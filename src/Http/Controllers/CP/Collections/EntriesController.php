@@ -8,6 +8,7 @@ use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Cp\Toast;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -27,6 +28,10 @@ class EntriesController extends CpController
     public function index(FilteredRequest $request, $collection)
     {
         $this->authorize('view', $collection);
+
+        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, $site)) {
+            return $response;
+        }
 
         $query = $this->indexQuery($collection);
 
@@ -270,6 +275,10 @@ class EntriesController extends CpController
     public function create(Request $request, $collection, $site)
     {
         $this->authorize('create', [EntryContract::class, $collection, $site]);
+
+        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, $site)) {
+            return $response;
+        }
 
         $blueprint = $collection->entryBlueprint($request->blueprint);
 
@@ -572,5 +581,15 @@ class EntriesController extends CpController
         return $collection
             ->sites()
             ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
+    }
+
+    protected function ensureCollectionIsAvailableOnSite($collection, $site)
+    {
+        if (Site::hasMultiple()) {
+            if (! $collection->sites()->contains($site->handle)) {
+                Toast::error(__('Collection is not available on this site (:handle)', ['handle' => $site->handle]));
+                return redirect()->back();
+            }
+        }
     }
 }
