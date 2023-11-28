@@ -201,13 +201,11 @@ class EntriesController extends CpController
 
         $values = $fields->process()->values();
 
-        $parent = $values->get('parent');
-
         if ($explicitBlueprint = $values->pull('blueprint')) {
             $entry->blueprint($explicitBlueprint);
         }
 
-        $values = $values->except(['slug', 'published', 'parent']);
+        $values = $values->except(['slug', 'published']);
 
         if ($entry->collection()->dated()) {
             $entry->date($entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date')));
@@ -226,11 +224,10 @@ class EntriesController extends CpController
         }
 
         if ($structure && ! $collection->orderable()) {
+            $parent = $values->get('parent');
             $this->validateParent($entry, $tree, $parent);
 
-            if ($entry->revisionsEnabled()) {
-                $entry->setSupplement('parent', $parent);
-            } else {
+            if (! $entry->revisionsEnabled()) {
                 $entry->afterSave(function ($entry) use ($parent, $tree) {
                     if ($parent && optional($tree->find($parent))->isRoot()) {
                         $parent = null;
@@ -240,6 +237,8 @@ class EntriesController extends CpController
                         ->move($entry->id(), $parent)
                         ->save();
                 });
+
+                $values->forget('parent');
             }
         }
 
@@ -451,7 +450,7 @@ class EntriesController extends CpController
 
         if ($entry->hasStructure()) {
             $values['parent'] = $entry->revisionsEnabled()
-                ? $entry->getSupplement('parent')
+                ? $entry->get('parent')
                 : array_filter([optional($entry->parent())->id()]);
         }
 
