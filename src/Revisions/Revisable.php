@@ -71,12 +71,16 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
+        $parent = $item->get('parent');
+
+        $item->remove('parent');
+
         $item
             ->published(true)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
 
-        if ($item->collection()->hasStructure() && $parent = $item->get('parent')) {
+        if ($item->collection()->hasStructure() && $parent) {
             $tree = $item->collection()->structure()->in($item->locale());
 
             if (optional($tree->find($parent))->isRoot()) {

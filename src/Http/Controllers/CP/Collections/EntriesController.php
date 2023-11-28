@@ -450,9 +450,11 @@ class EntriesController extends CpController
         $values = $values->all();
 
         if ($entry->hasStructure()) {
-            $values['parent'] = $entry->revisionsEnabled()
-                ? $entry->get('parent')
-                : array_filter([optional($entry->parent())->id()]);
+            $values['parent'] = array_filter([optional($entry->parent())->id()]);
+
+            if ($entry->revisionsEnabled() && $entry->has('parent')) {
+                $values['parent'] = [$entry->get('parent')];
+            }
         }
 
         if ($entry->collection()->dated()) {
