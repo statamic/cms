@@ -116,6 +116,7 @@ class UsersController extends CpController
         $this->authorize('create', UserContract::class);
 
         $blueprint = User::blueprint();
+        $blueprint->ensureFieldHasConfig('email', ['validate' => 'required']);
 
         $fields = $blueprint->fields()->preProcess();
 
