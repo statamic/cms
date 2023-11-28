@@ -59,9 +59,9 @@ class Field implements Arrayable
         return $path;
     }
 
-    public function fieldPath()
+    public function fieldPathKeys()
     {
-        $path = $this->parentField ? $this->parentField->fieldPath() : [];
+        $path = $this->parentField ? $this->parentField->fieldPathKeys() : [];
 
         if (isset($this->parentIndex)) {
             $path[] = $this->parentIndex;
@@ -74,7 +74,7 @@ class Field implements Arrayable
 
     public function fieldPathPrefix()
     {
-        return implode('.', $this->fieldPath());
+        return implode('.', $this->fieldPathKeys());
     }
 
     public function setPrefix($prefix)

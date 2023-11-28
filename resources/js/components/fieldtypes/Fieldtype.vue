@@ -59,7 +59,7 @@ export default {
             return this.value;
         },
 
-        fieldPath() {
+        fieldPathKeys() {
             const prefix = this.fieldPathPrefix || this.handle;
 
             return prefix.split('.');
