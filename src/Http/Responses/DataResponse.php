@@ -77,6 +77,9 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
+        // If there is a redirect value but no corresponding blueprint field, (e.g. someone
+        // manually set a redirect in the YAML), we'll need to resolve it manually since
+        // they might have set one of the magic values like @child or entry::some-id.
         $redirect = ResolveRedirect::resolve($redirect, $this->data);
 
         if ($redirect === 404) {
