@@ -57,7 +57,7 @@ abstract class Index
     {
         $this->deleteIndex();
 
-        $this->insertMultiple($this->searchables()->all());
+        $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
 
         return $this;
     }
