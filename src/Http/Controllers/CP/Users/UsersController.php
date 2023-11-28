@@ -129,7 +129,7 @@ class UsersController extends CpController
         $viewData = [
             'values' => (object) $fields->values()->only($additional)->all(),
             'meta' => (object) $fields->meta()->only($additional)->all(),
-            'fields' => collect($fields->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->ray()->all(),
+            'fields' => collect($fields->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
@@ -153,6 +153,12 @@ class UsersController extends CpController
         $fields = $blueprint->fields()->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
+
+        if ($request->input('_validate_only')) {
+            return [
+                'error' => false,
+            ];
+        }
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 

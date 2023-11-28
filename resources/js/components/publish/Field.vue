@@ -7,7 +7,7 @@
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
-            <label v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
+            <label v-if="showLabel" class="publish-field-label" :class="labelClasses" :for="fieldId">
                 <span
                     v-if="showLabelText"
                     class="mr-1"
@@ -156,8 +156,16 @@ export default {
                 this.isReadOnly ? 'read-only-field' : '',
                 this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
                 this.config.classes || '',
+                this.config.field_classes || '',
                 this.config.full_width_setting ? 'full-width-setting' : '',
                 { 'has-error': this.hasError || this.hasNestedError }
+            ];
+        },
+
+        labelClasses() {
+            return [
+                this.config.bold ? 'font-bold' : '',
+                this.config.label_classes || '',
             ];
         },
 

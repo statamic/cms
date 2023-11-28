@@ -32,7 +32,7 @@
             </div>
 
             <!-- Name -->
-            <div v-if="! separateNameFields" class="max-w-md mx-auto px-4 pb-20">
+            <div v-if="! separateNameFields" class="max-w-md mx-auto px-4" :class="additionalFields.length ? 'pb-10' : 'pb-20'">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Name') }}</label>
                 <input type="text" v-model="user.name" id="name" class="input-text" tabindex="2">
                 <div class="text-2xs text-gray-600 mt-2 flex items-center">
@@ -41,7 +41,7 @@
                 </div>
             </div>
 
-            <div v-else class="max-w-md mx-auto px-4 pb-20 flex space-x-4">
+            <div v-else class="max-w-md mx-auto px-4 flex space-x-4" :class="additionalFields.length ? 'pb-10' : 'pb-20'">
                 <div class="flex-1">
                     <label class="font-bold text-base mb-1" for="first_name">{{ __('First Name') }}</label>
                     <input type="text" v-model="user.first_name" id="first_name" class="input-text" tabindex="2">
@@ -56,6 +56,24 @@
                     <input type="text" v-model="user.last_name" id="last_name" class="input-text" tabindex="2">
                 </div>
             </div>
+
+            <publish-container
+                :name="storeName"
+                :blueprint="blueprint"
+                :values="additionalValues"
+                :meta="additionalMeta"
+                :track-dirty-state="false"
+                class="max-w-md mx-auto px-4 pb-20"
+                @updated="additionalValues = $event"
+                v-if="additionalFields.length"
+            >
+                <publish-fields
+                    slot-scope="{ setFieldValue, setFieldMeta }"
+                    :fields="publishFields"
+                    @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
+                />
+            </publish-container>
         </div>
 
         <!-- Step: Roles & Groups -->
@@ -151,30 +169,6 @@
             </div>
         </div>
 
-        <!-- Step: Additional Information -->
-        <div v-if="!completed && onAdditionalStep">
-            <div class="max-w-md mx-auto px-4 py-16 text-center">
-                <h1 class="mb-6">{{ __('Additional Information') }}</h1>
-            </div>
-
-            <publish-container
-                :name="storeName"
-                :blueprint="blueprint"
-                :values="additionalValues"
-                :meta="additionalMeta"
-                :track-dirty-state="false"
-                class="max-w-md mx-auto px-4 pb-20"
-                @updated="additionalValues = $event"
-            >
-                <publish-fields
-                    slot-scope="{ setFieldValue, setFieldMeta }"
-                    :fields="additionalFields"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                />
-            </publish-container>
-        </div>
-
         <!-- Post creation -->
         <div v-if="completed">
             <div class="max-w-md mx-auto px-4 py-16 text-center">
@@ -201,7 +195,7 @@
                 <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="! completed && ! onFirstStep">
                     &larr; {{ __('Previous')}}
                 </button>
-                <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="next" v-if="! completed && ! onLastStep">
+                <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="nextStep" v-if="! completed && ! onLastStep">
                     {{ __('Next')}} &rarr;
                 </button>
                 <button tabindex="4" class="btn-primary mx-4" @click="submit" v-if="! completed && onLastStep">
@@ -273,7 +267,6 @@ export default {
             let steps = [__('User Information')];
             if (this.canAssignPermissions) steps.push(__('Roles & Groups'));
             if (this.canSendInvitation) steps.push(__('Customize Invitation'));
-            if (this.additionalFields.length) steps.push(__('Additional Information'));
 
             return steps;
         },
@@ -289,18 +282,19 @@ export default {
         onInvitationStep() {
             return this.canAssignPermissions ? this.currentStep === 2 : this.currentStep === 1;
         },
-        onAdditionalStep() {
-            if (this.additionalFields.length < 1) {
-                return false;
-            }
-
-            return this.canAssignPermissions ? this.currentStep === 3 : this.currentStep === 2;
-        },
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
         },
         isValidEmail() {
             return this.user.email && isEmail(this.user.email)
+        },
+        publishFields() {
+            return this.additionalFields.map((field) => {
+                field.field_classes = 'p-0 pb-10';
+                field.bold = true;
+                field.label_classes = 'text-base mb-1';
+                return field;
+            });
         }
     },
 
@@ -321,12 +315,29 @@ export default {
                 this.$toast.error(error.response.data.message);
             });
         },
-        submit() {
+        nextStep() {
+            if (this.currentStep > 1) {
+                this.next();
+                return;
+            }
+
+            this.submit(true);
+        },
+        submit(validateOnly) {
             let payload = {...this.user, ...this.additionalValues, invitation: this.invitation};
+
+            if (validateOnly) {
+                payload._validate_only = true;
+            }
 
             this.clearErrors();
 
             this.$axios.post(this.route, payload).then(response => {
+                if (payload._validate_only) {
+                    this.next();
+                    return;
+                }
+
                 if (this.invitation.send) {
                     window.location = response.data.redirect;
                 } else {
