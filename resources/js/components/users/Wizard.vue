@@ -22,16 +22,18 @@
                 :values="values"
                 :meta="meta"
                 :track-dirty-state="false"
-                class="max-w-md mx-auto px-4 pb-20"
+                class="max-w-md mx-auto -mt-6 py-0 px-4 pb-20"
                 @updated="values = $event"
-                v-if="fields.length"
             >
-                <publish-fields
-                    slot-scope="{ setFieldValue, setFieldMeta }"
-                    :fields="publishFields"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                />
+                <div slot-scope="{ setFieldValue, setFieldMeta }">
+                    <div class="-mx-6">
+                        <publish-fields
+                            :fields="publishFields"
+                            @updated="setFieldValue"
+                            @meta-updated="setFieldMeta"
+                        />
+                    </div>
+                </div>
             </publish-container>
         </div>
 
@@ -246,7 +248,7 @@ export default {
         },
         publishFields() {
             return this.fields.map((field) => {
-                return {...field, field_classes: 'p-0 pb-10', bold: true, label_classes: 'text-base mb-1'};
+                return {...field, field_classes: 'pb-4', bold: true, label_classes: 'text-base mb-1'};
             });
         }
     },
