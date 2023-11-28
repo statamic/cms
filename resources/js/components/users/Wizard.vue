@@ -290,10 +290,7 @@ export default {
         },
         publishFields() {
             return this.additionalFields.map((field) => {
-                field.field_classes = 'p-0 pb-10';
-                field.bold = true;
-                field.label_classes = 'text-base mb-1';
-                return field;
+                return {...field, field_classes: 'p-0 pb-10', bold: true, label_classes: 'text-base mb-1'};
             });
         }
     },
