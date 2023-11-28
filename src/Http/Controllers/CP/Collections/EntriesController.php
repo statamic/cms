@@ -223,8 +223,9 @@ class EntriesController extends CpController
             $tree = $entry->structure()->in($entry->locale());
         }
 
+        $parent = $values->get('parent');
+
         if ($structure && ! $collection->orderable()) {
-            $parent = $values->get('parent');
             $this->validateParent($entry, $tree, $parent);
 
             if (! $entry->revisionsEnabled()) {
