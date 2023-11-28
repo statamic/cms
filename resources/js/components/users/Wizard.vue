@@ -16,56 +16,15 @@
                 <p class="text-gray" v-text="__('messages.user_wizard_intro')" />
             </div>
 
-            <!-- Email Address -->
-            <div class="max-w-md mx-auto px-4 pb-10">
-                <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}*</label>
-                <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
-
-                <div class="text-2xs text-red-500 mt-2 flex items-center" v-if="userExists">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
-                    {{ __('This user already exists.') }}
-                </div>
-                <div class="text-2xs text-gray-600 mt-2 flex items-center" v-else>
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
-                    {{ __('messages.user_wizard_email_instructions') }}
-                </div>
-            </div>
-
-            <!-- Name -->
-            <div v-if="! separateNameFields" class="max-w-md mx-auto px-4" :class="additionalFields.length ? 'pb-10' : 'pb-20'">
-                <label class="font-bold text-base mb-1" for="name">{{ __('Name') }}</label>
-                <input type="text" v-model="user.name" id="name" class="input-text" tabindex="2">
-                <div class="text-2xs text-gray-600 mt-2 flex items-center">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
-                    {{ __('messages.user_wizard_name_instructions') }}
-                </div>
-            </div>
-
-            <div v-else class="max-w-md mx-auto px-4 flex space-x-4" :class="additionalFields.length ? 'pb-10' : 'pb-20'">
-                <div class="flex-1">
-                    <label class="font-bold text-base mb-1" for="first_name">{{ __('First Name') }}</label>
-                    <input type="text" v-model="user.first_name" id="first_name" class="input-text" tabindex="2">
-                    <div class="text-2xs text-gray-600 mt-2 flex items-center">
-                        <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
-                        {{ __('messages.user_wizard_name_instructions') }}
-                    </div>
-                </div>
-
-                <div class="flex-1">
-                    <label class="font-bold text-base mb-1" for="last_name">{{ __('Last Name') }}</label>
-                    <input type="text" v-model="user.last_name" id="last_name" class="input-text" tabindex="2">
-                </div>
-            </div>
-
             <publish-container
                 :name="storeName"
                 :blueprint="blueprint"
-                :values="additionalValues"
-                :meta="additionalMeta"
+                :values="values"
+                :meta="meta"
                 :track-dirty-state="false"
                 class="max-w-md mx-auto px-4 pb-20"
-                @updated="additionalValues = $event"
-                v-if="additionalFields.length"
+                @updated="values = $event"
+                v-if="fields.length"
             >
                 <publish-fields
                     slot-scope="{ setFieldValue, setFieldMeta }"
@@ -165,7 +124,7 @@
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-4 pb-20" v-else>
-                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
+                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share_before', { email: values.email })" />
             </div>
         </div>
 
@@ -178,7 +137,7 @@
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-4 pb-10">
-                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
+                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share', { email: values.email })" />
             </div>
             <div class="max-w-md mx-auto px-4 pb-10">
                 <label class="font-bold text-base mb-1" for="email">{{ __('Activation URL') }}</label>
@@ -186,7 +145,7 @@
             </div>
             <div class="max-w-md mx-auto px-4 pb-20">
                 <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="user.email" />
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="values.email" />
             </div>
         </div>
 
@@ -217,6 +176,7 @@
 
 import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
+import uniq from 'underscore/modules/uniq.js';
 
 export default {
 
@@ -233,15 +193,14 @@ export default {
         separateNameFields: { type: Boolean },
         canSendInvitation: { type: Boolean },
         blueprint: { type: Object },
-        initialAdditionalValues: { type: Object },
-        additionalFields: { type: Array },
-        additionalMeta: { type: Object }
+        initialValues: { type: Object },
+        fields: { type: Array },
+        meta: { type: Object }
     },
 
     data() {
         return {
             user: {
-                email: null,
                 super: this.canCreateSupers,
                 roles: [],
                 groups: []
@@ -258,7 +217,7 @@ export default {
             errors: {},
             error: null,
             storeName: 'userwizard',
-            additionalValues: this.initialAdditionalValues,
+            values: this.initialValues,
         }
     },
 
@@ -285,11 +244,8 @@ export default {
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
         },
-        isValidEmail() {
-            return this.user.email && isEmail(this.user.email)
-        },
         publishFields() {
-            return this.additionalFields.map((field) => {
+            return this.fields.map((field) => {
                 return {...field, field_classes: 'p-0 pb-10', bold: true, label_classes: 'text-base mb-1'};
             });
         }
@@ -299,29 +255,24 @@ export default {
         canGoToStep(step) {
             if (this.completed) return false;
 
-            if (step >= 1) {
-                return this.isValidEmail && ! this.userExists;
-            }
-
             return true;
         },
-        checkIfUserExists() {
-            this.$axios.post(cp_url('user-exists'), {email: this.user.email}).then(response => {
+        checkIfUserExists(email) {
+            this.$axios.post(cp_url('user-exists'), { email }).then(response => {
                 this.userExists = response.data.exists
             }).catch(error => {
                 this.$toast.error(error.response.data.message);
             });
         },
         nextStep() {
-            if (this.currentStep > 1) {
-                this.next();
-                return;
+            if (this.onUserInfoStep) {
+                return this.submit(true).then(this.next).catch(() => {})
             }
 
-            this.submit(true);
+            this.next();
         },
         submit(validateOnly) {
-            let payload = {...this.user, ...this.additionalValues, invitation: this.invitation};
+            let payload = {...this.user, ...this.values, invitation: this.invitation};
 
             if (validateOnly === true) {
                 payload._validate_only = true;
@@ -329,9 +280,8 @@ export default {
 
             this.clearErrors();
 
-            this.$axios.post(this.route, payload).then(response => {
+            return this.$axios.post(this.route, payload).then(response => {
                 if (payload._validate_only) {
-                    this.next();
                     return;
                 }
 
@@ -342,7 +292,10 @@ export default {
                     this.editUrl = response.data.redirect;
                     this.activationUrl = response.data.activationUrl;
                 }
-            }).catch(e => this.handleAxiosError(e));
+            }).catch(e => {
+                this.handleAxiosError(e);
+                throw e;
+            });
         },
         handleAxiosError(e) {
             if (e.response && e.response.status === 422) {
@@ -361,14 +314,23 @@ export default {
     },
 
     watch: {
-        'user.email': function(email) {
-            if (this.isValidEmail) {
-                this.checkIfUserExists()
+        'values.email': function(email) {
+            if (email && isEmail(email)) this.checkIfUserExists(email);
+        },
+
+        userExists(exists) {
+            let emailErrors = this.errors.email || [];
+            const error = __('statamic::validation.unique');
+            if (exists) {
+                emailErrors.push(error);
+            } else {
+                emailErrors = emailErrors.filter(error => error !== error);
             }
+            this.errors = { ...this.errors, email: uniq(emailErrors) };
         },
 
         'errors': function (errors) {
-            this.$store.commit(`publish/${this.storeName}/setErrors`, errors);
+            if (this.onUserInfoStep) this.$store.commit(`publish/${this.storeName}/setErrors`, errors);
         }
     },
 

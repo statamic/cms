@@ -123,7 +123,7 @@ class UsersController extends CpController
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
         $additional = $fields->all()
-            ->reject(fn ($field) => in_array($field->handle(), ['email', 'name', 'first_name', 'last_name', 'roles', 'groups']))
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups']))
             ->keys();
 
         $viewData = [
@@ -150,7 +150,7 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->addValues($request->all());
+        $fields = $blueprint->fields()->except(['roles', 'groups'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
@@ -158,7 +158,7 @@ class UsersController extends CpController
             return [];
         }
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email']);
 
         $user = User::make()
             ->email($request->email)
