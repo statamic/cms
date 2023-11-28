@@ -155,9 +155,7 @@ class UsersController extends CpController
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
         if ($request->input('_validate_only')) {
-            return [
-                'error' => false,
-            ];
+            return [];
         }
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
