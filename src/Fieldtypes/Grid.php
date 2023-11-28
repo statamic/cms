@@ -122,7 +122,7 @@ class Grid extends Fieldtype
         ]);
     }
 
-    public function fields($index)
+    public function fields($index = -1)
     {
         return new Fields($this->config('fields'), $this->field()->parent(), $this->field(), $index);
     }
@@ -189,7 +189,7 @@ class Grid extends Fieldtype
     {
         return [
             'defaults' => $this->defaultRowData()->all(),
-            'new' => $this->fields(-1)->meta()->all(),
+            'new' => $this->fields()->meta()->all(),
             'existing' => collect($this->field->value())->mapWithKeys(function ($row, $index) {
                 return [$row['_id'] => $this->fields($index)->addValues($row)->meta()];
             })->toArray(),
@@ -198,7 +198,7 @@ class Grid extends Fieldtype
 
     protected function defaultRowData()
     {
-        return $this->fields(-1)->all()->map(function ($field) {
+        return $this->fields()->all()->map(function ($field) {
             return $field->fieldtype()->preProcess($field->defaultValue());
         });
     }

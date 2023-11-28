@@ -538,13 +538,13 @@ class Bard extends Replicator
         })->toArray();
 
         $defaults = collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
-            return $this->fields($handle, -1)->all()->map(function ($field) {
+            return $this->fields($handle)->all()->map(function ($field) {
                 return $field->fieldtype()->preProcess($field->defaultValue());
             })->all();
         })->all();
 
         $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
-            return $this->fields($handle, -1)->addValues($defaults[$handle])->meta()->put('_', '_');
+            return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
         })->toArray();
 
         $previews = collect($existing)->map(function ($fields) {
