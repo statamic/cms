@@ -23,6 +23,7 @@ use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Forms\Exporters\Exporter;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Form implements Arrayable, Augmentable, FormContract
@@ -34,6 +35,7 @@ class Form implements Arrayable, Augmentable, FormContract
     protected $blueprint;
     protected $honeypot;
     protected $store;
+    protected $deleteAttachments = false;
     protected $email;
     protected $metrics;
     protected $afterSaveCallbacks = [];
@@ -108,6 +110,21 @@ class Form implements Arrayable, Augmentable, FormContract
             })
             ->setter(function ($store) {
                 return $store === false ? false : null;
+            })
+            ->args(func_get_args());
+    }
+
+     /**
+     * Get or set the deleteAttachments field.
+     *
+     * @param  mixed  $store
+     * @return mixed
+     */
+    public function deleteAttachments($deleteAttachments = null)
+    {
+        return $this->fluentlyGetOrSet('deleteAttachments')
+            ->setter(function ($deleteAttachments) {
+                return $deleteAttachments === true ? true : false;
             })
             ->args(func_get_args());
     }
@@ -200,6 +217,10 @@ class Form implements Arrayable, Augmentable, FormContract
             $data['store'] = false;
         }
 
+        if ($this->deleteAttachments === true) {
+            $data['delete_attachments'] = true;
+        }
+
         File::put($this->path(), YAML::dump($data));
 
         foreach ($afterSaveCallbacks as $callback) {
@@ -240,11 +261,12 @@ class Form implements Arrayable, Augmentable, FormContract
                     'title',
                     'honeypot',
                     'store',
+                    'delete_attachments',
                     'email',
                 ]);
             })
             ->each(function ($value, $property) {
-                $this->{$property}($value);
+                $this->{Str::camel($property)}($value);
             });
 
         return $this;

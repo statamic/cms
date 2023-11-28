@@ -144,6 +144,7 @@ class FormsController extends CpController
             'title' => $form->title(),
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
+            'delete_attachments' => $form->deleteAttachments(),
             'email' => $form->email(),
         ];
 
@@ -174,6 +175,7 @@ class FormsController extends CpController
             ->title($values['title'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
+            ->deleteAttachments($values['delete_attachments'])
             ->email($values['email']);
 
         $form->save();
@@ -225,6 +227,13 @@ class FormsController extends CpController
                         'display' => __('Store Submissions'),
                         'type' => 'toggle',
                         'instructions' => __('statamic::messages.form_configure_store_instructions'),
+                        'width' => 50,
+                    ],
+                    'delete_attachments' => [
+                        'display' => __('Delete Attachments after Submission?'),
+                        'type' => 'toggle',
+                        'instructions' => __('statamic::messages.form_configure_delete_attachments_instructions'),
+                        'width' => 50,
                     ],
                 ],
             ],
