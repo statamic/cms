@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
+use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
@@ -12,8 +13,13 @@ use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
+use Statamic\Exceptions\AssetContainerNotFoundException;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
+use Statamic\Fields\Field;
+use Statamic\Fieldtypes\Assets\UndefinedContainerException;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -122,6 +128,37 @@ class Submission implements Augmentable, SubmissionContract
         return collect($uploadedFiles)->map(function ($files, $handle) {
             return AssetsUploader::field($this->fields()->get($handle))->upload($files);
         })->all();
+    }
+
+    public function deleteAttachments(): void
+    {
+        $this->blueprint()->fields()->all()
+            ->filter(fn (Field $field) => $field->type() === 'assets')
+            ->each(function (Field $field) {
+                $assets = Arr::wrap($this->get($field->handle(), []));
+                $assetContainer = $this->resolveAssetContainerForField($field);
+
+                collect($assets)->each(function ($path) use ($assetContainer) {
+                    $assetContainer->asset($path)?->delete();
+                });
+            });
+    }
+
+    protected function resolveAssetContainerForField(Field $field): AssetContainerContract
+    {
+        if ($configured = $field->get('container')) {
+            if ($container = AssetContainer::find($configured)) {
+                return $container;
+            }
+
+            throw new AssetContainerNotFoundException($configured);
+        }
+
+        if (($containers = AssetContainer::all())->count() === 1) {
+            return $containers->first();
+        }
+
+        throw new UndefinedContainerException;
     }
 
     public function afterSave($callback)

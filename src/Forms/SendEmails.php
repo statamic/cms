@@ -4,8 +4,10 @@ namespace Statamic\Forms;
 
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Forms\DeleteTemporaryAttachments;
 use Statamic\Sites\Site;
 
 class SendEmails
@@ -23,16 +25,20 @@ class SendEmails
 
     public function handle()
     {
-        $this->jobs()->each(fn ($job) => Bus::dispatch($job));
+        Bus::chain($this->jobs())->dispatch();
     }
 
-    private function jobs()
+    private function jobs(): Collection
     {
-        return $this->emailConfigs($this->submission)->map(function ($config) {
-            $class = config('statamic.forms.send_email_job');
+        return $this->emailConfigs($this->submission)
+            ->map(function ($config) {
+                $class = config('statamic.forms.send_email_job');
 
-            return new $class($this->submission, $this->site, $config);
-        });
+                return new $class($this->submission, $this->site, $config);
+            })
+            ->when($this->submission->form()->deleteAttachments(), function ($jobs) {
+                $jobs->push(new DeleteTemporaryAttachments($this->submission));
+            });
     }
 
     private function emailConfigs($submission)
