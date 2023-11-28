@@ -28,7 +28,7 @@
                 <div slot-scope="{ setFieldValue, setFieldMeta }">
                     <div class="-mx-6">
                         <publish-fields
-                            :fields="publishFields"
+                            :fields="fields"
                             @updated="setFieldValue"
                             @meta-updated="setFieldMeta"
                         />
@@ -173,6 +173,13 @@
     </div>
 </template>
 
+<style>
+.publish-fields .form-group .field-inner > label {
+    @apply text-base font-bold mb-1;
+    & + .help-block { @apply -mt-1 !important; }
+}
+</style>
+
 <script>
 // Yer a wizard Harry
 
@@ -245,11 +252,6 @@ export default {
         },
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
-        },
-        publishFields() {
-            return this.fields.map((field) => {
-                return {...field, field_classes: 'pb-4', bold: true, label_classes: 'text-base mb-1'};
-            });
         }
     },
 
