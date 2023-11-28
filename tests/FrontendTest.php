@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Facades\Statamic\CP\LivePreview;
+use Facades\Statamic\Routing\ResolveRedirect;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -815,43 +816,16 @@ class FrontendTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider redirectProviderNoBlueprint
-     */
-    public function redirect_is_followed_when_no_field_is_present_in_blueprint($dataValue, $expectedStatus, $expectedLocation)
-    {
-        $entry = $this->createPage('about', [
-            'with' => [
-                'title' => 'About',
-                'redirect' => $dataValue, // this should not be used - the augmented value should.
-            ],
-        ])->save();
-
-        $response = $this->get('/about');
-
-        if ($expectedStatus === 302) {
-            $response->assertRedirect($expectedLocation);
-        } elseif ($expectedStatus === 200) {
-            $response->assertOk();
-        } elseif ($expectedStatus === 404) {
-            $response->assertNotFound();
-        } else {
-            throw new \Exception('Test not set up to handle status code: '.$expectedStatus);
-        }
-    }
-
     public function redirectProvider()
     {
         return [
             'valid redirect' => [
                 '/shouldnt-be-used',   // its got a value
-                '/target',             // the fieldtype will augmented to this
+                '/target',             // the fieldtype will augment to this
                 302,                   // its a redirect
                 '/target',             // to here
             ],
-            'child redirect' => [
+            'invalid redirect' => [
                 'something',           // its got a value
                 null,                  // the fieldtype will augment to this because its an invalid reference
                 404,                   // so it should 404
@@ -866,18 +840,71 @@ class FrontendTest extends TestCase
         ];
     }
 
+    /**
+     * @test
+     *
+     * @dataProvider redirectProviderNoBlueprint
+     */
+    public function redirect_is_followed_when_no_field_is_present_in_blueprint(
+        $dataValue,
+        $shouldResolve,
+        $resolvedValue,
+        $expectedStatus,
+        $expectedLocation
+    ) {
+        $entry = tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => $dataValue,
+            ],
+        ]))->save();
+
+        $mock = ResolveRedirect::shouldReceive('resolve');
+
+        if ($shouldResolve) {
+            $mock->with($dataValue, $entry)->andReturn($resolvedValue)->once();
+        } else {
+            $mock->never();
+        }
+
+        $response = $this->get('/about');
+
+        if ($expectedStatus === 302) {
+            $response->assertRedirect($expectedLocation);
+        } elseif ($expectedStatus === 200) {
+            $response->assertOk();
+        } elseif ($expectedStatus === 404) {
+            $response->assertNotFound();
+        } else {
+            throw new \Exception('Test not set up to handle status code: '.$expectedStatus);
+        }
+    }
+
     public function redirectProviderNoBlueprint()
     {
         return [
             'valid redirect' => [
-                '/target',             // its got a value
+                // A valid redirect could be a literal URL, "@child", "entry::id", etc.
+                // It's irrelevant for this test since we're mocking the resolver.
+                'something',           // the value
+                true,                  // the resolver will run, getting the above value
+                '/target',             // and return this.
                 302,                   // its a redirect
-                '/target',             // to here
+                '/target',             // to here.
             ],
             'missing redirect' => [
-                null,                  // its got a value
+                null,                  // its got no value
+                false,                 // so the resolver will not be called at all.
+                null,                  // irrelevant since it won't be called.
                 200,                   // since there's no redirect, its a successful response
                 null,                  // and not a redirect
+            ],
+            'intentional 404' => [
+                '404',                 // its got a value
+                true,                  // the resolver will run, getting the above value,
+                404,                   // and return this
+                404,                   // so it should 404
+                null,                  // and not redirect
             ],
         ];
     }
