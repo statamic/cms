@@ -201,13 +201,13 @@ class EntriesController extends CpController
 
         $values = $fields->process()->values();
 
-        $parent = $values->pull('parent');
+        $parent = $values->get('parent');
 
         if ($explicitBlueprint = $values->pull('blueprint')) {
             $entry->blueprint($explicitBlueprint);
         }
 
-        $values = $values->except(['slug', 'published']);
+        $values = $values->except(['slug', 'published', 'parent']);
 
         if ($entry->collection()->dated()) {
             $entry->date($entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date')));
@@ -228,15 +228,19 @@ class EntriesController extends CpController
         if ($structure && ! $collection->orderable()) {
             $this->validateParent($entry, $tree, $parent);
 
-            $entry->afterSave(function ($entry) use ($parent, $tree) {
-                if ($parent && optional($tree->find($parent))->isRoot()) {
-                    $parent = null;
-                }
+            if ($entry->revisionsEnabled()) {
+                $entry->setSupplement('parent', $parent);
+            } else {
+                $entry->afterSave(function ($entry) use ($parent, $tree) {
+                    if ($parent && optional($tree->find($parent))->isRoot()) {
+                        $parent = null;
+                    }
 
-                $tree
-                    ->move($entry->id(), $parent)
-                    ->save();
-            });
+                    $tree
+                        ->move($entry->id(), $parent)
+                        ->save();
+                });
+            }
         }
 
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
@@ -446,7 +450,9 @@ class EntriesController extends CpController
         $values = $values->all();
 
         if ($entry->hasStructure()) {
-            $values['parent'] = array_filter([optional($entry->parent())->id()]);
+            $values['parent'] = $entry->revisionsEnabled()
+                ? $entry->getSupplement('parent')
+                : array_filter([optional($entry->parent())->id()]);
         }
 
         if ($entry->collection()->dated()) {

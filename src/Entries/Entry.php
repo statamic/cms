@@ -590,6 +590,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             'slug' => $this->slug(),
             'published' => $this->published(),
             'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
+            'parent' => $this->getSupplement('parent') ?? $this->parent()?->id(),
             'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
         ];
     }
@@ -608,6 +609,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             ->published($attrs['published'])
             ->data($attrs['data'])
             ->slug($attrs['slug']);
+
+        if ($this->structure()) {
+            $entry->setSupplement('parent', $attrs['parent']);
+        }
 
         if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
             $entry->date(Carbon::createFromTimestamp($date));
