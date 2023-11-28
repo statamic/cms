@@ -76,6 +76,18 @@ trait Revisable
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
 
+        if ($item->collection()->hasStructure() && $parent = $item->getSupplement('parent')) {
+            $tree = $item->collection()->structure()->in($item->locale());
+
+            if (optional($tree->find($parent))->isRoot()) {
+                $parent = null;
+            }
+
+            $tree
+                ->move($this->id(), $parent)
+                ->save();
+        }
+
         $item
             ->makeRevision()
             ->user($user)
