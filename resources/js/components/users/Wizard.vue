@@ -323,7 +323,7 @@ export default {
         submit(validateOnly) {
             let payload = {...this.user, ...this.additionalValues, invitation: this.invitation};
 
-            if (validateOnly) {
+            if (validateOnly === true) {
                 payload._validate_only = true;
             }
 
