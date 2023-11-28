@@ -91,7 +91,6 @@ class EntryRevisionsTest extends TestCase
             'slug' => 'test',
             'id' => '1',
             'date' => 1482624000,
-            'parent' => null,
             'data' => [
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -148,7 +147,6 @@ class EntryRevisionsTest extends TestCase
             'slug' => 'test',
             'id' => '1',
             'date' => 1293235200, // 2010-12-25
-            'parent' => null,
             'data' => [
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -206,7 +204,6 @@ class EntryRevisionsTest extends TestCase
             'slug' => 'test',
             'id' => '1',
             'date' => 1293235200, // 2010-12-25
-            'parent' => null,
             'data' => [
                 'blueprint' => 'test',
                 'title' => 'Title',
