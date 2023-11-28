@@ -534,7 +534,7 @@ class Bard extends Replicator
         })->mapWithKeys(function ($set, $index) {
             $values = $set['attrs']['values'];
 
-            return [$set['attrs']['id'] => $this->fields($set['type'], $index)->addValues($values)->meta()->put('_', '_')];
+            return [$set['attrs']['id'] => $this->fields($values['type'], $index)->addValues($values)->meta()->put('_', '_')];
         })->toArray();
 
         $defaults = collect($this->flattenedSetsConfig())->map(function ($set, $handle) {

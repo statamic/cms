@@ -183,14 +183,14 @@ class Replicator extends Fieldtype
     {
         return collect($values)->reject(function ($set, $key) {
             return array_get($set, 'enabled', true) === false;
-        })->map(function ($set) use ($shallow) {
+        })->map(function ($set, $index) use ($shallow) {
             if (! Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields")) {
                 return $set;
             }
 
             $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
 
-            $values = $this->fields($set['type'])->addValues($set)->{$augmentMethod}()->values();
+            $values = $this->fields($set['type'], $index)->addValues($set)->{$augmentMethod}()->values();
 
             return new Values($values->merge([RowId::handle() => $set[RowId::handle()] ?? null, 'type' => $set['type']])->all());
         })->values()->all();
