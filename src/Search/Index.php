@@ -2,7 +2,6 @@
 
 namespace Statamic\Search;
 
-use Illuminate\Support\LazyCollection;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Support\Arr;
 
@@ -58,7 +57,7 @@ abstract class Index
     {
         $this->deleteIndex();
 
-        $this->insertLazily($this->searchables()->lazy());
+        $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
 
         return $this;
     }
@@ -84,13 +83,6 @@ abstract class Index
         });
 
         $this->insertDocuments($documents);
-
-        return $this;
-    }
-
-    public function insertLazily(LazyCollection $providers)
-    {
-        $providers->each(fn ($documents) => $this->insertMultiple($documents));
 
         return $this;
     }
