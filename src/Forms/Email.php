@@ -132,10 +132,15 @@ class Email extends Mailable
     protected function addData()
     {
         $augmented = $this->submission->toAugmentedArray();
+        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']));
+
+        if (array_has($this->config, 'attachments')) {
+            $fields = $fields->reject(fn ($field) => $field['fieldtype'] === 'assets');
+        }
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
             'config' => config()->all(),
-            'fields' => $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form'])),
+            'fields' => $fields,
             'site_url' => Config::getSiteUrl(),
             'date' => now(),
             'now' => now(),
