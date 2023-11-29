@@ -114,7 +114,7 @@ class Form implements Arrayable, Augmentable, FormContract
             ->args(func_get_args());
     }
 
-     /**
+    /**
      * Get or set the deleteAttachments field.
      *
      * @param  mixed  $store
