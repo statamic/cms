@@ -7,7 +7,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Forms\DeleteTemporaryAttachments;
 use Statamic\Sites\Site;
 
 class SendEmails
@@ -23,9 +22,13 @@ class SendEmails
         $this->site = $site;
     }
 
-    public function handle()
+    public function handle(): void
     {
-        Bus::chain($this->jobs())->dispatch();
+        $jobs = $this->jobs();
+
+        if ($jobs->isNotEmpty()) {
+            Bus::chain($jobs)->dispatch();
+        }
     }
 
     private function jobs(): Collection
