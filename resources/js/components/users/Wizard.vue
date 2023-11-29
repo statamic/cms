@@ -156,7 +156,10 @@
                 <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="! completed && ! onFirstStep">
                     &larr; {{ __('Previous')}}
                 </button>
-                <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="nextStep" v-if="! completed && ! onLastStep">
+                <button tabindex="4" class="btn mx-4 w-32" @click="nextStep" v-if="onUserInfoStep">
+                    {{ __('Next')}} &rarr;
+                </button>
+                <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="nextStep" v-if="!onUserInfoStep && ! completed && ! onLastStep">
                     {{ __('Next')}} &rarr;
                 </button>
                 <button tabindex="4" class="btn-primary mx-4" @click="submit" v-if="! completed && onLastStep">
@@ -257,9 +260,14 @@ export default {
 
     methods: {
         canGoToStep(step) {
+            // If we've created the user, you shouldn't be allowed to go back anywhere.
             if (this.completed) return false;
 
-            return true;
+            // You can go back to the first step from anywhere.
+            if (step === 0) return true;
+
+            // Otherwise, you can only go to a step if the first one is complete/valid.
+            return this.valid;
         },
         checkIfUserExists(email) {
             this.$axios.post(cp_url('user-exists'), { email }).then(response => {
@@ -285,6 +293,8 @@ export default {
             this.clearErrors();
 
             return this.$axios.post(this.route, payload).then(response => {
+                this.valid = true;
+
                 if (payload._validate_only) {
                     return;
                 }
@@ -306,6 +316,7 @@ export default {
                 const { message, errors } = e.response.data;
                 this.error = message;
                 this.errors = errors;
+                this.valid = false;
                 this.$toast.error(message);
             } else {
                 this.$toast.error(__(e.response.data.message));
