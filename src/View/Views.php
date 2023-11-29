@@ -3,8 +3,8 @@
 namespace Statamic\View;
 
 use Illuminate\Support\Collection;
-use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class Views
 {
@@ -17,7 +17,7 @@ class Views
 
                 foreach ($iterator as $file) {
                     if ($file->isFile()) {
-                        $views->push(str_replace_first($path . '/', '', str_before($file->getPathname(), '.')));
+                        $views->push(str_replace_first($path.'/', '', str_before($file->getPathname(), '.')));
                     }
                 }
 
