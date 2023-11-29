@@ -23,7 +23,7 @@
                 <section :class="{ 'p-4': fullScreenMode }">
                     <div
                         v-if="!fullScreenMode"
-                        class="flex justify-end absolute top-7 right-0 @md:right-6"
+                        class="group-fieldtype-button-wrapper"
                     >
                         <button
                             v-if="config.fullscreen"
@@ -64,6 +64,16 @@
         </element-container>
     </portal>
 </template>
+
+<style>
+    .group-fieldtype-button-wrapper {
+        @apply flex justify-end absolute top-5 sm:top-7 right-0 @md:right-4 @lg:right-6;
+    }
+
+    .replicator-set .group-fieldtype-button-wrapper {
+        @apply top-5 right-4;
+    }
+</style>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
