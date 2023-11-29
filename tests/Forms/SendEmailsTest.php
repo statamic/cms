@@ -5,6 +5,7 @@ namespace Tests\Forms;
 use Illuminate\Support\Facades\Bus;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
+use Statamic\Forms\DeleteTemporaryAttachments;
 use Statamic\Forms\SendEmail;
 use Statamic\Forms\SendEmails;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -81,6 +82,32 @@ class SendEmailsTest extends TestCase
                 'to' => 'first@recipient.com',
                 'foo' => 'bar',
             ]),
+        ]);
+    }
+
+    /** @test */
+    public function it_dispatches_delete_attachments_job_after_dispatching_email_jobs()
+    {
+        Bus::fake();
+
+        $form = tap(FacadesForm::make('test')->email([
+            'from' => 'first@sender.com',
+            'to' => 'first@recipient.com',
+            'foo' => 'bar',
+        ])->deleteAttachments(true))->save();
+
+        (new SendEmails(
+            $submission = $form->makeSubmission(),
+            $site = Site::default(),
+        ))->handle();
+
+        Bus::assertChained([
+            new SendEmail($submission, $site, [
+                'from' => 'first@sender.com',
+                'to' => 'first@recipient.com',
+                'foo' => 'bar',
+            ]),
+            new DeleteTemporaryAttachments($submission),
         ]);
     }
 
