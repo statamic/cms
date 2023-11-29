@@ -176,9 +176,9 @@
     </div>
 </template>
 
-<style>
-.publish-fields .form-group .field-inner > label {
-    @apply text-base font-bold mb-1 !important;
+<style scoped>
+>>> .publish-fields .form-group .field-inner > label {
+    @apply text-base font-bold mb-1;
     & + .help-block { @apply -mt-1 !important; }
 }
 </style>
