@@ -212,7 +212,11 @@ class SubmissionTest extends TestCase
             'attachments' => ['foo.jpg', 'bar.pdf'],
         ]))->save();
 
+        $this->assertCount(2, $submission->get('attachments'));
+
         $submission->deleteAttachments();
+
+        $this->assertNull($submission->get('attachments'));
 
         Storage::disk('uploads')->assertMissing(['foo.jpg', 'bar.pdf']);
         Storage::disk('uploads')->assertExists(['baz.txt']);

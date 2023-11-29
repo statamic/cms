@@ -141,6 +141,8 @@ class Submission implements Augmentable, SubmissionContract
                 collect($assets)->each(function ($path) use ($assetContainer) {
                     $assetContainer->asset($path)?->delete();
                 });
+
+                $this->set($field->handle(), null)->saveQuietly();
             });
     }
 
