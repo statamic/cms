@@ -4,16 +4,21 @@ namespace Tests\Forms;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class SubmissionTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     public function the_id_is_generated_the_first_time_but_can_be_overridden()
     {
@@ -186,5 +191,30 @@ class SubmissionTest extends TestCase
         $submission->save();
 
         Event::assertNotDispatched(SubmissionSaved::class);
+    }
+
+    /** @test */
+    public function it_deletes_attachments()
+    {
+        Storage::fake('uploads');
+        AssetContainer::make('uploads')->disk('uploads')->save();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $form->blueprint()->ensureField('attachments', ['type' => 'assets', 'container' => 'uploads'])->save();
+
+        Storage::disk('uploads')->put('foo.jpg', '');
+        Storage::disk('uploads')->put('bar.pdf', '');
+        Storage::disk('uploads')->put('baz.txt', '');
+
+        Storage::disk('uploads')->assertExists(['foo.jpg', 'bar.pdf', 'baz.txt']);
+
+        $submission = tap($form->makeSubmission()->data([
+            'attachments' => ['foo.jpg', 'bar.pdf'],
+        ]))->save();
+
+        $submission->deleteAttachments();
+
+        Storage::disk('uploads')->assertMissing(['foo.jpg', 'bar.pdf']);
+        Storage::disk('uploads')->assertExists(['baz.txt']);
     }
 }
