@@ -2,7 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\View\Views;
 
 class TemplateFolder extends Relationship
 {
@@ -16,13 +18,6 @@ class TemplateFolder extends Relationship
 
     public function getIndexItems($request)
     {
-        return Folder::disk('resources')
-            ->getFoldersRecursively('views')
-            ->map(function ($folder) {
-                $folder = str_replace_first('views/', '', $folder);
-
-                return ['id' => $folder, 'title' => $folder];
-            })
-            ->values();
+        return Views::all();
     }
 }

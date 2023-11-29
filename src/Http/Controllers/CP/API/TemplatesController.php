@@ -2,17 +2,16 @@
 
 namespace Statamic\Http\Controllers\CP\API;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\View\Views;
 
 class TemplatesController extends CpController
 {
     public function index()
     {
-        return collect(Folder::disk('resources')->getFilesRecursively('views'))
-            ->map(function ($view) {
-                return str_replace_first('views/', '', str_before($view, '.'));
-            })
-            ->filter()->values();
+        return Views::all();
     }
 }
