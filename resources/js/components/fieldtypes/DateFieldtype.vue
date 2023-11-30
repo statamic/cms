@@ -162,12 +162,16 @@ export default {
             if (! this.value.date) return;
 
             if (this.isRange) {
-                return `${this.value.date.start} - ${this.value.date.end}`;
+                return Vue.moment(this.value.date.start).format(this.displayFormat) + ' – ' + Vue.moment(this.value.date.end).format(this.displayFormat);
             }
 
-            return this.hasTime
-                ? `${this.value.date} ${this.value.time}`
-                : this.value.date;
+            let preview = Vue.moment(this.value.date).format(this.displayFormat);
+
+            if (this.hasTime) {
+                preview += ` ${this.value.time}`;
+            }
+
+            return preview;
         },
 
     },
