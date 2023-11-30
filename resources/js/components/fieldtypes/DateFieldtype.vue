@@ -159,6 +159,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.value.date) return;
+
             return this.hasTime
                 ? `${this.value.date} ${this.value.time}`
                 : this.value.date;
