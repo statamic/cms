@@ -161,6 +161,10 @@ export default {
         replicatorPreview() {
             if (! this.value.date) return;
 
+            if (this.isRange) {
+                return `${this.value.date.start} - ${this.value.date.end}`;
+            }
+
             return this.hasTime
                 ? `${this.value.date} ${this.value.time}`
                 : this.value.date;
