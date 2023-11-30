@@ -39,6 +39,10 @@ export default {
     mounted() {
         autosize(this.$refs.textarea);
 
+        if (this.focus) {
+            this.$refs.input.focus();
+        }
+
         setTimeout(() => {
             this.updateSize();
         }, 1);
