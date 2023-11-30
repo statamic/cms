@@ -40,7 +40,7 @@ export default {
         autosize(this.$refs.textarea);
 
         if (this.focus) {
-            this.$refs.input.focus();
+            this.$refs.textarea.focus();
         }
 
         setTimeout(() => {
@@ -48,7 +48,7 @@ export default {
         }, 1);
         this.$events.$on('tab-switched', this.updateSize);
     },
-    
+
     beforeDestroy() {
         autosize.destroy(this.$refs.textarea);
     },
