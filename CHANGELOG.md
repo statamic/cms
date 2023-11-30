@@ -1,5 +1,18 @@
 # Release Notes
 
+## 4.38.0 (2023-11-30)
+
+### What's new
+- Support Laravel Precognition on front end forms. [#8886](https://github.com/statamic/cms/issues/8886) by @ryanmitchell
+
+### What's fixed
+- Fix 404 redirect after creating entry. [#9095](https://github.com/statamic/cms/issues/9095) by @jasonvarga
+- Fix date field not populating with current date, revert prevention of ensuring fields if they already exist. [#9094](https://github.com/statamic/cms/issues/9094) by @jasonvarga
+- Fix date replicator preview in more configurations. [#9093](https://github.com/statamic/cms/issues/9093) by @jasonvarga
+- Fix autofocus on textareas [#9089](https://github.com/statamic/cms/issues/9089) by @robdekort
+
+
+
 ## 4.37.0 (2023-11-29)
 
 ### What's new
