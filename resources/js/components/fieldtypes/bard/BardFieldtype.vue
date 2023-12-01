@@ -83,7 +83,7 @@
                 </set-picker>
             </floating-menu>
 
-            <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
+            <div class="bard-error" v-if="initError" v-html="initError"></div>
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
@@ -173,7 +173,7 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
-            invalid: false,
+            initError: null,
             pageHeader: null,
             escBinding: null,
             showAddSetButton: false,
@@ -631,11 +631,37 @@ export default {
                         try {
                             state.schema.nodeFromJSON(content);
                         } catch (error) {
-                            this.invalid = true;
+                            const invalidError = this.invalidError(error);
+                            if (invalidError) {
+                                this.initError = invalidError;
+                            } else {
+                                this.initError = __('Something went wrong');
+                                console.error(error);
+                            }
                         }
                     }
                 }
             });
+        },
+
+        invalidError(error) {
+            const messages = {
+                'Invalid text node in JSON': 'Invalid content, text values must be strings',
+                'Empty text nodes are not allowed': 'Invalid content, text values cannot be empty',
+            };
+
+            if (messages[error.message]) {
+                return __(messages[error.message]);
+            }
+
+            let match;
+            if (match = error.message.match(/^(?:There is no|Unknown) (?:node|mark) type:? (\w*)(?: in this schema)?$/)) {
+                if (match[1]) {
+                    return __('Invalid content, :type button/extension is not enabled', { type: match[1] });
+                } else {
+                    return __('Invalid content, nodes and marks must have a type');
+                }
+            }
         },
 
         valueToContent(value) {

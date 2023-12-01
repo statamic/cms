@@ -27,14 +27,18 @@ class StringFragment
         view()->addNamespace('nocache', $this->directory);
         File::makeDirectory($this->directory);
 
-        $this->createTemporaryView();
+        $path = $this->createTemporaryView();
 
         $this->data['__frontmatter'] = Arr::pull($this->data, 'view', []);
 
-        return view('nocache::'.$this->region, $this->data)->render();
+        $rendered = view('nocache::'.$this->region, $this->data)->render();
+
+        File::delete($path);
+
+        return $rendered;
     }
 
-    private function createTemporaryView()
+    private function createTemporaryView(): string
     {
         $path = vsprintf('%s/%s.%s', [
             $this->directory,
@@ -42,10 +46,10 @@ class StringFragment
             $this->extension,
         ]);
 
-        if (File::exists($path)) {
-            return;
+        if (! File::exists($path)) {
+            File::put($path, $this->contents);
         }
 
-        File::put($path, $this->contents);
+        return $path;
     }
 }

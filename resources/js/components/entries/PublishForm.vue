@@ -337,7 +337,7 @@ export default {
         canEditBlueprint: Boolean,
         canManagePublishState: Boolean,
         createAnotherUrl: String,
-        listingUrl: String,
+        initialListingUrl: String,
         collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
@@ -412,6 +412,10 @@ export default {
 
         published() {
             return this.values.published;
+        },
+
+        listingUrl() {
+            return `${this.initialListingUrl}?site=${this.site}`;
         },
 
         livePreviewUrl() {
@@ -558,6 +562,7 @@ export default {
                 .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
+                        this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
