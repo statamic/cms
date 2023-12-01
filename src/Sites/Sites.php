@@ -10,6 +10,7 @@ class Sites
     protected $config;
     protected $sites;
     protected $current;
+    protected static $currentUrlCallback;
 
     public function __construct($config)
     {
@@ -54,7 +55,11 @@ class Sites
     public function current()
     {
         return $this->current
-            ?? $this->findByUrl(request()->getUri())
+            ?? $this->findByUrl(
+                static::$currentUrlCallback
+                    ? call_user_func(static::$currentUrlCallback)
+                    : request()->getUri()
+            )
             ?? $this->default();
     }
 
