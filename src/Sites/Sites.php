@@ -68,6 +68,11 @@ class Sites
         $this->current = $this->get($site);
     }
 
+    public static function resolveCurrentUrl($callback)
+    {
+        static::$currentUrlCallback = $callback;
+    }
+
     public function selected()
     {
         return $this->get(session('statamic.cp.selected-site')) ?? $this->default();
