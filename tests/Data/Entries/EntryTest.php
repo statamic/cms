@@ -2207,23 +2207,23 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
 
         $collection->previewTargets([
-            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?uri={url}', 'refresh' => false],
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'refresh' => false],
             ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'refresh' => false],
         ]);
         $collection->save();
 
         $this->assertEquals([
-            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?uri={url}', 'url' => 'http://preview.domain.com/preview?uri=/blog/foo'],
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'url' => 'http://preview.domain.com/preview?url=/blog/foo'],
             ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'url' => 'http://preview.domain.com/preview?uri=/blog/foo'],
         ], $entryEn->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?uri={url}', 'url' => 'http://preview.domain.com/preview?uri=/fr/le-blog/le-foo'],
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'url' => 'http://preview.domain.com/preview?url=/fr/le-blog/le-foo'],
             ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'url' => 'http://preview.domain.com/preview?uri=/le-blog/le-foo'],
         ], $entryFr->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?uri={url}', 'url' => 'http://preview.domain.com/preview?uri=/das-blog/das-foo'],
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'url' => 'http://preview.domain.com/preview?url=/das-blog/das-foo'],
             ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'url' => 'http://preview.domain.com/preview?uri=/das-blog/das-foo'],
         ], $entryDe->previewTargets()->all());
     }
