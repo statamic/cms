@@ -14,6 +14,7 @@ use Statamic\CP\Columns;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\BlueprintCreated;
+use Statamic\Events\BlueprintCreating;
 use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
@@ -449,6 +450,10 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && BlueprintCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (BlueprintSaving::dispatch($this) === false) {
                 return false;
             }

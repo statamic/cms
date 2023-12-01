@@ -1,5 +1,6 @@
 <template>
     <textarea-input
+        :focus="config.focus"
         :name="name"
         :isReadOnly="isReadOnly"
         :limit="config.character_limit || null"

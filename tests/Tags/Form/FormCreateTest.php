@@ -757,7 +757,6 @@ EOT
     /** @test */
     public function it_can_render_an_inline_error_when_multiple_rules_fail()
     {
-        $this->withoutExceptionHandling();
         $this->assertEmpty(Form::find('contact')->submissions());
 
         $this

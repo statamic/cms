@@ -17,6 +17,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Events\GlobalVariablesCreated;
+use Statamic\Events\GlobalVariablesCreating;
 use Statamic\Events\GlobalVariablesDeleted;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Events\GlobalVariablesSaving;
@@ -127,6 +128,10 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && GlobalVariablesCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (GlobalVariablesSaving::dispatch($this) === false) {
                 return false;
             }

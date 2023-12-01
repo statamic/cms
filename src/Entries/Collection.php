@@ -11,8 +11,10 @@ use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\CollectionCreated;
+use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
 use Statamic\Events\CollectionSaved;
+use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -336,22 +338,20 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function ensureEntryBlueprintFields($blueprint)
     {
-        if (! $blueprint->hasField('title')) {
-            $blueprint->ensureFieldPrepended('title', [
-                'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
-                'required' => ! $auto,
-            ]);
+        $blueprint->ensureFieldPrepended('title', [
+            'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
+            'required' => ! $auto,
+        ]);
+
+        if ($this->requiresSlugs()) {
+            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true, 'validate' => 'max:200'], 'sidebar');
         }
 
-        if ($this->requiresSlugs() && ! $blueprint->hasField('slug')) {
-            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
-        }
-
-        if ($this->dated() && ! $blueprint->hasField('date')) {
+        if ($this->dated()) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
         }
 
-        if ($this->hasStructure() && ! $this->orderable() && ! $blueprint->hasField('parent')) {
+        if ($this->hasStructure() && ! $this->orderable()) {
             $blueprint->ensureField('parent', [
                 'type' => 'entries',
                 'collections' => [$this->handle()],
@@ -437,6 +437,14 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function save()
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
+
+        if ($isNew && CollectionCreating::dispatch($this) === false) {
+            return false;
+        }
+
+        if (CollectionSaving::dispatch($this) === false) {
+            return false;
+        }
 
         Facades\Collection::save($this);
 

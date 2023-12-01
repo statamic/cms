@@ -214,7 +214,7 @@ class CorePermissions
 
     protected function registerUtilities()
     {
-        Utility::all()->each(function ($utility) {
+        Utility::boot()->all()->each(function ($utility) {
             Permission::register("access {$utility->handle()} utility", function ($perm) use ($utility) {
                 return $perm
                     ->label(__('statamic::permissions.access_utility', ['title' => $utility->title()]))
