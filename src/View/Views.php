@@ -25,4 +25,22 @@ class Views
             })
             ->values();
     }
+
+    public static function directories(): Collection
+    {
+        return collect(config('view.paths'))
+            ->flatMap(function ($path) {
+                $directories = collect();
+                $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+
+                foreach ($iterator as $file) {
+                    if ($file->isDir() && !$iterator->isDot() && !$iterator->isLink()) {
+                        $directories->push(str_replace_first($path . '/', '', $file->getPathname()));
+                    }
+                }
+
+                return $directories->filter()->values();
+            })
+            ->values();
+    }
 }
