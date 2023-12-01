@@ -216,6 +216,10 @@ class Terms extends Relationship
 
     public function getIndexItems($request)
     {
+        if ($this->config('mode') == 'typeahead' && ! $request->search) {
+            return collect();
+        }
+
         $query = $this->getIndexQuery($request);
 
         if ($sort = $this->getSortColumn($request)) {
