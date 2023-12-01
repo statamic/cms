@@ -34,8 +34,8 @@ class Views
                 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
 
                 foreach ($iterator as $file) {
-                    if ($file->isDir() && !$iterator->isDot() && !$iterator->isLink()) {
-                        $directories->push(str_replace_first($path . '/', '', $file->getPathname()));
+                    if ($file->isDir() && ! $iterator->isDot() && ! $iterator->isLink()) {
+                        $directories->push(str_replace_first($path.'/', '', $file->getPathname()));
                     }
                 }
 

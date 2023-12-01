@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\Folder;
 use Statamic\View\Views;
 
 class TemplateFolder extends Relationship
