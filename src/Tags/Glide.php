@@ -168,6 +168,8 @@ class Glide extends Tags
 
             return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
         } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+
             return null;
         }
     }
