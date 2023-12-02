@@ -156,16 +156,20 @@ class Glide extends Tags
      */
     private function generateImage($item)
     {
-        $item = $this->normalizeItem($item);
-        $params = $this->getGlideParams($item);
+        try {
+            $item = $this->normalizeItem($item);
+            $params = $this->getGlideParams($item);
 
-        if (is_string($item) && Str::isUrl($item)) {
-            return Str::startsWith($item, ['http://', 'https://'])
-                ? $this->getGenerator()->generateByUrl($item, $params)
-                : $this->getGenerator()->generateByPath($item, $params);
+            if (is_string($item) && Str::isUrl($item)) {
+                return Str::startsWith($item, ['http://', 'https://'])
+                    ? $this->getGenerator()->generateByUrl($item, $params)
+                    : $this->getGenerator()->generateByPath($item, $params);
+            }
+
+            return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
+        } catch (\Exception $e) {
+            return null;
         }
-
-        return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
     }
 
     /**
