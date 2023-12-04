@@ -148,8 +148,6 @@ class Glide extends Tags
                 return $data;
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
-
-                return null;
             }
         })->filter()->all();
     }
