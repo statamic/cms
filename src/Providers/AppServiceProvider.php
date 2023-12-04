@@ -2,10 +2,12 @@
 
 namespace Statamic\Providers;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
@@ -26,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        Date::use(CarbonImmutable::class);
+
         $this->app->booted(function () {
             Statamic::runBootedCallbacks();
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
