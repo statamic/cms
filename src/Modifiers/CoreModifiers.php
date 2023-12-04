@@ -3,7 +3,7 @@
 namespace Statamic\Modifiers;
 
 use ArrayAccess;
-use Carbon\Carbon;
+use Carbon\CarbonInterface as Carbon;
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
