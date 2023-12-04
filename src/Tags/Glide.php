@@ -132,20 +132,26 @@ class Glide extends Tags
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
         return $items->map(function ($item) {
-            $data = ['url' => $this->generateGlideUrl($item)];
+            try {
+                $data = ['url' => $this->generateGlideUrl($item)];
 
-            if ($this->isValidExtension($item)) {
-                $path = $this->generateImage($item);
-                $attrs = Attributes::from(GlideManager::cacheDisk(), $path);
-                $data = array_merge($data, $attrs);
+                if ($this->isValidExtension($item)) {
+                    $path = $this->generateImage($item);
+                    $attrs = Attributes::from(GlideManager::cacheDisk(), $path);
+                    $data = array_merge($data, $attrs);
+                }
+
+                if ($item instanceof Augmentable) {
+                    $data = array_merge($item->toAugmentedArray(), $data);
+                }
+
+                return $data;
+            } catch (\Exception $e) {
+                \Log::error($e->getMessage());
+
+                return null;
             }
-
-            if ($item instanceof Augmentable) {
-                $data = array_merge($item->toAugmentedArray(), $data);
-            }
-
-            return $data;
-        })->all();
+        })->filter()->all();
     }
 
     /**
@@ -156,22 +162,16 @@ class Glide extends Tags
      */
     private function generateImage($item)
     {
-        try {
-            $item = $this->normalizeItem($item);
-            $params = $this->getGlideParams($item);
+        $item = $this->normalizeItem($item);
+        $params = $this->getGlideParams($item);
 
-            if (is_string($item) && Str::isUrl($item)) {
-                return Str::startsWith($item, ['http://', 'https://'])
-                    ? $this->getGenerator()->generateByUrl($item, $params)
-                    : $this->getGenerator()->generateByPath($item, $params);
-            }
-
-            return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-
-            return null;
+        if (is_string($item) && Str::isUrl($item)) {
+            return Str::startsWith($item, ['http://', 'https://'])
+                ? $this->getGenerator()->generateByUrl($item, $params)
+                : $this->getGenerator()->generateByPath($item, $params);
         }
+
+        return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
     }
 
     /**
