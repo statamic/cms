@@ -10,7 +10,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class FormsController extends CpController
