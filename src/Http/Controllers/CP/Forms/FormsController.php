@@ -10,6 +10,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class FormsController extends CpController
@@ -193,7 +194,7 @@ class FormsController extends CpController
 
     protected function editFormBlueprint($form)
     {
-        $fields = array_merge([
+        $fields = [
             'name' => [
                 'display' => __('Name'),
                 'fields' => [
@@ -317,7 +318,21 @@ class FormsController extends CpController
             // metrics
             // ...
 
-        ], Form::getConfigFor($form->handle()));
+        ];
+
+        foreach (Form::getConfigFor($form->handle()) as $handle => $config) {
+            $merged = false;
+            foreach ($fields as $fieldHandle => $fieldConfig) {
+                if ($fieldConfig['display'] == $config['display']) {
+                    $fields[$fieldHandle]['fields'] += $config['fields'];
+                    $merged = true;
+                }
+            }
+
+            if (! $merged) {
+                $fields[] = $config;
+            }
+        }
 
         return Blueprint::makeFromTabs($fields);
     }
