@@ -5,6 +5,7 @@ namespace Tests\Forms;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\FormCreated;
+use Statamic\Events\FormCreating;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
 use Statamic\Facades\Form;
@@ -44,6 +45,10 @@ class FormTest extends TestCase
             'foo' => 'bar',
             'roo' => 'rar',
         ], $form->data()->all());
+
+        Event::assertDispatched(FormCreating::class, function ($event) use ($form) {
+            return $event->form === $form;
+        });
 
         Event::assertDispatched(FormSaving::class, function ($event) use ($form) {
             return $event->form === $form;
@@ -92,8 +97,28 @@ class FormTest extends TestCase
             ->honeypot('winnie')
             ->saveQuietly();
 
+        Event::assertNotDispatched(FormCreating::class);
         Event::assertNotDispatched(FormSaving::class);
         Event::assertNotDispatched(FormSaved::class);
+        Event::assertNotDispatched(FormCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_form_doesnt_save()
+    {
+        Event::fake([FormCreated::class]);
+
+        Event::listen(FormCreating::class, function () {
+            return false;
+        });
+
+        $blueprint = (new Blueprint)->setHandle('post')->save();
+
+        $form = Form::make('contact_us')
+            ->title('Contact Us')
+            ->honeypot('winnie')
+            ->save();
+
         Event::assertNotDispatched(FormCreated::class);
     }
 

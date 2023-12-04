@@ -21,6 +21,7 @@ use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
+use Statamic\Events\EntryCreating;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
@@ -1267,6 +1268,9 @@ class EntryTest extends TestCase
         $return = $entry->save();
 
         $this->assertTrue($return);
+        Event::assertDispatched(EntryCreating::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
         Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
@@ -1313,6 +1317,7 @@ class EntryTest extends TestCase
         $return = $entry->saveQuietly();
 
         $this->assertTrue($return);
+        Event::assertNotDispatched(EntryCreating::class);
         Event::assertNotDispatched(EntrySaving::class);
         Event::assertNotDispatched(EntrySaved::class);
         Event::assertNotDispatched(EntryCreated::class);
@@ -1547,6 +1552,26 @@ class EntryTest extends TestCase
 
         $entry->save();
         $this->assertCount(1, Entry::all());
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_entry_doesnt_save()
+    {
+        Facades\Entry::spy();
+        Event::fake([EntryCreated::class]);
+
+        Event::listen(EntryCreating::class, function () {
+            return false;
+        });
+
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertFalse($return);
+        Facades\Entry::shouldNotHaveReceived('save');
+        Event::assertNotDispatched(EntryCreated::class);
     }
 
     /** @test */

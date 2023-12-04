@@ -337,7 +337,7 @@ export default {
         canEditBlueprint: Boolean,
         canManagePublishState: Boolean,
         createAnotherUrl: String,
-        listingUrl: String,
+        initialListingUrl: String,
         collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
@@ -412,6 +412,10 @@ export default {
 
         published() {
             return this.values.published;
+        },
+
+        listingUrl() {
+            return `${this.initialListingUrl}?site=${this.site}`;
         },
 
         livePreviewUrl() {
@@ -534,6 +538,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
+                if (! response.data.saved) {
+                    return this.$toast.error(__(`Couldn't save entry`));
+                }
                 this.title = response.data.data.title;
                 this.isWorkingCopy = true;
                 if (this.isBase) {

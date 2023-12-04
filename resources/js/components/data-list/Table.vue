@@ -263,8 +263,8 @@ export default {
         },
 
         checkboxClicked(row, index, $event) {
-            this.$refs.table.focus();
             if ($event.shiftKey && this.lastItemClicked !== null) {
+                this.$refs.table.focus();
                 this.selectRange(
                     Math.min(this.lastItemClicked, index),
                     Math.max(this.lastItemClicked, index)

@@ -1,5 +1,64 @@
 # Release Notes
 
+## 4.38.0 (2023-11-30)
+
+### What's new
+- Support Laravel Precognition on front end forms. [#8886](https://github.com/statamic/cms/issues/8886) by @ryanmitchell
+
+### What's fixed
+- Fix 404 redirect after creating entry. [#9095](https://github.com/statamic/cms/issues/9095) by @jasonvarga
+- Fix date field not populating with current date, revert prevention of ensuring fields if they already exist. [#9094](https://github.com/statamic/cms/issues/9094) by @jasonvarga
+- Fix date replicator preview in more configurations. [#9093](https://github.com/statamic/cms/issues/9093) by @jasonvarga
+- Fix autofocus on textareas [#9089](https://github.com/statamic/cms/issues/9089) by @robdekort
+
+
+
+## 4.37.0 (2023-11-29)
+
+### What's new
+- Add `group` field type. [#8836](https://github.com/statamic/cms/issues/8836) by @godismyjudge95
+- User creation wizard now shows all fields from the blueprint with validation. [#9003](https://github.com/statamic/cms/issues/9003) by @ryanmitchell
+- Tag conditions can query on sub-fields using dot notation. [#9069](https://github.com/statamic/cms/issues/9069) by @ryanmitchell
+- Search indexes are updated with better memory efficiency using lazy collections. [#9072](https://github.com/statamic/cms/issues/9072) by @ryanmitchell
+- The `ray` modifier can specify color. [#9073](https://github.com/statamic/cms/issues/9073) by @joschuba
+- Add `UrlInvalidated` event for when a URL is invalidated from the static cache. [#8902](https://github.com/statamic/cms/issues/8902) by @ryanmitchell
+- Add `Creating` events. [#7377](https://github.com/statamic/cms/issues/7377) by @ryanmitchell
+- Add option to append original filename to Glide URLs. [#8661](https://github.com/statamic/cms/issues/8661) by @ryanmitchell
+
+### What's improved
+- Improve replicator preview for Date Fieldtype. [#9057](https://github.com/statamic/cms/issues/9057) by @duncanmcclean
+- Make whole branches clickable in Entries fieldtype in tree view. [#9074](https://github.com/statamic/cms/issues/9074) by @duncanmcclean
+- Add validation to limit characters in slugs. [#9046](https://github.com/statamic/cms/issues/9046) by @duncanmcclean
+- Improve sanitization of Replicator set preview text. [#9047](https://github.com/statamic/cms/issues/9047) by @jasonvarga
+
+### What's fixed
+- Scope filters can return null. [#9058](https://github.com/statamic/cms/issues/9058) by @jonassiewertsen
+- Fix passing null to strtolower. [#9042](https://github.com/statamic/cms/issues/9042) by @miloslavkostir
+- Fix `redirect: @child` redirecting to `@child` when not a link fieldtype. [#9062](https://github.com/statamic/cms/issues/9062) by @ryanmitchell
+- Prevent existing term data being overwritten in terms fieldtype. [#9076](https://github.com/statamic/cms/issues/9076) by @ryanmitchell
+- Translate widget header and collection widget title. [#9077](https://github.com/statamic/cms/issues/9077) by @ryanmitchell
+- Fix redirect actions showing a toast error. [#9054](https://github.com/statamic/cms/issues/9054) by @ryanmitchell
+- Fix appropriate site not being used in the listing when redirecting from an entry. [#9075](https://github.com/statamic/cms/issues/9075) by @duncanmcclean
+- Use `RedirectIfAuthorized` middleware on password reset & activate pages. [#9053](https://github.com/statamic/cms/issues/9053) by @ryanmitchell
+- Allow focus on textarea fieldtypes. [#9055](https://github.com/statamic/cms/issues/9055) by @robdekort
+- Fix pagination in relationship fieldtype causing page to scroll to the top. [#9060](https://github.com/statamic/cms/issues/9060) by @duncanmcclean
+- Fix error when copying assets across filesystems. [#9065](https://github.com/statamic/cms/issues/9065) by @mbale
+- Fix utility permissions not showing when using route caching. [#9059](https://github.com/statamic/cms/issues/9059) by @duncanmcclean
+- Revert auto-population of array fieldtype options. [#9066](https://github.com/statamic/cms/issues/9066) by @duncanmcclean
+- Fix checkbox selection in listing tables jumping on Safari. [#9052](https://github.com/statamic/cms/issues/9052) by @ryanmitchell
+- Assets get downloaded when no URL is available. [#9018](https://github.com/statamic/cms/issues/9018) by @duncanmcclean
+- Fix section header padding in the sidebar. [#9051](https://github.com/statamic/cms/issues/9051) by @jackmcdade
+- Pass autocomplete config param to CP text inputs. [#9013](https://github.com/statamic/cms/issues/9013) by @ryanmitchell
+- Fix Glide tag stripping domain when using unsupported extension. [#9031](https://github.com/statamic/cms/issues/9031) by @duncanmcclean
+- Allow revision actions to be translated. [#9023](https://github.com/statamic/cms/issues/9023) by @ryanmitchell
+- Fix URI validation error when collection route uses entry IDs. [#9035](https://github.com/statamic/cms/issues/9035) by @duncanmcclean
+- Fix Outpost locking code for cache drivers without locking support. [#9029](https://github.com/statamic/cms/issues/9029) by @duncanmcclean
+- Fix missing `nestedListing` method on `Html` class. [#9034](https://github.com/statamic/cms/issues/9034) by @duncanmcclean
+- Fix entries tag not filtering by taxonomy when terms field is `max_items: 1`. [#9045](https://github.com/statamic/cms/issues/9045) by @ryanmitchell
+- Fix select field value not being shown in listings when option label is missing. [#9038](https://github.com/statamic/cms/issues/9038) by @duncanmcclean
+
+
+
 ## 4.36.0 (2023-11-20)
 
 ### What's new

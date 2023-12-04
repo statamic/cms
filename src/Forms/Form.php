@@ -11,6 +11,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormCreated;
+use Statamic\Events\FormCreating;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
@@ -180,6 +181,10 @@ class Form implements Arrayable, Augmentable, FormContract
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && FormCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (FormSaving::dispatch($this) === false) {
                 return false;
             }
