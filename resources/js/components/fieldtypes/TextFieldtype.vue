@@ -4,6 +4,7 @@
         :value="value"
         :classes="config.classes"
         :focus="config.focus || name === 'title' || name === 'alt'"
+        :autocomplete="config.autocomplete"
         :autoselect="config.autoselect"
         :type="config.input_type"
         :isReadOnly="isReadOnly"

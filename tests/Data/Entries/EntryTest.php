@@ -21,6 +21,7 @@ use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
+use Statamic\Events\EntryCreating;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
@@ -1267,6 +1268,9 @@ class EntryTest extends TestCase
         $return = $entry->save();
 
         $this->assertTrue($return);
+        Event::assertDispatched(EntryCreating::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
         Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
@@ -1313,6 +1317,7 @@ class EntryTest extends TestCase
         $return = $entry->saveQuietly();
 
         $this->assertTrue($return);
+        Event::assertNotDispatched(EntryCreating::class);
         Event::assertNotDispatched(EntrySaving::class);
         Event::assertNotDispatched(EntrySaved::class);
         Event::assertNotDispatched(EntryCreated::class);
@@ -1547,6 +1552,26 @@ class EntryTest extends TestCase
 
         $entry->save();
         $this->assertCount(1, Entry::all());
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_entry_doesnt_save()
+    {
+        Facades\Entry::spy();
+        Event::fake([EntryCreated::class]);
+
+        Event::listen(EntryCreating::class, function () {
+            return false;
+        });
+
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertFalse($return);
+        Facades\Entry::shouldNotHaveReceived('save');
+        Event::assertNotDispatched(EntryCreated::class);
     }
 
     /** @test */
@@ -2167,6 +2192,7 @@ class EntryTest extends TestCase
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
         ]);
+
         $collection->save();
 
         $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo')->date('2014-01-01');
@@ -2203,6 +2229,27 @@ class EntryTest extends TestCase
         $this->assertEquals([
             ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'url' => 'http://preview.com/de/2016/blog?preview=true'],
             ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'url' => 'http://preview.com/de/2016/blog/das-foo?preview=true'],
+        ], $entryDe->previewTargets()->all());
+
+        $collection->previewTargets([
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'refresh' => false],
+            ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'refresh' => false],
+        ]);
+        $collection->save();
+
+        $this->assertEquals([
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'url' => 'http://preview.domain.com/preview?url=/blog/foo'],
+            ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'url' => 'http://preview.domain.com/preview?uri=/blog/foo'],
+        ], $entryEn->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'url' => 'http://preview.domain.com/preview?url=/fr/le-blog/le-foo'],
+            ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'url' => 'http://preview.domain.com/preview?uri=/le-blog/le-foo'],
+        ], $entryFr->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'url' => 'http://preview.domain.com/preview?url=/das-blog/das-foo'],
+            ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'url' => 'http://preview.domain.com/preview?uri=/das-blog/das-foo'],
         ], $entryDe->previewTargets()->all());
     }
 

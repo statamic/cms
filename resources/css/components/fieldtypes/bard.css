@@ -17,7 +17,7 @@
     }
 }
 
-.bard-editor .bard-invalid {
+.bard-editor .bard-error {
     @apply p-2 @lg:px-4 bg-red-100 text-red-500 text-xs whitespace-nowrap;
 }
 
@@ -465,7 +465,7 @@
     }
 
     p > code {
-        @apply font-mono bg-gray-400 rounded-sm text-xs relative;
+        @apply font-mono bg-gray-400 rounded-sm text-xs;
         padding: 2px 4px;
         top: -1px;
     }

@@ -116,7 +116,7 @@ trait Revisable
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
 
-        $this
+        return $this
             ->makeRevision()
             ->user($user)
             ->message($options['message'] ?? false)

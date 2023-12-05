@@ -150,6 +150,16 @@ class NavigationController extends CpController
             'handle' => 'required|alpha_dash',
         ]);
 
+        if (Nav::find($values['handle'])) {
+            $error = __('A navigation with that handle already exists.');
+
+            if ($request->wantsJson()) {
+                throw new \Exception($error);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
+
         $structure = Nav::make()
             ->title($values['title'])
             ->handle($values['handle']);

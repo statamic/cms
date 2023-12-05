@@ -2,14 +2,19 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\File;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 class Sets extends Fieldtype
 {
     protected $selectable = false;
+
+    protected static $iconsDirectory = null;
+    protected static $iconsFolder = 'plump';
 
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the
@@ -83,13 +88,14 @@ class Sets extends Fieldtype
         return collect($sets)->map(function ($group, $groupHandle) {
             return array_merge($group, [
                 'handle' => $groupHandle,
-                'sets' => collect($group['sets'])->map(function ($config, $name) {
-                    return array_merge($config, [
-                        'handle' => $name,
-                        'id' => $name,
-                        'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
-                    ]);
-                })
+                'sets' => collect($group['sets'])
+                    ->map(function ($config, $name) {
+                        return array_merge($config, [
+                            'handle' => $name,
+                            'id' => $name,
+                            'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
+                        ]);
+                    })
                     ->values()
                     ->all(),
             ]);
@@ -125,5 +131,38 @@ class Sets extends Fieldtype
             ];
         })
             ->all();
+    }
+
+    /**
+     * Allow the user to set custom icon directory and/or folder for SVG set icons.
+     *
+     * @param  string|null  $directory
+     * @param  string|null  $folder
+     */
+    public static function setIconsDirectory($directory = null, $folder = null)
+    {
+        // If they are specifying new base directory, ensure we do not assume sub-folder
+        if ($directory) {
+            static::$iconsDirectory = $directory;
+            static::$iconsFolder = $folder;
+        }
+
+        // Of if they are specifying just a sub-folder, use that with original base directory
+        elseif ($folder) {
+            static::$iconsFolder = $folder;
+        }
+
+        // Then provide to script for <icon-fieldtype> selector components in blueprint config
+        Statamic::provideToScript([
+            'setIconsDirectory' => static::$iconsDirectory,
+            'setIconsFolder' => static::$iconsFolder,
+        ]);
+
+        // And finally, provide the file contents of all custom svg icons to script,
+        // but only if custom directory because our <svg-icon> component cannot
+        // reference custom paths at runtime without a full Vite re-build
+        if ($directory) {
+            Icon::provideCustomSvgIconsToScript($directory, $folder);
+        }
     }
 }

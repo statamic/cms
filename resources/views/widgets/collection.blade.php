@@ -5,7 +5,7 @@
                 <div class="h-6 w-6 mr-2 text-gray-800">
                     @cp_svg('icons/light/content-writing')
                 </div>
-                <span>{{ $title }}</span>
+                <span>{{ __($title) }}</span>
             </a>
         </h2>
         @can('create', ['Statamic\Contracts\Entries\Entry', $collection])
