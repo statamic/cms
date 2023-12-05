@@ -173,7 +173,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return new AugmentedEntry($this);
     }
 
-    public function getDirtyArray()
+    public function getDirtyArray(): array
     {
         return array_merge([
             'collection' => $this->collectionHandle(),
