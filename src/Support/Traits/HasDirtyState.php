@@ -10,7 +10,7 @@ trait HasDirtyState
      * @param  null|string|array  $properties
      * @return bool
      */
-    public function isDirty($properties = null)
+    public function isDirty($properties = null): bool
     {
         $currentValues = $this->getDirtyArray();
         $originalValues = $this->getOriginal();
@@ -42,7 +42,7 @@ trait HasDirtyState
      * @param  null|string|array  $properties
      * @return bool
      */
-    public function isClean($properties = null)
+    public function isClean($properties = null): bool
     {
         return ! $this->isDirty($properties);
     }

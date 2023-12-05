@@ -183,7 +183,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             'date' => optional($this->date())->format('Y-m-d-Hi'),
             'published' => $this->published(),
             'path' => $this->initialPath() ?? $this->path(),
-        ], $this->data()->toArray());
+        ], $this->data()->except(['updated_at'])->toArray());
     }
 
     public function delete()

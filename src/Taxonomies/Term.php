@@ -278,12 +278,12 @@ class Term implements TermContract
         return $this;
     }
 
-    private function getDirtyArray()
+    public function getDirtyArray()
     {
         return array_merge([
             'slug' => $this->slug(),
             'taxonomy' => $this->taxonomyHandle(),
-        ], $this->data()->toArray());
+        ], $this->data()->except(['updated_at'])->toArray());
     }
 
     public function __call($method, $args)
