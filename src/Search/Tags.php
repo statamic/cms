@@ -49,7 +49,7 @@ class Tags extends BaseTags
             return;
         }
 
-        return $query->where('status', 'published');
+        return $query->where(fn ($query) => $query->where('status', 'published')->orWhereNull('status'));
     }
 
     protected function querySite($query)
