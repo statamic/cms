@@ -90,6 +90,11 @@ class Terms extends Relationship
                         'type' => 'taxonomies',
                         'mode' => 'select',
                     ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
             ],
         ];
@@ -179,7 +184,9 @@ class Terms extends Relationship
                 }
 
                 return explode('::', $id, 2)[1];
-            })->all();
+            })
+                ->unique()
+                ->all();
 
             if ($this->field->get('max_items') === 1) {
                 return $data[0] ?? null;
@@ -209,6 +216,10 @@ class Terms extends Relationship
 
     public function getIndexItems($request)
     {
+        if ($this->config('mode') == 'typeahead' && ! $request->search) {
+            return collect();
+        }
+
         $query = $this->getIndexQuery($request);
 
         if ($sort = $this->getSortColumn($request)) {
@@ -369,6 +380,8 @@ class Terms extends Relationship
             $query->whereNotIn('id', $request->exclusions);
         }
 
+        $this->applyIndexQueryScopes($query, $request->all());
+
         return $query;
     }
 
@@ -403,12 +416,16 @@ class Terms extends Relationship
             ? Site::get($parent->locale())->lang()
             : Site::default()->lang();
 
-        $term = Facades\Term::make()
-            ->slug(Str::slug($string, '-', $lang))
-            ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
-            ->set('title', $string);
+        $slug = Str::slug($string, '-', $lang);
 
-        $term->save();
+        if (! $term = Facades\Term::find("{$taxonomy}::{$slug}")) {
+            $term = Facades\Term::make()
+                ->slug($slug)
+                ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
+                ->set('title', $string);
+
+            $term->save();
+        }
 
         return $term->id();
     }

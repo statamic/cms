@@ -8,7 +8,7 @@ use Statamic\Statamic;
 
 abstract class Scope
 {
-    use RegistersItself, HasHandle;
+    use HasHandle, RegistersItself;
 
     protected static $binding = 'scopes';
     protected static $builders;

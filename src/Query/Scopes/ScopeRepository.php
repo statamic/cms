@@ -17,6 +17,10 @@ class ScopeRepository
         if ($class = app('statamic.scopes')->get($key)) {
             $scope = app($class);
 
+            if (! $scope) {
+                return null;
+            }
+
             if ($scope instanceof Filter) {
                 $scope->context($context);
             }

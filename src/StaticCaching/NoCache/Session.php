@@ -41,26 +41,38 @@ class Session
      */
     public function regions(): Collection
     {
-        return $this->regions;
+        return $this->regions->mapWithKeys(fn ($key) => [$key => $this->region($key)]);
     }
 
     public function region(string $key): Region
     {
-        return $this->regions[$key];
+        if ($this->regions->contains($key) && ($region = Cache::get('nocache::region.'.$key))) {
+            return $region;
+        }
+
+        throw new RegionNotFound($key);
     }
 
     public function pushRegion($contents, $context, $extension): StringRegion
     {
         $region = new StringRegion($this, trim($contents), $context, $extension);
 
-        return $this->regions[$region->key()] = $region;
+        $this->cacheRegion($region);
+
+        $this->regions[] = $region->key();
+
+        return $region;
     }
 
     public function pushView($view, $context): ViewRegion
     {
         $region = new ViewRegion($this, $view, $context);
 
-        return $this->regions[$region->key()] = $region;
+        $this->cacheRegion($region);
+
+        $this->regions[] = $region->key();
+
+        return $region;
     }
 
     public function cascade()
@@ -110,5 +122,10 @@ class Session
             ->withContent(Data::findByRequestUrl($this->url))
             ->hydrate()
             ->toArray();
+    }
+
+    private function cacheRegion(Region $region)
+    {
+        Cache::forever('nocache::region.'.$region->key(), $region);
     }
 }

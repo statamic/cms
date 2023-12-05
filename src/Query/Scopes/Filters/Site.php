@@ -41,7 +41,7 @@ class Site extends Filter
     {
         $site = Facades\Site::get($values['site']);
 
-        return __('Site').': '.$site->name();
+        return __('Site').': '.__($site->name());
     }
 
     public function visibleTo($key)
@@ -51,8 +51,8 @@ class Site extends Filter
 
     protected function options()
     {
-        return Facades\Site::all()->mapWithKeys(function ($site) {
-            return [$site->handle() => $site->name()];
+        return Facades\Site::authorized()->mapWithKeys(function ($site) {
+            return [$site->handle() => __($site->name())];
         });
     }
 }

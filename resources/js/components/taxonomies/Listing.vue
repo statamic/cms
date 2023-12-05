@@ -3,7 +3,7 @@
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
                 <template slot="cell-title" slot-scope="{ row: taxonomy }">
-                    <a :href="taxonomy.terms_url">{{ taxonomy.title }}</a>
+                    <a :href="taxonomy.terms_url">{{ __(taxonomy.title) }}</a>
                 </template>
                 <template slot="actions" slot-scope="{ row: taxonomy, index }">
                     <dropdown-list placement="left-start">

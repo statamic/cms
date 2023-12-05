@@ -2,6 +2,7 @@
 
 namespace Statamic\Structures;
 
+use Statamic\Contracts\Structures\CollectionTree;
 use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -58,7 +59,7 @@ class CollectionStructure extends Structure
 
     public function newTreeInstance()
     {
-        return new CollectionTree;
+        return app(CollectionTree::class);
     }
 
     public function validateTree(array $tree, string $locale): array

@@ -12,6 +12,7 @@ use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\TaxonomyCreated;
+use Statamic\Events\TaxonomyCreating;
 use Statamic\Events\TaxonomyDeleted;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
@@ -29,9 +30,9 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAccess, Arrayable
+class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData, ContainsSupplementalData;
+    use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
     protected $handle;
     protected $title;
@@ -143,7 +144,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     {
         $blueprint
             ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
-            ->ensureField('slug', ['type' => 'slug', 'required' => true], 'sidebar');
+            ->ensureField('slug', ['type' => 'slug', 'required' => true, 'validate' => 'max:200'], 'sidebar');
 
         return $blueprint;
     }
@@ -207,6 +208,10 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && TaxonomyCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (TaxonomySaving::dispatch($this) === false) {
                 return false;
             }

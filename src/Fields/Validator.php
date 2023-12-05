@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator as LaravelValidator;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -49,13 +50,15 @@ class Validator
 
     public function rules()
     {
-        return $this
+        $rules = $this
             ->merge($this->fieldRules(), $this->extraRules)
             ->map(function ($rules) {
                 return collect($rules)->map(function ($rule) {
                     return $this->parse($rule);
                 })->all();
             })->all();
+
+        return $this->filterPrecognitiveRules($rules);
     }
 
     private function fieldRules()
@@ -93,14 +96,19 @@ class Validator
         return $this;
     }
 
-    public function validate()
+    public function validator()
     {
-        return LaravelValidator::validate(
+        return LaravelValidator::make(
             $this->fields->preProcessValidatables()->values()->all(),
             $this->rules(),
             $this->customMessages,
             $this->attributes()
         );
+    }
+
+    public function validate()
+    {
+        return $this->validator()->validate();
     }
 
     public function attributes()
@@ -138,5 +146,18 @@ class Validator
         }
 
         return $rules;
+    }
+
+    public function filterPrecognitiveRules($rules)
+    {
+        $request = request();
+
+        if (! $request->headers->has('Precognition-Validate-Only')) {
+            return $rules;
+        }
+
+        return Collection::make($rules)
+            ->only(explode(',', $request->header('Precognition-Validate-Only')))
+            ->all();
     }
 }

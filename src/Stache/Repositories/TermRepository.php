@@ -59,7 +59,7 @@ class TermRepository implements RepositoryContract
                     return true;
                 }
 
-                return Str::startsWith($uri, '/'.$collection->handle());
+                return Str::startsWith($uri.'/', '/'.$collection->handle().'/');
             });
 
         if ($collection) {
@@ -122,7 +122,7 @@ class TermRepository implements RepositoryContract
         $items = $this->store->store($term->taxonomyHandle())
             ->index('associations')
             ->items()
-            ->where('value', $term->slug());
+            ->where('value', $term->inDefaultLocale()->slug());
 
         if ($term instanceof LocalizedTerm) {
             $items = $items->where('site', $term->locale());

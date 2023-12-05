@@ -7,7 +7,7 @@
             <breadcrumb :url="breadcrumbUrl" :title="__('Collections')" />
 
             <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+                <h1 class="flex-1" v-text="__(title)" />
 
                 <dropdown-list class="mr-2" v-if="!!this.$scopedSlots.twirldown">
                     <slot name="twirldown" />
@@ -103,7 +103,6 @@
         <page-tree
             v-if="canUseStructureTree && view === 'tree'"
             ref="tree"
-            :has-collection="true"
             :collections="[handle]"
             :create-url="createUrl"
             :pages-url="structurePagesUrl"
@@ -182,7 +181,7 @@ export default {
         title: { type: String, required: true },
         handle: { type: String, required: true },
         canCreate: { type: Boolean, required: true },
-        createUrl: { type: String, required: true },
+        createUrls: { type: Object, required: true },
         createLabel: { type: String, required: true },
         blueprints: { type: Array, required: true },
         breadcrumbUrl: { type: String, required: true },
@@ -243,6 +242,10 @@ export default {
             }
             countChildren(this.entryBeingDeleted);
             return children;
+        },
+
+        createUrl() {
+            return this.createUrls[this.site || this.initialSite];
         }
 
     },
