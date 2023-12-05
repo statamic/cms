@@ -17,6 +17,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Events\GlobalVariablesCreated;
+use Statamic\Events\GlobalVariablesCreating;
 use Statamic\Events\GlobalVariablesDeleted;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Events\GlobalVariablesSaving;
@@ -27,9 +28,9 @@ use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Variables implements Contract, Localization, Augmentable, ResolvesValuesContract, ArrayAccess, Arrayable
+class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Localization, ResolvesValuesContract
 {
-    use ExistsAsFile, ContainsData, HasAugmentedInstance, HasOrigin, FluentlyGetsAndSets, ResolvesValues, TracksQueriedRelations;
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, HasOrigin, ResolvesValues, TracksQueriedRelations;
 
     protected $set;
     protected $locale;
@@ -127,6 +128,10 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && GlobalVariablesCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (GlobalVariablesSaving::dispatch($this) === false) {
                 return false;
             }

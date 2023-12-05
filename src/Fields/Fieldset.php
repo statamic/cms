@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Statamic\Events\FieldsetCreated;
+use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
@@ -140,6 +141,10 @@ class Fieldset
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && FieldsetCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (FieldsetSaving::dispatch($this) === false) {
                 return false;
             }

@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Pattern;
 
 abstract class Builder implements Contract
 {
@@ -71,6 +72,11 @@ abstract class Builder implements Contract
         $this->orderBys[] = new OrderBy($column, $direction);
 
         return $this;
+    }
+
+    public function orderByDesc($column)
+    {
+        return $this->orderBy($column, 'desc');
     }
 
     abstract public function inRandomOrder();
@@ -150,7 +156,7 @@ abstract class Builder implements Contract
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
-        $loweredOperator = strtolower($operator);
+        $loweredOperator = strtolower((string) $operator);
 
         if ($useDefault) {
             return [$operator, '='];
@@ -624,13 +630,13 @@ abstract class Builder implements Contract
 
     protected function filterTestLike($item, $like)
     {
-        $pattern = '/^'.str_replace(['%', '_'], ['.*', '.'], preg_quote($like, '/')).'$/im';
-
         if (is_array($item)) {
             $item = json_encode($item);
         }
 
-        return preg_match($pattern, (string) $item);
+        $pattern = Pattern::sqlLikeToRegex($like);
+
+        return preg_match('/'.$pattern.'/im', (string) $item);
     }
 
     protected function filterTestNotLike($item, $like)

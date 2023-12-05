@@ -14,8 +14,8 @@ use Tests\TestCase;
 /** @group graphql */
 class TermsFieldtypeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['collections'];
 

@@ -21,6 +21,9 @@ use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
+use Statamic\Events\EntryCreating;
+use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
@@ -1265,6 +1268,9 @@ class EntryTest extends TestCase
         $return = $entry->save();
 
         $this->assertTrue($return);
+        Event::assertDispatched(EntryCreating::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
         Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
@@ -1311,6 +1317,7 @@ class EntryTest extends TestCase
         $return = $entry->saveQuietly();
 
         $this->assertTrue($return);
+        Event::assertNotDispatched(EntryCreating::class);
         Event::assertNotDispatched(EntrySaving::class);
         Event::assertNotDispatched(EntrySaved::class);
         Event::assertNotDispatched(EntryCreated::class);
@@ -1545,6 +1552,94 @@ class EntryTest extends TestCase
 
         $entry->save();
         $this->assertCount(1, Entry::all());
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_entry_doesnt_save()
+    {
+        Facades\Entry::spy();
+        Event::fake([EntryCreated::class]);
+
+        Event::listen(EntryCreating::class, function () {
+            return false;
+        });
+
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertFalse($return);
+        Facades\Entry::shouldNotHaveReceived('save');
+        Event::assertNotDispatched(EntryCreated::class);
+    }
+
+    /** @test */
+    public function it_adds_propagated_entry_to_structure()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->sites(['en', 'fr', 'es'])
+            ->propagate(false)
+            ->save();
+
+        (new Entry)->locale('en')->id('en-1')->collection($collection)->save();
+        (new Entry)->locale('en')->id('en-2')->collection($collection)->save();
+        (new Entry)->locale('en')->id('en-3')->collection($collection)->save();
+
+        (new Entry)->locale('fr')->id('fr-1')->collection($collection)->origin('en-1')->save();
+        (new Entry)->locale('fr')->id('fr-2')->collection($collection)->origin('en-2')->save();
+
+        (new Entry)->locale('es')->id('es-1')->collection($collection)->origin('en-1')->save();
+        (new Entry)->locale('es')->id('es-3')->collection($collection)->origin('en-3')->save();
+
+        $collection->structureContents(['expects_root' => false])->save();
+        $collection->structure()->in('en')->tree([['entry' => 'en-1'], ['entry' => 'en-2'], ['entry' => 'en-3']])->save();
+        $collection->structure()->in('fr')->tree([['entry' => 'fr-1'], ['entry' => 'fr-2']])->save();
+        $collection->structure()->in('es')->tree([['entry' => 'es-1'], ['entry' => 'es-3']])->save();
+
+        $collection->propagate(true);
+
+        $en = (new Entry)
+            ->id('en-2-1')
+            ->locale('en')
+            ->collection($collection)
+            ->afterSave(function ($entry) {
+                $entry->collection()->structure()->in('en')->appendTo('en-2', $entry)->save();
+            });
+
+        $en->save();
+
+        $this->assertIsObject($fr = $en->descendants()->get('fr'));
+        $this->assertIsObject($es = $en->descendants()->get('es'));
+
+        $this->assertEquals([
+            ['entry' => 'en-1'],
+            ['entry' => 'en-2', 'children' => [['entry' => $en->id()]]],
+            ['entry' => 'en-3'],
+        ], $collection->structure()->in('en')->tree());
+
+        $this->assertEquals([
+            ['entry' => 'fr-1'],
+            ['entry' => 'fr-2', 'children' => [['entry' => $fr->id()]]],
+        ], $collection->structure()->in('fr')->tree());
+
+        $this->assertEquals([
+            ['entry' => 'es-1'],
+            ['entry' => 'es-3'],
+            ['entry' => $es->id()],
+        ], $collection->structure()->in('es')->tree());
     }
 
     /** @test */
@@ -1857,6 +1952,40 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $entry = EntryFactory::collection('test')->create();
+
+        $entry->delete();
+
+        Event::assertDispatched(EntryDeleting::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Entry::spy();
+        Event::fake([EntryDeleted::class]);
+
+        Event::listen(EntryDeleting::class, function () {
+            return false;
+        });
+
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection);
+
+        $return = $entry->delete();
+
+        $this->assertFalse($return);
+        Facades\Entry::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(EntryDeleted::class);
+    }
+
+    /** @test */
     public function it_prevents_deleting_if_there_are_descendants()
     {
         $this->expectExceptionMessage('Cannot delete an entry with localizations.');
@@ -2058,16 +2187,17 @@ class EntryTest extends TestCase
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
         ]]);
 
-        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
+        $collection = (new Collection)->dated(true)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
         ]);
+
         $collection->save();
 
-        $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo');
-        $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo');
-        $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo');
+        $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo')->date('2014-01-01');
+        $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo')->date('2015-01-01');
+        $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo')->date('2016-01-01');
 
         $this->assertEquals([
             ['label' => 'Entry', 'format' => '{permalink}', 'url' => 'http://domain.com/blog/foo'],
@@ -2082,23 +2212,44 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
 
         $collection->previewTargets([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'refresh' => true],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'refresh' => true],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'refresh' => true],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'refresh' => true],
         ])->save();
 
         $this->assertEquals([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/en/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/en/blog/foo?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'url' => 'http://preview.com/en/2014/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'url' => 'http://preview.com/en/2014/blog/foo?preview=true'],
         ], $entryEn->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/fr/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/fr/blog/le-foo?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'url' => 'http://preview.com/fr/2015/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'url' => 'http://preview.com/fr/2015/blog/le-foo?preview=true'],
         ], $entryFr->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/de/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/de/blog/das-foo?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'url' => 'http://preview.com/de/2016/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'url' => 'http://preview.com/de/2016/blog/das-foo?preview=true'],
+        ], $entryDe->previewTargets()->all());
+
+        $collection->previewTargets([
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'refresh' => false],
+            ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'refresh' => false],
+        ]);
+        $collection->save();
+
+        $this->assertEquals([
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'url' => 'http://preview.domain.com/preview?url=/blog/foo'],
+            ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'url' => 'http://preview.domain.com/preview?uri=/blog/foo'],
+        ], $entryEn->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'url' => 'http://preview.domain.com/preview?url=/fr/le-blog/le-foo'],
+            ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'url' => 'http://preview.domain.com/preview?uri=/le-blog/le-foo'],
+        ], $entryFr->previewTargets()->all());
+
+        $this->assertEquals([
+            ['label' => 'url', 'format' => 'http://preview.domain.com/preview?url={url}', 'url' => 'http://preview.domain.com/preview?url=/das-blog/das-foo'],
+            ['label' => 'uri', 'format' => 'http://preview.domain.com/preview?uri={uri}', 'url' => 'http://preview.domain.com/preview?uri=/das-blog/das-foo'],
         ], $entryDe->previewTargets()->all());
     }
 
@@ -2204,7 +2355,7 @@ class EntryTest extends TestCase
                 // Ugly. Sorry. ¯\_(ツ)_/¯
                 $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
                 if (
-                    'Statamic\Entries\Entry@save' === $trace[2]['class'].'@'.$trace[2]['function']
+                    $trace[2]['class'].'@'.$trace[2]['function'] === 'Statamic\Entries\Entry@save'
                     && $method === 'forget'
                     && Str::startsWith($args[0], 'origin-Entry-')
                 ) {

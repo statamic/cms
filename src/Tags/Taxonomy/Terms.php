@@ -13,10 +13,10 @@ use Statamic\Taxonomies\TermCollection;
 
 class Terms
 {
-    use Concerns\QueriesConditions,
-        Concerns\QueriesScopes,
+    use Concerns\GetsQueryResults,
+        Concerns\QueriesConditions,
         Concerns\QueriesOrderBys,
-        Concerns\GetsQueryResults;
+        Concerns\QueriesScopes;
 
     protected $ignoredParams = ['as'];
     protected $params;

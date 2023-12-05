@@ -6,6 +6,7 @@ use Statamic\Contracts\Globals\GlobalSet as Contract;
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\GlobalSetCreated;
+use Statamic\Events\GlobalSetCreating;
 use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
@@ -86,6 +87,10 @@ class GlobalSet implements Contract
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && GlobalSetCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (GlobalSetSaving::dispatch($this) === false) {
                 return false;
             }
@@ -168,6 +173,11 @@ class GlobalSet implements Contract
         $this->localizations()->forget($localization->locale());
 
         return $this;
+    }
+
+    public function sites()
+    {
+        return $this->localizations()->map->locale()->values()->toBase();
     }
 
     public function in($locale)

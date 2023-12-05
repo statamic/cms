@@ -11,8 +11,8 @@ use Tests\TestCase;
 class EditNavigationTest extends TestCase
 {
     use FakesRoles;
-    use PreventSavingStacheItemsToDisk;
     use MocksStructures;
+    use PreventSavingStacheItemsToDisk;
 
     /** @test */
     public function it_shows_the_edit_form_if_user_has_edit_permission()

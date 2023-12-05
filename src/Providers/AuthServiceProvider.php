@@ -21,6 +21,7 @@ class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
         \Statamic\Contracts\Structures\Nav::class => Policies\NavPolicy::class,
+        \Statamic\Contracts\Structures\NavTree::class => Policies\NavTreePolicy::class,
         \Statamic\Contracts\Entries\Collection::class => Policies\CollectionPolicy::class,
         \Statamic\Contracts\Entries\Entry::class => Policies\EntryPolicy::class,
         \Statamic\Contracts\Taxonomies\Taxonomy::class => Policies\TaxonomyPolicy::class,
@@ -34,6 +35,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Assets\AssetFolder::class => Policies\AssetFolderPolicy::class,
         \Statamic\Contracts\Assets\AssetContainer::class => Policies\AssetContainerPolicy::class,
         \Statamic\Fields\Fieldset::class => Policies\FieldsetPolicy::class,
+        \Statamic\Sites\Site::class => Policies\SitePolicy::class,
     ];
 
     public function register()
