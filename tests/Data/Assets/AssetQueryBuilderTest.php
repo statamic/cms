@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Assets;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -530,7 +531,7 @@ class AssetQueryBuilderTest extends TestCase
     /** @test **/
     public function assets_are_found_using_scopes()
     {
-        $assets = $this->container->queryAssets()->customScope()->get();
+        $assets = $this->container->queryAssets()->customScope('a.jpg')->get();
 
         $this->assertCount(1, $assets);
     }
@@ -617,6 +618,6 @@ class CustomScope extends Scope
 {
     public function apply($query, $params)
     {
-        $query->where('filename', 'a');
+        $query->where('path', Arr::first($params));
     }
 }

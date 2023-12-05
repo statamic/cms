@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Users;
 
+use Illuminate\Support\Arr;
 use Statamic\Facades\User;
 use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -223,7 +224,7 @@ class UserQueryBuilderTest extends TestCase
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
         User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
 
-        $entries = User::query()->customScope()->get();
+        $entries = User::query()->customScope('gandalf@precious.com')->get();
 
         $this->assertCount(1, $entries);
     }
@@ -233,6 +234,6 @@ class CustomScope extends Scope
 {
     public function apply($query, $params)
     {
-        $query->where('email', 'gandalf@precious.com');
+        $query->where('email', Arr::first($params));
     }
 }

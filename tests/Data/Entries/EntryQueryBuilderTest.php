@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Arr;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -669,7 +670,7 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
         EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
 
-        $entries = Entry::query()->customScope()->get();
+        $entries = Entry::query()->customScope('Post 1')->get();
 
         $this->assertCount(1, $entries);
     }
@@ -762,6 +763,6 @@ class CustomScope extends Scope
 {
     public function apply($query, $params)
     {
-        $query->where('title', 'Post 1');
+        $query->where('title', Arr::first($params));
     }
 }
