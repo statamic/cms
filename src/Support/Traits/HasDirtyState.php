@@ -8,7 +8,6 @@ trait HasDirtyState
      * Is the item or property on the item dirty?
      *
      * @param  null|string|array  $properties
-     * @return bool
      */
     public function isDirty($properties = null): bool
     {
@@ -40,7 +39,6 @@ trait HasDirtyState
      * Is the item or property on the item clean?
      *
      * @param  null|string|array  $properties
-     * @return bool
      */
     public function isClean($properties = null): bool
     {
