@@ -26,4 +26,24 @@ trait AppliesScopes
         // Throw an exception if a user is trying to access a scope that is not supported by this builder.
         throw new \Exception('The ['.get_class($this)."] query builder does not support the [$method] scope.");
     }
+
+    public function canApplyScope($method): bool
+    {
+        // If the scope doesn't exist, return false.
+        if (! $scope = Scope::find(snake_case($method))) {
+            return false;
+        }
+
+        // If no builders are defined, return true.
+        if ($scope->builders()->isEmpty()) {
+            return true;
+        }
+
+        // If builders are defined and this builder is one of them, return true.
+        if ($scope->builders()->contains(get_class($this))) {
+            return true;
+        }
+
+        return false;
+    }
 }
