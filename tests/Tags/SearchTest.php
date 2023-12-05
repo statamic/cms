@@ -2,8 +2,10 @@
 
 namespace Tests\Tags;
 
+use Closure;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Storage;
+use Mockery;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Parse;
@@ -76,7 +78,23 @@ class SearchTest extends TestCase
         $assetA = tap(Asset::make()->container('images')->path('a.jpg')->data(['title' => 'asset a']))->save();
 
         $builder = $this->mock(QueryBuilder::class);
-        $builder->shouldReceive('ensureExists', 'search', 'withData', 'limit', 'offset', 'where')->andReturnSelf();
+        $builder->shouldReceive('ensureExists', 'search', 'withData', 'limit', 'offset')->andReturnSelf();
+
+        // We want to make sure that the appropriate where clauses are being applied.
+        $builder->shouldReceive('where')->withArgs(function ($arg) {
+            if (! $arg instanceof Closure) {
+                return false;
+            }
+
+            $subquery = Mockery::mock(QueryBuilder::class);
+            $subquery->shouldReceive('where')->with('status', 'published')->once()->andReturnSelf();
+            $subquery->shouldReceive('orWhereNull')->with('status')->once()->andReturnSelf();
+
+            $arg($subquery);
+
+            return true;
+        })->once()->andReturnSelf();
+
         $builder->shouldReceive('get')->andReturn(collect([$entryA, $entryB, $assetA]));
 
         Search::shouldReceive('index')->with(null)->once()->andReturn($builder);
