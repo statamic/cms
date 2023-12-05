@@ -36,7 +36,7 @@
             </a>
         @endif
 
-        @if (Route::has('pulse') && $user->can('viewPulse'))
+        @if (Route::has('pulse') && (app()->environment('local') || $user->can('viewPulse')))
             <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ route('pulse') }}" target="_blank" v-tooltip="'Laravel Pulse'">
                 @cp_svg('icons/regular/pulse')
             </a>
