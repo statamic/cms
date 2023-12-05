@@ -69,6 +69,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Floatval::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
+        Fieldtypes\Group::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Html::class,
         Fieldtypes\Icon::class,

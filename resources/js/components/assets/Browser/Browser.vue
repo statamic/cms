@@ -388,11 +388,11 @@ export default {
         },
 
         canUpload() {
-            return this.folder && this.container.allow_uploads;
+            return this.folder && this.container.allow_uploads && this.can('upload '+ this.container.id +' assets');
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation && this.can('upload '+ this.container.id +' assets');
         },
 
         parameters() {

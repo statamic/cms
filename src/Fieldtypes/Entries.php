@@ -5,11 +5,13 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\CP\Column;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
@@ -18,6 +20,7 @@ use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
+use Statamic\Search\Index;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
@@ -31,6 +34,7 @@ class Entries extends Relationship
     protected $canSearch = true;
     protected $statusIcons = true;
     protected $formComponent = 'entry-publish-form';
+    protected $activeFilterBadges;
 
     protected $formComponentProps = [
         'initialActions' => 'actions',
@@ -90,6 +94,11 @@ class Entries extends Relationship
                         'instructions' => __('statamic::fieldtypes.entries.config.collections'),
                         'type' => 'collections',
                         'mode' => 'select',
+                    ],
+                    'search_index' => [
+                        'display' => __('Search Index'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
+                        'type' => 'text',
                     ],
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
@@ -158,9 +167,9 @@ class Entries extends Relationship
 
     public function getSortColumn($request)
     {
-        $column = $request->get('sort');
+        $column = $request->sort ?? 'title';
 
-        if (! $column && ! $request->search) {
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
@@ -169,35 +178,30 @@ class Entries extends Relationship
 
     public function getSortDirection($request)
     {
-        $order = $request->get('order', 'asc');
+        $order = $request->order ?? 'asc';
 
-        if (! $request->sort && ! $request->search) {
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
         }
 
         return $order;
     }
 
+    public function initialSortColumn()
+    {
+        return $this->getSortColumn(optional());
+    }
+
+    public function initialSortDirection()
+    {
+        return $this->getSortDirection(optional());
+    }
+
     protected function getIndexQuery($request)
     {
         $query = Entry::query();
 
-        if ($search = $request->search) {
-            $usingSearchIndex = false;
-            $collections = collect($this->getConfiguredCollections());
-
-            if ($collections->count() == 1) {
-                $collection = Collection::findByHandle($collections->first());
-                if ($collection && $collection->hasSearchIndex()) {
-                    $query = $collection->searchIndex()->ensureExists()->search($search);
-                    $usingSearchIndex = true;
-                }
-            }
-
-            if (! $usingSearchIndex) {
-                $query->where('title', 'like', '%'.$search.'%');
-            }
-        }
+        $query = $this->toSearchQuery($query, $request);
 
         if ($site = $request->site) {
             $query->where('site', $site);
@@ -210,6 +214,49 @@ class Entries extends Relationship
         $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
+    }
+
+    private function toSearchQuery($query, $request)
+    {
+        if (! $search = $request->search) {
+            return $query;
+        }
+
+        if ($index = $this->getSearchIndex($request)) {
+            return $index->search($search);
+        }
+
+        return $query->where('title', 'like', '%'.$search.'%');
+    }
+
+    private function getSearchIndex($request): ?Index
+    {
+        $index = $this->getExplicitSearchIndex() ?? $this->getCollectionSearchIndex($request);
+
+        return $index?->ensureExists();
+    }
+
+    private function getExplicitSearchIndex(): ?Index
+    {
+        return ($explicit = $this->config('search_index'))
+            ? Search::in($explicit)
+            : null;
+    }
+
+    private function getCollectionSearchIndex($request): ?Index
+    {
+        // Use the collections being filtered, or the configured collections.
+        $collections = collect(
+            $request->input('filters.collection.collections') ?? $this->getConfiguredCollections()
+        );
+
+        $indexes = $collections->map(fn ($handle) => Collection::findByHandle($handle)->searchIndex());
+
+        // If all the collections use the same index, return it.
+        // Even if they're all null, that's fine. It'll just return null.
+        return $indexes->unique()->count() === 1
+            ? $indexes->first()
+            : null;
     }
 
     protected function getCreatables()
@@ -340,6 +387,22 @@ class Entries extends Relationship
 
     public function getColumns()
     {
+        if (count($this->getConfiguredCollections()) === 1) {
+            $columns = $this->getBlueprint()->columns();
+
+            $status = Column::make('status')
+                ->listable(true)
+                ->visible(true)
+                ->defaultVisibility(true)
+                ->sortable(false);
+
+            $columns->put('status', $status);
+
+            $columns->setPreferred("collections.{$this->getConfiguredCollections()[0]}.columns");
+
+            return $columns->rejectUnlisted()->values();
+        }
+
         return $this->getBlueprint()->columns()->values()->all();
     }
 
@@ -357,5 +420,23 @@ class Entries extends Relationship
     public function filter()
     {
         return new EntriesFilter($this);
+    }
+
+    public function preload()
+    {
+        $collection = count($this->getConfiguredCollections()) === 1
+            ? Collection::findByHandle($this->getConfiguredCollections()[0])
+            : null;
+
+        if (! $collection || ! $collection->hasStructure()) {
+            return parent::preload();
+        }
+
+        return array_merge(parent::preload(), ['tree' => [
+            'title' => $collection->title(),
+            'url' => cp_route('collections.tree.index', $collection),
+            'showSlugs' => $collection->structure()->showSlugs(),
+            'expectsRoot' => $collection->structure()->expectsRoot(),
+        ]]);
     }
 }

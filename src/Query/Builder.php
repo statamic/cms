@@ -156,7 +156,7 @@ abstract class Builder implements Contract
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
-        $loweredOperator = strtolower($operator);
+        $loweredOperator = strtolower((string) $operator);
 
         if ($useDefault) {
             return [$operator, '='];

@@ -4,16 +4,17 @@
         :value="value"
         :classes="config.classes"
         :focus="config.focus || name === 'title' || name === 'alt'"
+        :autocomplete="config.autocomplete"
         :autoselect="config.autoselect"
         :type="config.input_type"
         :isReadOnly="isReadOnly"
-        :prepend="config.prepend"
-        :append="config.append"
+        :prepend="__(config.prepend)"
+        :append="__(config.append)"
         :limit="config.character_limit"
-        :placeholder="config.placeholder"
+        :placeholder="__(config.placeholder)"
         :name="name"
         :id="fieldId"
-        @input="updateDebounced"
+        @input="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />
@@ -24,7 +25,17 @@ import Fieldtype from './Fieldtype.vue';
 
 export default {
 
-    mixins: [Fieldtype]
+    mixins: [Fieldtype],
+
+    methods: {
+        inputUpdated(value) {
+            if (! this.config.debounce) {
+                return this.update(value)
+            }
+
+            this.updateDebounced(value)
+        }
+    }
 
 }
 </script>

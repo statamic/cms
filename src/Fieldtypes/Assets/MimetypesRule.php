@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Contracts\Validation\Rule;
 use Statamic\Facades\Asset;
+use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MimetypesRule implements Rule
@@ -43,6 +44,6 @@ class MimetypesRule implements Rule
      */
     public function message()
     {
-        return str_replace(':values', implode(', ', $this->parameters), __('statamic::validation.mimetypes'));
+        return str_replace(':values', implode(', ', $this->parameters), __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimetypes'));
     }
 }

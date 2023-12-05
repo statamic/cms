@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
+use Closure;
 use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
@@ -29,7 +30,9 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
+use Statamic\Events\EntryCreating;
 use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
@@ -185,6 +188,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function delete()
     {
+        if (EntryDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         if ($this->descendants()->map->fresh()->filter()->isNotEmpty()) {
             throw new \Exception('Cannot delete an entry with localizations.');
         }
@@ -330,6 +337,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && EntryCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (EntrySaving::dispatch($this) === false) {
                 return false;
             }
@@ -738,11 +749,41 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             ->published($this->published)
             ->slug($this->slug());
 
+        if ($callback = $this->addToStructure($site, $this->parent())) {
+            $localization->afterSave($callback);
+        }
+
         if ($this->collection()->dated()) {
             $localization->date($this->date());
         }
 
         return $localization;
+    }
+
+    private function addToStructure($site, $parent = null): ?Closure
+    {
+        // If it's orderable (linear - a max depth of 1) then don't add it.
+        if ($this->collection()->orderable()) {
+            return null;
+        }
+
+        // Collection not structured? Don't add it.
+        if (! $structure = $this->collection()->structure()) {
+            return null;
+        }
+
+        $tree = $structure->in($site);
+        $parent = optional($parent)->in($site);
+
+        return function ($entry) use ($parent, $tree) {
+            if (! $parent || $parent->isRoot()) {
+                $tree->append($entry);
+            } else {
+                $tree->appendTo($parent->id(), $entry);
+            }
+
+            $tree->save();
+        };
     }
 
     public function supplementTaxonomies()
@@ -927,6 +968,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         return (string) Antlers::parse($format, array_merge($this->routeData(), [
             'site' => $this->site(),
+            'uri' => $this->uri(),
+            'url' => $this->url(),
             'permalink' => $this->absoluteUrl(),
             'locale' => $this->locale(),
         ]));
