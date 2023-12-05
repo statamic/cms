@@ -18,21 +18,13 @@ trait HasDirtyState
             return json_encode($currentValues) !== json_encode($originalValues);
         }
 
-        if (! is_array($properties)) {
-            $properties = [$properties];
-        }
-
-        foreach ($properties as $property) {
+        return collect($properties)->contains(function ($property) use ($currentValues, $originalValues) {
             if (! array_key_exists($property, $currentValues)) {
                 $property = 'data.'.$property;
             }
 
-            if (array_get($currentValues, $property) !== array_get($originalValues, $property)) {
-                return true;
-            }
-        }
-
-        return false;
+            return data_get($currentValues, $property) !== data_get($originalValues, $property);
+        });
     }
 
     /**
