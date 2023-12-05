@@ -41,11 +41,11 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function __call($method, $args)
     {
-        $response = $this->builder->$method(...$args);
-
         if ($this->canApplyScope($method)) {
             $this->applyScope($method);
         }
+
+        $response = $this->builder->$method(...$args);
 
         return $response instanceof EloquentBuilder ? $this : $response;
     }
