@@ -666,7 +666,6 @@ abstract class Builder implements Contract
      * Chunk the results of the query.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @return bool
      */
     public function chunk($count, callable $callback)
