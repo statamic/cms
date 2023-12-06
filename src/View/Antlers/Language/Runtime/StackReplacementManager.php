@@ -11,6 +11,8 @@ class StackReplacementManager
     protected static $arrayStacks = [];
     protected static $stackContents = [];
 
+    protected static $cachedStacks = [];
+
     public static function clearStackState()
     {
         self::$stackContents = [];
@@ -69,6 +71,10 @@ class StackReplacementManager
             $content = trim($content);
         }
 
+        if (GlobalRuntimeState::$isCacheEnabled) {
+            self::$cachedStacks[] = $stackName;
+        }
+
         array_unshift(self::$stackContents[GlobalRuntimeState::$environmentId][$name], $content);
     }
 
@@ -88,7 +94,46 @@ class StackReplacementManager
             $content = trim($content);
         }
 
+        if (GlobalRuntimeState::$isCacheEnabled) {
+            self::$cachedStacks[] = $stackName;
+        }
+
         self::$stackContents[GlobalRuntimeState::$environmentId][$name][] = $content;
+    }
+
+    public static function clearCachedStacks()
+    {
+        self::$cachedStacks = [];
+    }
+
+    public static function restoreCachedStacks($cachedStacks)
+    {
+        foreach ($cachedStacks as $stackName => $stackContents) {
+            $stackKey = self::getStackReplacement($stackName);
+
+            if (! array_key_exists(GlobalRuntimeState::$environmentId, self::$stackContents)) {
+                self::$stackContents[GlobalRuntimeState::$environmentId] = [];
+            }
+
+            self::$stackContents[GlobalRuntimeState::$environmentId][$stackKey] = array_merge(
+                self::$stackContents[GlobalRuntimeState::$environmentId][$stackKey] ?? [],
+                $stackContents
+            );
+        }
+    }
+
+    public static function getCachedStacks()
+    {
+        $stackValues = [];
+
+        foreach (self::$cachedStacks as $stackName) {
+            $stackKey = self::getStackReplacement($stackName);
+            if (array_key_exists($stackKey, self::$stackContents[GlobalRuntimeState::$environmentId])) {
+                $stackValues[$stackName] = self::$stackContents[GlobalRuntimeState::$environmentId][$stackKey];
+            }
+        }
+
+        return $stackValues;
     }
 
     public static function processReplacements($content)

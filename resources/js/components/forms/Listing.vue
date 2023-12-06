@@ -1,6 +1,6 @@
 <template>
     <data-list :visible-columns="columns" :columns="columns" :rows="items">
-        <div class="card p-0 relative" slot-scope="{ filteredRows: rows }">
+        <div class="card overflow-hidden p-0 relative" slot-scope="{ filteredRows: rows }">
             <data-list-bulk-actions
                 class="rounded"
                 :url="actionUrl"

@@ -30,6 +30,7 @@ import FloatFieldtype from '../components/fieldtypes/FloatFieldtype.vue';
 import Sites from '../components/globals/Sites.vue';
 import Grid from '../components/fieldtypes/grid/Grid.vue';
 import GridIndex from '../components/fieldtypes/grid/GridIndex.vue';
+import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
 import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue';
 import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
@@ -57,6 +58,8 @@ import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
 import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue';
+import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
+import SetField from '../components/fieldtypes/replicator/Field.vue';
 
 Vue.component('select-input', Select);
 Vue.component('text-input', Text);
@@ -86,6 +89,7 @@ Vue.component('float-fieldtype', FloatFieldtype);
 Vue.component('global_set_sites-fieldtype', Sites);
 Vue.component('grid-fieldtype', Grid);
 Vue.component('grid-fieldtype-index', GridIndex);
+Vue.component('group-fieldtype', GroupFieldtype);
 Vue.component('hidden-fieldtype', HiddenFieldtype);
 Vue.component('html-fieldtype', HtmlFieldtype);
 Vue.component('icon-fieldtype', IconFieldtype);
@@ -113,6 +117,8 @@ Vue.component('toggle-fieldtype-index', ToggleIndexFieldtype);
 Vue.component('width-fieldtype', WidthFieldtype);
 Vue.component('video-fieldtype', VideoFieldtype);
 Vue.component('yaml-fieldtype', YamlFieldtype);
+Vue.component('set-picker', SetPicker);
+Vue.component('set-field', SetField);
 
 
 Vue.component('revealer-fieldtype', RevealerFieldtype);

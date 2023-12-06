@@ -196,6 +196,10 @@ export default {
 
     mounted() {
         this.initToolbarButtons();
+
+        document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
+            this.codemirror.focus();
+        });
     },
 
     methods: {
@@ -440,7 +444,7 @@ export default {
             if (! url) {
                 url = prompt(__('Enter URL'), 'https://');
                 if (! url) {
-                    url = '';
+                    return;
                 }
             }
 

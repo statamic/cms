@@ -92,7 +92,13 @@ class FieldsetController extends CpController
         ]);
 
         if (Facades\Fieldset::find($request->handle)) {
-            return back()->withInput()->with('error', __('A fieldset with that name already exists.'));
+            $error = __('A fieldset with that name already exists.');
+
+            if ($request->wantsJson()) {
+                throw new \Exception($error);
+            }
+
+            return back()->withInput()->with('error', $error);
         }
 
         $fieldset = (new Fieldset)

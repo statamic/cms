@@ -2,67 +2,92 @@
 
     <div class="bard-link-toolbar">
         <div>
-            <!-- Link type select -->
-            <div class="flex items-center px-4 py-2 border-b">
-
-                <button
-                    class="button-tab"
-                    v-for="visibleLinkType in visibleLinkTypes"
-                    :class="{active: visibleLinkType.type === linkType}"
-                    :for="visibleLinkType.type"
-                    :key="visibleLinkType.type"
-                    :id="visibleLinkType.type"
-                    @click="setLinkType(visibleLinkType.type)"
-                >
-                    {{ visibleLinkType.title }}
-                </button>
-            </div>
-
             <div class="px-4 py-4 border-b">
-                <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center">
 
-                    <!-- URL input -->
-                    <input
-                        v-if="linkType === 'url'"
-                        v-model="url.url"
-                        type="text"
-                        ref="urlInput"
-                        class="input h-auto text-sm"
-                        placeholder="URL"
-                        @keydown.enter.prevent="commit"
-                    />
+                <div class="flex">
 
-                    <!-- Data input -->
-                    <div
-                        v-else
-                        class="w-full flex items-center justify-between cursor-pointer"
-                        @click="openSelector"
-                    >
-
-                        <loading-graphic v-if="isLoading" :inline="true" />
-
-                        <div v-else class="flex-1 flex items-center mr-2 truncate">
-                            <img
-                                v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
-                                :src="itemData.asset.thumbnail || itemData.asset.url"
-                                class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-2 object-cover lazyloaded"
+                    <div class="h-8 mb-4 bg-gray-100 text-gray-800 border rounded shadow-inner flex items-center mr-1">
+                        <select
+                            class="input w-auto text-sm px-1"
+                            v-model="linkType">
+                            <option
+                                v-for="visibleLinkType in visibleLinkTypes"
+                                :value="visibleLinkType.type"
                             >
-                            {{ displayValue }}
-                        </div>
-
-                        <button
-                        class="flex items-center"
-                            v-tooltip="`${__('Browse')}...`"
-                            :aria-label="`${__('Browse')}...`"
-                            @click="openSelector"
-                        >
-                            <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
-                            <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
-                        </button>
-
+                                {{ visibleLinkType.title }}
+                            </option>
+                        </select>
                     </div>
 
+                    <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center">
+    
+                        <!-- URL input -->
+                        <input
+                            v-if="linkType === 'url'"
+                            v-model="url.url"
+                            type="text"
+                            ref="urlInput"
+                            class="input h-auto text-sm"
+                            placeholder="URL"
+                            @keydown.enter.prevent="commit"
+                        />
+    
+                        <!-- Email input -->
+                        <input
+                            v-else-if="linkType === 'mailto'"
+                            v-model="urlData.mailto"
+                            type="text"
+                            ref="mailtoInput"
+                            class="input h-auto text-sm"
+                            placeholder="Email Address"
+                            @keydown.enter.prevent="commit"
+                        />
+    
+                        <!-- Phone input -->
+                        <input
+                            v-else-if="linkType === 'tel'"
+                            v-model="urlData.tel"
+                            type="text"
+                            ref="telInput"
+                            class="input h-auto text-sm"
+                            placeholder="Phone Number"
+                            @keydown.enter.prevent="commit"
+                        />
+    
+                        <!-- Data input -->
+                        <div
+                            v-else
+                            class="w-full flex items-center justify-between cursor-pointer"
+                            @click="openSelector"
+                        >
+    
+                            <loading-graphic v-if="isLoading" :inline="true" />
+    
+                            <div v-else class="flex-1 flex items-center mr-2 truncate">
+                                <img
+                                    v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
+                                    :src="itemData.asset.thumbnail || itemData.asset.url"
+                                    class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-2 object-cover lazyloaded"
+                                >
+                                {{ displayValue }}
+                            </div>
+    
+                            <button
+                            class="flex items-center"
+                                v-tooltip="`${__('Browse')}...`"
+                                :aria-label="`${__('Browse')}...`"
+                                @click="openSelector"
+                            >
+                                <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
+                                <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
+                            </button>
+    
+                        </div>
+    
+                    </div>
+                    
                 </div>
+
 
                 <!-- Title attribute -->
                 <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
@@ -75,7 +100,18 @@
                     />
                 </div>
 
-                <label for="target-blank" class="flex items-center font-normal cursor-pointer text-gray-800 hover:text-black">
+                <!-- Rel attribute -->
+                <div class="h-8 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
+                    <input
+                        type="text"
+                        ref="input"
+                        v-model="rel"
+                        class="input h-auto text-sm placeholder-gray-50"
+                        :placeholder="`${__('Relationship')} (${__('Optional')})`"
+                    />
+                </div>
+
+                <label for="target-blank" class="mt-4 flex items-center font-normal cursor-pointer text-gray-800 hover:text-black" v-if="canHaveTarget">
                     <input class="checkbox mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
@@ -170,10 +206,14 @@ export default {
                 { type: 'url', title: __('URL') },
                 { type: 'entry', title: __('Entry') },
                 { type: 'asset', title: __('Asset') },
+                { type: 'mailto', title: __('Email') },
+                { type: 'tel', title: __('Phone') },
             ],
             url: {},
+            urlData: {},
             itemData: {},
             title: null,
+            rel: null,
             targetBlank: null,
             showAssetSelector: false,
             isLoading: false,
@@ -199,6 +239,10 @@ export default {
                     return this.itemData.entry ? this.itemData.entry.title : null;
                 case 'asset':
                     return this.itemData.asset ? this.itemData.asset.basename : null;
+                case 'mailto':
+                    return this.urlData.mailto ? this.urlData.mailto : null;
+                case 'tel':
+                    return this.urlData.tel ? this.urlData.tel : null;
             }
         },
 
@@ -210,7 +254,7 @@ export default {
             return this.sanitizeLink(this.url[this.linkType]);
         },
 
-        rel() {
+        defaultRel() {
             let rel = [];
             if (this.config.link_noopener) rel.push('noopener');
             if (this.config.link_noreferrer) rel.push('noreferrer');
@@ -251,7 +295,11 @@ export default {
 
         collections() {
             return this.bard.meta.linkCollections;
-        }
+        },
+
+        canHaveTarget() {
+            return ['url', 'entry', 'asset'].includes(this.linkType);
+        },
 
     },
 
@@ -259,7 +307,19 @@ export default {
 
         linkType() {
             this.autofocus();
-        }
+        },
+
+        urlData: {
+            deep: true,
+            handler() {
+                if (!['mailto', 'tel'].includes(this.linkType)) {
+                    return;
+                }
+                this.setUrl(this.linkType, this.urlData[this.linkType]
+                    ? `${this.linkType}:${this.urlData[this.linkType]}`
+                    : null);
+            },
+        },
 
     },
 
@@ -285,16 +345,16 @@ export default {
             this.linkType = this.getLinkTypeForUrl(attrs.href);
 
             this.url = { [this.linkType]: attrs.href };
+            this.urlData = { [this.linkType]: this.getUrlDataForUrl(attrs.href) };
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
 
             this.title = attrs.title;
+            this.rel = attrs.href 
+                ? attrs.rel
+                : this.defaultRel;
             this.targetBlank = attrs.href
                 ? attrs.target === '_blank'
                 : this.config.target_blank;
-        },
-
-        setLinkType(type) {
-            this.linkType = type;
         },
 
         autofocus() {
@@ -333,7 +393,7 @@ export default {
             this.$emit('updated', {
                 href: this.href,
                 rel: this.rel,
-                target: this.targetBlank ? '_blank' : null,
+                target: (this.canHaveTarget && this.targetBlank) ? '_blank' : null,
                 title: this.title,
             });
         },
@@ -404,7 +464,25 @@ export default {
 
         getLinkTypeForUrl(url) {
             const { type } = this.parseDataUrl(url);
-            return type || 'url';
+            if (type) {
+                return type;
+            }
+
+            const matches = url ? url.match(/^(mailto|tel):(.*)$/) : null;
+            if (matches) {
+                return matches[1];
+            }
+
+            return 'url';
+        },
+
+        getUrlDataForUrl(url) {
+            const matches = url ? url.match(/^(mailto|tel):(.*)$/) : null;
+            if (! matches) {
+                return null;
+            }
+
+            return matches[2];
         },
 
         getItemDataForUrl(url) {

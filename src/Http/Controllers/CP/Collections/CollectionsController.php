@@ -93,18 +93,10 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'sites' => $collection->sites()->map(function ($site_handle) {
-                $site = Site::get($site_handle);
-
-                if (! $site) {
-                    throw new SiteNotFoundException($site_handle);
-                }
-
-                return [
-                    'handle' => $site->handle(),
-                    'name' => $site->name(),
-                ];
-            })->values()->all(),
+            'sites' => $this->getAuthorizedSitesForCollection($collection),
+            'createUrls' => $collection->sites()
+                ->mapWithKeys(fn ($site) => [$site => cp_route('collections.entries.create', [$collection->handle(), $site])])
+                ->all(),
         ];
 
         if ($collection->queryEntries()->count() === 0) {
@@ -207,7 +199,7 @@ class CollectionsController extends CpController
             ->futureDateBehavior('private');
 
         if (Site::hasMultiple()) {
-            $collection->sites([Site::default()->handle()]);
+            $collection->sites([Site::selected()->handle()]);
         }
 
         $collection->save();
@@ -556,5 +548,22 @@ class CollectionsController extends CpController
         ]);
 
         return Blueprint::makeFromTabs($fields);
+    }
+
+    protected function getAuthorizedSitesForCollection($collection)
+    {
+        return $collection
+            ->sites()
+            ->mapWithKeys(fn ($handle) => [$handle => Site::get($handle)])
+            ->each(fn ($site, $handle) => throw_unless($site, new SiteNotFoundException($handle)))
+            ->filter(fn ($site) => User::current()->can('view', $site))
+            ->map(function ($site) {
+                return [
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
+                ];
+            })
+            ->values()
+            ->all();
     }
 }

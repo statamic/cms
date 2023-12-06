@@ -7,6 +7,7 @@ use Statamic\Sites\Sites;
 
 /**
  * @method static mixed all()
+ * @method static mixed authorized()
  * @method static mixed default()
  * @method static bool hasMultiple()
  * @method static mixed get($handle)
@@ -14,6 +15,7 @@ use Statamic\Sites\Sites;
  * @method static mixed current()
  * @method static void setCurrent($site)
  * @method static mixed selected()
+ * @method static void setSelected($site)
  * @method static void setConfig($key, $value = null)
  *
  * @see \Statamic\Sites\Sites

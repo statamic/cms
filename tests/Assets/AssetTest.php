@@ -1655,6 +1655,50 @@ class AssetTest extends TestCase
         $this->assertEquals(15, $meta['height']);
     }
 
+    public function formatParams()
+    {
+        return [['format'], ['fm']];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider formatParams
+     **/
+    public function it_can_upload_an_image_into_a_container_with_new_extension_format($formatParam)
+    {
+        Event::fake();
+
+        config(['statamic.assets.image_manipulation.presets.enforce_png' => [
+            $formatParam => 'png',
+        ]]);
+
+        $this->container->sourcePreset('enforce_png');
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->with('jpg', 'image/jpeg')
+            ->andReturnTrue()
+            ->once();
+
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 20, 30));
+
+        $this->assertEquals($asset, $return);
+        $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
+        $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+        Storage::disk('test')->assertExists('path/to/asset.png');
+        $this->assertEquals('path/to/asset.png', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+        Event::assertDispatched(AssetSaved::class);
+    }
+
     public function nonGlideableFileExtensions()
     {
         return [
@@ -1662,7 +1706,6 @@ class AssetTest extends TestCase
             ['md'],  // not an image
             ['svg'], // doesn't work with imagick without extra server config
             ['pdf'], // doesn't work with imagick without extra server config
-            ['eps'], // doesn't work with imagick without extra server config
         ];
     }
 
@@ -1688,7 +1731,7 @@ class AssetTest extends TestCase
         Storage::disk('test')->assertMissing("path/to/file.{$extension}");
 
         // Ensure a glide server is never instantiated for these extensions...
-        Facades\Glide::shouldReceive('server')->never();
+        Facades\Glide::partialMock()->shouldReceive('server')->never();
 
         $return = $asset->upload(UploadedFile::fake()->create("file.{$extension}"));
 
@@ -1713,24 +1756,25 @@ class AssetTest extends TestCase
             'h' => '15',
         ]]);
 
-        // Normally eps files (for example) are not supported by gd or imagick. However, imagick does
+        // Normally pdf files (for example) are not supported by gd or imagick. However, imagick does
         // does actually support over 100 formats with extra configuration (eg. via ghostscript).
         // Thus, we allow the user to configure additional extensions in their assets config.
         config(['statamic.assets.image_manipulation.additional_extensions' => [
-            'eps',
+            'pdf',
         ]]);
 
         $this->container->sourcePreset('small');
 
-        $asset = (new Asset)->container($this->container)->path('path/to/asset.eps')->syncOriginal();
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.pdf')->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
-        Storage::disk('test')->assertMissing('path/to/asset.eps');
+        Storage::disk('test')->assertMissing('path/to/asset.pdf');
 
-        $file = UploadedFile::fake()->image('asset.eps', 20, 30);
+        $file = UploadedFile::fake()->image('asset.pdf', 20, 30);
 
         // Ensure a glide server is instantiated and `makeImage()` is called...
-        Facades\Glide::shouldReceive('server->makeImage')
+        Facades\Glide::partialMock()
+            ->shouldReceive('server->makeImage')
             ->andReturn($file->getFilename())
             ->once();
 
@@ -1748,8 +1792,8 @@ class AssetTest extends TestCase
         $this->assertEquals($asset, $return);
         $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
         $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
-        Storage::disk('test')->assertExists('path/to/asset.eps');
-        $this->assertEquals('path/to/asset.eps', $asset->path());
+        Storage::disk('test')->assertExists('path/to/asset.pdf');
+        $this->assertEquals('path/to/asset.pdf', $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
@@ -1757,7 +1801,7 @@ class AssetTest extends TestCase
         $meta = $asset->meta();
 
         // Normally we assert changes to the meta, but we cannot in this test because we can't guarantee
-        // the test suite has imagick with ghostscript installed (required for eps files, for example).
+        // the test suite has imagick with ghostscript installed (required for pdf files, for example).
         // $this->assertEquals(10, $meta['width']);
         // $this->assertEquals(15, $meta['height']);
     }
@@ -1785,10 +1829,10 @@ class AssetTest extends TestCase
     public function it_lowercases_uploaded_filenames_by_default()
     {
         Event::fake();
-        $asset = $this->container->makeAsset('path/to/lowercase-THIS-asset.jpg');
+        $asset = $this->container->makeAsset('path/to/lowercase-THIS-asset.JPG');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
 
-        $asset->upload(UploadedFile::fake()->image('lowercase-THIS-asset.jpg'));
+        $asset->upload(UploadedFile::fake()->image('lowercase-THIS-asset.JPG'));
 
         Storage::disk('test')->assertExists('path/to/lowercase-this-asset.jpg');
         $this->assertEquals('path/to/lowercase-this-asset.jpg', $asset->path());
@@ -1868,13 +1912,13 @@ class AssetTest extends TestCase
         config(['statamic.assets.lowercase' => false]);
 
         Event::fake();
-        $asset = $this->container->makeAsset('path/to/do-NOT-lowercase-THIS-asset.jpg');
+        $asset = $this->container->makeAsset('path/to/do-NOT-lowercase-THIS-asset.JPG');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
 
-        $asset->upload(UploadedFile::fake()->image('do-NOT-lowercase-THIS-asset.jpg'));
+        $asset->upload(UploadedFile::fake()->image('do-NOT-lowercase-THIS-asset.JPG'));
 
-        Storage::disk('test')->assertExists('path/to/do-NOT-lowercase-THIS-asset.jpg');
-        $this->assertEquals('path/to/do-NOT-lowercase-THIS-asset.jpg', $asset->path());
+        Storage::disk('test')->assertExists('path/to/do-NOT-lowercase-THIS-asset.JPG');
+        $this->assertEquals('path/to/do-NOT-lowercase-THIS-asset.JPG', $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
