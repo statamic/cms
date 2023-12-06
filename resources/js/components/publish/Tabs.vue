@@ -207,8 +207,11 @@ export default {
 
         actionsPortal() {
             return `publish-actions-${this.storeName}`;
-        }
+        },
 
+        values() {
+            return this.state.values;
+        },
     },
 
     beforeUpdate() {
