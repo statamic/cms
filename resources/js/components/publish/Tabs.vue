@@ -244,7 +244,7 @@ export default {
                 });
             });
 
-            return visibleFields;
+            return visibleFields > 0;
         },
 
         setActive(handle) {
