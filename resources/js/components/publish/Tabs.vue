@@ -116,10 +116,13 @@
 
 <script>
 import { uniq } from 'underscore';
+import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
 
     inject: ['storeName'],
+
+    mixins: [ValidatesFieldConditions],
 
     props: {
         readOnly: Boolean,
@@ -151,7 +154,7 @@ export default {
         },
 
         tabs() {
-            return this.state.blueprint.tabs;
+            return this.state.blueprint.tabs.filter(tab => this.tabHasVisibleFields(tab));
         },
 
         inStack() {
@@ -228,6 +231,18 @@ export default {
 
         tabHasError(handle) {
             return this.tabsWithErrors.includes(handle);
+        },
+
+        tabHasVisibleFields(tab) {
+            return tab.handle != 'hidden_fields';
+            let fields = {};
+            this.mainTabs[this.tabIndex(handle)].sections.forEach(section => {
+                section.fields.forEach(field => {
+                    fields[field.handle] = this.showField(field);
+                });
+            });
+
+            return fields;
         },
 
         setActive(handle) {
