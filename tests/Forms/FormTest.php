@@ -30,15 +30,13 @@ class FormTest extends TestCase
 
         $form = Form::make('contact_us')
             ->title('Contact Us')
-            ->honeypot('winnie')
-            ->mailer('mailer');
+            ->honeypot('winnie');
 
         $form->save();
 
         $this->assertEquals('contact_us', $form->handle());
         $this->assertEquals('Contact Us', $form->title());
         $this->assertEquals('winnie', $form->honeypot());
-        $this->assertEquals('mailer', $form->mailer());
 
         Event::assertDispatched(FormCreating::class, function ($event) use ($form) {
             return $event->form === $form;
