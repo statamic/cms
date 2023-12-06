@@ -9,18 +9,36 @@ use Mockery;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Globals\Variables;
 use Statamic\Support\Arr;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class VariablesTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Site::setConfig(['sites' => [
+            'a' => ['url' => '/', 'locale' => 'en'],
+            'b' => ['url' => '/b/', 'locale' => 'fr'],
+            'c' => ['url' => '/b/', 'locale' => 'fr'],
+            'd' => ['url' => '/d/', 'locale' => 'fr'],
+        ]]);
+    }
+
     /** @test */
     public function it_gets_file_contents_for_saving()
     {
-        $entry = (new Variables)->data([
+        $global = GlobalSet::make('test');
+
+        $entry = $global->makeLocalization('a')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
@@ -62,6 +80,10 @@ EOT;
             'null' => null, // this...
             'empty' => [],  // and this should get stripped out because there's no origin to fall back to.
         ]);
+
+        $global->addLocalization($a);
+        $global->addLocalization($b);
+        $global->addLocalization($c);
 
         $expected = <<<'EOT'
 array:
@@ -129,6 +151,12 @@ EOT;
             'one' => 'juliett',
             'two' => null,
         ]);
+
+        $global->addLocalization($a);
+        $global->addLocalization($b);
+        $global->addLocalization($c);
+        $global->addLocalization($d);
+        $global->addLocalization($e);
 
         $this->assertEquals([
             'one' => 'alfa',

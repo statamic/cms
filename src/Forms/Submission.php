@@ -11,6 +11,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\SubmissionCreated;
+use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
@@ -20,7 +21,7 @@ use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Submission implements SubmissionContract, Augmentable
+class Submission implements Augmentable, SubmissionContract
 {
     use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, TracksQueriedColumns, TracksQueriedRelations;
 
@@ -36,6 +37,8 @@ class Submission implements SubmissionContract, Augmentable
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+
+    protected ?string $redirect = null;
 
     public function __construct()
     {
@@ -152,6 +155,10 @@ class Submission implements SubmissionContract, Augmentable
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && SubmissionCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (SubmissionSaving::dispatch($this) === false) {
                 return false;
             }

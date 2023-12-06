@@ -10,6 +10,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormCreated;
+use Statamic\Events\FormCreating;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
@@ -20,11 +21,12 @@ use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
+use Statamic\Forms\Exporters\Exporter;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Form implements FormContract, Augmentable, Arrayable
+class Form implements Arrayable, Augmentable, FormContract
 {
     use FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -174,6 +176,10 @@ class Form implements FormContract, Augmentable, Arrayable
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && FormCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (FormSaving::dispatch($this) === false) {
                 return false;
             }
@@ -381,5 +387,18 @@ class Form implements FormContract, Augmentable, Arrayable
     public function actionUrl()
     {
         return route('statamic.forms.submit', $this->handle());
+    }
+
+    public function exporters()
+    {
+        return FormFacade::exporters()
+            ->all()
+            ->filter->allowedOnForm($this)
+            ->each->setForm($this);
+    }
+
+    public function exporter(string $handle): ?Exporter
+    {
+        return $this->exporters()->get($handle);
     }
 }

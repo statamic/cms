@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Forms\Form;
 use Tests\TestCase;
 
 class FieldTest extends TestCase
@@ -51,7 +52,8 @@ class FieldTest extends TestCase
     /** @test */
     public function it_gets_the_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
         };
 
         FieldtypeRepository::shouldReceive('find')
@@ -287,24 +289,24 @@ class FieldTest extends TestCase
             });
 
         FieldtypeRepository::shouldReceive('find')
-                ->with('with_processing')
-                ->andReturn(new class extends Fieldtype
+            ->with('with_processing')
+            ->andReturn(new class extends Fieldtype
+            {
+                public function preProcess($data)
                 {
-                    public function preProcess($data)
-                    {
-                        return $data.' preprocessed';
-                    }
-                });
+                    return $data.' preprocessed';
+                }
+            });
 
         FieldtypeRepository::shouldReceive('find')
-                ->with('without_processing')
-                ->andReturn(new class extends Fieldtype
+            ->with('without_processing')
+            ->andReturn(new class extends Fieldtype
+            {
+                public function preProcess($data)
                 {
-                    public function preProcess($data)
-                    {
-                        return $data;
-                    }
-                });
+                    return $data;
+                }
+            });
 
         $field = new Field('test', [
             'type' => 'example',
@@ -616,5 +618,18 @@ class FieldTest extends TestCase
         $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
 
         $this->assertTrue($field->isRelationship());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_form()
+    {
+        $field = new Field('test', ['type' => 'text']);
+
+        $this->assertNull($field->form());
+
+        $return = $field->setForm($form = new Form);
+
+        $this->assertEquals($field, $return);
+        $this->assertEquals($form, $field->form());
     }
 }

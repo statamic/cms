@@ -2,15 +2,21 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Filesystem\Filesystem;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Facades\Path;
 use Statamic\Fields\Fieldtype;
+use Statamic\Support\Str;
 
 class Icon extends Fieldtype
 {
+    public const DEFAULT_FOLDER = 'regular';
+
     protected $categories = ['media'];
     protected $icon = 'icon_picker';
+
+    protected static $customSvgIcons = [];
 
     public function preload(): array
     {
@@ -37,11 +43,13 @@ class Icon extends Fieldtype
                         'display' => __('Directory'),
                         'instructions' => __('statamic::fieldtypes.icon.config.directory'),
                         'type' => 'text',
+                        'placeholder' => 'vendor/statamic/cms/resources/svg/icons',
                     ],
                     'folder' => [
                         'display' => __('Folder'),
                         'instructions' => __('statamic::fieldtypes.icon.config.folder'),
                         'type' => 'text',
+                        'placeholder' => static::DEFAULT_FOLDER,
                     ],
                     'default' => [
                         'display' => __('Default Value'),
@@ -71,7 +79,7 @@ class Icon extends Fieldtype
 
         $folder = $this->config(
             'folder',
-            $hasConfiguredDirectory ? null : 'regular' // Only apply a default folder if using Statamic icons.
+            $hasConfiguredDirectory ? null : self::DEFAULT_FOLDER // Only apply a default folder if using Statamic icons.
         );
 
         $path = Path::tidy($directory.'/'.$folder);
@@ -82,5 +90,33 @@ class Icon extends Fieldtype
             $folder,
             $hasConfiguredDirectory,
         ];
+    }
+
+    /**
+     * Provide custom SVG icons to script.
+     *
+     * @param  string  $directory
+     * @param  string|null  $folder
+     */
+    public static function provideCustomSvgIconsToScript($directory, $folder = null)
+    {
+        $path = Str::removeRight(Path::tidy($directory.'/'.$folder), '/');
+
+        static::$customSvgIcons[$path] = collect(app(Filesystem::class)->files($path))
+            ->filter(fn ($file) => strtolower($file->getExtension()) === 'svg')
+            ->keyBy(fn ($file) => pathinfo($file->getBasename(), PATHINFO_FILENAME))
+            ->map
+            ->getContents()
+            ->all();
+    }
+
+    /**
+     * Get custom SVG icons for script.
+     *
+     * @return array
+     */
+    public static function getCustomSvgIcons()
+    {
+        return static::$customSvgIcons;
     }
 }

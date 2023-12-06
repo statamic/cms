@@ -9,13 +9,13 @@ use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
-    use Concerns\OutputsItems,
-        Concerns\QueriesConditions,
-        Concerns\QueriesScopes,
-        Concerns\QueriesOrderBys;
     use Concerns\GetsQueryResults {
         results as getQueryResults;
     }
+    use Concerns\OutputsItems,
+        Concerns\QueriesConditions,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes;
 
     protected static $handle = 'search';
 
@@ -30,9 +30,7 @@ class Tags extends BaseTags
         $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($supplementData)
-            ->limit($this->params->get('limit'))
-            ->offset($this->params->get('offset'));
+            ->withData($supplementData);
 
         $this->querySite($builder);
         $this->queryStatus($builder);

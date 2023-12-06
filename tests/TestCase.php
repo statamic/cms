@@ -15,8 +15,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function setUp(): void
     {
-        require_once __DIR__.'/ConsoleKernel.php';
-
         parent::setUp();
 
         $this->withoutVite();
@@ -105,6 +103,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.stache.stores.entries.directory', __DIR__.'/__fixtures__/content/collections');
         $app['config']->set('statamic.stache.stores.navigation.directory', __DIR__.'/__fixtures__/content/navigation');
         $app['config']->set('statamic.stache.stores.globals.directory', __DIR__.'/__fixtures__/content/globals');
+        $app['config']->set('statamic.stache.stores.global-variables.directory', __DIR__.'/__fixtures__/content/globals');
         $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
         $app['config']->set('statamic.stache.stores.nav-trees.directory', __DIR__.'/__fixtures__/content/structures/navigation');
         $app['config']->set('statamic.stache.stores.collection-trees.directory', __DIR__.'/__fixtures__/content/structures/collections');

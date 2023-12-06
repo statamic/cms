@@ -17,7 +17,6 @@ interface Cacher
     /**
      * Check if a page has been cached.
      *
-     * @param  Request  $request
      * @return bool
      */
     public function hasCachedPage(Request $request);
@@ -25,7 +24,6 @@ interface Cacher
     /**
      * Get a cached page.
      *
-     * @param  Request  $request
      * @return string
      */
     public function getCachedPage(Request $request);

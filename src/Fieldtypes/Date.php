@@ -72,13 +72,13 @@ class Date extends Fieldtype
             [
                 'display' => __('Timepicker'),
                 'fields' => [
-                    'time_enabled'  => [
+                    'time_enabled' => [
                         'display' => __('Time Enabled'),
                         'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
                         'type' => 'toggle',
                         'default' => false,
                     ],
-                    'time_seconds_enabled'  => [
+                    'time_seconds_enabled' => [
                         'display' => __('Show Seconds'),
                         'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
                         'type' => 'toggle',
@@ -203,7 +203,7 @@ class Date extends Fieldtype
 
     private function processSingle($data)
     {
-        return $this->processDateTime($data['date'].' '.$data['time']);
+        return $this->processDateTime($data['date'].' '.($data['time'] ?? '00:00'));
     }
 
     private function processRange($data)
@@ -212,13 +212,20 @@ class Date extends Fieldtype
 
         return [
             'start' => $this->processDateTime($date['start']),
-            'end' => $this->processDateTime($date['end']),
+            'end' => $this->processDateTimeEndOfDay($date['end']),
         ];
     }
 
     private function processDateTime($value)
     {
         $date = Carbon::parse($value);
+
+        return $this->formatAndCast($date, $this->saveFormat());
+    }
+
+    private function processDateTimeEndOfDay($value)
+    {
+        $date = Carbon::parse($value)->endOfDay();
 
         return $this->formatAndCast($date, $this->saveFormat());
     }
@@ -365,6 +372,10 @@ class Date extends Fieldtype
             ]);
         }
 
+        if ($value === null) {
+            return null;
+        }
+
         if ($this->config('mode', 'single') === 'single') {
             return $this->preProcessSingleValidatable($value);
         }
@@ -383,7 +394,7 @@ class Date extends Fieldtype
             return $value;
         }
 
-        if (! $value || ! $value['date']) {
+        if (! $value['date']) {
             return null;
         }
 

@@ -215,6 +215,10 @@ export default {
         this.keybinding = this.$keys.bindGlobal('mod+shift+p', () => {
             this.previewing ? this.close() : this.$emit('opened-via-keyboard');
         });
+
+        this.$events.$on(`live-preview.${this.name}.refresh`, () => {
+            this.update();
+        });
     },
 
     beforeDestroy() {
@@ -251,7 +255,11 @@ export default {
         setIframeAttributes(iframe) {
             iframe.setAttribute('frameborder', '0');
             iframe.setAttribute('class', this.previewDevice ? 'device' : 'responsive');
-            if (this.previewDevice) iframe.setAttribute('style', `width: ${this.previewDeviceWidth}; height: ${this.previewDeviceHeight}`);
+            if (this.previewDevice) {
+                iframe.setAttribute('style', `width: ${this.previewDeviceWidth}; height: ${this.previewDeviceHeight}`);
+            } else {
+                iframe.removeAttribute('style');
+            }
         },
 
         close() {

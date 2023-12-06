@@ -93,6 +93,13 @@
         background: linear-gradient(180deg, theme('colors.gray.900'), hsl(210, 20%, 13%));
     }
 
+    .editor {
+        @apply bg-gray-800 text-gray-200;
+        .cm-header {
+            @apply text-white;
+        }
+    }
+
     .helpers {
         @apply bg-gray-900 text-white border-t border-gray-950;
     }
@@ -191,6 +198,14 @@
 
     ul {
         @apply list-disc;
+    }
+
+    pre {
+        @apply rounded px-4 py-2;
+        color: #c7254e;
+        background-color: #f9f2f4;
+
+        code { @apply p-0 }
     }
 }
 

@@ -5,7 +5,9 @@ namespace Tests\Data\Taxonomies;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Event;
 use Mockery;
+use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
+use Statamic\Events\TermCreating;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
 use Statamic\Facades;
@@ -81,6 +83,28 @@ class TermTest extends TestCase
     }
 
     /** @test */
+    public function it_dispatches_an_event_when_getting_blueprint()
+    {
+        Event::fake();
+
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
+            'blueprint' => $blueprint = (new Blueprint)->setHandle('blueprint'),
+        ]));
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy($taxonomy);
+
+        // Do it twice so we can check the event is only dispatched once.
+        $term->blueprint();
+        $term->blueprint();
+
+        Event::assertDispatchedTimes(TermBlueprintFound::class, 1);
+        Event::assertDispatched(TermBlueprintFound::class, function ($event) use ($blueprint, $term) {
+            return $event->blueprint === $blueprint
+                && $event->term === $term;
+        });
+    }
+
+    /** @test */
     public function it_gets_the_entry_count_through_the_repository()
     {
         $term = (new Term)->taxonomy('tags')->slug('foo');
@@ -104,6 +128,10 @@ class TermTest extends TestCase
         $return = $term->save();
 
         $this->assertTrue($return);
+
+        Event::assertDispatched(TermCreating::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
 
         Event::assertDispatched(TermSaving::class, function ($event) use ($term) {
             return $event->term === $term;
@@ -149,8 +177,28 @@ class TermTest extends TestCase
 
         $this->assertTrue($return);
 
+        Event::assertNotDispatched(TermCreating::class);
         Event::assertNotDispatched(TermSaving::class);
         Event::assertNotDispatched(TermSaved::class);
+        Event::assertNotDispatched(TermCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_term_doesnt_save()
+    {
+        Event::fake([TermCreated::class]);
+
+        Event::listen(TermCreating::class, function () {
+            return false;
+        });
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->save();
+
+        $this->assertFalse($return);
+
         Event::assertNotDispatched(TermCreated::class);
     }
 

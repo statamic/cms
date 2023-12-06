@@ -216,7 +216,7 @@
                                             @dblclick.stop="$emit('edit-asset', asset)"
                                         >
                                             <div class="asset-thumb-container">
-                                                <div class="asset-thumb">
+                                                <div class="asset-thumb" :class="{'bg-checkerboard': asset.can_be_transparent}">
                                                     <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-4 h-full w-full': asset.extension === 'svg'}" />
                                                     <file-icon
                                                         v-else
@@ -388,11 +388,11 @@ export default {
         },
 
         canUpload() {
-            return this.folder && this.container.allow_uploads;
+            return this.folder && this.container.allow_uploads && this.can('upload '+ this.container.id +' assets');
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation && this.can('upload '+ this.container.id +' assets');
         },
 
         parameters() {
@@ -482,7 +482,11 @@ export default {
                 : this.path;
 
             this.$emit('navigated', this.container, path);
-        }
+        },
+
+        searchQuery() {
+            this.page = 1;
+        },
 
     },
 

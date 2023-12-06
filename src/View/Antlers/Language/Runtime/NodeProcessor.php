@@ -51,6 +51,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
+use Statamic\View\State\CachesOutput;
 use Throwable;
 
 class NodeProcessor
@@ -217,6 +218,8 @@ class NodeProcessor
      * @var string|null
      */
     private $profilingTagName = null;
+
+    private $scopeAdjustingParams = ['as'];
 
     public function __construct(Loader $loader, EnvironmentDetails $envDetails)
     {
@@ -393,36 +396,8 @@ class NodeProcessor
 
     private function startMeasuringTag($tagName, AntlersNode $node)
     {
-        $file = '';
-
-        if (count(GlobalRuntimeState::$templateFileStack) > 0) {
-            $file = GlobalRuntimeState::$templateFileStack[count(GlobalRuntimeState::$templateFileStack) - 1][0];
-        }
-
-        $suffix = '';
-
-        if ($file != '') {
-            $suffix = str_replace('//', '/', mb_substr($file, strlen(base_path())));
-
-            if (Str::startsWith($suffix, '/')) {
-                $suffix = mb_substr($suffix, 1);
-            }
-        }
-
-        if ($node->startPosition != null) {
-            $suffix .= ' Line: '.$node->startPosition->line;
-        }
-
-        $suffix = trim($suffix);
-
-        $report = 'Tag: '.$tagName;
-
-        if (mb_strlen($suffix) > 0) {
-            $report .= ' ['.$suffix.']';
-        }
-
         $this->profilingTagName = 'tag_'.$tagName.microtime();
-        debugbar()->startMeasure($this->profilingTagName, $report);
+        debugbar()->startMeasure($this->profilingTagName, $tagName);
     }
 
     private function stopMeasuringTag()
@@ -440,7 +415,7 @@ class NodeProcessor
      *
      * @return bool
      */
-    private function isTracingEnabled()
+    public function isTracingEnabled()
     {
         if ($this->runtimeConfiguration == null) {
             return false;
@@ -451,6 +426,11 @@ class NodeProcessor
         }
 
         return false;
+    }
+
+    public function getRuntimeConfiguration()
+    {
+        return $this->runtimeConfiguration;
     }
 
     /**
@@ -537,7 +517,7 @@ class NodeProcessor
 
         if (GlobalRuntimeState::$traceTagAssignments) {
             if (! empty(GlobalRuntimeState::$tracedRuntimeAssignments)) {
-                $data = GlobalRuntimeState::$tracedRuntimeAssignments + $data;
+                $data = array_merge(GlobalRuntimeState::$tracedRuntimeAssignments, $data);
             }
         }
 
@@ -1097,7 +1077,7 @@ class NodeProcessor
             Log::warning('Runtime Access Violation: '.$tagCheck, [
                 'tag' => $tagCheck,
                 'file' => GlobalRuntimeState::$currentExecutionFile,
-                'trace' =>  GlobalRuntimeState::$templateFileStack,
+                'trace' => GlobalRuntimeState::$templateFileStack,
             ]);
 
             if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
@@ -1385,7 +1365,24 @@ class NodeProcessor
                             $recursiveParent->activeDepth += 1;
 
                             $rootData = RecursiveNodeManager::getRecursiveRootData($node);
+                            $rootData = array_merge($rootData, $this->getRuntimeAssignments());
+
+                            // Prevent an infinite loop with arbitrary data.
+                            if (array_key_exists($node->content, $rootData)) {
+                                unset($rootData[$node->content]);
+                            }
+
                             $parentParameterValues = array_values($recursiveParent->getParameterValues($this));
+
+                            GlobalRuntimeState::$traceTagAssignments = true;
+                            GlobalRuntimeState::$activeTracerCount += 1;
+                            GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
+
+                            $currentAssignments = $this->getRuntimeAssignments();
+
+                            $recursiveProcessor = $this->cloneProcessor();
+                            $recursiveProcessor->setRuntimeAssignments($this->runtimeAssignments);
+
                             // Substitute the current node with the original parent.
                             foreach ($children as $childData) {
                                 $namedDepthMapping = $node->content.'_depth';
@@ -1397,7 +1394,7 @@ class NodeProcessor
                                 // Keep the manager in sync.
                                 RecursiveNodeManager::updateNamedDepth($node, $recursiveParent->activeDepth);
 
-                                $childDataToUse = $depths + $childData;
+                                $childDataToUse = $childData;
 
                                 if (! empty($recursiveParent->parameters)) {
                                     $lockData = $this->data;
@@ -1412,8 +1409,25 @@ class NodeProcessor
                                     $childDataToUse = $childDataToUse + $rootData;
                                 }
 
-                                $result = $this->cloneProcessor()
-                                    ->setData($childDataToUse)->reduce($recursiveParent->children);
+                                // Apply depths after merging root data to prevent overwriting.
+                                $childDataToUse = array_merge($childDataToUse, $depths);
+
+                                // Add an empty array for consistency.
+                                if (! array_key_exists($node->content, $childDataToUse)) {
+                                    $childDataToUse[$node->content] = [];
+                                }
+
+                                $result = $recursiveProcessor->replaceData($childDataToUse)->reduce($recursiveParent->children);
+
+                                $recursiveAssignmentValues = $recursiveProcessor->getRuntimeAssignments();
+
+                                if (! empty($recursiveAssignmentValues)) {
+                                    foreach ($recursiveAssignmentValues as $assignVar => $assignVal) {
+                                        if (array_key_exists($assignVar, $currentAssignments)) {
+                                            GlobalRuntimeState::$tracedRuntimeAssignments[$assignVar] = $assignVal;
+                                        }
+                                    }
+                                }
 
                                 $buffer .= $this->measureBufferAppend($node, $result);
 
@@ -1424,6 +1438,11 @@ class NodeProcessor
 
                             $recursiveParent->activeDepth -= 1;
                             RecursiveNodeManager::releaseRecursiveNode($node);
+
+                            if (GlobalRuntimeState::$activeTracerCount == 0) {
+                                GlobalRuntimeState::$traceTagAssignments = false;
+                                GlobalRuntimeState::$tracedRuntimeAssignments = [];
+                            }
                         }
 
                         continue;
@@ -1451,6 +1470,7 @@ class NodeProcessor
                     if ($shouldProcessAsTag) {
                         $tagName = $node->name->getCompoundTagName();
                         $tagMethod = $node->name->getMethodName();
+                        $isCacheTag = false;
 
                         $this->startMeasuringTag($tagName, $node);
 
@@ -1551,6 +1571,11 @@ class NodeProcessor
                             'tag_method' => $tagMethod,
                         ]);
 
+                        if (in_array(CachesOutput::class, class_implements($tag))) {
+                            $isCacheTag = true;
+                            GlobalRuntimeState::$isCacheEnabled = true;
+                        }
+
                         $methodToCall = $node->name->getRuntimeMethodName();
 
                         if ($this->encounteredBuilder) {
@@ -1570,6 +1595,10 @@ class NodeProcessor
 
                         try {
                             $output = call_user_func([$tag, $methodToCall], ...$args);
+
+                            if ($isCacheTag) {
+                                GlobalRuntimeState::$isCacheEnabled = false;
+                            }
                         } catch (Exception $e) {
                             throw $e;
                         } finally {
@@ -1674,6 +1703,14 @@ class NodeProcessor
                                 $this->cascade->sections()->get($tagMethod)
                             );
 
+                            if (GlobalRuntimeState::$isCacheEnabled) {
+                                LiteralReplacementManager::$cachedSections[] = [
+                                    $sectionName,
+                                    $tagMethod,
+                                    (string) $this->cascade->sections()->get($tagMethod),
+                                ];
+                            }
+
                             if ($this->isTracingEnabled()) {
                                 $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                             }
@@ -1716,10 +1753,39 @@ class NodeProcessor
                                 GlobalRuntimeState::$activeTracerCount += 1;
                                 GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
 
-                                if ($node->hasModifierParameters()) {
+                                // Only revert to parseLoop behavior if the tag contains
+                                // parameters that are likely to dramatically change
+                                // the scope or overall output of the tag result
+                                if ($node->hasScopeAdjustingParameters) {
+                                    $tagAssocOutput = $output;
                                     $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
                                     $tagCallbackResult = null;
                                     $currentProcessorCanHandleTagValue = false;
+
+                                    $adjustedScope = false;
+
+                                    // It is possible that the tag has injected a variable
+                                    // that was already in the scope. If this is the case,
+                                    // let's check if the final value is the same as the
+                                    // value returned from the tag. If so, we will not
+                                    // push this new value back up the stack as no
+                                    // explicit re-assignment has occurred.
+                                    foreach ($this->scopeAdjustingParams as $paramName) {
+                                        if (array_key_exists($paramName, $tagParameters)) {
+                                            $potentialVariableCollisionName = $tagParameters[$paramName];
+
+                                            if (array_key_exists($potentialVariableCollisionName, $beforeAssignments) && array_key_exists($potentialVariableCollisionName, $tagAssocOutput)) {
+                                                if ($this->data[count($this->data) - 1][$potentialVariableCollisionName] == $tagAssocOutput[$potentialVariableCollisionName]) {
+                                                    unset($this->runtimeAssignments[$potentialVariableCollisionName]);
+                                                    $adjustedScope = true;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if ($adjustedScope) {
+                                        GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
+                                    }
                                 } else {
                                     $tagCallbackResult = $output;
                                     $currentProcessorCanHandleTagValue = true;
@@ -2085,7 +2151,7 @@ class NodeProcessor
                                         }
                                     }
 
-                                    if ($val instanceof  Value) {
+                                    if ($val instanceof Value) {
                                         if ($val->shouldParseAntlers()) {
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
                                             GlobalRuntimeState::$isEvaluatingData = true;
@@ -2467,7 +2533,7 @@ class NodeProcessor
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
             if (! is_array($value)) {
-                $value = ['value' => $value, 'name'  => $value];
+                $value = ['value' => $value, 'name' => $value];
             }
 
             $value['count'] = $index + 1;

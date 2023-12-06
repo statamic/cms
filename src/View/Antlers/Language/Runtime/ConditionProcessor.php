@@ -5,6 +5,7 @@ namespace Statamic\View\Antlers\Language\Runtime;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
+use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 
 class ConditionProcessor
@@ -35,7 +36,20 @@ class ConditionProcessor
 
         foreach ($node->logicBranches as $branch) {
             if ($branch->head->name->name == 'else') {
+                // For consistency.
+                if ($this->processor->isTracingEnabled()) {
+                    $this->processor->getRuntimeConfiguration()->traceManager->traceOnEnter($branch->head);
+                }
+
+                if (GlobalDebugManager::$isConnected && GlobalDebugManager::$activeSessionLocator != null) {
+                    GlobalDebugManager::checkNodeForLocatorBreakpoint($branch->head, $this->processor);
+                }
+
                 $this->processor->setIsConditionProcessor($condValueToRestore);
+
+                if ($this->processor->isTracingEnabled()) {
+                    $this->processor->getRuntimeConfiguration()->traceManager->traceOnExit($branch->head, null);
+                }
 
                 return $branch;
             } else {
@@ -50,6 +64,14 @@ class ConditionProcessor
                 $environment->setProcessor($this->processor);
                 $dataToUse = $data;
                 $interpolationReplacements = [];
+
+                if ($this->processor->isTracingEnabled()) {
+                    $this->processor->getRuntimeConfiguration()->traceManager->traceOnEnter($branch->head);
+                }
+
+                if (GlobalDebugManager::$isConnected && GlobalDebugManager::$activeSessionLocator != null) {
+                    GlobalDebugManager::checkNodeForLocatorBreakpoint($branch->head, $this->processor);
+                }
 
                 if (! empty($branch->head->processedInterpolationRegions)) {
                     $this->processor->registerInterpolations($branch->head);
@@ -77,7 +99,12 @@ class ConditionProcessor
 
                 $result = $environment->evaluateBool(self::$branchCache[$branch->head->content]);
 
+                if ($this->processor->isTracingEnabled()) {
+                    $this->processor->getRuntimeConfiguration()->traceManager->traceOnExit($branch->head, $result);
+                }
+
                 if ($result == true) {
+
                     $this->processor->setIsConditionProcessor($condValueToRestore);
 
                     return $branch;
