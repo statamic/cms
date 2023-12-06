@@ -237,15 +237,14 @@ export default {
         },
 
         tabHasVisibleFields(tab) {
-            return tab.handle != 'hidden_fields';
-            let fields = {};
-            this.mainTabs[this.tabIndex(handle)].sections.forEach(section => {
+            let visibleFields = 0;
+            tab.sections.forEach(section => {
                 section.fields.forEach(field => {
-                    fields[field.handle] = this.showField(field);
+                    if (this.showField(field)) visibleFields++;
                 });
             });
 
-            return fields;
+            return visibleFields;
         },
 
         setActive(handle) {
