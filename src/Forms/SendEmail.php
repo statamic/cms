@@ -28,7 +28,7 @@ class SendEmail implements ShouldQueue
 
     public function handle()
     {
-        Mail::mailer($this->submission->form()->mailer())
+        Mail::mailer($this->config['mailer'] ?? null)
             ->send(new Email($this->submission, $this->config, $this->site));
     }
 }

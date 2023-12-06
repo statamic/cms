@@ -145,7 +145,6 @@ class FormsController extends CpController
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
             'email' => $form->email(),
-            'mailer' => $form->mailer(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($form))
@@ -175,8 +174,7 @@ class FormsController extends CpController
             ->title($values['title'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
-            ->email($values['email'])
-            ->mailer($values['mailer']);
+            ->email($values['email']);
 
         $form->save();
 
@@ -233,12 +231,6 @@ class FormsController extends CpController
             'email' => [
                 'display' => __('Email'),
                 'fields' => [
-                    'mailer' => [
-                        'type' => 'select',
-                        'instructions' => __('statamic::messages.form_configure_mailer_instructions'),
-                        'options' => array_keys(config('mail.mailers')),
-                        'clearable' => true,
-                    ],
                     'email' => [
                         'type' => 'grid',
                         'mode' => 'stacked',
@@ -312,6 +304,15 @@ class FormsController extends CpController
                                     'type' => 'toggle',
                                     'display' => __('Attachments'),
                                     'instructions' => __('statamic::messages.form_configure_email_attachments_instructions'),
+                                ],
+                            ],
+                            [
+                                'handle' => 'mailer',
+                                'field' => [
+                                    'type' => 'select',
+                                    'instructions' => __('statamic::messages.form_configure_mailer_instructions'),
+                                    'options' => array_keys(config('mail.mailers')),
+                                    'clearable' => true,
                                 ],
                             ],
                         ],

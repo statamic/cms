@@ -35,7 +35,6 @@ class Form implements Arrayable, Augmentable, FormContract
     protected $honeypot;
     protected $store;
     protected $email;
-    protected $mailer;
     protected $metrics;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
@@ -125,17 +124,6 @@ class Form implements Arrayable, Augmentable, FormContract
     }
 
     /**
-     * Get or set the mailer field.
-     *
-     * @param  mixed  $mailer
-     * @return mixed
-     */
-    public function mailer($mailer = null)
-    {
-        return $this->fluentlyGetOrSet('mailer')->args(func_get_args());
-    }
-
-    /**
      * Get the form fields off the blueprint.
      *
      * @return \Illuminate\Support\Collection
@@ -205,7 +193,6 @@ class Form implements Arrayable, Augmentable, FormContract
 
                 return Arr::removeNullValues($email);
             })->all(),
-            'mailer' => $this->mailer,
             'metrics' => $this->metrics,
         ])->filter()->all();
 
@@ -254,7 +241,6 @@ class Form implements Arrayable, Augmentable, FormContract
                     'honeypot',
                     'store',
                     'email',
-                    'mailer',
                 ]);
             })
             ->each(function ($value, $property) {
