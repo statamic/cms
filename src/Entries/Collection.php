@@ -860,15 +860,9 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function augmentedArrayData()
     {
-        $data = [
+        return [
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
-
-        if (! Statamic::isApiRoute() && ! Statamic::isCpRoute()) {
-            $data['mount'] = $this->mount();
-        }
-
-        return $data;
     }
 }
