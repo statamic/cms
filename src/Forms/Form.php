@@ -16,7 +16,6 @@ use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
-use Statamic\Facades\Folder;
 use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\YAML;
