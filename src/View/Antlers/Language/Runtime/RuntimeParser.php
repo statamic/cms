@@ -311,6 +311,10 @@ class RuntimeParser implements Parser
 
     protected function isIgnitionInstalled()
     {
+        if (app()->runningUnitTests()) {
+            return false;
+        }
+
         return class_exists(ViewException::class) || class_exists('Spatie\LaravelIgnition\Exceptions\ViewException');
     }
 
@@ -461,7 +465,7 @@ class RuntimeParser implements Parser
     private function addAntlersErrorDetails($exception, $text, $data)
     {
         // This is important to not completely bomb out the tests.
-        if (! class_exists(ViewException::class)) {
+        if (app()->runningUnitTests()) {
             return $exception;
         }
 
