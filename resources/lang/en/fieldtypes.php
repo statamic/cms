@@ -89,6 +89,7 @@ return [
     'grid.config.reorderable' => 'Enable the ability to reorder rows.',
     'grid.title' => 'Grid',
     'group.config.fields' => 'Configure fields to be nested inside this group.',
+    'group.title' => 'Group',
     'hidden.title' => 'Hidden',
     'html.title' => 'HTML',
     'html.config.html_instruct' => 'Manage the HTML to be displayed in the publish form.',

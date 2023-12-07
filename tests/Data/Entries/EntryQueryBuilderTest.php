@@ -737,4 +737,26 @@ class EntryQueryBuilderTest extends TestCase
             return [$like => [$like, $expected]];
         });
     }
+
+    /** @test */
+    public function entries_are_found_using_chunk()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $count = 0;
+        Entry::query()->chunk(2, function ($entries) use (&$count) {
+            $this->assertCount($count++ == 0 ? 2 : 1, $entries);
+        });
+    }
+
+    /** @test */
+    public function entries_are_found_using_lazy()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $entries = Entry::query()->lazy();
+
+        $this->assertInstanceOf(\Illuminate\Support\LazyCollection::class, $entries);
+        $this->assertCount(3, $entries);
+    }
 }

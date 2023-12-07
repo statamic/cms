@@ -116,6 +116,7 @@ return [
     'form_configure_handle_instructions' => 'Used to reference this form on the frontend. It\'s non-trivial to change later.',
     'form_configure_honeypot_instructions' => 'Field name to use as a honeypot. Honeypots are special fields used to reduce botspam.',
     'form_configure_intro' => 'Forms are used to collect information from visitors and dispatch events and notifications when there are new submissions.',
+    'form_configure_mailer_instructions' => 'Choose the mailer for sending this email. Leave blank to fall back to the default mailer.',
     'form_configure_store_instructions' => 'Disable to stop storing submissions. Events and email notifications will still be sent.',
     'form_configure_title_instructions' => 'Usually a call to action, like "Contact Us".',
     'getting_started_widget_blueprints' => 'Blueprints define the custom fields used to create and store content.',

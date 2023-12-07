@@ -67,7 +67,7 @@ class TaxonomyRepository implements RepositoryContract
                     return true;
                 }
 
-                return Str::startsWith($uri, '/'.$collection->handle());
+                return Str::startsWith($uri.'/', '/'.$collection->handle().'/');
             });
 
         if ($collection) {
