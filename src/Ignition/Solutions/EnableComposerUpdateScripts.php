@@ -3,8 +3,8 @@
 namespace Statamic\Ignition\Solutions;
 
 use Exception;
-use Facade\IgnitionContracts\RunnableSolution;
 use Facades\Statamic\UpdateScripts\Manager as UpdateScriptManager;
+use Spatie\Ignition\Contracts\RunnableSolution;
 use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\Console\NullConsole;
 use Statamic\Statamic;
@@ -38,7 +38,7 @@ class EnableComposerUpdateScripts implements RunnableSolution
         return 'Configure & Run Update Scripts';
     }
 
-    public function run(array $parameters = [])
+    public function run(array $parameters = []): void
     {
         // Setup null console so we can detect console error output.
         $console = new NullConsole;

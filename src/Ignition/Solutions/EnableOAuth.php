@@ -2,7 +2,7 @@
 
 namespace Statamic\Ignition\Solutions;
 
-use Facade\IgnitionContracts\Solution;
+use Spatie\Ignition\Contracts\Solution;
 use Statamic\Statamic;
 
 class EnableOAuth implements Solution

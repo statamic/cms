@@ -2,9 +2,9 @@
 
 namespace Statamic\View\Antlers\Language\Runtime;
 
-use Facade\Ignition\Exceptions\ViewException;
-use Facade\Ignition\Exceptions\ViewExceptionWithSolution;
-use Facade\IgnitionContracts\ProvidesSolution;
+use Spatie\LaravelIgnition\Exceptions\ViewException;
+use Spatie\LaravelIgnition\Exceptions\ViewExceptionWithSolution;
+use Spatie\Ignition\Contracts\ProvidesSolution;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use ReflectionProperty;
 use Statamic\Contracts\View\Antlers\Parser;

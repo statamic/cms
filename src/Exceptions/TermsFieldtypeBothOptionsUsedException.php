@@ -3,9 +3,9 @@
 namespace Statamic\Exceptions;
 
 use Exception;
-use Facade\IgnitionContracts\BaseSolution;
-use Facade\IgnitionContracts\ProvidesSolution;
-use Facade\IgnitionContracts\Solution;
+use Spatie\Ignition\Contracts\BaseSolution;
+use Spatie\Ignition\Contracts\ProvidesSolution;
+use Spatie\Ignition\Contracts\Solution;
 use Statamic\Statamic;
 
 class TermsFieldtypeBothOptionsUsedException extends Exception implements ProvidesSolution
