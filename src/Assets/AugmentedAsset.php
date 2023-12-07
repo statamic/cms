@@ -65,9 +65,7 @@ class AugmentedAsset extends AbstractAugmented
             ]);
         }
 
-        $keys->merge($this->blueprintFields()->keys());
-
-        return $keys->all();
+        return $keys->merge($this->blueprintFields()->keys())->all();
     }
 
     protected function isAsset()
