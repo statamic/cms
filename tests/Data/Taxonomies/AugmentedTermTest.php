@@ -95,14 +95,13 @@ class AugmentedTermTest extends AugmentedTestCase
     }
 
     /** @test */
-    public function collection_is_present_when_taxonomy_is_mounted()
+    public function collection_is_present_when_set()
     {
         $collection = tap(Collection::make('test'))->save();
         tap(Taxonomy::make('test'))->save();
 
         $term = Term::make()
             ->taxonomy('test')
-            ->collection($collection)
             ->blueprint('test')
             ->in('en')
             ->slug('term-slug')
@@ -110,9 +109,11 @@ class AugmentedTermTest extends AugmentedTestCase
 
         $augmented = new AugmentedTerm($term);
 
-        $value = $augmented->get('collection')->value();
+        $this->assertNull($augmented->get('collection')->value());
 
-        $this->assertInstanceOf(CollectionContract::class, $value);
+        $term->collection($collection);
+
+        $this->assertInstanceOf(CollectionContract::class, $value = $augmented->get('collection')->value());
         $this->assertEquals($collection->handle(), $value->handle());
     }
 }
