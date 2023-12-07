@@ -31,22 +31,7 @@ class FieldsetController extends CpController
                         'edit_url' => $fieldset->editUrl(),
                         'fields' => $fieldset->fields()->all()->count(),
                         'imported_by' => collect($fieldset->importedBy())->flatten(1)->mapToGroups(function ($item) {
-                            if ($item instanceof Blueprint) {
-                                $group = match (Str::before($item->namespace(), '.')) {
-                                    'collections' => __('Collections'),
-                                    'taxonomies' => __('Taxonomies'),
-                                    'navigation' => __('Navigation'),
-                                    'globals' => __('Globals'),
-                                    'assets' => __('Asset Containers'),
-                                    'forms' => __('Forms'),
-                                    'user' => __('Users'),
-                                    'user_group' => __('User Group'),
-                                };
-                            } else {
-                                $group = __('Fieldsets');
-                            }
-
-                            return [$group => ['handle' => $item->handle(), 'title' => $item->title()]];
+                            return [$this->group($item) => ['handle' => $item->handle(), 'title' => $item->title()]];
                         }),
                         'is_deletable' => $fieldset->isDeletable(),
                         'title' => $fieldset->title(),
@@ -59,6 +44,29 @@ class FieldsetController extends CpController
         }
 
         return view('statamic::fieldsets.index', compact('fieldsets'));
+    }
+
+    private function group(Blueprint|Fieldset $item)
+    {
+        if ($item instanceof Fieldset) {
+            return __('Fieldsets');
+        }
+
+        if ($namespace = $item->namespace()) {
+            return match (Str::before($namespace, '.')) {
+                'collections' => __('Collections'),
+                'taxonomies' => __('Taxonomies'),
+                'navigation' => __('Navigation'),
+                'globals' => __('Globals'),
+                'assets' => __('Asset Containers'),
+                'forms' => __('Forms'),
+            };
+        }
+
+        return match ($item->handle()) {
+            'user', 'user_group' => __('Users'),
+            default => __('Other'),
+        };
     }
 
     public function edit($fieldset)
