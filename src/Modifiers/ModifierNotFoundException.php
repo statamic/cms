@@ -3,10 +3,10 @@
 namespace Statamic\Modifiers;
 
 use Exception;
-use Spatie\LaravelIgnition\Support\StringComparator;
 use Spatie\Ignition\Contracts\BaseSolution;
 use Spatie\Ignition\Contracts\ProvidesSolution;
 use Spatie\Ignition\Contracts\Solution;
+use Spatie\LaravelIgnition\Support\StringComparator;
 use Statamic\Statamic;
 
 class ModifierNotFoundException extends Exception implements ProvidesSolution

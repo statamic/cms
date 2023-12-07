@@ -3,10 +3,10 @@
 namespace Statamic\Widgets;
 
 use Exception;
-use Spatie\LaravelIgnition\Support\StringComparator;
 use Spatie\Ignition\Contracts\BaseSolution;
 use Spatie\Ignition\Contracts\ProvidesSolution;
 use Spatie\Ignition\Contracts\Solution;
+use Spatie\LaravelIgnition\Support\StringComparator;
 use Statamic\Statamic;
 
 class WidgetNotFoundException extends Exception implements ProvidesSolution

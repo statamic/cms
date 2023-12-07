@@ -2,7 +2,6 @@
 
 namespace Statamic\View\Antlers;
 
-use Spatie\Ignition\Contracts\ProvidesSolution;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Collection;
@@ -10,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
+use Spatie\Ignition\Contracts\ProvidesSolution;
 use Spatie\LaravelIgnition\Exceptions\ViewException;
 use Spatie\LaravelIgnition\Exceptions\ViewExceptionWithSolution;
 use Statamic\Contracts\Data\Augmentable;
