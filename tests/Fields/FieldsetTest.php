@@ -7,14 +7,35 @@ use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class FieldsetTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
+    private $fieldsets;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->fieldsets = FieldsetRepository::getFacadeRoot();
+    }
+
+    public function tearDown(): void
+    {
+        $this->fieldsets->all()->each->delete();
+
+        parent::tearDown();
+    }
+
     /** @test */
     public function it_gets_the_handle()
     {
@@ -143,6 +164,258 @@ class FieldsetTest extends TestCase
         $this->assertEquals('textarea', $field->type());
 
         $this->assertNull($fieldset->field('unknown'));
+    }
+
+    /** @test */
+    public function gets_blueprints_importing_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                ['import' => 'seo'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_blueprints_importing_fieldset_inside_grid()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                [
+                                    'handle' => 'grid',
+                                    'field' => [
+                                        'type' => 'grid',
+                                        'fields' => [
+                                            ['import' => 'seo'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_blueprints_importing_fieldset_inside_replicator()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                [
+                                    'handle' => 'replicator',
+                                    'field' => [
+                                        'type' => 'replicator',
+                                        'sets' => [
+                                            'set_group' => [
+                                                'sets' => [
+                                                    'set' => [
+                                                        'fields' => [
+                                                            ['import' => 'seo'],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_blueprints_importing_single_field_from_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                ['handle' => 'meta_title', 'field' => 'seo.meta_title'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_fieldsets_importing_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'fields' => [
+                    ['import' => 'seo'],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_fieldsets_importing_fieldset_inside_grid()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'fields' => [
+                    [
+                        'handle' => 'grid',
+                        'field' => [
+                            'type' => 'grid',
+                            'fields' => [
+                                ['import' => 'seo'],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_fieldsets_importing_fieldset_inside_replicator()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'fields' => [
+                    [
+                        'handle' => 'replicator',
+                        'field' => [
+                            'type' => 'replicator',
+                            'sets' => [
+                                'set_group' => [
+                                    'sets' => [
+                                        'set' => [
+                                            'fields' => [
+                                                ['import' => 'seo'],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_fieldsets_importing_single_field_from_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'fields' => [
+                    ['handle' => 'meta_title', 'field' => 'seo.meta_title'],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
     }
 
     /** @test */
