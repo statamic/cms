@@ -78,6 +78,11 @@ export default {
 
                     this.loading = false;
                 }).catch((error) => {
+                    if (error.response.status === 500) {
+                        this.$toast.error(error.response.data.message);
+                        this.close();
+                    }
+
                     if (error.response.status === 403) {
                         this.$toast.error(__('This action is unauthorized.'));
                         this.close();
