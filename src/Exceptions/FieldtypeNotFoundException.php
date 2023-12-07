@@ -3,11 +3,11 @@
 namespace Statamic\Exceptions;
 
 use Exception;
-use Spatie\LaravelIgnition\Support\StringComparator;
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Spatie\Ignition\Contracts\BaseSolution;
 use Spatie\Ignition\Contracts\ProvidesSolution;
 use Spatie\Ignition\Contracts\Solution;
-use Facades\Statamic\Fields\FieldtypeRepository;
+use Spatie\LaravelIgnition\Support\StringComparator;
 use Statamic\Statamic;
 
 class FieldtypeNotFoundException extends Exception implements ProvidesSolution

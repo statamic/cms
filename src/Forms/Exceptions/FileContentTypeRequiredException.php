@@ -2,10 +2,10 @@
 
 namespace Statamic\Forms\Exceptions;
 
+use LogicException;
 use Spatie\Ignition\Contracts\BaseSolution;
 use Spatie\Ignition\Contracts\ProvidesSolution;
 use Spatie\Ignition\Contracts\Solution;
-use LogicException;
 use Statamic\Statamic;
 
 class FileContentTypeRequiredException extends LogicException implements ProvidesSolution

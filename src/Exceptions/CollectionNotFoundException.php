@@ -3,10 +3,10 @@
 namespace Statamic\Exceptions;
 
 use Exception;
-use Spatie\LaravelIgnition\Support\StringComparator;
 use Spatie\Ignition\Contracts\BaseSolution;
 use Spatie\Ignition\Contracts\ProvidesSolution;
 use Spatie\Ignition\Contracts\Solution;
+use Spatie\LaravelIgnition\Support\StringComparator;
 use Statamic\Facades\Collection;
 use Statamic\Statamic;
 
