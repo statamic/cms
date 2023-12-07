@@ -2,6 +2,7 @@
 
 namespace Statamic\Sites;
 
+use Closure;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
 
@@ -10,7 +11,7 @@ class Sites
     protected $config;
     protected $sites;
     protected $current;
-    protected $currentUrlCallback;
+    protected ?Closure $currentUrlCallback = null;
 
     public function __construct($config)
     {
@@ -68,7 +69,7 @@ class Sites
         $this->current = $this->get($site);
     }
 
-    public function resolveCurrentUrl($callback)
+    public function resolveCurrentUrlUsing(Closure $callback)
     {
         $this->currentUrlCallback = $callback;
     }
