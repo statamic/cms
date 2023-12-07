@@ -538,6 +538,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
+                if (! response.data.saved) {
+                    return this.$toast.error(__(`Couldn't save entry`));
+                }
                 this.title = response.data.data.title;
                 this.isWorkingCopy = true;
                 if (this.isBase) {

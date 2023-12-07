@@ -138,6 +138,8 @@ class Revision implements Arrayable, Contract
         Revisions::save($this);
 
         RevisionSaved::dispatch($this);
+
+        return true;
     }
 
     public function delete()

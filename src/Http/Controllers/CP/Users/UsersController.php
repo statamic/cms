@@ -116,20 +116,22 @@ class UsersController extends CpController
         $this->authorize('create', UserContract::class);
 
         $blueprint = User::blueprint();
+        $blueprint->ensureFieldHasConfig('email', ['validate' => 'required']);
 
         $fields = $blueprint->fields()->preProcess();
 
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
+        $additional = $fields->all()
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups']))
+            ->keys();
+
         $viewData = [
-            'title' => __('Create'),
-            'values' => $fields->values()->all(),
-            'meta' => $fields->meta(),
+            'values' => (object) $fields->values()->only($additional)->all(),
+            'meta' => (object) $fields->meta()->only($additional)->all(),
+            'fields' => collect($fields->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
-            'actions' => [
-                'save' => cp_route('users.store'),
-            ],
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
             'canSendInvitation' => config('statamic.users.wizard_invitation'),
@@ -149,11 +151,15 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->only(['email', 'name', 'first_name', 'last_name'])->addValues($request->all());
+        $fields = $blueprint->fields()->except(['roles', 'groups'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        if ($request->input('_validate_only')) {
+            return [];
+        }
+
+        $values = $fields->process()->values()->except(['email']);
 
         $user = User::make()
             ->email($request->email)
@@ -277,9 +283,12 @@ class UsersController extends CpController
             $user->groups($request->groups);
         }
 
-        $user->save();
+        $save = $user->save();
 
-        return ['title' => $user->title()];
+        return [
+            'title' => $user->title(),
+            'saved' => is_bool($save) ? $save : true,
+        ];
     }
 
     public function destroy($user)

@@ -15,7 +15,7 @@ class ScopeRepository
     public function find($key, $context = [])
     {
         if ($scope = app('statamic.scopes')->get($key)) {
-            return app($scope)->context($context);
+            return app($scope)?->context($context);
         }
     }
 
