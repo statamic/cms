@@ -15,7 +15,7 @@
                 <div v-for="(items, group) in resource.imported_by">
                     <h3 class="little-heading pl-0 mb-2">{{ group }}</h3>
 
-                    <ul>
+                    <ul class="list-disc pl-4">
                         <li
                             v-for="item in items"
                             :key="item.handle"
