@@ -56,12 +56,15 @@ class Sites
     public function current()
     {
         return $this->current
-            ?? $this->findByUrl(
-                $this->currentUrlCallback
-                    ? call_user_func($this->currentUrlCallback)
-                    : request()->getUri()
-            )
+            ?? $this->findByCurrentUrl()
             ?? $this->default();
+    }
+
+    private function findByCurrentUrl()
+    {
+        return $this->findByUrl(
+            $this->currentUrlCallback ? call_user_func($this->currentUrlCallback) : request()->getUri()
+        );
     }
 
     public function setCurrent($site)
