@@ -10,9 +10,9 @@ use Tests\TestCase;
 
 class StateTest extends TestCase
 {
-    use FakesViews,
-        PreventSavingStacheItemsToDisk,
-        FakesContent;
+    use FakesContent,
+        FakesViews,
+        PreventSavingStacheItemsToDisk;
 
     public function test_tag_state_is_cleared_between_responses()
     {

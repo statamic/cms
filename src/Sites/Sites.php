@@ -2,6 +2,8 @@
 
 namespace Statamic\Sites;
 
+use Closure;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 class Sites
@@ -9,6 +11,7 @@ class Sites
     protected $config;
     protected $sites;
     protected $current;
+    protected ?Closure $currentUrlCallback = null;
 
     public function __construct($config)
     {
@@ -18,6 +21,11 @@ class Sites
     public function all()
     {
         return $this->sites;
+    }
+
+    public function authorized()
+    {
+        return $this->sites->filter(fn ($site) => User::current()->can('view', $site));
     }
 
     public function default()
@@ -48,8 +56,15 @@ class Sites
     public function current()
     {
         return $this->current
-            ?? $this->findByUrl(request()->getUri())
+            ?? $this->findByCurrentUrl()
             ?? $this->default();
+    }
+
+    private function findByCurrentUrl()
+    {
+        return $this->findByUrl(
+            $this->currentUrlCallback ? call_user_func($this->currentUrlCallback) : request()->getUri()
+        );
     }
 
     public function setCurrent($site)
@@ -57,9 +72,19 @@ class Sites
         $this->current = $this->get($site);
     }
 
+    public function resolveCurrentUrlUsing(Closure $callback)
+    {
+        $this->currentUrlCallback = $callback;
+    }
+
     public function selected()
     {
-        return $this->get(session('statamic.cp.selected-site', $this->default()->handle()));
+        return $this->get(session('statamic.cp.selected-site')) ?? $this->default();
+    }
+
+    public function setSelected($site)
+    {
+        session()->put('statamic.cp.selected-site', $site);
     }
 
     public function setConfig($key, $value = null)

@@ -3,6 +3,7 @@
 namespace Statamic\Console\Please;
 
 use Illuminate\Console\Application as ConsoleApplication;
+use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
@@ -18,12 +19,14 @@ class Application extends ConsoleApplication
     /**
      * Add a command, resolving through the application.
      *
-     * @param  string  $command
-     * @return \Symfony\Component\Console\Command\Command
+     * @param  Command|string  $command
+     * @return \Symfony\Component\Console\Command\Command|void
      */
     public function resolve($command)
     {
-        $command = $this->laravel->make($command);
+        if (is_string($command)) {
+            $command = $this->laravel->make($command);
+        }
 
         if (! in_array(RunsInPlease::class, class_uses($command))) {
             $this->deferredCommands[] = $command;

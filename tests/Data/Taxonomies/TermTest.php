@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Mockery;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
+use Statamic\Events\TermCreating;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
 use Statamic\Facades;
@@ -128,6 +129,10 @@ class TermTest extends TestCase
 
         $this->assertTrue($return);
 
+        Event::assertDispatched(TermCreating::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+
         Event::assertDispatched(TermSaving::class, function ($event) use ($term) {
             return $event->term === $term;
         });
@@ -172,8 +177,28 @@ class TermTest extends TestCase
 
         $this->assertTrue($return);
 
+        Event::assertNotDispatched(TermCreating::class);
         Event::assertNotDispatched(TermSaving::class);
         Event::assertNotDispatched(TermSaved::class);
+        Event::assertNotDispatched(TermCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_term_doesnt_save()
+    {
+        Event::fake([TermCreated::class]);
+
+        Event::listen(TermCreating::class, function () {
+            return false;
+        });
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->save();
+
+        $this->assertFalse($return);
+
         Event::assertNotDispatched(TermCreated::class);
     }
 

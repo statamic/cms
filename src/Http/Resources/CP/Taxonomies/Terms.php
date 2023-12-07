@@ -13,6 +13,7 @@ class Terms extends ResourceCollection
     public $collects = ListedTerm::class;
     protected $blueprint;
     protected $columnPreferenceKey;
+    protected $columns;
 
     public function blueprint($blueprint)
     {

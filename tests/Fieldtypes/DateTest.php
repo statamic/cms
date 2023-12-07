@@ -182,6 +182,11 @@ class DateTest extends TestCase
                 ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
                 ['start' => '2012--08--29', 'end' => '2013--09--27'],
             ],
+            'range with format containing time has end date at end of day' => [
+                ['mode' => 'range', 'format' => 'Y-m-d H:i:s'],
+                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+                ['start' => '2012-08-29 00:00:00', 'end' => '2013-09-27 23:59:59'],
+            ],
         ];
     }
 

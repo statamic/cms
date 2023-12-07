@@ -12,7 +12,7 @@
                     v-if="showLabelText"
                     class="mr-1"
                     :class="{ 'text-gray-600': syncable && isSynced }"
-                    v-text="labelText"
+                    v-text="__(labelText)"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
                 <i class="required mr-1" v-if="config.required">*</i>
@@ -126,7 +126,7 @@ export default {
 
         instructions() {
             return this.config.instructions
-                ? this.renderMarkdownAndLinks(this.config.instructions)
+                ? this.renderMarkdownAndLinks(__(this.config.instructions))
                 : null
         },
 

@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
+use Closure;
 use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
@@ -28,9 +29,12 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
+use Statamic\Events\EntryCreating;
 use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
@@ -47,19 +51,19 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues, Arrayable, ArrayAccess, SearchableContract
+class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
-    use Routable {
-        uri as routableUri;
-    }
+    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
-    use ContainsData, ContainsComputedData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, Searchable;
-    use ResolvesValues {
-        resolveGqlValue as traitResolveGqlValue;
-    }
     use HasOrigin {
         value as originValue;
         values as originValues;
+    }
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
+    use Routable {
+        uri as routableUri;
     }
 
     protected $id;
@@ -140,6 +144,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
                 $blueprint = $this->collection()->entryBlueprint($blueprint, $this);
 
+                if (! $blueprint) {
+                    throw new BlueprintNotFoundException($this->value('blueprint'), 'collections/'.$this->collection()->handle());
+                }
+
                 Blink::put($key, $blueprint);
 
                 EntryBlueprintFound::dispatch($blueprint, $this);
@@ -166,6 +174,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function delete()
     {
+        if (EntryDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         if ($this->descendants()->map->fresh()->filter()->isNotEmpty()) {
             throw new \Exception('Cannot delete an entry with localizations.');
         }
@@ -311,6 +323,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && EntryCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (EntrySaving::dispatch($this) === false) {
                 return false;
             }
@@ -339,7 +355,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $stack = InitiatorStack::entry($this)->push();
 
-        $this->directDescendants()->each->save();
+        $this->directDescendants()->each->{$withEvents ? 'save' : 'saveQuietly'}();
 
         $this->taxonomize();
 
@@ -717,11 +733,41 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->published($this->published)
             ->slug($this->slug());
 
+        if ($callback = $this->addToStructure($site, $this->parent())) {
+            $localization->afterSave($callback);
+        }
+
         if ($this->collection()->dated()) {
             $localization->date($this->date());
         }
 
         return $localization;
+    }
+
+    private function addToStructure($site, $parent = null): ?Closure
+    {
+        // If it's orderable (linear - a max depth of 1) then don't add it.
+        if ($this->collection()->orderable()) {
+            return null;
+        }
+
+        // Collection not structured? Don't add it.
+        if (! $structure = $this->collection()->structure()) {
+            return null;
+        }
+
+        $tree = $structure->in($site);
+        $parent = optional($parent)->in($site);
+
+        return function ($entry) use ($parent, $tree) {
+            if (! $parent || $parent->isRoot()) {
+                $tree->append($entry);
+            } else {
+                $tree->appendTo($parent->id(), $entry);
+            }
+
+            $tree->save();
+        };
     }
 
     public function supplementTaxonomies()
@@ -904,7 +950,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             }, $format);
         }
 
-        return (string) Antlers::parse($format, $this->augmented()->all());
+        return (string) Antlers::parse($format, array_merge($this->routeData(), [
+            'site' => $this->site(),
+            'uri' => $this->uri(),
+            'url' => $this->url(),
+            'permalink' => $this->absoluteUrl(),
+            'locale' => $this->locale(),
+        ]));
     }
 
     public function repository()

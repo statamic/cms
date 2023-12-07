@@ -43,8 +43,6 @@ class Git extends Process
 
     /**
      * Git push.
-     *
-     * @return null
      */
     public function push()
     {

@@ -3,7 +3,9 @@
 namespace Statamic\Assets;
 
 use Illuminate\Support\Carbon;
+use Statamic\Facades\Image;
 use Statamic\Facades\Path;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -24,7 +26,12 @@ class AssetUploader extends Uploader
 
     protected function uploadPath(UploadedFile $file)
     {
-        $ext = $file->getClientOriginalExtension();
+        $ext = $this->getNewExtension() ?? $this->getFileExtension($file);
+
+        if (config('statamic.assets.lowercase')) {
+            $ext = strtolower($ext);
+        }
+
         $filename = self::getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
 
         $directory = $this->asset->folder();
@@ -49,6 +56,30 @@ class AssetUploader extends Uploader
     protected function disk()
     {
         return $this->asset->container()->disk();
+    }
+
+    protected function getNewExtension()
+    {
+        if (! $preset = $this->asset->container()->sourcePreset()) {
+            return null;
+        }
+
+        if (! $ext = Arr::get(Image::userManipulationPresets(), "$preset.fm")) {
+            return null;
+        }
+
+        return $ext;
+    }
+
+    private function getFileExtension(UploadedFile $file)
+    {
+        $extension = $file->getClientOriginalExtension();
+        $guessed = $file->guessExtension();
+
+        // Only use the guessed extension if it's different than the original.
+        // This allows us to maintain the casing of the original extension
+        // if the the "lowercase filenames" config option is disabled.
+        return strtolower($extension) === strtolower($guessed) ? $extension : $guessed;
     }
 
     public static function getSafeFilename($string)

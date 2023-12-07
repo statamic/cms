@@ -25,6 +25,13 @@ class Select extends Fieldtype
                         'key_header' => __('Key'),
                         'value_header' => __('Label').' ('.__('Optional').')',
                         'add_button' => __('Add Option'),
+                        'validate' => [function ($attribute, $value, $fail) {
+                            $optionsWithoutKeys = collect($value)->keys()->filter(fn ($key) => empty($key) || $key === 'null');
+
+                            if ($optionsWithoutKeys->isNotEmpty()) {
+                                $fail(__('statamic::validation.options_require_keys'));
+                            }
+                        }],
                     ],
                     'taggable' => [
                         'display' => __('Allow additions'),

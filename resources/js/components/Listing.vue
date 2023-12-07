@@ -130,11 +130,12 @@ export default {
                 if (this.shouldRequestFirstPage) return this.request();
                 this.loading = false;
                 this.initializing = false;
-                this.afterRequestCompleted();
+                this.afterRequestCompleted(response);
             }).catch(e => {
                 if (this.$axios.isCancel(e)) return;
                 this.loading = false;
                 this.initializing = false;
+                if (e.request && ! e.response) return;
                 this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
             })
         },

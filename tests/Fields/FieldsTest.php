@@ -265,7 +265,7 @@ class FieldsTest extends TestCase
     public function it_throws_exception_when_trying_to_import_a_non_existent_fieldset()
     {
         $this->expectException('Exception');
-        $this->expectExceptionMessage('Fieldset test_partial not found.');
+        $this->expectExceptionMessage('Fieldset [test_partial] not found');
         FieldsetRepository::shouldReceive('find')->with('test_partial')->once()->andReturnNull();
 
         (new Fields)->createFields([
@@ -425,6 +425,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'autocomplete' => null,
             ],
             [
                 'handle' => 'two',
@@ -500,6 +501,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'autocomplete' => null,
             ],
             [
                 'handle' => 'nested_deeper_two',
@@ -519,6 +521,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'autocomplete' => null,
             ],
         ], $fields->toPublishArray());
     }

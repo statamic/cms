@@ -50,6 +50,7 @@ class ServiceProvider extends LaravelServiceProvider
         $published = config('statamic.stache.stores');
 
         $nativeStores = collect($config['stores'])
+            ->reject(fn ($config, $key) => $key === 'users' && config('statamic.users.repository') !== 'file')
             ->map(function ($config, $key) use ($published) {
                 return array_merge($config, $published[$key] ?? []);
             });

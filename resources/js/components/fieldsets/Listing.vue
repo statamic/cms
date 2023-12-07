@@ -17,11 +17,11 @@
                             class="warning"
                             @click="$refs[`deleter_${fieldset.id}`].confirm()"
                         >
-                            <resource-deleter
+                            <fieldset-deleter
                                 :ref="`deleter_${fieldset.id}`"
                                 :resource="fieldset"
                                 @deleted="removeRow(fieldset)">
-                            </resource-deleter>
+                            </fieldset-deleter>
                         </dropdown-item>
                     </dropdown-list>
                 </template>
@@ -32,10 +32,13 @@
 
 <script>
 import Listing from '../Listing.vue';
+import FieldsetDeleter from './FieldsetDeleter.vue';
 
 export default {
 
     mixins: [Listing],
+
+    components: {FieldsetDeleter},
 
     props: ['initialRows'],
 
