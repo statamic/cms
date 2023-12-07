@@ -145,7 +145,7 @@ class Fieldset
         return ['blueprints' => $blueprints, 'fieldsets' => $fieldsets];
     }
 
-    protected function fieldImportsFieldset(array $field): bool
+    private function fieldImportsFieldset(array $field): bool
     {
         if (isset($field['import'])) {
             return $field['import'] === $this->handle();
