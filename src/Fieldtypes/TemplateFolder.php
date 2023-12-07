@@ -2,7 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\View\Views;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class TemplateFolder extends Relationship
 {
@@ -16,7 +17,19 @@ class TemplateFolder extends Relationship
 
     public function getIndexItems($request)
     {
-        return Views::directories()
+        return collect(config('view.paths'))
+            ->flatMap(function ($path) {
+                $directories = collect();
+                $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+
+                foreach ($iterator as $file) {
+                    if ($file->isDir() && ! $iterator->isDot() && ! $iterator->isLink()) {
+                        $directories->push(str_replace_first($path.'/', '', $file->getPathname()));
+                    }
+                }
+
+                return $directories->filter()->values();
+            })
             ->map(fn ($folder) => ['id' => $folder, 'title' => $folder])
             ->values();
     }
