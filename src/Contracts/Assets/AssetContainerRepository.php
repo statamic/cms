@@ -12,5 +12,5 @@ interface AssetContainerRepository
 
     public function findByHandle(string $handle): ?AssetContainer;
 
-    public function make(string $handle = null): AssetContainer;
+    public function make(?string $handle = null): AssetContainer;
 }

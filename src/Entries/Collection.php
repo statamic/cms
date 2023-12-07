@@ -680,7 +680,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
-    public function structureContents(array $contents = null)
+    public function structureContents(?array $contents = null)
     {
         return $this
             ->fluentlyGetOrSet('structureContents')

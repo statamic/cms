@@ -20,7 +20,7 @@ class User extends BaseUser
     protected $roles;
     protected $groups;
 
-    public function model(Model $model = null)
+    public function model(?Model $model = null)
     {
         if (is_null($model)) {
             return $this->model;

@@ -14,5 +14,5 @@ interface NavigationRepository
 
     public function save(Nav $nav);
 
-    public function make(string $handle = null): Nav;
+    public function make(?string $handle = null): Nav;
 }
