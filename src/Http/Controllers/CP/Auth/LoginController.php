@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
+use Statamic\Facades\CP\Toast;
 use Statamic\Facades\OAuth;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
@@ -83,6 +84,8 @@ class LoginController extends CpController
     protected function sendLoginResponse(Request $request)
     {
         $request->session()->regenerate();
+
+        Toast::clear();
 
         return $this->authenticated($request, $this->guard()->user());
     }
