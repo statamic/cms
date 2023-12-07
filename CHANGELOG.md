@@ -1,5 +1,47 @@
 # Release Notes
 
+## 4.39.0 (2023-12-07)
+
+### What's new
+- Add parent to asset blueprint, include asset in blueprint found event. [#8644](https://github.com/statamic/cms/issues/8644) by @jacksleight
+- Add current url resolver to sites. [#9098](https://github.com/statamic/cms/issues/9098) by @ajnsn
+- Add `children` tag. [#8990](https://github.com/statamic/cms/issues/8990) by @ryanmitchell
+- Add `chunk` and `lazy` to query builders. [#9142](https://github.com/statamic/cms/issues/9142) [#9148](https://github.com/statamic/cms/issues/9148) by @ryanmitchell
+- Add ability to configure the mailer for each form email. [#9136](https://github.com/statamic/cms/issues/9136) by @aerni
+- Add Laravel Pulse link to global header. [#9125](https://github.com/statamic/cms/issues/9125) by @joshuablum
+
+### What's improved
+- French translations. [#9139](https://github.com/statamic/cms/issues/9139) by @ebeauchamps
+
+### What's fixed
+- Fix templates fieldtype when views are in a non-default location. [#9085](https://github.com/statamic/cms/issues/9085) by @duncanmcclean
+- Fix styling of grid stacked mode header when deleting is not possible. [#9129](https://github.com/statamic/cms/issues/9129) by @ryanmitchell
+- Ensure `user:is` and `user:isnt` work with `roles` fieldtype. [#9041](https://github.com/statamic/cms/issues/9041) by @ryanmitchell
+- Exclude taxonomy index pages from `nav:breadcrumbs` tag when view is missing. [#9154](https://github.com/statamic/cms/issues/9154) by @duncanmcclean
+- Make the `container` field in the `assets` fieldtype required. [#9151](https://github.com/statamic/cms/issues/9151) by @robdekort
+- Improve handling around deleted blueprints & fieldsets. [#8989](https://github.com/statamic/cms/issues/8989) by @duncanmcclean
+- Fix collapsed Bard set revealer data loss. [#9153](https://github.com/statamic/cms/issues/9153) by @jacksleight
+- "Configure asset containers" permission should override other asset permissions. [#9134](https://github.com/statamic/cms/issues/9134) by @duncanmcclean
+- Revert mount from augmented collection. [#9145](https://github.com/statamic/cms/issues/9145) by @jasonvarga
+- Fix missing group title translation string. [#9143](https://github.com/statamic/cms/issues/9143) by @ryanmitchell
+- Fix replicator preview for `date` fieldtype when time is empty. [#9099](https://github.com/statamic/cms/issues/9099) by @duncanmcclean
+- Make arrayable link url method public. [#9131](https://github.com/statamic/cms/issues/9131) by @ryanmitchell
+- Change nocache performance optimizations to be opt-in. [#9124](https://github.com/statamic/cms/issues/9124) by @joshuablum
+- Handle glide exceptions gracefully. [#9109](https://github.com/statamic/cms/issues/9109) by @ryanmitchell
+- Fix prefixed fieldset imports being lost when there's an ensured blueprint field. [#9116](https://github.com/statamic/cms/issues/9116) by @ryanmitchell
+- When appending glide filename consider that the extension may have changed. [#9097](https://github.com/statamic/cms/issues/9097) by @ryanmitchell
+- Fix Antlers issue regarding conditions resolving variables. [#9106](https://github.com/statamic/cms/issues/9106) by @JohnathonKoster
+- Fix "Hide Display" setting not being persisted on reference field. [#9111](https://github.com/statamic/cms/issues/9111) by @duncanmcclean
+- Harden collection handle check in Taxonomy findByUri to prevent partial matches. [#9108](https://github.com/statamic/cms/issues/9108) by @ryanmitchell
+- Make url and uri available in preview targets. [#9104](https://github.com/statamic/cms/issues/9104) by @NeoIsRecursive
+- Prevent terms fieldtype in typehead mode showing results until a search is entered. [#9082](https://github.com/statamic/cms/issues/9082) by @ryanmitchell
+- Prevent showing "Saved" toast message when listener cancels save. [#9040](https://github.com/statamic/cms/issues/9040) by @duncanmcclean
+- Fix adding Bard sets with horizontal cursor. [#9064](https://github.com/statamic/cms/issues/9064) by @duncanmcclean
+- Improve comb search driver performance. [#9102](https://github.com/statamic/cms/issues/9102) by @jacksleight
+- Adjust Laravel Pint config to prevent a bunch of changes caused by an update. [#9126](https://github.com/statamic/cms/issues/9126) by @duncanmcclean
+
+
+
 ## 4.38.0 (2023-11-30)
 
 ### What's new
