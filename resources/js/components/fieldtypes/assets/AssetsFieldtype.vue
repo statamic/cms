@@ -27,6 +27,7 @@
                 >
 
                     <button
+                        v-if="canBrowse"
                         :class="{'opacity-0': dragging }"
                         type="button"
                         class="btn btn-with-icon"
@@ -350,6 +351,10 @@ export default {
         showSetAlt() {
             return this.config.show_set_alt && ! this.isReadOnly;
         },
+
+        canBrowse() {
+            return this.can('view '+ this.container +' assets')
+        }
 
     },
 
