@@ -10,6 +10,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
@@ -79,6 +80,8 @@ class Multisite extends Command
             $this->moveNav($nav);
             $this->checkLine("Nav [<comment>{$nav->handle()}</comment>] updated.");
         });
+
+        $this->addPermissions();
 
         Cache::clear();
         $this->checkLine('Cache cleared.');
@@ -277,5 +280,15 @@ class Multisite extends Command
     protected function newSites()
     {
         return $this->sites->slice(1);
+    }
+
+    protected function addPermissions()
+    {
+        Role::all()->each(function ($role) {
+            Site::all()->each(fn ($site) => $role->addPermission("access {$site->handle()} site"));
+            $role->save();
+            $this->checkLine("Site permissions added to [<comment>{$role->handle()}</comment>] role.");
+        });
+
     }
 }

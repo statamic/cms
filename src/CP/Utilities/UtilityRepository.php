@@ -23,6 +23,8 @@ class UtilityRepository
         foreach ($this->extensions as $callback) {
             $callback($this);
         }
+
+        return $this;
     }
 
     public function extend($callback)
@@ -60,20 +62,18 @@ class UtilityRepository
 
     public function find($handle)
     {
-        return $this->utilities->get($handle);
+        return $this->all()->get($handle);
     }
 
     public function findBySlug($slug)
     {
-        return $this->utilities->first(fn ($utility) => $utility->slug() === $slug);
+        return $this->all()->first(fn ($utility) => $utility->slug() === $slug);
     }
 
     public function routes()
     {
-        $this->boot();
-
         Route::namespace('\\')->prefix('utilities')->name('utilities.')->group(function () {
-            $this->all()->each(function ($utility) {
+            $this->boot()->all()->each(function ($utility) {
                 if ($utility->action()) {
                     Route::get($utility->slug(), $utility->action())
                         ->middleware("can:access {$utility->handle()} utility")

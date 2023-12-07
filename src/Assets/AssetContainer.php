@@ -11,6 +11,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetContainerCreated;
+use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
@@ -20,6 +21,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Image;
+use Statamic\Facades\Pattern;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
@@ -222,6 +224,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && AssetContainerCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (AssetContainerSaving::dispatch($this) === false) {
                 return false;
             }
@@ -281,7 +287,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     public function contents()
     {
         return Blink::once('asset-listing-cache-'.$this->handle(), function () {
-            return new AssetContainerContents($this);
+            return app(AssetContainerContents::class)->container($this);
         });
     }
 
@@ -357,7 +363,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
 
         if ($folder !== null) {
             if ($recursive) {
-                $query->where('path', 'like', "{$folder}/%");
+                $query->where('path', 'like', Pattern::sqlLikeQuote($folder).'/%');
             } else {
                 $query->where('folder', $folder);
             }

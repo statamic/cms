@@ -5,7 +5,7 @@
         <header class="mb-3">
             <breadcrumb :url="cp_url('user-groups')" :title="__('User Groups')" />
             <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+                <h1 class="flex-1" v-text="__(title)" />
                     <dropdown-list class="mr-2" v-if="canEditBlueprint">
                         <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
                     </dropdown-list>

@@ -12,6 +12,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsData;
@@ -30,6 +31,7 @@ use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
@@ -39,7 +41,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, SearchableContract
+class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance,
         Searchable,
@@ -50,6 +52,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             data as traitData;
             merge as traitMerge;
         }
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
 
     protected $container;
     protected $path;

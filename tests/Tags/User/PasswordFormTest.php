@@ -25,7 +25,7 @@ class PasswordFormTest extends TestCase
         $output = $this->tag('{{ user:password_form }}{{ /user:password_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/password">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
+        $this->assertStringContainsString(csrf_field(), $output);
         $this->assertStringEndsWith('</form>', $output);
     }
 

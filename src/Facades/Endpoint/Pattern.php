@@ -2,6 +2,8 @@
 
 namespace Statamic\Facades\Endpoint;
 
+use Statamic\Support\Str;
+
 /**
  * Regular expressions, et al.
  */
@@ -103,5 +105,36 @@ class Pattern
     public function isUUID($value)
     {
         return (bool) preg_match($this->uuid(), $value);
+    }
+
+    /**
+     * Quotes (escapes) SQL LIKE syntax.
+     *
+     * Similar to the preg_quote method for regular expressions.
+     */
+    public function sqlLikeQuote(string $like): string
+    {
+        return Str::of($like)
+            ->replace('%', '\%')
+            ->replace('_', '\_');
+    }
+
+    /**
+     * Converts SQL LIKE syntax to a regular expression.
+     *
+     * @return string  The regular expression without delimiters.
+     */
+    public function sqlLikeToRegex(string $like): string
+    {
+        return Str::of($like)
+            ->replace('\_', $underscore = Str::random())
+            ->replace('\%', $percent = Str::random())
+            ->pipe(fn ($str) => preg_quote($str, '/'))
+            ->replace('%', '.*')
+            ->replace('_', '.')
+            ->replace($underscore, '_')
+            ->replace($percent, '%')
+            ->prepend('^')
+            ->append('$');
     }
 }

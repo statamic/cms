@@ -119,7 +119,7 @@ class TermsController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'permalink' => $term->absoluteUrl(),
-            'localizations' => $taxonomy->sites()->map(function ($handle) use ($term) {
+            'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($term) {
                 $localized = $term->in($handle);
 
                 return [
@@ -195,15 +195,16 @@ class TermsController extends CpController
                 $term->published($request->published);
             }
 
-            $term->updateLastModified(User::current())->save();
+            $saved = $term->updateLastModified(User::current())->save();
         }
 
-        return new TermResource($term);
+        return (new TermResource($term))
+            ->additional(['saved' => $saved]);
     }
 
     public function create(Request $request, $taxonomy, $site)
     {
-        $this->authorize('create', [TermContract::class, $taxonomy]);
+        $this->authorize('create', [TermContract::class, $taxonomy, $site]);
 
         $blueprint = $taxonomy->termBlueprint($request->blueprint);
 
@@ -232,7 +233,7 @@ class TermsController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $taxonomy->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $taxonomy->sites()->map(function ($handle) use ($taxonomy, $site) {
+            'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($taxonomy, $site) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -242,7 +243,7 @@ class TermsController extends CpController
                     'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle]),
                     'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
-            })->all(),
+            })->values()->all(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
         ];
@@ -299,10 +300,11 @@ class TermsController extends CpController
                 'user' => User::current(),
             ]);
         } else {
-            $term->updateLastModified(User::current())->save();
+            $saved = $term->updateLastModified(User::current())->save();
         }
 
-        return new TermResource($term);
+        return (new TermResource($term))
+            ->additional(['saved' => $saved]);
     }
 
     protected function extractFromFields($term, $blueprint)
@@ -358,5 +360,12 @@ class TermsController extends CpController
                 'url' => $taxonomy->showUrl(),
             ],
         ]);
+    }
+
+    protected function getAuthorizedSitesForTaxonomy($taxonomy)
+    {
+        return $taxonomy
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
     }
 }

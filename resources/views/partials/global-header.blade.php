@@ -22,7 +22,7 @@
 
     <div class="head-link h-full md:pr-6 flex items-center justify-end">
 
-        @if (Statamic\Facades\Site::hasMultiple())
+        @if (Statamic\Facades\Site::authorized()->count() > 1)
             <global-site-selector>
                 <template slot="icon">@cp_svg('icons/light/sites')</template>
             </global-site-selector>
@@ -33,6 +33,12 @@
         @if (Route::has('horizon.index') && \Laravel\Horizon\Horizon::check(request()))
             <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
                 @cp_svg('icons/regular/horizon')
+            </a>
+        @endif
+
+        @if (Route::has('pulse') && (app()->environment('local') || $user->can('viewPulse')))
+            <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ route('pulse') }}" target="_blank" v-tooltip="'Laravel Pulse'">
+                @cp_svg('icons/regular/pulse')
             </a>
         @endif
 
