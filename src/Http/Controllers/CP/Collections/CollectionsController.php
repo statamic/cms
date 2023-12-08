@@ -573,10 +573,8 @@ class CollectionsController extends CpController
 
     protected function ensureCollectionIsAvailableOnSite($collection, $site)
     {
-        if (Site::hasMultiple()) {
-            if (! $collection->sites()->contains($site->handle())) {
-                return redirect()->back()->with('error', __('Collection is not available on this site (:handle)', ['handle' => $site->handle]));
-            }
+        if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
+            return redirect()->back()->with('error', __('Collection is not available on this site (:handle)', ['handle' => $site->handle]));
         }
     }
 }
