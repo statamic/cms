@@ -45,6 +45,8 @@ class IndexManager extends Manager
     {
         $name = $name ?: $this->getDefaultDriver();
 
+        $locale = $locale ?: Site::current()->handle();
+
         $handle = $name.'_'.$locale;
 
         if ($this->drivers[$handle] ?? null) {
