@@ -4,7 +4,6 @@ namespace Statamic\Routing;
 
 use Closure;
 use Statamic\Contracts\Routing\UrlBuilder;
-use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
