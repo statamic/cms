@@ -79,3 +79,8 @@
     z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
                 /*  too high and it'll be over the top of stacks, etc. */
 }
+
+/* when a stacked grid is inside a replicator the fullscreen button needs some more room */
+.replicator-set-body .grid-stacked {
+    @apply mt-6;
+}
