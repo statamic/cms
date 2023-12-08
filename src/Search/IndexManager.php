@@ -9,6 +9,7 @@ use Statamic\Search\Algolia\Index as AlgoliaIndex;
 use Statamic\Search\Comb\Index as CombIndex;
 use Statamic\Search\Null\NullIndex;
 use Statamic\Support\Manager;
+use Statamic\Support\Str;
 
 class IndexManager extends Manager
 {
@@ -45,7 +46,18 @@ class IndexManager extends Manager
     {
         $name = $name ?: $this->getDefaultDriver();
 
-        $locale = $locale ?: Site::current()->handle();
+        // on the cp search utilities page, the locale is appended to the name
+        if (! $locale) {
+            if ($locale = Str::after($name, '_')) {
+                if (Site::all()->firstWhere('handle', $locale)) {
+                    $name = Str::before($name, '_');
+                }
+            }
+
+            if (! $locale) {
+                $locale = Site::current()->handle();
+            }
+        }
 
         $handle = $name.'_'.$locale;
 
