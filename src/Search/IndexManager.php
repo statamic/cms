@@ -48,7 +48,7 @@ class IndexManager extends Manager
 
         // on the cp search utilities page, the locale is appended to the name
         if (! $locale) {
-            if ($locale = Str::after($name, '_')) {
+            if ($name && ($locale = Str::after($name, '_'))) {
                 if (Site::all()->firstWhere('handle', $locale)) {
                     $name = Str::before($name, '_');
                 }
