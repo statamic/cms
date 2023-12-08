@@ -581,7 +581,7 @@ class EntriesController extends CpController
     protected function ensureCollectionIsAvailableOnSite($collection, $site)
     {
         if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
-            return redirect()->back()->with('error', __('Collection is not available on this site (:handle)', ['handle' => $site->handle]));
+            return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
     }
 }
