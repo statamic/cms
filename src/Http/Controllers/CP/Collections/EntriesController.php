@@ -28,10 +28,6 @@ class EntriesController extends CpController
     {
         $this->authorize('view', $collection);
 
-        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, Site::current())) {
-            return $response;
-        }
-
         $query = $this->indexQuery($collection);
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
@@ -585,7 +581,7 @@ class EntriesController extends CpController
     protected function ensureCollectionIsAvailableOnSite($collection, $site)
     {
         if (Site::hasMultiple()) {
-            if (! $collection->sites()->contains($site->handle)) {
+            if (! $collection->sites()->contains($site->handle())) {
                 return redirect()->back()->with('error', __('Collection is not available on this site (:handle)', ['handle' => $site->handle]));
             }
         }
