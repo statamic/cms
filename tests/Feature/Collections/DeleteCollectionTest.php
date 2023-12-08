@@ -3,6 +3,8 @@
 namespace Tests\Feature\Collections;
 
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -40,6 +42,33 @@ class DeleteCollectionTest extends TestCase
 
         $collection = Collection::make('test')->save();
         $this->assertCount(1, Collection::all());
+
+        $this
+            ->actingAs($user)
+            ->delete(cp_route('collections.destroy', $collection->handle()))
+            ->assertOk();
+
+        $this->assertCount(0, Collection::all());
+    }
+
+    /** @test */
+    public function it_deletes_the_collection_with_localized_entries()
+    {
+        $this->withoutExceptionHandling();
+
+        Site::setConfig(['sites' => [
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr', 'locale' => 'fr_FR'],
+        ]]);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = Collection::make('test')->sites(['en', 'fr'])->save();
+        $this->assertCount(1, Collection::all());
+
+        $entry = tap(Entry::make()->locale('en')->slug('test')->collection('test')->data(['title' => 'Test']))->save();
+        $entry->makeLocalization('fr')->slug('test-fr')->data(['title' => 'Test FR'])->save();
 
         $this
             ->actingAs($user)
