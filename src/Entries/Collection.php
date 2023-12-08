@@ -727,7 +727,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function delete()
     {
-        $this->queryEntries()->get()->each->delete();
+        $this->queryEntries()->get()->each(function ($entry) {
+            $entry->deleteDescendants();
+            $entry->delete();
+        });
 
         Facades\Collection::delete($this);
 

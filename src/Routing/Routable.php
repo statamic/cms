@@ -4,6 +4,7 @@ namespace Statamic\Routing;
 
 use Closure;
 use Statamic\Contracts\Routing\UrlBuilder;
+use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
@@ -26,6 +27,10 @@ trait Routable
 
             if (! $slug) {
                 return null;
+            }
+
+            if (is_null($this->site())) {
+                dd($this->locale, Site::all());
             }
 
             $lang = method_exists($this, 'site') ? $this->site()->lang() : null;
