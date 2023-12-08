@@ -22,6 +22,10 @@ trait GetsQueryResults
             $query->offset($offset);
         }
 
+        if ($chunk = $this->params->int('chunk')) {
+            return $this->chunkedResults($query, $chunk);
+        }
+
         return $query->get();
     }
 
@@ -57,5 +61,16 @@ trait GetsQueryResults
             ->all();
 
         $query->whereNotin('id', $offsetIds);
+    }
+
+    protected function chunkedResults($query, $chunkSize)
+    {
+        $key = $this->params->get('chunk_key', 'chunk');
+
+        $results = collect();
+
+        $query->chunk($chunkSize, fn ($chunk) => $results->push(collect([$key => $chunk])));
+
+        return $results;
     }
 }
