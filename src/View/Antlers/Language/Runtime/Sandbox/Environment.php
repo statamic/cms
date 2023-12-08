@@ -1353,7 +1353,7 @@ class Environment
             }
         }
 
-        if (! empty($this->interpolationReplacements)) {
+        if (! empty($this->interpolationReplacements) && is_string($value)) {
             if (Str::contains($value, $this->interpolationKeys)) {
                 $value = strtr($value, $this->interpolationReplacements);
             }
