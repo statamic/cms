@@ -29,10 +29,6 @@ trait Routable
                 return null;
             }
 
-            if (is_null($this->site())) {
-                dd($this->locale, Site::all());
-            }
-
             $lang = method_exists($this, 'site') ? $this->site()->lang() : null;
 
             return Str::slug($slug, '-', $lang);
