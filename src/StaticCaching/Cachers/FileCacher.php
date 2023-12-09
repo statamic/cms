@@ -237,7 +237,7 @@ class FileCacher extends AbstractCacher
             window.livewireScriptConfig.csrf = data.csrf
         }
 
-        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
+        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));
     });
 })();
 EOT;
