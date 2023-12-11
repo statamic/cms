@@ -33,7 +33,7 @@ trait OutputsItems
         }
 
         return [
-            $key => $items->map(fn ($chunk) => ['items' => $chunk]),
+            $key => $items->map(fn ($chunk) => ['chunk' => $chunk]),
             'total_results' => $items->sum(fn ($chunk) => $chunk->count()),
             'total_chunks' => $items->count(),
         ];
