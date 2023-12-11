@@ -1,5 +1,35 @@
 # Release Notes
 
+## 4.40.0 (2023-12-11)
+
+### What's new
+- Add nocache regions and CSRF to `statamic:nocache.replaced` event. [#9167](https://github.com/statamic/cms/issues/9167) by @ryanmitchell
+- Add `collection` to augmented term values. [#9070](https://github.com/statamic/cms/issues/9070) by @ryanmitchell
+
+### What's improved
+- Improve CollectionStructure performance. [#8800](https://github.com/statamic/cms/issues/8800) by @mauricewijnia
+- Clarify which changes will stay in sync. [#9179](https://github.com/statamic/cms/issues/9179) by @duncanmcclean
+- German translations. [#9164](https://github.com/statamic/cms/issues/9164) by @helloDanuk
+
+### What's fixed
+- Render layout on 403 Forbidden pages. [#9180](https://github.com/statamic/cms/issues/9180) by @duncanmcclean
+- Fix tree view when configuring collection mount. [#9128](https://github.com/statamic/cms/issues/9128) by @duncanmcclean
+- Delete collection tree files when deleting collections. [#9183](https://github.com/statamic/cms/issues/9183) by @duncanmcclean
+- Prevent events being added to an element that doesn't exist when in grid table mode. [#9130](https://github.com/statamic/cms/issues/9130) by @ryanmitchell
+- Use date facade and carbon interface. [#9114](https://github.com/statamic/cms/issues/9114) by @jasonvarga
+- Ensure publish date field can only be in `single` mode. [#9178](https://github.com/statamic/cms/issues/9178) by @duncanmcclean
+- Fix template lookup with dots in view path. [#9176](https://github.com/statamic/cms/issues/9176) by @marijoo
+- Ensure field exists before checking if it imports a fieldset. [#9175](https://github.com/statamic/cms/issues/9175) by @ryanmitchell
+- Translate validation attributes when pulled from display. [#9169](https://github.com/statamic/cms/issues/9169) by @ryanmitchell
+- Fix updating localized search index through the CP. [#9160](https://github.com/statamic/cms/issues/9160) by @ryanmitchell
+- If collection is not available on a site, redirect back. [#9071](https://github.com/statamic/cms/issues/9071) by @ryanmitchell
+- Fix Antlers string interpolation checks running Str::contains on objects. [#9163](https://github.com/statamic/cms/issues/9163) by @JohnathonKoster
+- Fix deleting collections with localized entries. [#9165](https://github.com/statamic/cms/issues/9165) by @duncanmcclean
+- Update Laravel Pint. [#9181](https://github.com/statamic/cms/issues/9181) by @duncanmcclean
+- Update contribution guide. [#9133](https://github.com/statamic/cms/issues/9133) by @joshuablum
+
+
+
 ## 4.39.0 (2023-12-07)
 
 ### What's new
