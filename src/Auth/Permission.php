@@ -18,7 +18,7 @@ class Permission
     protected $description;
     protected $group;
 
-    public function value(string $value = null)
+    public function value(?string $value = null)
     {
         if (func_num_args() > 0) {
             $this->value = $value;
@@ -39,7 +39,7 @@ class Permission
         return $this->label;
     }
 
-    public function label(string $label = null)
+    public function label(?string $label = null)
     {
         if (func_num_args() > 0) {
             $this->label = $label;
@@ -52,17 +52,17 @@ class Permission
         return __($label, [$this->placeholder => $this->placeholderLabel]);
     }
 
-    public function placeholder(string $placeholder = null)
+    public function placeholder(?string $placeholder = null)
     {
         return $this->fluentlyGetOrSet('placeholder')->args(func_get_args());
     }
 
-    public function placeholderLabel(string $label = null)
+    public function placeholderLabel(?string $label = null)
     {
         return $this->fluentlyGetOrSet('placeholderLabel')->args(func_get_args());
     }
 
-    public function placeholderValue(string $placeholderValue = null)
+    public function placeholderValue(?string $placeholderValue = null)
     {
         return $this->fluentlyGetOrSet('placeholderValue')->args(func_get_args());
     }
@@ -103,7 +103,7 @@ class Permission
         })->values();
     }
 
-    public function children(array $children = null)
+    public function children(?array $children = null)
     {
         return $this
             ->fluentlyGetOrSet('children')
@@ -156,7 +156,7 @@ class Permission
         })->all();
     }
 
-    public function group(string $group = null)
+    public function group(?string $group = null)
     {
         return $this->fluentlyGetOrSet('group')->args(func_get_args());
     }
