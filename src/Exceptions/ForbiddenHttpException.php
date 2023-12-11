@@ -5,10 +5,15 @@ namespace Statamic\Exceptions;
 use Statamic\Facades\Cascade;
 use Statamic\Statamic;
 use Statamic\View\View;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class ForbiddenHttpException extends SymfonyException
+class ForbiddenHttpException extends HttpException
 {
+    public function __construct(string $message = '', \Throwable $previous = null, int $code = 0, array $headers = [])
+    {
+        parent::__construct(403, $message, $previous, $headers, $code);
+    }
+
     public function render()
     {
         if (Statamic::isCpRoute()) {
