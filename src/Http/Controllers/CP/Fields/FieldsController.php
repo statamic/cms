@@ -61,9 +61,17 @@ class FieldsController extends CpController
             ->fields()
             ->addValues($request->values);
 
-        $fields->validate([], [
+        $extraRules = [];
+        $customMessages = [
             'handle.not_in' => __('statamic::validation.reserved'),
-        ]);
+        ];
+
+        if ($request->type === 'date' && $request->values['handle'] === 'date') {
+            $extraRules['mode'] = 'in:single';
+            $customMessages['mode.in'] = __('statamic::validation.date_fieldtype_only_single_mode_allowed');
+        }
+
+        $fields->validate($extraRules, $customMessages);
 
         $values = array_merge($request->values, $fields->process()->values()->all());
 
