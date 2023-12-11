@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\API;
 
-use Illuminate\Support\Str;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Statamic\Http\Controllers\CP\CpController;
@@ -18,7 +17,7 @@ class TemplatesController extends CpController
 
                 foreach ($iterator as $file) {
                     if ($file->isFile()) {
-                        $views->push(str_replace_first($path.'/', '', Str::beforeLast($file->getPathname(), '.')));
+                        $views->push(str_before(str_replace_first($path . '/', '', $file->getPathname()), '.'));
                     }
                 }
 
