@@ -26,17 +26,16 @@ trait OutputsItems
 
     protected function chunkedOutput($items)
     {
-        $key = $this->params->get('as');
+        $key = $this->params->get('chunk_key', 'chunk');
 
-        if (! $key) {
-            return $items->map(fn ($chunk) => ['chunk' => $chunk]);
-        }
-
-        return [
-            $key => $items->map(fn ($chunk) => ['chunk' => $chunk, 'chunk_total' => $chunk->count()]),
-            'total_results' => $items->sum(fn ($chunk) => $chunk->count()),
+        $extra = [
+            'total_items' => $items->sum(fn ($chunk) => $chunk->count()),
             'total_chunks' => $items->count(),
         ];
+
+        return $items->map(fn ($chunk) => array_merge([
+            $key => $chunk,
+        ], $extra))->all();
     }
 
     protected function extraOutput($items)
