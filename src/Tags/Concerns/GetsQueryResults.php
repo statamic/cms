@@ -65,7 +65,7 @@ trait GetsQueryResults
 
     protected function chunkedResults($query, $chunkSize)
     {
-        $key = $this->params->get('as', 'chunk');
+        $key = $this->params->get('chunk_key', 'chunk');
 
         $results = collect();
 
