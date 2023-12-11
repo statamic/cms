@@ -129,7 +129,7 @@ class Fieldset
                 ->flatten(1)
                 ->pluck('fields')
                 ->flatten(1)
-                ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                ->filter(fn ($field) => $field && $this->fieldImportsFieldset($field))
                 ->isNotEmpty();
         })->values();
 
