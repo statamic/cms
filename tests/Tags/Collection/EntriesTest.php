@@ -567,8 +567,8 @@ class EntriesTest extends TestCase
 
         $entries = $this->getEntries(['chunk' => 2]);
 
-        $this->assertEquals([1, 2], $entries->first()->get('chunk')->map->slug()->all());
-        $this->assertEquals([3], $entries->last()->get('chunk')->map->slug()->all());
+        $this->assertEquals([1, 2], $entries->first()->map->slug()->all());
+        $this->assertEquals([3], $entries->last()->map->slug()->all());
     }
 }
 
