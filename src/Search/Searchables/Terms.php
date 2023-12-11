@@ -32,7 +32,7 @@ class Terms extends Provider
             $query->where('site', $site);
         }
 
-        return $query->lazy()->filter($this->filter())->values();
+        return $query->lazy(10)->filter($this->filter())->values();
     }
 
     public function contains($searchable): bool
