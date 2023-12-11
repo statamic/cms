@@ -7,6 +7,7 @@ use Facades\Statamic\Routing\ResolveRedirect;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
@@ -664,7 +665,7 @@ class FrontendTest extends TestCase
     public function it_sets_the_carbon_to_string_format()
     {
         config(['statamic.system.date_format' => 'd/m/Y']);
-        Carbon::setTestNow('October 21st, 2022');
+        Date::setTestNow('October 21st, 2022');
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<p>{{ now }}</p>');
         $this->makeCollection()->save();
@@ -737,8 +738,8 @@ class FrontendTest extends TestCase
     private function assertDefaultCarbonFormat()
     {
         $this->assertEquals(
-            Carbon::now()->format(Carbon::DEFAULT_TO_STRING_FORMAT),
-            (string) Carbon::now(),
+            Date::now()->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+            (string) Date::now(),
             'Carbon was not formatted using the default format.'
         );
     }

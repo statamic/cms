@@ -504,7 +504,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                     return null;
                 }
 
-                if ($date instanceof \Carbon\Carbon) {
+                if ($date instanceof \Carbon\CarbonInterface) {
                     return $date;
                 }
 
