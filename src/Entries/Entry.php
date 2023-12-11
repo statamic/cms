@@ -190,7 +190,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                     if (optional($parent)->isRoot()) {
                         $parent = null;
                     }
-                    $this->page()->pages()->all()->each(function ($child) use ($tree, $parent) {
+                    $this->page()?->pages()->all()->each(function ($child) use ($tree, $parent) {
                         $tree->move($child->id(), optional($parent)->id());
                     });
                     $tree->remove($this);
