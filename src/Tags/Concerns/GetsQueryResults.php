@@ -3,6 +3,7 @@
 namespace Statamic\Tags\Concerns;
 
 use Statamic\Facades\Blink;
+use Statamic\Tags\Chunks;
 
 trait GetsQueryResults
 {
@@ -65,11 +66,9 @@ trait GetsQueryResults
 
     protected function chunkedResults($query, $chunkSize)
     {
-        $key = $this->params->get('chunk_key', 'chunk');
+        $results = Chunks::make();
 
-        $results = collect();
-
-        $query->chunk($chunkSize, fn ($chunk) => $results->push(collect([$key => $chunk])));
+        $query->chunk($chunkSize, fn ($chunk) => $results->push($chunk));
 
         return $results;
     }

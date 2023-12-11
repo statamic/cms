@@ -3,6 +3,7 @@
 namespace Statamic\Tags\Concerns;
 
 use Illuminate\Contracts\Pagination\Paginator;
+use Statamic\Tags\Chunks;
 
 trait OutputsItems
 {
@@ -12,11 +13,30 @@ trait OutputsItems
             return $this->paginatedOutput($items);
         }
 
+        if ($items instanceof Chunks) {
+            return $this->chunkedOutput($items);
+        }
+
         if ($as = $this->params->get('as')) {
             return array_merge([$as => $items], $this->extraOutput($items));
         }
 
         return $items;
+    }
+
+    protected function chunkedOutput($items)
+    {
+        $key = $this->params->get('as');
+
+        if (! $key) {
+            return $items->map(fn ($chunk) => ['chunk' => $chunk]);
+        }
+
+        return [
+            $key => $items->map(fn ($chunk) => ['items' => $chunk]),
+            'total_results' => $items->sum(fn ($chunk) => $chunk->count()),
+            'total_chunks' => $items->count(),
+        ];
     }
 
     protected function extraOutput($items)
