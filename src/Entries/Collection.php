@@ -732,6 +732,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             $entry->delete();
         });
 
+        if ($this->hasStructure()) {
+            $this->structure()->trees()->each->delete();
+        }
+
         Facades\Collection::delete($this);
 
         CollectionDeleted::dispatch($this);
