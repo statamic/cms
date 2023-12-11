@@ -346,9 +346,12 @@ export default {
         this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
 
         this.$nextTick(() => {
-            document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
-                this.editor.commands.focus();
-            });
+            let el = document.querySelector(`label[for="${this.fieldId}"]`);
+            if (el) {
+                el.addEventListener('click', () => {
+                    this.editor.commands.focus();
+                });
+            }
         });
     },
 

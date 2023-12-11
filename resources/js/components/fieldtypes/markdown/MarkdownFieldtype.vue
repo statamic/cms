@@ -197,9 +197,12 @@ export default {
     mounted() {
         this.initToolbarButtons();
 
-        document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
-            this.codemirror.focus();
-        });
+        let el = document.querySelector(`label[for="${this.fieldId}"]`);
+        if (el) {
+            el.addEventListener('click', () => {
+                this.codemirror.focus();
+            });
+        }
     },
 
     methods: {

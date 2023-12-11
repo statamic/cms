@@ -21,7 +21,7 @@ abstract class Index
 
     abstract protected function deleteIndex();
 
-    public function __construct($name, array $config, string $locale = null)
+    public function __construct($name, array $config, ?string $locale = null)
     {
         $this->name = $locale ? $name.'_'.$locale : $name;
         $this->config = $config;

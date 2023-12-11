@@ -886,7 +886,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function download(string $name = null, array $headers = [])
+    public function download(?string $name = null, array $headers = [])
     {
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
     }

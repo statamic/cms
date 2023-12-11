@@ -43,7 +43,7 @@ class EntryRepository implements RepositoryContract
         return $this->query()->where('id', $id)->first();
     }
 
-    public function findByUri(string $uri, string $site = null): ?Entry
+    public function findByUri(string $uri, ?string $site = null): ?Entry
     {
         $site = $site ?? $this->stache->sites()->first();
 
