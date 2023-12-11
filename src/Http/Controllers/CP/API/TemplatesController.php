@@ -17,7 +17,7 @@ class TemplatesController extends CpController
 
                 foreach ($iterator as $file) {
                     if ($file->isFile()) {
-                        $views->push(str_replace_first($path.'/', '', str_before($file->getPathname(), '.')));
+                        $views->push(str_before(str_replace_first($path.'/', '', $file->getPathname()), '.'));
                     }
                 }
 
