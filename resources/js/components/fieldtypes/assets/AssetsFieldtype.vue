@@ -353,7 +353,7 @@ export default {
         },
 
         canBrowse() {
-            return this.can('view '+ this.container +' assets')
+            return this.can('configure asset containers') || this.can('view '+ this.container +' assets')
         }
 
     },
