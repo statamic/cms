@@ -3,12 +3,17 @@
 namespace Statamic\Fields;
 
 use Statamic\Events\FieldsetCreated;
+use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
 use Statamic\Facades;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
+use Statamic\Facades\Taxonomy;
 use Statamic\Support\Str;
 
 class Fieldset
@@ -110,6 +115,68 @@ class Fieldset
         return cp_route('fieldsets.destroy', $this->handle());
     }
 
+    public function importedBy(): array
+    {
+        $blueprints = collect([
+            ...Collection::all()->flatMap->entryBlueprints(),
+            ...Taxonomy::all()->flatMap->termBlueprints(),
+            ...GlobalSet::all()->map->blueprint(),
+            ...AssetContainer::all()->map->blueprint(),
+            ...Blueprint::in('')->values(),
+        ])->filter(function (Blueprint $blueprint) {
+            return collect($blueprint->contents()['tabs'])
+                ->pluck('sections')
+                ->flatten(1)
+                ->pluck('fields')
+                ->flatten(1)
+                ->filter(fn ($field) => $field && $this->fieldImportsFieldset($field))
+                ->isNotEmpty();
+        })->values();
+
+        $fieldsets = \Statamic\Facades\Fieldset::all()
+            ->filter(fn (Fieldset $fieldset) => isset($fieldset->contents()['fields']))
+            ->filter(function (Fieldset $fieldset) {
+                return collect($fieldset->contents()['fields'])
+                    ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                    ->isNotEmpty();
+            })
+            ->values();
+
+        return ['blueprints' => $blueprints, 'fieldsets' => $fieldsets];
+    }
+
+    private function fieldImportsFieldset(array $field): bool
+    {
+        if (isset($field['import'])) {
+            return $field['import'] === $this->handle();
+        }
+
+        if (is_string($field['field'])) {
+            return Str::before($field['field'], '.') === $this->handle();
+        }
+
+        if (isset($field['field']['fields'])) {
+            return collect($field['field']['fields'])
+                ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                ->isNotEmpty();
+        }
+
+        if (isset($field['field']['sets'])) {
+            return collect($field['field']['sets'])
+                ->filter(fn ($setGroup) => isset($setGroup['sets']))
+                ->filter(function ($setGroup) {
+                    return collect($setGroup['sets'])->filter(function ($set) {
+                        return collect($set['fields'])
+                            ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                            ->isNotEmpty();
+                    })->isNotEmpty();
+                })
+                ->isNotEmpty();
+        }
+
+        return false;
+    }
+
     public function isDeletable()
     {
         return ! $this->isNamespaced();
@@ -140,6 +207,10 @@ class Fieldset
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && FieldsetCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (FieldsetSaving::dispatch($this) === false) {
                 return false;
             }

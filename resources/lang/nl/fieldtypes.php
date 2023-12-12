@@ -74,6 +74,7 @@ return [
     'entries.config.collections' => 'Kies welke collecties gekozen kunnen worden door gebruikers.',
     'entries.config.create' => 'Het aanmaken van nieuwe entries toestaan.',
     'entries.config.query_scopes' => 'Kies welke query scopes toegepast worden bij het ophalen van entries.',
+    'entries.config.search_index' => 'Zoekindex',
     'entries.title' => 'Entries',
     'float.title' => 'Float',
     'form.config.max_items' => 'Het maximum aantal selecteerbare formulieren.',

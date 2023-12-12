@@ -309,7 +309,7 @@ abstract class Fieldtype implements Arrayable
             : 'statamic::forms.fields.default';
     }
 
-    public function config(string $key = null, $fallback = null)
+    public function config(?string $key = null, $fallback = null)
     {
         if (! $this->field) {
             return $fallback;

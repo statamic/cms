@@ -5,6 +5,7 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
@@ -122,6 +123,8 @@ class FileCacher extends AbstractCacher
                 $this->writer->delete($this->getFilePath($value, $site));
                 $this->forgetUrl($key, $domain);
             });
+
+        UrlInvalidated::dispatch($url, $domain);
     }
 
     public function getCachePaths()
@@ -234,7 +237,7 @@ class FileCacher extends AbstractCacher
             window.livewireScriptConfig.csrf = data.csrf
         }
 
-        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
+        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));
     });
 })();
 EOT;

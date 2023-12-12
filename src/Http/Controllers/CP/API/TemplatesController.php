@@ -2,17 +2,27 @@
 
 namespace Statamic\Http\Controllers\CP\API;
 
-use Statamic\Facades\Folder;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Statamic\Http\Controllers\CP\CpController;
 
 class TemplatesController extends CpController
 {
     public function index()
     {
-        return collect(Folder::disk('resources')->getFilesRecursively('views'))
-            ->map(function ($view) {
-                return str_replace_first('views/', '', str_before($view, '.'));
+        return collect(config('view.paths'))
+            ->flatMap(function ($path) {
+                $views = collect();
+                $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
+
+                foreach ($iterator as $file) {
+                    if ($file->isFile()) {
+                        $views->push(str_before(str_replace_first($path.'/', '', $file->getPathname()), '.'));
+                    }
+                }
+
+                return $views->filter()->values();
             })
-            ->filter()->values();
+            ->values();
     }
 }

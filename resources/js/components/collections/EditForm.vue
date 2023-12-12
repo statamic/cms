@@ -9,13 +9,14 @@
         :values="values"
         :meta="meta"
         :errors="errors"
+        :site="site"
         @updated="values = $event"
     >
         <div slot-scope="{ setFieldValue, setFieldMeta }">
             <header class="mb-6">
                 <breadcrumb :url="url" :title="values.title" />
                 <div class="flex items-center">
-                    <h1 class="flex-1" v-text="__('Configure Collection')" />
+                    <h1 class="flex-1" v-text="__(editTitle ?? 'Configure Collection')" />
                     <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
                 </div>
             </header>
@@ -33,6 +34,7 @@ export default {
 
     props: {
         blueprint: Object,
+        editTitle: String,
         initialValues: Object,
         meta: Object,
         url: String
@@ -84,6 +86,12 @@ export default {
             this.submit();
         });
     },
+
+    computed: {
+        site() {
+            return this.$config.get('selectedSite');
+        }
+    }
 
 }
 </script>

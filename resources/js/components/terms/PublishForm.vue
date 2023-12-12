@@ -445,6 +445,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
+                if (! response.data.saved) {
+                    return this.$toast.error(__(`Couldn't save term`));
+                }
                 this.title = response.data.data.title;
                 this.permalink = response.data.data.permalink;
                 this.isWorkingCopy = true;

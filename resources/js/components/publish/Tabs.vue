@@ -34,7 +34,7 @@
                     :aria-selected="isActive(tab.handle)"
                     :tabindex="isActive(tab.handle) ? 0 : -1"
                     @click="setActive(tab.handle)"
-                    v-text="tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`"
+                    v-text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
                 />
             </div>
             <div class="fade-left" v-if="canScrollLeft" />
@@ -46,7 +46,7 @@
                     v-for="(tab, index) in mainTabs"
                     v-show="shouldShowInDropdown(index)"
                     :key="tab.handle"
-                    :text="tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`"
+                    :text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
                     @click.prevent="setActive(tab.handle)"
                 />
             </dropdown-list>
