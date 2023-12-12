@@ -123,7 +123,7 @@ class Fieldset
             ...GlobalSet::all()->map->blueprint(),
             ...AssetContainer::all()->map->blueprint(),
             ...Blueprint::in('')->values(),
-        ])->filter(function (Blueprint $blueprint) {
+        ])->filter()->filter(function (Blueprint $blueprint) {
             return collect($blueprint->contents()['tabs'])
                 ->pluck('sections')
                 ->flatten(1)
