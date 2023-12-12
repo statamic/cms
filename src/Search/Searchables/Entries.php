@@ -31,7 +31,7 @@ class Entries extends Provider
             $query->where('site', $site);
         }
 
-        return $query->lazy(10)->filter($this->filter())->values();
+        return $query->lazy(100)->filter($this->filter())->values();
     }
 
     public function contains($searchable): bool
