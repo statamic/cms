@@ -24,7 +24,7 @@ class TemplateFolder extends Relationship
 
                 foreach ($iterator as $file) {
                     if ($file->isDir() && ! $iterator->isDot() && ! $iterator->isLink()) {
-                        $directories->push(str_replace_first($path.'/', '', $file->getPathname()));
+                        $directories->push(str_replace_first($path.DIRECTORY_SEPARATOR, '', $file->getPathname()));
                     }
                 }
 
