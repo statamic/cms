@@ -169,7 +169,7 @@ class TaxonomiesController extends CpController
         $taxonomy
             ->title($values['title'])
             ->previewTargets($values['preview_targets'])
-            ->routes($values['routes']);
+            ->routes($values['routes'])
             ->termTemplate($values['term_template'] ?? null)
             ->template($values['template'] ?? null)
             ->layout($values['layout'] ?? null);

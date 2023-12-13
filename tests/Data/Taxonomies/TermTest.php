@@ -347,7 +347,7 @@ class TermTest extends TestCase
         $this->assertEquals('/le-blog/{slug}', $termFr->route());
         $this->assertEquals('/das-blog/{slug}', $termDe->route());
     }
-  
+
     /** @test */
     public function it_gets_and_sets_the_layout()
     {

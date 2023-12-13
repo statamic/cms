@@ -456,7 +456,7 @@ class TaxonomyTest extends TestCase
         $this->assertNull($taxonomy->route('de'));
         $this->assertNull($taxonomy->route('unknown'));
     }
-  
+
     /** @test */
     public function it_gets_and_sets_the_layout()
     {
