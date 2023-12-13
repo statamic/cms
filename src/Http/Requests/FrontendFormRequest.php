@@ -100,7 +100,7 @@ class FrontendFormRequest extends FormRequest
 
         $this->assets = $this->normalizeAssetsValues($fields);
 
-        $values = array_merge($this->removeNullsFromCheckboxes($this->all()), $this->assets);
+        $values = array_merge($this->removeNullsFromCheckboxes($fields, $this->all()), $this->assets);
 
         return $this->cachedFields = $fields->addValues($values);
     }
