@@ -238,6 +238,7 @@ export default {
 
         tabHasVisibleFields(tab) {
             let visibleFields = 0;
+
             tab.sections.forEach(section => {
                 section.fields.forEach(field => {
                     if (this.showField(field)) visibleFields++;
