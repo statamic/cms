@@ -122,6 +122,7 @@
                 :selected="selectedAssets"
                 :view-mode="selectorViewMode"
                 :max-files="maxFiles"
+                :query-scopes="queryScopes"
                 @selected="assetsSelected"
                 @closed="closeSelector">
             </selector>
@@ -277,6 +278,13 @@ export default {
          */
         uploadElement() {
             return this.$el;
+        },
+
+        /**
+         * The scopes to use to filter the queries.
+         */
+        queryScopes() {
+            return this.config.query_scopes || [];
         },
 
         isInBardField() {

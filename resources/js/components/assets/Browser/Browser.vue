@@ -325,6 +325,7 @@ export default {
         restrictFolderNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         maxFiles: Number,
+        queryScopes: Array,
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
@@ -402,6 +403,7 @@ export default {
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 search: this.searchQuery,
+                queryScopes: this.queryScopes,
             }
         },
 
