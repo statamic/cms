@@ -136,6 +136,9 @@ class TaxonomiesController extends CpController
             'routes' => $taxonomy->routes()->unique()->count() === 1
                 ? $taxonomy->routes()->first()
                 : $taxonomy->routes()->all(),
+            'term_template' => $taxonomy->termTemplate(),
+            'template' => $taxonomy->template(),
+            'layout' => $taxonomy->layout(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
@@ -167,6 +170,9 @@ class TaxonomiesController extends CpController
             ->title($values['title'])
             ->previewTargets($values['preview_targets'])
             ->routes($values['routes']);
+            ->termTemplate($values['term_template'] ?? null)
+            ->template($values['template'] ?? null)
+            ->layout($values['layout'] ?? null);
 
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);
@@ -314,6 +320,28 @@ class TaxonomiesController extends CpController
                                 ],
                             ],
                         ],
+                    ],
+                ],
+            ],
+            'templates' => [
+                'display' => __('Templates'),
+                'fields' => [
+                    'template' => [
+                        'display' => __('Template'),
+                        'instructions' => __('statamic::messages.taxonomy_configure_template_instructions'),
+                        'type' => 'template',
+                        'placeholder' => __('System default'),
+                    ],
+                    'term_template' => [
+                        'display' => __('Term Template'),
+                        'instructions' => __('statamic::messages.taxonomy_configure_term_template_instructions'),
+                        'type' => 'template',
+                        'placeholder' => __('System default'),
+                    ],
+                    'layout' => [
+                        'display' => __('Layout'),
+                        'instructions' => __('statamic::messages.taxonomy_configure_layout_instructions'),
+                        'type' => 'template',
                     ],
                 ],
             ],

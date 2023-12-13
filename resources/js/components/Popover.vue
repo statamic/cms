@@ -100,7 +100,7 @@ export default {
             if (this.disabled) return;
 
             this.isOpen = true;
-            this.escBinding = this.$keys.bind('esc', e => this.close());
+            this.escBinding = this.$keys.bindGlobal('esc', e => this.close());
             this.$nextTick(() => {
                 this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger.firstChild, this.$refs.popover, this.computePosition);
 

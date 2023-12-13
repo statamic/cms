@@ -1,6 +1,7 @@
 import { marked } from 'marked';
 import { translate, translateChoice } from '../translations/translator';
 import uid from 'uniqid';
+import PreviewHtml from '../components/fieldtypes/replicator/PreviewHtml';
 
 export function cp_url(url) {
     url = Statamic.$config.get('cpUrl') + '/' + url;
@@ -102,4 +103,8 @@ export function escapeHtml(string) {
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
+}
+
+export function replicatorPreviewHtml(html) {
+    return new PreviewHtml(html);
 }

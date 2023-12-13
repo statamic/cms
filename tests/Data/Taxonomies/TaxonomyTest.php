@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Events\TaxonomyCreated;
+use Statamic\Events\TaxonomyCreating;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
@@ -302,6 +303,10 @@ class TaxonomyTest extends TestCase
 
         $this->assertTrue($return);
 
+        Event::assertDispatched(TaxonomyCreating::class, function ($event) use ($taxonomy) {
+            return $event->taxonomy = $taxonomy;
+        });
+
         Event::assertDispatched(TaxonomySaving::class, function ($event) use ($taxonomy) {
             return $event->taxonomy = $taxonomy;
         });
@@ -344,8 +349,27 @@ class TaxonomyTest extends TestCase
 
         $this->assertTrue($return);
 
+        Event::assertNotDispatched(TaxonomyCreating::class);
         Event::assertNotDispatched(TaxonomySaving::class);
         Event::assertNotDispatched(TaxonomySaved::class);
+        Event::assertNotDispatched(TaxonomyCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_taxonomy_doesnt_save()
+    {
+        Event::fake([TaxonomyCreated::class]);
+
+        Event::listen(TaxonomyCreating::class, function () {
+            return false;
+        });
+
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $return = $taxonomy->save();
+
+        $this->assertFalse($return);
+
         Event::assertNotDispatched(TaxonomyCreated::class);
     }
 
@@ -431,6 +455,45 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('{slug}', $taxonomy->route('fr'));
         $this->assertNull($taxonomy->route('de'));
         $this->assertNull($taxonomy->route('unknown'));
+    }
+  
+    /** @test */
+    public function it_gets_and_sets_the_layout()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to layout
+        $this->assertEquals('layout', $taxonomy->layout());
+
+        // taxonomy level overrides the default
+        $taxonomy->layout('foo');
+        $this->assertEquals('foo', $taxonomy->layout());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_template()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to taxonomy.index
+        $this->assertEquals('tags.index', $taxonomy->template());
+
+        // taxonomy level overrides the default
+        $taxonomy->template('foo');
+        $this->assertEquals('foo', $taxonomy->template());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_term_template()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to taxonomy.show
+        $this->assertEquals('tags.show', $taxonomy->termTemplate());
+
+        // taxonomy level overrides the default
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $taxonomy->termTemplate());
     }
 
     /** @test */

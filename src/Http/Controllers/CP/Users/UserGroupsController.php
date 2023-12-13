@@ -167,10 +167,22 @@ class UserGroupsController extends CpController
 
         $values = $fields->process()->values()->except(['title', 'handle', 'roles']);
 
+        $handle = $request->handle ?: snake_case($request->title);
+
+        if (UserGroup::find($handle)) {
+            $error = __('A User Group with that handle already exists.');
+
+            if ($request->wantsJson()) {
+                return response()->json(['message' => $error], 422);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
+
         $group = UserGroup::make()
             ->title($request->title)
             ->data($values)
-            ->handle($request->handle ?: snake_case($request->title));
+            ->handle($handle);
 
         if (User::current()->can('assign roles')) {
             $group->roles($request->roles);

@@ -243,8 +243,16 @@ class AntlersNodeParser
 
         $node->isClosingTag = $this->canBeClosingTag($node);
 
+        $lexerContent = $node->getContent();
+
+        if ($node->name->name == 'if' || $node->name->name == 'unless' || $node->name->name == 'elseif') {
+            if (mb_strlen(trim($lexerContent)) > 0) {
+                $lexerContent = '('.$lexerContent.')';
+            }
+        }
+
         // Need to run node type analysis here before the runtime node step.
-        $runtimeNodes = $this->lexer->tokenize($node, $node->getContent());
+        $runtimeNodes = $this->lexer->tokenize($node, $lexerContent);
 
         $node->runtimeNodes = $runtimeNodes;
 

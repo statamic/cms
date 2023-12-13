@@ -65,6 +65,6 @@ class Impersonate extends Action
             return $url;
         }
 
-        return $users->first()->can('access cp') ? cp_route('dashboard') : '/';
+        return $users->first()->can('access cp') ? cp_route('index') : '/';
     }
 }

@@ -12,6 +12,7 @@ use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\TaxonomyCreated;
+use Statamic\Events\TaxonomyCreating;
 use Statamic\Events\TaxonomyDeleted;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
@@ -43,6 +44,9 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
+    protected $template;
+    protected $termTemplate;
+    protected $layout;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -144,7 +148,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     {
         $blueprint
             ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
-            ->ensureField('slug', ['type' => 'slug', 'required' => true], 'sidebar');
+            ->ensureField('slug', ['type' => 'slug', 'required' => true, 'validate' => 'max:200'], 'sidebar');
 
         return $blueprint;
     }
@@ -208,6 +212,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && TaxonomyCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (TaxonomySaving::dispatch($this) === false) {
                 return false;
             }
@@ -251,6 +259,9 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             'blueprints' => $this->blueprints,
             'preview_targets' => $this->previewTargetsForFile(),
             'route' => $this->routes,
+            'template' => $this->template,
+            'term_template' => $this->termTemplate,
+            'layout' => $this->layout,
         ];
 
         if (Site::hasMultiple()) {
@@ -375,20 +386,50 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $fallback;
     }
 
-    public function template()
+    public function termTemplate($termTemplate = null)
     {
-        $template = $this->handle().'.index';
+        return $this
+            ->fluentlyGetOrSet('termTemplate')
+            ->getter(function ($termTemplate) {
+                if ($termTemplate ?? false) {
+                    return $termTemplate;
+                }
 
-        if ($collection = $this->collection()) {
-            $template = $collection->handle().'.'.$template;
-        }
+                $termTemplate = $this->handle().'.show';
 
-        return $template;
+                return $termTemplate;
+            })
+            ->args(func_get_args());
     }
 
-    public function layout()
+    public function template($template = null)
     {
-        return 'layout';
+        return $this
+            ->fluentlyGetOrSet('template')
+            ->getter(function ($template) {
+                if ($template ?? false) {
+                    return $template;
+                }
+
+                $template = $this->handle().'.index';
+
+                if ($collection = $this->collection()) {
+                    $template = $collection->handle().'.'.$template;
+                }
+
+                return $template;
+            })
+            ->args(func_get_args());
+    }
+
+    public function layout($layout = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('layout')
+            ->getter(function ($layout) {
+                return $layout ?? 'layout';
+            })
+            ->args(func_get_args());
     }
 
     public function searchIndex($index = null)

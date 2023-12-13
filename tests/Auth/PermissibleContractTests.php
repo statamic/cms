@@ -19,28 +19,28 @@ trait PermissibleContractTests
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
         };
         $roleC = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'c';
             }
         };
         $roleD = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'd';
             }
@@ -80,28 +80,28 @@ trait PermissibleContractTests
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
         };
         $roleC = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'c';
             }
         };
         $roleD = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'd';
             }
@@ -126,14 +126,14 @@ trait PermissibleContractTests
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
@@ -229,7 +229,7 @@ trait PermissibleContractTests
     {
         $superRole = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'superrole';
             }
@@ -241,7 +241,7 @@ trait PermissibleContractTests
         };
         $nonSuperRole = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'nonsuperrole';
             }

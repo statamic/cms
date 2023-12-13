@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Mockery;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
+use Statamic\Events\TermCreating;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
 use Statamic\Facades;
@@ -128,6 +129,10 @@ class TermTest extends TestCase
 
         $this->assertTrue($return);
 
+        Event::assertDispatched(TermCreating::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+
         Event::assertDispatched(TermSaving::class, function ($event) use ($term) {
             return $event->term === $term;
         });
@@ -172,8 +177,28 @@ class TermTest extends TestCase
 
         $this->assertTrue($return);
 
+        Event::assertNotDispatched(TermCreating::class);
         Event::assertNotDispatched(TermSaving::class);
         Event::assertNotDispatched(TermSaved::class);
+        Event::assertNotDispatched(TermCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_term_doesnt_save()
+    {
+        Event::fake([TermCreated::class]);
+
+        Event::listen(TermCreating::class, function () {
+            return false;
+        });
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->save();
+
+        $this->assertFalse($return);
+
         Event::assertNotDispatched(TermCreated::class);
     }
 
@@ -321,5 +346,43 @@ class TermTest extends TestCase
         $this->assertEquals('/blog/{slug}', $termEn->route());
         $this->assertEquals('/le-blog/{slug}', $termFr->route());
         $this->assertEquals('/das-blog/{slug}', $termDe->route());
+    }
+  
+    /** @test */
+    public function it_gets_and_sets_the_layout()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        // defaults to layout
+        $this->assertEquals('layout', $term->layout());
+
+        // taxonomy level overrides the default
+        $taxonomy->layout('foo');
+        $this->assertEquals('foo', $term->layout());
+
+        // term level overrides the origin
+        $return = $term->layout('baz');
+        $this->assertEquals($term, $return);
+        $this->assertEquals('baz', $term->layout());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_template()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        // defaults to taxonomy.show
+        $this->assertEquals('tags.show', $term->template());
+
+        // taxonomy level overrides the default
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $term->template());
+
+        // term level overrides the origin
+        $return = $term->template('baz');
+        $this->assertEquals($term, $return);
+        $this->assertEquals('baz', $term->template());
     }
 }

@@ -122,6 +122,7 @@
                 :selected="selectedAssets"
                 :view-mode="selectorViewMode"
                 :max-files="maxFiles"
+                :query-scopes="queryScopes"
                 @selected="assetsSelected"
                 @closed="closeSelector">
             </selector>
@@ -279,6 +280,13 @@ export default {
             return this.$el;
         },
 
+        /**
+         * The scopes to use to filter the queries.
+         */
+        queryScopes() {
+            return this.config.query_scopes || [];
+        },
+
         isInBardField() {
             let vm = this;
 
@@ -328,11 +336,11 @@ export default {
         },
 
         replicatorPreview() {
-            return _.map(this.assets, (asset) => {
+            return replicatorPreviewHtml(_.map(this.assets, (asset) => {
                 return (asset.isImage || asset.isSvg) ?
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
-            }).join(', ');
+            }).join(', '));
         },
 
         showPicker() {

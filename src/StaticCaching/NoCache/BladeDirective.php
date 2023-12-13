@@ -14,7 +14,7 @@ class BladeDirective
         $this->nocache = $nocache;
     }
 
-    public function handle($expression, array $params, array $data = null)
+    public function handle($expression, array $params, ?array $data = null)
     {
         if (func_num_args() == 2) {
             $data = $params;

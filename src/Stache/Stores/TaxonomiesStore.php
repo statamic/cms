@@ -46,7 +46,10 @@ class TaxonomiesStore extends BasicStore
             ->routes(array_get($data, 'route'))
             ->defaultPublishState($this->getDefaultPublishState($data))
             ->sites($sites)
-            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
+            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])))
+            ->termTemplate(array_get($data, 'term_template', null))
+            ->template(array_get($data, 'template', null))
+            ->layout(array_get($data, 'layout', null));
     }
 
     protected function getDefaultPublishState($data)

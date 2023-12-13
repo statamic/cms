@@ -17,6 +17,7 @@ class GlobalVariablesRepositoryTest extends TestCase
 {
     private $directory;
     private $repo;
+    private $globalRepo;
 
     private function setUpSingleSite()
     {

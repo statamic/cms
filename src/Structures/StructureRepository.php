@@ -25,7 +25,7 @@ class StructureRepository implements RepositoryContract
     public function findByHandle($handle): ?Structure
     {
         if (Str::startsWith($handle, 'collection::')) {
-            return Collection::find(Str::after($handle, 'collection::'))->structure();
+            return Collection::find(Str::after($handle, 'collection::'))?->structure();
         }
 
         return Nav::find($handle);
