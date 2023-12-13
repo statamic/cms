@@ -43,6 +43,9 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
+    protected $template;
+    protected $termTemplate;
+    protected $layout;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -254,6 +257,9 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             'title' => $this->title,
             'blueprints' => $this->blueprints,
             'preview_targets' => $this->previewTargetsForFile(),
+            'template' => $this->template,
+            'term_template' => $this->termTemplate,
+            'layout' => $this->layout,
         ];
 
         if (Site::hasMultiple()) {
@@ -359,20 +365,50 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $fallback;
     }
 
-    public function template()
+    public function termTemplate($termTemplate = null)
     {
-        $template = $this->handle().'.index';
+        return $this
+            ->fluentlyGetOrSet('termTemplate')
+            ->getter(function ($termTemplate) {
+                if ($termTemplate ?? false) {
+                    return $termTemplate;
+                }
 
-        if ($collection = $this->collection()) {
-            $template = $collection->handle().'.'.$template;
-        }
+                $termTemplate = $this->handle().'.show';
 
-        return $template;
+                return $termTemplate;
+            })
+            ->args(func_get_args());
     }
 
-    public function layout()
+    public function template($template = null)
     {
-        return 'layout';
+        return $this
+            ->fluentlyGetOrSet('template')
+            ->getter(function ($template) {
+                if ($template ?? false) {
+                    return $template;
+                }
+
+                $template = $this->handle().'.index';
+
+                if ($collection = $this->collection()) {
+                    $template = $collection->handle().'.'.$template;
+                }
+
+                return $template;
+            })
+            ->args(func_get_args());
+    }
+
+    public function layout($layout = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('layout')
+            ->getter(function ($layout) {
+                return $layout ?? 'layout';
+            })
+            ->args(func_get_args());
     }
 
     public function searchIndex($index = null)
