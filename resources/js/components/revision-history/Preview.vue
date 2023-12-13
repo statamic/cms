@@ -15,7 +15,7 @@ export default {
             readOnly: true,
             method: 'patch',
             action: 'update',
-            itemUrl: `${document.location.pathname}/revisions/${this.revision.id}`,
+            itemUrl: `${this.revision.attributes.id}/revisions/${this.revision.id}`,
         }
     },
 
