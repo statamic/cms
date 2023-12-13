@@ -122,6 +122,7 @@ export default {
                 return;
             }
             this.$events.$emit(`stacks.hit-area-clicked`, this.depth - 1);
+            this.$events.$emit(`stacks.${this.depth - 1}.hit-area-mouseout`);
         },
 
         mouseEnterHitArea() {
