@@ -20,6 +20,8 @@ class Children extends Structure
         $this->params->put('from', Str::start(Str::after(URL::getCurrent(), Site::current()->url()), '/'));
         $this->params->put('max_depth', 1);
 
-        return $this->structure($this->params->get('handle', 'collection::pages'));
+        $currentCollection = 'collection::'.$this->context->value('collection')->handle;
+
+        return $this->structure($this->params->get('handle', $currentCollection));
     }
 }
