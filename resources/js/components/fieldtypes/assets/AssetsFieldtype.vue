@@ -4,7 +4,7 @@
         <uploader
             ref="uploader"
             :container="container"
-            :enabled="config.allow_uploads"
+            :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
