@@ -128,7 +128,6 @@
             </selector>
         </stack>
     </div>
-    </element-container>
 </template>
 
 
