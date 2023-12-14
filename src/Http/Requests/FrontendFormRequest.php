@@ -118,7 +118,7 @@ class FrontendFormRequest extends FormRequest
     {
         $fields->all()
             ->filter(fn ($field) => $field->fieldtype()->handle() === 'checkboxes')
-            ->each(fn ($field) => Arr::set($values, $field->handle(), collect(Arr::get($values, $field->handle(), []))->reject(fn ($value) => $value === null)->all()));
+            ->each(fn ($field) => Arr::set($values, $field->handle(), collect(Arr::get($values, $field->handle(), []))->reject(fn ($value) => $value === 'null')->all()));
 
         return $values;
     }
