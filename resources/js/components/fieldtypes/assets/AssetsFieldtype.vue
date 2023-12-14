@@ -38,7 +38,7 @@
                         {{ __('Browse') }}
                     </button>
 
-                    <p class="asset-upload-control" v-if="config.allow_uploads">
+                    <p class="asset-upload-control" v-if="canUpload">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
@@ -354,7 +354,11 @@ export default {
 
         canBrowse() {
             return this.can('configure asset containers') || this.can('view '+ this.container +' assets')
-        }
+        },
+
+        canUpload() {
+            return this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload  '+ this.container +' assets'))
+        },
 
     },
 
