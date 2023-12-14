@@ -3,28 +3,28 @@
 ## 4.41.0 (2023-12-14)
 
 ### What's new
-- [4.x] Ability to configure templates & layouts for taxonomies [#8372](https://github.com/statamic/cms/issues/8372) by @ryanmitchell
-- [4.x] Add `query_scopes` option to the Assets fieldtype [#8459](https://github.com/statamic/cms/issues/8459) by @jacksleight
+- Ability to configure templates & layouts for taxonomies [#8372](https://github.com/statamic/cms/issues/8372) by @ryanmitchell
+- Add `query_scopes` option to the Assets fieldtype [#8459](https://github.com/statamic/cms/issues/8459) by @jacksleight
 
 ### What's improved
-- [4.x] Entries and terms are now provided lazily in search [#9171](https://github.com/statamic/cms/issues/9171) by @ryanmitchell
-- [4.x] When an entry has an origin, the mount will now be fetched from the origin [#9063](https://github.com/statamic/cms/issues/9063) by @ryanmitchell
+- Entries and terms are now provided lazily in search [#9171](https://github.com/statamic/cms/issues/9171) by @ryanmitchell
+- When an entry has an origin, the mount will now be fetched from the origin [#9063](https://github.com/statamic/cms/issues/9063) by @ryanmitchell
 
 ### What's fixed
-- [4.x] Fix dirty state issue on the entry publish form [#9203](https://github.com/statamic/cms/issues/9203) by @vluijkx
-- [4.x] Fix error when a navigation's tree file is missing [#9032](https://github.com/statamic/cms/issues/9032) by @duncanmcclean
-- [4.x] Asset field now supports mixed permissions [#9156](https://github.com/statamic/cms/issues/9156) by @edalzell
-- [4.x] Prevent precognitive validation on asset fields [#9170](https://github.com/statamic/cms/issues/9170) by @ryanmitchell
-- [4.x] Fix stack hover offset on close [#9201](https://github.com/statamic/cms/issues/9201) by @jacksleight
-- [4.x] Prevent configuring multiple conditions for the same field [#9199](https://github.com/statamic/cms/issues/9199) by @duncanmcclean
-- [4.x] Fix section showing without any visible fields [#9137](https://github.com/statamic/cms/issues/9137) by @aerni
-- [4.x] Fix tabs showing without any visible fields [#9135](https://github.com/statamic/cms/issues/9135) by @edalzell
-- [4.x] Fix template selector on Windows [#9197](https://github.com/statamic/cms/issues/9197) by @duncanmcclean
-- [4.x] Fix previewing revisions via the Relationship Fieldtype [#9190](https://github.com/statamic/cms/issues/9190) by @duncanmcclean
-- [4.x] Update the bug report template [#9195](https://github.com/statamic/cms/issues/9195) by @jelleroorda
-- [4.x] Fix issue with meta being updated wrongly in Link Fieldtype [#9189](https://github.com/statamic/cms/issues/9189) by @duncanmcclean
-- [4.x] Fix Read Only icon when viewing revisions [#9188](https://github.com/statamic/cms/issues/9188) by @duncanmcclean
-- [4.x] Fix Global Set without a blueprint breaking the Fieldsets page [#9187](https://github.com/statamic/cms/issues/9187) by @duncanmcclean
+- Fix dirty state issue on the entry publish form [#9203](https://github.com/statamic/cms/issues/9203) by @vluijkx
+- Fix error when a navigation's tree file is missing [#9032](https://github.com/statamic/cms/issues/9032) by @duncanmcclean
+- Asset field now supports mixed permissions [#9156](https://github.com/statamic/cms/issues/9156) by @edalzell
+- Prevent precognitive validation on asset fields [#9170](https://github.com/statamic/cms/issues/9170) by @ryanmitchell
+- Fix stack hover offset on close [#9201](https://github.com/statamic/cms/issues/9201) by @jacksleight
+- Prevent configuring multiple conditions for the same field [#9199](https://github.com/statamic/cms/issues/9199) by @duncanmcclean
+- Fix section showing without any visible fields [#9137](https://github.com/statamic/cms/issues/9137) by @aerni
+- Fix tabs showing without any visible fields [#9135](https://github.com/statamic/cms/issues/9135) by @edalzell
+- Fix template selector on Windows [#9197](https://github.com/statamic/cms/issues/9197) by @duncanmcclean
+- Fix previewing revisions via the Relationship Fieldtype [#9190](https://github.com/statamic/cms/issues/9190) by @duncanmcclean
+- Update the bug report template [#9195](https://github.com/statamic/cms/issues/9195) by @jelleroorda
+- Fix issue with meta being updated wrongly in Link Fieldtype [#9189](https://github.com/statamic/cms/issues/9189) by @duncanmcclean
+- Fix Read Only icon when viewing revisions [#9188](https://github.com/statamic/cms/issues/9188) by @duncanmcclean
+- Fix Global Set without a blueprint breaking the Fieldsets page [#9187](https://github.com/statamic/cms/issues/9187) by @duncanmcclean
 
 
 
