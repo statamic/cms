@@ -336,6 +336,8 @@ export default {
         },
 
         showPicker() {
+            if (! this.canBrowse && ! this.canUpload) return false
+
             if (this.maxFilesReached && ! this.isFullWidth) return false
 
             if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false
@@ -356,7 +358,7 @@ export default {
         },
 
         canUpload() {
-            return this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload  '+ this.container +' assets'))
+            return this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload '+ this.container +' assets'))
         },
 
     },
