@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
@@ -240,6 +241,7 @@ class UsersController extends CpController
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $request->user()->id === $user->id(),
+            'itemActions' => Action::for($user, ['view' => 'form']),
         ];
 
         if ($request->wantsJson()) {

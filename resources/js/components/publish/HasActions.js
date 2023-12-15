@@ -1,5 +1,16 @@
 export default {
 
+    props: {
+        initialItemActions: Array,
+        itemActionUrl: String,
+    },
+
+    data() {
+        return {
+            itemActions: this.initialItemActions,
+        }
+    },
+
     methods: {
 
         actionStarted() {
@@ -20,11 +31,17 @@ export default {
             if (response.message !== false) {
                 this.$toast.success(response.message || __("Action completed"));
             }
+            
+            if (response.data) {
+                this.itemActions = response.data.itemActions;
+            }
 
             this.afterItemActionSuccessfullyCompleted(response);
         },
 
-        afterItemActionSuccessfullyCompleted() {}
+        afterItemActionSuccessfullyCompleted(response) {
+            //
+        }
 
     }
 

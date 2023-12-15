@@ -8,6 +8,13 @@
                 <h1 class="flex-1" v-text="title" />
                     <dropdown-list class="mr-4" v-if="canEditBlueprint">
                         <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                        <data-list-inline-actions
+                            :item="initialReferenceId"
+                            :url="itemActionUrl"
+                            :actions="itemActions"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
                     </dropdown-list>
 
                     <change-password
@@ -55,11 +62,13 @@
 <script>
 import ChangePassword from './ChangePassword.vue';
 import HasHiddenFields from '../publish/HasHiddenFields';
+import HasActions from '../publish/HasActions';
 
 export default {
 
     mixins: [
         HasHiddenFields,
+        HasActions,
     ],
 
     components: {
@@ -95,7 +104,11 @@ export default {
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
-        }
+        },
+
+        initialReferenceId() {
+            return this.initialReference.split('::')[1];
+        },
 
     },
 
@@ -127,7 +140,13 @@ export default {
                     this.$toast.error(__('Something went wrong'));
                 }
             });
-        }
+        },
+
+        afterItemActionSuccessfullyCompleted(response) {
+            if (response.data) {
+                this.values = this.resetValuesFromResponse(response.data.values);
+            }
+        },
 
     },
 

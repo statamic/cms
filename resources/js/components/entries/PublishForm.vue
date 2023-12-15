@@ -14,7 +14,7 @@
             <dropdown-list class="mr-4">
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
                 <data-list-inline-actions
-                    :item="values.id"
+                    :item="initialReferenceId"
                     :url="itemActionUrl"
                     :actions="itemActions"
                     @started="actionStarted"
@@ -350,14 +350,11 @@ export default {
         collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
-        initialItemActions: Array,
-        itemActionUrl: String,
     },
 
     data() {
         return {
             actions: this.initialActions,
-            itemActions: this.initialItemActions,
             saving: false,
             localizing: false,
             trackDirtyState: true,
@@ -493,6 +490,10 @@ export default {
                     value: localization.handle,
                     label: localization.name,
                 }));
+        },
+
+        initialReferenceId() {
+            return this.initialReference.split('::')[2];
         },
 
     },
@@ -794,8 +795,7 @@ export default {
 
         afterItemActionSuccessfullyCompleted(response) {
             if (response.data) {
-                this.values = this.resetValuesFromResponse(response.data.data.values);
-                this.itemActions = response.data.itemActions;
+                this.values = this.resetValuesFromResponse(response.data.values);
             }
         },
 

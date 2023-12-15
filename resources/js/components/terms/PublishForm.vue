@@ -16,7 +16,7 @@
             <dropdown-list class="mr-4" v-if="canEditBlueprint">
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
                 <data-list-inline-actions
-                    :item="values.id"
+                    :item="initialReferenceId"
                     :url="itemActionUrl"
                     :actions="itemActions"
                     @started="actionStarted"
@@ -296,14 +296,11 @@ export default {
         createAnotherUrl: String,
         listingUrl: String,
         previewTargets: Array,
-        initialItemActions: Array,
-        itemActionUrl: String,
     },
 
     data() {
         return {
             actions: this.initialActions,
-            itemActions: this.initialItemActions,
             saving: false,
             localizing: false,
             fieldset: this.initialFieldset,
@@ -399,6 +396,10 @@ export default {
 
         afterSaveOption() {
             return this.getPreference('after_save');
+        },
+
+        initialReferenceId() {
+            return this.initialReference.split('::')[2];
         },
 
     },
@@ -635,8 +636,7 @@ export default {
 
         afterItemActionSuccessfullyCompleted(response) {
             if (response.data) {
-                this.values = { ...this.values, ...response.data.values };
-                this.itemActions = response.data.itemActions;
+                this.values = this.resetValuesFromResponse(response.data.values);
             }
         },
 

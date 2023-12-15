@@ -107,7 +107,6 @@ class TermsController extends CpController
                 'createRevision' => $term->createRevisionUrl(),
                 'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
             ],
-            'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
             'values' => array_merge($values, ['id' => $term->id()]),
             'meta' => $meta,
             'taxonomy' => $taxonomy->handle(),
@@ -141,6 +140,7 @@ class TermsController extends CpController
             'revisionsEnabled' => $term->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
+            'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
         ];
 
         if ($request->wantsJson()) {

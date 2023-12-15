@@ -118,7 +118,6 @@ class EntriesController extends CpController
                 'createRevision' => $entry->createRevisionUrl(),
                 'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
-            'itemActions' => Action::for($entry, ['collection' => $collection->handle(), 'view' => 'form']),
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
             'collection' => $collection->handle(),
@@ -157,6 +156,7 @@ class EntriesController extends CpController
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
+            'itemActions' => Action::for($entry, ['collection' => $collection->handle(), 'view' => 'form']),
         ];
 
         if ($request->wantsJson()) {
