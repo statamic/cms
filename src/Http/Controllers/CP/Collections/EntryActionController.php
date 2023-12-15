@@ -17,15 +17,14 @@ class EntryActionController extends ActionController
 
     protected function getItemData($entry, $context)
     {
-        $collection = $entry->collection();
-
         $blueprint = $entry->blueprint();
 
-        [$values] = $this->extractFromFields($entry, $blueprint);
+        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         return [
-            'values' => $values,
             'itemActions' => Action::for($entry, $context),
+            'values' => array_merge($values, ['id' => $entry->id()]),
+            'meta' => $meta,
         ];
     }
 

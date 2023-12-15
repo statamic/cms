@@ -15,6 +15,13 @@
 
             <dropdown-list class="mr-4" v-if="canEditBlueprint">
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                <data-list-inline-actions
+                    :item="values.id"
+                    :url="itemActionUrl"
+                    :actions="itemActions"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                />
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
@@ -243,12 +250,14 @@ import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
+import HasActions from '../publish/HasActions';
 
 export default {
 
     mixins: [
         HasPreferences,
         HasHiddenFields,
+        HasActions,
     ],
 
     components: {
@@ -287,11 +296,14 @@ export default {
         createAnotherUrl: String,
         listingUrl: String,
         previewTargets: Array,
+        initialItemActions: Array,
+        itemActionUrl: String,
     },
 
     data() {
         return {
             actions: this.initialActions,
+            itemActions: this.initialItemActions,
             saving: false,
             localizing: false,
             fieldset: this.initialFieldset,
@@ -619,7 +631,15 @@ export default {
                 this.localizedFields.push(handle);
 
             this.$refs.container.dirty();
-        }
+        },
+
+        afterItemActionSuccessfullyCompleted(response) {
+            if (response.data) {
+                this.values = { ...this.values, ...response.data.values };
+                this.itemActions = response.data.itemActions;
+            }
+        },
+
     },
 
     mounted() {

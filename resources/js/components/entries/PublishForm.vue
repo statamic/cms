@@ -793,8 +793,10 @@ export default {
         },
 
         afterItemActionSuccessfullyCompleted(response) {
-            this.values = { ...this.values, ...response.data.values };
-            this.itemActions = response.data.itemActions;
+            if (response.data) {
+                this.values = this.resetValuesFromResponse(response.data.data.values);
+                this.itemActions = response.data.itemActions;
+            }
         },
 
     },

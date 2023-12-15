@@ -51,8 +51,6 @@ class DuplicateEntry extends Action
 
     public function run($items, $values)
     {
-        dd($this->context);
-
         $this->newItems = $items
             ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
             ->unique()

@@ -63,7 +63,15 @@ class Delete extends Action
             return;
         }
 
-        // Also need to handle terms etc, todo
-        return cp_route('collections.show', $items->first()->collection()->handle());
+        $item = $items->first();
+
+        switch (true) {
+            case $item instanceof Contracts\Entries\Entry:
+                return cp_route('collections.show', $item->collection()->handle());
+                break;
+            case $item instanceof Contracts\Taxonomies\Term:
+                return cp_route('taxonomies.show', $item->taxonomy()->handle());
+                break;
+        }
     }
 }

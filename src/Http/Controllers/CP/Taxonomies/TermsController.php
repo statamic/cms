@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
@@ -106,6 +107,7 @@ class TermsController extends CpController
                 'createRevision' => $term->createRevisionUrl(),
                 'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
             ],
+            'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
             'values' => array_merge($values, ['id' => $term->id()]),
             'meta' => $meta,
             'taxonomy' => $taxonomy->handle(),
