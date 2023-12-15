@@ -17,7 +17,7 @@ abstract class ActionController extends CpController
             'context' => 'sometimes',
         ]);
 
-        $context = $data['context'] ?? [];
+        $context = $data['context'] ?? ['view' => 'list'];
 
         $items = $this->getSelectedItems(collect($data['selections']), $context);
 
@@ -49,7 +49,7 @@ abstract class ActionController extends CpController
 
         $response = $response ?: [];
 
-        if (($context['view'] ?? null) === 'form') {
+        if ($context['view'] === 'form') {
             $response['data'] = $this->getItemData($items->first(), $context);
         }
 

@@ -51,6 +51,8 @@ class DuplicateEntry extends Action
 
     public function run($items, $values)
     {
+        dd($this->context);
+
         $this->newItems = $items
             ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
             ->unique()
@@ -162,7 +164,7 @@ class DuplicateEntry extends Action
 
     public function redirect($items, $values)
     {
-        if (($this->context['view'] ?? null) !== 'form') {
+        if ($this->context['view'] !== 'form') {
             return;
         }
 

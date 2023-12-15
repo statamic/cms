@@ -15,9 +15,13 @@ abstract class Action implements Arrayable
     protected static $binding = 'actions';
 
     protected $items;
+
     protected $confirm = true;
+
     protected $dangerous = false;
+
     protected $fields = [];
+
     protected $context = [];
 
     public function __construct()
@@ -62,6 +66,10 @@ abstract class Action implements Arrayable
 
     public function context($context)
     {
+        if (! isset($context['view'])) {
+            $context['view'] = 'list';
+        }
+
         $this->context = $context;
 
         return $this;
