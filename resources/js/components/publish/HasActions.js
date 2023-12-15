@@ -21,7 +21,7 @@ export default {
                 this.$toast.success(response.message || __("Action completed"));
             }
 
-            this.afterListActionSuccessfullyCompleted(response);
+            this.afterItemActionSuccessfullyCompleted(response);
         },
 
     }

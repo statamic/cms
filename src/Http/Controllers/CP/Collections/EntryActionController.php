@@ -25,7 +25,7 @@ class EntryActionController extends ActionController
 
         return [
             'values' => $values,
-            'listActions' => Action::for($entry, $context),
+            'itemActions' => Action::for($entry, $context),
         ];
     }
 

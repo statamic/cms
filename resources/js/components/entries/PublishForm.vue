@@ -16,7 +16,7 @@
                 <data-list-inline-actions
                     :item="values.id"
                     :url="listActionUrl"
-                    :actions="listActions"
+                    :actions="itemActions"
                     @started="actionStarted"
                     @completed="actionCompleted"
                 />
@@ -350,14 +350,14 @@ export default {
         collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
-        initialListActions: Array,
+        initialItemActions: Array,
         listActionUrl: String,
     },
 
     data() {
         return {
             actions: this.initialActions,
-            listActions: this.initialListActions,
+            itemActions: this.initialItemActions,
             saving: false,
             localizing: false,
             trackDirtyState: true,
@@ -507,9 +507,9 @@ export default {
 
     methods: {
 
-        afterListActionSuccessfullyCompleted(response) {
+        afterItemActionSuccessfullyCompleted(response) {
             this.values = { ...this.values, ...response.data.values };
-            this.listActions = response.data.listActions;
+            this.itemActions = response.data.itemActions;
         },
 
         clearErrors() {
