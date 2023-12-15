@@ -144,6 +144,7 @@ class FormsController extends CpController
             'title' => $form->title(),
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
+            'send' => $form->send(),
             'email' => $form->email(),
         ];
 
@@ -174,6 +175,7 @@ class FormsController extends CpController
             ->title($values['title'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
+            ->send($values['send'])
             ->email($values['email']);
 
         $form->save();
@@ -231,6 +233,11 @@ class FormsController extends CpController
             'email' => [
                 'display' => __('Email'),
                 'fields' => [
+                    'send' => [
+                        'display' => __('Send Emails'),
+                        'type' => 'toggle',
+                        'instructions' => __('statamic::messages.form_configure_send_instructions'),
+                    ],
                     'email' => [
                         'type' => 'grid',
                         'mode' => 'stacked',

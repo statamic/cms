@@ -34,6 +34,7 @@ class Form implements Arrayable, Augmentable, FormContract
     protected $blueprint;
     protected $honeypot;
     protected $store;
+    protected $send;
     protected $email;
     protected $metrics;
     protected $afterSaveCallbacks = [];
@@ -108,6 +109,24 @@ class Form implements Arrayable, Augmentable, FormContract
             })
             ->setter(function ($store) {
                 return $store === false ? false : null;
+            })
+            ->args(func_get_args());
+    }
+
+    /**
+     * Get or set the send field.
+     *
+     * @param  mixed  $send
+     * @return mixed
+     */
+    public function send($send = null)
+    {
+        return $this->fluentlyGetOrSet('send')
+            ->getter(function ($send) {
+                return $send !== false;
+            })
+            ->setter(function ($send) {
+                return $send === false ? false : null;
             })
             ->args(func_get_args());
     }
@@ -200,6 +219,10 @@ class Form implements Arrayable, Augmentable, FormContract
             $data['store'] = false;
         }
 
+        if ($this->send === false) {
+            $data['send'] = false;
+        }
+
         File::put($this->path(), YAML::dump($data));
 
         foreach ($afterSaveCallbacks as $callback) {
@@ -240,6 +263,7 @@ class Form implements Arrayable, Augmentable, FormContract
                     'title',
                     'honeypot',
                     'store',
+                    'send',
                     'email',
                 ]);
             })
