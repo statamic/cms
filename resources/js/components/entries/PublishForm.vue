@@ -301,14 +301,14 @@ import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
-import HasListActions from '../publish/HasListActions';
+import HasActions from '../publish/HasActions';
 
 export default {
 
     mixins: [
         HasPreferences,
         HasHiddenFields,
-        HasListActions,
+        HasActions,
     ],
 
     components: {
