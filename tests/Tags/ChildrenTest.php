@@ -10,12 +10,6 @@ use Statamic\Facades\Site;
 use Statamic\Tags\Children;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Statamic\Facades\Config;
-use Illuminate\Support\Arr;
-use Statamic\Tags\Context;
-
-
-
 
 class ChildrenTest extends TestCase
 {
@@ -102,6 +96,5 @@ class ChildrenTest extends TestCase
         $this->get('/foo');
 
         $this->assertEquals('the bar entry', $this->tag('{{ nav }}{{ children }}{{ title }}{{ /children }}{{ /nav }}'));
-
     }
 }
