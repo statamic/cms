@@ -15,7 +15,7 @@
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
                 <data-list-inline-actions
                     :item="values.id"
-                    :url="listActionUrl"
+                    :url="itemActionUrl"
                     :actions="itemActions"
                     @started="actionStarted"
                     @completed="actionCompleted"
@@ -351,7 +351,7 @@ export default {
         previewTargets: Array,
         autosaveInterval: Number,
         initialItemActions: Array,
-        listActionUrl: String,
+        itemActionUrl: String,
     },
 
     data() {
