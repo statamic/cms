@@ -59,7 +59,7 @@ class Delete extends Action
 
     public function redirect($items, $values)
     {
-        if ($this->context['view'] ?? null !== 'form') {
+        if (($this->context['view'] ?? null) !== 'form') {
             return;
         }
 
