@@ -507,11 +507,6 @@ export default {
 
     methods: {
 
-        afterItemActionSuccessfullyCompleted(response) {
-            this.values = { ...this.values, ...response.data.values };
-            this.itemActions = response.data.itemActions;
-        },
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -795,7 +790,13 @@ export default {
             }, this.autosaveInterval);
 
             this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
-        }
+        },
+
+        afterItemActionSuccessfullyCompleted(response) {
+            this.values = { ...this.values, ...response.data.values };
+            this.itemActions = response.data.itemActions;
+        },
+
     },
 
     mounted() {
