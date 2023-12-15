@@ -117,6 +117,7 @@ return [
     'form_configure_honeypot_instructions' => 'Dieser Feldname als *Honeypot* verwenden. Honeypots sind besondere Felder, die zum Vermeiden von Spam-Antworten benutzt werden.',
     'form_configure_intro' => 'Mit Formularen werden Informationen von Besucher:innen gesammelt sowie Events ausgelöst und Benachrichtigungen gesendet, sobald es neue Antworten gibt.',
     'form_configure_mailer_instructions' => 'Mailer für den Versand dieser E-Mail auswählen. Feld leerlassen, um den Standard-Mailer zu verwenden.',
+    'form_configure_send_instructions' => 'Das Senden von E-Mails deaktivieren.',
     'form_configure_store_instructions' => 'Das Speichern von Antworten deaktivieren. Events und E-Mail-Benachrichtigungen werden weiterhin gesendet.',
     'form_configure_title_instructions' => 'Gewöhnlich ein Call to Action, wie z.B. Kontakt.',
     'getting_started_widget_blueprints' => 'Blueprints legen die benutzerdefinierten Felder fest, die zum Erstellen und Speichern der Inhalte verwendet werden.',
