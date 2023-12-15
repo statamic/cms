@@ -100,7 +100,7 @@ class FrontendFormRequest extends FormRequest
 
         $this->assets = $this->normalizeAssetsValues($fields);
 
-        $values = array_merge($this->removeNullsFromCheckboxes($fields, $this->all()), $this->assets);
+        $values = array_merge($this->all(), $this->assets);
 
         return $this->cachedFields = $fields->addValues($values);
     }
@@ -112,15 +112,6 @@ class FrontendFormRequest extends FormRequest
             ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets' && $this->hasFile($field->handle()))
             ->map(fn ($field) => Arr::wrap($this->file($field->handle())))
             ->all();
-    }
-
-    private function removeNullsFromCheckboxes($fields, $values)
-    {
-        $fields->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'checkboxes')
-            ->each(fn ($field) => Arr::set($values, $field->handle(), collect(Arr::get($values, $field->handle(), []))->filter(fn ($value) => $value !== null)->values()));
-
-        return $values;
     }
 
     public function validateResolved()
