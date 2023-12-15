@@ -54,7 +54,7 @@ class DuplicateEntry extends Action
         $this->newItems = $items
             ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
             ->unique()
-            ->each(fn ($original) => $this->duplicateEntry($original));
+            ->map(fn ($original) => $this->duplicateEntry($original));
     }
 
     private function duplicateEntry(Entry $original, ?string $origin = null)
@@ -100,6 +100,8 @@ class DuplicateEntry extends Action
                 ->appendTo($originalParent->id(), $entry)
                 ->save();
         }
+
+        return $entry;
     }
 
     protected function getEntryParentFromStructure(Entry $entry)
