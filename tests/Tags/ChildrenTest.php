@@ -76,7 +76,7 @@ class ChildrenTest extends TestCase
         $this->setUpEntries();
         $this->get('/foo');
 
-        $this->assertEquals('the bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}', ['collection' => $this->collection ]));
+        $this->assertEquals('the bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}', ['collection' => $this->collection]));
     }
 
     /** @test */
@@ -86,7 +86,7 @@ class ChildrenTest extends TestCase
 
         $this->get('/fr/fr-foo');
 
-        $this->assertEquals('the french bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}', ['collection' => $this->collection ]));
+        $this->assertEquals('the french bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}', ['collection' => $this->collection]));
     }
 
     /** @test */
