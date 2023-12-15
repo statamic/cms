@@ -24,6 +24,8 @@ export default {
             this.afterItemActionSuccessfullyCompleted(response);
         },
 
+        afterItemActionSuccessfullyCompleted() {}
+
     }
 
 }
