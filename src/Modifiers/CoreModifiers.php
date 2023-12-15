@@ -3,10 +3,11 @@
 namespace Statamic\Modifiers;
 
 use ArrayAccess;
-use Carbon\Carbon;
+use Carbon\CarbonInterface as Carbon;
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -897,6 +898,65 @@ class CoreModifiers extends Modifier
         return Stringy::hasUpperCase($value);
     }
 
+    public function headline($value, $params)
+    {
+        $style = Arr::get($params, 0, 'ap');
+
+        switch ($style) {
+            case 'mla':
+                return $this->renderMLAStyleHeadline($value);
+            default:
+                return $this->renderAPStyleHeadline($value);
+        }
+    }
+
+    private function renderAPStyleHeadline($value)
+    {
+        $exceptions = [
+            'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with',
+        ];
+
+        $words = explode(' ', $value);
+        $wordCount = count($words);
+
+        $headline = collect($words)->map(function ($word, $index) use ($exceptions, $wordCount) {
+            $word = strtolower($word);
+            $isFirstOrLast = ($index === 0 || $index === $wordCount - 1);
+
+            // Handle hyphenated words
+            if (strpos($word, '-') !== false) {
+                $subWords = explode('-', $word);
+
+                return collect($subWords)->map(function ($subWord) use ($isFirstOrLast, $exceptions) {
+                    return ($isFirstOrLast || ! in_array($subWord, $exceptions)) ? Str::ucfirst($subWord) : $subWord;
+                })->implode('-');
+            }
+
+            return ($isFirstOrLast || ! in_array($word, $exceptions)) ? Str::ucfirst($word) : $word;
+        })->implode(' ');
+
+        return $headline;
+    }
+
+    private function renderMLAStyleHeadline($value)
+    {
+        $exceptions = [
+            'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with',
+        ];
+
+        $words = explode(' ', $value);
+        $wordCount = count($words);
+
+        $headline = collect($words)->map(function ($word, $index) use ($exceptions, $wordCount) {
+            $word = strtolower($word);
+            $isFirstOrLast = ($index === 0 || $index === $wordCount - 1);
+
+            return ($isFirstOrLast || ! in_array($word, $exceptions)) ? Str::ucfirst($word) : $word;
+        })->implode(' ');
+
+        return $headline;
+    }
+
     /**
      * Get the date difference in hours.
      *
@@ -1735,11 +1795,11 @@ class CoreModifiers extends Modifier
      *
      * @return void
      */
-    public function ray($value)
+    public function ray($value, $params)
     {
         throw_unless(function_exists('ray'), new \Exception('Ray is not installed. Run `composer require spatie/laravel-ray --dev`'));
 
-        ray($value);
+        ray($value)->color(Arr::get($params, 0, 'gray'));
 
         return $value;
     }
@@ -1751,6 +1811,14 @@ class CoreModifiers extends Modifier
      */
     public function readTime($value, $params)
     {
+        if (is_array($value)) {
+            $value = collect($value)
+                ->map(fn (Values $values) => $values->all())
+                ->where('type', 'text')
+                ->map(fn ($item) => $item['text']->raw())
+                ->implode(' ');
+        }
+
         $words = $this->wordCount(strip_tags($value));
 
         return ceil($words / Arr::get($params, 0, 200));
@@ -2753,6 +2821,12 @@ class CoreModifiers extends Modifier
             return $value;
         }
 
+        if (is_array($value)) {
+            return array_map(function ($item) use ($params) {
+                return $this->wrap($item, $params);
+            }, $value);
+        }
+
         $attributes = '';
         $tag = Arr::get($params, 0);
 
@@ -2935,7 +3009,7 @@ class CoreModifiers extends Modifier
     private function carbon($value)
     {
         if (! $value instanceof Carbon) {
-            $value = (is_numeric($value)) ? Carbon::createFromTimestamp($value) : Carbon::parse($value);
+            $value = (is_numeric($value)) ? Date::createFromTimestamp($value) : Date::parse($value);
         }
 
         return $value;

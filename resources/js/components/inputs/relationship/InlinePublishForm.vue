@@ -69,14 +69,25 @@ export default {
     methods: {
 
         getItem() {
-            this.$axios.get(this.itemUrl).then(response => {
-                for (const prop in this.componentProps) {
-                    const value = data_get(response.data, this.componentProps[prop]);
-                    this.$set(this.componentPropValues, prop, value);
-                }
+            this.$axios.get(this.itemUrl)
+                .then(response => {
+                    for (const prop in this.componentProps) {
+                        const value = data_get(response.data, this.componentProps[prop]);
+                        this.$set(this.componentPropValues, prop, value);
+                    }
 
-                this.loading = false;
-            });
+                    this.loading = false;
+                }).catch((error) => {
+                    if (error.response.status === 500) {
+                        this.$toast.error(error.response.data.message);
+                        this.close();
+                    }
+
+                    if (error.response.status === 403) {
+                        this.$toast.error(__('This action is unauthorized.'));
+                        this.close();
+                    }
+                });
         },
 
         close() {

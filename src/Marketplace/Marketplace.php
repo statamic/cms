@@ -44,7 +44,7 @@ class Marketplace
         }
 
         $addon = Addon::all()->first(function ($addon) use ($slug) {
-            return $slug === $addon->slug();
+            return $addon->slug() === $slug;
         });
 
         if ($addon) {

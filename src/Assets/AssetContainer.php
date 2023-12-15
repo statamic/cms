@@ -11,6 +11,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetContainerCreated;
+use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
@@ -20,6 +21,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Image;
+use Statamic\Facades\Pattern;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
@@ -171,25 +173,37 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @return \Statamic\Fields\Blueprint
      */
-    public function blueprint()
+    public function blueprint($asset = null)
     {
-        if (Blink::has($blink = 'asset-container-blueprint-'.$this->handle())) {
-            return Blink::get($blink);
+        $blueprint = $this->getBaseBlueprint();
+
+        $blueprint->setParent($asset ?? $this);
+
+        // Only dispatch the event when there's no asset.
+        // When there is an asset, the event is dispatched from the asset.
+        if (! $asset) {
+            Blink::once(
+                'asset-container-assetcontainerblueprintfound-'.$this->handle(),
+                fn () => AssetContainerBlueprintFound::dispatch($blueprint, $this)
+            );
         }
 
-        $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
-            'alt' => [
-                'type' => 'text',
-                'display' => __('Alt Text'),
-                'instructions' => __('Description of the image'),
-            ],
-        ])->setHandle($this->handle())->setNamespace('assets');
-
-        Blink::put($blink, $blueprint);
-
-        AssetContainerBlueprintFound::dispatch($blueprint, $this);
-
         return $blueprint;
+    }
+
+    private function getBaseBlueprint()
+    {
+        $blink = 'asset-container-blueprint-'.$this->handle();
+
+        return Blink::once($blink, function () {
+            return Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
+                'alt' => [
+                    'type' => 'text',
+                    'display' => __('Alt Text'),
+                    'instructions' => __('Description of the image'),
+                ],
+            ])->setHandle($this->handle())->setNamespace('assets');
+        });
     }
 
     public function afterSave($callback)
@@ -222,6 +236,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && AssetContainerCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (AssetContainerSaving::dispatch($this) === false) {
                 return false;
             }
@@ -281,7 +299,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     public function contents()
     {
         return Blink::once('asset-listing-cache-'.$this->handle(), function () {
-            return new AssetContainerContents($this);
+            return app(AssetContainerContents::class)->container($this);
         });
     }
 
@@ -357,7 +375,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
 
         if ($folder !== null) {
             if ($recursive) {
-                $query->where('path', 'like', "{$folder}/%");
+                $query->where('path', 'like', Pattern::sqlLikeQuote($folder).'/%');
             } else {
                 $query->where('folder', $folder);
             }

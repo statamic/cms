@@ -45,6 +45,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\ReuploadAsset::class,
         Actions\MoveAssetFolder::class,
         Actions\RenameAssetFolder::class,
+        Actions\Impersonate::class,
     ];
 
     protected $fieldtypes = [
@@ -68,6 +69,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Floatval::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
+        Fieldtypes\Group::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Html::class,
         Fieldtypes\Icon::class,
@@ -149,6 +151,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Assets::class,
         Tags\Cache::class,
         Tags\Can::class,
+        Tags\Children::class,
         Tags\Collection\Collection::class,
         Tags\Cookie::class,
         Tags\Dd::class,
@@ -225,6 +228,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddGraphQLPermission::class,
         Updates\AddAssignRolesAndGroupsPermissions::class,
         Updates\AddDefaultPreferencesToGitConfig::class,
+        Updates\AddConfigureFormFieldsPermission::class,
+        Updates\AddSitePermissions::class,
     ];
 
     public function register()

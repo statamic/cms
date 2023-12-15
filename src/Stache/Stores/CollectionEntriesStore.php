@@ -30,7 +30,7 @@ class CollectionEntriesStore extends ChildStore
         $dir = str_finish($this->directory(), '/');
         $relative = Path::tidy($file->getPathname());
 
-        if ($dir == substr($relative, 0, strlen($dir))) {
+        if (substr($relative, 0, strlen($dir)) == $dir) {
             $relative = substr($relative, strlen($dir));
         }
 

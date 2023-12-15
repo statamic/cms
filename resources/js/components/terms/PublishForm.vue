@@ -18,7 +18,7 @@
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
-                <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
+                <svg-icon name="light/lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden md:flex items-center">
@@ -98,6 +98,7 @@
                             @blur="container.$emit('blur', $event)"
                         >
                             <template #actions="{ shouldShowSidebar }">
+                            <div class="card p-0" :class="{ 'mb-5': showLivePreviewButton || showVisitUrlButton || localizations.length > 1 }">
 
                                 <div :class="{ 'hi': !shouldShowSidebar }">
 
@@ -183,6 +184,7 @@
                                     </div>
                                 </div>
 
+                            </div>
                             </template>
                         </publish-tabs>
                     </transition>
@@ -443,6 +445,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
+                if (! response.data.saved) {
+                    return this.$toast.error(__(`Couldn't save term`));
+                }
                 this.title = response.data.data.title;
                 this.permalink = response.data.data.permalink;
                 this.isWorkingCopy = true;

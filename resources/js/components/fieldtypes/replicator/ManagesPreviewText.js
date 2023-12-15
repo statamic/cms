@@ -1,3 +1,5 @@
+import PreviewHtml from "./PreviewHtml";
+
 export default {
 
     computed: {
@@ -13,13 +15,15 @@ export default {
                     return value;
                 })
                 .map(value => {
-                    if (typeof value === 'string') return value;
+                    if (value instanceof PreviewHtml) return value.html;
+
+                    if (typeof value === 'string') return escapeHtml(value);
 
                     if (Array.isArray(value) && typeof value[0] === 'string') {
-                        return value.join(', ');
+                        return escapeHtml(value.join(', '));
                     }
 
-                    return JSON.stringify(value);
+                    return escapeHtml(JSON.stringify(value));
                 })
                 .join(' / ');
         }

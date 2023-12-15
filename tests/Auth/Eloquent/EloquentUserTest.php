@@ -36,28 +36,28 @@ class EloquentUserTest extends TestCase
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
         };
         $roleC = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'c';
             }
         };
         $roleD = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'd';
             }
@@ -138,5 +138,25 @@ class EloquentUserTest extends TestCase
         $user->model()->timestamps = false;
 
         $this->assertFalse($user->timestamps);
+    }
+
+    /** @test */
+    public function it_gets_super_correctly_on_the_model()
+    {
+        $user = $this->makeUser();
+
+        $this->assertNull($user->super);
+
+        $user->super = true;
+        $user->save();
+
+        $this->assertTrue($user->super);
+        $this->assertTrue($user->model()->super);
+
+        $user->super = false;
+        $user->save();
+
+        $this->assertFalse($user->super);
+        $this->assertFalse($user->model()->super);
     }
 }

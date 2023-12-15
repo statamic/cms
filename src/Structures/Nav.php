@@ -104,6 +104,11 @@ class Nav extends Structure implements Contract
         })->filter();
     }
 
+    public function sites()
+    {
+        return $this->trees()->keys();
+    }
+
     public function existsIn($site)
     {
         return $this->trees()->has($site);

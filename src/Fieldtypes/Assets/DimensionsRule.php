@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Contracts\Validation\Rule;
 use Statamic\Facades\Asset;
+use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DimensionsRule implements Rule
@@ -63,7 +64,7 @@ class DimensionsRule implements Rule
      */
     public function message()
     {
-        return __('statamic::validation.dimensions');
+        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.dimensions');
     }
 
     /**
@@ -121,6 +122,6 @@ class DimensionsRule implements Rule
 
         $precision = 1 / (max($width, $height) + 1);
 
-        return $precision < abs($numerator / $denominator - $width / $height);
+        return abs($numerator / $denominator - $width / $height) > $precision;
     }
 }

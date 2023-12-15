@@ -160,6 +160,7 @@ abstract class Tree implements Contract, Localization
         $this->cachedFlattenedPages = null;
 
         Blink::forget('collection-structure-flattened-pages-collection*');
+        Blink::forget('collection-structure-tree*');
 
         $this->repository()->save($this);
 
@@ -170,6 +171,8 @@ abstract class Tree implements Contract, Localization
 
     public function delete()
     {
+        Blink::forget('collection-structure-tree*');
+
         $this->repository()->delete($this);
 
         $this->dispatchDeletedEvent();
@@ -297,11 +300,11 @@ abstract class Tree implements Contract, Localization
     {
         $parent = optional($this->find($entry)->parent());
 
-        if ($target === $parent->id() || $parent->isRoot() && is_null($target)) {
+        if ($parent->id() === $target || $parent->isRoot() && is_null($target)) {
             return $this;
         }
 
-        if ($this->structure()->expectsRoot() && $target === Arr::get($this->tree, '0.'.$this->idKey())) {
+        if ($this->structure()->expectsRoot() && Arr::get($this->tree, '0.'.$this->idKey()) === $target) {
             throw new \Exception('Root page cannot have children');
         }
 

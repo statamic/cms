@@ -31,7 +31,7 @@ trait RendersControlPanelExceptions
 
         // If we're already there, there'd be a redirect loop, so we'll
         // send them to a page that tells them they're unauthorized.
-        if ($target === request()->getUri()) {
+        if (request()->getUri() === $target) {
             return cp_route('unauthorized');
         }
 

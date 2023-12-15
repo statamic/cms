@@ -243,8 +243,16 @@ class AntlersNodeParser
 
         $node->isClosingTag = $this->canBeClosingTag($node);
 
+        $lexerContent = $node->getContent();
+
+        if ($node->name->name == 'if' || $node->name->name == 'unless' || $node->name->name == 'elseif') {
+            if (mb_strlen(trim($lexerContent)) > 0) {
+                $lexerContent = '('.$lexerContent.')';
+            }
+        }
+
         // Need to run node type analysis here before the runtime node step.
-        $runtimeNodes = $this->lexer->tokenize($node, $node->getContent());
+        $runtimeNodes = $this->lexer->tokenize($node, $lexerContent);
 
         $node->runtimeNodes = $runtimeNodes;
 
@@ -450,7 +458,7 @@ class AntlersNodeParser
                     }
                 }
 
-                if ($charCount <= $i + 1) {
+                if ($i + 1 >= $charCount) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_END_OF_INPUT,
                         $node,
@@ -460,7 +468,7 @@ class AntlersNodeParser
 
                 $peek = null;
 
-                if ($charCount > $i + 1) {
+                if ($i + 1 < $charCount) {
                     $peek = $chars[$i + 1];
                 }
 
@@ -499,7 +507,7 @@ class AntlersNodeParser
             if ($hasFoundName && $current == DocumentParser::String_EscapeCharacter) {
                 $peek = null;
 
-                if ($charCount > $i + 1) {
+                if ($i + 1 < $charCount) {
                     $peek = $chars[$i + 1];
                 }
 
@@ -567,7 +575,11 @@ class AntlersNodeParser
                 $parameterNode->value = $content;
                 $parameterNode->startPosition = $node->relativePositionFromOffset($startAt, $nameStart);
 
-                if ($charCount < $i + 1) {
+                if (in_array($name, ['as', 'scope', 'handle_prefix'])) {
+                    $node->hasScopeAdjustingParameters = true;
+                }
+
+                if ($i + 1 > $charCount) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_NODE_PARAMETER,
                         $node,

@@ -11,7 +11,7 @@
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
     >
-        <svg-icon v-if="tab.icon" :name="`plump/${tab.icon}`" class="w-4 h-4 mr-1" />
+        <svg-icon v-if="tab.icon" :name="iconName(tab.icon)" :directory="iconBaseDirectory" class="w-4 h-4 mr-1" />
 
         {{ tab.display }}
 
@@ -58,7 +58,7 @@
                 <div class="form-group w-full" v-if="showInstructions">
                     <label v-text="__('Icon')" />
                     <publish-field-meta
-                        :config="{ handle: 'icon', type: 'icon', folder: 'plump' }"
+                        :config="{ handle: 'icon', type: 'icon', directory: this.iconBaseDirectory, folder: this.iconSubFolder }"
                         :initial-value="icon"
                         v-slot="{ meta, value, loading }"
                     >
@@ -117,6 +117,14 @@ export default {
             return this.currentTab === this.tab._id;
         },
 
+        iconBaseDirectory() {
+            return this.$config.get('setIconsDirectory');
+        },
+
+        iconSubFolder() {
+            return this.$config.get('setIconsFolder');
+        },
+
     },
 
     methods: {
@@ -156,7 +164,15 @@ export default {
 
         remove() {
             this.$emit('removed');
-        }
+        },
+
+        iconName(name) {
+            if (! name) return null;
+
+            return this.iconSubFolder
+                ? this.iconSubFolder+'/'+name
+                : name;
+        },
 
     }
 

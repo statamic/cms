@@ -541,7 +541,7 @@
                     dataTree: true,
                     dataTreeStartExpanded: true,
                     dataTreeChildField: 'children',
-                    layout: 'responsive',
+                    responsiveLayout: true,
                     tooltips: true,
                     rowFormatter: function (row) {
                         var data = row.getData(),

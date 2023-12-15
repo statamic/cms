@@ -230,7 +230,7 @@ class DocumentParser
 
                 $peek = null;
 
-                if ($this->inputLen > $this->currentIndex + 2) {
+                if ($this->currentIndex + 2 < $this->inputLen) {
                     $peek = $this->peek($this->currentIndex + 2);
                 }
 
@@ -272,7 +272,7 @@ class DocumentParser
             }
 
             if ($this->cur == self::AtChar && $this->next != null && $this->next == self::LeftBrace) {
-                if ($this->inputLen <= $this->currentIndex + 2) {
+                if ($this->currentIndex + 2 >= $this->inputLen) {
                     $this->currentContent[] = $this->next;
                     $this->dumpLiteralNode($this->currentIndex + 1);
                     break;
@@ -447,7 +447,7 @@ class DocumentParser
                 }
 
                 if ($this->lastAntlersNode != null && $this->lastAntlersNode instanceof PhpExecutionNode == false && $this->lastAntlersNode->isComment) {
-                    if ($indexCount > $i + 1) {
+                    if ($i + 1 < $indexCount) {
                         $nextAntlersStart = $this->antlersStartIndex[$i + 1];
 
                         if ($nextAntlersStart < $this->lastAntlersNode->endPosition->offset) {
@@ -523,11 +523,11 @@ class DocumentParser
 
                     // Skip processing potential nodes that are inside the last node.
                     if ($startCandidate->isBefore($this->lastAntlersNode->endPosition)) {
-                        if ($indexCount > $i + 1) {
+                        if ($i + 1 < $indexCount) {
                             $nextAntlersStart = $this->antlersStartIndex[$i + 1];
 
                             if ($nextAntlersStart < $this->lastAntlersNode->endPosition->offset) {
-                                if ($indexCount > $i + 2) {
+                                if ($i + 2 < $indexCount) {
                                     $nextAntlersStart = $this->antlersStartIndex[$i + 2];
                                 } else {
                                     $literalStart = $this->lastAntlersNode->endPosition->offset + 1;
@@ -547,14 +547,14 @@ class DocumentParser
                                 }
                             }
                         } else {
-                            if ($lastIndex != $i + 1) {
+                            if ($i + 1 != $lastIndex) {
                                 continue;
                             }
                         }
                     }
                 }
 
-                if ($indexCount > $i + 1) {
+                if ($i + 1 < $indexCount) {
                     $nextAntlersStart = $this->antlersStartIndex[$i + 1];
                     $literalStartIndex = $this->lastAntlersEndIndex + 1;
 
@@ -592,7 +592,7 @@ class DocumentParser
                         }
                     }
 
-                    if ($lastIndex == $i + 1 && ($nextAntlersStart <= $this->lastAntlersEndIndex)) {
+                    if ($i + 1 == $lastIndex && ($nextAntlersStart <= $this->lastAntlersEndIndex)) {
                         // In this scenario, we will create the last trailing literal node and break.
                         $thisOffset = $this->currentChunkOffset;
                         $content = StringUtilities::substr($this->content, $literalStartIndex);
@@ -1088,7 +1088,7 @@ class DocumentParser
             $this->startIndex + $this->seedOffset
         );
 
-        if ($this->inputLen < $index + 3) {
+        if ($index + 3 > $this->inputLen) {
             throw ErrorFactory::makeSyntaxError(
                 AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_MANIFESTING_ANTLERS_NODE,
                 $node,
@@ -1142,7 +1142,7 @@ class DocumentParser
             $this->startIndex + $this->seedOffset
         );
 
-        if ($this->inputLen < $index + 2) {
+        if ($index + 2 > $this->inputLen) {
             throw ErrorFactory::makeSyntaxError(
                 AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_MANIFESTING_ANTLERS_NODE,
                 $node,

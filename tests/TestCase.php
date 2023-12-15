@@ -177,7 +177,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     // This method is unavailable on earlier versions of Laravel.
-    public function partialMock($abstract, \Closure $mock = null)
+    public function partialMock($abstract, ?\Closure $mock = null)
     {
         $mock = \Mockery::mock(...array_filter(func_get_args()))->makePartial();
         $this->app->instance($abstract, $mock);

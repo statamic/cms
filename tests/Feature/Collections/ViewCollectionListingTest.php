@@ -105,7 +105,7 @@ class ViewCollectionListingTest extends TestCase
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
             ->assertViewHas('collections', function ($collections) {
-                return ['foo', 'bar'] === $collections->map->id->all();
+                return $collections->map->id->all() === ['foo', 'bar'];
             })
             ->assertDontSee('no-results');
     }

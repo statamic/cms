@@ -6,9 +6,9 @@ class TypeCoercion
 {
     public static function coerceType($value)
     {
-        if ($value == intval($value)) {
+        if (intval($value) == $value) {
             return intval($value);
-        } elseif ($value == floatval($value)) {
+        } elseif (floatval($value) == $value) {
             return floatval($value);
         }
 
