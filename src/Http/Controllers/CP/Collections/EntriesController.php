@@ -118,7 +118,7 @@ class EntriesController extends CpController
                 'createRevision' => $entry->createRevisionUrl(),
                 'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
-            'itemActions' => Action::for($entry, ['collection' => $collection->handle(), 'publish_form' => true]),
+            'itemActions' => Action::for($entry, ['collection' => $collection->handle(), 'view' => 'form']),
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
             'collection' => $collection->handle(),

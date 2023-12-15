@@ -162,7 +162,7 @@ class DuplicateEntry extends Action
 
     public function redirect($items, $values)
     {
-        if (! array_get($this->context, 'publish_form', false)) {
+        if ($this->context['view'] ?? null !== 'form') {
             return;
         }
 

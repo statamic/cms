@@ -49,7 +49,7 @@ abstract class ActionController extends CpController
 
         $response = $response ?: [];
 
-        if (array_get($context, 'publish_form', false)) {
+        if ($context['view'] ?? null === 'form') {
             $response['data'] = $this->getItemData($items->first(), $context);
         }
 
