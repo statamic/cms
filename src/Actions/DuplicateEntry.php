@@ -9,6 +9,8 @@ use Statamic\Facades\User;
 
 class DuplicateEntry extends Action
 {
+    protected $newItems;
+
     public static function title()
     {
         return __('Duplicate');
@@ -49,7 +51,7 @@ class DuplicateEntry extends Action
 
     public function run($items, $values)
     {
-        $items
+        $this->newItems = $items
             ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
             ->unique()
             ->each(fn ($original) => $this->duplicateEntry($original));
@@ -154,5 +156,14 @@ class DuplicateEntry extends Action
     public function authorize($user, $item)
     {
         return $user->can('create', [Entry::class, $item->collection(), $item->site()]);
+    }
+
+    public function redirect($items, $values)
+    {
+        if (! array_get($this->context, 'publish_form', false)) {
+            return;
+        }
+
+        return $this->newItems->first()->editUrl();
     }
 }
