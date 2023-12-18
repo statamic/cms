@@ -36,10 +36,10 @@ export default {
                 this.itemActions = response.data.itemActions;
             }
 
-            this.afterItemActionSuccessfullyCompleted(response);
+            this.afterActionSuccessfullyCompleted(response);
         },
 
-        afterItemActionSuccessfullyCompleted(response) {
+        afterActionSuccessfullyCompleted(response) {
             //
         }
 

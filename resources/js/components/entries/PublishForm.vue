@@ -793,7 +793,7 @@ export default {
             this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
         },
 
-        afterItemActionSuccessfullyCompleted(response) {
+        afterActionSuccessfullyCompleted(response) {
             if (response.data) {
                 this.values = this.resetValuesFromResponse(response.data.values);
             }

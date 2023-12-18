@@ -142,7 +142,7 @@ export default {
             });
         },
 
-        afterItemActionSuccessfullyCompleted(response) {
+        afterActionSuccessfullyCompleted(response) {
             if (response.data) {
                 this.values = this.resetValuesFromResponse(response.data.values);
             }
