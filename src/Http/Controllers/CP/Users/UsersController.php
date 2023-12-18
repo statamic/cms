@@ -287,9 +287,14 @@ class UsersController extends CpController
 
         $save = $user->save();
 
+        [$values] = $this->extractFromFields($user, $user->blueprint());
+
         return [
             'title' => $user->title(),
             'saved' => is_bool($save) ? $save : true,
+            'data' => [
+                'values' => $values,
+            ],
         ];
     }
 
@@ -306,5 +311,18 @@ class UsersController extends CpController
         $user->delete();
 
         return response('', 204);
+    }
+
+    protected function extractFromFields($user, $blueprint)
+    {
+        $fields = $blueprint
+            ->fields()
+            ->addValues(array_merge(
+                $user->data()->all(),
+                ['email' => $user->email()],
+            ))
+            ->preProcess();
+
+        return [$fields->values()->all(), $fields->meta()->all()];
     }
 }

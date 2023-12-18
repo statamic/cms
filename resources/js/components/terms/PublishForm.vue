@@ -13,8 +13,9 @@
                 </div>
             </h1>
 
-            <dropdown-list class="mr-4" v-if="canEditBlueprint">
-                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            <dropdown-list class="mr-4">
+                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
+                <li class="divider" />
                 <data-list-inline-actions
                     :item="initialReferenceId"
                     :url="itemActionUrl"
@@ -399,7 +400,7 @@ export default {
         },
 
         initialReferenceId() {
-            return this.initialReference.split('::')[2];
+            return this.initialReference.split('::').slice(1, 3).join('::');
         },
 
     },
@@ -486,6 +487,7 @@ export default {
                 .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
+                        this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
@@ -506,6 +508,7 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
+                        this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                     }
 
@@ -636,6 +639,8 @@ export default {
 
         afterActionSuccessfullyCompleted(response) {
             if (response.data) {
+                this.title = response.data.title;
+                this.permalink = response.data.permalink;
                 this.values = this.resetValuesFromResponse(response.data.values);
             }
         },

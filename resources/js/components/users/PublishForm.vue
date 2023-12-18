@@ -6,12 +6,13 @@
             <breadcrumb :url="cp_url('users')" :title="__('Users')" />
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
-                    <dropdown-list class="mr-4" v-if="canEditBlueprint">
-                        <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                    <dropdown-list class="mr-4">
+                        <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
+                        <li class="divider" />
                         <data-list-inline-actions
                             :item="initialReferenceId"
                             :url="itemActionUrl"
-                            :actions="itemActions"
+                            :actions="itemActionsFiltered"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
@@ -90,6 +91,7 @@ export default {
     },
 
     data() {
+            console.log(this.initialTitle);
         return {
             fieldset: _.clone(this.initialFieldset),
             values: _.clone(this.initialValues),
@@ -107,7 +109,11 @@ export default {
         },
 
         initialReferenceId() {
-            return this.initialReference.split('::')[1];
+            return this.initialReference.split('::').pop();
+        },
+
+        itemActionsFiltered() {
+            return this.itemActions.filter(action => !['assign_groups'].includes(action.handle));
         },
 
     },
@@ -124,6 +130,7 @@ export default {
 
             this.$axios[this.method](this.actions.save, this.visibleValues).then(response => {
                 this.title = response.data.title;
+                this.values = this.resetValuesFromResponse(response.data.data.values);
                 if (!response.data.saved) {
                     return this.$toast.error(`Couldn't save user`)
                 }
@@ -144,10 +151,17 @@ export default {
 
         afterActionSuccessfullyCompleted(response) {
             if (response.data) {
+                this.title = response.data.title;
                 this.values = this.resetValuesFromResponse(response.data.values);
             }
         },
 
+    },
+
+    watch: {
+        title() {
+            console.log(this.title);
+        },
     },
 
     mounted() {

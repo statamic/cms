@@ -13,10 +13,11 @@
 
             <dropdown-list class="mr-4">
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
+                <li class="divider" />
                 <data-list-inline-actions
                     :item="initialReferenceId"
                     :url="itemActionUrl"
-                    :actions="itemActions"
+                    :actions="itemActionsFiltered"
                     @started="actionStarted"
                     @completed="actionCompleted"
                 />
@@ -493,7 +494,11 @@ export default {
         },
 
         initialReferenceId() {
-            return this.initialReference.split('::')[2];
+            return this.initialReference.split('::').pop();
+        },
+
+        itemActionsFiltered() {
+            return this.itemActions.filter(action => !['publish', 'unpublish'].includes(action.handle));
         },
 
     },
@@ -502,7 +507,13 @@ export default {
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
-        }
+        },
+
+        title(title) {
+            if (this.isBase) {
+                document.title = title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
+            }
+        },
 
     },
 
@@ -556,9 +567,6 @@ export default {
                 }
                 this.title = response.data.data.title;
                 this.isWorkingCopy = true;
-                if (this.isBase) {
-                    document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
-                }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
@@ -795,6 +803,8 @@ export default {
 
         afterActionSuccessfullyCompleted(response) {
             if (response.data) {
+                this.title = response.data.title;
+                if (!this.revisionsEnabled) this.permalink = response.data.permalink;
                 this.values = this.resetValuesFromResponse(response.data.values);
             }
         },

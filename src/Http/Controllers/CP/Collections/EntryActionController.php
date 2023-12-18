@@ -19,12 +19,13 @@ class EntryActionController extends ActionController
     {
         $blueprint = $entry->blueprint();
 
-        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
+        [$values] = $this->extractFromFields($entry, $blueprint);
 
         return [
-            'itemActions' => Action::for($entry, $context),
+            'title' => $entry->value('title'),
+            'permalink' => $entry->absoluteUrl(),
             'values' => array_merge($values, ['id' => $entry->id()]),
-            'meta' => $meta,
+            'itemActions' => Action::for($entry, $context),
         ];
     }
 

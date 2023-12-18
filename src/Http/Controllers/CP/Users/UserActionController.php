@@ -19,12 +19,12 @@ class UserActionController extends ActionController
     {
         $blueprint = $user->blueprint();
 
-        [$values, $meta] = $this->extractFromFields($user, $blueprint);
+        [$values] = $this->extractFromFields($user, $blueprint);
 
         return [
-            'itemActions' => Action::for($user, $context),
+            'title' => $user->title(),
             'values' => array_merge($values, ['id' => $user->id()]),
-            'meta' => $meta,
+            'itemActions' => Action::for($user, $context),
         ];
     }
 
@@ -32,7 +32,10 @@ class UserActionController extends ActionController
     {
         $fields = $blueprint
             ->fields()
-            ->addValues($user->data()->all())
+            ->addValues(array_merge(
+                $user->data()->all(),
+                ['email' => $user->email()],
+            ))
             ->preProcess();
 
         return [$fields->values()->all(), $fields->meta()->all()];

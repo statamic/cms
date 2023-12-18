@@ -24,12 +24,19 @@ class Term implements TermContract
     use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState;
 
     protected $taxonomy;
+
     protected $slug;
+
     protected $blueprint;
+
     protected $collection;
+
     protected $data;
+
     protected $afterSaveCallbacks = [];
+
     protected $withEvents = true;
+
     protected $syncOriginalProperties = ['slug'];
 
     public function __construct()

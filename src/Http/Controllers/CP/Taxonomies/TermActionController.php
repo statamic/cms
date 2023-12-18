@@ -19,12 +19,13 @@ class TermActionController extends ActionController
     {
         $blueprint = $term->blueprint();
 
-        [$values, $meta] = $this->extractFromFields($term, $blueprint);
+        [$values] = $this->extractFromFields($term, $blueprint);
 
         return [
-            'itemActions' => Action::for($term, $context),
+            'title' => $term->value('title'),
+            'permalink' => $term->absoluteUrl(),
             'values' => array_merge($values, ['id' => $term->id()]),
-            'meta' => $meta,
+            'itemActions' => Action::for($term, $context),
         ];
     }
 
