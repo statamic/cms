@@ -168,20 +168,16 @@ EOT;
     /** @test */
     public function it_gets_git_user_info()
     {
-        $this->markTestSkipped();
-
         $this->assertEquals('Spock', Git::gitUserName());
         $this->assertEquals('spock@example.com', Git::gitUserEmail());
 
-        $this->actingAs(
-            User::make()
-                ->email('chew@bacca.com')
-                ->data(['name' => 'Chewy'])
-                ->makeSuper()
-        );
+        $user =  User::make()
+            ->email('chew@bacca.com')
+            ->data(['name' => 'Chewy'])
+            ->makeSuper();
 
-        $this->assertEquals('Chewy', Git::gitUserName());
-        $this->assertEquals('chew@bacca.com', Git::gitUserEmail());
+        $this->assertEquals('Chewy', Git::gitUserName($user));
+        $this->assertEquals('chew@bacca.com', Git::gitUserEmail($user));
 
         Config::set('statamic.git.use_authenticated', false);
 
