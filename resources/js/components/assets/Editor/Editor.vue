@@ -64,6 +64,16 @@
                             <svg-icon name="trash" class="h-4" />
                             <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
                         </button>
+
+                        <dropdown-list class="mr-4" v-if="menuActions.length">
+                            <data-list-inline-actions
+                                :item="id"
+                                :url="actionUrl"
+                                :actions="menuActions"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
+                        </dropdown-list>
                     </div>
 
                     <!-- Image Preview -->
@@ -271,7 +281,20 @@ export default {
         isToolbarVisible()
         {
             return ! this.readOnly && this.showToolbar;
-        }
+        },
+
+        menuActions()
+        {
+            return this.actions.filter(action => ![
+                'rename_asset',
+                'move_asset',
+                'replace_asset',
+                'reupload_asset',
+                'download_asset',
+                'delete',
+            ].includes(action.handle));
+        },
+
     },
 
     mounted() {
