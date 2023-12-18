@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class TaxonomyDeleted extends Event implements ProvidesCommitMessage
 {
     public $taxonomy;
-    public $currentUser;
 
-    public function __construct($taxonomy, $currentUser = null)
+    public function __construct($taxonomy)
     {
         $this->taxonomy = $taxonomy;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

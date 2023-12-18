@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class AssetContainerDeleted extends Event implements ProvidesCommitMessage
 {
     public $container;
-    public $currentUser;
 
-    public function __construct($container, $currentUser = null)
+    public function __construct($container)
     {
         $this->container = $container;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

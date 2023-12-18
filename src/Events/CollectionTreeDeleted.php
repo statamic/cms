@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class CollectionTreeDeleted extends Event implements ProvidesCommitMessage
 {
     public $tree;
-    public $currentUser;
 
-    public function __construct($tree, $currentUser = null)
+    public function __construct($tree)
     {
         $this->tree = $tree;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

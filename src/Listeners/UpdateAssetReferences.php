@@ -9,7 +9,6 @@ use Statamic\Events\AssetReferencesUpdated;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\Subscriber;
-use Statamic\Facades\User;
 
 class UpdateAssetReferences extends Subscriber implements ShouldQueue
 {
@@ -96,7 +95,7 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
             ->filter();
 
         if ($updatedItems->isNotEmpty()) {
-            AssetReferencesUpdated::dispatch($asset, User::current());
+            AssetReferencesUpdated::dispatch($asset);
         }
     }
 }

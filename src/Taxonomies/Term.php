@@ -15,7 +15,6 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
-use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -233,7 +232,7 @@ class Term implements TermContract
                 TermCreated::dispatch($this);
             }
 
-            TermSaved::dispatch($this, User::current());
+            TermSaved::dispatch($this);
         }
 
         $this->syncOriginal();
@@ -245,7 +244,7 @@ class Term implements TermContract
     {
         Facades\Term::delete($this);
 
-        TermDeleted::dispatch($this, User::current());
+        TermDeleted::dispatch($this);
 
         return true;
     }

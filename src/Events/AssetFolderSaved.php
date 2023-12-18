@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class AssetFolderSaved extends Event implements ProvidesCommitMessage
 {
     public $folder;
-    public $currentUser;
 
-    public function __construct($folder, $currentUser = null)
+    public function __construct($folder)
     {
         $this->folder = $folder;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

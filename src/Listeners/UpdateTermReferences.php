@@ -7,7 +7,6 @@ use Statamic\Events\Subscriber;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermReferencesUpdated;
 use Statamic\Events\TermSaved;
-use Statamic\Facades\User;
 use Statamic\Taxonomies\TermReferenceUpdater;
 
 class UpdateTermReferences extends Subscriber implements ShouldQueue
@@ -82,7 +81,7 @@ class UpdateTermReferences extends Subscriber implements ShouldQueue
             ->filter();
 
         if ($updatedItems->isNotEmpty()) {
-            TermReferencesUpdated::dispatch($term, User::current());
+            TermReferencesUpdated::dispatch($term);
         }
     }
 }

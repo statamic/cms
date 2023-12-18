@@ -32,7 +32,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
-use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
@@ -604,7 +603,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->clearCaches();
 
         if ($withEvents) {
-            AssetSaved::dispatch($this, User::current());
+            AssetSaved::dispatch($this);
         }
 
         $this->syncOriginal();
@@ -626,7 +625,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $this->clearCaches();
 
-        AssetDeleted::dispatch($this, User::current());
+        AssetDeleted::dispatch($this);
 
         return $this;
     }
@@ -861,7 +860,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             ->syncOriginal()
             ->save();
 
-        AssetUploaded::dispatch($this, User::current());
+        AssetUploaded::dispatch($this);
 
         return $this;
     }
@@ -877,7 +876,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->clearCaches();
         $this->writeMeta($this->generateMeta());
 
-        AssetReuploaded::dispatch($this, User::current());
+        AssetReuploaded::dispatch($this);
 
         return $this;
     }

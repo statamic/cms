@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class BlueprintDeleted extends Event implements ProvidesCommitMessage
 {
     public $blueprint;
-    public $currentUser;
 
-    public function __construct($blueprint, $currentUser = null)
+    public function __construct($blueprint)
     {
         $this->blueprint = $blueprint;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

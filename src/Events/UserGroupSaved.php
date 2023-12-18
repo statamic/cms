@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class UserGroupSaved extends Event implements ProvidesCommitMessage
 {
     public $group;
-    public $currentUser;
 
-    public function __construct($group, $currentUser = null)
+    public function __construct($group)
     {
         $this->group = $group;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

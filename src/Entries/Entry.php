@@ -201,7 +201,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         Facades\Entry::delete($this);
 
-        EntryDeleted::dispatch($this, User::current());
+        EntryDeleted::dispatch($this);
 
         return true;
     }

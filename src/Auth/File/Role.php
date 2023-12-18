@@ -7,7 +7,6 @@ use Statamic\Auth\Role as BaseRole;
 use Statamic\Events\RoleDeleted;
 use Statamic\Events\RoleSaved;
 use Statamic\Facades;
-use Statamic\Facades\User;
 use Statamic\Preferences\HasPreferencesInProperty;
 use Statamic\Support\Arr;
 
@@ -109,7 +108,7 @@ class Role extends BaseRole
 
         Facades\Role::save($this);
 
-        RoleSaved::dispatch($this, User::current());
+        RoleSaved::dispatch($this);
 
         return $this;
     }
@@ -120,6 +119,6 @@ class Role extends BaseRole
 
         Facades\Role::delete($this);
 
-        RoleDeleted::dispatch($this, User::current());
+        RoleDeleted::dispatch($this);
     }
 }

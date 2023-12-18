@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class GlobalSetSaved extends Event implements ProvidesCommitMessage
 {
     public $globals;
-    public $currentUser;
 
-    public function __construct($globals, $currentUser = null)
+    public function __construct($globals)
     {
         $this->globals = $globals;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class SubmissionDeleted extends Event implements ProvidesCommitMessage
 {
     public $submission;
-    public $currentUser;
 
-    public function __construct($submission, $currentUser = null)
+    public function __construct($submission)
     {
         $this->submission = $submission;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

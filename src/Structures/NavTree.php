@@ -11,7 +11,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Facades\User;
 
 class NavTree extends Tree implements TreeContract
 {
@@ -35,12 +34,12 @@ class NavTree extends Tree implements TreeContract
 
     protected function dispatchSavedEvent()
     {
-        NavTreeSaved::dispatch($this, User::current());
+        NavTreeSaved::dispatch($this);
     }
 
     protected function dispatchDeletedEvent()
     {
-        NavTreeDeleted::dispatch($this, User::current());
+        NavTreeDeleted::dispatch($this);
     }
 
     protected function repository()

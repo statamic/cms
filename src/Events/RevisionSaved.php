@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class RevisionSaved extends Event implements ProvidesCommitMessage
 {
     public $revision;
-    public $currentUser;
 
-    public function __construct($revision, $currentUser = null)
+    public function __construct($revision)
     {
         $this->revision = $revision;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

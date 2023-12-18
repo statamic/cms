@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class FormSaved extends Event implements ProvidesCommitMessage
 {
     public $form;
-    public $currentUser;
 
-    public function __construct($form, $currentUser = null)
+    public function __construct($form)
     {
         $this->form = $form;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class EntryDeleted extends Event implements ProvidesCommitMessage
 {
     public $entry;
-    public $currentUser;
 
-    public function __construct($entry, $currentUser = null)
+    public function __construct($entry)
     {
         $this->entry = $entry;
-        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()
