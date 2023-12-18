@@ -171,7 +171,7 @@ EOT;
         $this->assertEquals('Spock', Git::gitUserName());
         $this->assertEquals('spock@example.com', Git::gitUserEmail());
 
-        $user =  User::make()
+        $user = User::make()
             ->email('chew@bacca.com')
             ->data(['name' => 'Chewy'])
             ->makeSuper();
