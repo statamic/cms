@@ -57,24 +57,24 @@ class Git
     /**
      * Git add and commit all tracked content, using configured commands.
      */
-    public function commit($message = null)
+    public function commit($message = null, $committer = null)
     {
-        $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) use ($message) {
-            $this->runConfiguredCommands($gitRoot, $paths, $message ?? __('Content saved'));
+        $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) use ($message, $committer) {
+            $this->runConfiguredCommands($gitRoot, $paths, $message ?? __('Content saved'), $committer);
         });
     }
 
     /**
      * Dispatch commit job to queue.
      */
-    public function dispatchCommit($message = null)
+    public function dispatchCommit($message = null, $committer = null)
     {
         if ($delay = config('statamic.git.dispatch_delay')) {
             $delayInMinutes = now()->addMinutes($delay);
             $message = null;
         }
 
-        CommitJob::dispatch($message)
+        CommitJob::dispatch($message, $committer)
             ->onConnection(config('statamic.git.queue_connection'))
             ->delay($delayInMinutes ?? null);
     }
@@ -82,9 +82,10 @@ class Git
     /**
      * Get git user name.
      *
+     * @param  \Statamic\Contracts\Auth\User|null  $committer
      * @return string
      */
-    public function gitUserName()
+    public function gitUserName($committer = null)
     {
         $default = config('statamic.git.user.name');
 
@@ -92,17 +93,16 @@ class Git
             return $default;
         }
 
-        $currentUser = User::current();
-
-        return $currentUser ? $currentUser->name() : $default;
+        return $committer?->name() ?? $default;
     }
 
     /**
      * Get git user email.
      *
+     * @param  \Statamic\Contracts\Auth\User|null  $committer
      * @return string
      */
-    public function gitUserEmail()
+    public function gitUserEmail($committer = null)
     {
         $default = config('statamic.git.user.email');
 
@@ -110,9 +110,7 @@ class Git
             return $default;
         }
 
-        $currentUser = User::current();
-
-        return $currentUser ? $currentUser->email() : $default;
+        return $committer?->email() ?? $default;
     }
 
     /**
@@ -202,9 +200,9 @@ class Git
      * @param  mixed  $paths
      * @param  mixed  $message
      */
-    protected function runConfiguredCommands($gitRoot, $paths, $message)
+    protected function runConfiguredCommands($gitRoot, $paths, $message, $committer = null)
     {
-        $this->getParsedCommands($paths, $message)->each(function ($command) use ($gitRoot) {
+        $this->getParsedCommands($paths, $message, $committer)->each(function ($command) use ($gitRoot) {
             GitProcess::create($gitRoot)->run($command);
         });
 
@@ -219,9 +217,9 @@ class Git
      * @param  mixed  $paths
      * @param  mixed  $message
      */
-    protected function getParsedCommands($paths, $message)
+    protected function getParsedCommands($paths, $message, $committer = null)
     {
-        $context = $this->getCommandContext($paths, $message);
+        $context = $this->getCommandContext($paths, $message, $committer);
 
         return collect(config('statamic.git.commands'))->map(function ($command) use ($context) {
             return Antlers::parse($command, $context);
@@ -235,13 +233,13 @@ class Git
      * @param  string  $message
      * @return array
      */
-    protected function getCommandContext($paths, $message)
+    protected function getCommandContext($paths, $message, $committer = null)
     {
         return [
             'paths' => collect($paths)->implode(' '),
             'message' => $this->shellEscape($message),
-            'name' => $this->shellEscape($this->gitUserName()),
-            'email' => $this->shellEscape($this->gitUserEmail()),
+            'name' => $this->shellEscape($this->gitUserName($committer)),
+            'email' => $this->shellEscape($this->gitUserEmail($committer)),
         ];
     }
 
