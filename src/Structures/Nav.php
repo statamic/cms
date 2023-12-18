@@ -15,6 +15,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Facades\User;
 
 class Nav extends Structure implements Contract
 {
@@ -26,7 +27,7 @@ class Nav extends Structure implements Contract
     {
         Facades\Nav::save($this);
 
-        NavSaved::dispatch($this);
+        NavSaved::dispatch($this, User::current());
 
         return true;
     }
@@ -35,7 +36,7 @@ class Nav extends Structure implements Contract
     {
         Facades\Nav::delete($this);
 
-        NavDeleted::dispatch($this);
+        NavDeleted::dispatch($this, User::current());
 
         return true;
     }

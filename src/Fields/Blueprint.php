@@ -22,6 +22,7 @@ use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -450,7 +451,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
                 BlueprintCreated::dispatch($this);
             }
 
-            BlueprintSaved::dispatch($this);
+            BlueprintSaved::dispatch($this, User::current());
         }
 
         return $this;
@@ -460,7 +461,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     {
         BlueprintRepository::delete($this);
 
-        BlueprintDeleted::dispatch($this);
+        BlueprintDeleted::dispatch($this, User::current());
 
         return true;
     }

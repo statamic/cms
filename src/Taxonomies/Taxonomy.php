@@ -26,6 +26,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Facades\User;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -227,7 +228,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
                 TaxonomyCreated::dispatch($this);
             }
 
-            TaxonomySaved::dispatch($this);
+            TaxonomySaved::dispatch($this, User::current());
         }
 
         return true;
@@ -239,7 +240,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
         Facades\Taxonomy::delete($this);
 
-        TaxonomyDeleted::dispatch($this);
+        TaxonomyDeleted::dispatch($this, User::current());
 
         return true;
     }

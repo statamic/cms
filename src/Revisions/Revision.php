@@ -11,6 +11,7 @@ use Statamic\Events\RevisionSaved;
 use Statamic\Events\RevisionSaving;
 use Statamic\Facades;
 use Statamic\Facades\Revision as Revisions;
+use Statamic\Facades\User as FacadesUser;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Revision implements Arrayable, Contract
@@ -137,7 +138,7 @@ class Revision implements Arrayable, Contract
 
         Revisions::save($this);
 
-        RevisionSaved::dispatch($this);
+        RevisionSaved::dispatch($this, FacadesUser::current());
 
         return true;
     }
@@ -146,6 +147,6 @@ class Revision implements Arrayable, Contract
     {
         Revisions::delete($this);
 
-        RevisionDeleted::dispatch($this);
+        RevisionDeleted::dispatch($this, FacadesUser::current());
     }
 }

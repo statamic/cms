@@ -16,6 +16,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalVariables;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -109,7 +110,7 @@ class GlobalSet implements Contract
                 GlobalSetCreated::dispatch($this);
             }
 
-            GlobalSetSaved::dispatch($this);
+            GlobalSetSaved::dispatch($this, User::current());
         }
 
         return $this;
@@ -132,7 +133,7 @@ class GlobalSet implements Contract
 
         Facades\GlobalSet::delete($this);
 
-        GlobalSetDeleted::dispatch($this);
+        GlobalSetDeleted::dispatch($this, User::current());
 
         return true;
     }

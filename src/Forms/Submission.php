@@ -13,6 +13,7 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\File;
+use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Support\Arr;
@@ -172,7 +173,7 @@ class Submission implements Augmentable, SubmissionContract
                 SubmissionCreated::dispatch($this);
             }
 
-            SubmissionSaved::dispatch($this);
+            SubmissionSaved::dispatch($this, User::current());
         }
     }
 
@@ -183,7 +184,7 @@ class Submission implements Augmentable, SubmissionContract
     {
         File::delete($this->getPath());
 
-        SubmissionDeleted::dispatch($this);
+        SubmissionDeleted::dispatch($this, User::current());
     }
 
     /**

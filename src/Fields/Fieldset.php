@@ -14,6 +14,7 @@ use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 class Fieldset
@@ -227,7 +228,7 @@ class Fieldset
                 FieldsetCreated::dispatch($this);
             }
 
-            FieldsetSaved::dispatch($this);
+            FieldsetSaved::dispatch($this, User::current());
         }
 
         return $this;
@@ -237,7 +238,7 @@ class Fieldset
     {
         FieldsetRepository::delete($this);
 
-        FieldsetDeleted::dispatch($this);
+        FieldsetDeleted::dispatch($this, User::current());
 
         return true;
     }

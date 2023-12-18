@@ -11,6 +11,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Facades\User;
 
 class CollectionTree extends Tree implements TreeContract
 {
@@ -36,12 +37,12 @@ class CollectionTree extends Tree implements TreeContract
 
     protected function dispatchSavedEvent()
     {
-        CollectionTreeSaved::dispatch($this);
+        CollectionTreeSaved::dispatch($this, User::current());
     }
 
     protected function dispatchDeletedEvent()
     {
-        CollectionTreeDeleted::dispatch($this);
+        CollectionTreeDeleted::dispatch($this, User::current());
     }
 
     public function collection()

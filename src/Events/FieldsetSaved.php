@@ -6,11 +6,12 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class FieldsetSaved extends Event implements ProvidesCommitMessage
 {
-    public $fieldset;
+    public $currentUser;
 
-    public function __construct($fieldset)
+    public function __construct($fieldset, $currentUser)
     {
         $this->fieldset = $fieldset;
+        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

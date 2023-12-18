@@ -18,6 +18,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Facades\Form as FormFacade;
+use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Forms\Exporters\Exporter;
@@ -211,7 +212,7 @@ class Form implements Arrayable, Augmentable, FormContract
                 FormCreated::dispatch($this);
             }
 
-            FormSaved::dispatch($this);
+            FormSaved::dispatch($this, User::current());
         }
     }
 
@@ -224,7 +225,7 @@ class Form implements Arrayable, Augmentable, FormContract
 
         File::delete($this->path());
 
-        FormDeleted::dispatch($this);
+        FormDeleted::dispatch($this, User::current());
     }
 
     /**

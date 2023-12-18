@@ -25,6 +25,7 @@ use Statamic\Facades\Pattern;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -256,7 +257,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
                 AssetContainerCreated::dispatch($this);
             }
 
-            AssetContainerSaved::dispatch($this);
+            AssetContainerSaved::dispatch($this, User::current());
         }
 
         return $this;
@@ -271,7 +272,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     {
         Facades\AssetContainer::delete($this);
 
-        AssetContainerDeleted::dispatch($this);
+        AssetContainerDeleted::dispatch($this, User::current());
 
         return true;
     }

@@ -7,10 +7,12 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class AssetSaved extends Event implements ProvidesCommitMessage
 {
     public $asset;
+    public $currentUser;
 
-    public function __construct($asset)
+    public function __construct($asset, $currentUser = null)
     {
         $this->asset = $asset;
+        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

@@ -7,10 +7,12 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class RevisionDeleted extends Event implements ProvidesCommitMessage
 {
     public $revision;
+    public $currentUser;
 
-    public function __construct($revision)
+    public function __construct($revision, $currentUser = null)
     {
         $this->revision = $revision;
+        $this->currentUser = $currentUser;
     }
 
     public function commitMessage()

@@ -189,7 +189,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
                 UserCreated::dispatch($this);
             }
 
-            UserSaved::dispatch($this);
+            UserSaved::dispatch($this, \Statamic\Facades\User::current());
         }
 
         return $this;
@@ -199,7 +199,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     {
         Facades\User::delete($this);
 
-        UserDeleted::dispatch($this);
+        UserDeleted::dispatch($this, \Statamic\Facades\User::current());
 
         return $this;
     }

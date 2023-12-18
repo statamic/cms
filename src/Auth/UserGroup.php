@@ -139,7 +139,7 @@ abstract class UserGroup implements Arrayable, ArrayAccess, Augmentable, UserGro
     {
         Facades\UserGroup::save($this);
 
-        UserGroupSaved::dispatch($this);
+        UserGroupSaved::dispatch($this, \Statamic\Facades\User::current());
 
         return true;
     }
@@ -148,7 +148,7 @@ abstract class UserGroup implements Arrayable, ArrayAccess, Augmentable, UserGro
     {
         Facades\UserGroup::delete($this);
 
-        UserGroupDeleted::dispatch($this);
+        UserGroupDeleted::dispatch($this, \Statamic\Facades\User::current());
 
         return true;
     }

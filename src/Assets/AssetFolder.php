@@ -8,6 +8,7 @@ use Statamic\Events\AssetFolderDeleted;
 use Statamic\Events\AssetFolderSaved;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Path;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -102,7 +103,7 @@ class AssetFolder implements Arrayable, Contract
 
         $this->container()->contents()->add($this->path())->save();
 
-        AssetFolderSaved::dispatch($this);
+        AssetFolderSaved::dispatch($this, User::current());
 
         return $this;
     }
@@ -132,7 +133,7 @@ class AssetFolder implements Arrayable, Contract
         });
         $cache->save();
 
-        AssetFolderDeleted::dispatch($this);
+        AssetFolderDeleted::dispatch($this, User::current());
 
         return $this;
     }

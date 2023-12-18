@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Events\DuplicateIdRegenerated;
 use Statamic\Facades\File;
 use Statamic\Facades\Stache;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 class DuplicatesController extends CpController
@@ -48,7 +49,7 @@ class DuplicatesController extends CpController
 
         Stache::clear();
 
-        DuplicateIdRegenerated::dispatch();
+        DuplicateIdRegenerated::dispatch(User::current());
 
         return back()->with('success', __('ID regenerated and Stache cleared'));
     }

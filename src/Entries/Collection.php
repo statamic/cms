@@ -25,6 +25,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\User;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
@@ -455,7 +456,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             CollectionCreated::dispatch($this);
         }
 
-        CollectionSaved::dispatch($this);
+        CollectionSaved::dispatch($this, User::current());
 
         return $this;
     }
@@ -738,7 +739,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         Facades\Collection::delete($this);
 
-        CollectionDeleted::dispatch($this);
+        CollectionDeleted::dispatch($this, User::current());
 
         return true;
     }
