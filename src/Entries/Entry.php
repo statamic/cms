@@ -41,7 +41,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Facades\User;
 use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
@@ -371,7 +370,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                 EntryCreated::dispatch($this);
             }
 
-            EntrySaved::dispatch($this, User::current());
+            EntrySaved::dispatch($this);
         }
 
         if ($isNew && ! $this->hasOrigin() && $this->collection()->propagate()) {
