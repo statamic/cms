@@ -12,7 +12,7 @@
                         <data-list-inline-actions
                             :item="initialReferenceId"
                             :url="itemActionUrl"
-                            :actions="itemActionsFiltered"
+                            :actions="itemActionsMenu"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
@@ -91,7 +91,6 @@ export default {
     },
 
     data() {
-            console.log(this.initialTitle);
         return {
             fieldset: _.clone(this.initialFieldset),
             values: _.clone(this.initialValues),
@@ -112,7 +111,7 @@ export default {
             return this.initialReference.split('::').pop();
         },
 
-        itemActionsFiltered() {
+        itemActionsMenu() {
             return this.itemActions.filter(action => !['assign_groups'].includes(action.handle));
         },
 
