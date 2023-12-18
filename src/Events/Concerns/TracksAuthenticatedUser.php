@@ -7,7 +7,7 @@ use Statamic\Facades\User;
 
 trait TracksAuthenticatedUser
 {
-    public null|UserContract $authenticatedUser;
+    public ?UserContract $authenticatedUser;
 
     public static function dispatch()
     {
