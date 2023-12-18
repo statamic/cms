@@ -3,9 +3,12 @@
 namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
+use Statamic\Events\Concerns\TracksAuthenticatedUser;
 
 class AssetContainerDeleted extends Event implements ProvidesCommitMessage
 {
+    use TracksAuthenticatedUser;
+
     public $container;
 
     public function __construct($container)

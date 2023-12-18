@@ -10,6 +10,7 @@ use Statamic\Assets\Asset;
 use Statamic\Assets\ReplacementFile;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Events;
+use Statamic\Events\Concerns\TracksAuthenticatedUser;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Statamic\Facades\Git;
@@ -600,6 +601,8 @@ class GitEventTest extends TestCase
 
 class PunSaved extends Events\Event implements ProvidesCommitMessage
 {
+    use TracksAuthenticatedUser;
+
     public $item;
 
     public function __construct($item)
