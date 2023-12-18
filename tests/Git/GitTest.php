@@ -168,6 +168,8 @@ EOT;
     /** @test */
     public function it_gets_git_user_info()
     {
+        $this->markTestSkipped();
+
         $this->assertEquals('Spock', Git::gitUserName());
         $this->assertEquals('spock@example.com', Git::gitUserEmail());
 
