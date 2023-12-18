@@ -1,5 +1,19 @@
 # Release Notes
 
+## 4.42.0 (2023-12-18)
+
+### What's improved
+- Submission date now uses localized date format [#9215](https://github.com/statamic/cms/issues/9215) by @mmodler
+- French translations [#9218](https://github.com/statamic/cms/issues/9218) by @ebeauchamps
+
+### What's fixed
+- Fix nested JSON field handles not passing validation [#9217](https://github.com/statamic/cms/issues/9217) by @caseydwyer
+- Fix null values not being filtered on front-end forms [#9212](https://github.com/statamic/cms/issues/9212) by @ryanmitchell
+- Fix `{{ children }}` tag for collections other than Pages [#9210](https://github.com/statamic/cms/issues/9210) by @MedRochon
+- Use `setTimeout` to fix dirty state issue [#9213](https://github.com/statamic/cms/issues/9213) by @duncanmcclean
+
+
+
 ## 4.41.0 (2023-12-14)
 
 ### What's new
