@@ -29,7 +29,8 @@ class ServiceProvider extends LaravelServiceProvider
         $this->app->bind(DefaultInvalidator::class, function ($app) {
             return new DefaultInvalidator(
                 $app[Cacher::class],
-                $app['config']['statamic.static_caching.invalidation.rules']
+                $app['config']['statamic.static_caching.invalidation.rules'],
+                $app['config']['statamic.static_caching.invalidation.handler'] ?? null
             );
         });
 

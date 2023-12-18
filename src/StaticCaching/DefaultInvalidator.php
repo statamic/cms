@@ -14,11 +14,13 @@ use Statamic\Support\Arr;
 class DefaultInvalidator implements Invalidator
 {
     protected $cacher;
+    protected $handler;
     protected $rules;
 
-    public function __construct(Cacher $cacher, $rules = [])
+    public function __construct(Cacher $cacher, $rules = [], $handler = null)
     {
         $this->cacher = $cacher;
+        $this->handler = $handler;
         $this->rules = $rules;
     }
 
@@ -26,6 +28,14 @@ class DefaultInvalidator implements Invalidator
     {
         if ($this->rules === 'all') {
             return $this->cacher->flush();
+        }
+
+        if ($this->handler && class_exists($this->handler)) {
+            $result = (new $this->handler)->handle($this->cacher, $item);
+
+            if (! $result) {
+                return;
+            }
         }
 
         if ($item instanceof Entry) {
