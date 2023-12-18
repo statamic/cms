@@ -8,11 +8,13 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 class EntrySaved extends Event implements ProvidesCommitMessage
 {
     public $entry;
+    public $currentUser;
     public $initiator;
 
-    public function __construct($entry)
+    public function __construct($entry, $currentUser = null)
     {
         $this->entry = $entry;
+        $this->currentUser = $currentUser;
         $this->initiator = InitiatorStack::entry($entry)->initiator();
     }
 
