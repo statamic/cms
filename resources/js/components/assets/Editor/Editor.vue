@@ -65,11 +65,11 @@
                             <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
                         </button>
 
-                        <dropdown-list class="mr-4" v-if="menuActions.length">
+                        <dropdown-list class="mr-4" v-if="actionsMenu.length">
                             <data-list-inline-actions
                                 :item="id"
                                 :url="actionUrl"
-                                :actions="menuActions"
+                                :actions="actionsMenu"
                                 @started="actionStarted"
                                 @completed="actionCompleted"
                             />
@@ -283,7 +283,7 @@ export default {
             return ! this.readOnly && this.showToolbar;
         },
 
-        menuActions()
+        actionsMenu()
         {
             return this.actions.filter(action => ![
                 'rename_asset',
