@@ -10,7 +10,7 @@
                         <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
                         <li class="divider" />
                         <data-list-inline-actions
-                            :item="initialReferenceId"
+                            :item="id"
                             :url="itemActionUrl"
                             :actions="itemActionsMenu"
                             @started="actionStarted"
@@ -107,7 +107,7 @@ export default {
             return this.error || Object.keys(this.errors).length;
         },
 
-        initialReferenceId() {
+        id() {
             return this.initialReference.split('::').pop();
         },
 

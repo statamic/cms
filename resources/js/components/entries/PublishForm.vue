@@ -16,7 +16,7 @@
                 <li class="divider" />
                 <data-list-inline-actions
                     v-if="!isCreating"
-                    :item="initialReferenceId"
+                    :item="id"
                     :url="itemActionUrl"
                     :actions="itemActionsMenu"
                     @started="actionStarted"
@@ -494,7 +494,7 @@ export default {
                 }));
         },
 
-        initialReferenceId() {
+        id() {
             return this.initialReference.split('::').pop();
         },
 
