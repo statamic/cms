@@ -72,6 +72,9 @@ class Delete extends Action
             case $item instanceof Contracts\Taxonomies\Term:
                 return cp_route('taxonomies.show', $item->taxonomy()->handle());
                 break;
+            case $item instanceof Contracts\Auth\User:
+                return cp_route('users.index');
+                break;
         }
     }
 }
