@@ -285,7 +285,11 @@ export default {
 
         viewLocalStorageKey() {
             return `statamic.selector.field.${this.name}`;
-        }
+        },
+
+        hasSiteFilter() {
+            return this.filters.some(filter => filter.handle === 'site');
+        },
 
     },
 
@@ -360,6 +364,8 @@ export default {
         },
 
         setSiteFilter(site) {
+            if (!this.hasSiteFilter) return;
+
             this.filterChanged({ handle: 'site', values: { site }});
         },
 

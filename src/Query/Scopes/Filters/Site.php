@@ -46,7 +46,8 @@ class Site extends Filter
 
     public function visibleTo($key)
     {
-        return in_array($key, ['entries', 'entries-fieldtype']) && Facades\Site::hasMultiple();
+        return in_array($key, ['entries', 'entries-fieldtype'])
+            && Facades\Site::authorized()->count() > 1;
     }
 
     protected function options()
