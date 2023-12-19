@@ -46,7 +46,7 @@ class Site extends Filter
 
     public function visibleTo($key)
     {
-        return $key === 'entries' && Facades\Site::hasMultiple();
+        return in_array($key, ['entries', 'entries-fieldtype']) && Facades\Site::hasMultiple();
     }
 
     protected function options()
