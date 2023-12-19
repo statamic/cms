@@ -373,7 +373,7 @@ export default {
         },
 
         actionContext() {
-            return {container: this.selectedContainer};
+            return {container: this.selectedContainer, view: 'list'};
         },
 
         showContainerTabs() {
