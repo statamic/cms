@@ -203,8 +203,8 @@ class Entries extends Relationship
 
         $query = $this->toSearchQuery($query, $request);
 
-        if ($site = $request->site) {
-            $query->where('site', $site);
+        if (Site::hasMultiple()) {
+            $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
         if ($request->exclusions) {
