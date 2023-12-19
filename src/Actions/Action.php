@@ -13,6 +13,7 @@ abstract class Action implements Arrayable
     use HasFields, HasHandle, HasTitle, RegistersItself;
 
     protected static $binding = 'actions';
+
     protected $items;
     protected $confirm = true;
     protected $dangerous = false;
