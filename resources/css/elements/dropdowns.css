@@ -42,7 +42,8 @@
         margin: 6px -8px;
         /* Hide dividers that come first or immediately after another (due to v-if) */
         & + &,
-        &:first-child {
+        &:first-child,
+        &:last-child {
             display: none;
         }
     }
