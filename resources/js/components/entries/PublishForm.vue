@@ -11,10 +11,11 @@
                 </div>
             </h1>
 
-            <dropdown-list class="mr-4">
+            <dropdown-list class="mr-4" v-if="!isCreating || canEditBlueprint">
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
                 <li class="divider" />
                 <data-list-inline-actions
+                    v-if="!isCreating"
                     :item="initialReferenceId"
                     :url="itemActionUrl"
                     :actions="itemActionsMenu"
