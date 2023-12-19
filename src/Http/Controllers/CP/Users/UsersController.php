@@ -217,21 +217,12 @@ class UsersController extends CpController
             $blueprint->ensureField('super', ['type' => 'toggle']);
         }
 
-        $values = $user->data()
-            ->merge($user->computedData())
-            ->merge(['email' => $user->email()]);
-
-        $fields = $blueprint
-            ->removeField('password')
-            ->removeField('password_confirmation')
-            ->fields()
-            ->addValues($values->all())
-            ->preProcess();
+        [$values, $meta] = $this->extractFromFields($user, $blueprint);
 
         $viewData = [
             'title' => $user->email(),
-            'values' => $fields->values()->all(),
-            'meta' => $fields->meta(),
+            'values' => $values,
+            'meta' => $meta,
             'blueprint' => $user->blueprint()->toPublishArray(),
             'reference' => $user->reference(),
             'actions' => [
@@ -315,12 +306,15 @@ class UsersController extends CpController
 
     protected function extractFromFields($user, $blueprint)
     {
+        $values = $user->data()
+            ->merge($user->computedData())
+            ->merge(['email' => $user->email()]);
+
         $fields = $blueprint
+            ->removeField('password')
+            ->removeField('password_confirmation')
             ->fields()
-            ->addValues(array_merge(
-                $user->data()->all(),
-                ['email' => $user->email()],
-            ))
+            ->addValues($values->all())
             ->preProcess();
 
         return [$fields->values()->all(), $fields->meta()->all()];
