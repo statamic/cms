@@ -203,8 +203,9 @@ class Entries extends Relationship
 
         $query = $this->toSearchQuery($query, $request);
 
+
         if (Site::hasMultiple()) {
-            $query->whereIn('site', Site::authorized()->map->handle()->all());
+            $query->whereIn('site', $this->getSites($request));
         }
 
         if ($request->exclusions) {
@@ -214,6 +215,15 @@ class Entries extends Relationship
         $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
+    }
+
+    private function getSites($request): array
+    {
+        if ($request->site && Arr::get($this->field()->config(), 'mode') == 'select') {
+            return [$request->site];
+        }
+
+        return Site::authorized()->map->handle()->all();
     }
 
     private function toSearchQuery($query, $request)
