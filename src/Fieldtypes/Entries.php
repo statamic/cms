@@ -217,15 +217,6 @@ class Entries extends Relationship
         return $query;
     }
 
-    private function getSites($request): array
-    {
-        if ($request->site && Arr::get($this->field()->config(), 'mode') == 'select') {
-            return [$request->site];
-        }
-
-        return Site::authorized()->map->handle()->all();
-    }
-
     private function toSearchQuery($query, $request)
     {
         if (! $search = $request->search) {
@@ -457,5 +448,14 @@ class Entries extends Relationship
             ->sortable(false);
 
         $columns->put($columnKey, $column);
+    }
+
+    private function getSites($request): array
+    {
+        if ($request->site && Arr::get($this->field()->config(), 'mode') == 'select') {
+            return [$request->site];
+        }
+
+        return Site::authorized()->map->handle()->all();
     }
 }
