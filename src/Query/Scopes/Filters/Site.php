@@ -2,6 +2,7 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
+use Illuminate\Support\Arr;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Query\Scopes\Filter;
@@ -48,15 +49,32 @@ class Site extends Filter
     public function visibleTo($key)
     {
         return in_array($key, ['entries', 'entries-fieldtype'])
-            && Facades\Site::authorized()->count() > 1;
+            && $this->availableSites()->count() > 1;
     }
 
     protected function options()
     {
-        $configuredSites = Collection::find($this->context['collection'])->sites();
+        return $this->availableSites()
+            ->mapWithKeys(fn ($site) => [$site->handle() => __($site->name())]);
+    }
+
+    protected function availableSites()
+    {
+        // Get the configured sites of a single collection when on the entries index view.
+        if ($collection = Arr::get($this->context, 'collection')) {
+            $configuredSites = Collection::find($collection)->sites();
+        }
+
+        // Get the configured sites of multiple collections when in the entries fieldtype.
+        if ($collections = Arr::get($this->context, 'collections')) {
+            $configuredSites = collect($collections)->flatMap(fn ($collection) => Collection::find($collection)->sites());
+        }
+
+        if (! isset($configuredSites)) {
+            return Facades\Site::authorized();
+        }
 
         return Facades\Site::authorized()
-            ->filter(fn ($site) => $configuredSites->contains($site->handle()))
-            ->mapWithKeys(fn ($site) => [$site->handle() => __($site->name())]);
+            ->filter(fn ($site) => $configuredSites->contains($site->handle()));
     }
 }
