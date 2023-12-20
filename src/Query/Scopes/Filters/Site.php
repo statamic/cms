@@ -3,6 +3,7 @@
 namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\Facades;
+use Statamic\Facades\Collection;
 use Statamic\Query\Scopes\Filter;
 
 class Site extends Filter
@@ -52,8 +53,10 @@ class Site extends Filter
 
     protected function options()
     {
-        return Facades\Site::authorized()->mapWithKeys(function ($site) {
-            return [$site->handle() => __($site->name())];
-        });
+        $configuredSites = Collection::find($this->context['collection'])->sites();
+
+        return Facades\Site::authorized()
+            ->filter(fn ($site) => $configuredSites->contains($site->handle()))
+            ->mapWithKeys(fn ($site) => [$site->handle() => __($site->name())]);
     }
 }
