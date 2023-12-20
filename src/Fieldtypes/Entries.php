@@ -6,6 +6,7 @@ use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
+use Statamic\CP\Columns;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -203,7 +204,6 @@ class Entries extends Relationship
 
         $query = $this->toSearchQuery($query, $request);
 
-
         if (Site::hasMultiple()) {
             $query->whereIn('site', $this->getSites($request));
         }
@@ -400,20 +400,18 @@ class Entries extends Relationship
         if (count($this->getConfiguredCollections()) === 1) {
             $columns = $this->getBlueprint()->columns();
 
-            $status = Column::make('status')
-                ->listable(true)
-                ->visible(true)
-                ->defaultVisibility(true)
-                ->sortable(false);
-
-            $columns->put('status', $status);
+            $this->addColumn($columns, 'status');
 
             $columns->setPreferred("collections.{$this->getConfiguredCollections()[0]}.columns");
 
             return $columns->rejectUnlisted()->values();
         }
 
-        return $this->getBlueprint()->columns()->values()->all();
+        $columns = $this->getBlueprint()->columns();
+
+        $this->addColumn($columns, 'site');
+
+        return $columns->values();
     }
 
     protected function getItemsForPreProcessIndex($values): SupportCollection
@@ -448,5 +446,16 @@ class Entries extends Relationship
             'showSlugs' => $collection->structure()->showSlugs(),
             'expectsRoot' => $collection->structure()->expectsRoot(),
         ]]);
+    }
+
+    private function addColumn(Columns $columns, string $columnKey): void
+    {
+        $column = Column::make($columnKey)
+            ->listable(true)
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(false);
+
+        $columns->put($columnKey, $column);
     }
 }
