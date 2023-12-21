@@ -2,11 +2,8 @@
 
 namespace Statamic\Auth\File;
 
-use Exception;
 use Statamic\Auth\PasskeyCollection;
-use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Auth\PasskeyQueryBuilder as Contract;
-use Statamic\Facades;
 use Statamic\Stache\Query\Builder as BaseQueryBuilder;
 
 class PasskeyQueryBuilder extends BaseQueryBuilder implements Contract

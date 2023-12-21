@@ -4,7 +4,8 @@ namespace Statamic\Http\Controllers\CP\Auth;
 
 use Cose\Algorithm\Manager;
 use Cose\Algorithm\Signature\ECDSA\ES256;
-use Cose\Algorithm\Signature\RSA\RS256;use Exception;
+use Cose\Algorithm\Signature\RSA\RS256;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -81,7 +82,7 @@ class WebAuthnController
         $passkey->save();
 
         return [
-            'verified' => true
+            'verified' => true,
         ];
     }
 
