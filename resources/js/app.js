@@ -100,6 +100,7 @@ import GlobalSearch from './components/GlobalSearch.vue';
 import GlobalSiteSelector from './components/GlobalSiteSelector.vue';
 import Login from './components/login/login';
 import LoginModal from './components/login/LoginModal.vue';
+import Passkeys from './components/login/passkeys';
 import BaseEntryCreateForm from './components/entries/BaseCreateForm.vue';
 import BaseTermCreateForm from './components/terms/BaseCreateForm.vue';
 import CreateTermButton from './components/terms/CreateTermButton.vue';
@@ -155,6 +156,7 @@ Statamic.app({
         GlobalSiteSelector,
         Login,
         LoginModal,
+        Passkeys,
         BaseEntryCreateForm,
         BaseTermCreateForm,
         CreateTermButton,

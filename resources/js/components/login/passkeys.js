@@ -1,28 +1,17 @@
-import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser';
+import { startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/browser';
 
 export default {
 
     props: {
-        showEmailLogin: {
-            default: false
-        },
-        hasError: {
-            default: false
-        },
         webAuthnRoutes: {
             default: {},
             type: Object,
         }
     },
 
-    mounted() {
-        if (this.hasError) {
-            this.$el.parentElement.parentElement.classList.add('animation-shake');
-        }
-    },
-
     computed: {
         showWebAuthn() {
+            console.log('Supported: ' + browserSupportsWebAuthn());
             return browserSupportsWebAuthn();
         },
     },
@@ -30,9 +19,9 @@ export default {
     methods: {
         async webAuthn() {
             const authOptionsResponse = await fetch(this.webAuthnRoutes.options);
-            const startAuthResponse = await startAuthentication(await authOptionsResponse.json());
+            const startRegistrationResponse = await startRegistration(await authOptionsResponse.json());
 
-            this.$axios.post(this.webAuthnRoutes.verify, startAuthResponse)
+            this.$axios.post(this.webAuthnRoutes.verify, startRegistrationResponse)
                 .then(response => {
 
                     if (response && response.verified) {

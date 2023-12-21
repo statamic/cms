@@ -2,19 +2,13 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
-use Exception;
+use Cose\Algorithm\Manager;
+use Cose\Algorithm\Signature\ECDSA\ES256;
+use Cose\Algorithm\Signature\RSA\RS256;use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Facades\User;
-use Webauthn\AuthenticatorAssertionResponse;
-use Webauthn\AuthenticatorAssertionResponseValidator;
-use Webauthn\AuthenticatorAttestationResponse;
-use Webauthn\AuthenticatorAttestationResponseValidator;
-use Webauthn\PublicKeyCredentialCreationOptions;
-use Webauthn\PublicKeyCredentialLoader;
-use Webauthn\PublicKeyCredentialRequestOptions;
-use Webauthn\PublicKeyCredentialRpEntity;
-use Webauthn\PublicKeyCredentialUserEntity;
+use Webauthn;
 
 class WebAuthnController
 {
@@ -24,34 +18,46 @@ class WebAuthnController
             throw new Exception('You must be logged in');
         }
 
-        $userEntity = PublicKeyCredentialUserEntity::create(
+        if (! $challenge = session()->pull('webauthn.challenge')) {
+            $challenge = random_bytes(16);
+            session()->put('webauthn.challenge', $challenge);
+        }
+
+        $userEntity = Webauthn\PublicKeyCredentialUserEntity::create(
             $user->email(),
             $user->id(),
             $user->name()
         );
 
-        return PublicKeyCredentialCreationOptions::create(
+        return Webauthn\PublicKeyCredentialCreationOptions::create(
             $this->rpEntity(),
             $userEntity,
-            random_bytes(16),
+            $challenge,
         );
     }
 
     public function create(Request $request)
     {
         // https://webauthn-doc.spomky-labs.com/pure-php/authenticator-registration#creation-response
+        $publicKeyCredential = $this->credentialLoader()->loadArray($request->all());
 
-        $publicKeyCredential = (new PublicKeyCredentialLoader())->load($request->getContent());
-
-        if (! $publicKeyCredential->response instanceof AuthenticatorAttestationResponse) {
+        if (! $publicKeyCredential->response instanceof Webauthn\AuthenticatorAttestationResponse) {
             throw new Exception('Invalid credentials'); // maybe redirect back with errors?
         }
 
         try {
-            $publicKeyCredentialSource = (new AuthenticatorAttestationResponseValidator)->check(
+            $responseValidator = Webauthn\AuthenticatorAttestationResponseValidator::create(
+                $this->attestationSupportManager(),
+                null,
+                null,
+                Webauthn\AuthenticationExtensions\ExtensionOutputCheckerHandler::create()
+            );
+
+            $publicKeyCredentialSource = $responseValidator->check(
                 $publicKeyCredential->response,
                 $this->createOptions(),
-                config('statamic.webauthn.rrp_entity.id', config('app.url'))
+                $request->getHost(),
+                config('statamic.webauthn.rrp_entity.id', [])
             );
         } catch (Exception $e) {
             throw new Exception('Invalid credentials'); // maybe redirect back with errors?
@@ -69,9 +75,9 @@ class WebAuthnController
 
     public function verifyOptions()
     {
-        return PublicKeyCredentialRequestOptions::create(
+        return Webauthn\PublicKeyCredentialRequestOptions::create(
             random_bytes(32),
-            userVerification: PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
+            userVerification: Webauthn\PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
         );
     }
 
@@ -79,9 +85,9 @@ class WebAuthnController
     {
         // https://webauthn-doc.spomky-labs.com/pure-php/authenticate-your-users#response-verification
 
-        $publicKeyCredential = (new PublicKeyCredentialLoader())->load($request->getContent());
+        $publicKeyCredential = $this->credentialLoader()->load($request->getContent());
 
-        if (! $publicKeyCredential->response instanceof AuthenticatorAssertionResponse) {
+        if (! $publicKeyCredential->response instanceof Webauthn\AuthenticatorAssertionResponse) {
             throw new Exception('Invalid credentials'); // maybe redirect back with errors?
         }
 
@@ -93,11 +99,25 @@ class WebAuthnController
         }
 
         try {
-            $publicKeyCredentialSource = (new AuthenticatorAssertionResponseValidator)->check(
+            $algorithmManager = Manager::create()
+                ->add(
+                    ES256::create(),
+                    RS256::create()
+                )
+            ;
+
+            $responseValidator = Webauthn\AuthenticatorAssertionResponseValidator::create(
+                null,
+                null,
+                Webauthn\AuthenticationExtensions\ExtensionOutputCheckerHandler::create(),
+                $algorithmManager
+            );
+
+            $publicKeyCredentialSource = $responseValidator->check(
                 $passkey,
                 $publicKeyCredential->response,
                 $this->verifyOptions(),
-                config('statamic.webauthn.rrp_entity.id', config('app.url'))
+                config('statamic.webauthn.rrp_entity.id', [])
             );
         } catch (Exception $e) {
             throw new Exception('Invalid credentials'); // maybe redirect back with errors?
@@ -110,14 +130,31 @@ class WebAuthnController
 
     public function view()
     {
-        throw new Exception('Show a list of the users existing passkeys, with revoke option and the ability to let them create a new one');
+        return view('statamic::users.webauthn', [
+            'passkeys' => [],
+        ]);
     }
 
-    private function rpEntity(): PublicKeyCredentialRpEntity
+    private function attestationSupportManager(): Webauthn\AttestationStatement\AttestationStatementSupportManager
     {
-        return PublicKeyCredentialRpEntity::create(
+        $attestationStatementSupportManager = Webauthn\AttestationStatement\AttestationStatementSupportManager::create();
+        $attestationStatementSupportManager->add(Webauthn\AttestationStatement\NoneAttestationStatementSupport::create());
+
+        return $attestationStatementSupportManager;
+    }
+
+    private function credentialLoader(): Webauthn\PublicKeyCredentialLoader
+    {
+        $attestationObjectLoader = Webauthn\AttestationStatement\AttestationObjectLoader::create($this->attestationSupportManager());
+
+        return Webauthn\PublicKeyCredentialLoader::create($attestationObjectLoader);
+    }
+
+    private function rpEntity(): Webauthn\PublicKeyCredentialRpEntity
+    {
+        return Webauthn\PublicKeyCredentialRpEntity::create(
             name: config('statamic.webauthn.rrp_entity.name', config('app.name')),
-            id: config('statamic.webauthn.rrp_entity.id', config('app.url')),
+            id: config('statamic.webauthn.rrp_entity.id', null),
         );
     }
 

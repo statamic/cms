@@ -115,6 +115,9 @@
             <div class="divider"></div>
 
             <dropdown-item :text="__('Profile')" redirect="{{ route('statamic.cp.account') }}"></dropdown-item>
+            @if (config('statamic.webauthn.enabled'))
+            <dropdown-item :text="__('Passkeys')" redirect="{{ route('statamic.cp.webauthn.view') }}"></dropdown-item>
+            @endif
             @if (session()->get('statamic_impersonated_by'))
                 <dropdown-item :text="__('Stop Impersonating')" redirect="{{ cp_route('impersonation.stop') }}"></dropdown-item>
             @endif
