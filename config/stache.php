@@ -89,6 +89,11 @@ return [
             'directory' => base_path('users'),
         ],
 
+        'passkeys' => [
+            'class' => Stores\PasskeysStore::class,
+            'directory' => base_path('users/passkeys'),
+        ],
+
     ],
 
     /*

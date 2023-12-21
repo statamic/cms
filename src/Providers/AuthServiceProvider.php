@@ -11,6 +11,7 @@ use Statamic\Auth\Permissions;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Auth\UserProvider;
 use Statamic\Auth\UserRepositoryManager;
+use Statamic\Contracts\Auth\PasskeyRepository;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
@@ -75,6 +76,10 @@ class AuthServiceProvider extends ServiceProvider
         $this->app->singleton(PermissionCache::class, function ($app) {
             return new PermissionCache;
         });
+
+        if (! $this->app->bound(PasskeyRepository::class)) {
+            \Statamic\Statamic::repository(PasskeyRepository::class, \Statamic\Auth\File\PasskeyRepository::class);
+        }
     }
 
     public function boot()

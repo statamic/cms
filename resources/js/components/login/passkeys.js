@@ -24,13 +24,15 @@ export default {
             this.$axios.post(this.webAuthnRoutes.verify, startRegistrationResponse)
                 .then(response => {
 
-                    if (response && response.verified) {
-                        alert('it worked');
-                    } else {
-                        alert('it failed');
-                        console.log(response);
+                    console.log(response.data);
+
+                    if (response && response.data.redirect) {
+                        location.href = response.data.redirect;
+                        return;
                     }
 
+                    alert('it failed');
+                    console.log(response);
                 })
                 .catch (e => {
                     console.error(e);

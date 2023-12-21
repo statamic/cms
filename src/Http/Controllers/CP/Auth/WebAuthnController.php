@@ -5,20 +5,23 @@ namespace Statamic\Http\Controllers\CP\Auth;
 use Cose\Algorithm\Manager;
 use Cose\Algorithm\Signature\ECDSA\ES256;
 use Cose\Algorithm\Signature\RSA\RS256;use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Statamic\Facades\Passkey;
 use Statamic\Facades\User;
+use Statamic\Support\Str;
 use Webauthn;
 
 class WebAuthnController
 {
-    public function createOptions()
+    public function createOptions($challenge = false)
     {
         if (! $user = User::current()) {
             throw new Exception('You must be logged in');
         }
 
-        if (! $challenge = session()->pull('webauthn.challenge')) {
+        if (! $challenge) {
             $challenge = random_bytes(16);
             session()->put('webauthn.challenge', $challenge);
         }
@@ -55,28 +58,40 @@ class WebAuthnController
 
             $publicKeyCredentialSource = $responseValidator->check(
                 $publicKeyCredential->response,
-                $this->createOptions(),
+                $this->createOptions(session()->pull('webauthn.challenge')),
                 $request->getHost(),
                 config('statamic.webauthn.rrp_entity.id', [])
             );
+
+            session()->forget('webauthn.challenge');
         } catch (Exception $e) {
-            throw new Exception('Invalid credentials'); // maybe redirect back with errors?
+            throw new Exception('Invalid credentials: '.$e->getMessage()); // maybe redirect back with errors?
         }
 
         if (! $user = User::current()) {
             throw new Exception('You must be logged in');
         }
 
-        WebAuthnRepository::create([
-            'id' => $publicKeyCredentialSource->rawId, // should we store it all?
-            'user' => $user
-        ]);
+        Passkey::make()
+            ->id($publicKeyCredential->id)
+            ->user($user)
+            ->data($publicKeyCredentialSource->jsonSerialize())
+            ->save();
+
+        return [
+            'verified' => true
+        ];
     }
 
-    public function verifyOptions()
+    public function verifyOptions($challenge = false)
     {
+        if (! $challenge) {
+            $challenge = random_bytes(32);
+            session()->put('webauthn.challenge', $challenge);
+        }
+
         return Webauthn\PublicKeyCredentialRequestOptions::create(
-            random_bytes(32),
+            $challenge,
             userVerification: Webauthn\PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
         );
     }
@@ -92,19 +107,14 @@ class WebAuthnController
         }
 
         // get from passkey repository
-        $passkey = WebAuthnRepository::find($publicKeyCredential->rawId);
+        $passkey = Passkey::find($publicKeyCredential->id);
 
         if (! $passkey) {
             throw new Exception('Invalid credentials'); // maybe redirect back with errors?
         }
 
         try {
-            $algorithmManager = Manager::create()
-                ->add(
-                    ES256::create(),
-                    RS256::create()
-                )
-            ;
+            $algorithmManager = Manager::create()->add(ES256::create(), RS256::create());
 
             $responseValidator = Webauthn\AuthenticatorAssertionResponseValidator::create(
                 null,
@@ -114,16 +124,27 @@ class WebAuthnController
             );
 
             $publicKeyCredentialSource = $responseValidator->check(
-                $passkey,
+                $passkey->toPublicKeyCredentialSource(),
                 $publicKeyCredential->response,
-                $this->verifyOptions(),
+                $this->verifyOptions(session()->pull('webauthn.challenge')),
+                $request->getHost(),
+                null,
                 config('statamic.webauthn.rrp_entity.id', [])
             );
         } catch (Exception $e) {
-            throw new Exception('Invalid credentials'); // maybe redirect back with errors?
+            throw new Exception('Invalid credentials: '.$e->getMessage()); // maybe redirect back with errors?
         }
 
-        Auth::login($passkey->user, config('statamic.webauthn.remember_me', true));
+        // update passkey with latest data
+        $passkey->data($publicKeyCredentialSource->jsonSerialize())->save();
+
+        Auth::login($passkey->user(), config('statamic.webauthn.remember_me', true));
+
+        if ($request->wantsJson()) {
+            return new JsonResponse([
+                'redirect' => $this->successRedirectUrl(),
+            ], 200);
+        }
 
         return redirect()->to($this->successRedirectUrl());
     }
@@ -160,16 +181,8 @@ class WebAuthnController
 
     private function successRedirectUrl()
     {
-        $default = '/';
+        $referer = request('referer');
 
-        $previous = session('_previous.url');
-
-        if (! $query = array_get(parse_url($previous), 'query')) {
-            return $default;
-        }
-
-        parse_str($query, $query);
-
-        return array_get($query, 'redirect', $default);
+        return Str::contains($referer, '/'.config('statamic.cp.route')) ? $referer : cp_route('index');
     }
 }
