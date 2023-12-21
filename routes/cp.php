@@ -344,6 +344,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('/', [WebAuthnController::class, 'view'])->name('webauthn.view');
         Route::get('create', [WebAuthnController::class, 'createOptions'])->name('webauthn.create-options');
         Route::post('create', [WebAuthnController::class, 'create'])->name('webauthn.create');
+        Route::delete('delete/{id}', [WebAuthnController::class, 'delete'])->name('webauthn.delete');
     });
 
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');

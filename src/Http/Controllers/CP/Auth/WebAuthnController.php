@@ -72,15 +72,34 @@ class WebAuthnController
             throw new Exception('You must be logged in');
         }
 
-        Passkey::make()
+        $passkey = Passkey::make()
             ->id($publicKeyCredential->id)
             ->user($user)
-            ->data($publicKeyCredentialSource->jsonSerialize())
-            ->save();
+            ->data($publicKeyCredentialSource->jsonSerialize());
+
+        $passkey->set('last_login', now()->timestamp);
+        $passkey->save();
 
         return [
             'verified' => true
         ];
+    }
+
+    public function delete(Request $request, $id)
+    {
+        $passkey = Passkey::find($id);
+
+        if (! $passkey || ($passkey->user() != User::current())) {
+            abort(403);
+        }
+
+        $passkey->delete();
+
+        if ($request->wantsJson()) {
+            return new JsonResponse([], 201);
+        }
+
+        return redirect()->back();
     }
 
     public function verifyOptions($challenge = false)
@@ -136,7 +155,9 @@ class WebAuthnController
         }
 
         // update passkey with latest data
-        $passkey->data($publicKeyCredentialSource->jsonSerialize())->save();
+        $passkey->data($publicKeyCredentialSource->jsonSerialize());
+        $passkey->set('last_login', now()->timestamp);
+        $passkey->save();
 
         Auth::login($passkey->user(), config('statamic.webauthn.remember_me', true));
 
@@ -151,8 +172,19 @@ class WebAuthnController
 
     public function view()
     {
+        $user = User::current();
+
+        $passkeys = Passkey::query()
+            ->where('user', $user->id())
+            ->get();
+
         return view('statamic::users.webauthn', [
-            'passkeys' => [],
+            'passkeys' => $passkeys,
+            'routes' => [
+                'options' => route('statamic.cp.webauthn.create-options'),
+                'verify' => route('statamic.cp.webauthn.create'),
+                'delete' => substr(route('statamic.cp.webauthn.delete', ['id' => 0]), 0, -1),
+            ],
         ]);
     }
 

@@ -4,9 +4,14 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\Passkey;
 use Statamic\Facades\YAML;
+use Statamic\Stache\Indexes;
 
 class PasskeysStore extends BasicStore
 {
+    protected $storeIndexes = [
+        'user' => Indexes\Users\User::class,
+    ];
+
     public function key()
     {
         return 'passkeys';

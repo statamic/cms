@@ -4,6 +4,7 @@ namespace Statamic\Stache;
 
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Assets\QueryBuilder as AssetQueryBuilder;
+use Statamic\Auth\File\PasskeyQueryBuilder;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
@@ -30,6 +31,10 @@ class ServiceProvider extends LaravelServiceProvider
 
         $this->app->bind(AssetQueryBuilder::class, function () {
             return new AssetQueryBuilder($this->app->make(Stache::class)->store('assets'));
+        });
+
+        $this->app->bind(PasskeyQueryBuilder::class, function () {
+            return new PasskeyQueryBuilder($this->app->make(Stache::class)->store('passkeys'));
         });
     }
 

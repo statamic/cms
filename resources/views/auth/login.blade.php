@@ -26,6 +26,12 @@
                             </a>
                         </div>
                     @endforeach
+
+                    @if ($webAuthnEnabled)
+                    <div class="provider mb-2" v-show="showWebAuthn">
+                        <button class="w-full btn-primary" @click="webAuthn()">{{ __('Log in with passkey') }}</button>
+                    </div>
+                    @endif
                 </div>
 
                 @if($emailLoginEnabled)
@@ -63,12 +69,6 @@
                     <button type="submit" class="btn-primary">{{ __('Log in') }}</button>
                 </div>
             </form>
-
-            @if ($webAuthnEnabled)
-            <div v-show="showWebAuthn">
-                <button class="btn-primary" @click="webAuthn()">{{ __('Login with passkey') }}</button>
-            </div>
-            @endif
 
         </div>
     </login>

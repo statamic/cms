@@ -12,38 +12,35 @@
         <h1 class="flex-1">{{ __('Passkeys') }}</h1>
     </div>
 
-    <passkeys
-        inline-template
-        :web-authn-routes=@json([
-            'options' => route('statamic.cp.webauthn.create-options'),
-            'verify' => route('statamic.cp.webauthn.create'),
-        ])
-    >
-    {{--
-    <h6 class="mt-8">Site</h6>
-    <div class="card p-0 mt-2">
-        <table class="data-table">
-            <tr>
-                <td class="w-64 font-bold">
-                    <span class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-500' }} mr-2"></span>
-                    {{ $site->key() ?? __('No license key') }}
-                </td>
-                <td class="relative">
-                    {{ $site->domain()['url'] ?? '' }}
-                    @if ($site->hasMultipleDomains())
-                        <span class="text-2xs">({{ trans_choice('and :count more', $site->additionalDomainCount()) }})</span>
-                    @endif
-                </td>
-                <td class="text-right text-red-500">{{ $site->invalidReason() }}</td>
-            </tr>
-        </table>
-    </div>
-    --}}
+    <passkeys inline-template :web-authn-routes=@json($routes)>
+        <div>
 
-    <div class="mt-10 py-4 border-t flex items-center" v-show="showWebAuthn">
-        <a class="btn btn-primary mr-4" @click="webAuthn">{{ __('Create Passkey') }}</a>
-    </div>
+            @if ($passkeys->isEmpty())
+            <p class="text-sm text-gray mt-2">{{ __('No passkeys created') }}</p>
+            @else
+            <div class="card p-0 mt-10">
+                <table class="data-table">
+                    @foreach ($passkeys as $passkey)
+                        <tr>
+                            <td class="w-128 mr-2">
+                                <span class="little-dot bg-green-600 mr-2"></span>
+                                <span class="font-bold">{{ $passkey->id() }}</span>
+                                <span class="badge uppercase font-bold text-gray-600">{{ $passkey->get('type') }}</span>
+                            </td>
+                            <td>{{ $passkey->lastLogin()?->format(config('statamic.cp.date_format')).' '.$passkey->lastLogin()?->format('H:i') }}
 
+                            <td class="text-right text-red-500"><a class="btn-sm btn-danger" @click="(event) => deletePasskey('{{ $passkey->id() }}', event.target)">{{ __('Delete') }}</a></td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+            @endif
+
+            <div class="mt-10 py-4 border-t flex items-center" v-show="showWebAuthn">
+                <a class="btn btn-primary mr-4" @click="webAuthn">{{ __('Create Passkey') }}</a>
+            </div>
+
+        </div>
     </passkeys>
 
 @stop

@@ -2,9 +2,12 @@
 
 namespace Statamic\Auth\File;
 
+use Carbon\Carbon;
 use Statamic\Contracts\Auth\Passkey as PasskeyContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Facades;
 use Statamic\Facades\Stache;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -12,7 +15,7 @@ use Webauthn\PublicKeyCredentialSource;
 
 class Passkey implements PasskeyContract
 {
-    use ContainsData, ExistsAsFile, FluentlyGetsAndSets;
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $id;
     protected $user;
@@ -74,6 +77,11 @@ class Passkey implements PasskeyContract
         Facades\Passkey::delete($this);
 
         return true;
+    }
+
+    public function lastLogin()
+    {
+        return ($login = $this->get('last_login')) ? Carbon::createFromTimestamp($login) : null;
     }
 
     public function toPublicKeyCredentialSource()

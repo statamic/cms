@@ -4,6 +4,7 @@ namespace Statamic\Auth\File;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\Passkey;
+use Statamic\Contracts\Auth\PasskeyQueryBuilder;
 use Statamic\Contracts\Auth\PasskeyRepository as RepositoryContract;
 use Statamic\Stache\Stache;
 
@@ -33,6 +34,11 @@ class PasskeyRepository implements RepositoryContract
         return app(Passkey::class);
     }
 
+    public function query()
+    {
+        return app(PasskeyQueryBuilder::class);
+    }
+
     public function save(Passkey $passkey)
     {
         $this->store->save($passkey);
@@ -47,6 +53,7 @@ class PasskeyRepository implements RepositoryContract
     {
         return [
             Passkey::class => \Statamic\Auth\File\Passkey::class,
+            PasskeyQueryBuilder::class => \Statamic\Auth\File\PasskeyQueryBuilder::class,
         ];
     }
 }

@@ -11,20 +11,26 @@ export default {
 
     computed: {
         showWebAuthn() {
-            console.log('Supported: ' + browserSupportsWebAuthn());
             return browserSupportsWebAuthn();
         },
     },
 
     methods: {
+        deletePasskey(id, target) {
+            if (confirm(__('Are you sure?'))) {
+                this.$axios.delete(this.webAuthnRoutes.delete + id).then(response => {
+                    let row = target.closest('tr');
+                    row.parentNode.removeChild(row);
+                });
+            }
+        },
+
         async webAuthn() {
             const authOptionsResponse = await fetch(this.webAuthnRoutes.options);
             const startRegistrationResponse = await startRegistration(await authOptionsResponse.json());
 
             this.$axios.post(this.webAuthnRoutes.verify, startRegistrationResponse)
                 .then(response => {
-
-                    console.log(response.data);
 
                     if (response && response.data.redirect) {
                         location.href = response.data.redirect;
