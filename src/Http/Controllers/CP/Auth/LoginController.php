@@ -34,6 +34,7 @@ class LoginController extends CpController
     {
         $data = [
             'title' => __('Log in'),
+            'webAuthnEnabled' => config('statamic.webauthn.enabled'),
             'oauth' => $enabled = OAuth::enabled(),
             'emailLoginEnabled' => $enabled ? config('statamic.oauth.email_login_enabled') : true,
             'providers' => $enabled ? OAuth::providers() : [],
