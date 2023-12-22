@@ -51,10 +51,18 @@ export default {
                     }
 
                     this.webAuthnError = response.data.message;
-                })
-                .catch (e => {
-                    this.webAuthnError = e.message;
-                });
+                }).catch(e => this.handleAxiosError(e));
+
+        },
+
+        handleAxiosError(e) {
+            if (e.response) {
+                const { message, errors } = e.response.data;
+                this.webAuthnError = message;
+                return;
+            }
+
+            this.webAuthnError = __('Something went wrong');
         },
     }
 

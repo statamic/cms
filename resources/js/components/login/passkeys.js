@@ -47,10 +47,18 @@ export default {
                     }
 
                     this.error = response.data.message;
-                })
-                .catch (e => {
-                    this.error = e.message;
-                });
+                }).catch(e => this.handleAxiosError(e));
+
+        },
+
+        handleAxiosError(e) {
+            if (e.response) {
+                const { message, errors } = e.response.data;
+                this.error = message;
+                return;
+            }
+
+            this.error = __('Something went wrong');
         },
     }
 
