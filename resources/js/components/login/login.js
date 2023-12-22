@@ -44,7 +44,6 @@ export default {
 
             this.$axios.post(this.webAuthnRoutes.verify, startAuthResponse)
                 .then(response => {
-                    console.log(response);
                     if (response && response.data.redirect) {
                         location.href = response.data.redirect;
                         return;
