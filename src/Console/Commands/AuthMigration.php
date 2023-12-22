@@ -44,6 +44,27 @@ class AuthMigration extends Command
 
         $this->line("<info>Created Migration:</info> {$file}");
 
+        $this->createPasskeysTable();
+
         $this->composer->dumpAutoloads();
+    }
+
+    private function createPasskeysTable()
+    {
+        if (config('statamic.users.tables.passkeys', false) == false) {
+            return;
+        }
+
+        $from = __DIR__.'/stubs/auth/statamic_passkeys_table.php.stub';
+        $file = Carbon::now()->format('Y_m_d_His').'_statamic_passkeys_table';
+        $to = ($path = $this->option('path')) ? $path."/{$file}.php" : database_path("migrations/{$file}.php");
+
+        $contents = File::get($from);
+
+        $contents = str_replace('PASSKEYS_TABLE', config('statamic.users.tables.passkeys', 'passkeys'), $contents);
+
+        File::put($to, $contents);
+
+        $this->line("<info>Created Passkeys Migration:</info> {$file}");
     }
 }

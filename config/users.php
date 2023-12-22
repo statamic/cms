@@ -132,6 +132,7 @@ return [
         'users' => 'users',
         'role_user' => 'role_user',
         'group_user' => 'group_user',
+        'passkeys' => false,
     ],
 
     /*

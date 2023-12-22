@@ -42,7 +42,7 @@ export default {
             this.$axios.post(this.webAuthnRoutes.verify, startRegistrationResponse)
                 .then(response => {
                     if (response && response.data.verified) {
-                        location.refresh();
+                        location.reload();
                         return;
                     }
 

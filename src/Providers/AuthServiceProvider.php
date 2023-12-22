@@ -65,6 +65,10 @@ class AuthServiceProvider extends ServiceProvider
             return $app[UserRepository::class]->userGroupRepository();
         });
 
+        $this->app->singleton(PasskeyRepository::class, function ($app) {
+            return $app[UserRepository::class]->passkeyRepository();
+        });
+
         $this->app->singleton(ProtectorManager::class, function ($app) {
             return new ProtectorManager($app);
         });
@@ -76,10 +80,6 @@ class AuthServiceProvider extends ServiceProvider
         $this->app->singleton(PermissionCache::class, function ($app) {
             return new PermissionCache;
         });
-
-        if (! $this->app->bound(PasskeyRepository::class)) {
-            \Statamic\Statamic::repository(PasskeyRepository::class, \Statamic\Auth\File\PasskeyRepository::class);
-        }
     }
 
     public function boot()

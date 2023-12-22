@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class StatamicPasskeysTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('PASSKEYS_TABLE', function (Blueprint $table) {
+            $table->string('id')->unique()->index();
+            $table->string('user_id');
+            $table->json('data')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down()
+    {
+        Schema::dropIfExists('PASSKEYS_TABLE');
+    }
+}

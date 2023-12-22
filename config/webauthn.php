@@ -22,4 +22,14 @@ return [
 
     'remember_me' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Model
+    |--------------------------------------------------------------------------
+    |
+    | When using eloquent passkeys you can specify the model you want to use
+    |
+    */
+    'model' => \Statamic\Auth\Eloquent\PasskeyModel::class,
+
 ];

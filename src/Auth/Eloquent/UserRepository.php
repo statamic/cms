@@ -13,6 +13,7 @@ class UserRepository extends BaseRepository
     protected $config;
     protected $roleRepository = RoleRepository::class;
     protected $userGroupRepository = UserGroupRepository::class;
+    protected $passkeyRepository = PasskeyRepository::class;
 
     public function __construct($config)
     {
