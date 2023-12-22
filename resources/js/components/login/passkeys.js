@@ -10,9 +10,19 @@ export default {
     },
 
     computed: {
+        showErrorModal() {
+            return this.error !== false;
+        },
+
         showWebAuthn() {
             return browserSupportsWebAuthn();
         },
+    },
+
+    data() {
+        return {
+            error: false,
+        }
     },
 
     methods: {
@@ -31,17 +41,15 @@ export default {
 
             this.$axios.post(this.webAuthnRoutes.verify, startRegistrationResponse)
                 .then(response => {
-
-                    if (response && response.data.redirect) {
-                        location.href = response.data.redirect;
+                    if (response && response.data.verified) {
+                        location.refresh();
                         return;
                     }
 
-                    alert('it failed');
-                    console.log(response);
+                    this.error = response.data.message;
                 })
                 .catch (e => {
-                    console.error(e);
+                    this.error = e.message;
                 });
         },
     }

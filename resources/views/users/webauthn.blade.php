@@ -27,7 +27,7 @@
                                 <span class="font-bold">{{ $passkey->id() }}</span>
                                 <span class="badge uppercase font-bold text-gray-600">{{ $passkey->get('type') }}</span>
                             </td>
-                            <td>{{ $passkey->lastLogin()?->format(config('statamic.cp.date_format')).' '.$passkey->lastLogin()?->format('H:i') }}
+                            <td>{{ ($login = $passkey->lastLogin()) ? ($login->format(config('statamic.cp.date_format')).' '.$login->format('H:i')) : __('Never') }}
 
                             <td class="text-right text-red-500"><a class="btn-sm btn-danger" @click="(event) => deletePasskey('{{ $passkey->id() }}', event.target)">{{ __('Delete') }}</a></td>
                         </tr>
@@ -40,7 +40,24 @@
                 <a class="btn btn-primary mr-4" @click="webAuthn">{{ __('Create Passkey') }}</a>
             </div>
 
+            <modal name="passkey-create-error" v-if="showErrorModal">
+                <div class="confirmation-modal flex flex-col h-full">
+                    <div class="text-lg font-medium p-4 pb-0">
+                        {{ __('There was an error creating your passkey') }}
+                    </div>
+                    <div class="flex-1 px-4 py-6 text-gray">
+                        <p class="mb-4" v-text="error" />
+                    </div>
+                    <div class="p-4 bg-gray-200 border-t flex items-center justify-end text-sm">
+                        <button class="text-gray hover:text-gray-900"
+                            @click="error = false"
+                            v-text="__('Close')" />
+                    </div>
+                </div>
+            </modal>
+
         </div>
+
     </passkeys>
 
 @stop

@@ -61,7 +61,7 @@ class WebAuthnController
                 $publicKeyCredential->response,
                 $this->createOptions(session()->pull('webauthn.challenge')),
                 $request->getHost(),
-                config('statamic.webauthn.rrp_entity.id', [])
+                ($rpEntityId = config('statamic.webauthn.rrp_entity.id')) ? [$rpEntityId] : []
             );
 
             session()->forget('webauthn.challenge');
@@ -78,12 +78,15 @@ class WebAuthnController
             ->user($user)
             ->data($publicKeyCredentialSource->jsonSerialize());
 
-        $passkey->set('last_login', now()->timestamp);
         $passkey->save();
 
-        return [
-            'verified' => true,
-        ];
+        if ($request->wantsJson()) {
+            return new JsonResponse([
+                'verified' => true,
+            ], 200);
+        }
+
+        return redirect()->to(route('statamic.cp.webauthn.view'));
     }
 
     public function delete(Request $request, $id)
@@ -149,7 +152,7 @@ class WebAuthnController
                 $this->verifyOptions(session()->pull('webauthn.challenge')),
                 $request->getHost(),
                 null,
-                config('statamic.webauthn.rrp_entity.id', [])
+                ($rpEntityId = config('statamic.webauthn.rrp_entity.id')) ? [$rpEntityId] : []
             );
         } catch (Exception $e) {
             throw new Exception('Invalid credentials: '.$e->getMessage()); // maybe redirect back with errors?
