@@ -3,7 +3,7 @@
 namespace Statamic\Auth\Eloquent;
 
 use Statamic\Auth\PasskeyCollection;
-Use Statamic\Facades\Passkey;
+use Statamic\Facades\Passkey;
 use Statamic\Query\EloquentQueryBuilder;
 
 class PasskeyQueryBuilder extends EloquentQueryBuilder

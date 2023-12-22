@@ -2,9 +2,8 @@
 
 namespace Statamic\Auth\Eloquent;
 
-use Illuminate\Database\Eloquent\Model;
-use Statamic\Auth\PasskeyCollection;
 use Statamic\Auth\File\PasskeyRepository as BaseRepository;
+use Statamic\Auth\PasskeyCollection;
 use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\Blink;
 
