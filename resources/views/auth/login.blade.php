@@ -30,6 +30,7 @@
                     @if ($webAuthnEnabled)
                     <div class="provider mb-2" v-show="showWebAuthn">
                         <button class="w-full btn-primary" @click="webAuthn()">{{ __('Log in with passkey') }}</button>
+                        <div class="text-red-500 text-xs mt-2 text-center" v-if="showWebAuthnError" v-text="webAuthnError" />
                     </div>
                     @endif
                 </div>

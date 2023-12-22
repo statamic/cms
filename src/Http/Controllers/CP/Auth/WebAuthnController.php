@@ -46,31 +46,27 @@ class WebAuthnController
         $publicKeyCredential = $this->credentialLoader()->loadArray($request->all());
 
         if (! $publicKeyCredential->response instanceof Webauthn\AuthenticatorAttestationResponse) {
-            throw new Exception('Invalid credentials'); // maybe redirect back with errors?
+            throw new Exception(__('Invalid credentials'));
         }
 
-        try {
-            $responseValidator = Webauthn\AuthenticatorAttestationResponseValidator::create(
-                $this->attestationSupportManager(),
-                null,
-                null,
-                Webauthn\AuthenticationExtensions\ExtensionOutputCheckerHandler::create()
-            );
+        $responseValidator = Webauthn\AuthenticatorAttestationResponseValidator::create(
+            $this->attestationSupportManager(),
+            null,
+            null,
+            Webauthn\AuthenticationExtensions\ExtensionOutputCheckerHandler::create()
+        );
 
-            $publicKeyCredentialSource = $responseValidator->check(
-                $publicKeyCredential->response,
-                $this->createOptions(session()->pull('webauthn.challenge')),
-                $request->getHost(),
-                ($rpEntityId = config('statamic.webauthn.rrp_entity.id')) ? [$rpEntityId] : []
-            );
+        $publicKeyCredentialSource = $responseValidator->check(
+            $publicKeyCredential->response,
+            $this->createOptions(session()->pull('webauthn.challenge')),
+            $request->getHost(),
+            ($rpEntityId = config('statamic.webauthn.rrp_entity.id')) ? [$rpEntityId] : []
+        );
 
-            session()->forget('webauthn.challenge');
-        } catch (Exception $e) {
-            throw new Exception('Invalid credentials: '.$e->getMessage()); // maybe redirect back with errors?
-        }
+        session()->forget('webauthn.challenge');
 
         if (! $user = User::current()) {
-            throw new Exception('You must be logged in');
+            throw new Exception(__('Invalid user'));
         }
 
         $passkey = Passkey::make()
@@ -126,37 +122,33 @@ class WebAuthnController
         $publicKeyCredential = $this->credentialLoader()->load($request->getContent());
 
         if (! $publicKeyCredential->response instanceof Webauthn\AuthenticatorAssertionResponse) {
-            throw new Exception('Invalid credentials'); // maybe redirect back with errors?
+            throw new Exception(__('Invalid credentials'));
         }
 
         // get from passkey repository
         $passkey = Passkey::find($publicKeyCredential->id);
 
         if (! $passkey) {
-            throw new Exception('Invalid credentials'); // maybe redirect back with errors?
+            throw new Exception(__('No matching passkey found'));
         }
 
-        try {
-            $algorithmManager = Manager::create()->add(ES256::create(), RS256::create());
+        $algorithmManager = Manager::create()->add(ES256::create(), RS256::create());
 
-            $responseValidator = Webauthn\AuthenticatorAssertionResponseValidator::create(
-                null,
-                null,
-                Webauthn\AuthenticationExtensions\ExtensionOutputCheckerHandler::create(),
-                $algorithmManager
-            );
+        $responseValidator = Webauthn\AuthenticatorAssertionResponseValidator::create(
+            null,
+            null,
+            Webauthn\AuthenticationExtensions\ExtensionOutputCheckerHandler::create(),
+            $algorithmManager
+        );
 
-            $publicKeyCredentialSource = $responseValidator->check(
-                $passkey->toPublicKeyCredentialSource(),
-                $publicKeyCredential->response,
-                $this->verifyOptions(session()->pull('webauthn.challenge')),
-                $request->getHost(),
-                null,
-                ($rpEntityId = config('statamic.webauthn.rrp_entity.id')) ? [$rpEntityId] : []
-            );
-        } catch (Exception $e) {
-            throw new Exception('Invalid credentials: '.$e->getMessage()); // maybe redirect back with errors?
-        }
+        $publicKeyCredentialSource = $responseValidator->check(
+            $passkey->toPublicKeyCredentialSource(),
+            $publicKeyCredential->response,
+            $this->verifyOptions(session()->pull('webauthn.challenge')),
+            $request->getHost(),
+            null,
+            ($rpEntityId = config('statamic.webauthn.rrp_entity.id')) ? [$rpEntityId] : []
+        );
 
         // update passkey with latest data
         $passkey->data($publicKeyCredentialSource->jsonSerialize());

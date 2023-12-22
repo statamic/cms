@@ -25,6 +25,16 @@ export default {
         showWebAuthn() {
             return browserSupportsWebAuthn();
         },
+
+        showWebAuthnError() {
+            return this.webAuthnError !== false;
+        },
+    },
+
+    data() {
+        return {
+            webAuthnError: false,
+        }
     },
 
     methods: {
@@ -34,17 +44,16 @@ export default {
 
             this.$axios.post(this.webAuthnRoutes.verify, startAuthResponse)
                 .then(response => {
+                    console.log(response);
                     if (response && response.data.redirect) {
                         location.href = response.data.redirect;
                         return;
                     }
 
-                    alert('it failed');
-                    console.log(response);
-
+                    this.webAuthnError = response.data.message;
                 })
                 .catch (e => {
-                    console.error(e);
+                    this.webAuthnError = e.message;
                 });
         },
     }
