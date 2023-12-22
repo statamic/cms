@@ -8,9 +8,15 @@ use Statamic\Facades\UserGroup;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Users\Group;
 use Statamic\Stache\Indexes\Users\Role;
+use Symfony\Component\Finder\SplFileInfo;
 
 class UsersStore extends BasicStore
 {
+    public function getItemFilter(SplFileInfo $file)
+    {
+        return $file->getRelativePath() == '' && parent::getItemFilter($file);
+    }
+
     protected function storeIndexes()
     {
         $groups = UserGroup::all()->mapWithKeys(function ($group) {
