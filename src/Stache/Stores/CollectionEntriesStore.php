@@ -198,7 +198,7 @@ class CollectionEntriesStore extends ChildStore
         while (true) {
             $ext = '.'.$item->fileExtension();
             $filename = Str::beforeLast($basePath, $ext);
-            $suffix = $num ? ".$num" : '';
+            $suffix = $num ? "-$num" : '';
             $path = "{$filename}{$suffix}{$ext}";
 
             if (! $contents = File::get($path)) {
