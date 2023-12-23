@@ -213,13 +213,13 @@ class EntriesStoreTest extends TestCase
 
         $entry = Facades\Entry::make()->id('new-id')->slug('test')->collection('blog')->date('2017-07-04');
         $this->parent->store('blog')->save($entry);
-        $newPath = $this->directory.'/blog/2017-07-04.test.1.md';
+        $newPath = $this->directory.'/blog/2017-07-04.test-1.md';
         $this->assertStringEqualsFile($existingPath, $existingContents);
         $this->assertStringEqualsFile($newPath, $entry->fileContents());
 
         $anotherEntry = Facades\Entry::make()->id('another-new-id')->slug('test')->collection('blog')->date('2017-07-04');
         $this->parent->store('blog')->save($anotherEntry);
-        $anotherNewPath = $this->directory.'/blog/2017-07-04.test.2.md';
+        $anotherNewPath = $this->directory.'/blog/2017-07-04.test-2.md';
         $this->assertStringEqualsFile($existingPath, $existingContents);
         $this->assertStringEqualsFile($anotherNewPath, $anotherEntry->fileContents());
 
@@ -285,7 +285,7 @@ class EntriesStoreTest extends TestCase
     /** @test */
     public function it_keeps_the_suffix_even_if_the_suffixless_path_is_available()
     {
-        $existingPath = $this->directory.'/blog/2017-07-04.test.1.md';
+        $existingPath = $this->directory.'/blog/2017-07-04.test-1.md';
         $suffixlessPath = $this->directory.'/blog/2017-07-04.test.md';
 
         file_put_contents($existingPath, 'id: 123');
