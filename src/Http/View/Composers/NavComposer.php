@@ -15,6 +15,6 @@ class NavComposer
 
     public function compose(View $view)
     {
-        $view->with('nav', Blink::once('nav-composer::navigation', fn () => Nav::build()));
+        $view->with('nav', Blink::once('nav-composer-navigation', fn () => Nav::build()));
     }
 }
