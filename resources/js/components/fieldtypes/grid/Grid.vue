@@ -207,7 +207,30 @@ export default {
         },
 
         sorted(rows) {
+            let oldRows = this.value;
             this.update(rows);
+
+            let originalHiddenFields = this.$store.state.publish[this.storeName].hiddenFields || {};
+            let updatedHiddenFields = {};
+
+            rows.forEach((set, newIndex) => {
+                let originalIndex = oldRows.findIndex((oldSet) => oldSet._id === set._id);
+
+                Object.entries(originalHiddenFields)
+                    .filter(([key, value]) => {
+                        return key.startsWith(`${this.fieldPathPrefix || this.handle}.${originalIndex}.`)
+                    })
+                    .forEach(([key, value]) => {
+                        updatedHiddenFields[key.replace(`${this.fieldPathPrefix || this.handle}.${originalIndex}.`, `${this.fieldPathPrefix || this.handle}.${newIndex}.`)] = value;
+                    });
+            });
+
+            Object.entries(updatedHiddenFields).forEach(([key, value]) => {
+                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                    dottedKey: key,
+                    ...value,
+                });
+            });
         },
 
         focus() {
