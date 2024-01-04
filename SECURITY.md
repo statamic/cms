@@ -22,7 +22,7 @@ We are only interested in vulnerabilities that affect Statamic itself, tested ag
 
 ### Non-Qualifying Vulnerabilities
 
-- XSS vectors or bugs that rely on an unlikely user interaction (i.e. a privelaged user attacking themselves or their own site)
+- XSS vectors or bugs that rely on an unlikely user interaction (i.e. a privileged user attacking themselves or their own site)
 - Reports from automated tools or scanners
 - Theoretical attacks without actual proof of exploitability
 - Attacks that can be guarded against by following our security recommendations.
