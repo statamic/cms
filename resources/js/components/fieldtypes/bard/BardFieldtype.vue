@@ -177,6 +177,7 @@ export default {
             pageHeader: null,
             escBinding: null,
             showAddSetButton: false,
+            isDragging: false,
             provide: {
                 bard: this.makeBardProvide(),
                 storeName: this.storeName
@@ -625,8 +626,37 @@ export default {
                     }, 1);
                 },
                 onUpdate: () => {
+                    let oldJson = this.json;
+
                     this.json = this.editor.getJSON().content;
                     this.html = this.editor.getHTML();
+
+                    if (this.isDragging) {
+                        let originalHiddenFields = this.$store.state.publish[this.storeName].hiddenFields || {};
+                        let updatedHiddenFields = {};
+
+                        this.json.forEach((node, newIndex) => {
+                            // We don't have any IDs to check so the best we can do is compare the entire object.
+                            let originalIndex = oldJson.findIndex((oldNode) => {
+                                return JSON.stringify(oldNode) === JSON.stringify(node);
+                            });
+
+                            Object.entries(originalHiddenFields)
+                                .filter(([key, value]) => {
+                                    return key.startsWith(`${this.fieldPathPrefix || this.handle}.${originalIndex}.`);
+                                })
+                                .forEach(([key, value]) => {
+                                    updatedHiddenFields[key.replace(`${this.fieldPathPrefix || this.handle}.${originalIndex}.`, `${this.fieldPathPrefix || this.handle}.${newIndex}.`)] = value;
+                                });
+                        });
+
+                        Object.entries(updatedHiddenFields).forEach(([key, value]) => {
+                            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                                dottedKey: key,
+                                ...value,
+                            });
+                        });
+                    }
                 },
                 onCreate: ({ editor }) => {
                     const state = editor.view.state;
@@ -643,6 +673,9 @@ export default {
                             }
                         }
                     }
+
+                    editor.view.dom.addEventListener('dragstart', (event) => this.isDragging = true);
+                    editor.view.dom.addEventListener('dragend', (event) => this.isDragging = false);
                 }
             });
         },
