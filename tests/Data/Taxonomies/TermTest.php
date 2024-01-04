@@ -313,4 +313,42 @@ class TermTest extends TestCase
             ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/de/tags/das-foo?preview=true'],
         ], $termDe->previewTargets()->all());
     }
+
+    /** @test */
+    public function it_gets_and_sets_the_layout()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        // defaults to layout
+        $this->assertEquals('layout', $term->layout());
+
+        // taxonomy level overrides the default
+        $taxonomy->layout('foo');
+        $this->assertEquals('foo', $term->layout());
+
+        // term level overrides the origin
+        $return = $term->layout('baz');
+        $this->assertEquals($term, $return);
+        $this->assertEquals('baz', $term->layout());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_template()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        // defaults to taxonomy.show
+        $this->assertEquals('tags.show', $term->template());
+
+        // taxonomy level overrides the default
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $term->template());
+
+        // term level overrides the origin
+        $return = $term->template('baz');
+        $this->assertEquals($term, $return);
+        $this->assertEquals('baz', $term->template());
+    }
 }

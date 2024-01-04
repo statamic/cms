@@ -3,7 +3,6 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
@@ -724,15 +723,13 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_augments()
     {
-        $mountedEntry = EntryFactory::collection('pages')->id('blog')->slug('blog')->data(['title' => 'Blog'])->create();
-
-        $collection = (new Collection)->mount('blog')->handle('test');
+        $collection = (new Collection)->handle('test');
 
         $this->assertInstanceof(Augmentable::class, $collection);
-        $this->assertCount(3, $augmentedArray = $collection->toAugmentedArray());
-        $this->assertEquals('Test', $augmentedArray['title']);
-        $this->assertEquals('test', $augmentedArray['handle']);
-        $this->assertEquals($mountedEntry, $augmentedArray['mount']->value());
+        $this->assertEquals([
+            'title' => 'Test',
+            'handle' => 'test',
+        ], $collection->toAugmentedArray());
     }
 
     /** @test */

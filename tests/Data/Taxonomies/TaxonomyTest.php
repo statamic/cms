@@ -393,6 +393,45 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_the_layout()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to layout
+        $this->assertEquals('layout', $taxonomy->layout());
+
+        // taxonomy level overrides the default
+        $taxonomy->layout('foo');
+        $this->assertEquals('foo', $taxonomy->layout());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_template()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to taxonomy.index
+        $this->assertEquals('tags.index', $taxonomy->template());
+
+        // taxonomy level overrides the default
+        $taxonomy->template('foo');
+        $this->assertEquals('foo', $taxonomy->template());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_term_template()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to taxonomy.show
+        $this->assertEquals('tags.show', $taxonomy->termTemplate());
+
+        // taxonomy level overrides the default
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $taxonomy->termTemplate());
+    }
+
+    /** @test */
     public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
     {
         Site::setConfig([

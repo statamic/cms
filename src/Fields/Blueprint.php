@@ -267,7 +267,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
                 $field = $allFields->get($importKey);
                 $tab = $field['tab'];
                 $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'])->keyBy(function ($field) {
-                    return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
+                    return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
                 });
                 $importedConfig = $importedField['field']->config();
                 $config = array_merge($config, $importedConfig);

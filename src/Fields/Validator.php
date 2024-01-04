@@ -68,6 +68,10 @@ class Validator
         }
 
         return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
+            if (request()->isPrecognitive() && $field->type() == 'assets') {
+                return $carry;
+            }
+
             return $carry->merge($field->setValidationContext($this->context)->rules());
         }, collect());
     }

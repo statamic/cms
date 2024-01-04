@@ -678,7 +678,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
-    public function structureContents(array $contents = null)
+    public function structureContents(?array $contents = null)
     {
         return $this
             ->fluentlyGetOrSet('structureContents')
@@ -727,7 +727,14 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function delete()
     {
-        $this->queryEntries()->get()->each->delete();
+        $this->queryEntries()->get()->each(function ($entry) {
+            $entry->deleteDescendants();
+            $entry->delete();
+        });
+
+        if ($this->hasStructure()) {
+            $this->structure()->trees()->each->delete();
+        }
 
         Facades\Collection::delete($this);
 
@@ -860,15 +867,9 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function augmentedArrayData()
     {
-        $data = [
+        return [
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
-
-        if (! Statamic::isApiRoute() && ! Statamic::isCpRoute()) {
-            $data['mount'] = $this->mount();
-        }
-
-        return $data;
     }
 }

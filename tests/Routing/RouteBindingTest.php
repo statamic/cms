@@ -169,8 +169,8 @@ class RouteBindingTest extends TestCase
      */
     public function binds_route_parameters_in_frontend_routes(
         $uri,
-        Closure $enabledCallback = null,
-        Closure $disabledCallback = null,
+        ?Closure $enabledCallback = null,
+        ?Closure $disabledCallback = null,
     ) {
         $this->setupContent();
 
@@ -193,8 +193,8 @@ class RouteBindingTest extends TestCase
      */
     public function binds_route_parameters_in_frontend_routes_with_bindings_disabled(
         $uri,
-        Closure $enabledCallback = null,
-        Closure $disabledCallback = null,
+        ?Closure $enabledCallback = null,
+        ?Closure $disabledCallback = null,
     ) {
         $this->setupContent();
 

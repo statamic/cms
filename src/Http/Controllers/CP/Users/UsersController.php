@@ -283,9 +283,12 @@ class UsersController extends CpController
             $user->groups($request->groups);
         }
 
-        $user->save();
+        $save = $user->save();
 
-        return ['title' => $user->title()];
+        return [
+            'title' => $user->title(),
+            'saved' => is_bool($save) ? $save : true,
+        ];
     }
 
     public function destroy($user)
