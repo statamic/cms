@@ -673,6 +673,7 @@ export default {
                 this.site = localization.handle;
                 this.localizing = false;
                 this.initialPublished = data.values.published;
+                this.readOnly = data.readOnly;
 
                 this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
             })
