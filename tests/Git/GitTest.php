@@ -181,8 +181,8 @@ EOT;
 
         Config::set('statamic.git.use_authenticated', false);
 
-        $this->assertEquals('Spock', Git::gitUserName());
-        $this->assertEquals('spock@example.com', Git::gitUserEmail());
+        $this->assertEquals('Spock', Git::gitUserName($user));
+        $this->assertEquals('spock@example.com', Git::gitUserEmail($user));
     }
 
     /** @test */
