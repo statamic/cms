@@ -14,6 +14,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Events\TaxonomyCreated;
 use Statamic\Events\TaxonomyCreating;
 use Statamic\Events\TaxonomyDeleted;
+use Statamic\Events\TaxonomyDeleting;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
@@ -235,6 +236,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
     public function delete()
     {
+        if (TaxonomyDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->queryTerms()->get()->each->delete();
 
         Facades\Taxonomy::delete($this);
