@@ -3,7 +3,6 @@
 @section('title', Statamic::crumb($nav->title(), 'Navigation'))
 
 @section('content')
-
     <navigation-view
         title="{{ $nav->title() }}"
         handle="{{ $nav->handle() }}"
@@ -18,14 +17,15 @@
         :expects-root="{{ $str::bool($expectsRoot) }}"
         :blueprint="{{ json_encode($blueprint) }}"
     >
-        <template #twirldown>
-            @can('edit', $nav)
-                <dropdown-item :text="__('Edit Navigation')" redirect="{{ $nav->editUrl() }}"></dropdown-item>
-            @endcan
-            @can('configure fields')
-                <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}"></dropdown-item>
-            @endcan
-        </template>
+        @if(Auth::user()->can('edit', $nav) || Auth::user()->can('configure fields'))
+            <template #twirldown>
+                @can('edit', $nav)
+                    <dropdown-item :text="__('Edit Navigation')" redirect="{{ $nav->editUrl() }}"></dropdown-item>
+                @endcan
+                @can('configure fields')
+                    <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}"></dropdown-item>
+                @endcan
+            </template>
+        @endif
     </navigation-view>
-
 @endsection

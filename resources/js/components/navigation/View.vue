@@ -8,7 +8,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list class="mr-2">
+                <dropdown-list v-if="$slots.twirldown" class="mr-2">
                     <slot name="twirldown" />
                 </dropdown-list>
 
