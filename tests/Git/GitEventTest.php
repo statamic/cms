@@ -33,13 +33,13 @@ class GitEventTest extends TestCase
         Config::set('statamic.git', $defaultConfig);
         Config::set('statamic.git.enabled', true);
 
-        $this->user = User::make()
-            ->id('chewbacca')
-            ->email('chew@bacca.com')
-            ->data(['name' => 'Chewbacca'])
-            ->makeSuper();
-
-        $this->actingAs($this->user);
+        $this->actingAs(
+            $user = User::make()
+                ->id('chewbacca')
+                ->email('chew@bacca.com')
+                ->data(['name' => 'Chewbacca'])
+                ->makeSuper()
+        );
 
         Config::set('filesystems.disks.test', [
             'driver' => 'local',
@@ -49,13 +49,13 @@ class GitEventTest extends TestCase
         Storage::fake('test');
 
         Git::shouldReceive('statuses');
-        Git::shouldReceive('as')->with($this->user);
+        Git::shouldReceive('as')->with($user);
     }
 
     /** @test */
     public function it_doesnt_commit_when_git_is_disabled()
     {
-        Git::shouldReceive('as')->with($this->user)->never();
+        Git::shouldReceive('as')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection deleted')->never();
 
@@ -70,7 +70,7 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_doesnt_commit_when_automatic_is_disabled()
     {
-        Git::shouldReceive('as')->with($this->user)->never();
+        Git::shouldReceive('as')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection deleted')->never();
 
@@ -85,7 +85,7 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_doesnt_commit_ignored_events()
     {
-        Git::shouldReceive('as')->with($this->user)->never();
+        Git::shouldReceive('as')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection deleted')->once();
 
@@ -102,7 +102,7 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_doesnt_commit_when_event_subscriber_is_disabled()
     {
-        Git::shouldReceive('as')->with($this->user)->never();
+        Git::shouldReceive('as')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection deleted')->once();
 
