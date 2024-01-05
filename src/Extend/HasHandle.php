@@ -3,6 +3,7 @@
 namespace Statamic\Extend;
 
 use ReflectionClass;
+use Statamic\Support\Str;
 
 trait HasHandle
 {
@@ -14,7 +15,12 @@ trait HasHandle
             return static::$handle;
         }
 
-        $class = (new ReflectionClass(static::class))->getShortName();
+        $reflection = (new ReflectionClass(static::class));
+
+        $class = $reflection->getShortName();
+        if (! Str::startsWith($reflection->getNamespaceName(), 'Statamic\\')) {
+            $class = $reflection->getName();
+        }
 
         return snake_case($class);
     }
