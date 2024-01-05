@@ -69,6 +69,8 @@ class JavascriptComposer
             'permissions' => $this->permissions($user),
             'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
             'customSvgIcons' => Icon::getCustomSvgIcons(),
+            'revisionHistoryDateFormat' => config('statamic.revisions.history_date_format'),
+            'revisionHistoryTimeFormat' => config('statamic.revisions.history_time_format'),
         ];
     }
 

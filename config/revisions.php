@@ -27,4 +27,17 @@ return [
 
     'path' => storage_path('statamic/revisions'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Date format
+    |--------------------------------------------------------------------------
+    |
+    | This is the date and time format used to display months in the revision
+    | history panel. See: https://momentjs.com/docs/#/displaying/format
+    |
+    */
+
+    'history_date_format' => 'LL',
+    'history_time_format' => 'LT',
+
 ];
