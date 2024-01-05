@@ -28,7 +28,15 @@ class FormController extends Controller
         $site = Site::findByUrl(URL::previous()) ?? Site::default();
         $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
-        $values = array_merge($request->all(), $assets = $request->assets());
+        $values = $request->all();
+
+        $fields->all()
+            ->filter(fn ($field) => $field->fieldtype()->handle() === 'checkboxes')
+            ->each(function ($field) use (&$values) {
+                return Arr::set($values, $field->handle(), collect(Arr::get($values, $field->handle(), []))->filter(fn ($value) => $value !== null)->values()->all());
+            });
+
+        $values = array_merge($values, $assets = $request->assets());
         $params = collect($request->all())->filter(function ($value, $key) {
             return Str::startsWith($key, '_');
         })->all();

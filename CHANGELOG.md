@@ -1,5 +1,34 @@
 # Release Notes
 
+## 4.42.1 (2024-01-04)
+
+### What's fixed
+- Ensure error message is displayed when uploading large file. [#9258](https://github.com/statamic/cms/issues/9258) by @duncanmcclean
+- Prevent Bard augmentation error after enabling "Save HTML" option. [#9198](https://github.com/statamic/cms/issues/9198) by @duncanmcclean
+- Avoid compiling certain user defined strings. [#9256](https://github.com/statamic/cms/issues/9256) by @jasonvarga
+- Fix an issue with short interpolated variables in Antlers. [#9253](https://github.com/statamic/cms/issues/9253) by @JohnathonKoster
+- Fix issue with AuthServiceProvider and Laravel Octane. [#9240](https://github.com/statamic/cms/issues/9240) by @nadinengland
+- Allow CP Nav to be created each request under Laravel Octane. [#9241](https://github.com/statamic/cms/issues/9241) by @nadinengland
+- Fix Link Fieldtype inside nested Bard. [#9252](https://github.com/statamic/cms/issues/9252) by @duncanmcclean
+- Clear permission cache when setting or removing permissions from a role. [#9244](https://github.com/statamic/cms/issues/9244) by @aerni
+- Bump tj-actions/changed-files from 36 to 41. [#9247](https://github.com/statamic/cms/issues/9247) by @dependabot
+
+
+
+## 4.42.0 (2023-12-18)
+
+### What's improved
+- Submission date now uses localized date format [#9215](https://github.com/statamic/cms/issues/9215) by @mmodler
+- French translations [#9218](https://github.com/statamic/cms/issues/9218) by @ebeauchamps
+
+### What's fixed
+- Fix nested JSON field handles not passing validation [#9217](https://github.com/statamic/cms/issues/9217) by @caseydwyer
+- Fix null values not being filtered on front-end forms [#9212](https://github.com/statamic/cms/issues/9212) by @ryanmitchell
+- Fix `{{ children }}` tag for collections other than Pages [#9210](https://github.com/statamic/cms/issues/9210) by @MedRochon
+- Use `setTimeout` to fix dirty state issue [#9213](https://github.com/statamic/cms/issues/9213) by @duncanmcclean
+
+
+
 ## 4.41.0 (2023-12-14)
 
 ### What's new
