@@ -36,5 +36,7 @@ class ScopeRepository
     public function remove(string $handle)
     {
         $this->removed[] = $handle;
+
+        return $this;
     }
 }
