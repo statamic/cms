@@ -60,7 +60,7 @@ class Git
     /**
      * Act as a specific user.
      */
-    public function as(?UserContract $user): self
+    public function as(?UserContract $user): static
     {
         $clone = clone $this;
 
