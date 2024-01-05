@@ -41,7 +41,7 @@ class Subscriber extends StatamicSubscriber
             message: $event instanceof ProvidesCommitMessage
                 ? $event->commitMessage()
                 : null,
-            committer: $event->authenaticatedUser ?? User::current(),
+            committer: $event->authenticatedUser ?? User::current(),
         );
     }
 
