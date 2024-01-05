@@ -3,6 +3,7 @@
 @section('title', Statamic::crumb($nav->title(), 'Navigation'))
 
 @section('content')
+
     <navigation-view
         title="{{ $nav->title() }}"
         handle="{{ $nav->handle() }}"
@@ -16,16 +17,16 @@
         :max-depth="{{ $nav->maxDepth() ?? 'Infinity' }}"
         :expects-root="{{ $str::bool($expectsRoot) }}"
         :blueprint="{{ json_encode($blueprint) }}"
+        :can-edit="{{ Statamic\Support\Str::bool($user->can('edit', $nav)) }}"
     >
-        @if(Auth::user()->can('edit', $nav) || Auth::user()->can('configure fields'))
-            <template #twirldown>
-                @can('edit', $nav)
-                    <dropdown-item :text="__('Edit Navigation')" redirect="{{ $nav->editUrl() }}"></dropdown-item>
-                @endcan
-                @can('configure fields')
-                    <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}"></dropdown-item>
-                @endcan
-            </template>
-        @endif
+        <template #twirldown>
+            @can('edit', $nav)
+                <dropdown-item :text="__('Edit Navigation')" redirect="{{ $nav->editUrl() }}"></dropdown-item>
+            @endcan
+            @can('configure fields')
+                <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}"></dropdown-item>
+            @endcan
+        </template>
     </navigation-view>
+
 @endsection
