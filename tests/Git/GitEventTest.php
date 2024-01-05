@@ -47,7 +47,7 @@ class GitEventTest extends TestCase
         Storage::fake('test');
 
         Git::shouldReceive('statuses');
-        Git::shouldReceive('as')->with($user);
+        Git::shouldReceive('as')->with($user)->andReturnSelf();
     }
 
     /** @test */
