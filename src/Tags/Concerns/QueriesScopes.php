@@ -14,8 +14,7 @@ trait QueriesScopes
                 return Scope::find($handle);
             })
             ->filter()
-            ->each(function ($class) use ($query) {
-                $scope = app($class);
+            ->each(function ($scope) use ($query) {
                 $scope->apply($query, $this->params);
             });
     }

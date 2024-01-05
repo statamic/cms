@@ -330,6 +330,6 @@ abstract class Relationship extends Fieldtype
         collect(Arr::wrap($this->config('query_scopes')))
             ->map(fn ($handle) => Scope::find($handle))
             ->filter()
-            ->each(fn ($class) => app($class)->apply($query, $params));
+            ->each(fn ($scope) => $scope->apply($query, $params));
     }
 }

@@ -17,11 +17,25 @@ class ScopeRepository
 
     public function find($key, $context = [])
     {
-        if ($scope = app('statamic.scopes')->get($key)) {
-            if (! in_array($scope->handle(), $this->removed)) {
-                return app($scope)?->context($context);
-            }
+        if (in_array($key, $this->removed)) {
+            return;
         }
+
+        if (! $scope = app('statamic.scopes')->get($key)) {
+            return;
+        }
+
+        $scope = app($scope);
+
+        if (! $scope) {
+            return;
+        }
+
+        if (! method_exists($scope, 'context')) {
+            return $scope;
+        }
+
+        return $scope->context($context);
     }
 
     public function filters($key, $context = [])
