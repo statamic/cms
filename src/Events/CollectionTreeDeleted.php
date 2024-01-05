@@ -3,12 +3,9 @@
 namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
-use Statamic\Events\Concerns\TracksAuthenticatedUser;
 
 class CollectionTreeDeleted extends Event implements ProvidesCommitMessage
 {
-    use TracksAuthenticatedUser;
-
     public $tree;
 
     public function __construct($tree)

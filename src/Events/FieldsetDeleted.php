@@ -3,12 +3,9 @@
 namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
-use Statamic\Events\Concerns\TracksAuthenticatedUser;
 
 class FieldsetDeleted extends Event implements ProvidesCommitMessage
 {
-    use TracksAuthenticatedUser;
-
     public $fieldset;
 
     public function __construct($fieldset)

@@ -4,18 +4,17 @@ namespace Statamic\Events;
 
 use Facades\Statamic\Entries\InitiatorStack;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
-use Statamic\Events\Concerns\TracksAuthenticatedUser;
 
 class EntrySaved extends Event implements ProvidesCommitMessage
 {
-    use TracksAuthenticatedUser;
-
     public $entry;
+    public $currentUser;
     public $initiator;
 
     public function __construct($entry, $currentUser = null)
     {
         $this->entry = $entry;
+        $this->currentUser = $currentUser;
         $this->initiator = InitiatorStack::entry($entry)->initiator();
     }
 

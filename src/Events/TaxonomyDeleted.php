@@ -3,12 +3,9 @@
 namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
-use Statamic\Events\Concerns\TracksAuthenticatedUser;
 
 class TaxonomyDeleted extends Event implements ProvidesCommitMessage
 {
-    use TracksAuthenticatedUser;
-
     public $taxonomy;
 
     public function __construct($taxonomy)
