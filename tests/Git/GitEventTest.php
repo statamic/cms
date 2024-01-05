@@ -22,8 +22,6 @@ class GitEventTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public $user;
-
     public function setUp(): void
     {
         parent::setUp();
