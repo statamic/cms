@@ -27,7 +27,7 @@
             >
                 <h6 class="revision-date" v-text="
                     $moment.unix(group.day).isBefore($moment().startOf('day'))
-                        ? $moment.unix(group.day).toDate().toLocaleDateString($config.get('locale'), { month: 'long', day: 'numeric', year: 'numeric' })
+                        ? $moment.unix(group.day).toDate().toLocaleDateString($config.get('locale').replace('_', '-'), { month: 'long', day: 'numeric', year: 'numeric' })
                         : __('Today')" />
                 <div class="revision-list">
                     <revision

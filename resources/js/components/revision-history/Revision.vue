@@ -16,7 +16,7 @@
                 <div class="flex-1">
                     <div class="revision-author text-gray-700 text-2xs">
                         <template v-if="revision.user">{{ revision.user.name || revision.user.email }} &ndash;</template>
-                        {{ date.toDate().toLocaleTimeString($config.get('locale'), { hour: 'numeric', minute: '2-digit' }) }}
+                        {{ date.toDate().toLocaleTimeString($config.get('locale').replace('_', '-'), { hour: 'numeric', minute: '2-digit' }) }}
                     </div>
                 </div>
 
