@@ -11,10 +11,10 @@ trait TracksAuthenticatedUser
 
     public static function dispatch()
     {
-        $event = parent::dispatch();
+        $event = new static(...func_get_args());
 
         $event->authenticatedUser = User::current();
 
-        return $event;
+        return event($event);
     }
 }
