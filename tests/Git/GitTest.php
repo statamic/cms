@@ -171,18 +171,30 @@ EOT;
         $this->assertEquals('Spock', Git::gitUserName());
         $this->assertEquals('spock@example.com', Git::gitUserEmail());
 
-        $user = User::make()
-            ->email('chew@bacca.com')
-            ->data(['name' => 'Chewy'])
+        $this->actingAs(
+            User::make()
+                ->email('chew@bacca.com')
+                ->data(['name' => 'Chewy'])
+                ->makeSuper()
+        );
+
+        $this->assertEquals('Chewy', Git::gitUserName());
+        $this->assertEquals('chew@bacca.com', Git::gitUserEmail());
+
+        $han = User::make()
+            ->email('han@solo.com')
+            ->data(['name' => 'Han Solo'])
             ->makeSuper();
 
-        $this->assertEquals('Chewy', Git::gitUserName($user));
-        $this->assertEquals('chew@bacca.com', Git::gitUserEmail($user));
+        Git::as($han);
+
+        $this->assertEquals('Han Solo', Git::gitUserName());
+        $this->assertEquals('han@solo.com', Git::gitUserEmail());
 
         Config::set('statamic.git.use_authenticated', false);
 
-        $this->assertEquals('Spock', Git::gitUserName($user));
-        $this->assertEquals('spock@example.com', Git::gitUserEmail($user));
+        $this->assertEquals('Spock', Git::gitUserName());
+        $this->assertEquals('spock@example.com', Git::gitUserEmail());
     }
 
     /** @test */

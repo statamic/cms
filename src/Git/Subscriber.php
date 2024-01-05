@@ -6,7 +6,6 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Events\Concerns\ListensForContentEvents;
 use Statamic\Events\Subscriber as StatamicSubscriber;
 use Statamic\Facades\Git;
-use Statamic\Facades\User;
 
 class Subscriber extends StatamicSubscriber
 {
@@ -37,11 +36,10 @@ class Subscriber extends StatamicSubscriber
             return;
         }
 
-        Git::dispatchCommit(
-            message: $event instanceof ProvidesCommitMessage
+        Git::as($event->authenticatedUser)->dispatchCommit(
+            $event instanceof ProvidesCommitMessage
                 ? $event->commitMessage()
-                : null,
-            committer: $event->authenticatedUser ?? User::current(),
+                : null
         );
     }
 

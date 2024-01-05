@@ -24,6 +24,6 @@ class CommitJob implements ShouldQueue
      */
     public function handle()
     {
-        Git::commit($this->message, $this->committer);
+        Git::as($this->committer)->commit($this->message);
     }
 }

@@ -4,6 +4,7 @@ namespace Statamic\Git;
 
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Processes\Git as GitProcess;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Path;
 use Statamic\Facades\User;
@@ -11,6 +12,8 @@ use Statamic\Support\Str;
 
 class Git
 {
+    private ?UserContract $authenticatedUser;
+
     /**
      * Instantiate git tracked content manager.
      */
@@ -54,27 +57,34 @@ class Git
         return $statuses->isNotEmpty() ? $statuses : null;
     }
 
+    public function as($user)
+    {
+        $this->authenticatedUser = $user;
+
+        return $this;
+    }
+
     /**
      * Git add and commit all tracked content, using configured commands.
      */
-    public function commit($message = null, $committer = null)
+    public function commit($message = null)
     {
-        $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) use ($message, $committer) {
-            $this->runConfiguredCommands($gitRoot, $paths, $message ?? __('Content saved'), $committer);
+        $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) use ($message) {
+            $this->runConfiguredCommands($gitRoot, $paths, $message ?? __('Content saved'));
         });
     }
 
     /**
      * Dispatch commit job to queue.
      */
-    public function dispatchCommit($message = null, $committer = null)
+    public function dispatchCommit($message = null)
     {
         if ($delay = config('statamic.git.dispatch_delay')) {
             $delayInMinutes = now()->addMinutes($delay);
             $message = null;
         }
 
-        CommitJob::dispatch($message, $committer)
+        CommitJob::dispatch($message, $this->authenticatedUser())
             ->onConnection(config('statamic.git.queue_connection'))
             ->delay($delayInMinutes ?? null);
     }
@@ -82,10 +92,9 @@ class Git
     /**
      * Get git user name.
      *
-     * @param  \Statamic\Contracts\Auth\User|null  $committer
      * @return string
      */
-    public function gitUserName($committer = null)
+    public function gitUserName()
     {
         $default = config('statamic.git.user.name');
 
@@ -93,16 +102,15 @@ class Git
             return $default;
         }
 
-        return $committer?->name() ?? $default;
+        return $this->authenticatedUser()?->name() ?? $default;
     }
 
     /**
      * Get git user email.
      *
-     * @param  \Statamic\Contracts\Auth\User|null  $committer
      * @return string
      */
-    public function gitUserEmail($committer = null)
+    public function gitUserEmail()
     {
         $default = config('statamic.git.user.email');
 
@@ -110,7 +118,12 @@ class Git
             return $default;
         }
 
-        return $committer?->email() ?? $default;
+        return $this->authenticatedUser()?->email() ?? $default;
+    }
+
+    private function authenticatedUser(): ?UserContract
+    {
+        return $this->authenticatedUser ?? User::current();
     }
 
     /**
@@ -200,9 +213,9 @@ class Git
      * @param  mixed  $paths
      * @param  mixed  $message
      */
-    protected function runConfiguredCommands($gitRoot, $paths, $message, $committer = null)
+    protected function runConfiguredCommands($gitRoot, $paths, $message)
     {
-        $this->getParsedCommands($paths, $message, $committer)->each(function ($command) use ($gitRoot) {
+        $this->getParsedCommands($paths, $message)->each(function ($command) use ($gitRoot) {
             GitProcess::create($gitRoot)->run($command);
         });
 
@@ -217,9 +230,9 @@ class Git
      * @param  mixed  $paths
      * @param  mixed  $message
      */
-    protected function getParsedCommands($paths, $message, $committer = null)
+    protected function getParsedCommands($paths, $message)
     {
-        $context = $this->getCommandContext($paths, $message, $committer);
+        $context = $this->getCommandContext($paths, $message);
 
         return collect(config('statamic.git.commands'))->map(function ($command) use ($context) {
             return Antlers::parse($command, $context);
@@ -233,13 +246,13 @@ class Git
      * @param  string  $message
      * @return array
      */
-    protected function getCommandContext($paths, $message, $committer = null)
+    protected function getCommandContext($paths, $message)
     {
         return [
             'paths' => collect($paths)->implode(' '),
             'message' => $this->shellEscape($message),
-            'name' => $this->shellEscape($this->gitUserName($committer)),
-            'email' => $this->shellEscape($this->gitUserEmail($committer)),
+            'name' => $this->shellEscape($this->gitUserName()),
+            'email' => $this->shellEscape($this->gitUserEmail()),
         ];
     }
 
