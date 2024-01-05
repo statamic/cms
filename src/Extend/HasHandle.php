@@ -18,8 +18,11 @@ trait HasHandle
         $reflection = (new ReflectionClass(static::class));
 
         $class = $reflection->getShortName();
-        if (! Str::startsWith($reflection->getNamespaceName(), 'Statamic\\')) {
-            $class = $reflection->getName();
+
+        if (app()->environment() !== 'testing') {
+            if (! Str::startsWith($reflection->getNamespaceName(), 'Statamic\\')) {
+                $class = $reflection->getName();
+            }
         }
 
         return snake_case($class);
