@@ -57,11 +57,16 @@ class Git
         return $statuses->isNotEmpty() ? $statuses : null;
     }
 
-    public function as($user)
+    /**
+     * Act as a specific user.
+     */
+    public function as(?UserContract $user): static
     {
-        $this->authenticatedUser = $user;
+        $clone = clone $this;
 
-        return $this;
+        $clone->authenticatedUser = $user;
+
+        return $clone;
     }
 
     /**
