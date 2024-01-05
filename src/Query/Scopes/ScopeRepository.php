@@ -4,10 +4,13 @@ namespace Statamic\Query\Scopes;
 
 class ScopeRepository
 {
+    private $removed = [];
+
     public function all()
     {
         return app('statamic.scopes')
             ->map(fn ($class) => app($class))
+            ->reject(fn ($class) => in_array($class->handle(), $this->removed))
             ->filter()
             ->values();
     }
@@ -15,7 +18,9 @@ class ScopeRepository
     public function find($key, $context = [])
     {
         if ($scope = app('statamic.scopes')->get($key)) {
-            return app($scope)?->context($context);
+            if (! in_array($scope->handle(), $this->removed)) {
+                return app($scope)?->context($context);
+            }
         }
     }
 
@@ -26,5 +31,11 @@ class ScopeRepository
             ->each->context($context)
             ->filter->visibleTo($key)
             ->values();
+    }
+
+    public function remove(string $handle)
+    {
+        $this->removed[] = $handle;
+
     }
 }
