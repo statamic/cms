@@ -14,6 +14,10 @@ trait RendersHttpExceptions
             return response()->view('statamic::errors.'.$this->getStatusCode(), [], $this->getStatusCode());
         }
 
+        if (Statamic::isApiRoute()) {
+            return response()->json(['message' => $this->getApiMessage()], $this->getStatusCode());
+        }
+
         if (view()->exists('errors.'.$this->getStatusCode())) {
             return response($this->contents(), $this->getStatusCode());
         }
