@@ -21,6 +21,7 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetDeleting;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
@@ -618,6 +619,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function delete()
     {
+        if (AssetDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->disk()->delete($this->path());
         $this->disk()->delete($this->metaPath());
 

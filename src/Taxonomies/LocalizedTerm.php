@@ -416,6 +416,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
     //     ])->all();
     // }
 
+    public function saveQuietly()
+    {
+        return $this->term->saveQuietly();
+    }
+
     public function save()
     {
         return $this->term->save();

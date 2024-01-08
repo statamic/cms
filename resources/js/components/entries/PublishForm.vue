@@ -565,9 +565,10 @@ export default {
                 .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
-                        this.trackDirtyState = false;
+                        clearTimeout(this.trackDirtyStateTimeout)
+                        this.trackDirtyState = false
                         this.values = this.resetValuesFromResponse(response.data.data.values);
-                        this.nextTick(() => this.trackDirtyState = true);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350)
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
@@ -588,9 +589,10 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
+                        clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
-                        this.nextTick(() => this.trackDirtyState = true);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
@@ -671,6 +673,7 @@ export default {
                 this.site = localization.handle;
                 this.localizing = false;
                 this.initialPublished = data.values.published;
+                this.readOnly = data.readOnly;
 
                 this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
             })

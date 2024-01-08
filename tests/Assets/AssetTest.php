@@ -18,6 +18,7 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Assets\PendingMeta;
 use Statamic\Assets\ReplacementFile;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetDeleting;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
@@ -2324,5 +2325,44 @@ YAML;
         $mock = \Mockery::mock($fake)->makePartial();
         $mock->shouldReceive('forgetListener');
         Event::swap($mock);
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\AssetContainer::shouldReceive('find')->with('test')->andReturn($container);
+
+        Storage::disk('test')->put('foo/test.txt', '');
+        $asset = (new Asset)->container('test')->path('foo/test.txt');
+
+        $asset->delete();
+
+        Event::assertDispatched(AssetDeleting::class, function ($event) use ($asset) {
+            return $event->asset === $asset;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Asset::spy();
+        Event::fake([AssetDeleted::class]);
+
+        Event::listen(AssetDeleting::class, function () {
+            return false;
+        });
+
+        Storage::disk('test')->put('foo/test.txt', '');
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        $return = $asset->delete();
+
+        $this->assertFalse($return);
+        Facades\Asset::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(AssetDeleted::class);
     }
 }
