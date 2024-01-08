@@ -573,6 +573,17 @@ export default {
                         return;
                     }
 
+                    // When saving an entry in a stack & that same entry is being edited in another publish
+                    // form, we need to update its values too.
+                    if (! this.isBase) {
+                        Object.entries(this.$store.state.publish)
+                            .filter(([key, value]) => key !== this.publishContainer)
+                            .filter(([key, value]) => value.values.id === this.values.id)
+                            .forEach(([key, value]) => {
+                                this.$store.commit(`publish/${key}/setValues`, response.data.data.values)
+                            })
+                    }
+
                     let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
                     // If the user has opted to create another entry, redirect them to create page.
