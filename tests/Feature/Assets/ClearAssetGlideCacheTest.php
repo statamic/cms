@@ -23,7 +23,7 @@ class ClearAssetGlideCacheTest extends TestCase
         $events->shouldReceive('listen')->with(AssetDeleted::class, [ClearAssetGlideCache::class, 'handleDeleted'])->once();
         $events->shouldReceive('listen')->with(AssetSaved::class, [ClearAssetGlideCache::class, 'handleSaved'])->once();
 
-        (new ClearAssetGlideCache(app(PresetGenerator::class)))->subscribe($events);
+        app(ClearAssetGlideCache::class)->subscribe($events);
     }
 
     /** @test */
@@ -32,7 +32,7 @@ class ClearAssetGlideCacheTest extends TestCase
         $asset = Mockery::mock(Asset::class);
         Glide::shouldReceive('clearAsset')->with($asset)->once();
 
-        (new ClearAssetGlideCache(app(PresetGenerator::class)))->handleDeleted(new AssetDeleted($asset));
+        app(ClearAssetGlideCache::class)->handleDeleted(new AssetDeleted($asset));
     }
 
     /** @test */
@@ -41,7 +41,7 @@ class ClearAssetGlideCacheTest extends TestCase
         $asset = Mockery::mock(Asset::class);
         Glide::shouldReceive('clearAsset')->with($asset)->once();
 
-        (new ClearAssetGlideCache(app(PresetGenerator::class)))->handleReuploaded(new AssetReuploaded($asset));
+        app(ClearAssetGlideCache::class)->handleReuploaded(new AssetReuploaded($asset));
     }
 
     /** @test */
@@ -55,7 +55,7 @@ class ClearAssetGlideCacheTest extends TestCase
         Glide::shouldReceive('clearAsset')->with($asset)->once()->globally()->ordered();
         $this->mock(PresetGenerator::class)->shouldReceive('generate')->withArgs(fn ($arg1) => $arg1->id() === $asset->id())->once()->globally()->ordered();
 
-        (new ClearAssetGlideCache(app(PresetGenerator::class)))->handleSaved(new AssetSaved($asset));
+        app(ClearAssetGlideCache::class)->handleSaved(new AssetSaved($asset));
     }
 
     /** @test */
@@ -69,7 +69,7 @@ class ClearAssetGlideCacheTest extends TestCase
         Glide::shouldReceive('clearAsset')->with($asset)->once()->globally()->ordered();
         $this->mock(PresetGenerator::class)->shouldReceive('generate')->withArgs(fn ($arg1) => $arg1->id() === $asset->id())->once()->globally()->ordered();
 
-        (new ClearAssetGlideCache(app(PresetGenerator::class)))->handleSaved(new AssetSaved($asset));
+        app(ClearAssetGlideCache::class)->handleSaved(new AssetSaved($asset));
     }
 
     /** @test */
@@ -82,7 +82,7 @@ class ClearAssetGlideCacheTest extends TestCase
         Glide::shouldReceive('clearAsset')->with($asset)->never()->globally()->ordered();
         $this->mock(PresetGenerator::class)->shouldNotHaveReceived('generate');
 
-        (new ClearAssetGlideCache(app(PresetGenerator::class)))->handleSaved(new AssetSaved($asset));
+        app(ClearAssetGlideCache::class)->handleSaved(new AssetSaved($asset));
     }
 
     /** @test */
@@ -96,6 +96,6 @@ class ClearAssetGlideCacheTest extends TestCase
         Glide::shouldReceive('clearAsset')->with($asset)->once()->globally()->ordered();
         $this->mock(PresetGenerator::class)->shouldReceive('generate')->withArgs(fn ($arg1) => $arg1->id() === $asset->id())->once()->globally()->ordered();
 
-        (new ClearAssetGlideCache(app(PresetGenerator::class)))->handleSaved(new AssetSaved($asset));
+        app(ClearAssetGlideCache::class)->handleSaved(new AssetSaved($asset));
     }
 }
