@@ -15,9 +15,9 @@
 @endforeach
 
 <script>
-var StatamicConfig = @json(array_merge(Statamic::jsonVariables(request()), [
+var StatamicConfig = {!! json_encode(array_merge(Statamic::jsonVariables(request()), [
     'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl')
-]))
+])) !!}
 </script>
 
 {{-- Deferred to allow Vite modules to load first --}}
