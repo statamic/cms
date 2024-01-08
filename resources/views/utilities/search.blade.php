@@ -14,7 +14,7 @@
             <form method="POST" action="{{ cp_route('utilities.search', 'all') }}">
                 @csrf
                 @foreach (\Statamic\Facades\Search::indexes() as $index)
-                    <input type="hidden" name="indexes[]" value="{{ $index->name() }}">
+                    <input type="hidden" name="indexes[]" value="{{ $index->name() }}::{{ $index->locale() }}">
                 @endforeach
                 <button class="btn-primary">{{ __('Update All') }}</button>
             </form>
@@ -71,7 +71,7 @@
                         <td class="text-right">
                             <form method="POST" action="{{ cp_route('utilities.search') }}">
                                 @csrf
-                                <input type="hidden" name="indexes[]" value="{{ $index->name() }}">
+                                <input type="hidden" name="indexes[]" value="{{ $index->name() }}::{{ $index->locale() }}">
                                 <button type="submit" class="btn btn-xs">{{ __('Update') }}</button>
                             </form>
                         </td>

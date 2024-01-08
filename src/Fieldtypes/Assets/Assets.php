@@ -54,6 +54,7 @@ class Assets extends Fieldtype
                         'type' => 'asset_container',
                         'max_items' => 1,
                         'mode' => 'select',
+                        'required' => true,
                         'default' => AssetContainer::all()->count() == 1 ? AssetContainer::all()->first()->handle() : null,
                     ],
                     'folder' => [
@@ -90,6 +91,11 @@ class Assets extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.assets.config.show_set_alt'),
                         'type' => 'toggle',
                         'default' => true,
+                    ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.query_scopes'),
+                        'type' => 'taggable',
                     ],
                 ],
             ],

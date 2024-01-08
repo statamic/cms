@@ -14,7 +14,9 @@ use Statamic\CP\Columns;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\BlueprintCreated;
+use Statamic\Events\BlueprintCreating;
 use Statamic\Events\BlueprintDeleted;
+use Statamic\Events\BlueprintDeleting;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
 use Statamic\Exceptions\DuplicateFieldException;
@@ -256,7 +258,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
                 $field = $allFields->get($importKey);
                 $tab = $field['tab'];
                 $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'])->keyBy(function ($field) {
-                    return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
+                    return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
                 });
                 $importedConfig = $importedField['field']->config();
                 $config = array_merge($config, $importedConfig);
@@ -429,6 +431,10 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && BlueprintCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (BlueprintSaving::dispatch($this) === false) {
                 return false;
             }
@@ -453,6 +459,10 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function delete()
     {
+        if (BlueprintDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         BlueprintRepository::delete($this);
 
         BlueprintDeleted::dispatch($this);

@@ -3,10 +3,11 @@
 namespace Statamic\Modifiers;
 
 use ArrayAccess;
-use Carbon\Carbon;
+use Carbon\CarbonInterface as Carbon;
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -1794,11 +1795,11 @@ class CoreModifiers extends Modifier
      *
      * @return void
      */
-    public function ray($value)
+    public function ray($value, $params)
     {
         throw_unless(function_exists('ray'), new \Exception('Ray is not installed. Run `composer require spatie/laravel-ray --dev`'));
 
-        ray($value);
+        ray($value)->color(Arr::get($params, 0, 'gray'));
 
         return $value;
     }
@@ -3008,7 +3009,7 @@ class CoreModifiers extends Modifier
     private function carbon($value)
     {
         if (! $value instanceof Carbon) {
-            $value = (is_numeric($value)) ? Carbon::createFromTimestamp($value) : Carbon::parse($value);
+            $value = (is_numeric($value)) ? Date::createFromTimestamp($value) : Date::parse($value);
         }
 
         return $value;

@@ -18,6 +18,7 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Assets\PendingMeta;
 use Statamic\Assets\ReplacementFile;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetDeleting;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
@@ -1706,7 +1707,6 @@ class AssetTest extends TestCase
             ['md'],  // not an image
             ['svg'], // doesn't work with imagick without extra server config
             ['pdf'], // doesn't work with imagick without extra server config
-            ['eps'], // doesn't work with imagick without extra server config
         ];
     }
 
@@ -1757,21 +1757,21 @@ class AssetTest extends TestCase
             'h' => '15',
         ]]);
 
-        // Normally eps files (for example) are not supported by gd or imagick. However, imagick does
+        // Normally pdf files (for example) are not supported by gd or imagick. However, imagick does
         // does actually support over 100 formats with extra configuration (eg. via ghostscript).
         // Thus, we allow the user to configure additional extensions in their assets config.
         config(['statamic.assets.image_manipulation.additional_extensions' => [
-            'eps',
+            'pdf',
         ]]);
 
         $this->container->sourcePreset('small');
 
-        $asset = (new Asset)->container($this->container)->path('path/to/asset.eps')->syncOriginal();
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.pdf')->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
-        Storage::disk('test')->assertMissing('path/to/asset.eps');
+        Storage::disk('test')->assertMissing('path/to/asset.pdf');
 
-        $file = UploadedFile::fake()->image('asset.eps', 20, 30);
+        $file = UploadedFile::fake()->image('asset.pdf', 20, 30);
 
         // Ensure a glide server is instantiated and `makeImage()` is called...
         Facades\Glide::partialMock()
@@ -1793,8 +1793,8 @@ class AssetTest extends TestCase
         $this->assertEquals($asset, $return);
         $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
         $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
-        Storage::disk('test')->assertExists('path/to/asset.eps');
-        $this->assertEquals('path/to/asset.eps', $asset->path());
+        Storage::disk('test')->assertExists('path/to/asset.pdf');
+        $this->assertEquals('path/to/asset.pdf', $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
@@ -1802,7 +1802,7 @@ class AssetTest extends TestCase
         $meta = $asset->meta();
 
         // Normally we assert changes to the meta, but we cannot in this test because we can't guarantee
-        // the test suite has imagick with ghostscript installed (required for eps files, for example).
+        // the test suite has imagick with ghostscript installed (required for pdf files, for example).
         // $this->assertEquals(10, $meta['width']);
         // $this->assertEquals(15, $meta['height']);
     }
@@ -2325,5 +2325,44 @@ YAML;
         $mock = \Mockery::mock($fake)->makePartial();
         $mock->shouldReceive('forgetListener');
         Event::swap($mock);
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\AssetContainer::shouldReceive('find')->with('test')->andReturn($container);
+
+        Storage::disk('test')->put('foo/test.txt', '');
+        $asset = (new Asset)->container('test')->path('foo/test.txt');
+
+        $asset->delete();
+
+        Event::assertDispatched(AssetDeleting::class, function ($event) use ($asset) {
+            return $event->asset === $asset;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Asset::spy();
+        Event::fake([AssetDeleted::class]);
+
+        Event::listen(AssetDeleting::class, function () {
+            return false;
+        });
+
+        Storage::disk('test')->put('foo/test.txt', '');
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        $return = $asset->delete();
+
+        $this->assertFalse($return);
+        Facades\Asset::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(AssetDeleted::class);
     }
 }

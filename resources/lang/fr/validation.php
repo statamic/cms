@@ -136,6 +136,7 @@ return [
     'date_fieldtype_start_date_invalid' => 'Date de début invalide.',
     'date_fieldtype_end_date_required' => 'Date de fin obligatoire.',
     'date_fieldtype_end_date_invalid' => 'Date de fin invalide.',
+    'date_fieldtype_only_single_mode_allowed' => 'Vous ne pouvez utiliser le mode "Single" que lorsque l’identifiant est Date.',
     'code_fieldtype_rulers' => 'Les données saisies sont invalides.',
     'options_require_keys' => 'Toutes les options doivent posséder une clef.',
     'custom.attribute-name.rule-name' => 'message personnalisé',

@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
@@ -45,11 +46,13 @@ class Nav extends Structure
             $this->content = trim($this->content);
         }
 
-        $crumbs = $crumbs->values()->map(function ($crumb) {
-            $crumb->setSupplement('is_current', URL::getCurrent() === $crumb->urlWithoutRedirect());
+        $crumbs = $crumbs->values()
+            ->reject(fn ($crumb) => $crumb instanceof Taxonomy && ! view()->exists($crumb->template()))
+            ->map(function ($crumb) {
+                $crumb->setSupplement('is_current', URL::getCurrent() === $crumb->urlWithoutRedirect());
 
-            return $crumb;
-        });
+                return $crumb;
+            });
 
         if (! $this->parser) {
             return $crumbs;

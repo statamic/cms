@@ -14,7 +14,7 @@
                 v-text="item.title" />
 
 
-            <a v-if="!item.invalid && editable" @click="edit" v-text="item.title" class="truncate" v-tooltip="item.title" />
+            <a v-if="!item.invalid && editable" @click.prevent="edit" v-text="item.title" class="truncate" v-tooltip="item.title" :href="item.edit_url" />
 
             <div v-if="!item.invalid && !editable" v-text="item.title" />
 

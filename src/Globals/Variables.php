@@ -17,7 +17,9 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Events\GlobalVariablesCreated;
+use Statamic\Events\GlobalVariablesCreating;
 use Statamic\Events\GlobalVariablesDeleted;
+use Statamic\Events\GlobalVariablesDeleting;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Events\GlobalVariablesSaving;
 use Statamic\Facades;
@@ -127,6 +129,10 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && GlobalVariablesCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (GlobalVariablesSaving::dispatch($this) === false) {
                 return false;
             }
@@ -151,6 +157,10 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
 
     public function delete()
     {
+        if (GlobalVariablesDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\GlobalVariables::delete($this);
 
         GlobalVariablesDeleted::dispatch($this);
