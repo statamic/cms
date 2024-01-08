@@ -197,6 +197,21 @@ class TaxonomyTermsStore extends ChildStore
         }
     }
 
+    public function delete($term)
+    {
+        $this->deleteItemFromDisk($term);
+
+        foreach ($term->localizations() as $item) {
+            $key = $this->getItemKey($item);
+
+            $this->forgetItem($key);
+
+            $this->forgetPath($key);
+
+            $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
+        }
+    }
+
     protected function getItemFromModifiedPath($path)
     {
         return parent::getItemFromModifiedPath($path)->localizations()->all();
