@@ -39,6 +39,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
 
     protected $locale;
     protected $term;
+    protected $withEvents = true;
 
     public function __construct($term, $locale)
     {
@@ -415,6 +416,13 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
     //         'entries_count' => $entryQuery->count(),
     //     ])->all();
     // }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
 
     public function save()
     {
