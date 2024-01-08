@@ -93,23 +93,9 @@ class TermRepository implements RepositoryContract
 
     public function save($term)
     {
-        $store = $this->store->store($term->taxonomyHandle());
-
-        if (($originalSlug = $term->getOriginal('slug')) && $originalSlug != $term->slug()) {
-            foreach ($term->localizations() as $item) {
-                $key = $item->locale().'::'.$originalSlug;
-                $store->forgetItem($key);
-                $store->resolveIndexes()->filter->isCached()->each->forgetItem($key);
-            }
-
-            // we need to call sync original here so the original values are saved to the stache
-            // otherwise the slug code above only works on the first slug change, not subsequent ones
-            // we clone it so as not to affect the original term passed to this function
-            $term = clone $term;
-            $term->syncOriginal();
-        }
-
-        $store->save($term);
+        $this->store
+            ->store($term->taxonomyHandle())
+            ->save($term);
     }
 
     public function delete($term)
