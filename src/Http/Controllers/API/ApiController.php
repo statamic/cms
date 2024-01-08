@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\ResourceAuthorizer;
-use Illuminate\Validation\ValidationException;
 use Statamic\Exceptions\ApiValidationException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
