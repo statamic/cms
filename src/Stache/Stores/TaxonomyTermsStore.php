@@ -185,7 +185,7 @@ class TaxonomyTermsStore extends ChildStore
         // Since we store terms by slug, if the slug changes it's technically
         // a completely new term, and we'll need to delete the existing one.
         if (($originalSlug = $term->getOriginal('slug')) && $originalSlug != $term->slug()) {
-            $existing = Term::find($term->taxonomyHandle().'::'.$term->getOriginal('slug'));
+            $existing = Term::find($term->taxonomyHandle().'::'.$originalSlug);
             $this->delete($existing->term());
         }
 
