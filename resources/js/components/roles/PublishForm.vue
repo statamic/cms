@@ -19,6 +19,7 @@
                     :instructions="__('messages.role_title_instructions')"
                     v-model="title"
                     :focus="true"
+                    autocomplete="off"
                 />
 
                 <form-group

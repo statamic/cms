@@ -21,7 +21,7 @@
                         </div>
                     </div>
                     <div>
-                        <input type="text" name="title" class="input-text" v-model="fieldset.title" autofocus="autofocus">
+                        <input type="text" name="title" class="input-text" v-model="fieldset.title" autofocus="autofocus" autocomplete="off">
                     </div>
                 </div>
             </div>

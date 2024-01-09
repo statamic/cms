@@ -239,6 +239,7 @@ class TaxonomiesController extends CpController
                     'title' => [
                         'type' => 'text',
                         'validate' => 'required',
+                        'autocomplete' => 'off',
                     ],
                 ],
             ],
@@ -292,6 +293,7 @@ class TaxonomiesController extends CpController
                                 'field' => [
                                     'display' => __('Label'),
                                     'type' => 'text',
+                                    'autocomplete' => 'off',
                                 ],
                             ],
                             [
@@ -299,6 +301,7 @@ class TaxonomiesController extends CpController
                                 'field' => [
                                     'display' => __('Format'),
                                     'type' => 'text',
+                                    'autocomplete' => 'off',
                                 ],
                             ],
                             [

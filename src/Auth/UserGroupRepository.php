@@ -18,7 +18,7 @@ abstract class UserGroupRepository implements RepositoryContract
     {
         $blueprint = Blueprint::find('user_group') ?? Blueprint::makeFromFields([])->setHandle('user_group');
 
-        $blueprint->ensureField('title', ['type' => 'text', 'display' => __('Title'), 'listable' => true, 'validate' => ['required'], 'instructions' => __('statamic::messages.user_groups_title_instructions')]);
+        $blueprint->ensureField('title', ['type' => 'text', 'display' => __('Title'), 'listable' => true, 'validate' => ['required'], 'instructions' => __('statamic::messages.user_groups_title_instructions'), 'autocomplete' => 'off']);
 
         $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'listable' => true, 'instructions' => __('statamic::messages.user_groups_role_instructions')]);
 

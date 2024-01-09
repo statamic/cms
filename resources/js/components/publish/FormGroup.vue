@@ -51,6 +51,10 @@ export default {
             type: Boolean
         },
 
+        autocomplete: {
+            type: String
+        },
+
         errors: {
             type: Array
         },
@@ -78,6 +82,7 @@ export default {
                 width: this.width,
                 focus: this.focus,
                 autoselect: this.autoselect,
+                autocomplete: this.autocomplete,
             };
         },
 

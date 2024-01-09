@@ -193,6 +193,7 @@ class GlobalsController extends CpController
                         'type' => 'text',
                         'instructions' => __('statamic::messages.globals_configure_title_instructions'),
                         'validate' => 'required',
+                        'autocomplete' => 'off',
                     ],
                 ],
             ],

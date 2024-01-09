@@ -324,6 +324,7 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_title_instructions'),
                         'type' => 'text',
                         'validate' => 'required',
+                        'autocomplete' => 'off',
                     ],
                 ],
             ],
@@ -527,6 +528,7 @@ class CollectionsController extends CpController
                                 'field' => [
                                     'display' => __('Label'),
                                     'type' => 'text',
+                                    'autocomplete' => 'off',
                                 ],
                             ],
                             [
@@ -534,6 +536,7 @@ class CollectionsController extends CpController
                                 'field' => [
                                     'display' => __('Format'),
                                     'type' => 'text',
+                                    'autocomplete' => 'off',
                                 ],
                             ],
                             [

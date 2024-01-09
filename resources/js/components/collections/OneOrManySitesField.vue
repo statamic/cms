@@ -24,6 +24,7 @@
                         <td>
                             <text-input
                                 class="slug-field"
+                                autocomplete="off"
                                 :value="value[site.handle]"
                                 @input="updateSiteValue(site.handle, $event)" />
                         </td>
@@ -33,7 +34,7 @@
         </div>
 
         <div v-if="!hasMultipleSites || !inMultipleMode">
-            <text-input :value="value" @input="update" class="slug-field" />
+            <text-input :value="value" @input="update" class="slug-field" autocomplete="off" />
         </div>
     </div>
 
