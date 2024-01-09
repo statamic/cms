@@ -1,5 +1,35 @@
 # Release Notes
 
+## 4.43.0 (2024-01-09)
+
+### What's new
+- Add deleting events. [#9227](https://github.com/statamic/cms/issues/9227) by @ryanmitchell
+- Add `saveQuietly` to `LocalizedTerm`. [#9278](https://github.com/statamic/cms/issues/9278) by @joshuablum
+- Presets are regenerated after updating focal point. [#9019](https://github.com/statamic/cms/issues/9019) by @duncanmcclean
+- Allow removal of scopes. [#9264](https://github.com/statamic/cms/issues/9264) by @ryanmitchell
+
+### What's fixed
+- Fix disabled save button when creating term inside term inside stack. [#9152](https://github.com/statamic/cms/issues/9152) by @duncanmcclean
+- Fix `metaPath` for root assets. [#9287](https://github.com/statamic/cms/issues/9287) by @duncanmcclean
+- Prevent corrupt submission file from causing errors. [#9282](https://github.com/statamic/cms/issues/9282) by @duncanmcclean
+- Clear selections when navigating pagination. [#9286](https://github.com/statamic/cms/issues/9286) by @duncanmcclean
+- Avoid custom exception handler for API requests. [#9275](https://github.com/statamic/cms/issues/9275) by @duncanmcclean
+- Fix usage of children tag with multisite and specified url. [#9280](https://github.com/statamic/cms/issues/9280) by @MedRochon
+- Fix mobile issues with Fieldset Listing & Field Settings stack. [#9250](https://github.com/statamic/cms/issues/9250) by @duncanmcclean
+- Prevent updating a term's slug resulting in two Stache terms. [#9260](https://github.com/statamic/cms/issues/9260) by @ryanmitchell
+- Change asset unlink icon. [#9204](https://github.com/statamic/cms/issues/9204) by @edalzell
+- Fix error from static caching invalidator when deleting entries. [#9191](https://github.com/statamic/cms/issues/9191) by @duncanmcclean
+- Throw 404 exception on Taxonomy Term Entries endpoint when term doesn't exist. [#9273](https://github.com/statamic/cms/issues/9273) by @duncanmcclean
+- Replace problematic JSON directive. [#9271](https://github.com/statamic/cms/issues/9271) by @JohnathonKoster
+- Use authenticated user in Git events even when queued. [#9225](https://github.com/statamic/cms/issues/9225) by @duncanmcclean
+- Fix "Update All" in search utility. [#9269](https://github.com/statamic/cms/issues/9269) by @duncanmcclean
+- Prevent users without "edit" permission editing navs. [#9265](https://github.com/statamic/cms/issues/9265) by @duncanmcclean
+- Localize revision dates. [#9266](https://github.com/statamic/cms/issues/9266) by @jasonvarga
+- Use the site locale when auto generating titles. [#9261](https://github.com/statamic/cms/issues/9261) by @ryanmitchell
+- Bump axios from 0.21.4 to 1.6.4 [#8974](https://github.com/statamic/cms/issues/8974) by @dependabot
+
+
+
 ## 4.42.1 (2024-01-04)
 
 ### What's fixed
