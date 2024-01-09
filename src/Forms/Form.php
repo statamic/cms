@@ -302,7 +302,7 @@ class Form implements Arrayable, Augmentable, FormContract
                 $data = YAML::parse(File::get($file));
             } catch (ParseException $e) {
                 $data = [];
-                Log::warning('Could not parse form submission data.', ['submission' => $file]);
+                Log::warning('Could not parse form submission file: '.$file);
             }
 
             return $this->makeSubmission()
