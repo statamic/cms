@@ -84,6 +84,7 @@ class CpServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\CP\Authorize::class,
             \Statamic\Http\Middleware\CP\Localize::class,
             \Statamic\Http\Middleware\CP\SelectedSite::class,
+            \Statamic\Http\Middleware\CP\AddHeaders::class,
             \Statamic\Http\Middleware\CP\BootPermissions::class,
             \Statamic\Http\Middleware\CP\BootPreferences::class,
             \Statamic\Http\Middleware\CP\BootUtilities::class,
