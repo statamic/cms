@@ -721,6 +721,16 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_meta_path()
+    {
+        $asset = (new Asset)->container($this->container)->path('test.txt');
+        $this->assertEquals('.meta/test.txt.yaml', $asset->metaPath());
+
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+        $this->assertEquals('foo/.meta/test.txt.yaml', $asset->metaPath());
+    }
+
+    /** @test */
     public function it_generates_meta_on_demand_if_it_doesnt_exist()
     {
         Storage::fake('test');

@@ -290,7 +290,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     {
         $path = dirname($this->path()).'/.meta/'.$this->basename().'.yaml';
 
-        return ltrim($path, '/');
+        return (string) Str::of($path)->replaceFirst('./', '')->ltrim('/');
     }
 
     protected function metaExists()
