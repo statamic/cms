@@ -48,4 +48,9 @@ trait RendersHttpExceptions
             return view()->exists($layout);
         });
     }
+
+    public function getApiMessage()
+    {
+        return $this->getMessage();
+    }
 }
