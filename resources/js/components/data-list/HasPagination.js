@@ -45,10 +45,12 @@ export default {
 
         selectPage(page) {
             this.page = page;
+            this.$events.$emit('clear-selections');
         },
 
         resetPage() {
             this.page = 1;
+            this.$events.$emit('clear-selections');
         },
 
     }
