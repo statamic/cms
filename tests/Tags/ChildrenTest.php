@@ -15,6 +15,8 @@ class ChildrenTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $collection;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -32,7 +34,7 @@ class ChildrenTest extends TestCase
 
     private function setUpEntries()
     {
-        $collection = tap(Collection::make('pages')->sites(['en', 'fr'])->routes('{slug}')->structureContents(['root' => false]))->save();
+        $this->collection = tap(Collection::make('pages')->sites(['en', 'fr'])->routes('{slug}')->structureContents(['root' => false]))->save();
 
         EntryFactory::collection('pages')->id('foo')->data([
             'title' => 'the foo entry',
@@ -50,13 +52,13 @@ class ChildrenTest extends TestCase
             'title' => 'the french bar entry',
         ])->create();
 
-        $collection->structure()->in('en')->tree([
+        $this->collection->structure()->in('en')->tree([
             ['entry' => 'foo', 'url' => '/foo', 'children' => [
                 ['entry' => 'bar', 'url' => '/foo/bar'],
             ]],
         ])->save();
 
-        $collection->structure()->in('fr')->tree([
+        $this->collection->structure()->in('fr')->tree([
             ['entry' => 'fr-foo', 'url' => '/fr-foo', 'children' => [
                 ['entry' => 'fr-bar', 'url' => '/fr-foo/fr-bar'],
             ]],
@@ -67,10 +69,9 @@ class ChildrenTest extends TestCase
     public function it_gets_children_data()
     {
         $this->setUpEntries();
-
         $this->get('/foo');
 
-        $this->assertEquals('the bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}'));
+        $this->assertEquals('the bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}', ['collection' => $this->collection]));
     }
 
     /** @test */
@@ -80,7 +81,7 @@ class ChildrenTest extends TestCase
 
         $this->get('/fr/fr-foo');
 
-        $this->assertEquals('the french bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}'));
+        $this->assertEquals('the french bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}', ['collection' => $this->collection]));
     }
 
     /** @test */
@@ -96,6 +97,5 @@ class ChildrenTest extends TestCase
         $this->get('/foo');
 
         $this->assertEquals('the bar entry', $this->tag('{{ nav }}{{ children }}{{ title }}{{ /children }}{{ /nav }}'));
-
     }
 }

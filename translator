@@ -76,6 +76,7 @@ $additionalKeys = [
         'float.title',
         'form.title',
         'grid.title',
+        'group.title',
         'hidden.title',
         'html.title',
         'icon.title',

@@ -1,5 +1,92 @@
 # Release Notes
 
+## 4.43.0 (2024-01-09)
+
+### What's new
+- Add deleting events. [#9227](https://github.com/statamic/cms/issues/9227) by @ryanmitchell
+- Add `saveQuietly` to `LocalizedTerm`. [#9278](https://github.com/statamic/cms/issues/9278) by @joshuablum
+- Presets are regenerated after updating focal point. [#9019](https://github.com/statamic/cms/issues/9019) by @duncanmcclean
+- Allow removal of scopes. [#9264](https://github.com/statamic/cms/issues/9264) by @ryanmitchell
+
+### What's fixed
+- Fix disabled save button when creating term inside term inside stack. [#9152](https://github.com/statamic/cms/issues/9152) by @duncanmcclean
+- Fix `metaPath` for root assets. [#9287](https://github.com/statamic/cms/issues/9287) by @duncanmcclean
+- Prevent corrupt submission file from causing errors. [#9282](https://github.com/statamic/cms/issues/9282) by @duncanmcclean
+- Clear selections when navigating pagination. [#9286](https://github.com/statamic/cms/issues/9286) by @duncanmcclean
+- Avoid custom exception handler for API requests. [#9275](https://github.com/statamic/cms/issues/9275) by @duncanmcclean
+- Fix usage of children tag with multisite and specified url. [#9280](https://github.com/statamic/cms/issues/9280) by @MedRochon
+- Fix mobile issues with Fieldset Listing & Field Settings stack. [#9250](https://github.com/statamic/cms/issues/9250) by @duncanmcclean
+- Prevent updating a term's slug resulting in two Stache terms. [#9260](https://github.com/statamic/cms/issues/9260) by @ryanmitchell
+- Change asset unlink icon. [#9204](https://github.com/statamic/cms/issues/9204) by @edalzell
+- Fix error from static caching invalidator when deleting entries. [#9191](https://github.com/statamic/cms/issues/9191) by @duncanmcclean
+- Throw 404 exception on Taxonomy Term Entries endpoint when term doesn't exist. [#9273](https://github.com/statamic/cms/issues/9273) by @duncanmcclean
+- Replace problematic JSON directive. [#9271](https://github.com/statamic/cms/issues/9271) by @JohnathonKoster
+- Use authenticated user in Git events even when queued. [#9225](https://github.com/statamic/cms/issues/9225) by @duncanmcclean
+- Fix "Update All" in search utility. [#9269](https://github.com/statamic/cms/issues/9269) by @duncanmcclean
+- Prevent users without "edit" permission editing navs. [#9265](https://github.com/statamic/cms/issues/9265) by @duncanmcclean
+- Localize revision dates. [#9266](https://github.com/statamic/cms/issues/9266) by @jasonvarga
+- Use the site locale when auto generating titles. [#9261](https://github.com/statamic/cms/issues/9261) by @ryanmitchell
+- Bump axios from 0.21.4 to 1.6.4 [#8974](https://github.com/statamic/cms/issues/8974) by @dependabot
+
+
+
+## 4.42.1 (2024-01-04)
+
+### What's fixed
+- Ensure error message is displayed when uploading large file. [#9258](https://github.com/statamic/cms/issues/9258) by @duncanmcclean
+- Prevent Bard augmentation error after enabling "Save HTML" option. [#9198](https://github.com/statamic/cms/issues/9198) by @duncanmcclean
+- Avoid compiling certain user defined strings. [#9256](https://github.com/statamic/cms/issues/9256) by @jasonvarga
+- Fix an issue with short interpolated variables in Antlers. [#9253](https://github.com/statamic/cms/issues/9253) by @JohnathonKoster
+- Fix issue with AuthServiceProvider and Laravel Octane. [#9240](https://github.com/statamic/cms/issues/9240) by @nadinengland
+- Allow CP Nav to be created each request under Laravel Octane. [#9241](https://github.com/statamic/cms/issues/9241) by @nadinengland
+- Fix Link Fieldtype inside nested Bard. [#9252](https://github.com/statamic/cms/issues/9252) by @duncanmcclean
+- Clear permission cache when setting or removing permissions from a role. [#9244](https://github.com/statamic/cms/issues/9244) by @aerni
+- Bump tj-actions/changed-files from 36 to 41. [#9247](https://github.com/statamic/cms/issues/9247) by @dependabot
+
+
+
+## 4.42.0 (2023-12-18)
+
+### What's improved
+- Submission date now uses localized date format [#9215](https://github.com/statamic/cms/issues/9215) by @mmodler
+- French translations [#9218](https://github.com/statamic/cms/issues/9218) by @ebeauchamps
+
+### What's fixed
+- Fix nested JSON field handles not passing validation [#9217](https://github.com/statamic/cms/issues/9217) by @caseydwyer
+- Fix null values not being filtered on front-end forms [#9212](https://github.com/statamic/cms/issues/9212) by @ryanmitchell
+- Fix `{{ children }}` tag for collections other than Pages [#9210](https://github.com/statamic/cms/issues/9210) by @MedRochon
+- Use `setTimeout` to fix dirty state issue [#9213](https://github.com/statamic/cms/issues/9213) by @duncanmcclean
+
+
+
+## 4.41.0 (2023-12-14)
+
+### What's new
+- Ability to configure templates & layouts for taxonomies [#8372](https://github.com/statamic/cms/issues/8372) by @ryanmitchell
+- Add `query_scopes` option to the Assets fieldtype [#8459](https://github.com/statamic/cms/issues/8459) by @jacksleight
+
+### What's improved
+- Entries and terms are now provided lazily in search [#9171](https://github.com/statamic/cms/issues/9171) by @ryanmitchell
+- When an entry has an origin, the mount will now be fetched from the origin [#9063](https://github.com/statamic/cms/issues/9063) by @ryanmitchell
+
+### What's fixed
+- Fix dirty state issue on the entry publish form [#9203](https://github.com/statamic/cms/issues/9203) by @vluijkx
+- Fix error when a navigation's tree file is missing [#9032](https://github.com/statamic/cms/issues/9032) by @duncanmcclean
+- Asset field now supports mixed permissions [#9156](https://github.com/statamic/cms/issues/9156) by @edalzell
+- Prevent precognitive validation on asset fields [#9170](https://github.com/statamic/cms/issues/9170) by @ryanmitchell
+- Fix stack hover offset on close [#9201](https://github.com/statamic/cms/issues/9201) by @jacksleight
+- Prevent configuring multiple conditions for the same field [#9199](https://github.com/statamic/cms/issues/9199) by @duncanmcclean
+- Fix section showing without any visible fields [#9137](https://github.com/statamic/cms/issues/9137) by @aerni
+- Fix tabs showing without any visible fields [#9135](https://github.com/statamic/cms/issues/9135) by @edalzell
+- Fix template selector on Windows [#9197](https://github.com/statamic/cms/issues/9197) by @duncanmcclean
+- Fix previewing revisions via the Relationship Fieldtype [#9190](https://github.com/statamic/cms/issues/9190) by @duncanmcclean
+- Update the bug report template [#9195](https://github.com/statamic/cms/issues/9195) by @jelleroorda
+- Fix issue with meta being updated wrongly in Link Fieldtype [#9189](https://github.com/statamic/cms/issues/9189) by @duncanmcclean
+- Fix Read Only icon when viewing revisions [#9188](https://github.com/statamic/cms/issues/9188) by @duncanmcclean
+- Fix Global Set without a blueprint breaking the Fieldsets page [#9187](https://github.com/statamic/cms/issues/9187) by @duncanmcclean
+
+
+
 ## 4.40.0 (2023-12-11)
 
 ### What's new

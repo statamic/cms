@@ -5,6 +5,8 @@ namespace Tests\Fields;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
+use Statamic\Events\FieldsetDeleted;
+use Statamic\Events\FieldsetDeleting;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
 use Statamic\Facades\Blueprint;
@@ -523,5 +525,37 @@ class FieldsetTest extends TestCase
         $this->assertEquals($fieldset, $return);
 
         Event::assertNotDispatched(FieldsetSaved::class);
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $fieldset = (new Fieldset)->setHandle('test');
+
+        $fieldset->delete();
+
+        Event::assertDispatched(FieldsetDeleting::class, function ($event) use ($fieldset) {
+            return $event->fieldset === $fieldset;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        FieldsetRepository::spy();
+        Event::fake([FieldsetDeleted::class]);
+
+        Event::listen(FieldsetDeleting::class, function () {
+            return false;
+        });
+
+        $fieldset = (new Fieldset)->setHandle('test');
+        $return = $fieldset->delete();
+
+        $this->assertFalse($return);
+        FieldsetRepository::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(FieldsetDeleted::class);
     }
 }

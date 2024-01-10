@@ -1,6 +1,6 @@
 <template>
 
-    <div class="h-full overflow-auto bg-gray-300 h-full">
+    <div class="h-full bg-gray-300 h-full overflow-scroll">
 
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center ">
             <loading-graphic />

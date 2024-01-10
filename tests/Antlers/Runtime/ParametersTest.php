@@ -308,4 +308,30 @@ EOT;
 
         $this->assertSame('0:123', $this->renderString($template, [], true));
     }
+
+    public function test_short_tag_parameters_do_not_cause_collisions()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'test';
+
+            public function index()
+            {
+                return $this->params->get('param').':'.$this->params->get('param_two');
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ test param="{id}" param_two="{other:id}" }}
+EOT;
+
+        $result = $this->renderString($template, [
+            'id' => '123',
+            'other' => [
+                'id' => '456',
+            ],
+        ], true);
+
+        $this->assertSame('123:456', $result);
+    }
 }
