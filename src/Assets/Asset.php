@@ -4,6 +4,7 @@ namespace Statamic\Assets;
 
 use ArrayAccess;
 use Facades\Statamic\Assets\Attributes;
+use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -481,7 +482,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isImage()
     {
-        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp']);
+        return ImageValidator::isValidExtension($this->extension());
     }
 
     /**
