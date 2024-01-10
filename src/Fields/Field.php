@@ -166,7 +166,7 @@ class Field implements Arrayable
     {
         $display = Lang::has($key = 'validation.attributes.'.$this->handle())
             ? Lang::get($key)
-            : $this->display();
+            : __($this->display());
 
         return array_merge(
             [$this->handle() => $display],

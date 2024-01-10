@@ -3,8 +3,11 @@
 namespace Tests\Antlers\Runtime;
 
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Entries\Collection;
+use Statamic\Fields\Field;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Code;
 use Statamic\Fieldtypes\Select;
 use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
@@ -13,9 +16,14 @@ use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Statamic\View\Cascade;
 use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
 use Tests\Antlers\ParserTestCase;
+use Tests\FakesViews;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class ConditionLogicTest extends ParserTestCase
 {
+    use FakesViews;
+    use PreventSavingStacheItemsToDisk;
+
     public function test_negation_following_or_is_evaluated()
     {
         $template = '{{ if !first && first_row_headers || !first_row_headers }}yes{{ else }}no{{ /if }}';
@@ -768,5 +776,64 @@ EOT;
 EOT;
 
         $this->assertSame('No', $this->renderString($template));
+    }
+
+    public function test_arrayable_strings_inside_conditions_used_with_modifiers()
+    {
+        $code = new Code();
+        $field = new Field('code_field', [
+            'type' => 'code',
+            'antlers' => false,
+        ]);
+
+        $code->setField($field);
+        $value = new Value('Oh hai, mark.', 'code_field', $code);
+
+        $template = <<<'EOT'
+{{ partial:test :code="code_field" }}
+EOT;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('test', <<<'EOT'
+{{ if code | starts_with('<div>') }}
+Yes{{ else }}
+No{{ /if }}
+EOT
+
+        );
+
+        $this->assertSame('No', trim($this->renderString($template, ['code_field' => $value], true)));
+
+        $this->viewShouldReturnRaw('test', <<<'EOT'
+{{ if code | starts_with('Oh hai, mark.') }}
+Yes{{ else }}
+No{{ /if }}
+EOT
+
+        );
+
+        $this->assertSame('Yes', trim($this->renderString($template, ['code_field' => $value], true)));
+    }
+
+    public function test_conditions_with_objects_inside_interpolations_dont_trigger_string_errors()
+    {
+        $collection = Collection::make('blog')->routes('{slug}')->save();
+
+        $template = <<<'EOT'
+{{ if items | where('collection', {collection}) }}
+Yes
+{{ /if }}
+EOT;
+
+        $data = [
+            'items' => [
+                [
+                    'collection' => 'blog',
+                ],
+            ],
+            'collection' => $collection,
+        ];
+
+        $this->assertSame('Yes', trim($this->renderString($template, $data, true)));
     }
 }

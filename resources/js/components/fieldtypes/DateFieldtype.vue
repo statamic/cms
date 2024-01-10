@@ -167,7 +167,7 @@ export default {
 
             let preview = Vue.moment(this.value.date).format(this.displayFormat);
 
-            if (this.hasTime) {
+            if (this.hasTime && this.value.time) {
                 preview += ` ${this.value.time}`;
             }
 
