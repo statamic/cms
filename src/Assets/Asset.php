@@ -225,6 +225,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return $this->metaValue($key);
         }
 
+        if (! $this->exists()) {
+            return $this->generateMeta();
+        }
+
         if (! config('statamic.assets.cache_meta')) {
             return $this->generateMeta();
         }
