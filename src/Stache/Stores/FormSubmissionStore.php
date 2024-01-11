@@ -37,7 +37,7 @@ class FormSubmissionStore extends ChildStore
         $handle = pathinfo($path, PATHINFO_FILENAME);
 
         try {
-            $data = YAML::parse(File::get($file));
+            $data = YAML::file($path)->parse($contents);
         } catch (ParseException $e) {
             $data = [];
             Log::warning('Could not parse form submission file: '.$file);
