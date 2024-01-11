@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Events\TaxonomyCreated;
 use Statamic\Events\TaxonomyCreating;
+use Statamic\Events\TaxonomyDeleted;
+use Statamic\Events\TaxonomyDeleting;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
@@ -469,5 +471,38 @@ class TaxonomyTest extends TestCase
             'through object' => [false],
             'through facade' => [true],
         ];
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Facades\Taxonomy::make('test'))->save();
+
+        $taxonomy->delete();
+
+        Event::assertDispatched(TaxonomyDeleting::class, function ($event) use ($taxonomy) {
+            return $event->taxonomy === $taxonomy;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Taxonomy::spy();
+        Event::fake([TaxonomyDeleted::class]);
+
+        Event::listen(TaxonomyDeleting::class, function () {
+            return false;
+        });
+
+        $taxonomy = new Taxonomy('test');
+
+        $return = $taxonomy->delete();
+
+        $this->assertFalse($return);
+        Facades\Taxonomy::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(TaxonomyDeleted::class);
     }
 }

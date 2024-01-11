@@ -45,7 +45,7 @@
                         </button>
 
                         <button @click="remove" class="btn btn-icon" :alt="__('Remove')">
-                            <svg-icon name="micro/sharp-trash" class="h-4 my-2" />
+                            <span class="text-lg antialiased w-4">×</span>
                         </button>
                     </div>
                 </div>

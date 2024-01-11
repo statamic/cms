@@ -21,6 +21,7 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetDeleting;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
@@ -224,6 +225,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return $this->metaValue($key);
         }
 
+        if (! $this->exists()) {
+            return $this->generateMeta();
+        }
+
         if (! config('statamic.assets.cache_meta')) {
             return $this->generateMeta();
         }
@@ -289,7 +294,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     {
         $path = dirname($this->path()).'/.meta/'.$this->basename().'.yaml';
 
-        return ltrim($path, '/');
+        return (string) Str::of($path)->replaceFirst('./', '')->ltrim('/');
     }
 
     protected function metaExists()
@@ -618,6 +623,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function delete()
     {
+        if (AssetDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->disk()->delete($this->path());
         $this->disk()->delete($this->metaPath());
 

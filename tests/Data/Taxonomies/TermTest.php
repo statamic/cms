@@ -8,6 +8,8 @@ use Mockery;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
 use Statamic\Events\TermCreating;
+use Statamic\Events\TermDeleted;
+use Statamic\Events\TermDeleting;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
 use Statamic\Facades;
@@ -350,5 +352,40 @@ class TermTest extends TestCase
         $return = $term->template('baz');
         $this->assertEquals($term, $return);
         $this->assertEquals('baz', $term->template());
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $term->delete();
+
+        Event::assertDispatched(TermDeleting::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Term::spy();
+        Event::fake([TermDeleted::class]);
+
+        Event::listen(TermDeleting::class, function () {
+            return false;
+        });
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $return = $term->delete();
+
+        $this->assertFalse($return);
+        Facades\Term::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(TermDeleted::class);
     }
 }

@@ -914,6 +914,12 @@ class DocumentParser
             $varContent = $this->interpolatedCollisions[$content];
         }
 
+        // Forcefully rotate the initial int_ to int0 to reduce the chance of string processing collisions.
+        if ($varContent == 'int_') {
+            $varContent = 'int0';
+            $this->interpolationRegions['int_'] = -1;
+        }
+
         $newLen = mb_strlen($varContent);
         $origLen = mb_strlen($content);
 

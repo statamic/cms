@@ -5,7 +5,7 @@
                 <div class="h-6 w-6 mr-2 text-gray-800">
                     @cp_svg('icons/light/drawer-file')
                 </div>
-                <span>{{ $title }}</span>
+                <span v-pre>{{ $title }}</span>
             </a>
         </h2>
     </div>
