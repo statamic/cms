@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\Collection;
-use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
@@ -25,10 +24,7 @@ class CollectionsStore extends BasicStore
 
     public function getItemFilter(SplFileInfo $file)
     {
-        $dir = str_finish($this->directory, '/');
-        $relative = str_after(Path::tidy($file->getPathname()), $dir);
-
-        return $file->getExtension() === 'yaml' && substr_count($relative, '/') === 0;
+        return $file->getExtension() === 'yaml';
     }
 
     public function makeItemFromFile($path, $contents)
