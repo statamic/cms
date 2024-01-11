@@ -73,7 +73,8 @@
 }
 
 /* Only top-level Bard fields should have a sticky header */
-.workspace .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
+.workspace .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar,
+.live-preview .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
     @apply sticky;
 }
 
@@ -109,6 +110,9 @@
 
     /*  Fixed toolbar inside a stack */
     .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }
+
+    /* We don't need the `top` when in Live Preview */
+    .live-preview .bard-fixed-toolbar { top: 0; }
 }
 
 .bard-floating-toolbar {

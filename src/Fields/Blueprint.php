@@ -16,6 +16,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Events\BlueprintCreated;
 use Statamic\Events\BlueprintCreating;
 use Statamic\Events\BlueprintDeleted;
+use Statamic\Events\BlueprintDeleting;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
 use Statamic\Exceptions\DuplicateFieldException;
@@ -458,6 +459,10 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function delete()
     {
+        if (BlueprintDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         BlueprintRepository::delete($this);
 
         BlueprintDeleted::dispatch($this);

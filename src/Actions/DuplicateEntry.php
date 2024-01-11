@@ -55,7 +55,7 @@ class DuplicateEntry extends Action
             ->each(fn ($original) => $this->duplicateEntry($original));
     }
 
-    private function duplicateEntry(Entry $original, string $origin = null)
+    private function duplicateEntry(Entry $original, ?string $origin = null)
     {
         $originalParent = $this->getEntryParentFromStructure($original);
         [$title, $slug] = $this->generateTitleAndSlug($original);

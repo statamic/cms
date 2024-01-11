@@ -13,6 +13,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionSaved;
 use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
@@ -678,7 +679,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
-    public function structureContents(array $contents = null)
+    public function structureContents(?array $contents = null)
     {
         return $this
             ->fluentlyGetOrSet('structureContents')
@@ -727,7 +728,18 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function delete()
     {
-        $this->queryEntries()->get()->each->delete();
+        if (CollectionDeleting::dispatch($this) === false) {
+            return false;
+        }
+
+        $this->queryEntries()->get()->each(function ($entry) {
+            $entry->deleteDescendants();
+            $entry->delete();
+        });
+
+        if ($this->hasStructure()) {
+            $this->structure()->trees()->each->delete();
+        }
 
         Facades\Collection::delete($this);
 
@@ -860,15 +872,9 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function augmentedArrayData()
     {
-        $data = [
+        return [
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
-
-        if (! Statamic::isApiRoute() && ! Statamic::isCpRoute()) {
-            $data['mount'] = $this->mount();
-        }
-
-        return $data;
     }
 }
