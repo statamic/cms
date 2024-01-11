@@ -163,6 +163,7 @@ class StaticWarm extends Command
             ->merge($this->taxonomyUris())
             ->merge($this->termUris())
             ->merge($this->customRouteUris())
+            ->merge($this->extraRouteUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
                 return $cacher->isExcluded($uri);
@@ -274,5 +275,28 @@ class StaticWarm extends Command
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Custom routes");
 
         return $routes;
+    }
+
+    protected function extraRouteUris(): Collection
+    {
+        $handler = config('statamic.static_caching.warm_extra_routes_generator', false);
+
+        if (! $handler || ! class_exists($handler)) {
+            return collect();
+        }
+
+        $this->line('[ ] Extra routes...');
+
+        $routes = (new $handler)->handle();
+
+        $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Extra routes");
+
+        if (! $routes instanceof Collection) {
+            return collect();
+        }
+
+        return $routes->map(function ($route) {
+            return URL::tidy(Str::start($route, config('app.url').'/'));
+        });
     }
 }
