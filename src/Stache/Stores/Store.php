@@ -293,7 +293,7 @@ abstract class Store
             return $this->paths = collect($paths);
         }
 
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this, $this->fileChangesAreRecursive);
 
         $fileItems = $files->map(function ($timestamp, $path) {
             return [
