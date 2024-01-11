@@ -12,7 +12,7 @@
         show-title
         action="{{ cp_route('blueprints.update', [$blueprint->namespace(), $blueprint->handle()]) }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
-        show-hidden="false"
+        :show-hidden="false"
     ></blueprint-builder>
 
     @include('statamic::partials.docs-callout', [
