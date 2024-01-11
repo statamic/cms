@@ -2,11 +2,13 @@
 
 namespace Statamic\Stache\Stores;
 
+use Illuminate\Support\Facades\Log;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Value;
+use Statamic\Yaml\ParseException;
 use Symfony\Component\Finder\SplFileInfo;
 
 class FormSubmissionStore extends ChildStore
@@ -33,7 +35,13 @@ class FormSubmissionStore extends ChildStore
     public function makeItemFromFile($path, $contents)
     {
         $handle = pathinfo($path, PATHINFO_FILENAME);
-        $data = YAML::file($path)->parse($contents);
+
+        try {
+            $data = YAML::parse(File::get($file));
+        } catch (ParseException $e) {
+            $data = [];
+            Log::warning('Could not parse form submission file: '.$file);
+        }
 
         $form = pathinfo($path, PATHINFO_DIRNAME);
         $form = str_after($form, $this->parent->directory());
