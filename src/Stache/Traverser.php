@@ -44,7 +44,7 @@ class Traverser
         return $files;
     }
 
-    public function traverse($store)
+    public function traverse($store, $recursiveFileChanges = true)
     {
         if (! $dir = $store->directory()) {
             throw new \Exception("Store [{$store->key()}] does not have a directory defined.");
@@ -56,7 +56,7 @@ class Traverser
             return collect();
         }
 
-        $files = collect($this->getFiles($dir, $store->getFileChangesAreRecursive()));
+        $files = collect($this->getFiles($dir, $recursiveFileChanges));
 
         if ($this->filter) {
             $files = $files->filter($this->filter);
