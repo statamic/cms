@@ -1,5 +1,24 @@
 # Release Notes
 
+## 4.44.0 (2024-01-11)
+
+### What's new
+- Support custom blueprint namespaces. [#8516](https://github.com/statamic/cms/issues/8516) by @ryanmitchell
+
+### What's improved
+- German translations. [#9295](https://github.com/statamic/cms/issues/9295) by @helloDanuk
+
+### What's fixed
+- Fix missing checkbox on tree view in the entries field type. [#9308](https://github.com/statamic/cms/issues/9308) by @duncanmcclean
+- Fix spacing around fullscreen button on Stacked Grid. [#9307](https://github.com/statamic/cms/issues/9307) by @duncanmcclean
+- Fix Asset browser firing 2 requests on initial Assets page load. [#8981](https://github.com/statamic/cms/issues/8981) by @modrictin
+- Use correct set_time_limit no limit value. [#9297](https://github.com/statamic/cms/issues/9297) by @robinvdvleuten
+- Fix Bard's sticky toolbar in Live Preview. [#9301](https://github.com/statamic/cms/issues/9301) by @duncanmcclean
+- Fix asset meta file not being deleted with asset. [#9300](https://github.com/statamic/cms/issues/9300) by @duncanmcclean
+- Fix creating entries with `JsonResource::withoutWrapping()`. [#9296](https://github.com/statamic/cms/issues/9296) by @duncanmcclean
+
+
+
 ## 4.43.0 (2024-01-09)
 
 ### What's new
