@@ -29,6 +29,11 @@ abstract class Store
     protected $modified;
     protected $keys;
 
+    public function getFileChangesAreRecursive()
+    {
+        return $this->fileChangesAreRecursive;
+    }
+
     public function directory($directory = null)
     {
         if (func_num_args() === 0) {
@@ -181,7 +186,7 @@ abstract class Store
         $existing = collect(Cache::get($cacheKey, []));
 
         // Get the files and timestamps from the filesystem right now.
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this, $this->fileChangesAreRecursive);
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         // Cache the files and timestamps, ready for comparisons on the next request.
         // We'll do it now since there are multiple early returns coming up.
@@ -293,7 +298,7 @@ abstract class Store
             return $this->paths = collect($paths);
         }
 
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this, $this->fileChangesAreRecursive);
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         $fileItems = $files->map(function ($timestamp, $path) {
             return [
