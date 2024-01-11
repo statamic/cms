@@ -108,10 +108,6 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function initialPath()
     {
-        if ($this->isNamespaced()) {
-            return $this->path();
-        }
-
         return $this->initialPath;
     }
 
