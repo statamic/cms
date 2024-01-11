@@ -34,7 +34,7 @@ class Traverser
         }
 
         foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isDot() || $fileInfo->isDir()) {
+            if ($fileInfo->isDir() || $fileInfo->getFilename()[0] === '.') {
                 continue;
             }
 
