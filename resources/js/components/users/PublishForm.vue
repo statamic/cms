@@ -157,12 +157,6 @@ export default {
 
     },
 
-    watch: {
-        title() {
-            console.log(this.title);
-        },
-    },
-
     mounted() {
         this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
