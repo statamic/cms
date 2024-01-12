@@ -276,7 +276,7 @@ class Entries
             return;
         }
 
-        return $query->where('status', 'published');
+        return $query->where('published', true);
     }
 
     protected function queryPastFuture($query)
