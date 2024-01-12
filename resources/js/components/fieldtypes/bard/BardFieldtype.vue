@@ -103,6 +103,7 @@
 import uniqid from 'uniqid';
 import reduce from 'underscore/modules/reduce';
 import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';
+import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
@@ -688,9 +689,21 @@ export default {
                     },
                 }));
             }
+           
+            // Allow passthrough of Ctrl/Cmd + Enter to submit the form 
+            const DisableCtrlEnter = Extension.create({
+                addKeyboardShortcuts() {
+                    return {
+                        'Ctrl-Enter': () => true,
+                        'Cmd-Enter': () => true,
+                    }
+                },
+            });
+
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
                 ...modeExts,
+                DisableCtrlEnter,
                 Dropcursor,
                 Gapcursor,
                 History,
