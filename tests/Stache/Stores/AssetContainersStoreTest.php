@@ -11,6 +11,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\AssetContainersStore;
+use Statamic\Stache\Stores\UsersStore;
 use Tests\TestCase;
 
 class AssetContainersStoreTest extends TestCase
@@ -111,6 +112,7 @@ EOL;
         // irrelevant for this test but gets called during saving
         Facades\Stache::shouldReceive('shouldUpdateIndexes')->andReturnTrue();
         Facades\Stache::shouldReceive('duplicates')->andReturn(optional());
+        Facades\Stache::shouldReceive('store')->with('users')->andReturn((new UsersStore((new Stache)->sites(['en']), app('files')))->directory($this->tempDir));
 
         $container = Facades\AssetContainer::make('new')
             ->title('New Container');

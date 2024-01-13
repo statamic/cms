@@ -272,6 +272,10 @@ class EntriesController extends CpController
     {
         $this->authorize('create', [EntryContract::class, $collection, $site]);
 
+        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, $site)) {
+            return $response;
+        }
+
         $blueprint = $collection->entryBlueprint($request->blueprint);
 
         if (! $blueprint) {
@@ -403,8 +407,10 @@ class EntriesController extends CpController
             $saved = $entry->updateLastModified(User::current())->save();
         }
 
-        return (new EntryResource($entry))
-            ->additional(['saved' => $saved]);
+        return [
+            'data' => (new EntryResource($entry))->resolve()['data'],
+            'saved' => $saved,
+        ];
     }
 
     private function resolveSlug($request)
@@ -574,5 +580,12 @@ class EntriesController extends CpController
         return $collection
             ->sites()
             ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
+    }
+
+    protected function ensureCollectionIsAvailableOnSite($collection, $site)
+    {
+        if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
+            return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
+        }
     }
 }

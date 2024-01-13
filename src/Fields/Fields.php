@@ -5,6 +5,7 @@ namespace Statamic\Fields;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
+use Statamic\Exceptions\FieldsetNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Support\Arr;
@@ -266,7 +267,7 @@ class Fields
 
         return Blink::once($blink, function () use ($config) {
             if (! $fieldset = FieldsetRepository::find($config['import'])) {
-                throw new \Exception("Fieldset {$config['import']} not found.");
+                throw new FieldsetNotFoundException($config['import']);
             }
 
             $fields = $fieldset->fields()->all();

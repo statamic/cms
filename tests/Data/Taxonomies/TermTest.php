@@ -8,6 +8,8 @@ use Mockery;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
 use Statamic\Events\TermCreating;
+use Statamic\Events\TermDeleted;
+use Statamic\Events\TermDeleting;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
 use Statamic\Facades;
@@ -314,9 +316,7 @@ class TermTest extends TestCase
         ], $termDe->previewTargets()->all());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_has_a_dirty_state()
     {
         tap(Taxonomy::make('tags')->sites(['en', 'fr']))->save();
@@ -342,5 +342,78 @@ class TermTest extends TestCase
         $this->assertEquals(true, $term->isDirty(['title']));
         $this->assertEquals(false, $term->isDirty('food'));
         $this->assertEquals(false, $term->isDirty(['food']));
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_layout()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        // defaults to layout
+        $this->assertEquals('layout', $term->layout());
+
+        // taxonomy level overrides the default
+        $taxonomy->layout('foo');
+        $this->assertEquals('foo', $term->layout());
+
+        // term level overrides the origin
+        $return = $term->layout('baz');
+        $this->assertEquals($term, $return);
+        $this->assertEquals('baz', $term->layout());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_template()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        // defaults to taxonomy.show
+        $this->assertEquals('tags.show', $term->template());
+
+        // taxonomy level overrides the default
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $term->template());
+
+        // term level overrides the origin
+        $return = $term->template('baz');
+        $this->assertEquals($term, $return);
+        $this->assertEquals('baz', $term->template());
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $term->delete();
+
+        Event::assertDispatched(TermDeleting::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Term::spy();
+        Event::fake([TermDeleted::class]);
+
+        Event::listen(TermDeleting::class, function () {
+            return false;
+        });
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $return = $term->delete();
+
+        $this->assertFalse($return);
+        Facades\Term::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(TermDeleted::class);
     }
 }

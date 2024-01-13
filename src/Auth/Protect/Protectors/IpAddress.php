@@ -2,6 +2,8 @@
 
 namespace Statamic\Auth\Protect\Protectors;
 
+use Statamic\Exceptions\ForbiddenHttpException;
+
 class IpAddress extends Protector
 {
     public function protect()
@@ -9,7 +11,7 @@ class IpAddress extends Protector
         $ips = array_get($this->config, 'allowed', []);
 
         if (! in_array(request()->ip(), $ips)) {
-            abort(403);
+            throw new ForbiddenHttpException();
         }
     }
 }

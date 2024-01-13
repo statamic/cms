@@ -21,7 +21,7 @@ abstract class Query extends BaseQuery
         static::$auth = $closure;
     }
 
-    public function authorize($root, array $args, $ctx, ResolveInfo $resolveInfo = null, Closure $getSelectFields = null): bool
+    public function authorize($root, array $args, $ctx, ?ResolveInfo $resolveInfo = null, ?Closure $getSelectFields = null): bool
     {
         if (static::$auth) {
             return call_user_func_array(static::$auth, [$root, $args, $ctx, $resolveInfo, $getSelectFields]);

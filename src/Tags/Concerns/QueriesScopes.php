@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags\Concerns;
 
+use Statamic\Facades\Scope;
 use Statamic\Support\Arr;
 
 trait QueriesScopes
@@ -10,11 +11,10 @@ trait QueriesScopes
     {
         $this->parseQueryScopes()
             ->map(function ($handle) {
-                return app('statamic.scopes')->get($handle);
+                return Scope::find($handle);
             })
             ->filter()
-            ->each(function ($class) use ($query) {
-                $scope = app($class);
+            ->each(function ($scope) use ($query) {
                 $scope->apply($query, $this->params);
             });
     }

@@ -306,6 +306,15 @@ class FormsController extends CpController
                                     'instructions' => __('statamic::messages.form_configure_email_attachments_instructions'),
                                 ],
                             ],
+                            [
+                                'handle' => 'mailer',
+                                'field' => [
+                                    'type' => 'select',
+                                    'instructions' => __('statamic::messages.form_configure_mailer_instructions'),
+                                    'options' => array_keys(config('mail.mailers')),
+                                    'clearable' => true,
+                                ],
+                            ],
                         ],
                     ],
                 ],
