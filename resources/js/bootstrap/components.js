@@ -60,6 +60,7 @@ import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
+import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 
 // Third Party
 Vue.component('v-select', vSelect)
@@ -142,3 +143,5 @@ Vue.component('resource-deleter', ResourceDeleter);
 
 Vue.component('stack', Stack);
 Vue.component('stack-test', StackTest);
+
+Vue.component('blueprint-resetter', BlueprintResetter);

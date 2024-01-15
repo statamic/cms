@@ -186,10 +186,24 @@
         @foreach ($namespace['blueprints'] as $blueprint)
             <tr>
                 <td>
-                    <div class="flex items-center">
+                    <div class="flex items-center w-100">
                         <div class="w-4 h-4 mr-4">@cp_svg('icons/light/blueprint')</div>
                         <a href="{{ cp_route('blueprints.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ $blueprint['title'] }}</a>
                     </div>
+                </td>
+                <th class="actions-column">
+                    @if ($blueprint['is_resetable'])
+                        <dropdown-list class="dropdown-list">
+                            <dropdown-item :text="__('Reset')" class="warning" @click="$refs[`resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}`].confirm()">
+                                <blueprint-resetter
+                                    ref="resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}"
+                                    :resource='@json($blueprint)'
+                                    reload="true"
+                                >
+                                </blueprint-resetter>
+                            </dropdown-item>
+                        </dropdown-list>
+                    @endif
                 </td>
             </tr>
         @endforeach

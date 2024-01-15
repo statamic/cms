@@ -108,13 +108,23 @@ class BlueprintRepository
 
     public function delete(Blueprint $blueprint)
     {
-        if (! $blueprint->isDeletable()) {
+        if ($blueprint->isNamespaced()) {
             throw new \Exception('Namespaced blueprints cannot be deleted');
         }
 
         $this->clearBlinkCaches();
 
         $blueprint->deleteFile();
+    }
+
+    public function reset(Blueprint $blueprint)
+    {
+        if (! $blueprint->isNamespaced()) {
+            dd($blueprint->path());
+            throw new \Exception('Non-namespaced blueprints cannot be reset');
+        }
+
+        File::delete($blueprint->path());
     }
 
     private function clearBlinkCaches()
