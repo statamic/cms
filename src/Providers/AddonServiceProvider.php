@@ -324,6 +324,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         $commands = collect($this->commands)
             ->merge($this->autoloadFilesFromFolder('Commands', Command::class))
+            ->merge($this->autoloadFilesFromFolder('Console/Commands', Command::class))
             ->unique()
             ->all();
 
@@ -513,7 +514,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootUpdateScripts()
     {
-        foreach ($this->updateScripts as $class) {
+        $scripts = collect($this->updateScripts)
+            ->merge($this->autoloadFilesFromFolder('UpdateScripts', UpdateScript::class))
+            ->unique();
+
+        foreach ($scripts as $class) {
             $class::register($this->getAddon()->package());
         }
 
