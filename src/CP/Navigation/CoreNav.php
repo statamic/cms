@@ -16,6 +16,7 @@ use Statamic\Facades\Form as FormAPI;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Facades\Nav as NavAPI;
 use Statamic\Facades\Role as RoleAPI;
+use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\UserGroup as UserGroupAPI;
@@ -65,11 +66,13 @@ class CoreNav
             ->icon('/content-writing')
             ->can('index', Collection::class)
             ->children(function () {
-                return CollectionAPI::all()->sortBy->title()->map(function ($collection) {
-                    return Nav::item($collection->title())
-                        ->url($collection->showUrl())
-                        ->can('view', $collection);
-                });
+                return CollectionAPI::all()->sortBy->title()
+                    ->filter(fn ($collection) => $collection->sites()->contains(Site::selected()->handle()))
+                    ->map(function ($collection) {
+                        return Nav::item($collection->title())
+                            ->url($collection->showUrl())
+                            ->can('view', $collection);
+                    });
             });
 
         Nav::content('Navigation')
