@@ -696,13 +696,6 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function writeFile($path = null)
     {
-        $path = $path ?? $this->buildPath();
-        $initial = $this->path();
-
-        if ($initial && $path !== $initial) {
-            File::delete($initial);
-        }
-
-        File::put($path, $this->fileContents());
+        File::put($path ?? $this->buildPath(), $this->fileContents());
     }
 }
