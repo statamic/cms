@@ -108,7 +108,7 @@ class BlueprintRepository
 
     public function delete(Blueprint $blueprint)
     {
-        if ($blueprint->isNamespaced()) {
+        if (! $blueprint->isDeletable()) {
             throw new \Exception('Namespaced blueprints cannot be deleted');
         }
 

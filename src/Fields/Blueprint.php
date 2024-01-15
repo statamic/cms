@@ -408,7 +408,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function isDeletable()
     {
-        return ! $this->isNamespaced();
+        if (! $this->isNamespaced()) {
+            return true;
+        }
+
+        return file_exists($this->path());
     }
 
     public function toPublishArray()
