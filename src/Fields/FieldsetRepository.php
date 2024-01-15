@@ -103,7 +103,7 @@ class FieldsetRepository
         return "{$this->hints[$namespace]}/{$path}.yaml";
     }
 
-    private function overriddenNamespacedFieldsetPath(string $handle)
+    public function overriddenNamespacedFieldsetPath(string $handle)
     {
         [$namespace, $handle] = explode('::', $handle);
         $handle = str_replace('/', '.', $handle);

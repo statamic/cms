@@ -13,6 +13,7 @@ use Statamic\Facades;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
+use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
 use Statamic\Facades\Taxonomy;
@@ -191,7 +192,8 @@ class Fieldset
 
     public function isResetable()
     {
-        return $this->isNamespaced();
+        return $this->isNamespaced()
+            && File::exists(FieldsetRepository::overriddenNamespacedFieldsetPath($this->handle));
     }
 
     public function afterSave($callback)
