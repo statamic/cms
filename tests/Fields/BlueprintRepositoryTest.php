@@ -294,7 +294,6 @@ EOT;
         $this->assertCount(0, $all);
     }
 
-
     /** @test */
     public function it_resets_a_namespaced_blueprint()
     {
