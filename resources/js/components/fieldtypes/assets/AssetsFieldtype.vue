@@ -4,7 +4,7 @@
         <uploader
             ref="uploader"
             :container="container"
-            :enabled="config.allow_uploads"
+            :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
@@ -27,6 +27,7 @@
                 >
 
                     <button
+                        v-if="canBrowse"
                         :class="{'opacity-0': dragging }"
                         type="button"
                         class="btn btn-with-icon"
@@ -37,7 +38,7 @@
                         {{ __('Browse') }}
                     </button>
 
-                    <p class="asset-upload-control" v-if="config.allow_uploads">
+                    <p class="asset-upload-control" v-if="canUpload">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
@@ -62,7 +63,7 @@
                         @dragend="$emit('blur')"
                         :constrain-dimensions="true"
                         :disabled="isReadOnly"
-                        :distance="10"
+                        :distance="5"
                         :animate="false"
                         append-to="body"
                     >
@@ -73,6 +74,7 @@
                                 :asset="asset"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
+                                :show-set-alt="showSetAlt"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
                                 @id-changed="idChanged(asset.id, $event)">
@@ -88,7 +90,7 @@
                                 handle-class="asset-row"
                                 :vertical="true"
                                 :disabled="isReadOnly"
-                                :distance="10"
+                                :distance="5"
                                 :mirror="false"
                             >
                                 <tbody ref="assets">
@@ -99,7 +101,7 @@
                                         :asset="asset"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
-                                        :show-set-alt="config.show_set_alt"
+                                        :show-set-alt="showSetAlt"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved"
                                         @id-changed="idChanged(asset.id, $event)">
@@ -121,12 +123,12 @@
                 :selected="selectedAssets"
                 :view-mode="selectorViewMode"
                 :max-files="maxFiles"
+                :query-scopes="queryScopes"
                 @selected="assetsSelected"
                 @closed="closeSelector">
             </selector>
         </stack>
     </div>
-    </element-container>
 </template>
 
 
@@ -278,6 +280,13 @@ export default {
             return this.$el;
         },
 
+        /**
+         * The scopes to use to filter the queries.
+         */
+        queryScopes() {
+            return this.config.query_scopes || [];
+        },
+
         isInBardField() {
             let vm = this;
 
@@ -327,14 +336,16 @@ export default {
         },
 
         replicatorPreview() {
-            return _.map(this.assets, (asset) => {
+            return replicatorPreviewHtml(_.map(this.assets, (asset) => {
                 return (asset.isImage || asset.isSvg) ?
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
-            }).join(', ');
+            }).join(', '));
         },
 
         showPicker() {
+            if (! this.canBrowse && ! this.canUpload) return false
+
             if (this.maxFilesReached && ! this.isFullWidth) return false
 
             if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false
@@ -344,7 +355,19 @@ export default {
 
         isFullWidth() {
             return ! (this.config.width && this.config.width < 100)
-        }
+        },
+
+        showSetAlt() {
+            return this.config.show_set_alt && ! this.isReadOnly;
+        },
+
+        canBrowse() {
+            return this.can('configure asset containers') || this.can('view '+ this.container +' assets')
+        },
+
+        canUpload() {
+            return this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload '+ this.container +' assets'))
+        },
 
     },
 
@@ -386,8 +409,8 @@ export default {
 
             this.loading = true;
 
-            this.$axios.get(cp_url('assets-fieldtype'), {
-                params: { assets }
+            this.$axios.post(cp_url('assets-fieldtype'), {
+                assets
             }).then(response => {
                 this.assets = response.data;
                 this.loading = false;

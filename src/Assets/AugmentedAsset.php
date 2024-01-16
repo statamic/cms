@@ -23,6 +23,7 @@ class AugmentedAsset extends AbstractAugmented
                 'is_audio',
                 'is_previewable',
                 'is_image',
+                'is_svg',
                 'is_video',
                 'blueprint',
                 'edit_url',
@@ -64,7 +65,7 @@ class AugmentedAsset extends AbstractAugmented
             ]);
         }
 
-        return $keys->all();
+        return $keys->merge($this->blueprintFields()->keys())->unique()->all();
     }
 
     protected function isAsset()
@@ -149,7 +150,9 @@ class AugmentedAsset extends AbstractAugmented
 
     protected function duration()
     {
-        return round($this->data->duration() ?? 0);
+        return ($duration = $this->data->duration())
+            ? round($duration)
+            : null;
     }
 
     protected function durationSeconds()

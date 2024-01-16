@@ -5,8 +5,11 @@ namespace Statamic\Taxonomies;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\SyncsOriginalState;
+use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
+use Statamic\Events\TermCreating;
 use Statamic\Events\TermDeleted;
+use Statamic\Events\TermDeleting;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
 use Statamic\Facades;
@@ -83,9 +86,17 @@ class Term implements TermContract
         return $this
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) use ($key) {
-                return Blink::once($key, function () use ($blueprint) {
-                    return $this->taxonomy()->termBlueprint($blueprint ?? $this->value('blueprint'), $this);
-                });
+                if (Blink::has($key)) {
+                    return Blink::get($key);
+                }
+
+                $blueprint = $this->taxonomy()->termBlueprint($blueprint ?? $this->value('blueprint'), $this);
+
+                Blink::put($key, $blueprint);
+
+                TermBlueprintFound::dispatch($blueprint, $this);
+
+                return $blueprint;
             })
             ->setter(function ($blueprint) use ($key) {
                 Blink::forget($key);
@@ -202,6 +213,10 @@ class Term implements TermContract
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && TermCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (TermSaving::dispatch($this) === false) {
                 return false;
             }
@@ -228,6 +243,10 @@ class Term implements TermContract
 
     public function delete()
     {
+        if (TermDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\Term::delete($this);
 
         TermDeleted::dispatch($this);

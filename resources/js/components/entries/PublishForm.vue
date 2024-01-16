@@ -16,7 +16,7 @@
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
-                <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
+                <svg-icon name="light/lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden md:flex items-center">
@@ -98,7 +98,7 @@
                             @blur="container.$emit('blur', $event)"
                         >
                             <template #actions="{ shouldShowSidebar }">
-                            <div :class="{'card p-0': !shouldShowSidebar}">
+                            <div class="card p-0 mb-5">
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
@@ -156,7 +156,7 @@
                                             class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
                                             v-if="!isCreating && revisionsEnabled"
                                             @click="showRevisionHistory = true">
-                                            <svg-icon name="history" class="h-4 w-4 mr-2" />
+                                            <svg-icon name="light/history" class="h-4 w-4 mr-2" />
                                             <span>{{ __('View History') }}</span>
                                         </button>
                                 </div>
@@ -337,7 +337,7 @@ export default {
         canEditBlueprint: Boolean,
         canManagePublishState: Boolean,
         createAnotherUrl: String,
-        listingUrl: String,
+        initialListingUrl: String,
         collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
@@ -412,6 +412,10 @@ export default {
 
         published() {
             return this.values.published;
+        },
+
+        listingUrl() {
+            return `${this.initialListingUrl}?site=${this.site}`;
         },
 
         livePreviewUrl() {
@@ -534,6 +538,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
+                if (! response.data.saved) {
+                    return this.$toast.error(__(`Couldn't save entry`));
+                }
                 this.title = response.data.data.title;
                 this.isWorkingCopy = true;
                 if (this.isBase) {
@@ -558,6 +565,10 @@ export default {
                 .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
+                        clearTimeout(this.trackDirtyStateTimeout)
+                        this.trackDirtyState = false
+                        this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350)
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
@@ -578,7 +589,10 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
+                        clearTimeout(this.trackDirtyStateTimeout);
+                        this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
@@ -659,6 +673,7 @@ export default {
                 this.site = localization.handle;
                 this.localizing = false;
                 this.initialPublished = data.values.published;
+                this.readOnly = data.readOnly;
 
                 this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
             })

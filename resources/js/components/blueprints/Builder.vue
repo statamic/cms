@@ -24,7 +24,7 @@
                     </div>
                 </div>
 
-                <div class="form-group config-field">
+                <div class="form-group config-field" v-if="showHidden">
                     <div class="field-inner">
                         <label class="block">{{ __('Hidden') }}</label>
                         <p class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</p>
@@ -41,7 +41,8 @@
 
         <tabs
             :single-tab="!useTabs"
-            :initial-tabs="blueprint.tabs"
+            :initial-tabs="tabs"
+            :errors="errors.tabs"
             @updated="tabsUpdated"
         />
 
@@ -50,9 +51,12 @@
 </template>
 
 <script>
+import SuggestsConditionalFields from './SuggestsConditionalFields';
 import Tabs from './Tabs.vue';
 
 export default {
+
+    mixins: [SuggestsConditionalFields],
 
     components: {
         Tabs,
@@ -64,14 +68,22 @@ export default {
         showTitle: Boolean,
         useTabs: { type: Boolean, default: true },
         isFormBlueprint: { type: Boolean, default: false },
+        showHidden: { type: Boolean, default: true },
     },
 
     data() {
         return {
             blueprint: this.initializeBlueprint(),
-            tabs: [],
             errors: {}
         }
+    },
+
+    computed: {
+
+        tabs() {
+            return this.blueprint.tabs;
+        }
+
     },
 
     created() {
@@ -86,10 +98,6 @@ export default {
     },
 
     watch: {
-
-        tabs(tabs) {
-            this.blueprint.tabs = tabs;
-        },
 
         blueprint: {
             deep: true,
@@ -111,7 +119,7 @@ export default {
         },
 
         tabsUpdated(tabs) {
-            this.tabs = tabs;
+            this.blueprint.tabs = tabs;
         },
 
         save() {

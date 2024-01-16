@@ -50,17 +50,15 @@
                                 <div class="flex items-center justify-between p-2 text-sm">
                                     <data-list-search class="h-8" ref="search" v-model="searchQuery" />
 
-                                    <template v-if="! hasSelections">
-                                        <button v-if="canCreateFolders" class="btn btn-sm ml-3" @click="creatingFolder = true">
-                                            <svg-icon name="folder-add" class="h-4 w-4 mr-2" />
-                                            <span>{{ __('Create Folder') }}</span>
-                                        </button>
+                                    <button v-if="canCreateFolders" class="btn btn-sm ml-3" @click="creatingFolder = true">
+                                        <svg-icon name="folder-add" class="h-4 w-4 mr-2" />
+                                        <span>{{ __('Create Folder') }}</span>
+                                    </button>
 
-                                        <button v-if="canUpload" class="btn btn-sm ml-3" @click="openFileBrowser">
-                                            <svg-icon name="upload" class="h-4 w-4 mr-2 text-current" />
-                                            <span>{{ __('Upload') }}</span>
-                                        </button>
-                                    </template>
+                                    <button v-if="canUpload" class="btn btn-sm ml-3" @click="openFileBrowser">
+                                        <svg-icon name="upload" class="h-4 w-4 mr-2 text-current" />
+                                        <span>{{ __('Upload') }}</span>
+                                    </button>
 
                                     <div class="btn-group ml-3">
                                         <button class="btn btn-sm" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
@@ -190,7 +188,12 @@
                                         <div class="asset-meta flex items-center">
                                             <div class="asset-filename text-center w-full px-2 py-1" v-text="folder.basename" :title="folder.basename" />
                                         </div>
-                                        <dropdown-list autoclose v-if="folderActions(folder).length" class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                        <dropdown-list v-if="folderActions(folder).length"
+                                            class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                            :class="{ 'opacity-100': actionOpened === folder.path }"
+                                            @opened="actionOpened = folder.path"
+                                            @closed="actionOpened = null"
+                                        >
                                              <data-list-inline-actions
                                                  :item="folder.path"
                                                  :url="folderActionUrl"
@@ -213,7 +216,7 @@
                                             @dblclick.stop="$emit('edit-asset', asset)"
                                         >
                                             <div class="asset-thumb-container">
-                                                <div class="asset-thumb">
+                                                <div class="asset-thumb" :class="{'bg-checkerboard': asset.can_be_transparent}">
                                                     <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-4 h-full w-full': asset.extension === 'svg'}" />
                                                     <file-icon
                                                         v-else
@@ -228,6 +231,9 @@
                                         </div>
                                         <dropdown-list
                                             class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                            :class="{ 'opacity-100': actionOpened === asset.id }"
+                                            @opened="actionOpened = asset.id"
+                                            @closed="actionOpened = null"
                                         >
                                              <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                              <div class="divider" v-if="asset.actions.length" />
@@ -319,6 +325,7 @@ export default {
         restrictFolderNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         maxFiles: Number,
+        queryScopes: Array,
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
@@ -352,7 +359,8 @@ export default {
             actionUrl: null,
             folderActionUrl: null,
             shifting: false,
-            lastItemClicked: null
+            lastItemClicked: null,
+            actionOpened: null,
         }
     },
 
@@ -377,15 +385,15 @@ export default {
         },
 
         canEdit() {
-            return this.can('edit '+ this.container.id +' assets')
+            return this.can('edit '+ this.container.id +' assets') || this.can('configure asset containers')
         },
 
         canUpload() {
-            return this.folder && this.container.allow_uploads;
+            return this.folder && this.container.allow_uploads && (this.can('upload '+ this.container.id +' assets') || this.can('configure asset containers'));
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation && (this.can('upload '+ this.container.id +' assets') || this.can('configure asset containers'));
         },
 
         parameters() {
@@ -395,6 +403,7 @@ export default {
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 search: this.searchQuery,
+                queryScopes: this.queryScopes,
             }
         },
 
@@ -444,6 +453,7 @@ export default {
         },
 
         container(container) {
+            this.initializing = true;
             this.preferencesPrefix = `assets.${container.id}`;
             this.mode = this.getPreference('mode') || 'table';
             this.setInitialPerPage();
@@ -455,7 +465,7 @@ export default {
         },
 
         parameters(after, before) {
-            if (JSON.stringify(before) === JSON.stringify(after)) return;
+            if (this.initializing || JSON.stringify(before) === JSON.stringify(after)) return;
             this.loadAssets();
         },
 
@@ -475,7 +485,11 @@ export default {
                 : this.path;
 
             this.$emit('navigated', this.container, path);
-        }
+        },
+
+        searchQuery() {
+            this.page = 1;
+        },
 
     },
 

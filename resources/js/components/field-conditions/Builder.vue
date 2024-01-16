@@ -31,6 +31,8 @@
                 :key="condition._id"
                 class="flex flex-wrap items-center py-4 border-t"
             >
+                <div v-if="index === 0" class="help-block" v-text="__('messages.field_conditions_field_instructions')" />
+
                 <v-select
                     ref="fieldSelect"
                     v-model="conditions[index].field"
@@ -132,12 +134,24 @@ export default {
 
         fieldOptions() {
             return this.normalizeInputOptions(
-                _.reject(this.suggestableFields, field => field === this.config.handle)
+                _.reject(this.suggestableFields, field => field === this.config.handle || this.conditions.map(condition => condition.field).includes(field))
             );
         },
 
         operatorOptions() {
-            return this.normalizeInputOptions(OPERATORS);
+            return this.normalizeInputOptions({
+                'equals': __('equals'),
+                'not': __('not'),
+                'contains': __('contains'),
+                'contains_any': __('contains any'),
+                '===': '===',
+                '!==': '!==',
+                '>': '>',
+                '>=': '>=',
+                '<': '<',
+                '<=': '<=',
+                'custom': __('custom'),
+            });
         },
 
         hasConditions() {

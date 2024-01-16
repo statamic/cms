@@ -2,13 +2,13 @@
 
 namespace Statamic\Http\Responses;
 
+use Facades\Statamic\Routing\ResolveRedirect;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Str;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
-use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\View;
 
 class DataResponse implements Responsable
@@ -77,6 +77,15 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
+        // If there is a redirect value but no corresponding blueprint field, (e.g. someone
+        // manually set a redirect in the YAML), we'll need to resolve it manually since
+        // they might have set one of the magic values like @child or entry::some-id.
+        $redirect = ResolveRedirect::resolve($redirect, $this->data);
+
+        if ($redirect === 404) {
+            throw new NotFoundHttpException;
+        }
+
         return redirect($redirect);
     }
 
@@ -99,7 +108,7 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_unless($this->isLivePreview(), new NotFoundHttpException);
+        throw_unless($this->request->isLivePreview(), new NotFoundHttpException);
 
         $this->headers['X-Statamic-Draft'] = true;
 
@@ -116,7 +125,7 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_unless($this->isLivePreview(), new NotFoundHttpException);
+        throw_unless($this->request->isLivePreview(), new NotFoundHttpException);
 
         $this->headers['X-Statamic-Private'] = true;
 
@@ -136,7 +145,7 @@ class DataResponse implements Responsable
     {
         $contents = $this->view()->render();
 
-        if ($this->isLivePreview()) {
+        if ($this->request->isLivePreview()) {
             $contents = $this->versionJavascriptModules($contents);
         }
 
@@ -171,11 +180,6 @@ class DataResponse implements Responsable
         $this->with = $data;
 
         return $this;
-    }
-
-    protected function isLivePreview()
-    {
-        return optional($this->request->statamicToken())->handler() === LivePreview::class;
     }
 
     protected function versionJavascriptModules($contents)

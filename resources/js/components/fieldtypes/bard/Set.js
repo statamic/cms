@@ -4,6 +4,7 @@ import { Slice, Fragment } from '@tiptap/pm/model';
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { VueNodeViewRenderer } from '@tiptap/vue-2'
 import SetComponent from './Set.vue';
+import { TextSelection } from '@tiptap/pm/state';
 
 export const Set = Node.create({
 
@@ -57,7 +58,10 @@ export const Set = Node.create({
                 const { selection } = tr;
                 const node = this.type.create(attrs);
                 if (dispatch) {
-                    const transaction = tr.insert(selection.$cursor.pos - 1, node);
+                    const transaction = selection instanceof TextSelection
+                        ? tr.insert(selection.$cursor.pos - 1, node)
+                        : tr.insert(selection.$head.pos, node);
+
                     dispatch(transaction);
                 }
             },

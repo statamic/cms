@@ -22,7 +22,7 @@
                     <div v-if="config.swatches.length" class="grid grid-cols-4 gap-3">
                         <div
                             v-for="swatch in config.swatches"
-                            class="w-10 h-10 inline-block cursor-pointer rounded flex"
+                            class="w-10 h-10 inline-block cursor-pointer rounded flex border border-gray-400"
                             :style="{ 'background-color': swatch }"
                             @click="() => { update(swatch); closePopover(); }"
                         >

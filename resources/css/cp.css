@@ -66,10 +66,10 @@
 @import "components/fieldtypes/relationship";
 @import "components/fieldtypes/replicator";
 @import "components/fieldtypes/section";
+@import "components/fieldtypes/spacer";
 @import "components/fieldtypes/table";
 @import "components/fieldtypes/tags";
 @import "components/fieldtypes/textarea";
-@import "components/fieldtypes/time";
 @import "components/fieldtypes/width";
 @import "components/fieldtypes/video";
 @import "components/fieldtypes/yaml";

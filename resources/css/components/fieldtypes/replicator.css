@@ -33,6 +33,10 @@
         @apply flex items-center;
     }
 
+    .replicator-set-header-inner {
+        min-height: 32px;
+    }
+
     &.invalid {
         .replicator-set-header-inner {
             @apply bg-red-100;
@@ -59,6 +63,10 @@
 
 .replicator-set-picker.between:hover {
     transform: translateX(-4px);
+}
+
+.replicator-set-picker.between .replicator-set-picker-button-wrapper {
+    @apply h-5;
 }
 
 .replicator-set.has-error > .replicator-set-header label {

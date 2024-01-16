@@ -15,6 +15,7 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Search\Result;
 
 class UsersController extends CpController
 {
@@ -69,6 +70,10 @@ class UsersController extends CpController
             ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
 
+        if ($users->getCollection()->first() instanceof Result) {
+            $users->setCollection($users->getCollection()->map->getSearchable());
+        }
+
         return (new Users($users))
             ->blueprint(User::blueprint())
             ->columnPreferenceKey('users.columns')
@@ -87,9 +92,11 @@ class UsersController extends CpController
             $query
                 ->where('email', 'like', '%'.$search.'%')
                 ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
-                    $query
-                        ->orWhere('first_name', 'like', '%'.$search.'%')
-                        ->orWhere('last_name', 'like', '%'.$search.'%');
+                    foreach (explode(' ', $search) as $word) {
+                        $query
+                            ->orWhere('first_name', 'like', '%'.$word.'%')
+                            ->orWhere('last_name', 'like', '%'.$word.'%');
+                    }
                 }, function ($query) use ($search) {
                     $query->orWhere('name', 'like', '%'.$search.'%');
                 });
@@ -109,20 +116,22 @@ class UsersController extends CpController
         $this->authorize('create', UserContract::class);
 
         $blueprint = User::blueprint();
+        $blueprint->ensureFieldHasConfig('email', ['validate' => 'required']);
 
         $fields = $blueprint->fields()->preProcess();
 
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
+        $additional = $fields->all()
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups']))
+            ->keys();
+
         $viewData = [
-            'title' => __('Create'),
-            'values' => $fields->values()->all(),
-            'meta' => $fields->meta(),
+            'values' => (object) $fields->values()->only($additional)->all(),
+            'meta' => (object) $fields->meta()->only($additional)->all(),
+            'fields' => collect($fields->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
-            'actions' => [
-                'save' => cp_route('users.store'),
-            ],
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
             'canSendInvitation' => config('statamic.users.wizard_invitation'),
@@ -142,11 +151,15 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->only(['email', 'name', 'first_name', 'last_name'])->addValues($request->all());
+        $fields = $blueprint->fields()->except(['roles', 'groups'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        if ($request->input('_validate_only')) {
+            return [];
+        }
+
+        $values = $fields->process()->values()->except(['email']);
 
         $user = User::make()
             ->email($request->email)
@@ -226,6 +239,7 @@ class UsersController extends CpController
                 'editBlueprint' => cp_route('users.blueprint.edit'),
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
+            'requiresCurrentPassword' => $request->user()->id === $user->id(),
         ];
 
         if ($request->wantsJson()) {
@@ -243,7 +257,11 @@ class UsersController extends CpController
 
         $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
 
-        $fields->validate(['email' => 'required|unique_user_value:'.$user->id()]);
+        $fields
+            ->validator()
+            ->withRules(['email' => 'required|unique_user_value:{id}'])
+            ->withReplacements(['id' => $user->id()])
+            ->validate();
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
@@ -265,9 +283,12 @@ class UsersController extends CpController
             $user->groups($request->groups);
         }
 
-        $user->save();
+        $save = $user->save();
 
-        return ['title' => $user->title()];
+        return [
+            'title' => $user->title(),
+            'saved' => is_bool($save) ? $save : true,
+        ];
     }
 
     public function destroy($user)

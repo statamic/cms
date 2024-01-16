@@ -159,6 +159,9 @@ abstract class Tree implements Contract, Localization
     {
         $this->cachedFlattenedPages = null;
 
+        Blink::forget('collection-structure-flattened-pages-collection*');
+        Blink::forget('collection-structure-tree*');
+
         $this->repository()->save($this);
 
         $this->dispatchSavedEvent();
@@ -168,6 +171,8 @@ abstract class Tree implements Contract, Localization
 
     public function delete()
     {
+        Blink::forget('collection-structure-tree*');
+
         $this->repository()->delete($this);
 
         $this->dispatchDeletedEvent();

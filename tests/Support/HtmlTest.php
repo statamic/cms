@@ -10,7 +10,7 @@ class HtmlTest extends TestCase
     public function testDl()
     {
         $list = [
-            'foo'  => 'bar',
+            'foo' => 'bar',
             'bing' => 'baz',
         ];
 
@@ -30,6 +30,34 @@ class HtmlTest extends TestCase
         $ol = Html::ol($list, $attributes);
 
         $this->assertEquals('<ol class="example"><li>foo</li><li>bar</li><li>&amp;</li></ol>', $ol);
+    }
+
+    /** @test */
+    public function nested_listing_with_keyed_sub_array()
+    {
+        $list = [
+            'foo',
+            'bar' => ['alfa', 'bravo'],
+            'baz',
+        ];
+
+        $ol = Html::ol($list);
+
+        $this->assertEquals('<ol><li>foo</li><li>bar<ol><li>alfa</li><li>bravo</li></ol></li><li>baz</li></ol>', $ol);
+    }
+
+    /** @test */
+    public function nested_listing_with_unkeyed_sub_array()
+    {
+        $list = [
+            'foo',
+            ['alfa', 'bravo'],
+            'bar',
+        ];
+
+        $ol = Html::ol($list);
+
+        $this->assertEquals('<ol><li>foo</li><li><ol><li>alfa</li><li>bravo</li></ol></li><li>bar</li></ol>', $ol);
     }
 
     /**

@@ -28,6 +28,7 @@
                     :meta="meta"
                     :errors="errors"
                     :localized-fields="localizedFields"
+                    :site="site"
                     class="px-2"
                     @updated="values = $event"
                 >
@@ -36,11 +37,11 @@
                             <loading-graphic text="" />
                         </div>
 
-
                         <publish-sections
                             :sections="adjustedBlueprint.tabs[0].sections"
                             :syncable="type == 'entry'"
                             :syncable-fields="syncableFields"
+                            :read-only="readOnly"
                             @updated="setFieldValue"
                             @meta-updated="setFieldMeta"
                             @synced="syncField"
@@ -53,8 +54,8 @@
 
             </div>
 
-            <div v-if="!loading" class="bg-gray-200 p-4 border-t flex items-center justify-between flex-row-reverse">
-                <div>
+            <div v-if="!loading && (!readOnly || type === 'entry')" class="bg-gray-200 p-4 border-t flex items-center justify-between flex-row-reverse">
+                <div v-if="!readOnly">
                     <button @click="confirmClose(close)" class="btn mr-2">{{ __('Cancel') }}</button>
                     <button @click="submit" class="btn-primary">{{ __('Submit') }}</button>
                 </div>
@@ -64,7 +65,6 @@
                         {{ __('Edit Entry') }}
                     </a>
                 </div>
-
             </div>
 
         </div>
@@ -83,7 +83,8 @@ export default {
         blueprint: Object,
         handle: String,
         editEntryUrl: String,
-        creating: Boolean
+        creating: Boolean,
+        readOnly: Boolean,
     },
 
     data() {

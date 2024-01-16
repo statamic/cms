@@ -59,7 +59,7 @@ class TaxonomyRepository implements RepositoryContract
         return app(Taxonomy::class)->handle($handle);
     }
 
-    public function findByUri(string $uri, string $site = null): ?Taxonomy
+    public function findByUri(string $uri, ?string $site = null): ?Taxonomy
     {
         $collection = Facades\Collection::all()
             ->first(function ($collection) use ($uri, $site) {
@@ -67,7 +67,7 @@ class TaxonomyRepository implements RepositoryContract
                     return true;
                 }
 
-                return Str::startsWith($uri, '/'.$collection->handle());
+                return Str::startsWith($uri.'/', '/'.$collection->handle().'/');
             });
 
         if ($collection) {
