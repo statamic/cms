@@ -33,8 +33,10 @@
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"
+                            :id="field._id"
                             :type="field.fieldtype"
                             :root="isRoot"
+                            :fields="fields"
                             :config="fieldConfig"
                             :overrides="field.config_overrides || []"
                             :suggestable-condition-fields="suggestableConditionFields"
