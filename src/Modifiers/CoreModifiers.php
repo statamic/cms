@@ -1006,7 +1006,7 @@ class CoreModifiers extends Modifier
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param $value
+     * @param  $value
      * @return bool
      */
     public function inArray($haystack, $params, $context)
@@ -1493,7 +1493,7 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param $params
+     * @param  $params
      * @return string
      */
     public function md5($value)

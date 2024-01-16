@@ -434,9 +434,16 @@ export default {
 
             this.updateSetMeta(id, this.meta.new[handle]);
 
+            const { $head } = this.editor.view.state.selection;
+            const { nodeBefore } = $head;
+
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
-                this.editor.commands.set({ id, values });
+                if (nodeBefore) {
+                    this.editor.commands.setAt({ attrs: { id, values }, pos: $head.pos });
+                } else {
+                    this.editor.commands.set({ id, values });
+                }
             });
         },
 
