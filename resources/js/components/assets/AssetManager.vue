@@ -92,25 +92,19 @@ export default {
         /**
          * Push a new state onto the browser's history
          */
-        pushState() {
-            let url = cp_url('assets/browse/' + this.container.id);
-
-            if (this.path !== '/') {
-                url += '/' + this.path;
-            }
-
+        pushState(asset) {
             window.history.pushState({
-                container: this.container, path: this.path
-            }, '', url);
+                container: this.container, path: asset.path
+            }, '', asset.edit_url);
         },
 
         /**
-         * When a user has navigated to another folder or container
+         * When a user has navigated to another folder or container.
          */
-        navigate(container, path) {
+        navigate(container, asset) {
             this.container = container;
-            this.path = path;
-            this.pushState();
+            this.path = asset.path;
+            this.pushState(asset);
 
             // Clear out any selections. It would be confusing to navigate to a different
             // folder and/or container, perform an action, and discover you performed

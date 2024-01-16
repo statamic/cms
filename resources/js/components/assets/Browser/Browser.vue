@@ -273,6 +273,7 @@
             :id="editedAssetId"
             :read-only="! canEdit"
             @closed="closeAssetEditor"
+            @navigated="$emit('navigated', container, $event)"
             @saved="assetSaved"
         />
 
@@ -477,14 +478,6 @@ export default {
 
         loading(loading) {
             this.$progress.loading('asset-browser', loading);
-        },
-
-        editedAssetId(editedAssetId) {
-            let path = editedAssetId
-                ? [this.path, this.editedAssetBasename].filter(value => value != '/').join('/') + '/edit'
-                : this.path;
-
-            this.$emit('navigated', this.container, path);
         },
 
         searchQuery() {

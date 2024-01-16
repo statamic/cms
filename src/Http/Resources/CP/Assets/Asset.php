@@ -16,6 +16,7 @@ class Asset extends JsonResource
             'filename' => $this->filename(),
             'basename' => $this->basename(),
             'url' => $this->url(),
+            'edit_url' => $this->editUrl(),
             'reference' => $this->reference(),
             'permalink' => $this->absoluteUrl(),
             'extension' => $this->extension(),

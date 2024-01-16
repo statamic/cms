@@ -320,6 +320,8 @@ export default {
                     .flatten(true)
                     .value();
 
+                this.$emit('navigated', this.asset);
+
                 this.loading = false;
             });
         },
