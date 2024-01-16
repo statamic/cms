@@ -179,6 +179,24 @@
         </table>
     </div>
 
+    @foreach ($additional as $namespace)
+    <h3 class="little-heading pl-0 mb-2">{{ $namespace['title'] }}</h3>
+    <div class="card p-0 mb-4">
+        <table class="data-table">
+        @foreach ($namespace['blueprints'] as $blueprint)
+            <tr>
+                <td>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 mr-4">@cp_svg('icons/light/blueprint')</div>
+                        <a href="{{ cp_route('blueprints.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ $blueprint['title'] }}</a>
+                    </div>
+                </td>
+            </tr>
+        @endforeach
+        </table>
+    </div>
+    @endforeach
+
     @include('statamic::partials.docs-callout', [
         'topic' => __('Blueprints'),
         'url' => Statamic::docsUrl('blueprints')
