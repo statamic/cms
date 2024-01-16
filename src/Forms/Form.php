@@ -40,7 +40,7 @@ class Form implements Arrayable, Augmentable, FormContract
     protected $email;
     protected $metrics;
     protected $afterSaveCallbacks = [];
-    protected $withEvents = true;
+    public $withEvents = true;
 
     /**
      * Get or set the handle.
@@ -331,8 +331,13 @@ class Form implements Arrayable, Augmentable, FormContract
      */
     public function makeSubmission()
     {
-        $submission = app(Submission::class);
 
+        $submission = app(Submission::class);
+        if(isset($_POST['_no_events'])){
+            if($_POST['_no_events'] == "no"){
+                $this->withEvents = false;
+                }
+          }
         $submission->form($this);
 
         return $submission;

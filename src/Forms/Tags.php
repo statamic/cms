@@ -21,7 +21,7 @@ class Tags extends BaseTags
         Concerns\OutputsItems,
         Concerns\RendersForms;
 
-    const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
+    const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset', 'no_events'];
 
     protected static $handle = 'form';
 
@@ -69,6 +69,10 @@ class Tags extends BaseTags
 
         $data['honeypot'] = $form->honeypot();
 
+
+
+
+
         if ($jsDriver) {
             $data['js_driver'] = $jsDriver->handle();
             $data['show_field'] = $jsDriver->copyShowFieldToFormData($data['fields']);
@@ -88,6 +92,8 @@ class Tags extends BaseTags
         $action = $this->params->get('action', $form->actionUrl());
         $method = $this->params->get('method', 'POST');
 
+
+
         $attrs = [];
 
         if ($jsDriver) {
@@ -95,7 +101,7 @@ class Tags extends BaseTags
         }
 
         $params = [];
-
+        $params['no_events'] = $this->params->get('no_events');
         if ($redirect = $this->getRedirectUrl()) {
             $params['redirect'] = $this->parseRedirect($redirect);
         }
@@ -114,6 +120,7 @@ class Tags extends BaseTags
         $html = $this->formOpen($action, $method, $knownParams, $attrs);
 
         $html .= $this->formMetaFields($params);
+
 
         $html .= $this->parse($data);
 
@@ -192,6 +199,16 @@ class Tags extends BaseTags
     protected function getSortOrder()
     {
         return $this->params->get('sort', 'date');
+    }
+
+     /**
+     * Get the sort order for a collection.
+     *
+     * @return string
+     */
+    protected function getNoEvents()
+    {
+        return $this->params->get('no_events');
     }
 
     /**
@@ -364,6 +381,7 @@ class Tags extends BaseTags
 
         return $form;
     }
+
 
     public function eventUrl($url, $relative = true)
     {

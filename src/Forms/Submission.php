@@ -33,7 +33,7 @@ class Submission implements Augmentable, SubmissionContract
     public $form;
 
     protected $afterSaveCallbacks = [];
-    protected $withEvents = true;
+    public $withEvents = true;
 
     protected ?string $redirect = null;
 
@@ -145,8 +145,13 @@ class Submission implements Augmentable, SubmissionContract
     {
         $isNew = is_null($this->form()->submission($this->id()));
 
-        $withEvents = $this->withEvents;
-        $this->withEvents = true;
+        if(isset($_POST['_no_events'])){
+            if($_POST['_no_events'] == "no"){
+            $this->withEvents = false;
+            }
+          }
+      $withEvents = $this->withEvents;
+
 
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];

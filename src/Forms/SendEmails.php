@@ -23,7 +23,12 @@ class SendEmails
 
     public function handle()
     {
+
+        if($this->submission->withEvents == true){
+
         $this->jobs()->each(fn ($job) => Bus::dispatch($job));
+        }
+
     }
 
     private function jobs()
