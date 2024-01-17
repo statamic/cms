@@ -22,6 +22,7 @@ use Statamic\Events\BlueprintSaving;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
+use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -691,5 +692,10 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     public function toQueryableValue()
     {
         return $this->handle();
+    }
+
+    public function writeFile($path = null)
+    {
+        File::put($path ?? $this->buildPath(), $this->fileContents());
     }
 }
