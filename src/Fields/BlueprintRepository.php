@@ -120,7 +120,6 @@ class BlueprintRepository
     public function reset(Blueprint $blueprint)
     {
         if (! $blueprint->isNamespaced()) {
-            dd($blueprint->path());
             throw new \Exception('Non-namespaced blueprints cannot be reset');
         }
 
