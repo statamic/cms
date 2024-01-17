@@ -37,7 +37,8 @@ class FieldsetController extends CpController
                         'title' => $fieldset->title(),
                     ],
                 ];
-            });
+            })
+            ->sortBy(fn ($value, $key) => $key === __('My Fieldsets') ? '0' : $key);
 
         if ($request->wantsJson()) {
             return $fieldsets;
@@ -153,6 +154,14 @@ class FieldsetController extends CpController
 
     private function groupKey(Fieldset $fieldset): string
     {
-        return $fieldset->isNamespaced() ? Str::of($fieldset->namespace())->replace('_', ' ')->title() : __('My Fieldsets');
+        if ($fieldset->isNamespaced()) {
+            return Str::of($fieldset->namespace())->replace('_', ' ')->title();
+        }
+
+        if (str_contains($fieldset->handle(), '.')) {
+            return Str::of($fieldset->handle())->beforeLast('.')->title();
+        }
+
+        return __('My Fieldsets');
     }
 }
