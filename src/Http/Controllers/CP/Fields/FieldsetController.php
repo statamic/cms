@@ -115,8 +115,8 @@ class FieldsetController extends CpController
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required',
-            'handle' => 'required|alpha_dash',
+            'title' => ['required'],
+            'handle' => ['required', 'regex:/^[a-zA-Z0-9._-]+$/'],
         ]);
 
         if (Facades\Fieldset::find($request->handle)) {
