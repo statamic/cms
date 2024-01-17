@@ -167,7 +167,7 @@ class FieldsetRepository
             throw new \Exception('Namespaced fieldsets cannot be deleted');
         }
 
-        File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
+        File::delete($fieldset->path());
     }
 
     public function addNamespace(string $namespace, string $directory): void
