@@ -12,12 +12,18 @@
                 <div class="text-2xs text-gray-600 mt-2 flex items-center">
                     {{ __('messages.fieldsets_title_instructions') }}
                 </div>
+                <div v-if="errors.title">
+                    <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+                </div>
             </div>
             <div class="mb-4">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Handle') }}</label>
                 <input type="text" v-model="handle" class="input-text" tabindex="2">
                 <div class="text-2xs text-gray-600 mt-2 flex items-center">
                     {{ __('messages.fieldsets_handle_instructions') }}
+                </div>
+                <div v-if="errors.handle">
+                    <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors.handle" :key="i" v-text="error" />
                 </div>
             </div>
         </div>
@@ -43,7 +49,8 @@ export default {
     data() {
         return {
             title: null,
-            handle: null
+            handle: null,
+            errors: [],
         }
     },
 
@@ -64,6 +71,7 @@ export default {
             this.$axios.post(this.route, {title: this.title, handle: this.handle}).then(response => {
                 window.location = response.data.redirect;
             }).catch(error => {
+                this.errors = error.response.data.errors;
                 this.$toast.error(error.response.data.message);
             });
         }
