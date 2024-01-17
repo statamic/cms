@@ -26,27 +26,7 @@ class Status extends Filter
 
     public function apply($query, $values)
     {
-        $status = $values['status'];
-
-        if ($status === 'draft') {
-            return $query->where('published', false);
-        }
-
-        $query->where('published', true);
-
-        $collection = $this->collection();
-
-        if ($collection->futureDateBehavior() === 'private') {
-            $status === 'scheduled'
-                ? $query->where('date', '>', now())
-                : $query->where('date', '<', now());
-        }
-
-        if ($collection->pastDateBehavior() === 'private') {
-            $status === 'expired'
-                ? $query->where('date', '<', now())
-                : $query->where('date', '>', now());
-        }
+        $query->whereStatus($values['status']);
     }
 
     public function badge($values)

@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Facades\Log;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -758,5 +759,83 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Support\LazyCollection::class, $entries);
         $this->assertCount(3, $entries);
+    }
+
+    /** @test */
+    public function filtering_by_status_column_writes_deprecation_log()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        Log::shouldReceive('debug')->with('Filtering by status is deprecated. Use whereStatus() instead.')->once();
+
+        Entry::query()->where('collection', 'posts')->where('status', 'published')->get();
+    }
+
+    /** @test */
+    public function filtering_by_unexpected_status_throws_exception()
+    {
+        $this->expectExceptionMessage('Invalid status [foo]');
+
+        Entry::query()->whereStatus('foo')->get();
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider filterByStatusProvider
+     */
+    public function it_filters_by_status($status, $expected)
+    {
+        Collection::make('pages')->dated(false)->save();
+        EntryFactory::collection('pages')->id('page')->published(true)->create();
+        EntryFactory::collection('pages')->id('page-draft')->published(false)->create();
+
+        Collection::make('blog')->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
+        EntryFactory::collection('blog')->id('blog-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('blog')->id('blog-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('blog')->id('blog-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('blog')->id('blog-past-draft')->published(false)->date(now()->subDay())->create();
+
+        Collection::make('events')->dated(true)->futureDateBehavior('public')->pastDateBehavior('private')->save();
+        EntryFactory::collection('events')->id('event-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('events')->id('event-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('events')->id('event-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('events')->id('event-past-draft')->published(false)->date(now()->subDay())->create();
+
+        Collection::make('calendar')->dated(true)->futureDateBehavior('public')->pastDateBehavior('public')->save();
+        EntryFactory::collection('calendar')->id('calendar-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('calendar')->id('calendar-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('calendar')->id('calendar-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('calendar')->id('calendar-past-draft')->published(false)->date(now()->subDay())->create();
+
+        $this->assertEquals($expected, Entry::query()->whereStatus($status)->get()->map->id->all());
+    }
+
+    public function filterByStatusProvider()
+    {
+        return [
+            'draft' => ['draft', [
+                'page-draft',
+                'blog-future-draft',
+                'blog-past-draft',
+                'event-future-draft',
+                'event-past-draft',
+                'calendar-future-draft',
+                'calendar-past-draft',
+            ]],
+            'published' => ['published', [
+                'page',
+                'blog-past',
+                'event-future',
+                'calendar-future',
+                'calendar-past',
+            ]],
+            'scheduled' => ['scheduled', [
+                'blog-future',
+            ]],
+            'expired' => ['expired', [
+                'event-past',
+            ]],
+        ];
     }
 }

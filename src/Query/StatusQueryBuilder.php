@@ -35,7 +35,7 @@ class StatusQueryBuilder implements Builder
     public function get($columns = ['*'])
     {
         if ($this->queryFallbackStatus) {
-            $this->builder->where('status', $this->fallbackStatus);
+            $this->builder->whereStatus($this->fallbackStatus);
         }
 
         return $this->builder->get($columns);
@@ -48,7 +48,7 @@ class StatusQueryBuilder implements Builder
 
     public function __call($method, $parameters)
     {
-        if (in_array($method, self::METHODS) && in_array(array_first($parameters), ['status', 'published'])) {
+        if ((in_array($method, self::METHODS) && in_array(array_first($parameters), ['status', 'published'])) || $method === 'whereStatus') {
             $this->queryFallbackStatus = false;
         }
 
