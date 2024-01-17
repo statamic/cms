@@ -762,13 +762,23 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     /** @test */
-    public function filtering_by_status_column_writes_deprecation_log()
+    public function filtering_using_where_status_column_writes_deprecation_log()
     {
         $this->createDummyCollectionAndEntries();
 
         Log::shouldReceive('debug')->with('Filtering by status is deprecated. Use whereStatus() instead.')->once();
 
         Entry::query()->where('collection', 'posts')->where('status', 'published')->get();
+    }
+
+    /** @test */
+    public function filtering_using_whereIn_status_column_writes_deprecation_log()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        Log::shouldReceive('debug')->with('Filtering by status is deprecated. Use whereStatus() instead.')->once();
+
+        Entry::query()->where('collection', 'posts')->whereIn('status', ['published'])->get();
     }
 
     /** @test */

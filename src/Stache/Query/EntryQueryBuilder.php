@@ -39,6 +39,10 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             return $this;
         }
 
+        if ($column === 'status') {
+            Log::debug('Filtering by status is deprecated. Use whereStatus() instead.');
+        }
+
         return parent::whereIn($column, $values, $boolean);
     }
 
