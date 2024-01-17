@@ -156,15 +156,9 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
         $this->where('published', true);
 
-        $this->where(function ($query) use ($status) {
-            $this->getCollectionsForStatus()->each(function ($collection) use ($query, $status) {
-                $query->orWhere(function ($q) use ($collection, $status) {
-                    $this->addCollectionStatusLogicToQuery($q, $status, $collection);
-                });
-            });
-        });
-
-        return $this;
+        return $this->where(fn ($query) => $this
+            ->getCollectionsForStatus()
+            ->each(fn ($collection) => $query->orWhere(fn ($q) => $this->addCollectionStatusLogicToQuery($q, $status, $collection))));
     }
 
     private function getCollectionsForStatus()
