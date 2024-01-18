@@ -81,18 +81,44 @@ class CollectionsStore extends BasicStore
 
     public function updateEntryUris($collection, $ids = null)
     {
-        Stache::store('entries')
+        $index = Stache::store('entries')
             ->store($collection->handle())
-            ->index('uri')
-            ->update();
+            ->index('uri');
+
+            if (empty($ids)) {
+                $index->update();
+                
+                return;
+            }
+        
+            foreach($ids as $id) {
+                if (!$entry = Entry::find($id)) {
+                    continue;
+                }
+
+                $index->updateItem($entry);
+            }
     }
 
     public function updateEntryOrder($collection, $ids = null)
     {
         Stache::store('entries')
             ->store($collection->handle())
-            ->index('order')
-            ->update();
+            ->index('order');
+
+        if (empty($ids)) {
+            $index->update();
+            
+            return;
+        }
+    
+        foreach($ids as $id) {
+            if (!$entry = Entry::find($id)) {
+                continue;
+            }
+
+            $index->updateItem($entry);
+        }
     }
 
     public function handleFileChanges()
