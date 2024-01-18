@@ -5,6 +5,7 @@ namespace Tests\Auth\Eloquent;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
 use Statamic\Contracts\Auth\Role as RoleContract;
@@ -29,6 +30,10 @@ class EloquentUserTest extends TestCase
         // TODO: The migration has been added into the test, but the implementation could be broken if the real
         // migration is different from what's in here. We should find a way to reference the actual migrations.
         $this->loadMigrationsFrom(__DIR__.'/__migrations__');
+
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to these tests.
+        Event::fake();
     }
 
     /** @test */
