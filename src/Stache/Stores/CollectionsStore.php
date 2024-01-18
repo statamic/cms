@@ -85,19 +85,19 @@ class CollectionsStore extends BasicStore
             ->store($collection->handle())
             ->index('uri');
 
-            if (empty($ids)) {
-                $index->update();
+        if (empty($ids)) {
+            $index->update();
 
-                return;
+            return;
+        }
+
+        foreach ($ids as $id) {
+            if (! $entry = Entry::find($id)) {
+                continue;
             }
 
-            foreach($ids as $id) {
-                if (!$entry = Entry::find($id)) {
-                    continue;
-                }
-
-                $index->updateItem($entry);
-            }
+            $index->updateItem($entry);
+        }
     }
 
     public function updateEntryOrder($collection, $ids = null)
@@ -112,8 +112,8 @@ class CollectionsStore extends BasicStore
             return;
         }
 
-        foreach($ids as $id) {
-            if (!$entry = Entry::find($id)) {
+        foreach ($ids as $id) {
+            if (!$ entry = Entry::find($id)) {
                 continue;
             }
 
