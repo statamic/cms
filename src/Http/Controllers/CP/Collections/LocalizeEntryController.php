@@ -14,8 +14,6 @@ class LocalizeEntryController extends CpController
 
         $localized = $entry->makeLocalization($site = $request->site);
 
-        $this->addToStructure($collection, $entry, $localized);
-
         if ($entry->revisionsEnabled()) {
             $localized->store(['user' => User::fromUser($request->user())]);
         } else {
