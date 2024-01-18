@@ -34,13 +34,19 @@
                     />
                 </save-button-options>
 
-                <button
+                <save-button-options
                     v-if="revisionsEnabled && !isCreating"
-                    class="ml-4 btn-primary flex items-center"
-                    :disabled="!canPublish"
-                    @click="confirmingPublish = true">
-                    <span>{{ __('Publish') }}…</span>
-                </button>
+                    :show-options="!isInline"
+                    button-class="btn-primary"
+                    :preferences-prefix="preferencesPrefix"
+                >
+                    <button
+                        class="ml-4 btn-primary flex items-center"
+                        :disabled="!canPublish"
+                        @click="confirmingPublish = true">
+                        <span>{{ __('Publish') }}…</span>
+                    </button>
+                </save-button-options>
             </div>
 
             <slot name="action-buttons-right" />
@@ -735,12 +741,30 @@ export default {
             this.$refs.container.saved();
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
-            this.title = response.data.data.title;
-            this.activeLocalization.title = response.data.data.title;
-            this.activeLocalization.published = response.data.data.published;
-            this.activeLocalization.status = response.data.data.status;
-            this.permalink = response.data.data.permalink
-            this.$nextTick(() => this.$emit('saved', response));
+
+            let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
+
+            // If the user has opted to create another entry, redirect them to create page.
+            if (!this.isInline && nextAction === 'create_another') {
+                window.location = this.createAnotherUrl;
+            }
+
+            // If the user has opted to go to listing (default/null option), redirect them there.
+            else if (!this.isInline && nextAction === null) {
+                window.location = this.listingUrl;
+            }
+
+            // Otherwise, leave them on the edit form and emit an event. We need to wait until after
+            // the hooks are resolved because if this form is being shown in a stack, we only
+            // want to close it once everything's done.
+            else {
+                this.title = response.data.data.title;
+                this.activeLocalization.title = response.data.data.title;
+                this.activeLocalization.published = response.data.data.published;
+                this.activeLocalization.status = response.data.data.status;
+                this.permalink = response.data.data.permalink
+                this.$nextTick(() => this.$emit('saved', response));
+            }
         },
 
         setFieldValue(handle, value) {
