@@ -105,6 +105,8 @@ export default {
             return 'theme-' + this.config.theme;
         },
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.value.code ? truncate(this.value.code, 60) : '';
         },
         readOnlyOption() {
