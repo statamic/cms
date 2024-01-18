@@ -113,7 +113,7 @@ class CollectionsStore extends BasicStore
         }
 
         foreach ($ids as $id) {
-            if (!$ entry = Entry::find($id)) {
+            if (! $entry = Entry::find($id)) {
                 continue;
             }
 
