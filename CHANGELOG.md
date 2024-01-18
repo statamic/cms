@@ -9,7 +9,7 @@
 
 ### What's improved
 - Prevent handling field previews when previews are disabled. [#9353](https://github.com/statamic/cms/issues/9353) by @duncanmcclean
-- Update entry order and uri by ids. [#9350](https://github.com/statamic/cms/issues/9350) by @jacksleight
+- Update entry order and uri by ids. [#9350](https://github.com/statamic/cms/issues/9350) by @juliawarnke
 - Dutch translations. [#9347](https://github.com/statamic/cms/issues/9347) by @jeroenpeters1986
 
 ### What's fixed
