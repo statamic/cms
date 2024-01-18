@@ -14,11 +14,7 @@ class LocalizeEntryController extends CpController
 
         $localized = $entry->makeLocalization($site = $request->site);
 
-        if ($entry->revisionsEnabled()) {
-            $localized->store(['user' => User::fromUser($request->user())]);
-        } else {
-            $localized->published(false)->updateLastModified($request->user())->save();
-        }
+        $localized->store(['user' => User::fromUser($request->user())]);
 
         return [
             'handle' => $site,

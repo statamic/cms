@@ -111,16 +111,20 @@ trait Revisable
 
     public function store($options = [])
     {
-        $this
+        $return = $this
             ->published(false)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
 
-        return $this
-            ->makeRevision()
-            ->user($user)
-            ->message($options['message'] ?? false)
-            ->save();
+        if ($this->revisionsEnabled()) {
+            $return = $this
+                ->makeRevision()
+                ->user($user)
+                ->message($options['message'] ?? false)
+                ->save();
+        }
+
+        return $return;
     }
 
     public function createRevision($options = [])
