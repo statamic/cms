@@ -86,19 +86,16 @@ class CollectionsStore extends BasicStore
             ->store($collection->handle())
             ->index('uri');
 
-        if (empty($ids)) {
-            $index->update();
+        $ids = collect($ids ?? []);
 
-            return;
+        if ($ids->isEmpty()) {
+            return $index->update();
         }
 
-        foreach ($ids as $id) {
-            if (! $entry = Entry::find($id)) {
-                continue;
-            }
-
-            $index->updateItem($entry);
-        }
+        $ids
+            ->map(fn ($id) => Entry::find($id))
+            ->filter()
+            ->each(fn ($entry) => $index->updateItem($entry));
     }
 
     public function updateEntryOrder($collection, $ids = null)
@@ -107,19 +104,16 @@ class CollectionsStore extends BasicStore
             ->store($collection->handle())
             ->index('order');
 
-        if (empty($ids)) {
-            $index->update();
+        $ids = collect($ids ?? []);
 
-            return;
+        if ($ids->isEmpty()) {
+            return $index->update();
         }
 
-        foreach ($ids as $id) {
-            if (! $entry = Entry::find($id)) {
-                continue;
-            }
-
-            $index->updateItem($entry);
-        }
+        $ids
+            ->map(fn ($id) => Entry::find($id))
+            ->filter()
+            ->each(fn ($entry) => $index->updateItem($entry));
     }
 
     public function handleFileChanges()
