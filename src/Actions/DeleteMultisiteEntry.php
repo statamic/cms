@@ -9,8 +9,11 @@ class DeleteMultisiteEntry extends Delete
 {
     public function visibleTo($item)
     {
-        return $item instanceof Entry
-            && $item->collection()->sites()->count() > 1;
+        if (! ($item instanceof Entry && $item->collection()->sites()->count() > 1)) {
+            return false;
+        }
+
+        return ! $item->page()?->isRoot();
     }
 
     public function fieldItems()

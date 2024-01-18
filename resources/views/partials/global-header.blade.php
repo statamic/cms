@@ -36,6 +36,12 @@
             </a>
         @endif
 
+        @if (Route::has('pulse') && (app()->environment('local') || $user->can('viewPulse')))
+            <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ route('pulse') }}" target="_blank" v-tooltip="'Laravel Pulse'">
+                @cp_svg('icons/regular/pulse')
+            </a>
+        @endif
+
         @if (config('nova.path') && (app()->environment('local') || $user->can('viewNova')))
             <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
                 @cp_svg('icons/regular/nova')

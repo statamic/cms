@@ -1,1 +1,1 @@
-<h2 class="{{ $classes }}">{{ $text }}</h2>
+<h2 class="{{ $classes }}">{{ __($text) }}</h2>

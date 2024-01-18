@@ -16,12 +16,12 @@
 
             @foreach (Statamic\Facades\Collection::all() as $collection)
                 @if ($loop->first)<h6 class="p-2">{{ __('Collections') }}</h6>@endif
-                <dropdown-item redirect="{{ cp_route('collections.blueprints.create', $collection) }}">{{ $collection->title() }}</dropdown-item>
+                <dropdown-item redirect="{{ cp_route('collections.blueprints.create', $collection) }}" text="{{ $collection->title() }}"></dropdown-item>
             @endforeach
 
             @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
                 @if ($loop->first)<h6 class="p-2 mt-4">{{ __('Taxonomies') }}</h6>@endif
-                <dropdown-item redirect="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}">{{ $taxonomy->title() }}</dropdown-item>
+                <dropdown-item redirect="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}" text="{{ $taxonomy->title() }}"></dropdown-item>
             @endforeach
         </dropdown-list>
         </div>
@@ -39,10 +39,10 @@
                             <div class="flex items-center">
                                 <div class="w-4 h-4 mr-4">@cp_svg('icons/light/content-writing')</div>
                                 <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green-600' }} mr-2" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
-                                <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}">{{ $blueprint->title() }}</a>
+                                <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}" v-pre>{{ $blueprint->title() }}</a>
                             </div>
                         </td>
-                        <td class="text-right text-2xs">{{ $collection->title() }}</td>
+                        <td class="text-right text-2xs" v-pre>{{ $collection->title() }}</td>
                     </tr>
                 @endforeach
         @if ($loop->last)
@@ -63,10 +63,10 @@
                             <div class="flex items-center">
                                 <div class="w-4 h-4 mr-4">@cp_svg('icons/light/tags')</div>
                                 <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green-600' }} mr-2" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
-                                <a href="{{ cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]) }}">{{ $blueprint->title() }}</a>
+                                <a href="{{ cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]) }}" v-pre>{{ $blueprint->title() }}</a>
                             </div>
                         </td>
-                        <td class="text-right text-2xs">{{ $taxonomy->title() }}</td>
+                        <td class="text-right text-2xs" v-pre>{{ $taxonomy->title() }}</td>
                     </tr>
                 @endforeach
         @if ($loop->last)
@@ -85,7 +85,7 @@
                     <td>
                         <div class="flex items-center">
                             <div class="w-4 h-4 mr-4">@cp_svg('icons/light/hierarchy-files')</div>
-                            <a href="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}">{{ $nav->title() }}</a>
+                            <a href="{{ cp_route('navigation.blueprint.edit', $nav->handle()) }}" v-pre>{{ $nav->title() }}</a>
                         </div>
                     </td>
                 </tr>
@@ -105,7 +105,7 @@
                     <td>
                         <div class="flex items-center">
                             <div class="w-4 h-4 mr-4">@cp_svg('icons/light/earth')</div>
-                            <a href="{{ cp_route('globals.blueprint.edit', $set->handle()) }}">{{ $set->title() }}</a>
+                            <a href="{{ cp_route('globals.blueprint.edit', $set->handle()) }}" v-pre>{{ $set->title() }}</a>
                         </div>
                     </td>
                 </tr>
@@ -125,7 +125,7 @@
                     <td>
                         <div class="flex items-center">
                             <div class="w-4 h-4 mr-4">@cp_svg('icons/light/assets')</div>
-                            <a href="{{ cp_route('asset-containers.blueprint.edit', $container->handle()) }}">{{ $container->title() }}</a>
+                            <a href="{{ cp_route('asset-containers.blueprint.edit', $container->handle()) }}" v-pre>{{ $container->title() }}</a>
                         </div>
                     </td>
                 </tr>
@@ -146,7 +146,7 @@
                     <td>
                         <div class="flex items-center">
                             <div class="w-4 h-4 mr-4">@cp_svg('icons/light/drawer-file')</div>
-                            <a href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}">{{ $form->title() }}</a>
+                            <a href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}" v-pre>{{ $form->title() }}</a>
                         </div>
                     </td>
             @if ($loop->last)
@@ -178,6 +178,24 @@
             </tr>
         </table>
     </div>
+
+    @foreach ($additional as $namespace)
+    <h3 class="little-heading pl-0 mb-2">{{ $namespace['title'] }}</h3>
+    <div class="card p-0 mb-4">
+        <table class="data-table">
+        @foreach ($namespace['blueprints'] as $blueprint)
+            <tr>
+                <td>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 mr-4">@cp_svg('icons/light/blueprint')</div>
+                        <a href="{{ cp_route('blueprints.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ $blueprint['title'] }}</a>
+                    </div>
+                </td>
+            </tr>
+        @endforeach
+        </table>
+    </div>
+    @endforeach
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Blueprints'),

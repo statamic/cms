@@ -83,6 +83,69 @@ EOT;
     }
 
     /** @test */
+    public function it_gets_a_blueprint_in_a_custom_namespace()
+    {
+        $contents = <<<'EOT'
+title: Test
+tabs:
+  main:
+    fields:
+      - one
+      - two
+EOT;
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/baz.yaml')->once()->andReturnTrue();
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/vendor/foo/baz.yaml')->once()->andReturnFalse();
+        File::shouldReceive('get')->with('/path/to/resources/blueprints/foo/baz.yaml')->once()->andReturn($contents);
+
+        Facades\Blueprint::addNamespace('foo', '/path/to/resources/blueprints/foo');
+
+        $blueprint = $this->repo->find('foo::baz');
+
+        $this->assertInstanceOf(Blueprint::class, $blueprint);
+        $this->assertEquals('baz', $blueprint->handle());
+        $this->assertEquals('foo', $blueprint->namespace());
+        $this->assertEquals([
+            'title' => 'Test',
+            'tabs' => [
+                'main' => [
+                    'fields' => ['one', 'two'],
+                ],
+            ],
+        ], $blueprint->contents());
+    }
+
+    /** @test */
+    public function it_gets_an_overidden_blueprint_in_a_custom_namespace()
+    {
+        $contents = <<<'EOT'
+title: Test
+tabs:
+  main:
+    fields:
+      - one
+      - two
+EOT;
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/vendor/foo/baz.yaml')->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/blueprints/vendor/foo/baz.yaml')->once()->andReturn($contents);
+
+        Facades\Blueprint::addNamespace('foo', '/path/to/resources/blueprints/foo');
+
+        $blueprint = $this->repo->find('foo::baz');
+
+        $this->assertInstanceOf(Blueprint::class, $blueprint);
+        $this->assertEquals('baz', $blueprint->handle());
+        $this->assertEquals('foo', $blueprint->namespace());
+        $this->assertEquals([
+            'title' => 'Test',
+            'tabs' => [
+                'main' => [
+                    'fields' => ['one', 'two'],
+                ],
+            ],
+        ], $blueprint->contents());
+    }
+
+    /** @test */
     public function it_returns_null_if_blueprint_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();

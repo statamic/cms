@@ -27,7 +27,8 @@ class DuplicateEntry extends Action
             ->contains(fn ($entry) => $entry->descendants()->count());
 
         if ($hasDescendants) {
-            return 'duplicate_action_localizations_confirmation';
+            /** @translation */
+            return 'statamic::messages.duplicate_action_localizations_confirmation';
         }
 
         return parent::confirmationText();
@@ -36,9 +37,13 @@ class DuplicateEntry extends Action
     public function warningText()
     {
         if ($this->items->contains(fn ($entry) => $entry->hasOrigin())) {
-            return $this->items->count() === 1
-                ? 'duplicate_action_warning_localization'
-                : 'duplicate_action_warning_localizations';
+            if ($this->items->count() === 1) {
+                /** @translation */
+                return 'statamic::messages.duplicate_action_warning_localization';
+            }
+
+            /** @translation */
+            return 'statamic::messages.duplicate_action_warning_localizations';
         }
     }
 
@@ -50,7 +55,7 @@ class DuplicateEntry extends Action
             ->each(fn ($original) => $this->duplicateEntry($original));
     }
 
-    private function duplicateEntry(Entry $original, string $origin = null)
+    private function duplicateEntry(Entry $original, ?string $origin = null)
     {
         $originalParent = $this->getEntryParentFromStructure($original);
         [$title, $slug] = $this->generateTitleAndSlug($original);

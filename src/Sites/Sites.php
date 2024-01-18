@@ -2,6 +2,7 @@
 
 namespace Statamic\Sites;
 
+use Closure;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
 
@@ -10,6 +11,7 @@ class Sites
     protected $config;
     protected $sites;
     protected $current;
+    protected ?Closure $currentUrlCallback = null;
 
     public function __construct($config)
     {
@@ -54,13 +56,25 @@ class Sites
     public function current()
     {
         return $this->current
-            ?? $this->findByUrl(request()->getUri())
+            ?? $this->findByCurrentUrl()
             ?? $this->default();
+    }
+
+    private function findByCurrentUrl()
+    {
+        return $this->findByUrl(
+            $this->currentUrlCallback ? call_user_func($this->currentUrlCallback) : request()->getUri()
+        );
     }
 
     public function setCurrent($site)
     {
         $this->current = $this->get($site);
+    }
+
+    public function resolveCurrentUrlUsing(Closure $callback)
+    {
+        $this->currentUrlCallback = $callback;
     }
 
     public function selected()
