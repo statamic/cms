@@ -1,5 +1,33 @@
 # Release Notes
 
+## 4.45.0 (2024-01-18)
+
+### What's new
+- Allow search index updates to be queued. [#9358](https://github.com/statamic/cms/issues/9358) by @jasonvarga
+- Autoload addon blueprints. [#9324](https://github.com/statamic/cms/issues/9324) by @aerni
+- Add CC and BCC fields to form email config. [#9336](https://github.com/statamic/cms/issues/9336) by @godismyjudge95
+
+### What's improved
+- Prevent handling field previews when previews are disabled. [#9353](https://github.com/statamic/cms/issues/9353) by @duncanmcclean
+- Update entry order and uri by ids. [#9350](https://github.com/statamic/cms/issues/9350) by @jacksleight
+- Dutch translations. [#9347](https://github.com/statamic/cms/issues/9347) by @jeroenpeters1986
+
+### What's fixed
+- Improve Bard cut/copy/pasting sets. [#7606](https://github.com/statamic/cms/issues/7606) by @jacksleight
+- Catch validation exceptions thrown in FormSubmitted events. [#9348](https://github.com/statamic/cms/issues/9348) by @ryanmitchell
+- Allow optional asset fields in form submissions. [#9356](https://github.com/statamic/cms/issues/9356) by @AndreasSchantl
+- Fix error from Relationship Index Fieldtype after toggling column. [#9355](https://github.com/statamic/cms/issues/9355) by @duncanmcclean
+- Prevent creating revision when localizing entry unless revisions are enabled on the collection. [#8908](https://github.com/statamic/cms/issues/8908) by @duncanmcclean
+- Fix "Read Only" text for section fields. [#9315](https://github.com/statamic/cms/issues/9315) by @duncanmcclean
+- Fix additional blueprints in multi-part namespaces. [#9325](https://github.com/statamic/cms/issues/9325) by @jacksleight
+- Prevent Bard causing dirty state issues. [#9344](https://github.com/statamic/cms/issues/9344) by @duncanmcclean
+- Prevent original addon blueprint being deleted when saving. [#9326](https://github.com/statamic/cms/issues/9326) by @ryanmitchell
+- Fix Bard sets being inserted too early. [#9216](https://github.com/statamic/cms/issues/9216) by @duncanmcclean
+- Fix too many redirects on collection. [#9318](https://github.com/statamic/cms/issues/9318) by @aerni
+- Fix Statamic compiled assets not working when running in a subdirectory. [#8984](https://github.com/statamic/cms/issues/8984) by @singer-d
+
+
+
 ## 4.44.0 (2024-01-11)
 
 ### What's new
