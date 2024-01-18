@@ -20,10 +20,9 @@
             </div>
 
             <div class="hidden md:flex items-center">
-
                 <save-button-options
                     v-if="!readOnly"
-                    :show-options="!revisionsEnabled && !isInline"
+                    :show-options="!isInline"
                     :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
@@ -563,16 +562,6 @@ export default {
                     response
                 })
                 .then(() => {
-                    // If revisions are enabled, just emit event.
-                    if (this.revisionsEnabled) {
-                        clearTimeout(this.trackDirtyStateTimeout)
-                        this.trackDirtyState = false
-                        this.values = this.resetValuesFromResponse(response.data.data.values);
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350)
-                        this.$nextTick(() => this.$emit('saved', response));
-                        return;
-                    }
-
                     let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
                     // If the user has opted to create another entry, redirect them to create page.
@@ -589,6 +578,15 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
+                        if (this.revisionsEnabled) {
+                            clearTimeout(this.trackDirtyStateTimeout)
+                            this.trackDirtyState = false
+                            this.values = this.resetValuesFromResponse(response.data.data.values);
+                            this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350)
+                            this.$nextTick(() => this.$emit('saved', response));
+                            return;
+                        }
+
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
