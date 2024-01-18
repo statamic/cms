@@ -86,16 +86,7 @@ class CollectionsStore extends BasicStore
             ->store($collection->handle())
             ->index('uri');
 
-        $ids = collect($ids ?? []);
-
-        if ($ids->isEmpty()) {
-            return $index->update();
-        }
-
-        $ids
-            ->map(fn ($id) => Entry::find($id))
-            ->filter()
-            ->each(fn ($entry) => $index->updateItem($entry));
+        $this->updateEntriesWithinIndex($index, $ids);
     }
 
     public function updateEntryOrder($collection, $ids = null)
@@ -104,6 +95,11 @@ class CollectionsStore extends BasicStore
             ->store($collection->handle())
             ->index('order');
 
+        $this->updateEntriesWithinIndex($index, $ids);
+    }
+
+    private function updateEntriesWithinIndex($index, $ids)
+    {
         $ids = collect($ids ?? []);
 
         if ($ids->isEmpty()) {
