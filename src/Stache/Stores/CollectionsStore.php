@@ -100,13 +100,11 @@ class CollectionsStore extends BasicStore
 
     private function updateEntriesWithinIndex($index, $ids)
     {
-        $ids = collect($ids ?? []);
-
-        if ($ids->isEmpty()) {
+        if (empty($ids)) {
             return $index->update();
         }
 
-        $ids
+        collect($ids)
             ->map(fn ($id) => Entry::find($id))
             ->filter()
             ->each(fn ($entry) => $index->updateItem($entry));
