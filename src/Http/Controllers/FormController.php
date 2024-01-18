@@ -79,7 +79,7 @@ class FormController extends Controller
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
-        if ($type !== 'multipart/form-data' && $form->hasFiles()) {
+        if ($type !== 'multipart/form-data' && $form->hasFiles() && $request->assets()) {
             throw new FileContentTypeRequiredException;
         }
     }
