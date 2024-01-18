@@ -44,6 +44,7 @@
                     :set-index="index"
                     :field-path="fieldPath(field)"
                     :read-only="isReadOnly"
+                    :show-field-previews="showFieldPreviews"
                     @updated="updated(field.handle, $event)"
                     @meta-updated="metaUpdated(field.handle, $event)"
                     @focus="$emit('focus')"
