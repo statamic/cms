@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
