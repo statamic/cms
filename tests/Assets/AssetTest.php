@@ -562,6 +562,7 @@ class AssetTest extends TestCase
     public function it_gets_the_extension_guessed_extension_and_mime_type()
     {
         Storage::fake('test');
+        Storage::disk('test')->put('foo.mp4a', '');
         Storage::disk('test')->put('.meta/foo.mp4a.yaml', YAML::dump(['mime_type' => 'audio/mp4']));
 
         $container = Facades\AssetContainer::make('test')->disk('test');
@@ -718,6 +719,33 @@ class AssetTest extends TestCase
         ];
 
         $this->assertEquals($expectedAfterMerge, $asset->meta());
+    }
+
+    /** @test */
+    public function it_does_not_write_to_meta_file_when_asset_does_not_exist()
+    {
+        Storage::fake('test');
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/test.txt');
+
+        // No meta file should exist yet...
+        $this->assertFalse(Storage::disk('test')->exists('foo/.meta/test.txt.yaml'));
+
+        // Calling `meta` should return an empty meta array, but not write a meta file...
+        $meta = $asset->meta();
+        $this->assertEquals(['data' => []], $meta);
+        $this->assertFalse(Storage::disk('test')->exists('foo/.meta/test.txt.yaml'));
+    }
+
+    /** @test */
+    public function it_gets_meta_path()
+    {
+        $asset = (new Asset)->container($this->container)->path('test.txt');
+        $this->assertEquals('.meta/test.txt.yaml', $asset->metaPath());
+
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+        $this->assertEquals('foo/.meta/test.txt.yaml', $asset->metaPath());
     }
 
     /** @test */
@@ -1388,6 +1416,7 @@ class AssetTest extends TestCase
     public function it_gets_no_ratio_when_height_is_zero()
     {
         Storage::fake('test');
+        Storage::disk('test')->put('image.jpg', '');
         Storage::disk('test')->put('.meta/image.jpg.yaml', YAML::dump(['width' => '30', 'height' => '0']));
 
         $container = Facades\AssetContainer::make('test')->disk('test');
@@ -2153,6 +2182,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_syncs_original_state_with_no_data_but_with_data_in_meta()
     {
+        Storage::disk('test')->put('path/to/test.txt', '');
         Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  foo: bar");
         $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
 
@@ -2181,6 +2211,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_syncs_original_state_with_data()
     {
+        Storage::disk('test')->put('path/to/test.txt', '');
         $yaml = <<<'YAML'
 data:
   alfa: bravo
@@ -2222,6 +2253,7 @@ YAML;
     /** @test */
     public function it_resolves_pending_original_meta_values_when_hydrating()
     {
+        Storage::disk('test')->put('path/to/test.txt', '');
         $yaml = <<<'YAML'
 data:
   alfa: bravo

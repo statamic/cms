@@ -225,6 +225,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return $this->metaValue($key);
         }
 
+        if (! $this->exists()) {
+            return $this->generateMeta();
+        }
+
         if (! config('statamic.assets.cache_meta')) {
             return $this->generateMeta();
         }
@@ -290,7 +294,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     {
         $path = dirname($this->path()).'/.meta/'.$this->basename().'.yaml';
 
-        return ltrim($path, '/');
+        return (string) Str::of($path)->replaceFirst('./', '')->ltrim('/');
     }
 
     protected function metaExists()

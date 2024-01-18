@@ -453,6 +453,7 @@ export default {
         },
 
         container(container) {
+            this.initializing = true;
             this.preferencesPrefix = `assets.${container.id}`;
             this.mode = this.getPreference('mode') || 'table';
             this.setInitialPerPage();
@@ -464,7 +465,7 @@ export default {
         },
 
         parameters(after, before) {
-            if (JSON.stringify(before) === JSON.stringify(after)) return;
+            if (this.initializing || JSON.stringify(before) === JSON.stringify(after)) return;
             this.loadAssets();
         },
 

@@ -367,13 +367,17 @@ export default {
         json(json) {
             if (!this.mounted) return;
 
+            let jsonValue = JSON.stringify(json);
+
+            if (jsonValue === this.value) return;
+
             // Prosemirror's JSON will include spaces between tags.
             // For example (this is not the actual json)...
             // "<p>One <b>two</b> three</p>" becomes ['OneSPACE', '<b>two</b>', 'SPACEthree']
             // But, Laravel's TrimStrings middleware would remove them.
             // Those spaces need to be there, otherwise it would be rendered as <p>One<b>two</b>three</p>
             // To combat this, we submit the JSON string instead of an object.
-            this.updateDebounced(JSON.stringify(json));
+            this.updateDebounced(jsonValue);
         },
 
         value(value, oldValue) {
@@ -434,9 +438,16 @@ export default {
 
             this.updateSetMeta(id, this.meta.new[handle]);
 
+            const { $head } = this.editor.view.state.selection;
+            const { nodeBefore } = $head;
+
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
-                this.editor.commands.set({ id, values });
+                if (nodeBefore) {
+                    this.editor.commands.setAt({ attrs: { id, values }, pos: $head.pos });
+                } else {
+                    this.editor.commands.set({ id, values });
+                }
             });
         },
 
