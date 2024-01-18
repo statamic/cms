@@ -286,6 +286,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             const stack = JSON.parse(this.value);
             let text = '';
             while (stack.length) {

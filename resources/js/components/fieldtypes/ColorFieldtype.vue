@@ -92,6 +92,8 @@ export default {
     computed: {
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.value
                 ? `<span class="little-dot" style="background-color:${this.value}"></span>`
                 : null;
