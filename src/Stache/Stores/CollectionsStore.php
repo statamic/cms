@@ -102,7 +102,7 @@ class CollectionsStore extends BasicStore
 
     public function updateEntryOrder($collection, $ids = null)
     {
-        Stache::store('entries')
+        $index = Stache::store('entries')
             ->store($collection->handle())
             ->index('order');
 
