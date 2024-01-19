@@ -127,6 +127,10 @@ trait QueriesConditions
 
     protected function queryIsCondition($query, $field, $value)
     {
+        if ($field === 'status') {
+            return $query->whereStatus($value);
+        }
+
         return $query->where($field, $value);
     }
 

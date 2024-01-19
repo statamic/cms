@@ -26,7 +26,7 @@ class Status extends Filter
 
     public function apply($query, $values)
     {
-        $query->where('status', $values['status']);
+        $query->whereStatus($values['status']);
     }
 
     public function badge($values)

@@ -40,7 +40,7 @@ class StatusQueryBuilderTest extends TestCase
     public function it_queries_status_by_default()
     {
         $builder = $this->mock(Builder::class);
-        $builder->shouldReceive('where')->with('status', 'published')->once()->andReturnSelf();
+        $builder->shouldReceive('whereStatus')->with('published')->once()->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn('results');
 
         $results = (new StatusQueryBuilder($builder))->get();
@@ -52,7 +52,7 @@ class StatusQueryBuilderTest extends TestCase
     public function the_fallback_query_status_value_can_be_set_in_the_constructor()
     {
         $builder = $this->mock(Builder::class);
-        $builder->shouldReceive('where')->with('status', 'potato')->once()->andReturnSelf();
+        $builder->shouldReceive('whereStatus')->with('potato')->once()->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn('results');
 
         $results = (new StatusQueryBuilder($builder, 'potato'))->get();
@@ -74,6 +74,20 @@ class StatusQueryBuilderTest extends TestCase
         $query = (new StatusQueryBuilder($builder));
 
         $query->$method('status', 'foo');
+
+        $this->assertEquals('results', $query->get());
+    }
+
+    /** @test */
+    public function it_doesnt_perform_fallback_status_query_when_wherestatus_is_explicitly_queried()
+    {
+        $builder = $this->mock(Builder::class);
+        $builder->shouldReceive('whereStatus')->with('foo')->once()->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturn('results');
+
+        $query = (new StatusQueryBuilder($builder));
+
+        $query->whereStatus('foo');
 
         $this->assertEquals('results', $query->get());
     }
