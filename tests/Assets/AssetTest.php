@@ -1763,7 +1763,7 @@ class AssetTest extends TestCase
         // Ensure a glide server is never instantiated for these extensions...
         Facades\Glide::partialMock()->shouldReceive('server')->never();
 
-        $return = $asset->upload(UploadedFile::fake()->create("file.{$extension}"));
+        $return = $asset->upload(UploadedFile::fake()->createWithContent("file.{$extension}", '<svg width="20" height="30"></svg>'));
 
         $this->assertEquals($asset, $return);
         $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
