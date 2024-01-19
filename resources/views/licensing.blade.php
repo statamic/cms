@@ -70,7 +70,7 @@
                 <tr>
                     <td class="w-64 font-bold">
                         <span class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-500' }} mr-2"></span>
-                        Statamic @if ($statamic->pro())<span class="text-pink">{{ __('Pro') }}</span>@else {{ __('Free') }} @endif
+                        Statamic @if ($statamic->pro())<span class="text-pink">Pro</span>@else Free @endif
                     </td>
                     <td>{{ $statamic->version() }}</td>
                     <td class="text-right text-red-500">{{ $statamic->invalidReason() }}</td>
