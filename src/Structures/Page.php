@@ -195,7 +195,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
         }
 
         $parentUri = $this->parent && ! $this->parent->isRoot() ? $this->parent->uri() : '';
-        $parentUri = Str::replace(['.html', '.htm', '.xml', '.xhtml'], '', $parentUri);
+        $parentUri = Str::replace('.html', '', $parentUri);
 
         return $uris[$this->reference] = app(UrlBuilder::class)
             ->content($this)
