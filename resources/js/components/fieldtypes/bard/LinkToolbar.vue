@@ -28,7 +28,7 @@
                             type="text"
                             ref="urlInput"
                             class="input h-auto text-sm"
-                            placeholder="URL"
+                            :placeholder="__('URL')"
                             @keydown.enter.prevent="commit"
                         />
     
@@ -39,7 +39,7 @@
                             type="text"
                             ref="mailtoInput"
                             class="input h-auto text-sm"
-                            placeholder="Email Address"
+                            :placeholder="__('Email Address')"
                             @keydown.enter.prevent="commit"
                         />
     

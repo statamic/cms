@@ -19,7 +19,7 @@
                 @blur="$emit('blur')"
             >
                 <template v-slot:append v-if="config.show_regenerate">
-                    <button class="input-group-append items-center flex" @click="sync" v-tooltip="__('Regenerate from: ' + config.from)">
+                    <button class="input-group-append items-center flex" @click="sync" v-tooltip="__('Regenerate from: :field', { 'field': config.from })">
                         <svg-icon name="light/synchronize" class="w-5 h-5" />
                     </button>
                 </template>
