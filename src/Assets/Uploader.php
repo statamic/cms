@@ -54,7 +54,9 @@ abstract class Uploader
 
         if (Str::endsWith($destinationPath, '.svg')) {
             $sanitizer = new DOMSanitizer(DOMSanitizer::SVG);
-            $stream = $sanitizer->sanitize(stream_get_contents($stream));
+            $stream = $sanitizer->sanitize($svg = stream_get_contents($stream), [
+                'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
+            ]);
         }
 
         $this->disk()->put($this->uploadPathPrefix().$destinationPath, $stream);
