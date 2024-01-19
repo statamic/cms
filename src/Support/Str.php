@@ -139,17 +139,17 @@ class Str
     public static function fileSizeForHumans($bytes, $decimals = 2)
     {
         if ($bytes >= 1073741824) {
-            $bytes = number_format($bytes / 1073741824, $decimals).' GB';
+            $bytes = number_format($bytes / 1073741824, $decimals).' '.__('GB');
         } elseif ($bytes >= 1048576) {
-            $bytes = number_format($bytes / 1048576, $decimals).' MB';
+            $bytes = number_format($bytes / 1048576, $decimals).' '.__('MB');
         } elseif ($bytes >= 1024) {
-            $bytes = number_format($bytes / 1024, $decimals).' KB';
+            $bytes = number_format($bytes / 1024, $decimals).' '.__('KB');
         } elseif ($bytes > 1) {
-            $bytes = $bytes.' B';
+            $bytes = $bytes.' '.__('B');
         } elseif ($bytes == 1) {
-            $bytes = $bytes.' B';
+            $bytes = $bytes.' '.__('B');
         } else {
-            $bytes = '0 B';
+            $bytes = __('0 B');
         }
 
         return $bytes;
@@ -158,10 +158,10 @@ class Str
     public static function timeForHumans($ms)
     {
         if ($ms < 1000) {
-            return $ms.'ms';
+            return $ms.__('ms');
         }
 
-        return round($ms / 1000, 2).'s';
+        return round($ms / 1000, 2).__('s');
     }
 
     /**
