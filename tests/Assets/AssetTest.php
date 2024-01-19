@@ -1594,7 +1594,7 @@ class AssetTest extends TestCase
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
         // This should only get called when glide processing source image on upload...
-        ImageValidator::shouldReceive('isValidImage')->never();
+        ImageValidator::partialMock()->shouldReceive('isValidImage')->never();
 
         $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
 
@@ -1644,7 +1644,8 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
-        ImageValidator::shouldReceive('isValidImage')
+        ImageValidator::partialMock()
+            ->shouldReceive('isValidImage')
             ->with('jpg', 'image/jpeg')
             ->andReturnTrue()
             ->once();
@@ -1691,7 +1692,8 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
-        ImageValidator::shouldReceive('isValidImage')
+        ImageValidator::partialMock()
+            ->shouldReceive('isValidImage')
             ->with('jpg', 'image/jpeg')
             ->andReturnTrue()
             ->once();
