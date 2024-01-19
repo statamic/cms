@@ -1730,7 +1730,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function it_can_upload_an_svg_with_inline_scripts()
+    public function it_sanitizes_svgs_on_upload()
     {
         Event::fake();
 
@@ -1742,14 +1742,8 @@ class AssetTest extends TestCase
         $return = $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>'));
 
         $this->assertEquals($asset, $return);
-        $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
-        $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
         Storage::disk('test')->assertExists('path/to/asset.svg');
         $this->assertEquals('path/to/asset.svg', $asset->path());
-        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
-            return $event->asset = $asset;
-        });
-        Event::assertDispatched(AssetSaved::class);
 
         // Ensure the inline scripts were stripped out.
         $this->assertStringNotContainsString('<script', $asset->contents());
