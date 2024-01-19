@@ -185,8 +185,12 @@ class PageTest extends TestCase
         $this->assertFalse($page->hasCustomUrl());
     }
 
-    /** @test */
-    public function it_builds_a_uri_and_strips_out_file_extensions_from_parent_uri()
+    /**
+     * @test
+     *
+     * @dataProvider stripExtensionFromParentUriProvider
+     */
+    public function it_builds_a_uri_and_strips_out_file_extensions_from_parent_uri($ext)
     {
         $entry = new class extends Entry
         {
@@ -205,7 +209,7 @@ class PageTest extends TestCase
 
         $parent = Mockery::mock(Page::class);
         $parent->shouldReceive('id')->andReturn('the-parent-entry');
-        $parent->shouldReceive('uri')->andReturn('/the-parent-entry.html');
+        $parent->shouldReceive('uri')->andReturn('/the-parent-entry.'.$ext);
         $parent->shouldReceive('isRoot')->andReturnFalse();
 
         $tree = $this->newTree()->setStructure(
@@ -214,12 +218,20 @@ class PageTest extends TestCase
 
         $page = (new Page)
             ->setTree($tree)
-            ->setRoute('/{parent_uri}/{slug}.html')
+            ->setRoute('/{parent_uri}/{slug}.'.$ext)
             ->setParent($parent)
             ->setEntry($entry);
 
-        $this->assertEquals('/the-parent-entry/entry-slug.html', $page->uri());
+        $this->assertEquals('/the-parent-entry/entry-slug.'.$ext, $page->uri());
         $this->assertFalse($page->hasCustomUrl());
+    }
+
+    public function stripExtensionFromParentUriProvider()
+    {
+        return [
+            'html' => ['html'],
+            'htm' => ['htm'],
+        ];
     }
 
     /** @test */
