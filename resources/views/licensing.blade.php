@@ -45,7 +45,7 @@
            </div>
         @endif
 
-        <h6 class="mt-8">Site</h6>
+        <h6 class="mt-8">{{ __('Site') }}</h6>
         <div class="card p-0 mt-2">
             <table class="data-table">
                 <tr>
@@ -64,13 +64,13 @@
             </table>
         </div>
 
-        <h6 class="mt-8">Core</h6>
+        <h6 class="mt-8">{{ __('Core') }}</h6>
         <div class="card p-0 mt-2">
             <table class="data-table">
                 <tr>
                     <td class="w-64 font-bold">
                         <span class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-500' }} mr-2"></span>
-                        Statamic @if ($statamic->pro())<span class="text-pink">Pro</span>@else Free @endif
+                        Statamic @if ($statamic->pro())<span class="text-pink">{{ __('Pro') }}</span>@else {{ __('Free') }} @endif
                     </td>
                     <td>{{ $statamic->version() }}</td>
                     <td class="text-right text-red-500">{{ $statamic->invalidReason() }}</td>
