@@ -186,6 +186,43 @@ class PageTest extends TestCase
     }
 
     /** @test */
+    public function it_builds_a_uri_and_strips_out_file_extensions_from_parent_uri()
+    {
+        $entry = new class extends Entry
+        {
+            public function id($id = null)
+            {
+                return 'a';
+            }
+
+            public function slug($slug = null)
+            {
+                return 'entry-slug';
+            }
+        };
+        $collection = tap(\Statamic\Facades\Collection::make('test'))->save();
+        $entry->collection('test');
+
+        $parent = Mockery::mock(Page::class);
+        $parent->shouldReceive('id')->andReturn('the-parent-entry');
+        $parent->shouldReceive('uri')->andReturn('/the-parent-entry.html');
+        $parent->shouldReceive('isRoot')->andReturnFalse();
+
+        $tree = $this->newTree()->setStructure(
+            $this->mock(CollectionStructure::class)->shouldReceive('collection')->andReturn($collection)->getMock()
+        );
+
+        $page = (new Page)
+            ->setTree($tree)
+            ->setRoute('/{parent_uri}/{slug}.html')
+            ->setParent($parent)
+            ->setEntry($entry);
+
+        $this->assertEquals('/the-parent-entry/entry-slug.html', $page->uri());
+        $this->assertFalse($page->hasCustomUrl());
+    }
+
+    /** @test */
     public function it_gets_the_entrys_uri_when_the_structure_does_not_have_a_collection()
     {
         $entry = $this->partialMock(Entry::class);
