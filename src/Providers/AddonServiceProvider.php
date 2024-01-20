@@ -668,6 +668,11 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function autoloadFilesFromFolder($folder, $requiredClass)
     {
         $addon = $this->getAddon();
+
+        if ($cache = $addon->folderCache()->get(Str::lower($folder))) {
+            return $cache;
+        }
+
         $path = $addon->directory().$addon->autoload().'/'.$folder;
 
         if (! $this->app['files']->exists($path)) {
