@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.4.16 (2024-01-22)
+
+### What's fixed
+- Fix Outpost error handling [#9370](https://github.com/statamic/cms/issues/9370) by @jasonvarga
+
+
+
 ## 3.4.15 (2023-11-21)
 
 ### What's fixed
