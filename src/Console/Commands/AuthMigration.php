@@ -13,7 +13,7 @@ class AuthMigration extends Command
     use RunsInPlease;
 
     protected $composer;
-    protected $name = 'statamic:auth:migration {--path=}';
+    protected $signature = 'statamic:auth:migration {--path=}';
     protected $description = 'Generate Auth Migrations';
 
     public function __construct(Composer $composer)

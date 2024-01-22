@@ -9,7 +9,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
-use Statamic\Console\Please\Kernel;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Facades;
 use Tests\Auth\PermissibleContractTests;
@@ -25,8 +24,6 @@ class EloquentUserTest extends TestCase
 
     public function setUp(): void
     {
-        require_once __DIR__.'/../../Console/Kernel.php';
-
         parent::setUp();
 
         Carbon::setTestNow(Carbon::create(2019, 11, 21, 23, 39, 29));
@@ -40,7 +37,7 @@ class EloquentUserTest extends TestCase
         $tmpDir = $this->migrationsDir.'/tmp';
 
         if (! self::$migrationsGenerated) {
-            $this->please('auth:migration', ['--path' => $tmpDir]);
+            $this->artisan('statamic:auth:migration', ['--path' => $tmpDir]);
 
             self::$migrationsGenerated = true;
         }
@@ -66,11 +63,6 @@ class EloquentUserTest extends TestCase
         (new Filesystem)->deleteDirectory(__DIR__.'/__migrations__/tmp');
 
         parent::tearDownAfterClass();
-    }
-
-    private function please($command, $parameters = [])
-    {
-        return $this->app[Kernel::class]->call($command, $parameters);
     }
 
     /** @test */
