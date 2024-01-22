@@ -38,7 +38,7 @@ class FieldTransformer
 
         if (Arr::get($field, 'duplicate', true) === true) {
             unset($field['duplicate']);
-    }
+        }
 
         if (Arr::has($field, 'icon')) {
             unset($field['icon']);
