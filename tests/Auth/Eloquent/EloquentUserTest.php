@@ -30,11 +30,9 @@ class EloquentUserTest extends TestCase
 
         config(['statamic.users.repository' => 'eloquent']);
 
-        $this->migrationsDir = __DIR__.'/__migrations__';
+        $this->loadMigrationsFrom(static::migrationsDir());
 
-        $this->loadMigrationsFrom($this->migrationsDir);
-
-        $tmpDir = $this->migrationsDir.'/tmp';
+        $tmpDir = static::migrationsDir().'/tmp';
 
         if (! self::$migrationsGenerated) {
             $this->artisan('statamic:auth:migration', ['--path' => $tmpDir]);
@@ -49,6 +47,11 @@ class EloquentUserTest extends TestCase
         Event::fake();
     }
 
+    private static function migrationsDir()
+    {
+        return __DIR__.'/__migrations__';
+    }
+
     public function tearDown(): void
     {
         // Prevent error about null password during the down migration.
@@ -60,7 +63,7 @@ class EloquentUserTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         // Clean up the orphaned migration file.
-        (new Filesystem)->deleteDirectory(__DIR__.'/__migrations__/tmp');
+        (new Filesystem)->deleteDirectory(static::migrationsDir().'/tmp');
 
         parent::tearDownAfterClass();
     }

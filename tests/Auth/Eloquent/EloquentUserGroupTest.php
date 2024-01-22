@@ -27,11 +27,9 @@ class EloquentUserGroupTest extends TestCase
             'statamic.users.tables.groups' => 'groups',
         ]);
 
-        $this->migrationsDir = __DIR__.'/__migrations__';
+        $this->loadMigrationsFrom(static::migrationsDir());
 
-        $this->loadMigrationsFrom($this->migrationsDir);
-
-        $tmpDir = $this->migrationsDir.'/tmp';
+        $tmpDir = static::migrationsDir().'/tmp';
 
         if (! self::$migrationsGenerated) {
             $this->artisan('statamic:auth:migration', ['--path' => $tmpDir]);
@@ -40,6 +38,11 @@ class EloquentUserGroupTest extends TestCase
         }
 
         $this->loadMigrationsFrom($tmpDir);
+    }
+
+    private static function migrationsDir()
+    {
+        return __DIR__.'/__migrations__';
     }
 
     public function tearDown(): void
@@ -52,7 +55,7 @@ class EloquentUserGroupTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         // Clean up the orphaned migration file.
-        (new Filesystem)->deleteDirectory(__DIR__.'/__migrations__/tmp');
+        (new Filesystem)->deleteDirectory(static::migrationsDir().'/tmp');
 
         parent::tearDownAfterClass();
     }
