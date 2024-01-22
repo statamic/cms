@@ -27,7 +27,6 @@ class StatamicAuthTables extends Migration
         });
 
         Schema::create('password_activation_tokens', function (Blueprint $table) {
-            $table->id('id');
             $table->string('email')->index();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
