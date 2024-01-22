@@ -11,7 +11,7 @@ class ScaffoldCollectionController extends CpController
 {
     public function index($collection)
     {
-        $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
+        $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
 
         return view('statamic::collections.scaffold', compact('collection'));
     }
