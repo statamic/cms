@@ -2,12 +2,11 @@
 
 namespace Tests\Auth\Eloquent;
 
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Schema;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
 use Statamic\Console\Please\Kernel;
@@ -55,10 +54,18 @@ class EloquentUserTest extends TestCase
 
     public function tearDown(): void
     {
-        // our down() migration sets password to not be nullable, so change it back
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('password')->nullable(true)->change();
-        });
+        // Prevent error about null password during the down migration.
+        User::all()->each->delete();
+
+        parent::tearDown();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        // Clean up the orphaned migration file.
+        (new Filesystem)->deleteDirectory(__DIR__.'/__migrations__/tmp');
+
+        parent::tearDownAfterClass();
     }
 
     private function please($command, $parameters = [])
