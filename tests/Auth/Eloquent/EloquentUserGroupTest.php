@@ -2,14 +2,11 @@
 
 namespace Tests\Auth\Eloquent;
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schema;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\Eloquent\UserGroup as EloquentGroup;
 use Statamic\Auth\Eloquent\UserGroupModel;
-use Statamic\Console\Please\Kernel;
 use Tests\TestCase;
 
 class EloquentUserGroupTest extends TestCase
@@ -20,8 +17,6 @@ class EloquentUserGroupTest extends TestCase
 
     public function setUp(): void
     {
-        require_once __DIR__.'/../../Console/Kernel.php';
-
         parent::setUp();
 
         Carbon::setTestNow(Carbon::create(2019, 11, 21, 23, 39, 29));
@@ -38,7 +33,7 @@ class EloquentUserGroupTest extends TestCase
         $tmpDir = $this->migrationsDir.'/tmp';
 
         if (! self::$migrationsGenerated) {
-            $this->please('auth:migration', ['--path' => $tmpDir]);
+            $this->artisan('statamic:auth:migration', ['--path' => $tmpDir]);
 
             self::$migrationsGenerated = true;
         }
@@ -48,15 +43,9 @@ class EloquentUserGroupTest extends TestCase
 
     public function tearDown(): void
     {
-        // our down() migration sets password to not be nullable, so change it back
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('password')->nullable(true)->change();
-        });
-    }
+        \Statamic\Facades\User::all()->each->delete();
 
-    private function please($command, $parameters = [])
-    {
-        return $this->app[Kernel::class]->call($command, $parameters);
+        parent::tearDown();
     }
 
     public function makeGroup()
