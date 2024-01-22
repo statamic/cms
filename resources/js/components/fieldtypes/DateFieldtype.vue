@@ -158,6 +158,23 @@ export default {
             return this.meta.displayFormat;
         },
 
+        replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (! this.value.date) return;
+
+            if (this.isRange) {
+                return Vue.moment(this.value.date.start).format(this.displayFormat) + ' – ' + Vue.moment(this.value.date.end).format(this.displayFormat);
+            }
+
+            let preview = Vue.moment(this.value.date).format(this.displayFormat);
+
+            if (this.hasTime && this.value.time) {
+                preview += ` ${this.value.time}`;
+            }
+
+            return preview;
+        },
+
     },
 
     created() {

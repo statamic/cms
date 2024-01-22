@@ -182,7 +182,7 @@ class Date extends Fieldtype
         ];
     }
 
-    private function splitDateTimeForPreProcessRange(array $range = null)
+    private function splitDateTimeForPreProcessRange(?array $range = null)
     {
         return ['date' => $range, 'time' => null];
     }

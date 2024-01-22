@@ -3,14 +3,17 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\Collection;
 use Statamic\Events\CollectionCreated;
+use Statamic\Events\CollectionCreating;
+use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionSaved;
+use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
@@ -363,6 +366,7 @@ class CollectionTest extends TestCase
                 ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
 
         $blueprint = $collection->entryBlueprint();
         $this->assertNotEquals($default, $blueprint);
@@ -494,6 +498,32 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_dispatches_collection_saving()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->save();
+
+        Event::assertDispatched(CollectionSaving::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_collection_creating()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->save();
+
+        Event::assertDispatched(CollectionCreating::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
+    }
+
+    /** @test */
     public function it_dispatches_collection_created_only_once()
     {
         Event::fake();
@@ -507,6 +537,42 @@ class CollectionTest extends TestCase
         });
         Event::assertDispatched(CollectionSaved::class, 2);
         Event::assertDispatched(CollectionCreated::class, 1);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_collection_doesnt_save()
+    {
+        Event::fake([CollectionCreated::class]);
+        Facades\Collection::spy();
+
+        Event::listen(CollectionCreating::class, function () {
+            return false;
+        });
+
+        $container = (new Collection)->handle('test');
+        $return = $container->save();
+
+        $this->assertFalse($return);
+
+        Event::assertNotDispatched(CollectionCreated::class);
+    }
+
+    /** @test */
+    public function if_saving_event_returns_false_the_collection_doesnt_save()
+    {
+        Event::fake([CollectionSaved::class]);
+        Facades\Collection::spy();
+
+        Event::listen(CollectionSaving::class, function () {
+            return false;
+        });
+
+        $container = (new Collection)->handle('test');
+        $return = $container->save();
+
+        $this->assertFalse($return);
+
+        Event::assertNotDispatched(CollectionSaved::class);
     }
 
     /** @test */
@@ -659,15 +725,13 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_augments()
     {
-        $mountedEntry = EntryFactory::collection('pages')->id('blog')->slug('blog')->data(['title' => 'Blog'])->create();
-
-        $collection = (new Collection)->mount('blog')->handle('test');
+        $collection = (new Collection)->handle('test');
 
         $this->assertInstanceof(Augmentable::class, $collection);
-        $this->assertCount(3, $augmentedArray = $collection->toAugmentedArray());
-        $this->assertEquals('Test', $augmentedArray['title']);
-        $this->assertEquals('test', $augmentedArray['handle']);
-        $this->assertEquals($mountedEntry, $augmentedArray['mount']->value());
+        $this->assertEquals([
+            'title' => 'Test',
+            'handle' => 'test',
+        ], $collection->toAugmentedArray());
     }
 
     /** @test */
@@ -900,5 +964,38 @@ class CollectionTest extends TestCase
         $this->assertTrue($user->can('view', $collection1));
         $this->assertTrue($user->can('view', $collection2));
         $this->assertFalse($user->can('view', $collection3));
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $collection = Facades\Collection::make('test')->save();
+
+        $collection->delete();
+
+        Event::assertDispatched(CollectionDeleting::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Collection::spy();
+        Event::fake([CollectionDeleted::class]);
+
+        Event::listen(CollectionDeleting::class, function () {
+            return false;
+        });
+
+        $collection = new Collection('test');
+
+        $return = $collection->delete();
+
+        $this->assertFalse($return);
+        Facades\Collection::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(CollectionDeleted::class);
     }
 }

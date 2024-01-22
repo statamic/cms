@@ -7,6 +7,7 @@ use DateTimeInterface;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\LazyCollection;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
@@ -156,7 +157,7 @@ abstract class Builder implements Contract
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
-        $loweredOperator = strtolower($operator);
+        $loweredOperator = strtolower((string) $operator);
 
         if ($useDefault) {
             return [$operator, '='];
@@ -479,6 +480,12 @@ abstract class Builder implements Contract
             throw new InvalidArgumentException('Illegal operator for date comparison');
         }
 
+        if (! ($value instanceof DateTimeInterface)) {
+            $value = Carbon::parse($value);
+        }
+
+        $value = $value->format('H:i:s'); // we only care about the time part
+
         $this->wheres[] = [
             'type' => 'Time',
             'column' => $column,
@@ -659,5 +666,73 @@ abstract class Builder implements Contract
         $this->with = array_merge($this->with, Arr::wrap($relations));
 
         return $this;
+    }
+
+    /**
+     * Chunk the results of the query.
+     *
+     * @param  int  $count
+     * @return bool
+     */
+    public function chunk($count, callable $callback)
+    {
+        $page = 1;
+
+        do {
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
+            $results = $this->forPage($page, $count)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
+            // On each chunk result set, we will pass them to the callback and then let the
+            // developer take care of everything within the callback, which allows us to
+            // keep the memory low for spinning through large result sets for working.
+            if ($callback($results, $page) === false) {
+                return false;
+            }
+
+            unset($results);
+
+            $page++;
+        } while ($countResults == $count);
+
+        return true;
+    }
+
+    /**
+     * Query lazily, by chunks of the given size.
+     *
+     * @param  int  $chunkSize
+     * @return \Illuminate\Support\LazyCollection
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function lazy($chunkSize = 1000)
+    {
+        if ($chunkSize < 1) {
+            throw new InvalidArgumentException('The chunk size should be at least 1');
+        }
+
+        return LazyCollection::make(function () use ($chunkSize) {
+            $page = 1;
+
+            while (true) {
+                $results = $this->forPage($page++, $chunkSize)->get();
+
+                foreach ($results as $result) {
+                    yield $result;
+                }
+
+                if ($results->count() < $chunkSize) {
+                    return;
+                }
+            }
+        });
     }
 }

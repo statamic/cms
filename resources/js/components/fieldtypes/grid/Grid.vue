@@ -28,6 +28,7 @@
                 :can-delete-rows="canDeleteRows"
                 :can-add-rows="canAddRows"
                 :allow-fullscreen="config.fullscreen"
+                :hide-display="config.hide_display"
                 @updated="updated"
                 @meta-updated="updateRowMeta"
                 @removed="removed"
@@ -135,6 +136,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return `${__(this.config.display)}: ${__n(':count row|:count rows', this.value.length)}`;
         }
 

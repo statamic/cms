@@ -75,6 +75,7 @@
                             class="border-t shadow-lg"
                             :resource-meta="meta"
                             :inline="true"
+                            :scroll-to-top="false"
                             @page-selected="setPage" />
 
                         <div class="p-4 border-t flex items-center justify-between bg-gray-200">
@@ -131,10 +132,12 @@
                                 :site="site"
                                 :preferences-prefix="`selector-field.${name}`"
                                 :editable="false"
+                                @branch-clicked="$refs[`tree-branch-${$event.id}`].click()"
                             >
                                 <template #branch-action="{ branch, index }">
                                     <div>
                                         <input
+                                            :ref="`tree-branch-${branch.id}`"
                                             type="checkbox"
                                             class="mt-3 ml-3"
                                             :value="branch.id"

@@ -3,7 +3,10 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Facades\Event;
+use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\Site;
+use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
 use Tests\TestCase;
@@ -290,6 +293,38 @@ class FileCacherTest extends TestCase
         $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/two', 'de'));
         $this->assertEquals(['two' => '/two', 'un' => '/fr/un'], $cacher->getUrls('http://domain.com')->all());
         $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://domain.de')->all());
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider invalidateEventProvider
+     */
+    public function invalidating_a_url_dispatches_event($domain, $expectedUrl)
+    {
+        Event::fake();
+
+        $writer = \Mockery::spy(Writer::class);
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher(['base_url' => 'http://base.com'], $writer, $cache);
+
+        // Put it in the container so that the event can resolve it.
+        $this->instance(Cacher::class, $cacher);
+
+        $cacher->invalidateUrl('/foo', $domain);
+
+        Event::assertDispatched(UrlInvalidated::class, function ($event) use ($expectedUrl) {
+            return $event->url === $expectedUrl;
+        });
+    }
+
+    public function invalidateEventProvider()
+    {
+        return [
+            'no domain' => [null, 'http://base.com/foo'],
+            'configured base domain' => ['http://base.com', 'http://base.com/foo'],
+            'another domain' => ['http://another.com', 'http://another.com/foo'],
+        ];
     }
 
     private function cacheKey($domain)

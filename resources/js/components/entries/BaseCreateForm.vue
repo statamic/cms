@@ -20,7 +20,7 @@
         :initial-site="site"
         :can-manage-publish-state="canManagePublishState"
         :create-another-url="createAnotherUrl"
-        :listing-url="listingUrl"
+        :initial-listing-url="listingUrl"
         :preview-targets="previewTargets"
         @saved="saved"
     ></entry-publish-form>

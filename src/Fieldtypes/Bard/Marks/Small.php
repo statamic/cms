@@ -3,10 +3,18 @@
 namespace Statamic\Fieldtypes\Bard\Marks;
 
 use Tiptap\Core\Mark;
+use Tiptap\Utils\HTML;
 
 class Small extends Mark
 {
     public static $name = 'small';
+
+    public function addOptions()
+    {
+        return [
+            'HTMLAttributes' => [],
+        ];
+    }
 
     public function parseHTML()
     {
@@ -17,8 +25,12 @@ class Small extends Mark
         ];
     }
 
-    public function renderHTML($mark)
+    public function renderHTML($mark, $HTMLAttributes = [])
     {
-        return ['small', 0];
+        return [
+            'small',
+            HTML::mergeAttributes($this->options['HTMLAttributes'], $HTMLAttributes),
+            0,
+        ];
     }
 }

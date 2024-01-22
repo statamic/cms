@@ -325,6 +325,7 @@ export default {
         restrictFolderNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         maxFiles: Number,
+        queryScopes: Array,
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
@@ -384,15 +385,15 @@ export default {
         },
 
         canEdit() {
-            return this.can('edit '+ this.container.id +' assets')
+            return this.can('edit '+ this.container.id +' assets') || this.can('configure asset containers')
         },
 
         canUpload() {
-            return this.folder && this.container.allow_uploads && this.can('upload '+ this.container.id +' assets');
+            return this.folder && this.container.allow_uploads && (this.can('upload '+ this.container.id +' assets') || this.can('configure asset containers'));
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation && this.can('upload '+ this.container.id +' assets');
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation && (this.can('upload '+ this.container.id +' assets') || this.can('configure asset containers'));
         },
 
         parameters() {
@@ -402,6 +403,7 @@ export default {
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 search: this.searchQuery,
+                queryScopes: this.queryScopes,
             }
         },
 
@@ -451,6 +453,7 @@ export default {
         },
 
         container(container) {
+            this.initializing = true;
             this.preferencesPrefix = `assets.${container.id}`;
             this.mode = this.getPreference('mode') || 'table';
             this.setInitialPerPage();
@@ -462,7 +465,7 @@ export default {
         },
 
         parameters(after, before) {
-            if (JSON.stringify(before) === JSON.stringify(after)) return;
+            if (this.initializing || JSON.stringify(before) === JSON.stringify(after)) return;
             this.loadAssets();
         },
 

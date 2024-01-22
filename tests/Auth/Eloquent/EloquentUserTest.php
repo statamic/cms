@@ -5,6 +5,7 @@ namespace Tests\Auth\Eloquent;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
@@ -31,6 +32,10 @@ class EloquentUserTest extends TestCase
         // TODO: The migration has been added into the test, but the implementation could be broken if the real
         // migration is different from what's in here. We should find a way to reference the actual migrations.
         $this->loadMigrationsFrom(__DIR__.'/__migrations__');
+
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to these tests.
+        Event::fake();
     }
 
     /** @test */
@@ -38,28 +43,28 @@ class EloquentUserTest extends TestCase
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
         };
         $roleC = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'c';
             }
         };
         $roleD = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'd';
             }
@@ -238,5 +243,25 @@ class EloquentUserTest extends TestCase
         $user->model()->timestamps = false;
 
         $this->assertFalse($user->timestamps);
+    }
+
+    /** @test */
+    public function it_gets_super_correctly_on_the_model()
+    {
+        $user = $this->makeUser();
+
+        $this->assertNull($user->super);
+
+        $user->super = true;
+        $user->save();
+
+        $this->assertTrue($user->super);
+        $this->assertTrue($user->model()->super);
+
+        $user->super = false;
+        $user->save();
+
+        $this->assertFalse($user->super);
+        $this->assertFalse($user->model()->super);
     }
 }

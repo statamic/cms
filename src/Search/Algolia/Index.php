@@ -54,16 +54,28 @@ class Index extends BaseIndex
 
     public function update()
     {
-        $this->getIndex()->clearObjects();
+        $index = $this->getIndex();
+        $index->clearObjects();
 
-        $this->insertMultiple($this->searchables()->all());
+        if (isset($this->config['settings'])) {
+            $index->setSettings($this->config['settings']);
+        }
+
+        $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
 
         return $this;
     }
 
     public function getIndex()
     {
-        return $this->client->initIndex($this->name);
+        $indexExisted = $this->exists();
+        $index = $this->client->initIndex($this->name);
+
+        if (! $indexExisted && isset($this->config['settings'])) {
+            $index->setSettings($this->config['settings']);
+        }
+
+        return $index;
     }
 
     public function searchUsingApi($query, $fields = null)

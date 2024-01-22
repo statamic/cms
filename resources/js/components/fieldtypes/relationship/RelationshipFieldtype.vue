@@ -134,6 +134,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.value.map(id => {
                 const item = _.findWhere(this.meta.data, { id });
                 return item ? item.title : id;
