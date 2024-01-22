@@ -2,14 +2,12 @@
 
 namespace Tests\Auth\Eloquent;
 
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schema;
 use Statamic\Auth\Eloquent\Role as EloquentRole;
 use Statamic\Auth\Eloquent\RoleModel;
 use Statamic\Auth\Eloquent\User as EloquentUser;
-use Statamic\Console\Please\Kernel;
 use Tests\TestCase;
 
 class EloquentRoleTest extends TestCase
@@ -20,8 +18,6 @@ class EloquentRoleTest extends TestCase
 
     public function setUp(): void
     {
-        require_once __DIR__.'/../../Console/Kernel.php';
-
         parent::setUp();
 
         Carbon::setTestNow(Carbon::create(2019, 11, 21, 23, 39, 29));
@@ -31,14 +27,12 @@ class EloquentRoleTest extends TestCase
             'statamic.users.tables.roles' => 'roles',
         ]);
 
-        $this->migrationsDir = __DIR__.'/__migrations__';
+        $this->loadMigrationsFrom(static::migrationsDir());
 
-        $this->loadMigrationsFrom($this->migrationsDir);
-
-        $tmpDir = $this->migrationsDir.'/tmp';
+        $tmpDir = static::migrationsDir().'/tmp';
 
         if (! self::$migrationsGenerated) {
-            $this->please('auth:migration', ['--path' => $tmpDir]);
+            $this->artisan('statamic:auth:migration', ['--path' => $tmpDir]);
 
             self::$migrationsGenerated = true;
         }
@@ -46,17 +40,24 @@ class EloquentRoleTest extends TestCase
         $this->loadMigrationsFrom($tmpDir);
     }
 
-    public function tearDown(): void
+    private static function migrationsDir()
     {
-        // our down() migration sets password to not be nullable, so change it back
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('password')->nullable(true)->change();
-        });
+        return __DIR__.'/__migrations__';
     }
 
-    private function please($command, $parameters = [])
+    public function tearDown(): void
     {
-        return $this->app[Kernel::class]->call($command, $parameters);
+        \Statamic\Facades\User::all()->each->delete();
+
+        parent::tearDown();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        // Clean up the orphaned migration file.
+        (new Filesystem)->deleteDirectory(static::migrationsDir().'/tmp');
+
+        parent::tearDownAfterClass();
     }
 
     public function makeRole()
