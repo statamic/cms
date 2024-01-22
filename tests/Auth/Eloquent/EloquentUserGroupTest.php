@@ -2,6 +2,7 @@
 
 namespace Tests\Auth\Eloquent;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Statamic\Auth\Eloquent\User as EloquentUser;
@@ -46,6 +47,14 @@ class EloquentUserGroupTest extends TestCase
         \Statamic\Facades\User::all()->each->delete();
 
         parent::tearDown();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        // Clean up the orphaned migration file.
+        (new Filesystem)->deleteDirectory(__DIR__.'/__migrations__/tmp');
+
+        parent::tearDownAfterClass();
     }
 
     public function makeGroup()
