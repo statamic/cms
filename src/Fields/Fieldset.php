@@ -5,6 +5,7 @@ namespace Statamic\Fields;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
+use Statamic\Events\FieldsetDeleting;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
 use Statamic\Facades;
@@ -123,13 +124,13 @@ class Fieldset
             ...GlobalSet::all()->map->blueprint(),
             ...AssetContainer::all()->map->blueprint(),
             ...Blueprint::in('')->values(),
-        ])->filter(function (Blueprint $blueprint) {
+        ])->filter()->filter(function (Blueprint $blueprint) {
             return collect($blueprint->contents()['tabs'])
                 ->pluck('sections')
                 ->flatten(1)
                 ->pluck('fields')
                 ->flatten(1)
-                ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                ->filter(fn ($field) => $field && $this->fieldImportsFieldset($field))
                 ->isNotEmpty();
         })->values();
 
@@ -235,6 +236,10 @@ class Fieldset
 
     public function delete()
     {
+        if (FieldsetDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         FieldsetRepository::delete($this);
 
         FieldsetDeleted::dispatch($this);

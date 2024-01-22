@@ -13,6 +13,7 @@ return [
     'assets.config.max_files' => 'Le nombre maxi de ressources sélectionnables.',
     'assets.config.min_files' => 'Le nombre mini de ressources sélectionnables.',
     'assets.config.mode' => 'Choisissez votre disposition préférée.',
+    'assets.config.query_scopes' => 'Choisissez les étendues de requête à appliquer lors de la récupération des ressources sélectionnables.',
     'assets.config.restrict' => 'Empêchez les utilisateurs de naviguer vers d’autres dossiers.',
     'assets.config.show_filename' => 'Affichez le nom du fichier à côté de l’image de prévisualisation.',
     'assets.config.show_set_alt' => 'Affichez un lien afin de définir le texte alternatif pour n’importe quelle image.',

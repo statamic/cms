@@ -10,6 +10,8 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\Collection;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionCreating;
+use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionSaved;
 use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
@@ -364,6 +366,7 @@ class CollectionTest extends TestCase
                 ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
 
         $blueprint = $collection->entryBlueprint();
         $this->assertNotEquals($default, $blueprint);
@@ -961,5 +964,38 @@ class CollectionTest extends TestCase
         $this->assertTrue($user->can('view', $collection1));
         $this->assertTrue($user->can('view', $collection2));
         $this->assertFalse($user->can('view', $collection3));
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $collection = Facades\Collection::make('test')->save();
+
+        $collection->delete();
+
+        Event::assertDispatched(CollectionDeleting::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Collection::spy();
+        Event::fake([CollectionDeleted::class]);
+
+        Event::listen(CollectionDeleting::class, function () {
+            return false;
+        });
+
+        $collection = new Collection('test');
+
+        $return = $collection->delete();
+
+        $this->assertFalse($return);
+        Facades\Collection::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(CollectionDeleted::class);
     }
 }

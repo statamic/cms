@@ -3,6 +3,7 @@
 namespace Statamic\Http\View\Composers;
 
 use Illuminate\View\View;
+use Statamic\Facades\Blink;
 use Statamic\Facades\CP\Nav;
 
 class NavComposer
@@ -12,10 +13,8 @@ class NavComposer
         'statamic::partials.nav-mobile',
     ];
 
-    protected static $nav;
-
     public function compose(View $view)
     {
-        $view->with('nav', self::$nav = self::$nav ?? Nav::build());
+        $view->with('nav', Blink::once('nav-composer-navigation', fn () => Nav::build()));
     }
 }

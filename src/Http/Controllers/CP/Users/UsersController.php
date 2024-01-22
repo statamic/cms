@@ -213,7 +213,7 @@ class UsersController extends CpController
         }
 
         if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
-            $blueprint->ensureField('super', ['type' => 'toggle']);
+            $blueprint->ensureField('super', ['type' => 'toggle', 'display' => __('permissions.super')]);
         }
 
         $values = $user->data()

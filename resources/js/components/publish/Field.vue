@@ -17,7 +17,7 @@
                 />
                 <i class="required mr-1" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2 mr-2" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isTab" class="text-gray-500 font-normal text-2xs mr-1">
+                <span v-if="isReadOnly && !isTab && !isSection" class="text-gray-500 font-normal text-2xs mr-1">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
                 <svg-icon name="translate" class="h-4 mr-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
@@ -146,6 +146,10 @@ export default {
 
         isTab() {
             return this.config.type === 'tab';
+        },
+
+        isSection() {
+            return this.config.type === 'section';
         },
 
         classes() {

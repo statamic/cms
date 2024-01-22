@@ -6,6 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
@@ -46,6 +47,10 @@ class EloquentUserTest extends TestCase
         }
 
         $this->loadMigrationsFrom($tmpDir);
+
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to these tests.
+        Event::fake();
     }
 
     public function tearDown(): void
@@ -66,28 +71,28 @@ class EloquentUserTest extends TestCase
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
         };
         $roleC = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'c';
             }
         };
         $roleD = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'd';
             }

@@ -27,7 +27,7 @@
             <h1 class="flex-1">{{ __('Updates') }}</h1>
         </div>
 
-        <h6 class="mt-8">Core</h6>
+        <h6 class="mt-8">{{ __('Core') }}</h6>
         <div class="card p-0 mt-2">
             <table class="data-table">
                 <tr>

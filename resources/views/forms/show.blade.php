@@ -14,21 +14,23 @@
                 {{ $form->title() }}
             </h1>
 
-            <dropdown-list class="mr-2">
-                @can('edit', $form)
-                    <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
-                @endcan
-                @can('delete', $form)
-                    <dropdown-item :text="__('Delete Form')" class="warning" @click="$refs.deleter.confirm()">
-                        <resource-deleter
-                            ref="deleter"
-                            resource-title="{{ $form->title() }}"
-                            route="{{ $form->deleteUrl() }}"
-                            redirect="{{ cp_route('forms.index') }}"
-                        ></resource-deleter>
-                    </dropdown-item>
-                @endcan
-            </dropdown-list>
+            @if(\Statamic\Facades\User::current()->can('edit', $form) || \Statamic\Facades\User::current()->can('delete', $form))
+                <dropdown-list class="mr-2">
+                    @can('edit', $form)
+                        <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
+                    @endcan
+                    @can('delete', $form)
+                        <dropdown-item :text="__('Delete Form')" class="warning" @click="$refs.deleter.confirm()">
+                            <resource-deleter
+                                ref="deleter"
+                                resource-title="{{ $form->title() }}"
+                                route="{{ $form->deleteUrl() }}"
+                                redirect="{{ cp_route('forms.index') }}"
+                            ></resource-deleter>
+                        </dropdown-item>
+                    @endcan
+                </dropdown-list>
+            @endif
 
             @if (($exporters = $form->exporters()) && $exporters->isNotEmpty())
             <dropdown-list>
