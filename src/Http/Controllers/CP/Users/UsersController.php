@@ -190,7 +190,7 @@ class UsersController extends CpController
             try {
                 $user->generateTokenAndSendActivateAccountNotification();
             } catch (TransportException $e) {
-                Toast::error(__("The activation email couldn't be sent. Please check your email configuration and try again."));
+                Toast::error(__('statamic::messages.user_activation_email_not_sent_error'));
             }
 
             $url = null;
