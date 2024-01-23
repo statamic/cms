@@ -169,7 +169,7 @@ export default {
         valueUpdated(value) {
             this.$emit('updated', {
                 ...this.condition,
-                value: value,
+                value: value.toString(),
             });
         },
 
