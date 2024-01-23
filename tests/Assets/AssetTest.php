@@ -17,11 +17,14 @@ use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Assets\PendingMeta;
 use Statamic\Assets\ReplacementFile;
+use Statamic\Events\AssetCreated;
+use Statamic\Events\AssetCreating;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetDeleting;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
+use Statamic\Events\AssetSaving;
 use Statamic\Events\AssetUploaded;
 use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
@@ -700,6 +703,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/test.txt');
         Facades\Asset::shouldReceive('save')->with($asset);
+        Facades\Asset::shouldReceive('find')->andReturn($asset);
         $asset->save();
 
         $this->assertEquals($expectedBeforeMerge, $asset->meta());
@@ -792,7 +796,6 @@ class AssetTest extends TestCase
         $this->assertEquals($metaWithoutData, Cache::get($asset->metaCacheKey()));
 
         // Saving should clear the cache and persist the new meta data to the filesystem...
-        $asset->save();
         $this->assertEquals($metaWithData, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
 
         // Then if we ask for new meta, it should cache with the newly saved data...
@@ -854,16 +857,28 @@ class AssetTest extends TestCase
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::shouldReceive('find')->andReturn(null);
         Facades\Asset::shouldReceive('save')->with($asset);
 
         $return = $asset->save();
 
         $this->assertTrue($return);
 
+        Event::assertDispatched(AssetSaving::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+
         Event::assertDispatched(AssetSaved::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
 
+        Event::assertDispatched(AssetCreating::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+
+        Event::assertDispatched(AssetCreated::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
         // Assertion about the meta file is in the AssetRepository test
     }
 
@@ -874,6 +889,7 @@ class AssetTest extends TestCase
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::shouldReceive('find')->andReturn(null);
         Facades\Asset::shouldReceive('save')->with($asset);
 
         $return = $asset->saveQuietly();
@@ -881,6 +897,7 @@ class AssetTest extends TestCase
         $this->assertTrue($return);
 
         Event::assertNotDispatched(AssetSaved::class);
+        Event::assertNotDispatched(AssetSaving::class);
     }
 
     /** @test */
@@ -890,6 +907,7 @@ class AssetTest extends TestCase
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::shouldReceive('find')->andReturn(null);
         Facades\Asset::shouldReceive('save')->with($asset);
 
         $return = $asset->saveQuietly();
@@ -907,6 +925,7 @@ class AssetTest extends TestCase
     public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist()
     {
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
 
         $this->container->makeAsset('one/two/foo.jpg')->save();
 
@@ -967,6 +986,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
         $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
@@ -1014,6 +1034,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
         $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
@@ -1054,6 +1075,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $asset = $container->makeAsset('old/asset.txt');
         $asset->save();
 
@@ -1077,6 +1099,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $asset = $container->makeAsset('old/asset.txt');
         $asset->save();
 
@@ -1098,6 +1121,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
         $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
@@ -1144,6 +1168,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $asset = $container->makeAsset('old/asset.txt');
         $asset->save();
 
@@ -1175,6 +1200,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $asset = $container->makeAsset('old/asset.txt');
         $asset->save();
 
@@ -1203,6 +1229,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
 
         foreach (['foo', 'bar', 'baz', 'fraz', 'do-not-touch'] as $filename) {
             $disk->put("old/{$filename}.txt", 'The asset con ents');
@@ -1291,6 +1318,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $oldAsset = tap($container->makeAsset('some/old-asset.txt')->data(['foo' => 'bar']))->saveQuietly();
         $newAsset = tap($container->makeAsset('some/new-asset.txt')->data(['foo' => 'baz']))->saveQuietly();
         $oldMeta = $disk->get('some/.meta/old-asset.txt.yaml');
@@ -1345,6 +1373,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $oldAsset = tap($container->makeAsset('some/old-asset.txt')->data(['foo' => 'bar']))->saveQuietly();
         $newAsset = tap($container->makeAsset('some/new-asset.txt')->data(['foo' => 'baz']))->saveQuietly();
         $oldMeta = $disk->get('some/.meta/old-asset.txt.yaml');
@@ -1610,6 +1639,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
         // This should only get called when glide processing source image on upload...
@@ -1661,6 +1691,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
         ImageValidator::partialMock()
@@ -1709,6 +1740,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
         ImageValidator::partialMock()
@@ -1739,6 +1771,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         Storage::disk('test')->assertMissing('path/to/asset.svg');
 
         $return = $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>'));
@@ -1782,6 +1815,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($this->container)->path("path/to/file.{$extension}")->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         Storage::disk('test')->assertMissing("path/to/file.{$extension}");
 
         // Ensure a glide server is never instantiated for these extensions...
@@ -1822,6 +1856,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($this->container)->path('path/to/asset.pdf')->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         Storage::disk('test')->assertMissing('path/to/asset.pdf');
 
         $file = UploadedFile::fake()->image('asset.pdf', 20, 30);
@@ -1867,6 +1902,7 @@ class AssetTest extends TestCase
         Carbon::setTestNow(Carbon::createFromTimestamp(1549914700));
         $asset = $this->container->makeAsset('path/to/asset.jpg');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         Storage::disk('test')->put('path/to/asset.jpg', '');
         Storage::disk('test')->assertExists('path/to/asset.jpg');
 
@@ -1885,6 +1921,7 @@ class AssetTest extends TestCase
         Event::fake();
         $asset = $this->container->makeAsset('path/to/lowercase-THIS-asset.JPG');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
 
         $asset->upload(UploadedFile::fake()->image('lowercase-THIS-asset.JPG'));
 
@@ -1902,6 +1939,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
         $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
@@ -1968,6 +2006,7 @@ class AssetTest extends TestCase
         Event::fake();
         $asset = $this->container->makeAsset('path/to/do-NOT-lowercase-THIS-asset.JPG');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
 
         $asset->upload(UploadedFile::fake()->image('do-NOT-lowercase-THIS-asset.JPG'));
 
