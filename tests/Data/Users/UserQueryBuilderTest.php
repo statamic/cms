@@ -260,6 +260,11 @@ class UserQueryBuilderTest extends TestCase
 
         $this->assertCount(1, $users);
         $this->assertEquals(['Frodo'], $users->map->name->all());
+
+        $users = User::query()->whereGroupIn(['one', 'two'])->orWhereGroupIn(['three'])->get();
+
+        $this->assertCount(3, $users);
+        $this->assertEquals(['Gandalf', 'Frodo', 'Smeagol'], $users->map->name->all());
     }
 
     /** @test **/
@@ -332,6 +337,11 @@ class UserQueryBuilderTest extends TestCase
 
         $this->assertCount(1, $users);
         $this->assertEquals(['Frodo'], $users->map->name->all());
+
+        $users = User::query()->whereRoleIn(['one', 'two'])->orWhereRoleIn(['three'])->get();
+
+        $this->assertCount(3, $users);
+        $this->assertEquals(['Gandalf', 'Frodo', 'Smeagol'], $users->map->name->all());
     }
 
     /** @test **/

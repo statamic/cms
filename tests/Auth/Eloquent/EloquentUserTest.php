@@ -99,21 +99,26 @@ class EloquentUserTest extends TestCase
 
         $userTwo = $this->createPermissible();
         $userThree = $this->createPermissible();
+        $userFour = $this->createPermissible();
 
         \DB::table(config('statamic.users.tables.role_user', 'role_user'))->insert([
             ['user_id' => $userTwo->id(), 'role_id' => 'a'],
             ['user_id' => $userThree->id(), 'role_id' => 'b'],
+            ['user_id' => $userFour->id(), 'role_id' => 'c'],
         ]);
 
         $this->assertCount(2, Facades\User::query()->whereRole('a')->get());
         $this->assertCount(2, Facades\User::query()->whereRole('b')->get());
-        $this->assertCount(1, Facades\User::query()->whereRole('c')->get());
+        $this->assertCount(2, Facades\User::query()->whereRole('c')->get());
         $this->assertCount(1, Facades\User::query()->whereRole('d')->get());
 
         $this->assertSame([$user->email(), $userTwo->email()], Facades\User::query()->whereRole('a')->get()->map->email()->all());
         $this->assertSame([$user->email(), $userThree->email()], Facades\User::query()->whereRole('b')->get()->map->email()->all());
+        $this->assertSame([$user->email()], Facades\User::query()->whereRole('b')->whereRole('c')->get()->map->email()->all());
+        $this->assertSame([$user->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereRole('b')->orWhereRole('c')->get()->map->email()->all());
 
         $this->assertSame([$user->email(), $userTwo->email(), $userThree->email()], Facades\User::query()->whereRoleIn(['a', 'b'])->get()->map->email()->all());
+        $this->assertSame([$user->email(), $userTwo->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereRoleIn(['a', 'b'])->orWhereRoleIn(['c'])->get()->map->email()->all());
     }
 
     /** @test */
@@ -121,28 +126,28 @@ class EloquentUserTest extends TestCase
     {
         $roleA = new class extends UserGroup
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends UserGroup
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
         };
         $roleC = new class extends UserGroup
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'c';
             }
         };
         $roleD = new class extends UserGroup
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'd';
             }
@@ -177,21 +182,26 @@ class EloquentUserTest extends TestCase
 
         $userTwo = $this->createPermissible();
         $userThree = $this->createPermissible();
+        $userFour = $this->createPermissible();
 
         \DB::table(config('statamic.users.tables.group_user', 'group_user'))->insert([
             ['user_id' => $userTwo->id(), 'group_id' => 'a'],
             ['user_id' => $userThree->id(), 'group_id' => 'b'],
+            ['user_id' => $userFour->id(), 'group_id' => 'c'],
         ]);
 
         $this->assertCount(2, Facades\User::query()->whereGroup('a')->get());
         $this->assertCount(2, Facades\User::query()->whereGroup('b')->get());
-        $this->assertCount(1, Facades\User::query()->whereGroup('c')->get());
+        $this->assertCount(2, Facades\User::query()->whereGroup('c')->get());
         $this->assertCount(1, Facades\User::query()->whereGroup('d')->get());
 
         $this->assertSame([$user->email(), $userTwo->email()], Facades\User::query()->whereGroup('a')->get()->map->email()->all());
         $this->assertSame([$user->email(), $userThree->email()], Facades\User::query()->whereGroup('b')->get()->map->email()->all());
+        $this->assertSame([$user->email()], Facades\User::query()->whereGroup('b')->whereGroup('c')->get()->map->email()->all());
+        $this->assertSame([$user->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereGroup('b')->orWhereGroup('c')->get()->map->email()->all());
 
         $this->assertSame([$user->email(), $userTwo->email(), $userThree->email()], Facades\User::query()->whereGroupIn(['a', 'b'])->get()->map->email()->all());
+        $this->assertSame([$user->email(), $userTwo->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereGroupIn(['a', 'b'])->orWhereGroupIn(['c'])->get()->map->email()->all());
     }
 
     public function makeUser()
