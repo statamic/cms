@@ -67,23 +67,28 @@
 </template>
 
 <script>
+import _ from 'underscore/modules/underscore';
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 
 export default {
     mixins: [HasInputOptions],
 
     props: {
+        config: {
+            type: Object,
+            required: true
+        },
         condition: {
             type: Object,
+            required: true
         },
         index: {
             type: Number,
-        },
-        fieldOptions: {
-            type: Array,
+            required: true
         },
         suggestableFields: {
             type: Array,
+            required: true
         },
     },
 
@@ -108,6 +113,20 @@ export default {
             if (! this.showValueDropdown) return;
 
             return this.normalizeInputOptions(this.field.config.options);
+        },
+
+        fieldOptions() {
+            return _(this.suggestableFields)
+                .reject(field => field.handle === this.config.handle || this.condition.field === field.handle)
+                .map(field => {
+                    let display = field.config.display;
+
+                    if (! display) {
+                        display = field.handle.replace(/_/g, ' ').replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+                    }
+
+                    return {value: field.handle, label: display}
+                });
         },
 
         operatorOptions() {

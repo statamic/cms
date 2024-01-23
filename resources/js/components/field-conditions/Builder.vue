@@ -28,10 +28,10 @@
             <condition
                 v-if="hasConditions && isStandard"
                 v-for="(condition, index) in conditions"
-                :condition="condition"
                 :index="index"
+                :config="config"
+                :condition="condition"
                 :key="condition._id"
-                :field-options="fieldOptions"
                 :suggestable-fields="suggestableFields"
                 @updated="updated(index, $event)"
                 @removed="remove(index)"
@@ -108,20 +108,6 @@ export default {
                 any: __('Any of the following conditions pass'),
                 custom: __('Custom method passes')
             });
-        },
-
-        fieldOptions() {
-            return _(this.suggestableFields)
-                .reject(field => field.handle === this.config.handle || this.conditions.map(condition => condition.field).includes(field.handle))
-                .map(field => {
-                    let display = field.config.display;
-
-                    if (! display) {
-                        display = field.handle.replace(/_/g, ' ').replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
-                    }
-
-                    return {value: field.handle, label: display}
-                });
         },
 
         hasConditions() {
