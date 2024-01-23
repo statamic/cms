@@ -28,7 +28,7 @@
             <condition
                 v-if="hasConditions && isStandard"
                 v-for="(condition, index) in conditions"
-                :condition="conditions[index]"
+                :condition="condition"
                 :index="index"
                 :key="condition._id"
                 :field-options="fieldOptions"
@@ -63,6 +63,7 @@ import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 import Condition from './Condition.vue';
+import { __ } from '../../bootstrap/globals';
 
 export default {
 
@@ -108,9 +109,17 @@ export default {
         },
 
         fieldOptions() {
-            return this.normalizeInputOptions(
-                _.reject(this.suggestableFields, field => field === this.config.handle || this.conditions.map(condition => condition.field).includes(field))
-            );
+            return _(this.suggestableFields)
+                .reject(field => field.handle === this.config.handle || this.conditions.map(condition => condition.field).includes(field.handle))
+                .map(field => {
+                    let display = field.config.display;
+
+                    if (! display) {
+                        display = field.handle.replace(/_/g, ' ').replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+                    }
+
+                    return {value: field.handle, label: display}
+                });
         },
 
         hasConditions() {
