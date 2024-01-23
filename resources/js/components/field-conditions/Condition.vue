@@ -31,7 +31,26 @@
             class="md:ml-4"
             @input="operatorSelected" />
 
+        <template v-if="showValueDropdown">
+            <v-select
+                ref="valueSelect"
+                :value="condition.value"
+                class="ml-4 w-full md:w-52 mb-2 md:mb-0"
+                :options="valueOptions"
+                :placeholder="__('Option')"
+                :taggable="false"
+                :push-tags="true"
+                :reduce="field => field.value"
+                :create-option="field => ({value: field, label: field })"
+                @input="valueUpdated"
+                @search:blur="valueSelectBlur"
+            >
+                <template #no-options><div class="hidden" /></template>
+            </v-select>
+        </template>
+
         <text-input
+            v-else
             :value="condition.value"
             class="ml-4"
             @input="valueUpdated" />
@@ -58,9 +77,28 @@ export default {
         fieldOptions: {
             type: Array,
         },
+        suggestableFields: {
+            type: Array,
+        },
     },
 
     computed: {
+        field() {
+            return this.suggestableFields.find(field => field.handle === this.condition.field);
+        },
+
+        showValueDropdown() {
+            return this.field
+                && ['button_group', 'checkboxes', 'radio', 'select'].includes(this.field.config.type)
+                && ['equals', 'not', '===', '!=='].includes(this.condition.operator);
+        },
+
+        valueOptions() {
+            if (! this.showValueDropdown) return;
+
+            return this.normalizeInputOptions(this.field.config.options);
+        },
+
         operatorOptions() {
             return this.normalizeInputOptions({
                 'equals': __('equals'),
@@ -103,6 +141,11 @@ export default {
                 ...this.condition,
                 value: value,
             });
+        },
+
+        valueSelectBlur() {
+            const value = this.$refs.valueSelect.$refs.search.value;
+            if (value) this.valueUpdated(value);
         },
 
         remove() {

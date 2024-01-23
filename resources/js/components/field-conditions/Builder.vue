@@ -32,6 +32,7 @@
                 :index="index"
                 :key="condition._id"
                 :field-options="fieldOptions"
+                :suggestable-fields="suggestableFields"
                 @updated="updated(index, $event)"
                 @removed="remove(index)"
             />
