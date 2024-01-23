@@ -11,15 +11,6 @@ class UserQueryBuilder extends EloquentQueryBuilder
 {
     public function whereGroup($value, $operator = '=', $boolean = 'and')
     {
-        if ($this->hasGroupsRelation()) {
-            $method = $boolean == 'or' ? 'orWhereHas' : 'whereHas';
-            $this->$method('groups', function ($query) use ($value, $operator) {
-                return $query->where('handle', $operator, $value);
-            });
-
-            return $this;
-        }
-
         $method = $boolean == 'or' ? 'orWhereExists' : 'whereExists';
         $this->$method(function ($query) use ($operator, $value) {
             $query->select(DB::raw(1))
@@ -40,15 +31,6 @@ class UserQueryBuilder extends EloquentQueryBuilder
 
     public function whereGroupIn($groups, $boolean = 'and')
     {
-        if ($this->hasGroupsRelation()) {
-            $method = $boolean == 'or' ? 'orWhereHas' : 'whereHas';
-            $this->$method('groups', function ($query) use ($groups) {
-                return $query->whereIn('handle', $groups);
-            });
-
-            return $this;
-        }
-
         $method = $boolean == 'or' ? 'orWhereExists' : 'whereExists';
         $this->$method(function ($query) use ($groups) {
             $query->select(DB::raw(1))
@@ -69,15 +51,6 @@ class UserQueryBuilder extends EloquentQueryBuilder
 
     public function whereRole($value, $operator = '=', $boolean = 'and')
     {
-        if ($this->hasRolesRelation()) {
-            $method = $boolean == 'or' ? 'orWhereHas' : 'whereHas';
-            $this->$method('roles', function ($query) use ($value, $operator) {
-                return $query->where('handle', $operator, $value);
-            });
-
-            return $this;
-        }
-
         $method = $boolean == 'or' ? 'orWhereExists' : 'whereExists';
         $this->$method(function ($query) use ($operator, $value) {
             $query->select(DB::raw(1))
@@ -98,15 +71,6 @@ class UserQueryBuilder extends EloquentQueryBuilder
 
     public function whereRoleIn($roles, $boolean = 'and')
     {
-        if ($this->hasRolesRelation()) {
-            $method = $boolean == 'or' ? 'orWhereHas' : 'whereHas';
-            $this->$method('roles', function ($query) use ($roles) {
-                return $query->whereIn('handle', $roles);
-            });
-
-            return $this;
-        }
-
         $method = $boolean == 'or' ? 'orWhereExists' : 'whereExists';
         $this->$method(function ($query) use ($roles) {
             $query->select(DB::raw(1))
@@ -130,16 +94,6 @@ class UserQueryBuilder extends EloquentQueryBuilder
         return UserCollection::make($items)->map(function ($model) {
             return User::make()->model($model);
         });
-    }
-
-    private function hasGroupsRelation()
-    {
-        return method_exists($this->builder->getModel(), 'groups');
-    }
-
-    private function hasRolesRelation()
-    {
-        return method_exists($this->builder->getModel(), 'roles');
     }
 
     private function groupsTable()
