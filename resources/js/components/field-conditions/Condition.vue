@@ -80,7 +80,10 @@ export default {
 
     methods: {
         fieldSelected(field) {
-            this.$parent.conditions[this.index].field = field;
+            this.$emit('updated', {
+                ...this.condition,
+                field: field,
+            });
         },
 
         fieldSelectBlur() {
@@ -89,11 +92,17 @@ export default {
         },
 
         operatorSelected(operator) {
-            this.$parent.conditions[this.index].operator = operator;
+            this.$emit('updated', {
+                ...this.condition,
+                operator: operator,
+            });
         },
 
         valueUpdated(value) {
-            this.$parent.conditions[this.index].value = value;
+            this.$emit('updated', {
+                ...this.condition,
+                value: value,
+            });
         },
 
         remove() {

@@ -32,6 +32,7 @@
                 :index="index"
                 :key="condition._id"
                 :field-options="fieldOptions"
+                @updated="updated(index, $event)"
                 @removed="remove(index)"
             />
 
@@ -184,6 +185,10 @@ export default {
 
         remove(index) {
             this.conditions.splice(index, 1);
+        },
+
+        updated(index, condition) {
+            this.conditions.splice(index, 1, condition);
         },
 
         getInitialConditions() {
