@@ -35,6 +35,17 @@
                 </div>
             </a>
         @endcan
+        @can('configure fields')
+            <a href="{{ cp_route('taxonomies.blueprints.index', $taxonomy->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
+                <div class="h-8 w-8 mr-4 text-gray-800">
+                    @cp_svg('icons/light/blueprint')
+                </div>
+                <div class="flex-1 mb-4 md:mb-0 md:mr-6">
+                    <h3 class="mb-2 text-blue">{{ __('Configure Blueprints') }} &rarr;</h3>
+                    <p>{{ __('statamic::messages.taxonomy_next_steps_blueprints_description') }}</p>
+                </div>
+            </a>
+        @endcan
         <div class="hidden first:flex justify-center items-center p-8 w-full">
             @cp_svg($svg ?? 'empty/content')
         </div>

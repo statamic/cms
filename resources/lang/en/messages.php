@@ -211,6 +211,7 @@ return [
     'taxonomy_configure_handle_instructions' => 'Used to reference this taxonomy on the frontend. It\'s non-trivial to change later.',
     'taxonomy_configure_intro' => 'A taxonomy is a system of classifying data around a set of unique characteristics, such as categories, tags, or colors.',
     'taxonomy_configure_title_instructions' => 'We recommend using a plural noun, like "Categories" or "Tags".',
+    'taxonomy_next_steps_blueprints_description' => 'Manage the blueprints and fields available for this taxonomy.',
     'taxonomy_next_steps_configure_description' => 'Configure names, associate collections, define blueprints, and more.',
     'taxonomy_next_steps_create_term_description' => 'Create the first term or stub out a handful of placeholder terms, it\'s up to you.',
     'taxonomy_next_steps_documentation_description' => 'Learn more about taxonomies, how they work, and how to configure them.',
