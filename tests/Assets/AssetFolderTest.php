@@ -337,6 +337,8 @@ class AssetFolderTest extends TestCase
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
+
         $paths = collect([
             'move/one.txt',
             'move/two.txt',
@@ -435,6 +437,8 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_can_be_moved_to_another_folder_with_a_new_folder_name()
     {
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
+
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -538,6 +542,8 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_lowercases_when_moving_to_another_foldre_with_a_new_folder_name()
     {
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
+
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -625,6 +631,8 @@ class AssetFolderTest extends TestCase
     {
         config(['statamic.assets.lowercase' => false]);
 
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
+
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -710,6 +718,8 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_cannot_be_moved_to_its_own_subfolder()
     {
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
+
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -748,6 +758,8 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_cannot_be_moved_if_the_destination_already_exists()
     {
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
+
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -794,6 +806,8 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_can_be_renamed()
     {
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
+
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -861,6 +875,8 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_cannot_be_renamed_if_the_destination_exists()
     {
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
+
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -901,6 +917,8 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_lowercases_when_renaming_by_default()
     {
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
+
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
         $path = 'before/sub/foo.txt';
@@ -948,6 +966,8 @@ class AssetFolderTest extends TestCase
     public function it_doesnt_lowercase_renamed_folder_when_configured()
     {
         config(['statamic.assets.lowercase' => false]);
+
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
 
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
