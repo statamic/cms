@@ -2,6 +2,7 @@
 
 namespace Tests\Auth\Eloquent;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -19,6 +20,8 @@ class EloquentUserTest extends TestCase
 {
     use HasPreferencesTests, PermissibleContractTests, UserContractTests, WithFaker;
 
+    public static $migrationsGenerated = false;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -27,13 +30,42 @@ class EloquentUserTest extends TestCase
 
         config(['statamic.users.repository' => 'eloquent']);
 
-        // TODO: The migration has been added into the test, but the implementation could be broken if the real
-        // migration is different from what's in here. We should find a way to reference the actual migrations.
-        $this->loadMigrationsFrom(__DIR__.'/__migrations__');
+        $this->loadMigrationsFrom(static::migrationsDir());
+
+        $tmpDir = static::migrationsDir().'/tmp';
+
+        if (! self::$migrationsGenerated) {
+            $this->artisan('statamic:auth:migration', ['--path' => $tmpDir]);
+
+            self::$migrationsGenerated = true;
+        }
+
+        $this->loadMigrationsFrom($tmpDir);
 
         // Prevent the anonymous role classes throwing errors when getting serialized
         // during event handling unrelated to these tests.
         Event::fake();
+    }
+
+    private static function migrationsDir()
+    {
+        return __DIR__.'/__migrations__';
+    }
+
+    public function tearDown(): void
+    {
+        // Prevent error about null password during the down migration.
+        User::all()->each->delete();
+
+        parent::tearDown();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        // Clean up the orphaned migration file.
+        (new Filesystem)->deleteDirectory(static::migrationsDir().'/tmp');
+
+        parent::tearDownAfterClass();
     }
 
     /** @test */
