@@ -17,7 +17,7 @@ abstract class ActionController extends CpController
             'context' => 'sometimes',
         ]);
 
-        $context = $data['context'] ?? [];
+        $context = $data['context'] ?? ['view' => 'list'];
 
         $items = $this->getSelectedItems(collect($data['selections']), $context);
 
@@ -44,10 +44,16 @@ abstract class ActionController extends CpController
         }
 
         if (is_string($response)) {
-            return ['message' => $response];
+            $response = ['message' => $response];
         }
 
-        return $response ?: [];
+        $response = $response ?: [];
+
+        if ($context['view'] === 'form') {
+            $response['data'] = $this->getItemData($items->first(), $context);
+        }
+
+        return $response;
     }
 
     public function bulkActions(Request $request)
@@ -65,4 +71,10 @@ abstract class ActionController extends CpController
     }
 
     abstract protected function getSelectedItems($items, $context);
+
+    // Should be abstract todo
+    protected function getItemData($item, $context)
+    {
+        return [];
+    }
 }

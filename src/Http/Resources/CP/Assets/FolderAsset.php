@@ -30,6 +30,7 @@ class FolderAsset extends JsonResource
             'actions' => Action::for($this->resource, [
                 'container' => $this->container()->handle(),
                 'folder' => $this->folder(),
+                'view' => 'list',
             ]),
         ];
     }

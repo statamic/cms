@@ -62,6 +62,10 @@ abstract class Action implements Arrayable
 
     public function context($context)
     {
+        if (! isset($context['view'])) {
+            $context['view'] = 'list';
+        }
+
         $this->context = $context;
 
         return $this;

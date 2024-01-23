@@ -9,6 +9,7 @@ use Statamic\Facades\User;
 class ListedTerm extends JsonResource
 {
     protected $blueprint;
+
     protected $columns;
 
     public function blueprint($blueprint)
@@ -45,7 +46,7 @@ class ListedTerm extends JsonResource
             'taxonomy' => $term->taxonomy()->toArray(),
             'viewable' => User::current()->can('view', $term),
             'editable' => User::current()->can('edit', $term),
-            'actions' => Action::for($term, ['taxonomy' => $taxonomy->handle()]),
+            'actions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'list']),
         ];
     }
 

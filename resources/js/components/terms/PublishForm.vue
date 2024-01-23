@@ -13,8 +13,17 @@
                 </div>
             </h1>
 
-            <dropdown-list class="mr-4" v-if="canEditBlueprint">
-                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            <dropdown-list class="mr-4" v-if="!isCreating || canEditBlueprint">
+                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
+                <li class="divider" />
+                <data-list-inline-actions
+                    v-if="!isCreating"
+                    :item="id"
+                    :url="itemActionUrl"
+                    :actions="itemActions"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                />
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
@@ -243,12 +252,14 @@ import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
+import HasActions from '../publish/HasActions';
 
 export default {
 
     mixins: [
         HasPreferences,
         HasHiddenFields,
+        HasActions,
     ],
 
     components: {
@@ -389,6 +400,10 @@ export default {
             return this.getPreference('after_save');
         },
 
+        id() {
+            return this.initialReference.split('::').slice(1, 3).join('::');
+        },
+
     },
 
     watch: {
@@ -473,6 +488,7 @@ export default {
                 .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
+                        this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
@@ -493,6 +509,7 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
+                        this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                     }
 
@@ -619,7 +636,16 @@ export default {
                 this.localizedFields.push(handle);
 
             this.$refs.container.dirty();
-        }
+        },
+
+        afterActionSuccessfullyCompleted(response) {
+            if (response.data) {
+                this.title = response.data.title;
+                this.permalink = response.data.permalink;
+                this.values = this.resetValuesFromResponse(response.data.values);
+            }
+        },
+
     },
 
     mounted() {

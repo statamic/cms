@@ -11,8 +11,17 @@
                 </div>
             </h1>
 
-            <dropdown-list class="mr-4" v-if="canEditBlueprint">
-                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            <dropdown-list class="mr-4" v-if="!isCreating || canEditBlueprint">
+                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
+                <li class="divider" />
+                <data-list-inline-actions
+                    v-if="!isCreating"
+                    :item="id"
+                    :url="itemActionUrl"
+                    :actions="itemActionsMenu"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                />
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
@@ -294,12 +303,14 @@ import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
+import HasActions from '../publish/HasActions';
 
 export default {
 
     mixins: [
         HasPreferences,
         HasHiddenFields,
+        HasActions,
     ],
 
     components: {
@@ -483,13 +494,27 @@ export default {
                 }));
         },
 
+        id() {
+            return this.initialReference.split('::').pop();
+        },
+
+        itemActionsMenu() {
+            return this.itemActions.filter(action => !['publish', 'unpublish'].includes(action.handle));
+        },
+
     },
 
     watch: {
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
-        }
+        },
+
+        title(title) {
+            if (this.isBase) {
+                document.title = title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
+            }
+        },
 
     },
 
@@ -543,9 +568,6 @@ export default {
                 }
                 this.title = response.data.data.title;
                 this.isWorkingCopy = true;
-                if (this.isBase) {
-                    document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
-                }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
@@ -779,7 +801,16 @@ export default {
             }, this.autosaveInterval);
 
             this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
-        }
+        },
+
+        afterActionSuccessfullyCompleted(response) {
+            if (response.data) {
+                this.title = response.data.title;
+                if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                this.values = this.resetValuesFromResponse(response.data.values);
+            }
+        },
+
     },
 
     mounted() {

@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
@@ -139,6 +140,7 @@ class TermsController extends CpController
             'revisionsEnabled' => $term->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
+            'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
         ];
 
         if ($request->wantsJson()) {
@@ -198,8 +200,15 @@ class TermsController extends CpController
             $saved = $term->updateLastModified(User::current())->save();
         }
 
+        [$values] = $this->extractFromFields($term, $term->blueprint());
+
         return (new TermResource($term))
-            ->additional(['saved' => $saved]);
+            ->additional([
+                'saved' => $saved,
+                'data' => [
+                    'values' => $values,
+                ],
+            ]);
     }
 
     public function create(Request $request, $taxonomy, $site)

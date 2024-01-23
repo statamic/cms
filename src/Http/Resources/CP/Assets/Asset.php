@@ -53,6 +53,7 @@ class Asset extends JsonResource
             'actions' => Action::for($this->resource, [
                 'container' => $this->container()->handle(),
                 'folder' => $this->folder(),
+                'view' => 'form',
             ]),
 
             'blueprint' => $this->blueprint()->toPublishArray(),
