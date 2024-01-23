@@ -9,7 +9,7 @@ use Statamic\Console\RunsInPlease;
 
 class LicenseSet extends Command
 {
-    use RunsInPlease, EnhancesCommands, ConfirmableTrait;
+    use ConfirmableTrait, EnhancesCommands, RunsInPlease;
 
     /**
      * The name and signature of the console command.

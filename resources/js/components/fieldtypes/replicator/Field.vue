@@ -23,6 +23,7 @@
             :field-path-prefix="fieldPath"
             :has-error="hasError || hasNestedError"
             :read-only="isReadOnly"
+            :show-field-previews="showFieldPreviews"
             @input="$emit('updated', $event)"
             @meta-updated="$emit('meta-updated', $event)"
             @focus="$emit('focus')"
@@ -69,6 +70,7 @@ export default {
             type: String
         },
         readOnly: Boolean,
+        showFieldPreviews: Boolean,
     },
 
     inject: ['storeName'],
@@ -84,12 +86,12 @@ export default {
         },
 
         display() {
-            return this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1)
+            return __(this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1))
         },
 
         instructions() {
             return this.field.instructions
-                ? this.$options.filters.markdown(this.field.instructions)
+                ? this.$options.filters.markdown(__(this.field.instructions))
                 : null
         },
 

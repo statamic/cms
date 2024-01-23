@@ -13,7 +13,7 @@
             :get-option-key="(option) => option.id"
             :get-option-label="(option) => option.title"
             :create-option="(value) => ({ title: value, id: value })"
-            :placeholder="config.placeholder || __('Choose...')"
+            :placeholder="__(config.placeholder) || __('Choose...')"
             :searchable="true"
             :taggable="isTaggable"
             :value="items"
@@ -25,7 +25,7 @@
             <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
             <template #search="{ events, attributes }" v-if="multiple">
                 <input
-                    :placeholder="config.placeholder || __('Choose...')"
+                    :placeholder="__(config.placeholder) || __('Choose...')"
                     class="vs__search"
                     type="search"
                     v-on="events"

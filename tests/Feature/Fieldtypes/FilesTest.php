@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Fieldtypes;
 
-use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades\User;
@@ -45,7 +45,7 @@ class FilesTest extends TestCase
             ? UploadedFile::fake()->image('test.jpg', 50, 75)
             : UploadedFile::fake()->create('test.txt');
 
-        Carbon::setTestNow(Carbon::createFromTimestamp(1671484636));
+        Date::setTestNow(Date::createFromTimestamp(1671484636));
 
         $disk = Storage::fake('local');
 

@@ -1,7 +1,7 @@
 @php use function Statamic\trans as __; @endphp
 
 <nav class="nav-main nav-mobile" v-cloak>
-    <div class="nav-main-inner">
+    <div class="nav-main-inner" v-pre>
         @foreach ($nav as $section)
             @if ($section['display'] !== 'Top Level')
                 <h6>{{ __($section['display']) }}</h6>

@@ -81,7 +81,7 @@ class UserGroupTest extends TestCase
 
         $role = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'test';
             }
@@ -98,7 +98,7 @@ class UserGroupTest extends TestCase
     {
         $role = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'test';
             }
@@ -115,7 +115,7 @@ class UserGroupTest extends TestCase
     {
         $role = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'test';
             }
@@ -135,21 +135,21 @@ class UserGroupTest extends TestCase
     {
         RoleAPI::shouldReceive('find')->with('one')->andReturn($roleOne = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'one';
             }
         });
         RoleAPI::shouldReceive('find')->with('two')->andReturn($roleTwo = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'two';
             }
         });
         RoleAPI::shouldReceive('find')->with('three')->andReturn($roleThree = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'three';
             }
@@ -170,7 +170,7 @@ class UserGroupTest extends TestCase
     {
         $role = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'test';
             }
@@ -189,7 +189,7 @@ class UserGroupTest extends TestCase
     {
         $role = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'test';
             }
@@ -209,14 +209,14 @@ class UserGroupTest extends TestCase
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
@@ -233,14 +233,14 @@ class UserGroupTest extends TestCase
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }

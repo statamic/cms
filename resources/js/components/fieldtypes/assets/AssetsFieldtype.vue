@@ -4,7 +4,7 @@
         <uploader
             ref="uploader"
             :container="container"
-            :enabled="config.allow_uploads"
+            :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
@@ -27,6 +27,7 @@
                 >
 
                     <button
+                        v-if="canBrowse"
                         :class="{'opacity-0': dragging }"
                         type="button"
                         class="btn btn-with-icon"
@@ -37,7 +38,7 @@
                         {{ __('Browse') }}
                     </button>
 
-                    <p class="asset-upload-control" v-if="config.allow_uploads">
+                    <p class="asset-upload-control" v-if="canUpload">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
@@ -122,12 +123,12 @@
                 :selected="selectedAssets"
                 :view-mode="selectorViewMode"
                 :max-files="maxFiles"
+                :query-scopes="queryScopes"
                 @selected="assetsSelected"
                 @closed="closeSelector">
             </selector>
         </stack>
     </div>
-    </element-container>
 </template>
 
 
@@ -279,6 +280,13 @@ export default {
             return this.$el;
         },
 
+        /**
+         * The scopes to use to filter the queries.
+         */
+        queryScopes() {
+            return this.config.query_scopes || [];
+        },
+
         isInBardField() {
             let vm = this;
 
@@ -328,14 +336,18 @@ export default {
         },
 
         replicatorPreview() {
-            return _.map(this.assets, (asset) => {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
+            return replicatorPreviewHtml(_.map(this.assets, (asset) => {
                 return (asset.isImage || asset.isSvg) ?
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
-            }).join(', ');
+            }).join(', '));
         },
 
         showPicker() {
+            if (! this.canBrowse && ! this.canUpload) return false
+
             if (this.maxFilesReached && ! this.isFullWidth) return false
 
             if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false
@@ -349,6 +361,14 @@ export default {
 
         showSetAlt() {
             return this.config.show_set_alt && ! this.isReadOnly;
+        },
+
+        canBrowse() {
+            return this.can('configure asset containers') || this.can('view '+ this.container +' assets')
+        },
+
+        canUpload() {
+            return this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload '+ this.container +' assets'))
         },
 
     },

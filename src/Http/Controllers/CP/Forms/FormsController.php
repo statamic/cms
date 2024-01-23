@@ -35,6 +35,8 @@ class FormsController extends CpController
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
                     'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
+                    'can_edit' => User::current()->can('edit', $form),
+                    'can_edit_blueprint' => User::current()->can('configure form fields', $form),
                     'actions' => Action::for($form),
                 ];
             })
@@ -241,11 +243,27 @@ class FormsController extends CpController
                                 'handle' => 'to',
                                 'field' => [
                                     'type' => 'text',
-                                    'display' => __('Recipient'),
+                                    'display' => __('Recipient(s)'),
                                     'validate' => [
                                         'required',
                                     ],
                                     'instructions' => __('statamic::messages.form_configure_email_to_instructions'),
+                                ],
+                            ],
+                            [
+                                'handle' => 'cc',
+                                'field' => [
+                                    'type' => 'text',
+                                    'display' => __('CC Recipient(s)'),
+                                    'instructions' => __('statamic::messages.form_configure_email_cc_instructions'),
+                                ],
+                            ],
+                            [
+                                'handle' => 'bcc',
+                                'field' => [
+                                    'type' => 'text',
+                                    'display' => __('BCC Recipient(s)'),
+                                    'instructions' => __('statamic::messages.form_configure_email_bcc_instructions'),
                                 ],
                             ],
                             [
@@ -304,6 +322,15 @@ class FormsController extends CpController
                                     'type' => 'toggle',
                                     'display' => __('Attachments'),
                                     'instructions' => __('statamic::messages.form_configure_email_attachments_instructions'),
+                                ],
+                            ],
+                            [
+                                'handle' => 'mailer',
+                                'field' => [
+                                    'type' => 'select',
+                                    'instructions' => __('statamic::messages.form_configure_mailer_instructions'),
+                                    'options' => array_keys(config('mail.mailers')),
+                                    'clearable' => true,
                                 ],
                             ],
                         ],

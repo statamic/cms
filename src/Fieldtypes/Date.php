@@ -182,7 +182,7 @@ class Date extends Fieldtype
         ];
     }
 
-    private function splitDateTimeForPreProcessRange(array $range = null)
+    private function splitDateTimeForPreProcessRange(?array $range = null)
     {
         return ['date' => $range, 'time' => null];
     }
@@ -212,13 +212,20 @@ class Date extends Fieldtype
 
         return [
             'start' => $this->processDateTime($date['start']),
-            'end' => $this->processDateTime($date['end']),
+            'end' => $this->processDateTimeEndOfDay($date['end']),
         ];
     }
 
     private function processDateTime($value)
     {
         $date = Carbon::parse($value);
+
+        return $this->formatAndCast($date, $this->saveFormat());
+    }
+
+    private function processDateTimeEndOfDay($value)
+    {
+        $date = Carbon::parse($value)->endOfDay();
 
         return $this->formatAndCast($date, $this->saveFormat());
     }

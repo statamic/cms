@@ -134,12 +134,24 @@ export default {
 
         fieldOptions() {
             return this.normalizeInputOptions(
-                _.reject(this.suggestableFields, field => field === this.config.handle)
+                _.reject(this.suggestableFields, field => field === this.config.handle || this.conditions.map(condition => condition.field).includes(field))
             );
         },
 
         operatorOptions() {
-            return this.normalizeInputOptions(OPERATORS);
+            return this.normalizeInputOptions({
+                'equals': __('equals'),
+                'not': __('not'),
+                'contains': __('contains'),
+                'contains_any': __('contains any'),
+                '===': '===',
+                '!==': '!==',
+                '>': '>',
+                '>=': '>=',
+                '<': '<',
+                '<=': '<=',
+                'custom': __('custom'),
+            });
         },
 
         hasConditions() {

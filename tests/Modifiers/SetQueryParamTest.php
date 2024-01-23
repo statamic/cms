@@ -63,7 +63,7 @@ class SetQueryParamTest extends TestCase
         $this->assertSame($this->baseUrl, $this->modify($this->baseUrl));
     }
 
-    private function modify(string $url, array $queryParam = null)
+    private function modify(string $url, ?array $queryParam = null)
     {
         if (is_null($queryParam)) {
             return Modify::value($url)->setQueryParam()->fetch();

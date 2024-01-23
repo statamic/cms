@@ -2,38 +2,43 @@
 
 namespace Statamic\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
 use Statamic\Forms\SendEmails;
+use Statamic\Http\Requests\FrontendFormRequest;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class FormController extends Controller
 {
-    use Localizable;
-
     /**
      * Handle a form submission request.
      *
      * @return mixed
      */
-    public function submit(Request $request, $form)
+    public function submit(FrontendFormRequest $request, $form)
     {
         $site = Site::findByUrl(URL::previous()) ?? Site::default();
         $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
-        $values = array_merge($request->all(), $assets = $this->normalizeAssetsValues($fields, $request));
+        $values = $request->all();
+
+        $fields->all()
+            ->filter(fn ($field) => $field->fieldtype()->handle() === 'checkboxes')
+            ->each(function ($field) use (&$values) {
+                return Arr::set($values, $field->handle(), collect(Arr::get($values, $field->handle(), []))->filter(fn ($value) => $value !== null)->values()->all());
+            });
+
+        $values = array_merge($values, $assets = $request->assets());
         $params = collect($request->all())->filter(function ($value, $key) {
             return Str::startsWith($key, '_');
         })->all();
@@ -43,10 +48,6 @@ class FormController extends Controller
         $submission = $form->makeSubmission();
 
         try {
-            $this->withLocale($site->lang(), function () use ($fields) {
-                $fields->validate($this->extraRules($fields));
-            });
-
             throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
 
             $values = array_merge($values, $submission->uploadFiles($assets));
@@ -82,40 +83,9 @@ class FormController extends Controller
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
-        if ($type !== 'multipart/form-data' && $form->hasFiles()) {
+        if ($type !== 'multipart/form-data' && $form->hasFiles() && $request->assets()) {
             throw new FileContentTypeRequiredException;
         }
-    }
-
-    /**
-     * The steps for a successful form submission.
-     *
-     * Used for actual success and by honeypot.
-     *
-     * @param  array  $params
-     * @param  Submission  $submission
-     * @param  bool  $silentFailure
-     * @return Response
-     */
-    private function formSuccess($params, $submission, $silentFailure = false)
-    {
-        if (request()->ajax() || request()->wantsJson()) {
-            return response([
-                'success' => true,
-                'submission_created' => ! $silentFailure,
-                'submission' => $submission->data(),
-            ]);
-        }
-
-        $redirect = Arr::get($params, '_redirect');
-
-        $response = $redirect ? redirect($redirect) : back();
-
-        session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
-        session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
-        session()->flash('submission', $submission);
-
-        return $response;
     }
 
     /**
@@ -144,30 +114,46 @@ class FormController extends Controller
         return $response->withInput()->withErrors($errors, 'form.'.$form);
     }
 
-    protected function normalizeAssetsValues($fields, $request)
+    /**
+     * The steps for a successful form submission.
+     *
+     * Used for actual success and by honeypot.
+     *
+     * @param  array  $params
+     * @param  Submission  $submission
+     * @param  bool  $silentFailure
+     * @return Response
+     */
+    private function formSuccess($params, $submission, $silentFailure = false)
     {
-        // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
-        return $fields->all()
-            ->filter(function ($field) {
-                return $field->fieldtype()->handle() === 'assets' && request()->hasFile($field->handle());
-            })
-            ->map(function ($field) use ($request) {
-                return Arr::wrap($request->file($field->handle()));
-            })
-            ->all();
+        $redirect = $this->formSuccessRedirect($params, $submission);
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response([
+                'success' => true,
+                'submission_created' => ! $silentFailure,
+                'submission' => $submission->data(),
+                'redirect' => $redirect,
+            ]);
+        }
+
+        $response = $redirect ? redirect($redirect) : back();
+
+        if (! \Statamic\Facades\URL::isExternal($redirect)) {
+            session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
+            session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
+            session()->flash('submission', $submission);
+        }
+
+        return $response;
     }
 
-    protected function extraRules($fields)
+    private function formSuccessRedirect($params, $submission)
     {
-        $assetFieldRules = $fields->all()
-            ->filter(function ($field) {
-                return $field->fieldtype()->handle() === 'assets';
-            })
-            ->mapWithKeys(function ($field) {
-                return [$field->handle().'.*' => 'file'];
-            })
-            ->all();
+        if (! $redirect = Form::getSubmissionRedirect($submission)) {
+            $redirect = Arr::get($params, '_redirect');
+        }
 
-        return $assetFieldRules;
+        return $redirect;
     }
 }

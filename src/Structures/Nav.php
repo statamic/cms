@@ -3,10 +3,12 @@
 namespace Statamic\Structures;
 
 use Statamic\Contracts\Structures\Nav as Contract;
+use Statamic\Contracts\Structures\NavTree;
 use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\NavBlueprintFound;
 use Statamic\Events\NavDeleted;
+use Statamic\Events\NavDeleting;
 use Statamic\Events\NavSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -32,6 +34,10 @@ class Nav extends Structure implements Contract
 
     public function delete()
     {
+        if (NavDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\Nav::delete($this);
 
         NavDeleted::dispatch($this);
@@ -88,7 +94,7 @@ class Nav extends Structure implements Contract
 
     public function newTreeInstance()
     {
-        return new NavTree;
+        return app(NavTree::class);
     }
 
     public function in($site)
@@ -101,6 +107,11 @@ class Nav extends Structure implements Contract
         return Site::all()->map(function ($site) {
             return $this->in($site);
         })->filter();
+    }
+
+    public function sites()
+    {
+        return $this->trees()->keys();
     }
 
     public function existsIn($site)

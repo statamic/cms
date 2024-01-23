@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
@@ -13,7 +14,7 @@ use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
 use Statamic\Facades\Search;
 
-class UpdateItemIndexes
+class UpdateItemIndexes implements ShouldQueue
 {
     public function subscribe($event)
     {

@@ -21,6 +21,10 @@ export default {
             type: Boolean,
             default: false
         },
+        showFieldPreviews: {
+            type: Boolean,
+            default: false
+        },
         namePrefix: String,
         fieldPathPrefix: String,
     },
@@ -56,6 +60,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.value;
         },
 
@@ -71,6 +77,8 @@ export default {
         replicatorPreview: {
             immediate: true,
             handler(text) {
+                if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
                 this.$emit('replicator-preview-updated', text);
             }
         }

@@ -170,6 +170,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return _.reduce(this.value, (carry, value, key) => {
                 let str = `${key}: ${value}`;
                 if (carry) str = carry + ', ' + str;
@@ -181,6 +183,9 @@ export default {
     methods: {
         addValue() {
             this.data.push(this.newSortableValue());
+            this.$nextTick(() => {
+                this.$el.querySelector('tr:last-child input').focus();
+            });
         },
 
         confirmDeleteValue(index) {

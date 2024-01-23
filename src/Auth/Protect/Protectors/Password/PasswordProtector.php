@@ -4,7 +4,7 @@ namespace Statamic\Auth\Protect\Protectors\Password;
 
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
 use Statamic\Auth\Protect\Protectors\Protector;
-use Statamic\Tokens\Handlers\LivePreview;
+use Statamic\Exceptions\ForbiddenHttpException;
 
 class PasswordProtector extends Protector
 {
@@ -16,10 +16,10 @@ class PasswordProtector extends Protector
     public function protect()
     {
         if (empty(array_get($this->config, 'allowed', []))) {
-            abort(403);
+            throw new ForbiddenHttpException();
         }
 
-        if (optional(request()->statamicToken())->handler() === LivePreview::class) {
+        if (request()->isLivePreview()) {
             return;
         }
 

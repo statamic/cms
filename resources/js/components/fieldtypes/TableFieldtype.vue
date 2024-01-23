@@ -2,7 +2,7 @@
     <portal name="table-fullscreen" :disabled="!fullScreenMode" target-class="table-fieldtype">
         <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white': fullScreenMode }">
             <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
-                <h2 v-text="config.display" />
+                <h2 v-text="__(config.display)" />
                 <button class="btn-close absolute top-2 right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
             </header>
             <section :class="{'p-4': fullScreenMode}">
@@ -163,6 +163,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             // Join all values with commas. Exclude any empties.
             return _(this.data)
                 .map(row => row.value.cells.filter(cell => !!cell).join(', '))
