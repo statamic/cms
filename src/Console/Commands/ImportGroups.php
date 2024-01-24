@@ -69,8 +69,7 @@ class ImportGroups extends Command
             $eloquentGroup = UserGroup::make()
                 ->handle($group->handle())
                 ->title($group->title())
-                ->roles($group->roles())
-                ->data($group->data());
+                ->roles($group->roles());
 
             $eloquentGroup->save();
         });
