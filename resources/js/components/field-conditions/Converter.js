@@ -32,7 +32,7 @@ export default class {
     }
 
     getScopedFieldHandle(field, prefix) {
-        if (field.startsWith('root.') || ! prefix) {
+        if (field.startsWith('root.') || field.startsWith('parent.') || ! prefix) {
             return field;
         }
 

@@ -95,8 +95,8 @@ const Fields = new Vue({
     }
 });
 
-let showFieldIf = function (conditions=null) {
-    return Fields.showField(conditions ? {'if': conditions} : {});
+let showFieldIf = function (conditions=null, dottedFieldPath=null) {
+    return Fields.showField(conditions ? {'if': conditions} : {}, dottedFieldPath);
 };
 
 afterEach(() => {
@@ -322,6 +322,8 @@ test('it can run conditions on nested data', () => {
     expect(showFieldIf({'address.country': 'Australia'})).toBe(false);
     expect(showFieldIf({'root.user.address.country': 'Canada'})).toBe(true);
     expect(showFieldIf({'root.user.address.country': 'Australia'})).toBe(false);
+    expect(showFieldIf({'parent.name': 'Han'}, 'user.address.country')).toBe(true);
+    expect(showFieldIf({'parent.name': 'Chewy'}, 'user.address.country')).toBe(false);
 });
 
 test('it can run conditions on root store values', () => {
@@ -346,13 +348,18 @@ test('it can run conditions on prefixed fields', async () => {
 test('it can run conditions on nested prefixed fields', async () => {
     Fields.setValues({
         prefixed_first_name: 'Rincess',
-        prefixed_last_name: 'Pleia'
+        prefixed_last_name: 'Pleia',
+        prefixed_address: {
+            home_planet: 'Alderaan'
+        }
     }, 'nested');
 
     expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
     expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
     expect(Fields.showField({if: {'root.nested.prefixed_last_name': 'is Pleia'}})).toBe(true);
     expect(Fields.showField({if: {'root.nested.prefixed_last_name': 'is Holo'}})).toBe(false);
+    expect(Fields.showField({if: {'parent.prefixed_last_name': 'is Pleia'}}, 'nested.prefixed_address.home_planet')).toBe(true);
+    expect(Fields.showField({if: {'parent.prefixed_last_name': 'is Holo'}}, 'nested.prefixed_address.home_planet')).toBe(false);
 });
 
 test('it can call a custom function', () => {
