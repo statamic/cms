@@ -14,3 +14,4 @@
 {{ trans_choice("blade trans_choice double quote :param", 2, ['param']) }}
 
 {{ __('blade with/slash') }}
+{{ __('blade with bracket(s)') }}
