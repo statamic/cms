@@ -66,7 +66,8 @@ class ImportGroups extends Command
         Facade::clearResolvedInstance(GroupRepositoryContract::class);
 
         $this->withProgressBar($groups, function ($group) {
-            $eloquentGroup = UserGroup::make($group->handle())
+            $eloquentGroup = UserGroup::make()
+                ->handle($group->handle())
                 ->title($group->title())
                 ->permissions($group->permissions())
                 ->roles($group->roles())
