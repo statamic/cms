@@ -882,6 +882,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function upload(UploadedFile $file)
     {
+        if (AssetCreating::dispatch($this) === false) {
+            return false;
+        }
+
         $path = Uploader::asset($this)->upload($file);
 
         $this
@@ -890,6 +894,8 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             ->save();
 
         AssetUploaded::dispatch($this);
+
+        AssetCreated::dispatch($this);
 
         return $this;
     }
