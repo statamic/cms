@@ -68,7 +68,8 @@ class ImportRoles extends Command
         $this->withProgressBar($roles, function ($role) {
             $eloquentRole = Role::make($role->handle())
                 ->title($role->title())
-                ->permissions($role->permissions());
+                ->permissions($role->permissions())
+                ->preferences($role->preferences());
 
             $eloquentRole->save();
         });
