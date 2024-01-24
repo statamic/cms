@@ -42,6 +42,10 @@
 
         <portal-targets></portal-targets>
 
+        @foreach (Statamic::availableBodyHtmls(request()) as $html)
+            {!! $html !!}
+        @endforeach
+
     </div>
 
     @include('statamic::partials.scripts')

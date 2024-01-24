@@ -28,6 +28,8 @@ class Statamic
     protected static $styles = [];
     protected static $externalStyles = [];
     protected static $vites = [];
+    protected static $headHtmls = [];
+    protected static $bodyHtmls = [];
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
@@ -125,6 +127,30 @@ class Statamic
     public static function availableVites(Request $request)
     {
         return static::$vites;
+    }
+
+    public static function headHtml($html)
+    {
+        static::$headHtmls[] = $html;
+
+        return new static;
+    }
+
+    public static function availableHeadHtmls(Request $request)
+    {
+        return static::$headHtmls;
+    }
+
+    public static function bodyHtml($html)
+    {
+        static::$bodyHtmls[] = $html;
+
+        return new static;
+    }
+
+    public static function availableBodyHtmls(Request $request)
+    {
+        return static::$bodyHtmls;
     }
 
     public static function pushWebRoutes(Closure $routes)
