@@ -17,7 +17,6 @@ return [
     'assets.config.show_filename' => 'Show the filename next to the preview image.',
     'assets.config.show_set_alt' => 'Show a link to set the Alt Text of any images.',
     'assets.config.query_scopes' => 'Choose which query scopes should be applied when retrieving selectable assets.',
-    'assets.dimension' => ':width x :height',
     'assets.title' => 'Assets',
     'bard.config.allow_source' => 'Enable to view the HTML source code while writing.',
     'bard.config.always_show_set_button' => 'Enable to always show the "Add Set" button.',
