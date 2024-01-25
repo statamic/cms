@@ -28,7 +28,7 @@ class StaticRecacheJob implements ShouldQueue
 
         $url .= (str_contains($url, '?') ? '&' : '?').$param;
 
-        $this->request = new Request('PUT', $url);
+        $this->request = new Request('GET', $url);
     }
 
     public function handle(Client $client)

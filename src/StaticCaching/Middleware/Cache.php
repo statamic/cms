@@ -120,6 +120,10 @@ class Cache
             return false;
         }
 
+        if ($this->hasValidRecacheToken($request)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -129,14 +133,7 @@ class Cache
         // POST requests to preview the changes. We don't want those to trigger any caching,
         // or else pending changes will be shown immediately, even without hitting save.
         if ($request->method() !== 'GET') {
-            if ($request->method() != 'PUT') {
-                return false;
-            }
-
-            // if we are not a recache attempt
-            if (! ($token = $request->input('__recache')) && ($token === config('statamic.static_caching.background_recache_token', ''))) {
-                return false;
-            }
+            return false;
         }
 
         // Draft and private pages should not be cached.
@@ -153,6 +150,15 @@ class Cache
         }
 
         return true;
+    }
+
+    private function hasValidRecacheToken($request)
+    {
+        if (! $token = $request->input('__recache')) {
+            return false;
+        }
+
+        return $token === config('statamic.static_caching.background_recache_token');
     }
 
     private function createLock($request)
