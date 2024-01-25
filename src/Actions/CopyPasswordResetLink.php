@@ -16,7 +16,7 @@ class CopyPasswordResetLink extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof UserContract;
+        return config('statamic.users.allow_copy_reset_password_link', false) && $item instanceof UserContract;
     }
 
     public function visibleToBulk($items)
