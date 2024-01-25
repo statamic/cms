@@ -2,12 +2,21 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
+use Closure;
 use Illuminate\Http\Request;
+use Statamic\Http\Middleware\Localize;
 use Statamic\StaticCaching\Replacers\NoCacheReplacer;
 use Statamic\Support\Str;
+use Illuminate\Routing\Controller as BaseController;
+use Statamic\Facades\Site;
 
-class Controller
+class Controller extends BaseController
 {
+    public function __construct()
+    {
+        $this->middleware(NoCacheLocalize::class);
+    }
+
     public function __invoke(Request $request, Session $session)
     {
         $url = $request->input('url');
