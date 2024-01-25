@@ -12,7 +12,7 @@
                 v-model="slug"
                 classes="font-mono text-xs"
                 :isReadOnly="isReadOnly"
-                :append="config.show_regenerate && value"
+                :append="config.show_regenerate"
                 :name="slug"
                 :id="fieldId"
                 @focus="$emit('focus')"

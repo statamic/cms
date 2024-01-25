@@ -27,7 +27,7 @@ class UserGroup extends Filter
 
     public function apply($query, $values)
     {
-        $query->where('groups/'.$values['group'], true);
+        $query->whereGroup($values['group']);
     }
 
     public function badge($values)
