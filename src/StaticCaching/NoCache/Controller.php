@@ -2,13 +2,10 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
-use Closure;
 use Illuminate\Http\Request;
-use Statamic\Http\Middleware\Localize;
+use Illuminate\Routing\Controller as BaseController;
 use Statamic\StaticCaching\Replacers\NoCacheReplacer;
 use Statamic\Support\Str;
-use Illuminate\Routing\Controller as BaseController;
-use Statamic\Facades\Site;
 
 class Controller extends BaseController
 {
