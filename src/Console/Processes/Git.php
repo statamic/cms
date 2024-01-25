@@ -47,8 +47,8 @@ class Git extends Process
     public function push()
     {
         $pushOptions = collect(config('statamic.git.push_options'))
-            ->map(fn($item, $key) => is_int($key) ? $item : implode("=", [$key, $item]))
-            ->map(fn($item) => implode(" ", ["-o", $item]))
+            ->map(fn ($item, $key) => is_int($key) ? $item : implode('=', [$key, $item]))
+            ->map(fn ($item) => implode(' ', ['-o', $item]))
             ->flatten();
 
         return $this->runGitCommand('push', '--porcelain', $pushOptions);

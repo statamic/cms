@@ -356,14 +356,13 @@ EOT;
 
         Config::set('statamic.git.push_options', [
             'merge_request.create',
-            'merge_request.target' => 'develop'
+            'merge_request.target' => 'develop',
         ]);
 
         $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
 
         Git::commit();
     }
-
 
     private function showLastCommit($path)
     {
