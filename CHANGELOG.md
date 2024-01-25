@@ -14,7 +14,7 @@
 ### What's fixed
 - Support data in Eloquent based user groups. [#9395](https://github.com/statamic/cms/issues/9395) by @jasonvarga
 - Revert overzealous file extension renaming feature. [#9389](https://github.com/statamic/cms/issues/9389) by @jasonvarga
-- Make copy reset password link action opt-in. [#9390](https://github.com/statamic/cms/issues/9390) by @jasonvarga
+- Make copy reset password link action opt-in. [#9390](https://github.com/statamic/cms/issues/9390) [#9397](https://github.com/statamic/cms/issues/9397) by @jasonvarga
 - Fix importing fieldsets in custom blueprint namespaces. [#9387](https://github.com/statamic/cms/issues/9387) by @duncanmcclean
 - Catch errors when sending user activation email. [#9382](https://github.com/statamic/cms/issues/9382) by @duncanmcclean
 - Only use site language for form submission validation messages if submitted from front-end. [#9383](https://github.com/statamic/cms/issues/9383) by @jasonvarga
