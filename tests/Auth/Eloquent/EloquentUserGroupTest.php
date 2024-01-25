@@ -5,9 +5,11 @@ namespace Tests\Auth\Eloquent;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\Eloquent\UserGroup as EloquentGroup;
 use Statamic\Auth\Eloquent\UserGroupModel;
+use Statamic\Facades\UserGroup;
 use Tests\TestCase;
 
 class EloquentUserGroupTest extends TestCase
@@ -62,13 +64,11 @@ class EloquentUserGroupTest extends TestCase
 
     public function makeGroup()
     {
-        return (new EloquentGroup)
-            ->model(UserGroupModel::create([
-                'handle' => $this->faker->word,
-                'title' => $this->faker->words(2, true),
-                'roles' => [],
-            ])
-            );
+        return EloquentGroup::fromModel(UserGroupModel::create([
+            'handle' => $this->faker->word,
+            'title' => $this->faker->words(2, true),
+            'roles' => [],
+        ]));
     }
 
     public function makeUser()
@@ -114,5 +114,23 @@ class EloquentUserGroupTest extends TestCase
         $user->removeFromGroup($group);
 
         $this->assertCount(0, $user->groups());
+    }
+
+    /** @test */
+    public function it_sets_and_gets_data()
+    {
+        $group = $this->makeGroup();
+
+        $this->assertInstanceOf(Collection::class, $data = $group->data());
+        $this->assertEquals([], $data->all());
+
+        $group->data(['alfa' => 'bravo']);
+        $group->set('charlie', 'delta');
+        $this->assertEquals(['alfa' => 'bravo', 'charlie' => 'delta'], $group->data()->all());
+
+        $group->save();
+
+        $group = UserGroup::all()->first();
+        $this->assertEquals(['alfa' => 'bravo', 'charlie' => 'delta'], $group->data()->all());
     }
 }
