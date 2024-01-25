@@ -138,6 +138,13 @@ abstract class AbstractCacher implements Cacher
     {
         $url = $request->getUri();
 
+        if ($recache = $request->input('__recache')) {
+            $url = str_replace('__recache='.$recache, '', $url);
+            if (substr($url, -1, 1) == '?') {
+                $url = substr($url, 0, -1);
+            }
+        }
+
         if ($this->config('ignore_query_strings')) {
             $url = explode('?', $url)[0];
         }
