@@ -77,7 +77,7 @@ class DefaultInvalidator implements Invalidator
         } elseif ($item instanceof Nav) {
             $urls = $this->getNavUrls($item);
         } elseif ($item instanceof GlobalSet) {
-            $this->getGlobalUrls($item);
+            $urls = $this->getGlobalUrls($item);
         } elseif ($item instanceof Collection) {
             $urls = $this->getCollectionUrls($item);
         } elseif ($item instanceof Asset) {
