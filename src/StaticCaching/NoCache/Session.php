@@ -4,8 +4,8 @@ namespace Statamic\StaticCaching\NoCache;
 
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Data;
 
