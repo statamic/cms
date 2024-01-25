@@ -9,6 +9,7 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Jobs\StaticRecacheJob;
 use Statamic\Support\Arr;
 
 class DefaultInvalidator implements Invalidator
@@ -28,56 +29,32 @@ class DefaultInvalidator implements Invalidator
             return $this->cacher->flush();
         }
 
+        $urls = collect();
+
         if ($item instanceof Entry) {
-            $this->invalidateEntryUrls($item);
+            $urls = $this->getEntryUrls($item);
         } elseif ($item instanceof Term) {
-            $this->invalidateTermUrls($item);
+            $urls = $this->getTermUrls($item);
         } elseif ($item instanceof Nav) {
-            $this->invalidateNavUrls($item);
+            $urls = $this->getNavUrls($item);
         } elseif ($item instanceof GlobalSet) {
-            $this->invalidateGlobalUrls($item);
+            $urls = $this->getGlobalUrls($item);
         } elseif ($item instanceof Collection) {
-            $this->invalidateCollectionUrls($item);
+            $urls = $this->getCollectionUrls($item);
         } elseif ($item instanceof Asset) {
-            $this->invalidateAssetUrls($item);
+            $urls = $this->getAssetUrls($item);
         } elseif ($item instanceof Form) {
-            $this->invalidateFormUrls($item);
+            $urls = $this->getFormUrls($item);
         }
-    }
 
-    protected function invalidateFormUrls($form)
-    {
-        $this->cacher->invalidateUrls($this->getFormUrls($form));
-    }
+        collect($urls)
+            ->filter(fn ($url) => is_array($url))
+            ->each(fn ($url) => $this->cacher->invalidateUrl(...$url));
 
-    protected function invalidateAssetUrls($asset)
-    {
-        $this->cacher->invalidateUrls($this->getAssetUrls($asset));
-    }
-
-    protected function invalidateEntryUrls($entry)
-    {
-        $this->cacher->invalidateUrls($this->getEntryUrls($entry));
-    }
-
-    protected function invalidateTermUrls($term)
-    {
-        $this->cacher->invalidateUrls($this->getTermUrls($term));
-    }
-
-    protected function invalidateNavUrls($nav)
-    {
-        $this->cacher->invalidateUrls($this->getNavUrls($nav));
-    }
-
-    protected function invalidateGlobalUrls($set)
-    {
-        $this->cacher->invalidateUrls($this->getGlobalUrls($set));
-    }
-
-    protected function invalidateCollectionUrls($collection)
-    {
-        $this->cacher->invalidateUrls($this->getCollectionUrls($collection));
+        $urls = collect($urls)->filter(fn ($url) => ! is_array($url));
+        if ($urls->isNotEmpty()) {
+            $this->cacher->invalidateUrls($urls->values()->all());
+        }
     }
 
     public function invalidateAndRecache($item)
@@ -150,11 +127,11 @@ class DefaultInvalidator implements Invalidator
         if ($url = $term->absoluteUrl()) {
             $urls = $urls->push($this->splitUrlAndDomain($url));
 
-            $urls = $urls->merge($term->taxonomy()->collections()->each(function ($collection) use ($term) {
+            $urls = $urls->merge($term->taxonomy()->collections()->map(function ($collection) use ($term) {
                 if ($url = $term->collection($collection)->absoluteUrl()) {
                     return $this->splitUrlAndDomain($url);
                 }
-            })->filter();
+            }))->filter();
         }
 
         return $urls->merge(Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"))->all();
