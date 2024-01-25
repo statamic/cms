@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Site;
+use Statamic\Jobs\StaticRecacheJob;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
@@ -252,6 +253,29 @@ abstract class AbstractCacher implements Cacher
                 $this->invalidateUrl(...$this->getPathAndDomain($url));
             }
         });
+    }
+
+    /**
+     * Recache multiple URLs.
+     *
+     * @param  array  $urls
+     * @return void
+     */
+    public function recacheUrls($urls)
+    {
+        collect($urls)->each(fn ($url) => is_array($url) ? $this->recacheUrl(...$url) : $this->recacheUrl($url));
+    }
+
+    /**
+     * Recache an individual URLs.
+     *
+     * @param  string  $path
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function recacheUrl($path, $domain = null)
+    {
+        StaticRecacheJob::dispatch($path, $domain);
     }
 
     /**

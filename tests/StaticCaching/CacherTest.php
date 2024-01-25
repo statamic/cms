@@ -243,7 +243,7 @@ class CacherTest extends TestCase
     }
 
     /** @test */
-    public function it_asks_the_url_excluder_if_a_url_should_be_excluder()
+    public function it_asks_the_url_excluder_if_a_url_should_be_excluded()
     {
         $mock = Mockery::mock(UrlExcluder::class);
         $mock->shouldReceive('isExcluded')->with('/foo')->andReturnTrue()->once();

@@ -15,7 +15,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 
-class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
+class DefaultInvalidatorTest extends \Tests\TestCase
 {
     public function tearDown(): void
     {
@@ -256,5 +256,65 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->assertNull($invalidator->invalidate($form));
+    }
+
+    /** @test */
+    public function it_doesnt_recache_when_background_recache_token_is_disabled()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('recacheUrls')->never();
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(true);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidateAndRecache($entry));
+    }
+
+    /** @test */
+    public function it_recaches_when_background_recache_token_is_enabled()
+    {
+        config()->set('statamic.static_caching.background_recache_token', 'some-token');
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->never();
+            $cacher->shouldReceive('recacheUrls')->once()->with(['/blog/one', '/blog/two']);
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(true);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidateAndRecache($entry));
     }
 }

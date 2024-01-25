@@ -9,7 +9,6 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Jobs\StaticRecacheJob;
 use Statamic\Support\Arr;
 
 class DefaultInvalidator implements Invalidator
@@ -87,17 +86,7 @@ class DefaultInvalidator implements Invalidator
             $urls = $this->getFormUrls($item);
         }
 
-        $this->recacheUrls($urls);
-    }
-
-    public function recacheUrls($urls)
-    {
-        collect($urls)->each(fn ($url) => is_array($url) ? $this->recacheUrl(...$url) : $this->recacheUrl($url));
-    }
-
-    public function recacheUrl($path, $domain = null)
-    {
-        StaticRecacheJob::dispatch($path, $domain);
+        $this->cacher->recacheUrls($urls);
     }
 
     private function getFormUrls($form)
