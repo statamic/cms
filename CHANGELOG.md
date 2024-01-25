@@ -1,5 +1,13 @@
 # Release Notes
 
+## 3.4.17 (2024-01-25)
+
+### What's fixed
+- Revert overzealous file extension renaming feature. [#9399](https://github.com/statamic/cms/issues/9399) by @jasonvarga
+- Make copy reset password link action opt-in. [#9398](https://github.com/statamic/cms/issues/9398) by @jasonvarga
+
+
+
 ## 3.4.16 (2024-01-22)
 
 ### What's fixed
