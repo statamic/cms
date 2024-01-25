@@ -125,4 +125,16 @@ return [
 
     'warm_queue' => null,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Background Re-cache Token
+    |--------------------------------------------------------------------------
+    |
+    | If you want Statamic to re-cache URLs in the background, without removing
+    | them, add a unique string here that should not be easy to guess
+    |
+    */
+
+    'background_recache_token' => env('STATAMIC_BACKGROUND_RECACHE_TOKEN', null),
+
 ];

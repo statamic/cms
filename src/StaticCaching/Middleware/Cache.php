@@ -134,7 +134,7 @@ class Cache
             }
 
             // if we are not a recache attempt
-            if (! ($request->headers->has('X-Statamic-Recache') && $request->input('__recache'))) {
+            if (! ($token = $request->input('__recache')) && ($token === config('statamic.static_caching.background_recache_token', ''))) {
                 return false;
             }
         }
