@@ -86,8 +86,7 @@ export default {
                 return this.visibleColumns.map(column => column.field).join(',');
             },
             set(value) {
-                const handles = value.split(',');
-                this.visibleColumns = this.columns.filter(column => handles.includes(column.field));
+                this.visibleColumns = value.split(',').map(field => this.columns.find(column => column.field === field));
             },
         },
 
