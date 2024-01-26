@@ -87,6 +87,15 @@ export function utf8btoa(stringToEncode) {
     return btoa(utf8String);
 }
 
+export function utf8atob(stringToDecode) {
+    // Decode from base64 to UTF-8 byte representation
+    const utf8String = atob(stringToDecode);
+
+    // Convert the UTF-8 byte representation back to a regular string
+    return decodeURIComponent(utf8String.split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+}
+
 export function uniqid() {
     return uid();
 }

@@ -34,26 +34,61 @@ export default {
             visibleColumns: this.initialColumns.filter(column => column.visible),
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
+            popping: false,
+            pushQuery: false,
             meta: null,
         }
     },
 
     computed: {
 
-        parameters() {
-            return Object.assign({
-                sort: this.sortColumn,
-                order: this.sortDirection,
-                page: this.page,
-                perPage: this.perPage,
-                search: this.searchQuery,
-                filters: this.activeFilterParameters,
-                columns: this.visibleColumns.map(column => column.field).join(','),
-            }, this.additionalParameters);
+        parameters:  {
+            get() {
+                return Object.assign({
+                    sort: this.sortColumn,
+                    order: this.sortDirection,
+                    page: this.page,
+                    perPage: this.perPage,
+                    search: this.searchQuery,
+                    filters: this.activeFilterParameters,
+                    columns: this.visibleColumnParameters,
+                }, this.additionalParameters);
+            },
+            set(value) {
+                const keyMap = [
+                    ['sort', 'sortColumn'],
+                    ['order', 'sortDirection'],
+                    ['page', 'page'],
+                    ['perPage', 'perPage'],
+                    ['search', 'searchQuery'],
+                    ['filters', 'activeFilterParameters'],
+                    ['columns', 'visibleColumnParameters'],
+                ];
+                keyMap.forEach(([key, property]) => {
+                    if (value.hasOwnProperty(key)) {
+                        this[property] = value[key];
+                    }
+                });
+            },
         },
 
-        activeFilterParameters() {
-            return utf8btoa(JSON.stringify(this.activeFilters));
+        activeFilterParameters: {
+            get() {
+                return utf8btoa(JSON.stringify(this.activeFilters));
+            },
+            set(value) {
+                this.activeFilters = JSON.parse(utf8atob(value));
+            },
+        },
+
+        visibleColumnParameters: {
+            get() {
+                return this.visibleColumns.map(column => column.field).join(',');
+            },
+            set(value) {
+                const handles = value.split(',');
+                this.visibleColumns = this.columns.filter(column => handles.includes(column.field));
+            },
         },
 
         additionalParameters() {
@@ -71,8 +106,18 @@ export default {
 
     },
 
+    mounted() {
+        window.history.replaceState({ parameters: this.parameters }, '');
+        window.addEventListener('popstate', this.popState);
+    },
+
+    beforeDestroy() {
+        window.removeEventListener('popstate', this.popState);
+    },
+
     created() {
         this.autoApplyFilters(this.filters);
+        this.autoApplyState();
         this.request();
     },
 
@@ -87,6 +132,7 @@ export default {
 
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
                 this.request();
+                this.pushState();
             }
         },
 
@@ -154,6 +200,39 @@ export default {
             let i = _.indexOf(this.rows, _.findWhere(this.rows, { id }));
             this.rows.splice(i, 1);
             if (this.rows.length === 0) location.reload();
+        },
+
+        popState(event) {
+            if (!this.pushQuery) {
+                return;
+            }
+            this.popping = true;
+            this.parameters = event.state.parameters;
+            this.$nextTick(() => {
+                this.popping = false;
+            });
+        },
+
+        pushState() {
+            if (!this.pushQuery || this.popping) {
+                return;
+            }
+            const parameters = this.parameters;
+            const keys = Object.keys(parameters);
+            const except = Object.keys(this.additionalParameters);
+            const searchParams = new URLSearchParams(Object.fromEntries(keys
+                .filter(key => !except.includes(key))
+                .map(key => [key, parameters[key]])));
+            window.history.pushState({ parameters }, '', '?' + searchParams.toString());
+        },
+
+        autoApplyState() {
+            if (!this.pushQuery || !window.location.search) {
+                return;
+            }
+            const searchParams = new URLSearchParams(window.location.search);
+            const parameters = Object.fromEntries(searchParams.entries());
+            this.parameters = parameters;
         },
 
     }

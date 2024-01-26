@@ -139,6 +139,7 @@ export default {
             requestUrl: cp_url(`collections/${this.collection}/entries`),
             currentSite: this.site,
             initialSite: this.site,
+            pushQuery: true,
         }
     },
 
