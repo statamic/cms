@@ -34,9 +34,9 @@ export default {
             visibleColumns: this.initialColumns.filter(column => column.visible),
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
-            popping: false,
-            pushQuery: false,
             meta: null,
+            pushQuery: false,
+            popping: false,
         }
     },
 
