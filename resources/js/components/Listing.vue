@@ -232,7 +232,11 @@ export default {
             }
             const searchParams = new URLSearchParams(window.location.search);
             const parameters = Object.fromEntries(searchParams.entries());
+            this.popping = true;
             this.parameters = parameters;
+            this.$nextTick(() => {
+                this.popping = false;
+            });
         },
 
     }
