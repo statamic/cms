@@ -290,7 +290,7 @@ class DefaultInvalidatorTest extends \Tests\TestCase
     /** @test */
     public function it_recaches_when_background_recache_token_is_enabled()
     {
-        config()->set('statamic.static_caching.background_recache_token', 'some-token');
+        config()->set('statamic.static_caching.background_recache', true);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrls')->never();
