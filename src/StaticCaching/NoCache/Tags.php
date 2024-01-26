@@ -23,7 +23,7 @@ class Tags extends \Statamic\Tags\Tags
     public function index()
     {
         if (! Cache::isBeingUsedOnCurrentRoute()) {
-            return $this->parse($this->context->toArray());
+            return $this->parse();
         }
 
         if ($this->params->has('select')) {
