@@ -150,16 +150,6 @@ return [
 
     'push' => env('STATAMIC_GIT_PUSH', false),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Push options
-    |--------------------------------------------------------------------------
-    |
-    | Determine the git push options to be added when pushing to
-    | repository. This is an empty array by default.
-    |
-    */
-
     'push_options' => [],
 
     /*
