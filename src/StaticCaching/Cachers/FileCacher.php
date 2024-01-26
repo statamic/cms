@@ -4,7 +4,6 @@ namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File as LaravelFile;
 use Illuminate\Support\Facades\Log;
 use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
@@ -102,10 +101,6 @@ class FileCacher extends AbstractCacher
     {
         foreach ($this->getCachePaths() as $path) {
             $this->writer->flush($path);
-        }
-
-        if ($path = config('statamic.static_caching.strategies.full.cache_path')) {
-            LaravelFile::deleteDirectory($path);
         }
 
         $this->flushUrls();
