@@ -8,4 +8,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyExcep
 class NotFoundHttpException extends SymfonyException
 {
     use RendersHttpExceptions;
+
+    public function getApiMessage()
+    {
+        return 'Not found.';
+    }
 }

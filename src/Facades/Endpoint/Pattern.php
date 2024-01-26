@@ -122,7 +122,7 @@ class Pattern
     /**
      * Converts SQL LIKE syntax to a regular expression.
      *
-     * @return string  The regular expression without delimiters.
+     * @return string The regular expression without delimiters.
      */
     public function sqlLikeToRegex(string $like): string
     {

@@ -9,6 +9,7 @@ use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
 use Statamic\Events\TermCreating;
 use Statamic\Events\TermDeleted;
+use Statamic\Events\TermDeleting;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
 use Statamic\Facades;
@@ -242,6 +243,10 @@ class Term implements TermContract
 
     public function delete()
     {
+        if (TermDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\Term::delete($this);
 
         TermDeleted::dispatch($this);

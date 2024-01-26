@@ -136,6 +136,7 @@ return [
     'date_fieldtype_start_date_invalid' => 'Kein gültiges Startdatum.',
     'date_fieldtype_end_date_required' => 'Ein Enddatum ist erforderlich.',
     'date_fieldtype_end_date_invalid' => 'Kein gültiges Enddatum.',
+    'date_fieldtype_only_single_mode_allowed' => 'Wenn der Handle für dieses Feld «date» heisst, kann nur der Modus «Einzeln» gewählt werden.',
     'code_fieldtype_rulers' => 'Dies ist ungültig.',
     'options_require_keys' => 'Alle Optionen müssen Schlüssel haben.',
     'custom.attribute-name.rule-name' => 'benutzerdefinierte Nachricht',

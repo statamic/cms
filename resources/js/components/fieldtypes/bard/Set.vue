@@ -2,7 +2,7 @@
 
     <node-view-wrapper>
         <div class="bard-set whitespace-normal my-6 rounded bg-white border shadow-md"
-            :class="{ 'border-blue-400': selected, 'has-error': hasError }"
+            :class="{ 'border-blue-400': selected || withinSelection, 'has-error': hasError }"
             contenteditable="false" @copy.stop @paste.stop @cut.stop
         >
             <div ref="content" hidden />
@@ -44,6 +44,7 @@
                     :set-index="index"
                     :field-path="fieldPath(field)"
                     :read-only="isReadOnly"
+                    :show-field-previews="showFieldPreviews"
                     @updated="updated(field.handle, $event)"
                     @meta-updated="metaUpdated(field.handle, $event)"
                     @focus="focused"
@@ -96,11 +97,11 @@ export default {
         },
 
         meta() {
-            return this.extension.options.bard.meta.existing[this.node.attrs.id];
+            return this.extension.options.bard.meta.existing[this.node.attrs.id] || {};
         },
 
         previews() {
-            return this.extension.options.bard.meta.previews[this.node.attrs.id];
+            return this.extension.options.bard.meta.previews[this.node.attrs.id] || {};
         },
 
         collapsed() {
@@ -150,6 +151,14 @@ export default {
 
         isInvalid() {
             return Object.keys(this.config).length === 0;
+        },
+
+        decorationSpecs() {
+            return Object.assign({}, ...this.decorations.map((decoration) => decoration.type.spec));
+        },
+
+        withinSelection() {
+            return this.decorationSpecs.withinSelection;
         },
 
     },

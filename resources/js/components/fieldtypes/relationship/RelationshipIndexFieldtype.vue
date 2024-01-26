@@ -33,11 +33,11 @@ export default {
 
     computed: {
         items() {
-            return this.showingAll ? this.value : this.value.slice(0, 2);
+            return this.showingAll ? this.value : this.value?.slice(0, 2);
         },
 
         hasMore() {
-            return this.value.length > 2;
+            return this.value?.length > 2;
         },
     },
 
