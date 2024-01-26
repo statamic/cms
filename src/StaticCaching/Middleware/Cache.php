@@ -19,8 +19,6 @@ use Symfony\Component\Lock\Store\FlockStore;
 
 class Cache
 {
-    public static bool $requestCanBeCached = false;
-
     /**
      * @var Cacher
      */
@@ -45,8 +43,6 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
-        static::$requestCanBeCached = true;
-
         $lock = $this->createLock($request);
 
         while (! $lock->acquire()) {
@@ -165,5 +161,10 @@ class Cache
         $key = $this->cacher->getUrl($request);
 
         return $locks->createLock($key, 30);
+    }
+
+    public static function isBeingUsedOnCurrentRoute()
+    {
+        return in_array(static::class, app('router')->gatherRouteMiddleware(request()->route()));
     }
 }

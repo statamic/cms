@@ -22,7 +22,7 @@ class Tags extends \Statamic\Tags\Tags
 
     public function index()
     {
-        if (! Cache::$requestCanBeCached) {
+        if (! Cache::isBeingUsedOnCurrentRoute()) {
             return $this->parse($this->context->toArray());
         }
 
