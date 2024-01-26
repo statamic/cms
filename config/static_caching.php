@@ -135,6 +135,6 @@ return [
     |
     */
 
-    'background_recache_token' => env('STATAMIC_BACKGROUND_RECACHE_TOKEN', null),
+    'background_recache' => env('STATAMIC_BACKGROUND_RECACHE', false),
 
 ];

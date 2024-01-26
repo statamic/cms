@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Hash;
 use Statamic\StaticCaching\Cacher;
 
 class StaticRecacheJob implements ShouldQueue
@@ -24,7 +25,7 @@ class StaticRecacheJob implements ShouldQueue
 
         $url = $domain.$url;
 
-        $param = '__recache='.config('statamic.static_caching.background_recache_token');
+        $param = '__recache='.Hash::make($url);
 
         $url .= (str_contains($url, '?') ? '&' : '?').$param;
 
