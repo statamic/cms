@@ -236,4 +236,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Les utilisateurs peuvent se voir attribuer des rôles qui personnalisent leurs autorisations, accès et possibilités d’agir au sein du Panneau de configuration.',
     'user_wizard_super_admin_instructions' => 'Les super-admin ont le contrôle complet du système et l’accès à tout ce qui se trouve dans le Panneau de configuration. Accordez ce rôle à bon escient.',
     'view_more_count' => 'En voir :count de plus',
+    'width_x_height' => ':width x :height',
 ];
