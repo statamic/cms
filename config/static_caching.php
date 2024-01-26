@@ -127,11 +127,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Background Re-cache Token
+    | Background Re-cache
     |--------------------------------------------------------------------------
     |
-    | If you want Statamic to re-cache URLs in the background, without removing
-    | them, add a unique string here that should not be easy to guess
+    | When this enabled, Statamic will re-cache URLs in the background,
+    | overwriting the existing cache, without removing it first.
     |
     */
 
