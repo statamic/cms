@@ -1635,6 +1635,32 @@ class AssetTest extends TestCase
         $this->uploadFileTest();
     }
 
+    /** @test */
+    public function if_saving_event_returns_false_during_upload_the_asset_doesnt_save()
+    {
+        Event::fake([AssetSaved::class, AssetUploaded::class, AssetCreated::class]);
+
+        Event::listen(AssetCreating::class, function ($event) {
+            return false;
+        });
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
+
+        $this->assertFalse($return);
+
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        Event::assertNotDispatched(AssetSaved::class);
+        Event::assertNotDispatched(AssetUploaded::class);
+        Event::assertNotDispatched(AssetCreated::class);
+    }
+
     private function uploadFileTest()
     {
         Event::fake();
