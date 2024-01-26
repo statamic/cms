@@ -885,6 +885,29 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_doesnt_save_when_asset_saving_event_returns_false()
+    {
+        Event::fake([AssetSaved::class]);
+        Storage::fake('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::shouldReceive('find')->andReturn(null);
+        Facades\Asset::shouldReceive('save')->with($asset);
+
+        Event::listen(AssetSaving::class, function ($event) {
+            return false;
+        });
+
+        $return = $asset->save();
+
+        $this->assertFalse($return);
+
+        Event::assertNotDispatched(AssetSaved::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+    }
+
+    /** @test */
     public function it_saves_quietly()
     {
         Event::fake();
@@ -903,7 +926,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function when_saving_quietly_the_cached_assetss_withEvents_flag_will_be_set_back_to_true()
+    public function when_saving_quietly_the_cached_assets_withEvents_flag_will_be_set_back_to_true()
     {
         Event::fake();
         Storage::fake('test');
