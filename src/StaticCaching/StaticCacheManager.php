@@ -4,6 +4,7 @@ namespace Statamic\StaticCaching;
 
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Extensions\FileStore;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
@@ -30,7 +31,15 @@ class StaticCacheManager extends Manager
 
     public function createFileDriver(array $config)
     {
-        return new FileCacher(new Writer, $this->app[Repository::class], $config);
+        $customCacheStore = null;
+
+        if ($path = config('statamic.static_caching.strategies.full.cache_path')) {
+            $customCacheStore = app('cache')->repository(
+                (new FileStore($this->app['files'], $path))
+            );
+        }
+
+        return new FileCacher(new Writer, $customCacheStore ?? $this->app[Repository::class], $config);
     }
 
     public function createApplicationDriver(array $config)
