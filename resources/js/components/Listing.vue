@@ -105,6 +105,12 @@ export default {
 
     },
 
+    created() {
+        this.autoApplyFilters(this.filters);
+        this.autoApplyState();
+        this.request();
+    },
+
     mounted() {
         window.history.replaceState({ parameters: this.parameters }, '');
         window.addEventListener('popstate', this.popState);
@@ -112,12 +118,6 @@ export default {
 
     beforeDestroy() {
         window.removeEventListener('popstate', this.popState);
-    },
-
-    created() {
-        this.autoApplyFilters(this.filters);
-        this.autoApplyState();
-        this.request();
     },
 
     watch: {
