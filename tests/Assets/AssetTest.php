@@ -1672,10 +1672,11 @@ class AssetTest extends TestCase
             'path/to',
             'path/to/asset.jpg',
         ], Cache::get('asset-list-contents-test_container')->keys()->all());
-        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
-            return $event->asset = $asset;
-        });
-        Event::assertDispatched(AssetSaved::class);
+
+        Event::assertDispatched(AssetCreating::class, fn ($event) => $event->asset === $asset);
+        Event::assertDispatched(AssetSaved::class, fn ($event) => $event->asset === $asset);
+        Event::assertDispatched(AssetUploaded::class, fn ($event) => $event->asset === $asset);
+        Event::assertDispatched(AssetCreated::class, fn ($event) => $event->asset === $asset);
     }
 
     /** @test */
