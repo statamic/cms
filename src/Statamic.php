@@ -25,11 +25,10 @@ class Statamic
 
     protected static $scripts = [];
     protected static $externalScripts = [];
+    protected static $inlineScripts = [];
     protected static $styles = [];
     protected static $externalStyles = [];
     protected static $vites = [];
-    protected static $headHtmls = [];
-    protected static $bodyHtmls = [];
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
@@ -86,6 +85,18 @@ class Statamic
         return new static;
     }
 
+    public static function inlineScript($html)
+    {
+        static::$inlineScripts[] = $html;
+
+        return new static;
+    }
+
+    public static function availableInlineScripts(Request $request)
+    {
+        return static::$inlineScripts;
+    }
+
     public static function availableStyles(Request $request)
     {
         return static::$styles;
@@ -127,30 +138,6 @@ class Statamic
     public static function availableVites(Request $request)
     {
         return static::$vites;
-    }
-
-    public static function headHtml($html)
-    {
-        static::$headHtmls[] = $html;
-
-        return new static;
-    }
-
-    public static function availableHeadHtmls(Request $request)
-    {
-        return static::$headHtmls;
-    }
-
-    public static function bodyHtml($html)
-    {
-        static::$bodyHtmls[] = $html;
-
-        return new static;
-    }
-
-    public static function availableBodyHtmls(Request $request)
-    {
-        return static::$bodyHtmls;
     }
 
     public static function pushWebRoutes(Closure $routes)

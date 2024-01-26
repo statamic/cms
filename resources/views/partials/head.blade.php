@@ -29,8 +29,4 @@
     @endforeach
 @endforeach
 
-@foreach (Statamic::availableHeadHtmls(request()) as $html)
-    {!! $html !!}
-@endforeach
-
 @stack('head')
