@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
+use Illuminate\View\InvokableComponentVariable;
 use Statamic\Support\Arr;
 
 abstract class Region
@@ -27,9 +28,10 @@ abstract class Region
 
     protected function filterContext(array $context)
     {
-        foreach (['__env', 'app', 'errors', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor'] as $var) {
-            unset($context[$var]);
-        }
+        $context = collect($context)
+            ->reject(fn ($value, $key) => $value instanceof InvokableComponentVariable)
+            ->reject(fn ($value, $key) => in_array($key, ['__env', 'app', 'errors', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor']))
+            ->toArray();
 
         return $this->arrayRecursiveDiff($context, $this->session->cascade());
     }
