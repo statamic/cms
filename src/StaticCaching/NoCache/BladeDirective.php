@@ -2,6 +2,8 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
+use Statamic\StaticCaching\Middleware\Cache;
+
 class BladeDirective
 {
     /**
@@ -22,8 +24,11 @@ class BladeDirective
         }
 
         $view = $expression;
-
         $context = array_merge($data, $params);
+
+        if (! Cache::$requestCanBeCached) {
+            return view($view, $context)->render();
+        }
 
         return $this->nocache->pushView($view, $context)->placeholder();
     }
