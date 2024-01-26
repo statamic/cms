@@ -36,7 +36,6 @@ return [
         'full' => [
             'driver' => 'file',
             'path' => public_path('static'),
-            'cache_path' => null,
             'lock_hold_length' => 0,
         ],
 
