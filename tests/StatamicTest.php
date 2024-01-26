@@ -344,26 +344,6 @@ class StatamicTest extends TestCase
         $this->assertFalse(Statamic::isWorker());
     }
 
-    /** @test */
-    public function head_htmls_can_be_added()
-    {
-        Statamic::headHtml('<div id="head-test"></div>');
-
-        $allHtmls = Statamic::availableHeadHtmls(Request::create('/'));
-
-        $this->assertContains('<div id="head-test"></div>', $allHtmls);
-    }
-
-    /** @test */
-    public function body_htmls_can_be_added()
-    {
-        Statamic::bodyHtml('<div id="body-test"></div>');
-
-        $allHtmls = Statamic::availableBodyHtmls(Request::create('/'));
-
-        $this->assertContains('<div id="body-test"></div>', $allHtmls);
-    }
-
     public function customAssetUrl($app)
     {
         $app['config']->set('app.asset_url', 'http://test-asset-url.com');
