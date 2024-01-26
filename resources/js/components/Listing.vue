@@ -202,7 +202,7 @@ export default {
         },
 
         popState(event) {
-            if (!this.pushQuery) {
+            if (!this.pushQuery || !event.state) {
                 return;
             }
             this.popping = true;
