@@ -108,11 +108,6 @@ class Values implements Arrayable, ArrayAccess, IteratorAggregate, JsonSerializa
         return $this->getProxiedInstance()->toArray();
     }
 
-    public function all()
-    {
-        return $this->getProxiedInstance()->all();
-    }
-
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
