@@ -366,7 +366,7 @@ export default {
         setSiteFilter(site) {
             if (!this.hasSiteFilter) return;
 
-            this.filterChanged({ handle: 'site', values: { site }});
+            this.filterChanged({ handle: 'site', values: { site }}, false);
         },
 
         initialRequest() {
