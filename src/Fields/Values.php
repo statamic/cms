@@ -111,7 +111,7 @@ class Values implements Arrayable, ArrayAccess, IteratorAggregate, JsonSerializa
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
-        return $this->all();
+        return $this->getProxiedInstance()->all();
     }
 
     public function resolveGqlValue($field)
