@@ -91,8 +91,9 @@ class Values implements Arrayable, ArrayAccess, IteratorAggregate, JsonSerializa
 
     public function __call($method, $args)
     {
-        if ($this->getProxiedInstance()->has($method)) {
-            $value = $this->getNormalizedValueFromProxiedCollection($method);
+        if (method_exists($this->getProxiedInstance(), $method)) {
+            return $this->getProxiedInstance()->$method(...$args);
+        }
 
             if (Compare::isQueryBuilder($value)) {
                 return $value;
