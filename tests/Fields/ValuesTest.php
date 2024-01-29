@@ -67,6 +67,18 @@ class ValuesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_pass_collection_method_calls_to_proxied_instance()
+    {
+        $values = new Values([
+            'body' => 'Potato',
+            'part' => new Value('Head', null, $this->fieldtype),
+        ]);
+
+        $this->assertEquals('Potato Head (augmented)', $values->implode(' '));
+        $this->assertEquals('Mr. Potato Head (augmented)', $values->prepend('Mr.', 'prefix')->implode(' '));
+    }
+
+    /** @test */
     public function its_arrayable()
     {
         $mockOne = Mockery::mock(Collection::class)->shouldReceive('toArray')->andReturn(['title' => 'first'])->getMock();
@@ -196,7 +208,7 @@ class ValuesTest extends TestCase
     public function it_throws_exception_if_trying_to_get_query_for_field_that_isnt_a_query()
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Method Statamic\Fields\Values::not_a_query does not exist.');
+        $this->expectExceptionMessage('Method Statamic\Fields\Values::not_a_query does not exist on proxied instance, and is not a query builder.');
 
         $values = new Values(['not_a_query' => 'test']);
 
@@ -207,7 +219,7 @@ class ValuesTest extends TestCase
     public function it_throws_exception_if_trying_to_get_query_for_missing_field()
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Method Statamic\Fields\Values::missing does not exist.');
+        $this->expectExceptionMessage('Method Statamic\Fields\Values::missing does not exist on proxied instance, and is not a query builder.');
 
         $values = new Values(['not_a_query' => 'test']);
 
