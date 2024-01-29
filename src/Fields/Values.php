@@ -95,9 +95,9 @@ class Values implements Arrayable, ArrayAccess, IteratorAggregate, JsonSerializa
             return $this->getProxiedInstance()->$method(...$args);
         }
 
-            if (Compare::isQueryBuilder($value)) {
-                return $value;
-            }
+        $value = $this->getNormalizedValueFromProxiedCollection($method);
+        if (Compare::isQueryBuilder($value)) {
+            return $value;
         }
 
         throw new BadMethodCallException(sprintf('Method %s::%s does not exist.', static::class, $method));
