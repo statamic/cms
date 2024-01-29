@@ -100,7 +100,7 @@ class Values implements Arrayable, ArrayAccess, IteratorAggregate, JsonSerializa
             return $value;
         }
 
-        throw new BadMethodCallException(sprintf('Method %s::%s does not exist.', static::class, $method));
+        throw new BadMethodCallException(sprintf('Method %s::%s does not exist on proxied instance, and is not a query builder.', static::class, $method));
     }
 
     public function toArray()
