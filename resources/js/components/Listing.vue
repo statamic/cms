@@ -112,12 +112,16 @@ export default {
     },
 
     mounted() {
-        window.history.replaceState({ parameters: this.parameters }, '');
-        window.addEventListener('popstate', this.popState);
+        if (this.pushQuery) {
+            window.history.replaceState({ parameters: this.parameters }, '');
+            window.addEventListener('popstate', this.popState);
+        }
     },
 
     beforeDestroy() {
-        window.removeEventListener('popstate', this.popState);
+        if (this.pushQuery) {
+            window.removeEventListener('popstate', this.popState);
+        }
     },
 
     watch: {
