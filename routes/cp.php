@@ -48,6 +48,7 @@ use Statamic\Http\Controllers\CP\Fields\MetaController;
 use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
+use Statamic\Http\Controllers\CP\Fieldtypes\SlugFieldtypeController;
 use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
 use Statamic\Http\Controllers\CP\Forms\FormBlueprintController;
 use Statamic\Http\Controllers\CP\Forms\FormExportController;
@@ -297,6 +298,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('relationship/filters', [RelationshipFieldtypeController::class, 'filters'])->name('relationship.filters');
         Route::post('markdown', [MarkdownFieldtypeController::class, 'preview'])->name('markdown.preview');
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
+        Route::post('slug', [SlugFieldtypeController::class, 'generate'])->name('slug.generate');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
