@@ -210,7 +210,7 @@ class Entries extends Relationship
         $query = $this->toSearchQuery($query, $request);
 
         if ($this->canSelectAcrossSites()) {
-            $query->whereIn('site', $this->getSites($request));
+            $query->whereIn('site', Site::authorized()->map->handle()->all());
         } elseif ($site = $request->site) {
             $query->where('site', $site);
         }
@@ -440,15 +440,19 @@ class Entries extends Relationship
 
     public function preload()
     {
+        $preloaded = array_merge(parent::preload(), [
+            'availableSites' => $this->availableSites(),
+        ]);
+
         $collection = count($this->getConfiguredCollections()) === 1
             ? Collection::findByHandle($this->getConfiguredCollections()[0])
             : null;
 
         if (! $collection || ! $collection->hasStructure()) {
-            return parent::preload();
+            return $preloaded;
         }
 
-        return array_merge(parent::preload(), ['tree' => [
+        return array_merge($preloaded, ['tree' => [
             'title' => $collection->title(),
             'url' => cp_route('collections.tree.index', $collection),
             'showSlugs' => $collection->structure()->showSlugs(),
@@ -467,17 +471,23 @@ class Entries extends Relationship
         $columns->put($columnKey, $column);
     }
 
-    private function getSites($request): array
-    {
-        if ($request->site && Arr::get($this->field()->config(), 'mode') == 'select') {
-            return [$request->site];
-        }
-
-        return Site::authorized()->map->handle()->all();
-    }
-
     private function canSelectAcrossSites(): bool
     {
         return $this->config('select_across_sites', false);
+    }
+
+    private function availableSites()
+    {
+        if (! Site::hasMultiple()) {
+            return [];
+        }
+
+        $configuredSites = collect($this->getConfiguredCollections())->flatMap(fn ($collection) => Collection::find($collection)->sites());
+
+        return Site::authorized()
+            ->when(isset($configuredSites), fn ($sites) => $sites->filter(fn ($site) => $configuredSites->contains($site->handle())))
+            ->map->handle()
+            ->values()
+            ->all();
     }
 }
