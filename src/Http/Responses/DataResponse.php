@@ -9,6 +9,7 @@ use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
+use Statamic\Fields\LabeledValue;
 use Statamic\View\View;
 
 class DataResponse implements Responsable
@@ -88,8 +89,8 @@ class DataResponse implements Responsable
 
         $code = $this->data->redirect_http_status ?? 302;
 
-        if ($code instanceof \Statamic\Fields\LabeledValue) {
-            $code = (int) ((string) $code);
+        if ($code instanceof LabeledValue) {
+            $code = $code->value();
         }
 
         return redirect($redirect, $code);
