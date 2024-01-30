@@ -231,10 +231,10 @@ export default {
                 return;
             }
             const parameters = this.parameters;
-            const keys = Object.keys(parameters);
-            const except = Object.keys(this.additionalParameters);
+            const keys = Object.keys(this.queryParameters);
+            // This ensures no additionalParameters are added to the URL
             const searchParams = new URLSearchParams(Object.fromEntries(keys
-                .filter(key => !except.includes(key))
+                .filter(key => parameters.hasOwnProperty(key))
                 .map(key => [key, parameters[key]])));
             window.history.pushState({ parameters }, '', '?' + searchParams.toString());
         },
