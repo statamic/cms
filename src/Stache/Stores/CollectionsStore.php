@@ -12,7 +12,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionsStore extends BasicStore
 {
-    protected $fileChangesAreRecursive = false;
+    protected $traverseRecursively = false;
 
     public function key()
     {
