@@ -913,7 +913,8 @@ class FrontendTest extends TestCase
     /**
      * @test
      */
-    public function redirect_http_status_is_applied_when_present_in_blueprint() {
+    public function redirect_http_status_is_applied_when_present_in_blueprint()
+    {
         $entry = tap($this->createPage('about', [
             'with' => [
                 'title' => 'About',
