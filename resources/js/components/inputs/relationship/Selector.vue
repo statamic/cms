@@ -240,8 +240,7 @@ export default {
             columns: this.initialColumns,
             visibleColumns: this.initialColumns.filter(column => column.visible),
             view: 'list',
-            lastItemClicked: null,
-            currentSite: this.site,
+            lastItemClicked: null
         }
     },
 
@@ -252,7 +251,7 @@ export default {
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 page: this.page,
-                site: this.currentSite,
+                site: this.site,
                 exclusions: this.exclusions,
                 filters: utf8btoa(JSON.stringify(this.activeFilters)),
                 columns: this.visibleColumns.map(column => column.field).join(','),
@@ -285,11 +284,7 @@ export default {
 
         viewLocalStorageKey() {
             return `statamic.selector.field.${this.name}`;
-        },
-
-        hasSiteFilter() {
-            return this.filters.some(filter => filter.handle === 'site');
-        },
+        }
 
     },
 
@@ -298,24 +293,11 @@ export default {
 
         this.getFilters().then(() => {
             this.autoApplyFilters(this.filters);
-            this.setSiteFilter(this.currentSite)
             this.initialRequest();
         });
     },
 
     watch: {
-
-        activeFilters: {
-            deep: true,
-            handler(filters) {
-                this.currentSite = filters.site ? filters.site.site : null;
-            }
-        },
-
-        currentSite(site) {
-            this.setSiteFilter(site);
-            this.$emit('site-changed', site);
-        },
 
         parameters: {
             deep: true,
@@ -361,12 +343,6 @@ export default {
             return this.$axios.get(this.filtersUrl).then(response => {
                 this.filters = response.data;
             });
-        },
-
-        setSiteFilter(site) {
-            if (!this.hasSiteFilter) return;
-
-            this.filterChanged({ handle: 'site', values: { site }}, false);
         },
 
         initialRequest() {
