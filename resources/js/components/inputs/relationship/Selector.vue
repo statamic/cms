@@ -128,6 +128,7 @@
                                 ref="tree"
                                 :pages-url="tree.url"
                                 :show-slugs="tree.showSlugs"
+                                :blueprints="tree.blueprints"
                                 :expects-root="tree.expectsRoot"
                                 :site="site"
                                 :preferences-prefix="`selector-field.${name}`"
