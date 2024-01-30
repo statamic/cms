@@ -20,30 +20,6 @@ class Traverser
         $this->filesystem = $filesystem;
     }
 
-    protected function getFiles($dir, $recursive)
-    {
-        $files = [];
-
-        if ($recursive) {
-            $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::CURRENT_AS_SELF),
-                RecursiveIteratorIterator::CHILD_FIRST
-            );
-        } else {
-            $iterator = new DirectoryIterator($dir);
-        }
-
-        foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isDir() || $fileInfo->getFilename()[0] === '.') {
-                continue;
-            }
-
-            $files[] = new SplFileInfo($fileInfo->getPathname(), $fileInfo->getPath(), $fileInfo->getFilename());
-        }
-
-        return $files;
-    }
-
     public function traverse($store, $recursive = true)
     {
         if (! $dir = $store->directory()) {
@@ -73,5 +49,29 @@ class Traverser
         $this->filter = $filter;
 
         return $this;
+    }
+
+    private function getFiles($dir, $recursive)
+    {
+        $files = [];
+
+        if ($recursive) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::CURRENT_AS_SELF),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+        } else {
+            $iterator = new DirectoryIterator($dir);
+        }
+
+        foreach ($iterator as $fileInfo) {
+            if ($fileInfo->isDir() || $fileInfo->getFilename()[0] === '.') {
+                continue;
+            }
+
+            $files[] = new SplFileInfo($fileInfo->getPathname(), $fileInfo->getPath(), $fileInfo->getFilename());
+        }
+
+        return $files;
     }
 }
