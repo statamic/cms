@@ -19,6 +19,10 @@
             </template>
             <template #default="{ close: closePopover }">
                 <div class="p-4">
+                    <div class="mb-2">
+                        <button @click="resetColor">Reset</button>
+                    </div>
+
                     <div v-if="config.swatches.length" class="grid grid-cols-4 gap-3">
                         <div
                             v-for="swatch in config.swatches"
@@ -109,7 +113,11 @@ export default {
 
         commitCustomColor() {
             this.update(this.customColor);
-        }
+        },
+
+        resetColor() {
+            this.update(null);
+        },
 
     }
 
