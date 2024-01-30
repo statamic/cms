@@ -77,11 +77,7 @@ class Site extends Filter
             $configuredSites = collect($collections)->flatMap(fn ($collection) => Collection::find($collection)->sites());
         }
 
-        if (! isset($configuredSites)) {
-            return Facades\Site::authorized();
-        }
-
         return Facades\Site::authorized()
-            ->filter(fn ($site) => $configuredSites->contains($site->handle()));
+            ->when(isset($configuredSites), fn ($sites) => $sites->filter(fn ($site) => $configuredSites->contains($site->handle())));
     }
 }
