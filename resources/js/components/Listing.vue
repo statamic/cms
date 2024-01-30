@@ -37,6 +37,15 @@ export default {
             meta: null,
             pushQuery: false,
             popping: false,
+            queryParameters: {
+                sort: 'sortColumn',
+                order: 'sortDirection',
+                page: 'page',
+                perPage: 'perPage',
+                search: 'searchQuery',
+                filters: 'activeFilterParameters',
+                columns: 'visibleColumnParameters',
+            },
         }
     },
 
@@ -44,36 +53,33 @@ export default {
 
         parameters:  {
             get() {
-                return Object.assign({
-                    sort: this.sortColumn,
-                    order: this.sortDirection,
-                    page: this.page,
-                    perPage: this.perPage,
-                    search: this.searchQuery,
-                    filters: this.activeFilterParameters,
-                    columns: this.visibleColumnParameters,
-                }, this.additionalParameters);
+                const parameters = Object.fromEntries(Object.entries(this.queryParameters)
+                    .map(([key, prop]) => {
+                        return [key, this[prop]];
+                    })
+                    .filter(([key, value]) => {
+                        return value !== null && value !== undefined && value !== '';
+                    }));
+                return {
+                    ...parameters,
+                    ...this.additionalParameters,
+                };
             },
             set(value) {
-                const keyMap = [
-                    ['sort', 'sortColumn'],
-                    ['order', 'sortDirection'],
-                    ['page', 'page'],
-                    ['perPage', 'perPage'],
-                    ['search', 'searchQuery'],
-                    ['filters', 'activeFilterParameters'],
-                    ['columns', 'visibleColumnParameters'],
-                ];
-                keyMap.forEach(([key, property]) => {
-                    if (value.hasOwnProperty(key)) {
-                        this[property] = value[key];
-                    }
-                });
+                Object.entries(this.queryParameters)
+                    .forEach(([key, prop]) => {
+                        if (value.hasOwnProperty(key)) {
+                            this[prop] = value[key];
+                        }
+                    });
             },
         },
 
         activeFilterParameters: {
             get() {
+                if (_.isEmpty(this.activeFilters)) {
+                    return null;
+                }
                 return utf8btoa(JSON.stringify(this.activeFilters));
             },
             set(value) {
@@ -83,6 +89,9 @@ export default {
 
         visibleColumnParameters: {
             get() {
+                if (_.isEmpty(this.visibleColumns)) {
+                    return null;
+                }
                 return this.visibleColumns.map(column => column.field).join(',');
             },
             set(value) {
@@ -151,6 +160,7 @@ export default {
             this.sortDirection = null;
             this.resetPage();
             this.request();
+            this.pushState();
         }
 
     },
