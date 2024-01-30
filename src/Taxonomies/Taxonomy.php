@@ -383,13 +383,6 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
                 return $termTemplate;
             })
-            ->setter(function ($termTemplate) {
-                if (! $termTemplate) {
-                    return;
-                }
-
-                return $termTemplate;
-            })
             ->args(func_get_args());
     }
 
@@ -406,13 +399,6 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
                 if ($collection = $this->collection()) {
                     $template = $collection->handle().'.'.$template;
-                }
-
-                return $template;
-            })
-            ->setter(function ($template) {
-                if (! $template) {
-                    return;
                 }
 
                 return $template;
