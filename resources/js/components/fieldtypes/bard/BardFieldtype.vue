@@ -706,6 +706,7 @@ export default {
 
         getExtensions() {
             let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
+
             if (this.config.inline === 'break') {
                 modeExts.push(HardBreak.extend({
                     addKeyboardShortcuts() {
@@ -716,8 +717,12 @@ export default {
                     },
                 }));
             }
-           
-            // Allow passthrough of Ctrl/Cmd + Enter to submit the form 
+
+            if (this.config.placeholder) {
+                modeExts.push(Placeholder.configure({ placeholder: __(this.config.placeholder) }));
+            }
+
+            // Allow passthrough of Ctrl/Cmd + Enter to submit the form
             const DisableCtrlEnter = Extension.create({
                 addKeyboardShortcuts() {
                     return {
@@ -735,7 +740,6 @@ export default {
                 Gapcursor,
                 History,
                 Paragraph,
-                Placeholder.configure({ placeholder: __(this.config.placeholder) }),
                 Set.configure({ bard: this }),
                 Text
             ];
