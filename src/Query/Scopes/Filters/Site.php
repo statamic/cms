@@ -48,15 +48,11 @@ class Site extends Filter
 
     public function visibleTo($key)
     {
-        if ($this->availableSites()->isEmpty()) {
-            return false;
-        }
-
-        if ($key === 'entries') {
+        if ($key === 'entries' && $this->availableSites()->isNotEmpty()) {
             return true;
         }
 
-        return $key === 'entries-fieldtype' && $this->context['showSiteFilter'];
+        return $key === 'entries-fieldtype' && $this->context['showSiteFilter'] && $this->availableSites()->isNotEmpty();
     }
 
     protected function options()
