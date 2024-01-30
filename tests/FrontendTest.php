@@ -910,6 +910,24 @@ class FrontendTest extends TestCase
         ];
     }
 
+    /**
+     * @test
+     */
+    public function redirect_http_status_is_applied_when_present_in_blueprint() {
+        $entry = tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => '/test',
+                'redirect_http_status' => 301,
+            ],
+        ]))->save();
+
+        $response = $this->get('/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
+    }
+
     /** @test */
     public function it_protects_404_pages()
     {

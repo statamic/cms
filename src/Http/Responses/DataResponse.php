@@ -86,7 +86,13 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
-        return redirect($redirect);
+        $code = $this->data->redirect_http_status ?? 302;
+
+        if ($code instanceof \Statamic\Fields\LabeledValue) {
+            $code = (int) ((string) $code);
+        }
+
+        return redirect($redirect, $code);
     }
 
     protected function protect()

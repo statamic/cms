@@ -288,7 +288,8 @@ class CollectionsController extends CpController
                 'title' => __('Link'),
                 'fields' => [
                     ['handle' => 'title', 'field' => ['type' => 'text']],
-                    ['handle' => 'redirect', 'field' => ['type' => 'link', 'required' => true]],
+                    ['handle' => 'redirect', 'field' => ['type' => 'link', 'required' => true, 'width' => '75']],
+                    ['handle' => 'redirect_http_status', 'field' => ['type' => 'select', 'required' => true, 'options' => [301, 302], 'width' => '25']],
                 ],
             ])
             ->save();
