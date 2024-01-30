@@ -41,7 +41,7 @@
 
                 <slot name="branch-icon" :branch="page" />
 
-                <dropdown-list class="ml-4" :class="{'invisible': isRoot || !editable}">
+                <dropdown-list class="ml-4" :class="{'invisible': isRoot, 'hidden': !editable}">
                     <slot name="branch-options"
                         :branch="page"
                         :depth="depth"
