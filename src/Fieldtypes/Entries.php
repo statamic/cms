@@ -326,13 +326,18 @@ class Entries extends Relationship
             $site = $parent->locale();
         }
 
+        // If they've opted into selecting across sites, we won't automatically localize or
+        // filter out entries that don't exist in the current site. They would do that.
+        $shouldLocalize = ! $this->config('select_across_sites', false);
+
         $ids = (new OrderedQueryBuilder(Entry::query(), $ids = Arr::wrap($values)))
             ->whereIn('id', $ids)
             ->get()
-            ->map(function ($entry) use ($site) {
-                return optional($entry->in($site))->id();
-            })
-            ->filter()
+            ->when($shouldLocalize, fn ($entries) => $entries
+                ->map(fn ($entry) => $entry->in($site))
+                ->filter()
+            )
+            ->map->id()
             ->all();
 
         $query = (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))

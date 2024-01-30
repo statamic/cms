@@ -360,6 +360,12 @@ class EntriesTest extends TestCase
         $this->assertNull($augmented); // 456 isnt localized
     }
 
+    /** @test */
+    public function it_doesnt_localize_when_select_across_sites_setting_is_enabled()
+    {
+        $this->markTestIncomplete();
+    }
+
     public function fieldtype($config = [], $parent = null)
     {
         $field = new Field('test', array_merge([
