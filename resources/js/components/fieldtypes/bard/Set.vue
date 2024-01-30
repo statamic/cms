@@ -179,9 +179,7 @@ export default {
         },
 
         previewUpdated(handle, value) {
-            let previews = clone(this.previews);
-            previews[handle] = value;
-            this.extension.options.bard.updateSetPreviews(this.node.attrs.id, previews);
+            this.extension.options.bard.updateSetPreviews(this.node.attrs.id, { ...this.previews, [handle]: value });
         },
 
         focused() {
