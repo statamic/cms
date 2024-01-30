@@ -919,7 +919,7 @@ class FrontendTest extends TestCase
             'with' => [
                 'title' => 'About',
                 'redirect' => '/test',
-                'redirect_http_status' => 301,
+                'redirect_status' => 301,
             ],
         ]))->save();
 

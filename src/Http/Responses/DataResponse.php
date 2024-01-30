@@ -87,7 +87,7 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
-        $code = $this->data->redirect_http_status ?? 302;
+        $code = $this->data->redirect_status ?? 302;
 
         if ($code instanceof LabeledValue) {
             $code = $code->value();
