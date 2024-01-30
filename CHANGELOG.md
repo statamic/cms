@@ -1,5 +1,84 @@
 # Release Notes
 
+## 4.46.0 (2024-01-25)
+
+### What's new
+- Allow roles and groups to be database driven. [#5686](https://github.com/statamic/cms/issues/5686) by @ryanmitchell
+- Add console command to import file-based groups and roles into database. [#6774](https://github.com/statamic/cms/issues/6774) by @ryanmitchell
+- SVG images get sanitized upon upload. [#9365](https://github.com/statamic/cms/issues/9365) by @duncanmcclean
+- Allow `.html` to be stripped from `parent_uri` in routes. [#9364](https://github.com/statamic/cms/issues/9364) by @duncanmcclean
+
+### What's improved
+- German translations. [#9374](https://github.com/statamic/cms/issues/9374) by @helloDanuk
+
+### What's fixed
+- Support data in Eloquent based user groups. [#9395](https://github.com/statamic/cms/issues/9395) by @jasonvarga
+- Revert overzealous file extension renaming feature. [#9389](https://github.com/statamic/cms/issues/9389) by @jasonvarga
+- Make copy reset password link action opt-in. [#9390](https://github.com/statamic/cms/issues/9390) [#9397](https://github.com/statamic/cms/issues/9397) by @jasonvarga
+- Fix importing fieldsets in custom blueprint namespaces. [#9387](https://github.com/statamic/cms/issues/9387) by @duncanmcclean
+- Catch errors when sending user activation email. [#9382](https://github.com/statamic/cms/issues/9382) by @duncanmcclean
+- Only use site language for form submission validation messages if submitted from front-end. [#9383](https://github.com/statamic/cms/issues/9383) by @jasonvarga
+- Avoid caching URLs with a token. [#9381](https://github.com/statamic/cms/issues/9381) by @jasonvarga
+- Fix user groups/roles querying. [#6131](https://github.com/statamic/cms/issues/6131) by @ryanmitchell
+- Avoid saving icons to field configs. [#9372](https://github.com/statamic/cms/issues/9372) by @duncanmcclean
+- Hide actions on form index/show pages when user is missing relevant permissions. [#9371](https://github.com/statamic/cms/issues/9371) by @duncanmcclean
+- Bard: Only configure placeholder extension when placeholder is provided. [#9369](https://github.com/statamic/cms/issues/9369) by @duncanmcclean
+- Always show slug rengerate button if enabled. [#9366](https://github.com/statamic/cms/issues/9366) by @jasonvarga
+- Fix some translations. [#9361](https://github.com/statamic/cms/issues/9361) by @peimn
+- Fix whereTime affecting the date as well as time. [#9360](https://github.com/statamic/cms/issues/9360) by @ryanmitchell
+- Passthrough Cmd/Ctrl + Enter inside Bard. [#9313](https://github.com/statamic/cms/issues/9313) by @godismyjudge95
+- Support brackets in translation strings in translator helper. [#9380](https://github.com/statamic/cms/issues/9380) by @jasonvarga
+- Bump vite from 4.2.3 to 4.5.2. [#9367](https://github.com/statamic/cms/issues/9367) by @dependabot
+
+
+
+## 4.45.0 (2024-01-18)
+
+### What's new
+- Allow search index updates to be queued. [#9358](https://github.com/statamic/cms/issues/9358) by @jasonvarga
+- Autoload addon blueprints. [#9324](https://github.com/statamic/cms/issues/9324) by @aerni
+- Add CC and BCC fields to form email config. [#9336](https://github.com/statamic/cms/issues/9336) by @godismyjudge95
+
+### What's improved
+- Prevent handling field previews when previews are disabled. [#9353](https://github.com/statamic/cms/issues/9353) by @duncanmcclean
+- Update entry order and uri by ids. [#9350](https://github.com/statamic/cms/issues/9350) by @juliawarnke
+- Dutch translations. [#9347](https://github.com/statamic/cms/issues/9347) by @jeroenpeters1986
+
+### What's fixed
+- Improve Bard cut/copy/pasting sets. [#7606](https://github.com/statamic/cms/issues/7606) by @jacksleight
+- Catch validation exceptions thrown in FormSubmitted events. [#9348](https://github.com/statamic/cms/issues/9348) by @ryanmitchell
+- Allow optional asset fields in form submissions. [#9356](https://github.com/statamic/cms/issues/9356) by @AndreasSchantl
+- Fix error from Relationship Index Fieldtype after toggling column. [#9355](https://github.com/statamic/cms/issues/9355) by @duncanmcclean
+- Prevent creating revision when localizing entry unless revisions are enabled on the collection. [#8908](https://github.com/statamic/cms/issues/8908) by @duncanmcclean
+- Fix "Read Only" text for section fields. [#9315](https://github.com/statamic/cms/issues/9315) by @duncanmcclean
+- Fix additional blueprints in multi-part namespaces. [#9325](https://github.com/statamic/cms/issues/9325) by @jacksleight
+- Prevent Bard causing dirty state issues. [#9344](https://github.com/statamic/cms/issues/9344) by @duncanmcclean
+- Prevent original addon blueprint being deleted when saving. [#9326](https://github.com/statamic/cms/issues/9326) by @ryanmitchell
+- Fix Bard sets being inserted too early. [#9216](https://github.com/statamic/cms/issues/9216) by @duncanmcclean
+- Fix too many redirects on collection. [#9318](https://github.com/statamic/cms/issues/9318) by @aerni
+- Fix Statamic compiled assets not working when running in a subdirectory. [#8984](https://github.com/statamic/cms/issues/8984) by @singer-d
+
+
+
+## 4.44.0 (2024-01-11)
+
+### What's new
+- Support custom blueprint namespaces. [#8516](https://github.com/statamic/cms/issues/8516) by @ryanmitchell
+
+### What's improved
+- German translations. [#9295](https://github.com/statamic/cms/issues/9295) by @helloDanuk
+
+### What's fixed
+- Fix missing checkbox on tree view in the entries field type. [#9308](https://github.com/statamic/cms/issues/9308) by @duncanmcclean
+- Fix spacing around fullscreen button on Stacked Grid. [#9307](https://github.com/statamic/cms/issues/9307) by @duncanmcclean
+- Fix Asset browser firing 2 requests on initial Assets page load. [#8981](https://github.com/statamic/cms/issues/8981) by @modrictin
+- Use correct set_time_limit no limit value. [#9297](https://github.com/statamic/cms/issues/9297) by @robinvdvleuten
+- Fix Bard's sticky toolbar in Live Preview. [#9301](https://github.com/statamic/cms/issues/9301) by @duncanmcclean
+- Fix asset meta file not being deleted with asset. [#9300](https://github.com/statamic/cms/issues/9300) by @duncanmcclean
+- Fix creating entries with `JsonResource::withoutWrapping()`. [#9296](https://github.com/statamic/cms/issues/9296) by @duncanmcclean
+
+
+
 ## 4.43.0 (2024-01-09)
 
 ### What's new

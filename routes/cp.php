@@ -239,13 +239,15 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('field-meta', [MetaController::class, 'show']);
         Route::resource('fieldsets', FieldsetController::class)->except(['show']);
         Route::get('blueprints', [BlueprintController::class, 'index'])->name('blueprints.index');
+        Route::get('blueprints/{namespace}/{handle}', [BlueprintController::class, 'edit'])->name('blueprints.edit');
+        Route::patch('blueprints/{namespace}/{handle}', [BlueprintController::class, 'update'])->name('blueprints.update');
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
     });
 
     Route::get('updater', [UpdaterController::class, 'index'])->name('updater');
     Route::get('updater/count', [UpdaterController::class, 'count']);
-    Route::get('updater/{product}', [UpdateProductController::class, 'show'])->name('updater.product');
-    Route::get('updater/{product}/changelog', [UpdateProductController::class, 'changelog']);
+    Route::get('updater/{marketplaceProductSlug}', [UpdateProductController::class, 'show'])->name('updater.product');
+    Route::get('updater/{marketplaceProductSlug}/changelog', [UpdateProductController::class, 'changelog']);
 
     Route::group(['prefix' => 'duplicates'], function () {
         Route::get('/', [DuplicatesController::class, 'index'])->name('duplicates');
