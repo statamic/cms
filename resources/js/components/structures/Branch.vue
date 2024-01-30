@@ -37,7 +37,7 @@
             </div>
 
             <div class="pr-2 flex items-center">
-                <div v-if="showBlueprintTitle && page.entry_blueprint" v-text="__(page.entry_blueprint.title)" class="shrink text-4xs text-gray-600 uppercase ml-2 mr-2" />
+                <div v-if="showBlueprintTitle && page.entry_blueprint" v-text="__(page.entry_blueprint.title)" class="shrink text-4xs text-gray-600 uppercase ml-4" />
 
                 <slot name="branch-icon" :branch="page" />
 
