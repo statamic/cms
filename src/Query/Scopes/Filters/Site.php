@@ -67,15 +67,15 @@ class Site extends Filter
             return collect();
         }
 
+        // Get the configured sites of multiple collections when in the entries fieldtype.
+        $collections = Arr::get($this->context, 'collections');
+
         // Get the configured sites of a single collection when on the entries index view.
         if ($collection = Arr::get($this->context, 'collection')) {
-            $configuredSites = Collection::find($collection)->sites();
+            $collections = [$collection];
         }
 
-        // Get the configured sites of multiple collections when in the entries fieldtype.
-        if ($collections = Arr::get($this->context, 'collections')) {
-            $configuredSites = collect($collections)->flatMap(fn ($collection) => Collection::find($collection)->sites());
-        }
+        $configuredSites = collect($collections)->flatMap(fn ($collection) => Collection::find($collection)->sites());
 
         return Facades\Site::authorized()
             ->when(isset($configuredSites), fn ($sites) => $sites->filter(fn ($site) => $configuredSites->contains($site->handle())));
