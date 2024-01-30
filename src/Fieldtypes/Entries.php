@@ -106,6 +106,11 @@ class Entries extends Relationship
                         'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
                         'type' => 'taggable',
                     ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
+                        'type' => 'toggle',
+                    ],
                 ],
             ],
         ];
@@ -204,8 +209,10 @@ class Entries extends Relationship
 
         $query = $this->toSearchQuery($query, $request);
 
-        if (Site::hasMultiple()) {
+        if ($this->canSelectAcrossSites()) {
             $query->whereIn('site', $this->getSites($request));
+        } elseif ($site = $request->site) {
+            $query->where('site', $site);
         }
 
         if ($request->exclusions) {
@@ -328,7 +335,7 @@ class Entries extends Relationship
 
         // If they've opted into selecting across sites, we won't automatically localize or
         // filter out entries that don't exist in the current site. They would do that.
-        $shouldLocalize = ! $this->config('select_across_sites', false);
+        $shouldLocalize = ! $this->canSelectAcrossSites();
 
         $ids = (new OrderedQueryBuilder(Entry::query(), $ids = Arr::wrap($values)))
             ->whereIn('id', $ids)
@@ -370,7 +377,10 @@ class Entries extends Relationship
 
     protected function getSelectionFilterContext()
     {
-        return ['collections' => $this->getConfiguredCollections()];
+        return [
+            'collections' => $this->getConfiguredCollections(),
+            'showSiteFilter' => $this->canSelectAcrossSites(),
+        ];
     }
 
     protected function getConfiguredCollections()
@@ -405,7 +415,9 @@ class Entries extends Relationship
 
         $columns = $this->getBlueprint()->columns();
 
-        $this->addColumn($columns, 'site');
+        if ($this->canSelectAcrossSites()) {
+            $this->addColumn($columns, 'site');
+        }
 
         return $columns->values();
     }
@@ -462,5 +474,10 @@ class Entries extends Relationship
         }
 
         return Site::authorized()->map->handle()->all();
+    }
+
+    private function canSelectAcrossSites(): bool
+    {
+        return $this->config('select_across_sites', false);
     }
 }

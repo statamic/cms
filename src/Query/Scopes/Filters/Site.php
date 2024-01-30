@@ -48,8 +48,15 @@ class Site extends Filter
 
     public function visibleTo($key)
     {
-        return in_array($key, ['entries', 'entries-fieldtype'])
-            && $this->availableSites()->count() > 1;
+        if ($this->availableSites()->isEmpty()) {
+            return false;
+        }
+
+        if ($key === 'entries') {
+            return true;
+        }
+
+        return $key === 'entries-fieldtype' && $this->context['showSiteFilter'];
     }
 
     protected function options()
@@ -60,6 +67,10 @@ class Site extends Filter
 
     protected function availableSites()
     {
+        if (! Facades\Site::hasMultiple()) {
+            return collect();
+        }
+
         // Get the configured sites of a single collection when on the entries index view.
         if ($collection = Arr::get($this->context, 'collection')) {
             $configuredSites = Collection::find($collection)->sites();
