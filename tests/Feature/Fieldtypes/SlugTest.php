@@ -36,8 +36,10 @@ class SlugTest extends TestCase
             'single_word' => ['one', '-', 'en', 'one'],
             'one-two-three' => ['one two three', '-', 'en', 'one-two-three'],
             'apples' => ["Apple's", '-', 'en', 'apples'],
-            'single_smart_quotes' => ['GTA Online’s latest news: “huge map”', '-', 'en', 'gta-onlines-latest-news-huge-map'],
+            'smart_quotes' => ['Statamic’s latest feature: “Duplicator”', '-', 'en', 'statamics-latest-feature-duplicator'],
             'highens_separated_by_spaces' => ['Block - Hero', '-', 'en', 'block-hero'],
+            'chinese_characters' => ['你好，世界', '-', 'ch', 'ni-hao-shi-jie'],
+            'german_characters' => ['Björn Müller', '-', 'de', 'bjoern-mueller'],
         ];
     }
 }
