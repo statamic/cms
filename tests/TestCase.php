@@ -53,7 +53,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [
             \Statamic\Providers\StatamicServiceProvider::class,
-            \Rebing\GraphQL\GraphQLServiceProvider::class,
+            // \Rebing\GraphQL\GraphQLServiceProvider::class,
             \Wilderborn\Partyline\ServiceProvider::class,
             \Archetype\ServiceProvider::class,
         ];
@@ -123,12 +123,12 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('view.paths', $viewPaths);
     }
 
-    public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
-    {
-        $args = static::normalizeArgsForWindows(func_get_args());
+    // public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
+    // {
+    //     $args = static::normalizeArgsForWindows(func_get_args());
 
-        parent::assertEquals(...$args);
-    }
+    //     parent::assertEquals(...$args);
+    // }
 
     protected function assertEveryItem($items, $callback)
     {
