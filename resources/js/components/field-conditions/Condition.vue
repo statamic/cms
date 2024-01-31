@@ -34,7 +34,7 @@
         <toggle-input
             v-if="showValueToggle"
             class="ml-4"
-            :value="condition.value"
+            :value="condition.value === 'true'"
             @input="valueUpdated" />
 
         <v-select
