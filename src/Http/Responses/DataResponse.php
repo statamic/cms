@@ -9,7 +9,6 @@ use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
-use Statamic\Fields\LabeledValue;
 use Statamic\View\View;
 
 class DataResponse implements Responsable
