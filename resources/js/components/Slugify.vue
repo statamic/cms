@@ -28,15 +28,10 @@ export default {
 
     computed: {
 
-        async slug() {
+        slug() {
             if (!this.shouldSlugify) return this.to;
             if (!this.from) return '';
-
-            // use generateSlug method and get the response.data.slug from it
-            // return this.generateSlug().data.slug;
-
-
-            // return await this.$slugify(this.from, this.separator, this.language);
+            return this.$slugify(this.from, this.separator, this.language);
         }
 
     },
@@ -64,14 +59,6 @@ export default {
     },
 
     methods: {
-
-        // async generateSlug() {
-        //     return await this.$axios.post(cp_url('fieldtypes/slug'), {
-        //         from: this.from,
-        //         separator: this.separator,
-        //         language: this.language
-        //     });
-        // },
 
         reset() {
             if (this.enabled) this.shouldSlugify = true;
