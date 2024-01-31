@@ -918,8 +918,10 @@ class FrontendTest extends TestCase
         $entry = tap($this->createPage('about', [
             'with' => [
                 'title' => 'About',
-                'redirect' => '/test',
-                'redirect_status' => 301,
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
+                ],
             ],
         ]))->save();
 

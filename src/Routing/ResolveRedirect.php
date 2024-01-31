@@ -26,6 +26,10 @@ class ResolveRedirect
             return 404;
         }
 
+        if ($item instanceof \Statamic\Fields\Value) {
+            return $item->value();
+        }
+
         return is_object($item) ? $item->url() : $item;
     }
 
@@ -37,6 +41,10 @@ class ResolveRedirect
 
         if ($redirect === '@child') {
             return $this->firstChild($parent);
+        }
+
+        if (is_array($redirect)) {
+            $redirect = $redirect['url'];
         }
 
         if (Str::startsWith($redirect, 'entry::')) {

@@ -78,6 +78,13 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
+        $code = 302;
+
+        if (is_array($redirect)) {
+            $code = $redirect['status'];
+            $redirect = $redirect['url'];
+        }
+
         // If there is a redirect value but no corresponding blueprint field, (e.g. someone
         // manually set a redirect in the YAML), we'll need to resolve it manually since
         // they might have set one of the magic values like @child or entry::some-id.
@@ -85,12 +92,6 @@ class DataResponse implements Responsable
 
         if ($redirect === 404) {
             throw new NotFoundHttpException;
-        }
-
-        $code = $this->data->redirect_status ?? 302;
-
-        if ($code instanceof LabeledValue) {
-            $code = $code->value();
         }
 
         return redirect($redirect, $code);
