@@ -37,7 +37,13 @@ export default {
             meta: null,
             pushQuery: false,
             popping: false,
-            queryParameters: {
+        }
+    },
+
+    computed: {
+
+        parameterMap()  {
+            return {
                 sort: 'sortColumn',
                 order: 'sortDirection',
                 page: 'page',
@@ -45,15 +51,12 @@ export default {
                 search: 'searchQuery',
                 filters: 'activeFilterParameters',
                 columns: 'visibleColumnParameters',
-            },
-        }
-    },
-
-    computed: {
+            };
+        },
 
         parameters:  {
             get() {
-                const parameters = Object.fromEntries(Object.entries(this.queryParameters)
+                const parameters = Object.fromEntries(Object.entries(this.parameterMap)
                     .map(([key, prop]) => {
                         return [key, this[prop]];
                     })
@@ -66,7 +69,7 @@ export default {
                 };
             },
             set(value) {
-                Object.entries(this.queryParameters)
+                Object.entries(this.parameterMap)
                     .forEach(([key, prop]) => {
                         if (value.hasOwnProperty(key)) {
                             this[prop] = value[key];
@@ -231,7 +234,7 @@ export default {
                 return;
             }
             const parameters = this.parameters;
-            const keys = Object.keys(this.queryParameters);
+            const keys = Object.keys(this.parameterMap);
             // This ensures no additionalParameters are added to the URL
             const searchParams = new URLSearchParams(Object.fromEntries(keys
                 .filter(key => parameters.hasOwnProperty(key))
