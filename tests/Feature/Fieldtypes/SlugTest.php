@@ -34,7 +34,7 @@ class SlugTest extends TestCase
     {
         return [
             'single_word' => ['one', '-', 'en', 'one'],
-            'one-two-three' => ['one two three', '-', 'en', 'one-two-three'],
+            'multiple_words' => ['one two three', '-', 'en', 'one-two-three'],
             'apples' => ["Apple's", '-', 'en', 'apples'],
             'smart_quotes' => ['Statamic’s latest feature: “Duplicator”', '-', 'en', 'statamics-latest-feature-duplicator'],
             'highens_separated_by_spaces' => ['Block - Hero', '-', 'en', 'block-hero'],
