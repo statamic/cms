@@ -11,12 +11,12 @@ class SlugFieldtypeController extends CpController
     public function generate(Request $request)
     {
         $validated = $request->validate([
-            'from' => ['required'],
-            'separator' => ['required'],
+            'text' => ['required'],
+            'glue' => ['required'],
             'language' => ['required'],
         ]);
 
-        $slug = Str::slug($validated['from'], $validated['separator'], $validated['language']);
+        $slug = Str::slug($validated['text'], $validated['glue'], $validated['language']);
 
         return [
             'slug' => $slug,
