@@ -48,9 +48,9 @@ export default {
     },
 
     watch: {
-        'title': function(val) {
-            this.handle = this.$slugify(val, '_');
-        }
+        title: _.debounce(function(value) {
+            this.$slugify(value, '_').then(handle => this.handle = handle);
+        }, 500)
     },
 
     computed: {
