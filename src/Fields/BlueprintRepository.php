@@ -18,6 +18,7 @@ class BlueprintRepository
 
     protected $directory;
     protected $fallbacks = [];
+    protected $additionalNamespaces = [];
 
     public function setDirectory(string $directory)
     {
@@ -38,12 +39,45 @@ class BlueprintRepository
                 return null;
             }
 
-            $path = $this->directory.'/'.str_replace('.', '/', $blueprint).'.yaml';
+            $parts = explode('::', $blueprint);
 
-            return File::exists($path)
-                ? $this->makeBlueprintFromFile($path)
+            $path = count($parts) > 1
+                ? $this->findNamespacedBlueprintPath($blueprint)
+                : $this->findStandardBlueprintPath($blueprint);
+
+            return $path !== null && File::exists($path)
+                ? $this->makeBlueprintFromFile($path, count($parts) > 1 ? $parts[0] : null)
                 : $this->findFallback($blueprint);
         });
+    }
+
+    public function findStandardBlueprintPath($handle)
+    {
+        if (Str::startsWith($handle, 'vendor.')) {
+            return null;
+        }
+
+        return $this->directory.'/'.str_replace('.', '/', $handle).'.yaml';
+    }
+
+    public function findNamespacedBlueprintPath($handle)
+    {
+        [$namespace, $handle] = explode('::', $handle);
+        $namespaceDir = str_replace('.', '/', $namespace);
+        $handle = str_replace('/', '.', $handle);
+        $path = str_replace('.', '/', $handle);
+
+        $overridePath = "{$this->directory}/vendor/{$namespaceDir}/{$path}.yaml";
+
+        if (File::exists($overridePath)) {
+            return $overridePath;
+        }
+
+        if (! isset($this->additionalNamespaces[$namespace])) {
+            return null;
+        }
+
+        return "{$this->additionalNamespaces[$namespace]}/{$path}.yaml";
     }
 
     public function setFallback($handle, Closure $blueprint)
@@ -75,6 +109,10 @@ class BlueprintRepository
 
     public function delete(Blueprint $blueprint)
     {
+        if ($blueprint->isNamespaced()) {
+            throw new \Exception('Namespaced blueprints cannot be deleted');
+        }
+
         $this->clearBlinkCaches();
 
         $blueprint->deleteFile();
@@ -136,8 +174,8 @@ class BlueprintRepository
     {
         return $this
             ->filesIn($namespace)
-            ->map(function ($file) {
-                return $this->makeBlueprintFromFile($file);
+            ->map(function ($file) use ($namespace) {
+                return $this->makeBlueprintFromFile($file, $namespace);
             })
             ->sort(function ($a, $b) {
                 $orderA = $a->order() ?? 99999;
@@ -150,12 +188,32 @@ class BlueprintRepository
             ->keyBy->handle();
     }
 
+    public function addNamespace(string $namespace, string $directory): void
+    {
+        $this->additionalNamespaces[$namespace] = $directory;
+    }
+
+    public function getAdditionalNamespaces()
+    {
+        return collect($this->additionalNamespaces);
+    }
+
     protected function filesIn($namespace)
     {
         return Blink::store(self::BLINK_NAMESPACE_PATHS)->once($namespace, function () use ($namespace) {
             $namespace = str_replace('/', '.', $namespace);
             $namespaceDir = str_replace('.', '/', $namespace);
             $directory = $this->directory.'/'.$namespaceDir;
+
+            if (isset($this->additionalNamespaces[$namespace])) {
+                $directory = $this->additionalNamespaces[$namespace];
+
+                $overridePath = "{$this->directory}/vendor/{$namespaceDir}";
+
+                if (File::exists($overridePath)) {
+                    $directory = $overridePath;
+                }
+            }
 
             if (! File::exists(Str::removeRight($directory, '/'))) {
                 return collect();
@@ -165,12 +223,16 @@ class BlueprintRepository
         });
     }
 
-    protected function makeBlueprintFromFile($path)
+    protected function makeBlueprintFromFile($path, $namespace = null)
     {
-        return Blink::store(self::BLINK_FROM_FILE)->once($path, function () use ($path) {
-            [$namespace, $handle] = $this->getNamespaceAndHandle(
-                Str::after(Str::before($path, '.yaml'), $this->directory.'/')
-            );
+        return Blink::store(self::BLINK_FROM_FILE)->once($path, function () use ($path, $namespace) {
+            if (! $namespace || ! isset($this->additionalNamespaces[$namespace])) {
+                [$namespace, $handle] = $this->getNamespaceAndHandle(
+                    Str::after(Str::before($path, '.yaml'), $this->directory.'/')
+                );
+            } else {
+                $handle = Str::of($path)->afterLast('/')->before('.');
+            }
 
             $contents = YAML::file($path)->parse();
 

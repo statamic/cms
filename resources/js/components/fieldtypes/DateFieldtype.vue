@@ -159,6 +159,7 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
             if (! this.value.date) return;
 
             if (this.isRange) {
@@ -167,7 +168,7 @@ export default {
 
             let preview = Vue.moment(this.value.date).format(this.displayFormat);
 
-            if (this.hasTime) {
+            if (this.hasTime && this.value.time) {
                 preview += ` ${this.value.time}`;
             }
 

@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Term;
 use Statamic\Http\Resources\API\EntryResource;
@@ -31,6 +32,8 @@ class TaxonomyTermEntriesController extends ApiController
         $this->abortIfDisabled();
 
         $term = Term::find($taxonomy.'::'.$term);
+
+        throw_unless($term, new NotFoundHttpException);
 
         $query = $term->queryEntries();
 

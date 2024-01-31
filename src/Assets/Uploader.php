@@ -3,7 +3,9 @@
 namespace Statamic\Assets;
 
 use Facades\Statamic\Imaging\ImageValidator;
+use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Facades\Glide;
+use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Uploader
@@ -49,6 +51,13 @@ abstract class Uploader
     private function write($sourcePath, $destinationPath)
     {
         $stream = fopen($sourcePath, 'r');
+
+        if (Str::endsWith($destinationPath, '.svg')) {
+            $sanitizer = new DOMSanitizer(DOMSanitizer::SVG);
+            $stream = $sanitizer->sanitize($svg = stream_get_contents($stream), [
+                'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
+            ]);
+        }
 
         $this->disk()->put($this->uploadPathPrefix().$destinationPath, $stream);
 

@@ -12,5 +12,5 @@ interface RoleRepository
 
     public function exists(string $id): bool;
 
-    public function make(string $handle = null): Role;
+    public function make(?string $handle = null): Role;
 }

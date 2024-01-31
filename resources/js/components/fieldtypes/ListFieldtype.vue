@@ -171,10 +171,6 @@ export default {
         deleteItem(index) {
             return this.data.splice(index, 1);
         },
-
-        getReplicatorPreviewText() {
-            return this.data.map(item => item.value).join(', ');
-        }
     }
 };
 </script>

@@ -110,6 +110,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.selectedOptions.map(option => option.label).join(', ');
         },
 
