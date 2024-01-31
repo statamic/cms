@@ -39,7 +39,13 @@ class ProEnable extends Command
 
         $this->laravel['config']['statamic.editions.pro'] = true;
 
-        $this->checkInfo('Statamic Pro successfully enabled.');
+        $this->checkInfo('Statamic Pro successfully enabled in .env file!');
+
+        if ($this->configNotReferencingEnv()) {
+            $this->crossLine('Statamic editions config not currently referencing .env file.');
+            $this->comment(PHP_EOL.'For this setting to take effect, please modify your [config/statamic/editions.php] as follows:');
+            $this->line("'pro' => env('STATAMIC_PRO_ENABLED', false)");
+        }
     }
 
     /**
@@ -114,5 +120,19 @@ class ProEnable extends Command
     protected function envContents()
     {
         return file_get_contents($this->envPath());
+    }
+
+    /**
+     * Check whether the editions config is referencing the .env var.
+     *
+     * @return bool
+     */
+    protected function configNotReferencingEnv()
+    {
+        if (! file_exists($configPath = config_path('statamic/editions.php'))) {
+            return false;
+        }
+
+        return ! preg_match('/[\'"]pro[\'"]\s*=>\s*env\([\'"]STATAMIC_PRO_ENABLED[\'"]/m', file_get_contents($configPath));
     }
 }
