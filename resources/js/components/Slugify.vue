@@ -26,25 +26,14 @@ export default {
         }
     },
 
-    computed: {
-
-        slug() {
-            if (!this.shouldSlugify) return this.to;
-            if (!this.from) return '';
-            return this.$slugify(this.from, this.separator, this.language);
-        }
-
-    },
-
     watch: {
 
-        to(to) {
-            if (to !== this.slug) this.shouldSlugify = false;
-        },
+        from(from) {
+            if (!this.shouldSlugify) return this.to;
+            if (!from) return this.$emit('slugified', '');
 
-        slug(slug) {
-            this.$emit('slugified', slug);
-        }
+            this.slugify();
+        },
 
     },
 
@@ -62,6 +51,17 @@ export default {
 
         reset() {
             if (this.enabled) this.shouldSlugify = true;
+        },
+
+        slugify() {
+            return new Promise((resolve, reject) => {
+                this.$slugify(this.from, this.separator, this.language).then((slug) => {
+                    this.$emit('slugified', slug);
+                    resolve(slug);
+                }).catch((error) => {
+                    reject(error);
+                });
+            });
         }
 
     }
