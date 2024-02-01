@@ -44,6 +44,7 @@ class JavascriptComposer
             'locale' => config('app.locale'),
             'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
             'charmap' => ASCII::charsArray($replaceSymbols),
+            'direction' => Site::selected()->direction(),
         ];
     }
 
