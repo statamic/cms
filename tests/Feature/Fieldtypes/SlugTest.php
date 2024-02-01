@@ -40,6 +40,7 @@ class SlugTest extends TestCase
             'highens_separated_by_spaces' => ['Block - Hero', '-', 'en', 'block-hero'],
             'chinese_characters' => ['你好，世界', '-', 'ch', 'ni-hao-shi-jie'],
             'german_characters' => ['Björn Müller', '-', 'de', 'bjoern-mueller'],
+            'arabic_characters' => ['صباح الخير', '-', 'ar', 'sbah-alkhyr'],
         ];
     }
 }
