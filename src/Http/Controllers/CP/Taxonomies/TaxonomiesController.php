@@ -133,8 +133,8 @@ class TaxonomiesController extends CpController
             'collections' => $taxonomy->collections()->map->handle()->all(),
             'sites' => $taxonomy->sites()->all(),
             'preview_targets' => $taxonomy->basePreviewTargets(),
-            'term_template' => $taxonomy->termTemplate(),
-            'template' => $taxonomy->template(),
+            'term_template' => $taxonomy->termTemplate,
+            'template' => $taxonomy->template,
             'layout' => $taxonomy->layout(),
         ];
 

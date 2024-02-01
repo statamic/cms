@@ -246,8 +246,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('updater', [UpdaterController::class, 'index'])->name('updater');
     Route::get('updater/count', [UpdaterController::class, 'count']);
-    Route::get('updater/{product}', [UpdateProductController::class, 'show'])->name('updater.product');
-    Route::get('updater/{product}/changelog', [UpdateProductController::class, 'changelog']);
+    Route::get('updater/{marketplaceProductSlug}', [UpdateProductController::class, 'show'])->name('updater.product');
+    Route::get('updater/{marketplaceProductSlug}/changelog', [UpdateProductController::class, 'changelog']);
 
     Route::group(['prefix' => 'duplicates'], function () {
         Route::get('/', [DuplicatesController::class, 'index'])->name('duplicates');

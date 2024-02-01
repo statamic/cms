@@ -2,8 +2,13 @@
 
 namespace Statamic\Stache;
 
+use DirectoryIterator;
+use FilesystemIterator;
 use Illuminate\Filesystem\Filesystem;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Statamic\Facades\Path;
+use Symfony\Component\Finder\SplFileInfo;
 
 class Traverser
 {
@@ -15,7 +20,7 @@ class Traverser
         $this->filesystem = $filesystem;
     }
 
-    public function traverse($store)
+    public function traverse($store, $recursive = true)
     {
         if (! $dir = $store->directory()) {
             throw new \Exception("Store [{$store->key()}] does not have a directory defined.");
@@ -27,7 +32,7 @@ class Traverser
             return collect();
         }
 
-        $files = collect($this->filesystem->allFiles($dir));
+        $files = collect($this->getFiles($dir, $recursive));
 
         if ($this->filter) {
             $files = $files->filter($this->filter);
@@ -44,5 +49,29 @@ class Traverser
         $this->filter = $filter;
 
         return $this;
+    }
+
+    private function getFiles($dir, $recursive)
+    {
+        $files = [];
+
+        if ($recursive) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::CURRENT_AS_SELF),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+        } else {
+            $iterator = new DirectoryIterator($dir);
+        }
+
+        foreach ($iterator as $fileInfo) {
+            if ($fileInfo->isDir() || $fileInfo->getFilename()[0] === '.') {
+                continue;
+            }
+
+            $files[] = new SplFileInfo($fileInfo->getPathname(), $fileInfo->getPath(), $fileInfo->getFilename());
+        }
+
+        return $files;
     }
 }

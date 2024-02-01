@@ -2,6 +2,7 @@
 
 namespace Statamic\Actions;
 
+use Exception;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 
@@ -16,7 +17,7 @@ class CopyPasswordResetLink extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof UserContract;
+        return config('statamic.users.allow_copy_reset_password_link', false) && $item instanceof UserContract;
     }
 
     public function visibleToBulk($items)
@@ -43,6 +44,10 @@ class CopyPasswordResetLink extends Action
 
     public function run($items, $values)
     {
+        if (! config('statamic.users.allow_copy_reset_password_link', false)) {
+            throw new Exception('Copying password reset links is not allowed.');
+        }
+
         $user = $items->first();
 
         $passwordResetLink = $user->password()
