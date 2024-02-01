@@ -44,8 +44,8 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
-    protected $template;
-    protected $termTemplate;
+    public $template;
+    public $termTemplate;
     protected $layout;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
