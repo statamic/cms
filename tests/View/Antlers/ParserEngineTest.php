@@ -8,7 +8,7 @@ use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\View\Antlers\Engine;
 use Tests\TestCase;
 
-class RuntimeParserEngineTest extends TestCase
+class ParserEngineTest extends TestCase
 {
     private $engine;
     private $files;
