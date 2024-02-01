@@ -314,4 +314,18 @@ EOT
             ->with('user')
             ->andReturn($blueprint);
     }
+
+    /** @test */
+    public function it_handles_precognitive_requests()
+    {
+        $this->actingAs(User::make()->save());
+
+        $response = $this
+            ->withPrecognition()
+            ->post('/!/auth/profile', [
+                'some' => 'thing',
+            ]);
+
+        $response->assertSuccessfulPrecognition();
+    }
 }

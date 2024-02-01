@@ -224,4 +224,19 @@ EOT
 
         $this->assertArrayHasKey('_token', $form['params']);
     }
+
+    /** @test */
+    public function it_handles_precognitive_requests()
+    {
+        $response = $this
+            ->withPrecognition()
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'wrong',
+                '_error_redirect' => '/login-error',
+            ]);
+
+        $response->assertSuccessfulPrecognition();
+    }
 }

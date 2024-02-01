@@ -24,6 +24,23 @@ class UserProfileRequest extends FormRequest
 
     protected function failedValidation(Validator $validator)
     {
+        if ($this->isPrecognitive()) {
+            return (new ValidationException($validator))->errorBag($this->errorBag);
+        }
+
+        if ($this->ajax()) {
+            $errors = $validator->errors();
+
+            $response = response([
+                'errors' => $errors->all(),
+                'error' => collect($errors->messages())->map(function ($errors, $field) {
+                    return $errors[0];
+                })->all(),
+            ], 400);
+
+            throw (new ValidationException($validator, $response));
+        }
+
         $errorResponse = $this->has('_error_redirect') ? redirect($this->input('_error_redirect')) : back();
 
         throw (new ValidationException($validator, $errorResponse->withInput()->withErrors($validator->errors(), 'user.profile')));
