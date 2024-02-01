@@ -146,9 +146,9 @@ export default {
             }
         },
 
-        'editingSection.display': function(display) {
+        'editingSection.display': async function(display) {
             if (this.editingSection && this.handleSyncedWithDisplay) {
-                this.editingSection.handle = this.$slugify(display, '_');
+                await this.$slugify(display, '_').then(slug => this.editingSection.handle = slug);
             }
         }
 

@@ -104,15 +104,22 @@ export default {
 
     methods: {
 
-        addSection() {
+        async addSection() {
+            let handle;
+            await this.$slugify(this.newSectionText, '_').then(slug => handle = slug);
+
+            console.log(handle);
+
             const section = {
                 _id: uniqid(),
                 display: this.newSectionText,
                 instructions: null,
                 icon: null,
-                handle: this.$slugify(this.newSectionText, '_'),
+                handle: handle,
                 fields: []
             };
+
+            console.log(section)
 
             this.sections.push(section);
 

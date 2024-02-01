@@ -274,13 +274,16 @@ export default {
             if (this.lastInteractedTab) this.selectTab(tabId);
         },
 
-        addTab() {
+        async addTab() {
             const id = uniqid();
+
+            let handle;
+            await this.$slugify(this.newTabText, '_').then(slug => handle = slug);
 
             this.tabs.push({
                 _id: id,
                 display: this.newTabText,
-                handle: this.$slugify(this.newTabText, '_'),
+                handle: handle,
                 instructions: null,
                 icon: null,
                 sections: []
