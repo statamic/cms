@@ -44,8 +44,8 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
-    public $template;
-    public $termTemplate;
+    protected $template;
+    protected $termTemplate;
     protected $layout;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
@@ -517,5 +517,15 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
                 'refresh' => $target['refresh'],
             ];
         })->filter()->values()->all();
+    }
+
+    public function hasCustomTemplate()
+    {
+        return $this->template !== null;
+    }
+
+    public function hasCustomTermTemplate()
+    {
+        return $this->termTemplate !== null;
     }
 }
