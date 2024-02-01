@@ -3,8 +3,6 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Contracts\Structures\CollectionTree as TreeContract;
-use Statamic\Contracts\Structures\Tree;
-use Statamic\Facades\Stache as StacheFacade;
 use Statamic\Stache\Stache;
 use Statamic\Structures\CollectionTree;
 
@@ -21,17 +19,5 @@ class CollectionTreeRepository extends NavTreeRepository
         return [
             TreeContract::class => CollectionTree::class,
         ];
-    }
-
-    public function save(Tree $tree)
-    {
-        $result = parent::save($tree);
-
-        StacheFacade::store('entries')
-            ->store($tree->collection()->handle())
-            ->resolveIndexes()
-            ->each->update();
-
-        return $result;
     }
 }

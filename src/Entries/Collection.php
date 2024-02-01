@@ -475,6 +475,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this;
     }
 
+    public function updateEntryParent($ids = null)
+    {
+        Facades\Collection::updateEntryParent($this, $ids);
+
+        return $this;
+    }
+
     public function path()
     {
         return vsprintf('%s/%s.yaml', [
