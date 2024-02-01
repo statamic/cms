@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .nav-main {
-    @apply hidden select-none bg-white shadow h-screen absolute left-0 overflow-scroll w-56;
+    @apply hidden select-none bg-white shadow h-screen absolute rtl:right-0 ltr:left-0 overflow-scroll w-56;
     transition: all .3s;
 
     h6 { @apply mt-6; }
@@ -26,7 +26,7 @@
         }
 
         i {
-            @apply block h-7 p-1 w-7 mr-2 rounded-full;
+            @apply block h-7 p-1 w-7 rtl:ml-2 ltr:mr-2 rounded-full;
         }
     }
 
@@ -40,11 +40,11 @@
 
     li ul {
         @apply mb-2;
-        margin-left: 1.5rem;
+        margin-left: 1.5rem ; [dir="rtl"] & { margin-right: 1.5rem ; margin-left: 0 ; }
 
         li {
             @apply text-xs;
-            margin-left: 12px;
+            margin-left: 12px ; [dir="rtl"] & { margin-right: 12px ; margin-left: 0 ; }
         }
 
         li a {
@@ -53,7 +53,7 @@
     }
 
     .nav-closed & {
-        left: -110%;
+        left: -110% ; [dir="rtl"] & { left: auto ; right: -110% ; }
     }
 
     .nav-section-top-level {
@@ -63,7 +63,7 @@
 
 @screen md {
     .nav-main {
-        @apply fixed flex bg-transparent shadow-none overflow-auto border-r;
+        @apply fixed flex bg-transparent shadow-none overflow-auto rtl:border-l ltr:border-r;
         height: calc(100% - 52px);
         .showing-license-banner & {
             height: calc(100% - 120px);
@@ -72,11 +72,11 @@
 }
 
 .nav-main-inner {
-    @apply pl-6 pr-4 pt-2;
+    @apply rtl:pr-6 ltr:pl-6 rtl:pl-4 ltr:pr-4 pt-2;
 }
 
 .nav-toggle {
-    @apply flex items-center justify-center h-6 p-1 w-6 mr-3 rounded;
+    @apply flex items-center justify-center h-6 p-1 w-6 rtl:ml-3 ltr:mr-3 rounded;
     outline: none !important;
 
     &:hover {

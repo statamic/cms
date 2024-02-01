@@ -2,7 +2,7 @@
     <div class="flex items-center">
 
         <!-- Link type selector -->
-        <div class="w-28 mr-4">
+        <div class="w-28 rtl:ml-4 ltr:mr-4">
             <v-select
                 v-model="option"
                 append-to-body

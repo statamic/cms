@@ -44,7 +44,7 @@
                             :class="{ 'mt-5': config.swatches.length }"
                         >
                             <input
-                                class="h-10 w-full cursor-pointer input-text w-full rounded p-[2px] mr-2"
+                                class="h-10 w-full cursor-pointer input-text w-full rounded p-[2px] rtl:ml-2 ltr:mr-2"
                                 type="color"
                                 :value="customColor"
                                 @input="customColorSelected"
@@ -70,7 +70,7 @@
             />
         </div>
 
-        <button v-if="value" class="btn-close ml-1" :aria-label="__('Reset')" @click="resetColor">&times;</button>
+        <button v-if="value" class="btn-close rtl:mr-1 ltr:ml-1" :aria-label="__('Reset')" @click="resetColor">&times;</button>
     </div>
 </template>
 

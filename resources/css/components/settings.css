@@ -3,7 +3,7 @@
     @apply p-3 @sm:p-4 m-0;
 
     .field-inner {
-        @apply w-full md:w-1/2 md:pr-8;
+        @apply w-full md:w-1/2 rtl:md:pl-8 ltr:md:pr-8;
     }
 
     .field-inner + div {

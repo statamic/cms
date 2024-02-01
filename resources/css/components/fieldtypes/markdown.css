@@ -37,7 +37,7 @@
         @apply flex items-center;
 
         button {
-            @apply text-gray-700 inline-block focus:outline-none px-2 py-1 mr-1;
+            @apply text-gray-700 inline-block focus:outline-none px-2 py-1 rtl:ml-1 ltr:mr-1;
 
             &:hover {
                 @apply text-blue;
@@ -154,7 +154,7 @@
     }
 
     .markdown-preview {
-        @apply border-none p-2 text-left;
+        @apply border-none p-2 rtl:text-right ltr:text-left;
         p { line-height: 1.2; }
     }
 }

@@ -1,7 +1,7 @@
 <template>
     <div class="range-fieldtype-wrapper bg-gray-200 rounded py-2 px-4 border">
         <div class="flex items-center">
-            <div v-if="config.prepend" v-text="__(config.prepend)" class="mr-2" />
+            <div v-if="config.prepend" v-text="__(config.prepend)" class="rtl:ml-2 ltr:mr-2" />
             <input
                 type="range"
                 v-model="val"

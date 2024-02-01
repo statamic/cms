@@ -5,7 +5,7 @@
         <div class="flex items-center mb-6">
             <h1 class="flex-1">{{ __(container.title) }}</h1>
 
-            <dropdown-list v-if="container.can_edit || container.can_delete" class="ml-4">
+            <dropdown-list v-if="container.can_edit || container.can_delete" class="rtl:mr-4 ltr:ml-4">
                 <dropdown-item
                     v-if="container.can_edit"
                     v-text="__('Edit Container')"
@@ -29,7 +29,7 @@
                 </dropdown-item>
             </dropdown-list>
 
-            <a :href="createContainerUrl" class="btn ml-4" v-if="canCreateContainers">{{ __('Create Container') }}</a>
+            <a :href="createContainerUrl" class="btn rtl:mr-4 ltr:ml-4" v-if="canCreateContainers">{{ __('Create Container') }}</a>
         </div>
 
         <asset-browser

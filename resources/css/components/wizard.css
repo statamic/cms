@@ -8,14 +8,14 @@
     .step:not(:first-child):before {
         @apply absolute h-1 w-1/2 bg-gray-300;
         content: '';
-        left: 0;
+        left: 0 ; [dir="rtl"] & { left: auto ; right: 0 ; }
         top: 18px;
     }
 
     .step:not(:last-child):after {
         @apply absolute h-1 w-1/2 bg-gray-300;
         content: '';
-        left: 50%;
+        left: 50% ; [dir="rtl"] & { left: auto ; right: 50% ; }
         top: 18px;
     }
 

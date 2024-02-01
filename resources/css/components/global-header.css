@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow pr-4 h-13 items-center flex relative w-full;
+    @apply bg-white shadow rtl:pl-4 ltr:pr-4 h-13 items-center flex relative w-full;
     z-index: 3; /* The search focus overlay sits underneath using z-index 2. */
 }
 
@@ -22,8 +22,8 @@
 
     .search-input {
         @apply text-sm w-full max-w-full;
-        padding-left: 5px;
-        padding-right: 20px;
+        padding-left: 5px ;
+        padding-right: 20px ; [dir="rtl"] & { padding-left: 20px ; padding-right: 5px ; }
         height: 32px;
 		&:focus {
 			outline: 0;
@@ -33,13 +33,13 @@
     .global-search-results {
         @apply shadow-lg absolute p-0 w-full bg-white rounded border border-gray-500;
         top: 36px;
-        left: -1px; /*  border offset */
+        left: -1px ; [dir="rtl"] & { left: auto ; right: -1px ; } /*  border offset */
         z-index: 999;
     }
 
     .global-search-loading-indicator {
         position: absolute;
-        right: 8px;
+        right: 8px ; [dir="rtl"] & { right: auto ; left: 8px ; }
     }
 
     .global-search-result-item {
@@ -67,7 +67,7 @@
     }
 
     .status {
-        float: right;
+        float: right ; [dir="rtl"] & { float: left ; }
         background: #ddd;
         border-radius: 2px;
         padding: 2px 4px;
@@ -87,7 +87,7 @@
 
     .reset {
         font-size: 21px;
-        left: -3px;
+        left: -3px ; [dir="rtl"] & { left: auto ; right: -3px ; }
         position: relative;
     }
 
@@ -108,7 +108,7 @@
     .v-select { @apply h-full }
     .vs__dropdown-toggle { @apply border-none bg-none }
     .vs__actions { @apply hidden }
-    .vs__search { @apply p-0 }
+    .vs__search { @apply p-0; [dir="rtl"] & { @apply p-0; } [dir="ltr"] & { @apply p-0; } }
     .vs__selected-options { @apply border-none shadow-none p-0 bg-none }
     .vs__selected { @apply flex }
     .vs__dropdown-toggle {

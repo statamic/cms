@@ -10,9 +10,9 @@
                 <h6 class="mb-2">{{ __('Pin to Favorites') }}</h6>
                 <div class="flex items-center">
                     <input type="text" class="input-text w-auto" ref="fave" v-model="name" @keydown.enter="save" />
-                    <button @click="save" class="btn-primary ml-2">{{ __('Save') }}</button>
+                    <button @click="save" class="btn-primary rtl:mr-2 ltr:ml-2">{{ __('Save') }}</button>
                 </div>
-                <button @click="makeStartPage" class="mt-2 text-xs text-blue outline-none hover:text-blue-800">{{ __('Set as start page') }} &rarr;</button>
+                <button @click="makeStartPage" class="mt-2 text-xs text-blue outline-none hover:text-blue-800">{{ __('Set as start page') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></button>
             </div>
         </popover>
         <div v-else>
@@ -50,7 +50,11 @@ export default {
 
         isNotYetFavorited() {
             return this.persistedFavorite === undefined;
-        }
+        },
+
+        direction() {
+            return this.$config.get('direction', 'rtl');
+        },
     },
 
     methods: {

@@ -50,17 +50,17 @@
                                 <div class="flex items-center justify-between p-2 text-sm">
                                     <data-list-search class="h-8" ref="search" v-model="searchQuery" />
 
-                                    <button v-if="canCreateFolders" class="btn btn-sm ml-3" @click="creatingFolder = true">
-                                        <svg-icon name="folder-add" class="h-4 w-4 mr-2" />
+                                    <button v-if="canCreateFolders" class="btn btn-sm rtl:mr-3 ltr:ml-3" @click="creatingFolder = true">
+                                        <svg-icon name="folder-add" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
                                         <span>{{ __('Create Folder') }}</span>
                                     </button>
 
-                                    <button v-if="canUpload" class="btn btn-sm ml-3" @click="openFileBrowser">
-                                        <svg-icon name="upload" class="h-4 w-4 mr-2 text-current" />
+                                    <button v-if="canUpload" class="btn btn-sm rtl:mr-3 ltr:ml-3" @click="openFileBrowser">
+                                        <svg-icon name="upload" class="h-4 w-4 rtl:ml-2 ltr:mr-2 text-current" />
                                         <span>{{ __('Upload') }}</span>
                                     </button>
 
-                                    <div class="btn-group ml-3">
+                                    <div class="btn-group rtl:mr-3 ltr:ml-3">
                                         <button class="btn btn-sm" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                             <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                         </button>
@@ -103,7 +103,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-400 group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 rtl:ml-2 ltr:mr-2 inline-block text-blue-400 group-hover:text-blue" />
                                                 ..
                                             </a>
                                         </td>
@@ -113,7 +113,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-400 group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 rtl:ml-2 ltr:mr-2 inline-block text-blue-400 group-hover:text-blue" />
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
@@ -136,7 +136,7 @@
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
                                     <div class="flex items-center w-fit-content group">
-                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-2 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
+                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 rtl:ml-2 ltr:mr-2 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
                                         <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue normal-nums" @click.stop="$emit('edit-asset', asset)">
                                             {{ asset.basename }}
                                         </label>
@@ -189,7 +189,7 @@
                                             <div class="asset-filename text-center w-full px-2 py-1" v-text="folder.basename" :title="folder.basename" />
                                         </div>
                                         <dropdown-list v-if="folderActions(folder).length"
-                                            class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                            class="absolute top-1 rtl:left-2 ltr:right-2 opacity-0 group-hover:opacity-100"
                                             :class="{ 'opacity-100': actionOpened === folder.path }"
                                             @opened="actionOpened = folder.path"
                                             @closed="actionOpened = null"
@@ -230,7 +230,7 @@
                                             </div>
                                         </div>
                                         <dropdown-list
-                                            class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                            class="absolute top-1 rtl:left-2 ltr:right-2 opacity-0 group-hover:opacity-100"
                                             :class="{ 'opacity-100': actionOpened === asset.id }"
                                             @opened="actionOpened = asset.id"
                                             @closed="actionOpened = null"

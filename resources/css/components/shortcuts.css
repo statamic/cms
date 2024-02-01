@@ -18,7 +18,7 @@
     min-width: 18px;
     height: 18px;
     margin: 0 .25em;
-    padding: 0 2px 2px 2px;
+    padding: 0 2px 2px 2px ; [dir="rtl"] & { padding: 0 2px 2px 2px ; }
 }
 
 .shortcut-combo {

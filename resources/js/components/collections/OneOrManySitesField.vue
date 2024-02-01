@@ -33,7 +33,7 @@
         </div>
 
         <div v-if="!hasMultipleSites || !inMultipleMode">
-            <text-input :value="value" @input="update" class="slug-field" />
+            <text-input :value="value" @input="update" class="slug-field" dir="ltr" />
         </div>
     </div>
 

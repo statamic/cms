@@ -125,7 +125,7 @@
         border-top-color: black;
         position: absolute;
         top: 100%;
-        left: 50%;
+        left: 50% ; [dir="rtl"] & { left: auto ; right: 50% ; }
         margin-left: -3px
     }
 
@@ -163,7 +163,7 @@
 }
 
 .bard-add-set-button {
-    @apply flex items-center justify-center absolute -left-4 top-[-6px] z-1;
+    @apply flex items-center justify-center absolute rtl:-right-4 ltr:-left-4 top-[-6px] z-1;
 }
 
 .bard-footer-toolbar {
@@ -192,8 +192,8 @@
     /*  transition: all .15s ease-in-out; */
 
     .dropdown-menu {
-        left: -5px;
-        right: auto;
+        left: -5px ; [dir="rtl"] & { left: auto ; right: -5px ; }
+        right: auto ; [dir="rtl"] & { right: auto ; left: auto ; }
     }
 }
 
@@ -240,16 +240,16 @@
     }
 
     .bard-set-selector {
-        @apply ml-6;
+        @apply rtl:mr-6 ltr:ml-6;
     }
 
     .bard-field-options {
         @apply fixed top-0 inset-x-0 bg-gray-700 p-4 w-full;
-        text-align: right;
+        @apply ltr:text-right rtl:text-left;
         z-index: 1; /*  to appear over the top of .bard-editor */
 
         .icon { font-size: 24px; }
-        a { margin-left: 16px; color: #fff; opacity: 1; }
+        a { margin-left: 16px ; [dir="rtl"] & { margin-right: 16px ; margin-left: 0 ; } color: #fff; opacity: 1; }
     }
 }
 
@@ -382,14 +382,14 @@
         padding: 0;
         margin: 0;
         margin-bottom: .85em;
-        padding-left: 2em;
+        padding-left: 2em ; [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
     }
 
     .tableWrapper table ol,
     .tableWrapper table ul {
         padding: 0;
         margin: 0;
-        padding-left: 2em;
+        padding-left: 2em ; [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
     }
 
     ol ol,
@@ -398,7 +398,7 @@
     ul ul {
         margin-top: 0;
         margin-bottom: 0;
-        padding-left: 2em;
+        padding-left: 2em ; [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
     }
 
     ul ul {
@@ -418,7 +418,7 @@
     }
 
     blockquote {
-        @apply text-gray-800 border-l-4 border-blue px-4;
+        @apply text-gray-800 rtl:border-r-4 ltr:border-l-4 border-blue px-4;
         margin: 0 0 .85em;
     }
 
@@ -439,7 +439,7 @@
         table-layout: fixed;
 
         th {
-            @apply font-bold text-left bg-gray-200;
+            @apply font-bold rtl:text-right ltr:text-left bg-gray-200;
         }
 
         td, th {
@@ -490,7 +490,7 @@
 .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
     @apply text-gray-600;
     content: attr(data-placeholder);
-    float: left;
+    float: left ; [dir="rtl"] & { float: right ; }
     height: 0;
     pointer-events: none;
 }
@@ -538,6 +538,6 @@
     table .column-resize-handle {
         @apply absolute top-0 bottom-0 pointer-events-none bg-blue-200;
         width: 3px;
-        right: -2px;
+        right: -2px ; [dir="rtl"] & { right: auto ; left: -2px ; }
     }
 }

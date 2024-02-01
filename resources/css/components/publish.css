@@ -27,7 +27,7 @@
 .head .status {
     display: inline-block;
     label {
-        margin: 0 6px 0 0;
+        margin: 0 6px 0 0 ; [dir="rtl"] & { margin: 0 0 0 6px ; }
         position: relative;
         top: 3px;
     }
@@ -41,7 +41,7 @@
 
 code.parent-url {
     @apply block text-3xs bg-none text-gray-700;
-    padding: 0 0 3px 0;
+    padding: 0 0 3px 0 ; [dir="rtl"] & { padding: 0 0 3px 0 ; }
 }
 
 .publish-fields {
@@ -95,7 +95,7 @@ code.parent-url {
 
 .publish-sidebar {
     @apply shrink-0;
-    margin-left: 20px;
+    margin-left: 20px ; [dir="rtl"] & { margin-right: 20px ; margin-left: 0 ; }
     width: 300px;
 
     .publish-fields .form-group {

@@ -28,6 +28,11 @@ a {
     cursor: pointer;
 }
 
+.break-all {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 @screen md {
 
     #main {
@@ -35,16 +40,16 @@ a {
     }
 
     #main .workspace {
-        padding-left: 14rem;
+        padding-left: 14rem ; [dir="rtl"] & { padding-right: 14rem ; padding-left: 0 ; }
     }
 
     #main.nav-closed {
         .nav-main {
-            left: -14rem;
+            left: -14rem ; [dir="rtl"] & { left: auto ; right: -14rem ; }
         }
 
         .workspace {
-            padding-left: 0;
+            padding-left: 0 ; [dir="rtl"] & { padding-right: 0 ; padding-left: 0 ; }
         }
     }
 }

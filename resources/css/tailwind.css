@@ -3,3 +3,4 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 @import "core/utilities";
+@import "rtl";

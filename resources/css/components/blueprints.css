@@ -41,7 +41,9 @@
     &:before {
         content: '';
         @apply border rounded absolute bg-gray-200 shadow-sm;
-        top: -3px; left: 6px; right: 0; bottom: 3px; z-index: 1;
+        top: -3px; left: 6px ; right: 0 ; bottom: 3px; z-index: 1;
+
+        [dir="rtl"] & { left: 0 ; right: 6px ; }
     }
 }
 

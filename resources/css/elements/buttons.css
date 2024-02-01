@@ -166,15 +166,15 @@ button {
     }
 
     button:not(:last-child):not(.active) {
-        @apply border-r-0;
+        @apply rtl:border-l-0 ltr:border-r-0;
     }
 
     button.active + button {
-        @apply border-l-0;
+        @apply rtl:border-r-0 ltr:border-l-0;
     }
 
     button:first-child {
-        @apply rounded-l;
+        @apply rtl:rounded-r ltr:rounded-l;
     }
 
     button.disabled {
@@ -182,9 +182,9 @@ button {
     }
 
     button:last-child {
-        @apply rounded-r border-l;
+        @apply rtl:rounded-l ltr:rounded-r rtl:border-r ltr:border-l;
         padding: .475rem .5rem;
-        &.btn-flat { @apply border-r-0; }
+        &.btn-flat { @apply rtl:border-l-0 ltr:border-r-0; }
     }
     .btn:focus {
         @apply ring-inset;
@@ -215,7 +215,7 @@ td .btn-icon {
 }
 
 .btn-with-icon .icon {
-    margin: -5px 7px 0 -3px;
+    margin: -5px 7px 0 -3px ; [dir="rtl"] & { margin: -5px -3px 0 7px ; }
     position: relative;
     top: 1px;
 }
@@ -224,7 +224,7 @@ td .btn-icon {
     @apply flex items-center;
 
     svg {
-        margin: 0 8px 0 -4px;
+        margin: 0 8px 0 -4px ; [dir="rtl"] & { margin: 0 -4px 0 8px ; }
         height: 16px;
         width: 16px;
 
@@ -247,7 +247,7 @@ td .btn-icon {
   ========================================================================== */
 
 .btn-close {
-    @apply ml-4 text-center p-0 text-xl text-gray-600 rounded-full w-8 h-8 outline-none shrink-0 leading-none inline-flex items-center justify-center;
+    @apply rtl:mr-4 ltr:ml-4 text-center p-0 text-xl text-gray-600 rounded-full w-8 h-8 outline-none shrink-0 leading-none inline-flex items-center justify-center;
 
     &:hover {
         @apply bg-gray-400;

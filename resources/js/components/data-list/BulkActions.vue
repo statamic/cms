@@ -20,7 +20,7 @@
                 <button
                     slot-scope="{ action, select }"
                     class="input-group-item"
-                    :class="{'text-red-500': action.dangerous, 'rounded-r': index + 1 === sortedActions.length }"
+                    :class="{'text-red-500': action.dangerous, 'ltr:rounded-r rtl:rounded-l': index + 1 === sortedActions.length }"
                     @click="select"
                     v-text="__(action.title)" />
             </data-list-action>

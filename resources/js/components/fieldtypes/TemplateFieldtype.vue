@@ -16,7 +16,7 @@
             :multiple="false"
             :value="value">
             <template #no-options>
-                <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No templates to choose from.')" />
+                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No templates to choose from.')" />
             </template>
         </v-select>
     </div>

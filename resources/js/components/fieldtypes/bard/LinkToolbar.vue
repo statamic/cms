@@ -6,7 +6,7 @@
 
                 <div class="flex">
 
-                    <div class="h-8 mb-4 bg-gray-100 text-gray-800 border rounded shadow-inner flex items-center mr-1">
+                    <div class="h-8 mb-4 bg-gray-100 text-gray-800 border rounded shadow-inner flex items-center rtl:ml-1 ltr:mr-1">
                         <select
                             class="input w-auto text-sm px-1"
                             v-model="linkType">
@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center">
-    
+
                         <!-- URL input -->
                         <input
                             v-if="linkType === 'url'"
@@ -31,7 +31,7 @@
                             :placeholder="__('URL')"
                             @keydown.enter.prevent="commit"
                         />
-    
+
                         <!-- Email input -->
                         <input
                             v-else-if="linkType === 'mailto'"
@@ -42,7 +42,7 @@
                             :placeholder="__('Email Address')"
                             @keydown.enter.prevent="commit"
                         />
-    
+
                         <!-- Phone input -->
                         <input
                             v-else-if="linkType === 'tel'"
@@ -53,25 +53,25 @@
                             placeholder="Phone Number"
                             @keydown.enter.prevent="commit"
                         />
-    
+
                         <!-- Data input -->
                         <div
                             v-else
                             class="w-full flex items-center justify-between cursor-pointer"
                             @click="openSelector"
                         >
-    
+
                             <loading-graphic v-if="isLoading" :inline="true" />
-    
-                            <div v-else class="flex-1 flex items-center mr-2 truncate">
+
+                            <div v-else class="flex-1 flex items-center rtl:ml-2 ltr:mr-2 truncate">
                                 <img
                                     v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
                                     :src="itemData.asset.thumbnail || itemData.asset.url"
-                                    class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-2 object-cover lazyloaded"
+                                    class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 rtl:ml-2 ltr:mr-2 object-cover lazyloaded"
                                 >
                                 {{ displayValue }}
                             </div>
-    
+
                             <button
                             class="flex items-center"
                                 v-tooltip="`${__('Browse')}...`"
@@ -81,11 +81,11 @@
                                 <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
                                 <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
                             </button>
-    
+
                         </div>
-    
+
                     </div>
-                    
+
                 </div>
 
 
@@ -112,7 +112,7 @@
                 </div>
 
                 <label for="target-blank" class="mt-4 flex items-center font-normal cursor-pointer text-gray-800 hover:text-black" v-if="canHaveTarget">
-                    <input class="checkbox mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
+                    <input class="checkbox rtl:ml-2 ltr:mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
             </div>
@@ -349,7 +349,7 @@ export default {
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
 
             this.title = attrs.title;
-            this.rel = attrs.href 
+            this.rel = attrs.href
                 ? attrs.rel
                 : this.defaultRel;
             this.targetBlank = attrs.href

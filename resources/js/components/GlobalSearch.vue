@@ -27,7 +27,7 @@
 
             <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-2 flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
                 <svg-icon :name="`light/${getResultIcon(result)}`" class="icon"></svg-icon>
-                <div class="flex-1 ml-2 title" v-html="result.title"></div>
+                <div class="flex-1 rtl:mr-2 ltr:ml-2 title" v-html="result.title"></div>
                 <span class="rounded px-1 text-2xs border bg-gray-200 text-gray" v-text="result.badge" />
             </div>
 
@@ -37,7 +37,7 @@
                 <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousemove="setActive(index)">
                     <div class="flex items-center flex-1 p-2" @click="hit">
                         <svg-icon name="light/pin" class="w-4 h-4"></svg-icon>
-                        <div class="ml-2 title" v-text="favorite.name"></div>
+                        <div class="rtl:mr-2 ltr:ml-2 title" v-text="favorite.name"></div>
                     </div>
                     <div class="p-2 text-gray-600 hover:text-gray-800" @click="removeFavorite(favorite)">&times;</div>
                 </div>

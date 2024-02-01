@@ -22,8 +22,8 @@
         border-radius: 50%;
         opacity: .9;
         position: absolute;
-        left: 50%;
-        margin-left: -1px;
+        left: 50% ; [dir="rtl"] & { left: auto ; right: 50% ; }
+        margin-left: -1px ; [dir="rtl"] & { margin-right: -1px ; margin-left: 0 ; }
         bottom: 1px;
     }
 

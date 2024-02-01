@@ -6,9 +6,9 @@
         <slot></slot>
 
         <!-- Save and continue options dropdown -->
-        <dropdown-list v-if="showOptions" class="text-left">
+        <dropdown-list v-if="showOptions" class="rtl:text-right ltr:text-left">
             <template v-slot:trigger>
-                <button :class="buttonClass" class="rounded-l-none">
+                <button :class="buttonClass" class="rtl:rounded-r-none ltr:rounded-l-none">
                     <svg-icon v-if="buttonIcon" :name="buttonIcon.name" :class="buttonIcon.class" />
                 </button>
             </template>
@@ -106,6 +106,6 @@ export default {
         margin-bottom: 9px;
     }
     .save-and-continue-options input {
-        margin-right: 5px;
+        margin-right: 5px ; [dir="rtl"] & { margin-left: 5px ; margin-right: 0 ; }
     }
 </style>

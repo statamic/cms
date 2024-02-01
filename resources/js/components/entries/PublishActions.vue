@@ -48,14 +48,14 @@
                         />
 
                         <div class="text-gray text-xs flex mb-6">
-                            <div class="pt-px w-4 mr-2">
+                            <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
                                 <svg-icon name="info-circle" class="pt-px" />
                             </div>
                             <div class="flex-1" v-text="actionInfoText" />
                         </div>
 
                         <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
-                            <div class="pt-px w-4 mr-2">
+                            <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
                                 <svg-icon name="info-circle" class="pt-px" />
                             </div>
                             <div class="flex-1" v-text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />

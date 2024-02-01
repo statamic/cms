@@ -970,7 +970,7 @@ trait TestsIlluminateArr
             'mr-2' => false,
         ]);
 
-        $this->assertSame('font-bold mt-4 ml-2', $classes);
+        $this->assertSame('font-bold mt-4 rtl:mr-2 ltr:ml-2', $classes);
     }
 
     public function testToCssStyles()
@@ -985,11 +985,11 @@ trait TestsIlluminateArr
         $styles = Arr::toCssStyles([
             'font-weight: bold;',
             'margin-top: 4px',
-            'margin-left: 2px;' => true,
+            'margin-left: 2px ; [dir="rtl"] & { margin-right: 2px ; margin-left: 0 ; }' => true,
             'margin-right: 2px' => false,
         ]);
 
-        $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px;', $styles);
+        $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px ; [dir="rtl"] & { margin-right: 2px ; margin-left: 0 ; }', $styles);
     }
 
     public function testWhere()

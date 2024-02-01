@@ -6,7 +6,7 @@
     @apply p-2;
 
     button, a {
-        @apply block w-full text-left rounded-sm text-xs font-normal px-2 py-1 text-gray-800;
+        @apply block w-full rtl:text-right ltr:text-left rounded-sm text-xs font-normal px-2 py-1 text-gray-800;
         line-height: 1.4;
         white-space: nowrap;
 
@@ -16,12 +16,12 @@
 
         .icon {
             color: #d0d4d7 !important;
-            margin-right: 6px;
-            margin-left: -4px;
+            margin-right: 6px ; [dir="rtl"] & { margin-left: 6px ; margin-right: 0 ; }
+            margin-left: -4px ; [dir="rtl"] & { margin-right: -4px ; margin-left: 0 ; }
             font-size: 12px;
             width: 20px;
             display: block;
-            float: left;
+            float: left ; [dir="rtl"] & { float: right ; }
             position: relative;
             top: 2px;
             line-height: inherit;
@@ -43,6 +43,6 @@
     }
 
     .align-left & {
-        right: auto;
+        right: auto ; [dir="rtl"] & { right: auto ; left: auto ; }
     }
 }

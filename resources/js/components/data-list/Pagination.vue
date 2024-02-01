@@ -11,7 +11,7 @@
         <ul v-if="hasMultiplePages" class="pagination" :class="{'pagination-inline': inline}">
 
             <li v-if="hasPrevious">
-                <a @click="selectPreviousPage"><span class="text-xs">&larr;</span></a>
+                <a @click="selectPreviousPage"><span class="text-xs" v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span></a>
             </li>
 
             <li
@@ -24,7 +24,7 @@
             </li>
 
             <li v-if="hasNext">
-                <a @click="selectNextPage"><span class="text-xs">&rarr;</span></a>
+                <a @click="selectNextPage"><span class="text-xs" v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></a>
             </li>
         </ul>
 
@@ -33,7 +33,7 @@
 
             <select-input
                 v-if="perPage && isPerPageEvenUseful"
-                class="ml-6"
+                class="rtl:mr-6 ltr:ml-6"
                 name="perPage"
                 :placeholder="__('Per Page')"
                 :options="perPageOptions"
@@ -164,6 +164,10 @@ export default {
 
         totalItems() {
             return this.resourceMeta.total;
+        },
+
+        direction() {
+            return this.$config.get('direction', 'rtl');
         },
 
     },

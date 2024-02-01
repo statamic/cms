@@ -10,11 +10,11 @@
     }
 
     .fade-left {
-        @apply left-0 bg-gradient-to-r;
+        @apply rtl:right-0 ltr:left-0 rtl:bg-gradient-to-l ltr:bg-gradient-to-r;
     }
 
     .fade-right {
-        @apply right-0 bg-gradient-to-l;
+        @apply rtl:left-0 ltr:right-0 rtl:bg-gradient-to-r ltr:bg-gradient-to-l;
     }
 }
 
@@ -25,7 +25,7 @@
 .tabs {
     @apply flex space-x-2 overflow-hidden relative w-full max-w-full;
     &-scrolled {
-        @apply pl-0 ml-0;
+        @apply rtl:pr-0 ltr:pl-0 rtl:mr-0 ltr:ml-0;
     }
 }
 
@@ -66,7 +66,7 @@
 }
 
 .button-tab {
-    @apply text-gray-700 inline-block focus:outline-none px-2 py-1 mr-1;
+    @apply text-gray-700 inline-block focus:outline-none px-2 py-1 rtl:ml-1 ltr:mr-1;
 
     &:hover {
         @apply text-blue;

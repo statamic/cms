@@ -24,7 +24,7 @@
             <div class="blueprint-add-section-container w-full">
                 <button class="blueprint-add-section-button outline-none" @click="addAndEditSection">
                     <div class="text-center flex items-center leading-none">
-                        <svg-icon name="micro/plus" class="h-3 w-3 mr-2" />
+                        <svg-icon name="micro/plus" class="h-3 w-3 rtl:ml-2 ltr:mr-2" />
                         <div v-text="addSectionText" />
                     </div>
 

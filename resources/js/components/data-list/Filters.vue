@@ -5,13 +5,13 @@
             <!-- Field filter (requires custom selection UI) -->
             <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
                 <template slot="trigger">
-                    <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
+                    <button class="filter-badge filter-badge-control rtl:ml-2 ltr:mr-2 mb-2" @click="resetFilterPopover">
                         {{ fieldFilter.title }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
                 </template>
                 <template #default="{ close: closePopover }">
-                    <div class="flex flex-col text-left min-w-[18rem]">
+                    <div class="flex flex-col rtl:text-right ltr:text-left min-w-[18rem]">
                         <div class="filter-fields text-sm">
                             <field-filter
                                 ref="fieldFilter"
@@ -30,7 +30,7 @@
             <!-- Standard pinned filters -->
             <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-start" :stop-propagation="false">
                 <template slot="trigger">
-                    <button class="filter-badge filter-badge-control mr-2 mb-2">
+                    <button class="filter-badge filter-badge-control rtl:ml-2 ltr:mr-2 mb-2">
                         {{ filter.title }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
@@ -51,7 +51,7 @@
             <!-- Standard unpinned filters -->
             <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
                 <template slot="trigger">
-                    <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
+                    <button class="filter-badge filter-badge-control rtl:ml-2 ltr:mr-2 mb-2" @click="resetFilterPopover">
                         {{ __('Filter') }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
@@ -85,11 +85,11 @@
             </popover>
 
             <!-- Active filter badges -->
-            <div class="filter-badge mr-2 mb-2" v-for="(badge, handle) in fieldFilterBadges">
+            <div class="filter-badge rtl:ml-2 ltr:mr-2 mb-2" v-for="(badge, handle) in fieldFilterBadges">
                 <span>{{ badge }}</span>
                 <button @click="removeFieldFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
             </div>
-            <div class="filter-badge mr-2 mb-2" v-for="(badge, handle) in standardBadges">
+            <div class="filter-badge rtl:ml-2 ltr:mr-2 mb-2" v-for="(badge, handle) in standardBadges">
                 <span>{{ badge }}</span>
                 <button @click="removeStandardFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
             </div>
