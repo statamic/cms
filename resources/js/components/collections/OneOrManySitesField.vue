@@ -23,6 +23,7 @@
                         <td class="align-middle" v-text="site.name" />
                         <td>
                             <text-input
+                                dir="ltr"
                                 class="slug-field"
                                 :value="value[site.handle]"
                                 @input="updateSiteValue(site.handle, $event)" />
