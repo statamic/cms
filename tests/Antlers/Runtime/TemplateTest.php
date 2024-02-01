@@ -2525,7 +2525,6 @@ PARTIAL;
     }
 }
 
-
 class NonArrayableObject
 {
     protected $data;
