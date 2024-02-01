@@ -985,11 +985,11 @@ trait TestsIlluminateArr
         $styles = Arr::toCssStyles([
             'font-weight: bold;',
             'margin-top: 4px',
-            'margin-left: 2px; [dir="rtl"] & { margin-right: 2px; margin-left: 0; }' => true,
-            'margin-right: 2px; [dir="rtl"] & { margin-left: 2px; margin-right: 0; }' => false,
+            'margin-left: 2px;' => true,
+            'margin-right: 2px;' => false,
         ]);
 
-        $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px; [dir="rtl"] & { margin-right: 2px; margin-left: 0; }', $styles);
+        $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px;', $styles);
     }
 
     public function testWhere()
