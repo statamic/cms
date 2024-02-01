@@ -615,17 +615,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
-    /** @deprecated */
-    public function revisions($enabled = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('revisions')
-            ->getter(function ($behavior) {
-                return $behavior ?? false;
-            })
-            ->args(func_get_args());
-    }
-
     public function revisionsEnabled($enabled = null)
     {
         return $this
