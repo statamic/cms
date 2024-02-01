@@ -15,6 +15,7 @@ class UserGroup extends FileUserGroup
             ->title($model->title)
             ->handle($model->handle)
             ->roles($model->roles ?? [])
+            ->data($model->data ?? [])
             ->model($model);
     }
 
@@ -25,6 +26,7 @@ class UserGroup extends FileUserGroup
                 'title' => $this->title,
                 'handle' => $this->handle,
                 'roles' => $this->roles->keys(),
+                'data' => $this->data->all(),
             ]);
     }
 
