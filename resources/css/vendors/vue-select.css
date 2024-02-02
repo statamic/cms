@@ -1,10 +1,6 @@
 .v-select {
 	@apply rounded min-w-0 relative font-sans;
 
-    [lang="fa"] & {
-        font-family: 'Dana', sans-serif;
-    }
-
     [dir='rtl'] & {
         direction: rtl;
     }
