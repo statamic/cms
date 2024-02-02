@@ -17,6 +17,7 @@ class StatamicGroupsTable extends Migration
             $table->id();
             $table->string('handle')->unique();
             $table->string('title');
+            $table->json('data')->nullable();
             $table->json('roles')->nullable();
             $table->timestamps();
         });

@@ -12,6 +12,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionsStore extends BasicStore
 {
+    protected $traverseRecursively = false;
+
     public function key()
     {
         return 'collections';
