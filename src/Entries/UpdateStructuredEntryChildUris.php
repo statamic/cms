@@ -17,6 +17,11 @@ class UpdateStructuredEntryChildUris
             return;
         }
 
+        // If the collection has no structure, there are no children to update.
+        if (! $collection->hasStructure()) {
+            return;
+        }
+
         // If the collection has no route, there are no uris to update.
         if (! $collection->route($entry->locale())) {
             return;
