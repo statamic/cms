@@ -17,17 +17,17 @@ class UpdateStructuredEntryChildUris
             return;
         }
 
-        // If the collection has no structure, there are no children to update.
-        if (! $collection->hasStructure()) {
-            return;
-        }
-
         // If the collection has no route, there are no uris to update.
         if (! $collection->route($entry->locale())) {
             return;
         }
 
-        $ids = $entry->page()->flattenedPages()->pluck('id');
+        // If there's no page, there are no children to update.
+        if (! $page = $entry->page()) {
+            return;
+        }
+
+        $ids = $page->flattenedPages()->pluck('id');
 
         if (empty($ids)) {
             return;
