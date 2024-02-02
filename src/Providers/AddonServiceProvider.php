@@ -175,6 +175,16 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $translations = true;
 
+    /**
+     * @var bool
+     */
+    protected $loadBlueprints = true;
+
+    /**
+     * @var bool
+     */
+    protected $loadFieldsets = true;
+
     public function boot()
     {
         Statamic::booted(function () {
@@ -626,6 +636,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootBlueprints()
     {
+        if (! $this->loadBlueprints) {
+            return $this;
+        }
+
         if (! file_exists($path = "{$this->getAddon()->directory()}resources/blueprints")) {
             return $this;
         }
@@ -640,6 +654,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldsets()
     {
+        if (! $this->loadFieldsets) {
+            return $this;
+        }
+
         if (! file_exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
             return $this;
         }
