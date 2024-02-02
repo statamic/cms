@@ -83,7 +83,7 @@
                 </form>
             </div>
             <div class="text-sm text-gray flex">
-                <div class="mr-4 badge-pill-sm"><span class="text-gray-800 font-medium">{{ __('Driver') }}:</span> {{ $cache['driver'] }}</div>
+                <div class="mr-4 badge-pill-sm"><span class="text-gray-800 font-medium">{{ __('Driver') }}:</span> {{ __($cache['driver']) }}</div>
             </div>
         </div>
 

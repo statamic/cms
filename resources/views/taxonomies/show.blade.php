@@ -10,7 +10,7 @@
             'title' => __('Taxonomies')
         ])
         <div class="flex items-center">
-            <h1 class="flex-1">{{ $taxonomy->title() }}</h1>
+            <h1 class="flex-1">{{ __($taxonomy->title()) }}</h1>
 
             <dropdown-list class="mr-2">
                 @can('edit', $taxonomy)

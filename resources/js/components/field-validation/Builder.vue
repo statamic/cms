@@ -59,7 +59,7 @@
                     />
                 </template>
                 <template #option="{ value, display }">
-                    {{ display }} <code class="ml-2">{{ valueWithoutTrailingColon(value) }}</code>
+                    {{ __(display) }} <code class="ml-2">{{ valueWithoutTrailingColon(value) }}</code>
                 </template>
                 <template #no-options="{ search }">
                     <div class="vs__dropdown-option text-left">{{ __('Add') }} <code class="ml-2">{{ search }}</code></div>

@@ -11,7 +11,7 @@
                 <a
                     @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
-                    v-text="title" />
+                    v-text="__(title)" />
 
                 <span v-if="showSlugs" class="ml-2 font-mono text-gray-700 text-2xs pt-px">
                     {{ isRoot ? '/' : page.slug }}
