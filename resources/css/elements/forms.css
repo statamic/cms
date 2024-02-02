@@ -83,6 +83,10 @@ input.input-text-minimal:read-only,
         @apply rtl:rounded-l-none ltr:rounded-r-none rtl:border-l-0 ltr:border-r-0;
     }
 
+    .input-text[dir='ltr']:not(:last-child) {
+        @apply rtl:rounded-r rtl:border-r;
+    }
+
     .input-group-prepend, .input-group-append, .input-group-item {
         @apply rtl:rounded-r ltr:rounded-l px-2 border text-sm text-gray-800 select-none;
         background: linear-gradient(180deg, #fff, #f9fafb);
