@@ -11,8 +11,7 @@ class UpdateStructuredEntryChildUris
         $entry = $event->entry;
         $collection = $entry->collection();
 
-        // If it's orderable (single depth structure) then changing the
-        // position of the entries is never going to affect the uris.
+        // If it's orderable (single depth structure), there are no children to update.
         if ($collection->orderable()) {
             return;
         }
