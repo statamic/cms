@@ -28,15 +28,16 @@ abstract class Region
 
     protected function filterContext(array $context)
     {
-        foreach (['__env', 'app', 'errors', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor'] as $var) {
-            unset($context[$var]);
-        }
+        $context = collect($context)
+            ->reject(fn ($value, $key) => in_array($key, ['__env', 'app', 'errors', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor']))
+            ->map(function ($value, $key) {
+                if ($value instanceof InvokableComponentVariable) {
+                    return $value->resolveDisplayableValue();
+                }
 
-        foreach ($context as $key => $value) {
-            if ($value instanceof InvokableComponentVariable) {
-                $context[$key] = $value->resolveDisplayableValue();
-            }
-        }
+                return $value;
+            })
+            ->toArray();
 
         return $this->arrayRecursiveDiff($context, $this->session->cascade());
     }
