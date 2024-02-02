@@ -19,6 +19,7 @@ use Statamic\Facades;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\Taxonomy;
@@ -117,6 +118,22 @@ class StaticWarm extends Command
     public function outputSuccessLine(Response $response, $index): void
     {
         $this->checkLine($this->getRelativeUri($index));
+
+        if ($response->hasHeader('Statamic-Pagination-Next')) {
+            $nextPageUrl = Arr::first($response->getHeader('Statamic-Pagination-Next'));
+
+            // TODO: find a better way of warming this URL
+            $request = new Request('GET', $nextPageUrl);
+            $client = new Client([
+                'verify' => $this->shouldVerifySsl(),
+                'auth' => $this->option('user') && $this->option('password')
+                    ? [$this->option('user'), $this->option('password')]
+                    : null,
+            ]);
+
+            $response = $client->send($request);
+            $this->outputSuccessLine($response, $index);
+        }
     }
 
     public function outputFailureLine($exception, $index): void
