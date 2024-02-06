@@ -4,6 +4,8 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
@@ -57,6 +59,8 @@ class FormController extends Controller
             // If any event listeners return false, we'll do a silent failure.
             // If they want to add validation errors, they can throw an exception.
             throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException);
+        } catch (ValidationException $e) {
+            return $this->formFailure($params, $e->errors(), $form->handle());
         } catch (SilentFormFailureException $e) {
             return $this->formSuccess($params, $submission, true);
         }
@@ -79,9 +83,35 @@ class FormController extends Controller
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
-        if ($type !== 'multipart/form-data' && $form->hasFiles()) {
+        if ($type !== 'multipart/form-data' && $form->hasFiles() && $request->assets()) {
             throw new FileContentTypeRequiredException;
         }
+    }
+
+    /**
+     * The steps for a failed form submission.
+     *
+     * @param  array  $params
+     * @param  array  $submission
+     * @param  string  $form
+     * @return Response|RedirectResponse
+     */
+    private function formFailure($params, $errors, $form)
+    {
+        if (request()->ajax()) {
+            return response([
+                'errors' => (new MessageBag($errors))->all(),
+                'error' => collect($errors)->map(function ($errors, $field) {
+                    return $errors[0];
+                })->all(),
+            ], 400);
+        }
+
+        $redirect = Arr::get($params, '_error_redirect');
+
+        $response = $redirect ? redirect($redirect) : back();
+
+        return $response->withInput()->withErrors($errors, 'form.'.$form);
     }
 
     /**

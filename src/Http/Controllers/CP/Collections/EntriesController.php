@@ -407,8 +407,10 @@ class EntriesController extends CpController
             $saved = $entry->updateLastModified(User::current())->save();
         }
 
-        return (new EntryResource($entry))
-            ->additional(['saved' => $saved]);
+        return [
+            'data' => (new EntryResource($entry))->resolve()['data'],
+            'saved' => $saved,
+        ];
     }
 
     private function resolveSlug($request)

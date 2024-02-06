@@ -4,8 +4,8 @@
         <table class="grid-table">
             <thead>
                 <tr>
-                    <th>Site</th>
-                    <th>Origin</th>
+                    <th>{{ __('Site') }}</th>
+                    <th>{{ __('Origin') }}</th>
                 </tr>
             </thead>
             <tbody>

@@ -163,6 +163,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             // Join all values with commas. Exclude any empties.
             return _(this.data)
                 .map(row => row.value.cells.filter(cell => !!cell).join(', '))

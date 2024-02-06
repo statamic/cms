@@ -49,8 +49,8 @@ class AuthServiceProvider extends ServiceProvider
             $repository = $app[UserRepositoryManager::class]->repository();
 
             foreach ($repository::bindings() as $abstract => $concrete) {
-                if (! $this->app->bound($abstract)) {
-                    $this->app->bind($abstract, $concrete);
+                if (! $app->bound($abstract)) {
+                    $app->bind($abstract, $concrete);
                 }
             }
 

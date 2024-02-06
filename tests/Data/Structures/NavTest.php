@@ -4,7 +4,10 @@ namespace Tests\Data\Structures;
 
 use Facades\Statamic\Stache\Repositories\NavTreeRepository;
 use Illuminate\Support\Collection as LaravelCollection;
+use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
+use Statamic\Events\NavDeleted;
+use Statamic\Events\NavDeleting;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -210,5 +213,38 @@ class NavTest extends StructureTestCase
         $this->assertTrue($user->can('view', $nav1));
         $this->assertTrue($user->can('view', $nav2));
         $this->assertFalse($user->can('view', $nav3));
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $nav = tap(Facades\Nav::make()->handle('test'))->save();
+
+        $nav->delete();
+
+        Event::assertDispatched(NavDeleting::class, function ($event) use ($nav) {
+            return $event->nav === $nav;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Nav::spy();
+        Event::fake([NavDeleted::class]);
+
+        Event::listen(NavDeleting::class, function () {
+            return false;
+        });
+
+        $nav = (new Nav)->handle('test');
+
+        $return = $nav->delete();
+
+        $this->assertFalse($return);
+        Facades\Nav::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(NavDeleted::class);
     }
 }

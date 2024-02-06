@@ -4,6 +4,7 @@ namespace Statamic\Git;
 
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Processes\Git as GitProcess;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Path;
 use Statamic\Facades\User;
@@ -11,6 +12,8 @@ use Statamic\Support\Str;
 
 class Git
 {
+    private ?UserContract $authenticatedUser;
+
     /**
      * Instantiate git tracked content manager.
      */
@@ -55,6 +58,18 @@ class Git
     }
 
     /**
+     * Act as a specific user.
+     */
+    public function as(?UserContract $user): static
+    {
+        $clone = clone $this;
+
+        $clone->authenticatedUser = $user;
+
+        return $clone;
+    }
+
+    /**
      * Git add and commit all tracked content, using configured commands.
      */
     public function commit($message = null)
@@ -74,7 +89,7 @@ class Git
             $message = null;
         }
 
-        CommitJob::dispatch($message)
+        CommitJob::dispatch($message, $this->authenticatedUser())
             ->onConnection(config('statamic.git.queue_connection'))
             ->delay($delayInMinutes ?? null);
     }
@@ -92,9 +107,7 @@ class Git
             return $default;
         }
 
-        $currentUser = User::current();
-
-        return $currentUser ? $currentUser->name() : $default;
+        return $this->authenticatedUser()?->name() ?? $default;
     }
 
     /**
@@ -110,9 +123,12 @@ class Git
             return $default;
         }
 
-        $currentUser = User::current();
+        return $this->authenticatedUser()?->email() ?? $default;
+    }
 
-        return $currentUser ? $currentUser->email() : $default;
+    private function authenticatedUser(): ?UserContract
+    {
+        return $this->authenticatedUser ?? User::current();
     }
 
     /**
