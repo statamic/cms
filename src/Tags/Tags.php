@@ -134,8 +134,7 @@ abstract class Tags
             throw new \BadMethodCallException("Call to undefined method {$method}.");
         }
 
-        if (static::hasMacro($method))
-        {
+        if (static::hasMacro($method)) {
             $macro = static::$macros[$method];
 
             if ($macro instanceof Closure) {
