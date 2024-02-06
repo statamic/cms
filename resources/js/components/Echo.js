@@ -5,7 +5,12 @@ window.Pusher = Pusher;
 class Echo {
 
     constructor() {
+        this.configCallback = null;
         this.bootedCallbacks = [];
+    }
+
+    config(callback) {
+        this.configCallback = callback;
     }
 
     booted(callback) {
@@ -13,7 +18,7 @@ class Echo {
     }
 
     start() {
-        const config = {
+        const config = this.configCallback ? this.configCallback(this) : {
             broadcaster: 'pusher',
             key: Statamic.$config.get('broadcasting.pusher.key'),
             cluster: Statamic.$config.get('broadcasting.pusher.cluster'),
