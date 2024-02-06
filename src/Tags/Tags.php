@@ -130,7 +130,7 @@ abstract class Tags
      */
     public function __call($method, $args)
     {
-        if ($this->wildcardHandled || ! method_exists($this, $this->wildcardMethod)) {
+        if ($this->wildcardHandled || ! method_exists($this, $this->wildcardMethod) || ! static::hasMacro($method)) {
             throw new \BadMethodCallException("Call to undefined method {$method}.");
         }
 
