@@ -27,7 +27,6 @@ class BroadcastServiceProvider extends ServiceProvider
                 'scheme' => config('broadcasting.connections.pusher.options.scheme'),
                 'host' => config('broadcasting.connections.pusher.options.host'),
                 'port' => config('broadcasting.connections.pusher.options.port'),
-                'useTLS' => config('broadcasting.connections.pusher.options.useTLS'),
             ],
         ];
     }
