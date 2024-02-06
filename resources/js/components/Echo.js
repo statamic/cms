@@ -5,12 +5,12 @@ window.Pusher = Pusher;
 class Echo {
 
     constructor() {
-        this.configCallback = null;
+        this.configCallbacks = [];
         this.bootedCallbacks = [];
     }
 
     config(callback) {
-        this.configCallback = callback;
+        this.configCallbacks.push(callback);
     }
 
     booted(callback) {
@@ -27,9 +27,7 @@ class Echo {
             authEndpoint: Statamic.$config.get('broadcasting.endpoint'),
         };
 
-        if (this.configCallback) {
-            config = this.configCallback(config);
-        }
+        this.configCallbacks.forEach(callback => config = callback(config));
 
         this.echo = new LaravelEcho(config);
 
