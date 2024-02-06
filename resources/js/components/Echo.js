@@ -18,7 +18,7 @@ class Echo {
     }
 
     start() {
-        const config = this.configCallback ? this.configCallback(this) : {
+        let config = {
             broadcaster: 'pusher',
             key: Statamic.$config.get('broadcasting.pusher.key'),
             cluster: Statamic.$config.get('broadcasting.pusher.cluster'),
@@ -26,6 +26,10 @@ class Echo {
             csrfToken: Statamic.$config.get('csrfToken'),
             authEndpoint: Statamic.$config.get('broadcasting.endpoint'),
         };
+
+        if (this.configCallback) {
+            config = this.configCallback(config);
+        }
 
         this.echo = new LaravelEcho(config);
 
