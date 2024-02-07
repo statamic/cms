@@ -21,10 +21,8 @@
         },
 
         methods: {
-            getCount(clearCache = true) {
-                let params = clearCache ? {'clearCache': clearCache} : {};
-
-                this.$axios.get(cp_url('updater/count'), params).then(response => {
+            getCount() {
+                this.$axios.get(cp_url('updater/count')).then(response => {
                     this.count = !isNaN(response.data) ? response.data : 0;
                 });
             }
