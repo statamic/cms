@@ -5,7 +5,7 @@
         <div class="nav-main-inner">
             @foreach ($nav as $section)
                 @if ($section['display'] !== 'Top Level')
-                    <h6>{{ __($section['display']) }}</h6>
+                    <h6 v-pre>{{ __($section['display']) }}</h6>
                 @endif
                 <ul class="nav-section-{{ Statamic\Support\Str::slug($section['display']) }}">
                     @foreach ($section['items'] as $item)

@@ -4,7 +4,7 @@
     <div class="nav-main-inner">
         @foreach ($nav as $section)
             @if ($section['display'] !== 'Top Level')
-                <h6>{{ __($section['display']) }}</h6>
+                <h6 v-pre>{{ __($section['display']) }}</h6>
             @endif
             <ul>
                 @foreach ($section['items'] as $item)
