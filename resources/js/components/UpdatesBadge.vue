@@ -30,12 +30,8 @@
                         requested: false,
                     },
                     mutations: {
-                        count(state, count) {
-                            state.count = count;
-                        },
-                        requested(state) {
-                            state.requested = true;
-                        },
+                        count: (state, count) => state.count = count,
+                        requested: (state) => state.requested = true,
                     }
                 })
             },
