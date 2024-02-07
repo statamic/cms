@@ -263,7 +263,19 @@ abstract class AbstractCacher implements Cacher
      */
     public function recacheUrls($urls)
     {
-        collect($urls)->each(fn ($url) => is_array($url) ? $this->recacheUrl(...$url) : $this->recacheUrl($url));
+        collect($urls)
+            ->map(fn ($url) => is_array($url) ? $url : [$url, null])
+            ->each(function ($parts) {
+                [$path, $domain] = $parts;
+
+                if (Str::contains($path, '*')) {
+                    $this->recacheWildcardUrl($path, $domain);
+
+                    return;
+                }
+
+                $this->recacheUrl($path, $domain);
+            });
     }
 
     /**
@@ -276,6 +288,28 @@ abstract class AbstractCacher implements Cacher
     public function recacheUrl($path, $domain = null)
     {
         StaticRecacheJob::dispatch($path, $domain);
+    }
+
+    /**
+     * Recache a wildcard URL.
+     *
+     * @param  string  $wildcard
+     * @param  string|null  $domain
+     */
+    protected function recacheWildcardUrl($wildcard, $domain = null)
+    {
+        // Remove the asterisk
+        $wildcard = substr($wildcard, 0, -1);
+
+        if (! $domain) {
+            [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
+        }
+
+        $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
+            return Str::startsWith($url, $wildcard);
+        })->each(function ($url) use ($domain) {
+            $this->recacheUrl($url, $domain);
+        });
     }
 
     /**
