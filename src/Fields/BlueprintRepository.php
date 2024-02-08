@@ -130,6 +130,15 @@ class BlueprintRepository
         $blueprint = new Blueprint;
 
         if ($handle) {
+            $handle = explode('::', $handle);
+
+            if (count($handle) > 1) {
+                $namespace = array_shift($handle);
+                $blueprint->setNamespace($namespace);
+            }
+
+            $handle = implode('::', $handle);
+
             $blueprint->setHandle($handle);
         }
 
