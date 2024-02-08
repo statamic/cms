@@ -33,10 +33,10 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
-    protected static $bootedCallbacks = [];
-    protected static $afterInstalledCallbacks = [
+    protected static $bootedCallbacks = [
         //
     ];
+    protected static $afterInstalledCallbacks = [];
 
     public static function version()
     {

@@ -40,7 +40,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v42
         with:
           files: |
             config
@@ -53,7 +53,7 @@ jobs:
             composer.json
             phpunit.xml.dist
             .github\workflows\tests.yml
-            *.php
+            **.php
 
       - name: Determine whether tests should run
         id: should-run-tests
