@@ -59,7 +59,7 @@ jobs:
         id: should-run-tests
         if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
         run: |
-          if [ "${{ runner.os }}" == "Windows" ]; then
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
             echo "result=true" >> $env:GITHUB_OUTPUT
           else
             echo "result=true" >> $HOME/GITHUB_OUTPUT
