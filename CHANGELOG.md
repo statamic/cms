@@ -1,7 +1,5 @@
 # Release Notes
 
-changing something that shouldnt trigger a test
-
 ## 4.47.0 (2024-01-31)
 
 ### What's new
