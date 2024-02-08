@@ -55,16 +55,6 @@ jobs:
             .github/workflows/tests.yml
             **.php
 
-      - name: Determine whether tests should run
-        id: should-run-tests
-        if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
-        run: |
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            echo "result=true" >> $env:GITHUB_OUTPUT
-          else
-            echo "result=true" >> $HOME/GITHUB_OUTPUT
-          fi
-
       - name: Determine whether tests should run (Ubuntu)
         id: should-run-tests-ubuntu
         if: matrix.os == 'ubuntu-latest' && (steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule')
