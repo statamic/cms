@@ -44,16 +44,16 @@ jobs:
         with:
           files: |
             config
-            resources/lang
-            resources/users
-            resources/views
+            resources\lang
+            resources\users
+            resources\views
             routes
             src
             tests
             composer.json
             phpunit.xml.dist
-            .github/workflows/tests.yml
-            **.php
+            .github\workflows\tests.yml
+            *.php
 
       - name: Determine whether tests should run
         id: should-run-tests
