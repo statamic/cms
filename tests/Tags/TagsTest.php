@@ -35,6 +35,27 @@ class TagsTest extends TestCase
         $this->assertEquals($parser, $class->parser);
         $this->assertInstanceOf(TestDependency::class, $class->dependency);
     }
+
+    /** @test */
+    public function tag_setup_hooks_are_run()
+    {
+        $class = app(TestTags::class);
+
+        $params = ['limit' => 10];
+
+        TestTags::addSetupHook(fn ($tag) => $tag->setParameters($params));
+
+        $class->setProperties([
+            'parser' => $parser = Antlers::parser(),
+            'content' => 'This is the tag content',
+            'context' => ['foo' => 'bar'],
+            'params' => ['limit' => 3],
+            'tag' => 'test:listing',
+            'tag_method' => 'listing',
+        ]);
+
+        $this->assertEquals(['limit' => 10], $class->params->all());
+    }
 }
 
 class TestTags extends Tags

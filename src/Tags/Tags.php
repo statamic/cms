@@ -5,13 +5,14 @@ namespace Statamic\Tags;
 use Illuminate\Support\Traits\Macroable;
 use Statamic\Extend\HasAliases;
 use Statamic\Extend\HasHandle;
+use Statamic\Extend\HasHooks;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Antlers;
 use Statamic\Support\Arr;
 
 abstract class Tags
 {
-    use HasAliases, HasHandle, Macroable, RegistersItself;
+    use HasAliases, HasHandle, HasHooks, Macroable, RegistersItself;
 
     protected static $binding = 'tags';
 
@@ -92,6 +93,8 @@ abstract class Tags
         $this->setParameters($properties['params']);
         $this->tag = array_get($properties, 'tag');
         $this->method = array_get($properties, 'tag_method');
+
+        $this->runSetupHooks();
     }
 
     public function setParser($parser)
