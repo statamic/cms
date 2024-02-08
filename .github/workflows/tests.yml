@@ -119,21 +119,26 @@ jobs:
             **.{js,vue,ts}
             package.json
 
-      - name: Determine whether tests should run
-        id: should-run-tests
-        if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
+      - name: Determine whether tests should run (Ubuntu)
+        id: should-run-tests-ubuntu
+        if: matrix.os == 'ubuntu-latest' && (steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule')
         run: echo "result=true" >> $GITHUB_OUTPUT
 
+      - name: Determine whether tests should run (Windows)
+        id: should-run-tests-windows
+        if: matrix.os == 'windows-latest' && (steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule')
+        run: echo "result=true" >> $env:GITHUB_OUTPUT
+
       - name: Install required npm version
-        if: steps.should-run-tests.outputs.result == 'true'
+        if: steps.should-run-tests-ubuntu.outputs.result == 'true' || steps.should-run-tests-windows.outputs.result == 'true'
         run: npm -g install npm@8.5.5
 
       - name: Install dependencies
-        if: steps.should-run-tests.outputs.result == 'true'
+        if: steps.should-run-tests-ubuntu.outputs.result == 'true' || steps.should-run-tests-windows.outputs.result == 'true'
         run: npm ci
 
       - name: Execute tests
-        if: steps.should-run-tests.outputs.result == 'true'
+        if: steps.should-run-tests-ubuntu.outputs.result == 'true' || steps.should-run-tests-windows.outputs.result == 'true'
         run: npm run test
 
   slack:
