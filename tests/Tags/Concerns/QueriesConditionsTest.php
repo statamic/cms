@@ -585,6 +585,30 @@ class QueriesConditionsTest extends TestCase
     }
 
     /** @test */
+    public function it_filters_by_includes_condition()
+    {
+        $this->makeEntry('a')->set('ages', [22, 52, 72])->save();
+        $this->makeEntry('b')->set('ages', [57, 72])->save();
+        $this->makeEntry('c')->set('ages', [2, 31, 22])->save();
+
+        $this->assertCount(3, $this->getEntries());
+        $this->assertCount(2, $this->getEntries(['ages:includes' => 72]));
+        $this->assertCount(1, $this->getEntries(['ages:includes' => 31]));
+    }
+
+    /** @test */
+    public function it_filters_by_doesnt_include_condition()
+    {
+        $this->makeEntry('a')->set('ages', [22, 52, 72])->save();
+        $this->makeEntry('b')->set('ages', [57, 72])->save();
+        $this->makeEntry('c')->set('ages', [2, 31, 22])->save();
+
+        $this->assertCount(3, $this->getEntries());
+        $this->assertCount(1, $this->getEntries(['ages:doesnt_include' => 72]));
+        $this->assertCount(2, $this->getEntries(['ages:doesnt_include' => 31]));
+    }
+
+    /** @test */
     public function when_the_value_is_an_augmentable_object_it_will_use_the_corresponding_value()
     {
         // The value doesn't have to be an entry, it just has to be an augmentable.
