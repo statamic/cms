@@ -115,6 +115,7 @@ jobs:
           files: |
             **.{js,vue,ts}
             package.json
+            .github/workflows/tests.yml
 
       - name: Determine whether tests should run
         id: should-run-tests
