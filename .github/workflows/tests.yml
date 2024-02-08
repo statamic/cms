@@ -44,15 +44,15 @@ jobs:
         with:
           files: |
             config
-            resources\lang
-            resources\users
-            resources\views
-            routes
-            src
-            tests
+            resources/lang/
+            resources/users/
+            resources/views/
+            routes/
+            src/
+            tests/
             composer.json
             phpunit.xml.dist
-            .github\workflows\tests.yml
+            .github/workflows/tests.yml
             **.php
             *.php
 
