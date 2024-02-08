@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => {
 
     return {
         base: './',
+        // this shouldn't trigger the tests to run
         plugins: [
             laravel({
                 valetTls: env.VALET_TLS,
