@@ -65,19 +65,29 @@ jobs:
             echo "result=true" >> $HOME/GITHUB_OUTPUT
           fi
 
+      - name: Determine whether tests should run (Ubuntu)
+        id: should-run-tests-ubuntu
+        if: matrix.os == 'ubuntu-latest' && (steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule')
+        run: echo "result=true" >> $HOME/GITHUB_OUTPUT
+
+      - name: Determine whether tests should run (Windows)
+        id: should-run-tests-windows
+        if: matrix.os == 'windows-latest' && (steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule')
+        run: echo "result=true" >> $env:GITHUB_OUTPUT
+
       - name: Update apt sources
-        if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
+        if: (steps.should-run-tests-ubuntu.outputs.result == 'true' || steps.should-run-tests-windows.outputs.result == 'true') && matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get check || sudo apt --fix-broken install -y
           sudo apt-get update
 
       - name: Install French Locale
-        if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
+        if: (steps.should-run-tests-ubuntu.outputs.result == 'true' || steps.should-run-tests-windows.outputs.result == 'true') && matrix.os == 'ubuntu-latest'
         run: sudo apt-get install language-pack-fr
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
-        if: steps.should-run-tests.outputs.result == 'true'
+        if: steps.should-run-tests-ubuntu.outputs.result == 'true' || steps.should-run-tests-windows.outputs.result == 'true'
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
@@ -85,7 +95,7 @@ jobs:
 
       - name: Install dependencies
         uses: nick-invision/retry@v2
-        if: steps.should-run-tests.outputs.result == 'true'
+        if: steps.should-run-tests-ubuntu.outputs.result == 'true' || steps.should-run-tests-windows.outputs.result == 'true'
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -94,11 +104,11 @@ jobs:
             composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
-        if: steps.should-run-tests.outputs.result == 'true'
+        if: steps.should-run-tests-ubuntu.outputs.result == 'true' || steps.should-run-tests-windows.outputs.result == 'true'
         run: composer show -D
 
       - name: Execute tests
-        if: steps.should-run-tests.outputs.result == 'true'
+        if: steps.should-run-tests-ubuntu.outputs.result == 'true' || steps.should-run-tests-windows.outputs.result == 'true'
         run: vendor/bin/phpunit
 
   js-tests:
