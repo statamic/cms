@@ -68,7 +68,7 @@ class Cache
             $this->nocache->write();
 
             if ($paginator = Blink::get('tag-paginator')) {
-                if ($paginator->hasMorePages() > 1) {
+                if ($paginator->hasMorePages()) {
                     $response->headers->set('Statamic-Pagination-Next', $paginator->nextPageUrl());
                 }
             }
