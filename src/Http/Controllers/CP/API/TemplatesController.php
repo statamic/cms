@@ -21,7 +21,7 @@ class TemplatesController extends CpController
                     }
                 }
 
-                return $views->filter()->values();
+                return $views->filter()->sort()->values();
             })
             ->values();
     }
