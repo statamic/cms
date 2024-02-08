@@ -54,6 +54,7 @@ jobs:
             phpunit.xml.dist
             .github\workflows\tests.yml
             **.php
+            *.php
 
       - name: Determine whether tests should run
         id: should-run-tests
