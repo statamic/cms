@@ -922,8 +922,16 @@ class CoreModifiers extends Modifier
     {
         $needle = $this->getFromContext($context, $params);
 
+        if ($needle instanceof Collection) {
+            $needle = $needle->values()->all();
+        }
+
         if (! is_array($needle)) {
             $needle = [$needle];
+        }
+
+        if ($haystack instanceof Collection) {
+            $haystack = $haystack->values()->all();
         }
 
         if (! is_array($haystack)) {
