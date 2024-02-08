@@ -37,7 +37,7 @@ abstract class Region
 
                 return $value;
             })
-            ->toArray();
+            ->all();
 
         return $this->arrayRecursiveDiff($context, $this->session->cascade());
     }
