@@ -59,11 +59,7 @@ jobs:
         id: should-run-tests
         if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
         run: |
-          if [ "${{ matrix.os }}" == "Windows" ]; then
-            echo "result=true" >> $GITHUB_OUTPUT
-          else
-            echo "result=true" >> $HOME/GITHUB_OUTPUT
-          fi
+          echo "result=true" >> ${{ if eq(matrix.os, 'Windows') }}$env:GITHUB_OUTPUT${{ else }}$HOME/GITHUB_OUTPUT${{ endif }}
 
       - name: Update apt sources
         if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
