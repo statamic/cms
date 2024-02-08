@@ -42,6 +42,8 @@ class StaticWarm extends Command
 
     private $uris;
 
+    private $additionalUris = [];
+
     public function handle()
     {
         if (! config('statamic.static_caching.strategy')) {
@@ -59,7 +61,29 @@ class StaticWarm extends Command
 
         $this->comment('Please wait. This may take a while if you have a lot of content.');
 
-        $this->warm();
+        $this->output->newLine();
+        $this->line('Compiling URLs...');
+        $this->output->newLine();
+
+        $client = new Client([
+            'verify' => $this->shouldVerifySsl(),
+            'auth' => $this->option('user') && $this->option('password')
+                ? [$this->option('user'), $this->option('password')]
+                : null,
+        ]);
+
+        $this->warm($client, $this->requests());
+
+        // TODO: Figure out if this works with queued warming.. we may need to figure out a different way if not.
+        while (count($this->additionalUris) > 0) {
+            $additionalRequests = collect($this->additionalUris)
+                ->map(fn ($uri) => new Request('GET', $uri))
+                ->all();
+
+            $this->additionalUris = [];
+
+            $this->warm($client, $additionalRequests);
+        }
 
         $this->output->newLine();
         $this->info($this->shouldQueue
@@ -70,22 +94,8 @@ class StaticWarm extends Command
         return 0;
     }
 
-    private function warm(): void
+    private function warm(Client $client, array $requests): void
     {
-        $client = new Client([
-            'verify' => $this->shouldVerifySsl(),
-            'auth' => $this->option('user') && $this->option('password')
-                ? [$this->option('user'), $this->option('password')]
-                : null,
-        ]);
-
-        $this->output->newLine();
-        $this->line('Compiling URLs...');
-
-        $requests = $this->requests();
-
-        $this->output->newLine();
-
         if ($this->shouldQueue) {
             $queue = config('statamic.static_caching.warm_queue');
             $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
@@ -120,19 +130,7 @@ class StaticWarm extends Command
         $this->checkLine($this->getRelativeUri($index));
 
         if ($response->hasHeader('Statamic-Pagination-Next')) {
-            $nextPageUrl = Arr::first($response->getHeader('Statamic-Pagination-Next'));
-
-            // TODO: find a better way of warming this URL
-            $request = new Request('GET', $nextPageUrl);
-            $client = new Client([
-                'verify' => $this->shouldVerifySsl(),
-                'auth' => $this->option('user') && $this->option('password')
-                    ? [$this->option('user'), $this->option('password')]
-                    : null,
-            ]);
-
-            $response = $client->send($request);
-            $this->outputSuccessLine($response, $index);
+            $this->additionalUris[] = Arr::first($response->getHeader('Statamic-Pagination-Next'));
         }
     }
 
