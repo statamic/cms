@@ -29,7 +29,7 @@ export default {
                 value = value.substring(0, this.truncateAt) + '&hellip;';
             }
 
-            return __(value);
+            return value;
         }
 
     },
