@@ -10,7 +10,7 @@ abstract class Event
 {
     use Dispatchable;
 
-    public ?UserContract $authenticatedUser;
+    public ?UserContract $authenticatedUser = null;
 
     public static function dispatch()
     {
