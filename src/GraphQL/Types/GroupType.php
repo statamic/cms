@@ -28,7 +28,6 @@ class GroupType extends Type
 
                 return $field;
             })
-            // ->ray()
             ->all();
     }
 }
