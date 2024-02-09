@@ -6,6 +6,7 @@ use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
+use Statamic\CP\Columns;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -106,6 +107,11 @@ class Entries extends Relationship
                         'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
                         'type' => 'taggable',
                     ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
+                        'type' => 'toggle',
+                    ],
                 ],
             ],
         ];
@@ -204,7 +210,9 @@ class Entries extends Relationship
 
         $query = $this->toSearchQuery($query, $request);
 
-        if ($site = $request->site) {
+        if ($this->canSelectAcrossSites()) {
+            $query->whereIn('site', Site::authorized()->map->handle()->all());
+        } elseif ($site = $request->site) {
             $query->where('site', $site);
         }
 
@@ -326,13 +334,18 @@ class Entries extends Relationship
             $site = $parent->locale();
         }
 
+        // If they've opted into selecting across sites, we won't automatically localize or
+        // filter out entries that don't exist in the current site. They would do that.
+        $shouldLocalize = ! $this->canSelectAcrossSites();
+
         $ids = (new OrderedQueryBuilder(Entry::query(), $ids = Arr::wrap($values)))
             ->whereIn('id', $ids)
             ->get()
-            ->map(function ($entry) use ($site) {
-                return optional($entry->in($site))->id();
-            })
-            ->filter()
+            ->when($shouldLocalize, fn ($entries) => $entries
+                ->map(fn ($entry) => $entry->in($site))
+                ->filter()
+            )
+            ->map->id()
             ->all();
 
         $query = (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
@@ -365,7 +378,10 @@ class Entries extends Relationship
 
     protected function getSelectionFilterContext()
     {
-        return ['collections' => $this->getConfiguredCollections()];
+        return [
+            'collections' => $this->getConfiguredCollections(),
+            'showSiteFilter' => $this->canSelectAcrossSites(),
+        ];
     }
 
     protected function getConfiguredCollections()
@@ -391,20 +407,20 @@ class Entries extends Relationship
         if (count($this->getConfiguredCollections()) === 1) {
             $columns = $this->getBlueprint()->columns();
 
-            $status = Column::make('status')
-                ->listable(true)
-                ->visible(true)
-                ->defaultVisibility(true)
-                ->sortable(false);
-
-            $columns->put('status', $status);
+            $this->addColumn($columns, 'status');
 
             $columns->setPreferred("collections.{$this->getConfiguredCollections()[0]}.columns");
 
             return $columns->rejectUnlisted()->values();
         }
 
-        return $this->getBlueprint()->columns()->values()->all();
+        $columns = $this->getBlueprint()->columns();
+
+        if ($this->canSelectAcrossSites()) {
+            $this->addColumn($columns, 'site');
+        }
+
+        return $columns->values();
     }
 
     protected function getItemsForPreProcessIndex($values): SupportCollection
@@ -425,19 +441,54 @@ class Entries extends Relationship
 
     public function preload()
     {
+        $preloaded = array_merge(parent::preload(), [
+            'availableSites' => $this->availableSites(),
+        ]);
+
         $collection = count($this->getConfiguredCollections()) === 1
             ? Collection::findByHandle($this->getConfiguredCollections()[0])
             : null;
 
         if (! $collection || ! $collection->hasStructure()) {
-            return parent::preload();
+            return $preloaded;
         }
 
-        return array_merge(parent::preload(), ['tree' => [
+        return array_merge($preloaded, ['tree' => [
             'title' => $collection->title(),
             'url' => cp_route('collections.tree.index', $collection),
             'showSlugs' => $collection->structure()->showSlugs(),
             'expectsRoot' => $collection->structure()->expectsRoot(),
         ]]);
+    }
+
+    private function addColumn(Columns $columns, string $columnKey): void
+    {
+        $column = Column::make($columnKey)
+            ->listable(true)
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(false);
+
+        $columns->put($columnKey, $column);
+    }
+
+    private function canSelectAcrossSites(): bool
+    {
+        return $this->config('select_across_sites', false);
+    }
+
+    private function availableSites()
+    {
+        if (! Site::hasMultiple()) {
+            return [];
+        }
+
+        $configuredSites = collect($this->getConfiguredCollections())->flatMap(fn ($collection) => Collection::find($collection)->sites());
+
+        return Site::authorized()
+            ->when(isset($configuredSites), fn ($sites) => $sites->filter(fn ($site) => $configuredSites->contains($site->handle())))
+            ->map->handle()
+            ->values()
+            ->all();
     }
 }

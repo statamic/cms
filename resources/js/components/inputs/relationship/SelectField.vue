@@ -11,7 +11,6 @@
             :multiple="multiple"
             :options="options"
             :get-option-key="(option) => option.id"
-            :get-option-label="(option) => option.title"
             :create-option="(value) => ({ title: value, id: value })"
             :placeholder="__(config.placeholder) || __('Choose...')"
             :searchable="true"
@@ -22,6 +21,12 @@
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')"
         >
+            <template #option="{ title, site }">
+                <div class="flex justify-between">
+                    <div>{{ title }}</div>
+                    <div v-if="showSiteLabel" class="text-2xs text-gray-700">{{ site.name }}</div>
+                </div>
+            </template>
             <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
             <template #search="{ events, attributes }" v-if="multiple">
                 <input
@@ -88,6 +93,7 @@ export default {
         multiple: Boolean,
         taggable: Boolean,
         config: Object,
+        meta: Object,
         readOnly: Boolean,
         site: String,
     },
@@ -111,6 +117,10 @@ export default {
                 paginate: false,
                 columns: 'title,id',
             }
+        },
+
+        showSiteLabel() {
+            return this.meta.availableSites.length > 1;
         }
     },
 
