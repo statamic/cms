@@ -23,6 +23,7 @@ use Statamic\Query\StatusQueryBuilder;
 use Statamic\Search\Index;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class Entries extends Relationship
 {
@@ -321,7 +322,7 @@ class Entries extends Relationship
     public function augment($values)
     {
         $site = Site::current()->handle();
-        if (($parent = $this->field()->parent()) && $parent instanceof Localization) {
+        if (($parent = $this->field()->parent()) && ($parent instanceof Localization || $parent instanceof LocalizedTerm)) {
             $site = $parent->locale();
         }
 

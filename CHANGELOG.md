@@ -1,5 +1,24 @@
 # Release Notes
 
+## 4.48.0 (2024-02-06)
+
+### What's new
+- Ability to customize Echo client configuration. [#9464](https://github.com/statamic/cms/issues/9464) by @jacksleight
+- Tags are macroable. [#9466](https://github.com/statamic/cms/issues/9466) by @SylvesterDamgaard
+- Statamic route views can be implied. [#9436](https://github.com/statamic/cms/issues/9436) by @jasonvarga
+- Add sites to support details output. [#9461](https://github.com/statamic/cms/issues/9461) by @jasonvarga
+
+### What's fixed
+- Fix unit translations. [#9472](https://github.com/statamic/cms/issues/9472) by @jasonvarga
+- Remove typo inside UserProvider. [#9459](https://github.com/statamic/cms/issues/9459) by @jonassiewertsen
+- Translate more untranslated strings. [#9451](https://github.com/statamic/cms/issues/9451) by @peimn
+- Fix timeout when using `nocache` tag. [#9449](https://github.com/statamic/cms/issues/9449) by @duncanmcclean
+- Revert Stache watcher performance PR. [#9448](https://github.com/statamic/cms/issues/9448) by @jasonvarga
+- Tidy up replicator field styles to match normal fields. [#9446](https://github.com/statamic/cms/issues/9446) by @duncanmcclean
+- Ensure template and termTemplate are accessed correctly in Taxonomy controller. [#9444](https://github.com/statamic/cms/issues/9444) by @ryanmitchell
+
+
+
 ## 4.47.0 (2024-01-31)
 
 ### What's new
