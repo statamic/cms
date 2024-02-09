@@ -139,16 +139,19 @@ abstract class AbstractCacher implements Cacher
     {
         $url = $request->getUri();
 
-        // When ignore_query_strings is enabled, strip out all query params except for `page`.
         if ($this->config('ignore_query_strings')) {
-            $urlWithoutParams = Arr::get(explode('?', $url), 0);
-            $queryParams = Arr::get(explode('?', $url), 1);
+            $originalUrl = $url;
 
-            $url = $urlWithoutParams;
+            $url = Arr::get(explode('?', $originalUrl), 0);
+            $queryParams = Arr::get(explode('?', $originalUrl), 1);
 
             if ($queryParams) {
-                $url .= '?'.collect(explode('&', $queryParams))->filter(function ($param) {
-                    return Str::startsWith($param, 'page=');
+                $whitelistedQueryParams = collect($this->config('whitelisted_query_parameters', []))
+                    ->map(fn ($param) => Str::ensureRight($param, '='))
+                    ->all();
+
+                $url .= '?'.collect(explode('&', $queryParams))->filter(function ($param) use ($whitelistedQueryParams) {
+                    return Str::startsWith($param, $whitelistedQueryParams);
                 })->implode('&');
             }
         }

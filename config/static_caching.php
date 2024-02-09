@@ -98,6 +98,10 @@ return [
 
     'ignore_query_strings' => false,
 
+    'whitelisted_query_parameters' => [
+        'page',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Replacers

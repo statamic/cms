@@ -167,10 +167,13 @@ class FileCacher extends AbstractCacher
         $slug = $pathParts['basename'];
         $query = Arr::get($urlParts, 'query', '');
 
-        // When ignore_query_strings is enabled, strip out all query params except for `page`.
         if ($this->config('ignore_query_strings')) {
-            $query = collect(explode('&', $query))->filter(function ($param) {
-                return Str::startsWith($param, 'page=');
+            $whitelistedQueryParams = collect($this->config('whitelisted_query_parameters', []))
+                ->map(fn ($param) => Str::ensureRight($param, '='))
+                ->all();
+
+            $query = collect(explode('&', $query))->filter(function ($param) use ($whitelistedQueryParams) {
+                return Str::startsWith($param, $whitelistedQueryParams);
             })->implode('&');
         }
 
