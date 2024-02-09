@@ -4,7 +4,7 @@
             <div class="overflow-x-auto overflow-y-hidden">
                 <data-list-table>
                     <template slot="cell-title" slot-scope="{ row: fieldset }">
-                        <a :href="fieldset.edit_url">{{ fieldset.title }}</a>
+                        <a :href="fieldset.edit_url">{{ __(fieldset.title) }}</a>
                     </template>
                     <template slot="cell-handle" slot-scope="{ value }">
                         <span class="font-mono text-xs">{{ value }}</span>

@@ -83,12 +83,12 @@
                                 <div class="role-index-field">
                                     <div v-if="user.super" class="role-index-field-item mr-1 mb-1.5">{{ __('Super Admin') }}</div>
                                     <div v-if="!roles || roles.length === 0" />
-                                    <div v-for="(role, i) in (roles || [])" class="role-index-field-item mr-1 mb-1.5">{{ role.title }}</div>
+                                    <div v-for="(role, i) in (roles || [])" class="role-index-field-item mr-1 mb-1.5">{{ __(role.title) }}</div>
                                 </div>
                             </template>
                             <template slot="cell-groups" slot-scope="{ row: user, value: groups }">
                                 <div class="groups-index-field">
-                                    <div v-for="group in (groups || [])" class="groups-index-field-item mr-1 mb-1.5">{{ group.title }}</div>
+                                    <div v-for="group in (groups || [])" class="groups-index-field-item mr-1 mb-1.5">{{ __(group.title) }}</div>
                                 </div>
                             </template>
                             <template slot="actions" slot-scope="{ row: user, index }">
