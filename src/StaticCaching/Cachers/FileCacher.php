@@ -165,7 +165,14 @@ class FileCacher extends AbstractCacher
         $urlParts = parse_url($url);
         $pathParts = pathinfo($urlParts['path']);
         $slug = $pathParts['basename'];
-        $query = $this->config('ignore_query_strings') ? '' : Arr::get($urlParts, 'query', '');
+        $query = Arr::get($urlParts, 'query', '');
+
+        // When ignore_query_strings is enabled, strip out all query params except for `page`.
+        if ($this->config('ignore_query_strings')) {
+            $query = collect(explode('&', $query))->filter(function ($param) {
+                return Str::startsWith($param, 'page=');
+            })->implode('&');
+        }
 
         if ($this->isBasenameTooLong($basename = $slug.'_'.$query.'.html')) {
             $basename = $slug.'_lqs_'.md5($query).'.html';

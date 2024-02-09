@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 abstract class AbstractCacher implements Cacher
@@ -138,8 +139,18 @@ abstract class AbstractCacher implements Cacher
     {
         $url = $request->getUri();
 
+        // When ignore_query_strings is enabled, strip out all query params except for `page`.
         if ($this->config('ignore_query_strings')) {
-            $url = explode('?', $url)[0];
+            $urlWithoutParams = Arr::get(explode('?', $url), 0);
+            $queryParams = Arr::get(explode('?', $url), 1);
+
+            $url = $urlWithoutParams;
+
+            if ($queryParams) {
+                $url .= '?'.collect(explode('&', $queryParams))->filter(function ($param) {
+                    return Str::startsWith($param, 'page=');
+                })->implode('&');
+            }
         }
 
         return $url;
