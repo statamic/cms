@@ -97,7 +97,7 @@ class FormCreateAlpineTest extends FormTestCase
             'fav_animals' => [],
             'fav_colour' => null,
             'fav_subject' => null,
-            'winnie' => null
+            'winnie' => null,
         ]);
 
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
