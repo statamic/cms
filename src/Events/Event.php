@@ -3,13 +3,14 @@
 namespace Statamic\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
 
 abstract class Event
 {
     use Dispatchable;
 
-    public $authenticatedUser;
+    public ?UserContract $authenticatedUser = null;
 
     public static function dispatch()
     {
