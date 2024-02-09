@@ -24,7 +24,7 @@
                             <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field" v-if="hiddenColumns.length">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="checkbox" class="mr-2" v-model="column.visible" @change="columnToggled(column) "/>
-                                    {{ column.label }}
+                                    {{ __(column.label) }}
                                 </label>
                             </div>
                         </div>
@@ -48,7 +48,7 @@
                                         <div class="item-move py-1">&nbsp;</div>
                                         <div class="flex flex-1 ml-2 items-center p-0">
                                             <input type="checkbox" class="mr-2" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
-                                            {{ column.label }}
+                                            {{ __(column.label) }}
                                         </div>
                                     </div>
                                 </div>
