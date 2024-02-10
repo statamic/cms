@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Statamic\Support\Arr;
 
 class StaticWarmJob implements ShouldQueue
 {
@@ -24,6 +25,10 @@ class StaticWarmJob implements ShouldQueue
 
     public function handle(Client $client)
     {
-        $client->send($this->request);
+        $response = $client->send($this->request);
+
+        if ($response->hasHeader('Statamic-Pagination-Next')) {
+            StaticWarmJob::dispatch(new Request('GET', Arr::first($response->getHeader('Statamic-Pagination-Next'))));
+        }
     }
 }
