@@ -77,19 +77,6 @@ class ConditionProcessor
                     $this->processor->registerInterpolations($branch->head);
                 }
 
-                if (! empty($branch->head->interpolationRegions)) {
-                    /**
-                     * @var string $varKey
-                     * @var AbstractNode[] $interpolationRegion
-                     */
-                    foreach ($branch->head->processedInterpolationRegions as $varKey => $interpolationRegion) {
-                        $interpolationResult = $this->processor->cloneProcessor()->setData($data)->render($interpolationRegion);
-
-                        $dataToUse[$varKey] = $interpolationResult;
-                        $interpolationReplacements[$varKey] = $interpolationResult;
-                    }
-                }
-
                 $environment->setInterpolationReplacements($interpolationReplacements);
                 $environment->setData($dataToUse);
 

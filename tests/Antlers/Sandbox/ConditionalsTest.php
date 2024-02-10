@@ -47,6 +47,15 @@ EOT;
         $this->assertSame('no', $this->renderString($template, $data));
     }
 
+    public function test_tags_are_not_evaluated_twice()
+    {
+        $template = <<<'EOT'
+{{ if {switch between='yes|no'} == 'yes' }}yes{{ else }}no{{ /if }}{{ if {switch between='yes|no'} == 'yes' }}yes{{ else }}no{{ /if }}
+EOT;
+
+        $this->assertSame('yesno', $this->renderString($template, [], true));
+    }
+
     public function test_sandbox_evaluates_simple_boolean_expressions()
     {
         $result = $this->getBoolResult('true == false', []);
