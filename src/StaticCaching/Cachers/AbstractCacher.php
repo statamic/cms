@@ -145,11 +145,11 @@ abstract class AbstractCacher implements Cacher
             $url = Arr::get(explode('?', $originalUrl), 0);
             $queryParams = Arr::get(explode('?', $originalUrl), 1);
 
-            if ($queryParams) {
-                $whitelistedQueryParams = collect($this->config('whitelisted_query_parameters', []))
-                    ->map(fn ($param) => Str::ensureRight($param, '='))
-                    ->all();
+            $whitelistedQueryParams = collect($this->config('whitelisted_query_parameters', []))
+                ->map(fn ($param) => Str::ensureRight($param, '='))
+                ->all();
 
+            if ($queryParams && $whitelistedQueryParams) {
                 $url .= '?'.collect(explode('&', $queryParams))->filter(function ($param) use ($whitelistedQueryParams) {
                     return Str::startsWith($param, $whitelistedQueryParams);
                 })->implode('&');
