@@ -37,7 +37,11 @@ class StaticWarmJobTest extends TestCase
         Queue::fake();
 
         $mock = new MockHandler([
-            (new Response(200))->withHeader('Statamic-Pagination-Next', '/blog?page=2'),
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 3,
+                'name' => 'page',
+            ]),
         ]);
 
         $handlerStack = HandlerStack::create($mock);
@@ -52,7 +56,17 @@ class StaticWarmJobTest extends TestCase
 
         Queue::assertPushed(StaticWarmJob::class, function (StaticWarmJob $job) {
             return $job->request->getUri()->getPath() === '/blog'
+                && $job->request->getUri()->getQuery() === 'page=1';
+        });
+
+        Queue::assertPushed(StaticWarmJob::class, function (StaticWarmJob $job) {
+            return $job->request->getUri()->getPath() === '/blog'
                 && $job->request->getUri()->getQuery() === 'page=2';
+        });
+
+        Queue::assertPushed(StaticWarmJob::class, function (StaticWarmJob $job) {
+            return $job->request->getUri()->getPath() === '/blog'
+                && $job->request->getUri()->getQuery() === 'page=3';
         });
     }
 }

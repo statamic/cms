@@ -42,8 +42,6 @@ class StaticWarm extends Command
 
     private $uris;
 
-    private $additionalUris = [];
-
     public function handle()
     {
         if (! config('statamic.static_caching.strategy')) {
@@ -61,29 +59,7 @@ class StaticWarm extends Command
 
         $this->comment('Please wait. This may take a while if you have a lot of content.');
 
-        $this->output->newLine();
-        $this->line('Compiling URLs...');
-        $this->output->newLine();
-
-        $client = new Client([
-            'verify' => $this->shouldVerifySsl(),
-            'auth' => $this->option('user') && $this->option('password')
-                ? [$this->option('user'), $this->option('password')]
-                : null,
-        ]);
-
-        $this->warm($client, $this->requests());
-
-        // TODO: Figure out if this works with queued warming.. we may need to figure out a different way if not.
-        while (count($this->additionalUris) > 0) {
-            $additionalRequests = collect($this->additionalUris)
-                ->map(fn ($uri) => new Request('GET', $uri))
-                ->all();
-
-            $this->additionalUris = [];
-
-            $this->warm($client, $additionalRequests);
-        }
+        $this->warm();
 
         $this->output->newLine();
         $this->info($this->shouldQueue
@@ -94,8 +70,15 @@ class StaticWarm extends Command
         return 0;
     }
 
-    private function warm(Client $client, array $requests): void
+    private function warm(): void
     {
+        $this->output->newLine();
+        $this->line('Compiling URLs...');
+
+        $requests = $this->requests();
+
+        $this->output->newLine();
+
         if ($this->shouldQueue) {
             $queue = config('statamic.static_caching.warm_queue');
             $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
@@ -106,7 +89,7 @@ class StaticWarm extends Command
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
 
-            $pool = new Pool($client, $requests, [
+            $pool = new Pool($this->client(), $requests, [
                 'concurrency' => $this->concurrency(),
                 'fulfilled' => [$this, 'outputSuccessLine'],
                 'rejected' => [$this, 'outputFailureLine'],
@@ -118,6 +101,37 @@ class StaticWarm extends Command
         }
     }
 
+    private function warmPaginatedPages(string $url, int $currentPage, int $totalPages, string $pageName): void
+    {
+        $urls = collect(range($currentPage, $totalPages))->map(function ($page) use ($url, $pageName) {
+            return "{$url}?{$pageName}={$page}";
+        });
+
+        $requests = $urls->map(fn (string $url) => new Request('GET', $url))->all();
+
+        $pool = new Pool($this->client(), $requests, [
+            'concurrency' => $this->concurrency(),
+            'fulfilled' => function (Response $response, $index) use ($urls) {
+                $this->checkLine($this->getRelativeUri($urls->get($index)));
+            },
+            'rejected' => [$this, 'outputFailureLine'],
+        ]);
+
+        $promise = $pool->promise();
+
+        $promise->wait();
+    }
+
+    private function client(): Client
+    {
+        return new Client([
+            'verify' => $this->shouldVerifySsl(),
+            'auth' => $this->option('user') && $this->option('password')
+                ? [$this->option('user'), $this->option('password')]
+                : null,
+        ]);
+    }
+
     private function concurrency(): int
     {
         $strategy = config('statamic.static_caching.strategy');
@@ -127,16 +141,18 @@ class StaticWarm extends Command
 
     public function outputSuccessLine(Response $response, $index): void
     {
-        $this->checkLine($this->getRelativeUri($index));
+        $this->checkLine($this->getRelativeUri($this->uris()->get($index)));
 
-        if ($response->hasHeader('Statamic-Pagination-Next')) {
-            $this->additionalUris[] = Arr::first($response->getHeader('Statamic-Pagination-Next'));
+        if ($response->hasHeader('X-Statamic-Pagination')) {
+            [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
+
+            $this->warmPaginatedPages($this->uris()->get($index), $currentPage, $totalPages, $pageName);
         }
     }
 
     public function outputFailureLine($exception, $index): void
     {
-        $uri = $this->getRelativeUri($index);
+        $uri = $this->getRelativeUri($this->uris()->get($index));
 
         if ($exception instanceof RequestException && $exception->hasResponse()) {
             $response = $exception->getResponse();
@@ -153,9 +169,9 @@ class StaticWarm extends Command
         $this->crossLine("$uri → <fg=cyan>$message</fg=cyan>");
     }
 
-    private function getRelativeUri(int $index): string
+    private function getRelativeUri(string $uri): string
     {
-        return Str::start(Str::after($this->uris()->get($index), config('app.url')), '/');
+        return Str::start(Str::after($uri, config('app.url')), '/');
     }
 
     private function requests()

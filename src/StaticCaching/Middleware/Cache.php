@@ -69,7 +69,11 @@ class Cache
 
             if ($paginator = Blink::get('tag-paginator')) {
                 if ($paginator->hasMorePages()) {
-                    $response->headers->set('Statamic-Pagination-Next', $paginator->nextPageUrl());
+                    $response->headers->set('X-Statamic-Pagination', [
+                        'current' => $paginator->currentPage(),
+                        'total' => $paginator->lastPage(),
+                        'name' => $paginator->getPageName(),
+                    ]);
                 }
             }
         } elseif (! $response->isRedirect()) {

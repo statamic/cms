@@ -27,8 +27,16 @@ class StaticWarmJob implements ShouldQueue
     {
         $response = $client->send($this->request);
 
-        if ($response->hasHeader('Statamic-Pagination-Next')) {
-            StaticWarmJob::dispatch(new Request('GET', Arr::first($response->getHeader('Statamic-Pagination-Next'))));
+        if ($response->hasHeader('X-Statamic-Pagination')) {
+            [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
+
+            collect(range($currentPage, $totalPages))
+                ->map(function (int $page) use ($pageName) {
+                    return "{$this->request->getUri()}?{$pageName}={$page}";
+                })
+                ->each(function (string $uri) {
+                    StaticWarmJob::dispatch(new Request('GET', $uri));
+                });
         }
     }
 }
