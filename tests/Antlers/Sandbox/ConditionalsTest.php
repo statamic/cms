@@ -56,6 +56,15 @@ EOT;
         $this->assertSame('yesno', $this->renderString($template, [], true));
     }
 
+    public function test_value_adjustments_inside_of_conditionals()
+    {
+        $template = <<<'EOT'
+{{ if 'bob' == 'bo{c}' }}yes{{ else }}no{{ /if }}
+EOT;
+        $this->assertSame('yes', $this->renderString($template, ['c' => 'b'], false));
+    }
+
+
     public function test_sandbox_evaluates_simple_boolean_expressions()
     {
         $result = $this->getBoolResult('true == false', []);
