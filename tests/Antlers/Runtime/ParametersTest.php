@@ -334,4 +334,27 @@ EOT;
 
         $this->assertSame('123:456', $result);
     }
+
+    public function test_shorthand_parameter_variable_syntax()
+    {
+        $data = [
+            'name' => 'Bacon',
+        ];
+
+        (new class extends Tags
+        {
+            protected static $handle = 'test';
+
+            public function index()
+            {
+                return 'From the tag! '.$this->params->get('name');
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ test :$name }}
+EOT;
+
+        $this->assertSame('From the tag! Bacon', $this->renderString($template, $data, true));
+    }
 }
