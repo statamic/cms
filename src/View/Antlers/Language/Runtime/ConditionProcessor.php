@@ -83,10 +83,6 @@ class ConditionProcessor
                      * @var AbstractNode[] $interpolationRegion
                      */
                     foreach ($branch->head->processedInterpolationRegions as $varKey => $interpolationRegion) {
-                        if ($interpolationRegion[0]->isTagNode) {
-                            continue;
-                        }
-
                         $interpolationResult = $this->processor->cloneProcessor()->setData($data)->render($interpolationRegion);
 
                         $dataToUse[$varKey] = $interpolationResult;
@@ -108,7 +104,6 @@ class ConditionProcessor
                 }
 
                 if ($result == true) {
-
                     $this->processor->setIsConditionProcessor($condValueToRestore);
 
                     return $branch;
