@@ -19,7 +19,6 @@ use Statamic\Facades;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\Taxonomy;
