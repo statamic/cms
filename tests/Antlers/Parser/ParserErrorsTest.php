@@ -212,6 +212,6 @@ EOT;
 
     public function test_incomplete_shorthand_parameters_throws_error_two()
     {
-        $this->assertThrowsParserError('{{ tag_name :$ }}');
+        $this->assertThrowsParserError('{{ tag_name :$}}');
     }
 }
