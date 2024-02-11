@@ -4,6 +4,7 @@ namespace Tests\Stache\Repositories;
 
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\EntryCollection;
+use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Stache\Repositories\EntryRepository;
@@ -226,5 +227,26 @@ class EntryRepositoryTest extends TestCase
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($item = $this->repo->find('test-blog-entry'));
         $this->assertFileDoesNotExist($path);
+    }
+
+    /** @test */
+    public function it_throws_an_error_when_find_or_fail_fails()
+    {
+        $this->expectException(EntryNotFoundException::class);
+
+        $invalidStringId = '00000000-0000-0000-0000-000000000000';
+        $invalidIntId = 123;
+
+        $this->repo->findOrFail($invalidStringId);
+        $this->repo->findOrFail($invalidIntId);
+    }
+
+    /** @test */
+    public function it_finds_an_entry_when_find_or_fail_is_queried()
+    {
+        $entry = $this->repo->findOrFail('alphabetical-bravo');
+
+        $this->assertInstanceOf(Entry::class, $entry);
+        $this->assertEquals('Bravo', $entry->get('title'));
     }
 }
