@@ -29,7 +29,7 @@ class ResolveRedirect
         }
 
         if ($item instanceof \Statamic\Fields\Values) {
-            $item = $item->url;
+            return $item->all();
         }
 
         if ($item instanceof \Statamic\Fields\Value) {
