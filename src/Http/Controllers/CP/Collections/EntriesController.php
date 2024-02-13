@@ -259,13 +259,13 @@ class EntriesController extends CpController
 
         [$values] = $this->extractFromFields($entry, $blueprint);
 
-        return (new EntryResource($entry->fresh()))
-            ->additional([
-                'saved' => $saved,
-                'data' => [
-                    'values' => $values,
-                ],
-            ]);
+        return [
+            'data' => [
+                ...(new EntryResource($entry->fresh()))->resolve()['data'],
+                'values' => $values,
+            ],
+            'saved' => $saved,
+        ];
     }
 
     public function create(Request $request, $collection, $site)
