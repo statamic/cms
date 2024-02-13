@@ -6,6 +6,8 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\Site;
+use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Structures\Page;
 use Statamic\Support\Str;
 
@@ -45,6 +47,14 @@ class ResolveRedirect
 
         if (is_array($redirect)) {
             $redirect = $redirect['url'];
+        }
+
+        if ($redirect instanceof Value) {
+            $redirect = $redirect->value();
+        }
+
+        if ($redirect instanceof ArrayableLink) {
+            $redirect = $redirect->value();
         }
 
         if (Str::startsWith($redirect, 'entry::')) {
