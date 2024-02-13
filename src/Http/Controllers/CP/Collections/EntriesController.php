@@ -260,10 +260,9 @@ class EntriesController extends CpController
         [$values] = $this->extractFromFields($entry, $blueprint);
 
         return [
-            'data' => [
-                ...(new EntryResource($entry->fresh()))->resolve()['data'],
+            'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
-            ],
+            ]),
             'saved' => $saved,
         ];
     }
