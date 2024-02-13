@@ -46,4 +46,9 @@ class NullCacher implements Cacher
     {
         return collect();
     }
+
+    public function getBaseUrl()
+    {
+        //
+    }
 }

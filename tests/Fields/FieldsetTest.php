@@ -4,16 +4,40 @@ namespace Tests\Fields;
 
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\FieldsetCreated;
+use Statamic\Events\FieldsetCreating;
+use Statamic\Events\FieldsetDeleted;
+use Statamic\Events\FieldsetDeleting;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class FieldsetTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
+    private $fieldsets;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->fieldsets = FieldsetRepository::getFacadeRoot();
+    }
+
+    public function tearDown(): void
+    {
+        $this->fieldsets->all()->each->delete();
+
+        parent::tearDown();
+    }
+
     /** @test */
     public function it_gets_the_handle()
     {
@@ -145,6 +169,258 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
+    public function gets_blueprints_importing_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                ['import' => 'seo'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_blueprints_importing_fieldset_inside_grid()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                [
+                                    'handle' => 'grid',
+                                    'field' => [
+                                        'type' => 'grid',
+                                        'fields' => [
+                                            ['import' => 'seo'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_blueprints_importing_fieldset_inside_replicator()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                [
+                                    'handle' => 'replicator',
+                                    'field' => [
+                                        'type' => 'replicator',
+                                        'sets' => [
+                                            'set_group' => [
+                                                'sets' => [
+                                                    'set' => [
+                                                        'fields' => [
+                                                            ['import' => 'seo'],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_blueprints_importing_single_field_from_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                ['handle' => 'meta_title', 'field' => 'seo.meta_title'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_fieldsets_importing_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'fields' => [
+                    ['import' => 'seo'],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_fieldsets_importing_fieldset_inside_grid()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'fields' => [
+                    [
+                        'handle' => 'grid',
+                        'field' => [
+                            'type' => 'grid',
+                            'fields' => [
+                                ['import' => 'seo'],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_fieldsets_importing_fieldset_inside_replicator()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'fields' => [
+                    [
+                        'handle' => 'replicator',
+                        'field' => [
+                            'type' => 'replicator',
+                            'sets' => [
+                                'set_group' => [
+                                    'sets' => [
+                                        'set' => [
+                                            'fields' => [
+                                                ['import' => 'seo'],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_fieldsets_importing_single_field_from_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']],
+        ]])->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'fields' => [
+                    ['handle' => 'meta_title', 'field' => 'seo.meta_title'],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+    }
+
+    /** @test */
     public function it_saves_through_the_repository()
     {
         Event::fake();
@@ -157,6 +433,10 @@ class FieldsetTest extends TestCase
         $return = $fieldset->save();
 
         $this->assertEquals($fieldset, $return);
+
+        Event::assertDispatched(FieldsetCreating::class, function ($event) use ($fieldset) {
+            return $event->fieldset === $fieldset;
+        });
 
         Event::assertDispatched(FieldsetSaving::class, function ($event) use ($fieldset) {
             return $event->fieldset === $fieldset;
@@ -203,8 +483,26 @@ class FieldsetTest extends TestCase
 
         $this->assertEquals($fieldset, $return);
 
+        Event::assertNotDispatched(FieldsetCreating::class);
         Event::assertNotDispatched(FieldsetSaving::class);
         Event::assertNotDispatched(FieldsetSaved::class);
+        Event::assertNotDispatched(FieldsetCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_fieldset_doesnt_save()
+    {
+        Event::fake([FieldsetCreated::class]);
+
+        Event::listen(FieldsetCreating::class, function () {
+            return false;
+        });
+
+        $fieldset = (new Fieldset)->setHandle('seo');
+
+        $return = $fieldset->save();
+
+        $this->assertFalse($return);
         Event::assertNotDispatched(FieldsetCreated::class);
     }
 
@@ -227,5 +525,37 @@ class FieldsetTest extends TestCase
         $this->assertEquals($fieldset, $return);
 
         Event::assertNotDispatched(FieldsetSaved::class);
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $fieldset = (new Fieldset)->setHandle('test');
+
+        $fieldset->delete();
+
+        Event::assertDispatched(FieldsetDeleting::class, function ($event) use ($fieldset) {
+            return $event->fieldset === $fieldset;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        FieldsetRepository::spy();
+        Event::fake([FieldsetDeleted::class]);
+
+        Event::listen(FieldsetDeleting::class, function () {
+            return false;
+        });
+
+        $fieldset = (new Fieldset)->setHandle('test');
+        $return = $fieldset->delete();
+
+        $this->assertFalse($return);
+        FieldsetRepository::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(FieldsetDeleted::class);
     }
 }

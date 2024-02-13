@@ -34,6 +34,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.values.map(value => {
                 const option = _.findWhere(this.options, { value });
                 return option ? option.label : value;

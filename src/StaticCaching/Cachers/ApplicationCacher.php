@@ -4,10 +4,10 @@ namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
+use Statamic\Events\UrlInvalidated;
 
 class ApplicationCacher extends AbstractCacher
 {
@@ -140,5 +140,7 @@ class ApplicationCacher extends AbstractCacher
                 $this->cache->forget($this->normalizeKey('headers:'.$key));
                 $this->forgetUrl($key);
             });
+
+        UrlInvalidated::dispatch($url, $domain);
     }
 }

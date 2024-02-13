@@ -106,10 +106,13 @@ EOT;
     /** @test */
     public function it_only_adds_appropriate_fields_of_context_to_session()
     {
-        // We will not add `baz` to the session because it is not used in the template.
-        // We will not add `nope` to the session because it is not in the context.
-        $expectedFields = ['foo', 'bar'];
-        $template = '{{ nocache }}{{ foo }}{{ bar }}{{ nope }}{{ /nocache }}';
+        $expectedFields = [
+            'foo', // By adding @auto it will be picked up from the template.
+            'baz', // Explicitly selected
+            // 'bar' // Not explicitly selected
+            // 'nope' // Not in the context
+        ];
+        $template = '{{ nocache select="@auto|baz" }}{{ foo }}{{ nope }}{{ /nocache }}';
         $context = [
             'foo' => 'alfa',
             'bar' => 'bravo',

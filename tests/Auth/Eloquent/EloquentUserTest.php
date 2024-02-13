@@ -2,12 +2,16 @@
 
 namespace Tests\Auth\Eloquent;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
+use Statamic\Auth\File\UserGroup;
 use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades;
 use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
@@ -18,6 +22,8 @@ class EloquentUserTest extends TestCase
 {
     use HasPreferencesTests, PermissibleContractTests, UserContractTests, WithFaker;
 
+    public static $migrationsGenerated = false;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -26,9 +32,42 @@ class EloquentUserTest extends TestCase
 
         config(['statamic.users.repository' => 'eloquent']);
 
-        // TODO: The migration has been added into the test, but the implementation could be broken if the real
-        // migration is different from what's in here. We should find a way to reference the actual migrations.
-        $this->loadMigrationsFrom(__DIR__.'/__migrations__');
+        $this->loadMigrationsFrom(static::migrationsDir());
+
+        $tmpDir = static::migrationsDir().'/tmp';
+
+        if (! self::$migrationsGenerated) {
+            $this->artisan('statamic:auth:migration', ['--path' => $tmpDir]);
+
+            self::$migrationsGenerated = true;
+        }
+
+        $this->loadMigrationsFrom($tmpDir);
+
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to these tests.
+        Event::fake();
+    }
+
+    private static function migrationsDir()
+    {
+        return __DIR__.'/__migrations__';
+    }
+
+    public function tearDown(): void
+    {
+        // Prevent error about null password during the down migration.
+        User::all()->each->delete();
+
+        parent::tearDown();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        // Clean up the orphaned migration file.
+        (new Filesystem)->deleteDirectory(static::migrationsDir().'/tmp');
+
+        parent::tearDownAfterClass();
     }
 
     /** @test */
@@ -36,28 +75,28 @@ class EloquentUserTest extends TestCase
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
         };
         $roleC = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'c';
             }
         };
         $roleD = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'd';
             }
@@ -87,6 +126,114 @@ class EloquentUserTest extends TestCase
             'c' => 'c',
             'd' => 'd',
         ], $user->roles()->map->handle()->all());
+
+        $this->assertSame(Facades\User::query()->whereRole('a')->get()->first()->id(), $user->id());
+
+        $userTwo = $this->createPermissible();
+        $userThree = $this->createPermissible();
+        $userFour = $this->createPermissible();
+
+        \DB::table(config('statamic.users.tables.role_user', 'role_user'))->insert([
+            ['user_id' => $userTwo->id(), 'role_id' => 'a'],
+            ['user_id' => $userThree->id(), 'role_id' => 'b'],
+            ['user_id' => $userFour->id(), 'role_id' => 'c'],
+        ]);
+
+        $this->assertCount(2, Facades\User::query()->whereRole('a')->get());
+        $this->assertCount(2, Facades\User::query()->whereRole('b')->get());
+        $this->assertCount(2, Facades\User::query()->whereRole('c')->get());
+        $this->assertCount(1, Facades\User::query()->whereRole('d')->get());
+
+        $this->assertSame([$user->email(), $userTwo->email()], Facades\User::query()->whereRole('a')->get()->map->email()->all());
+        $this->assertSame([$user->email(), $userThree->email()], Facades\User::query()->whereRole('b')->get()->map->email()->all());
+        $this->assertSame([$user->email()], Facades\User::query()->whereRole('b')->whereRole('c')->get()->map->email()->all());
+        $this->assertSame([$user->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereRole('b')->orWhereRole('c')->get()->map->email()->all());
+
+        $this->assertSame([$user->email(), $userTwo->email(), $userThree->email()], Facades\User::query()->whereRoleIn(['a', 'b'])->get()->map->email()->all());
+        $this->assertSame([$user->email(), $userTwo->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereRoleIn(['a', 'b'])->orWhereRoleIn(['c'])->get()->map->email()->all());
+    }
+
+    /** @test */
+    public function it_gets_groups_already_in_the_db_without_explicitly_assigning_them()
+    {
+        $roleA = new class extends UserGroup
+        {
+            public function handle(?string $handle = null)
+            {
+                return 'a';
+            }
+        };
+        $roleB = new class extends UserGroup
+        {
+            public function handle(?string $handle = null)
+            {
+                return 'b';
+            }
+        };
+        $roleC = new class extends UserGroup
+        {
+            public function handle(?string $handle = null)
+            {
+                return 'c';
+            }
+        };
+        $roleD = new class extends UserGroup
+        {
+            public function handle(?string $handle = null)
+            {
+                return 'd';
+            }
+        };
+
+        Facades\UserGroup::shouldReceive('find')->with('a')->andReturn($roleA);
+        Facades\UserGroup::shouldReceive('find')->with('b')->andReturn($roleB);
+        Facades\UserGroup::shouldReceive('find')->with('c')->andReturn($roleC);
+        Facades\UserGroup::shouldReceive('find')->with('d')->andReturn($roleD);
+        Facades\UserGroup::shouldReceive('find')->with('unknown')->andReturnNull();
+
+        $user = $this->createPermissible();
+
+        \DB::table(config('statamic.users.tables.group_user', 'group_user'))->insert([
+            ['user_id' => $user->id(), 'group_id' => 'a'],
+            ['user_id' => $user->id(), 'group_id' => 'b'],
+            ['user_id' => $user->id(), 'group_id' => 'c'],
+            ['user_id' => $user->id(), 'group_id' => 'd'],
+        ]);
+
+        $this->assertInstanceOf(Collection::class, $user->groups());
+        $this->assertCount(4, $user->groups());
+        $this->assertEveryItemIsInstanceOf(UserGroupContract::class, $user->groups());
+        $this->assertEquals([
+            'a' => 'a',
+            'b' => 'b',
+            'c' => 'c',
+            'd' => 'd',
+        ], $user->groups()->map->handle()->all());
+
+        $this->assertSame(Facades\User::query()->whereGroup('a')->get()->first()->id(), $user->id());
+
+        $userTwo = $this->createPermissible();
+        $userThree = $this->createPermissible();
+        $userFour = $this->createPermissible();
+
+        \DB::table(config('statamic.users.tables.group_user', 'group_user'))->insert([
+            ['user_id' => $userTwo->id(), 'group_id' => 'a'],
+            ['user_id' => $userThree->id(), 'group_id' => 'b'],
+            ['user_id' => $userFour->id(), 'group_id' => 'c'],
+        ]);
+
+        $this->assertCount(2, Facades\User::query()->whereGroup('a')->get());
+        $this->assertCount(2, Facades\User::query()->whereGroup('b')->get());
+        $this->assertCount(2, Facades\User::query()->whereGroup('c')->get());
+        $this->assertCount(1, Facades\User::query()->whereGroup('d')->get());
+
+        $this->assertSame([$user->email(), $userTwo->email()], Facades\User::query()->whereGroup('a')->get()->map->email()->all());
+        $this->assertSame([$user->email(), $userThree->email()], Facades\User::query()->whereGroup('b')->get()->map->email()->all());
+        $this->assertSame([$user->email()], Facades\User::query()->whereGroup('b')->whereGroup('c')->get()->map->email()->all());
+        $this->assertSame([$user->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereGroup('b')->orWhereGroup('c')->get()->map->email()->all());
+
+        $this->assertSame([$user->email(), $userTwo->email(), $userThree->email()], Facades\User::query()->whereGroupIn(['a', 'b'])->get()->map->email()->all());
+        $this->assertSame([$user->email(), $userTwo->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereGroupIn(['a', 'b'])->orWhereGroupIn(['c'])->get()->map->email()->all());
     }
 
     public function makeUser()

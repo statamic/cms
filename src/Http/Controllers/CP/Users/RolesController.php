@@ -24,7 +24,7 @@ class RolesController extends CpController
         $roles = Role::all()->map(function ($role) {
             return [
                 'id' => $role->handle(),
-                'title' => $role->title(),
+                'title' => __($role->title()),
                 'handle' => $role->handle(),
                 'permissions' => $role->isSuper() ? __('Super User') : $role->permissions()->count(),
                 'edit_url' => $role->editUrl(),

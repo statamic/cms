@@ -19,28 +19,28 @@ trait PermissibleContractTests
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
         };
         $roleC = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'c';
             }
         };
         $roleD = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'd';
             }
@@ -80,28 +80,28 @@ trait PermissibleContractTests
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
         };
         $roleC = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'c';
             }
         };
         $roleD = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'd';
             }
@@ -126,14 +126,14 @@ trait PermissibleContractTests
     {
         $roleA = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'a';
             }
         };
         $roleB = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'b';
             }
@@ -174,6 +174,7 @@ trait PermissibleContractTests
         $userGroup = (new UserGroup)->handle('usergroup')->assignRole($userGroupRole);
 
         RoleAPI::shouldReceive('find')->with('direct')->andReturn($directRole);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$directRole])); // the stache calls this when getting a user. unrelated to test.
         UserGroupAPI::shouldReceive('find')->with('usergroup')->andReturn($userGroup);
         RoleAPI::shouldReceive('all')->andReturn(collect([$directRole]));     // the stache calls this when getting a user. unrelated to test.
         UserGroupAPI::shouldReceive('all')->andReturn(collect([$userGroup])); // the stache calls this when getting a user. unrelated to test.
@@ -229,7 +230,7 @@ trait PermissibleContractTests
     {
         $superRole = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'superrole';
             }
@@ -241,7 +242,7 @@ trait PermissibleContractTests
         };
         $nonSuperRole = new class extends Role
         {
-            public function handle(string $handle = null)
+            public function handle(?string $handle = null)
             {
                 return 'nonsuperrole';
             }
@@ -257,6 +258,7 @@ trait PermissibleContractTests
 
         RoleAPI::shouldReceive('find')->with('superrole')->andReturn($superRole);
         RoleAPI::shouldReceive('find')->with('nonsuperrole')->andReturn($nonSuperRole);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$superRole, $nonSuperRole])); // the stache calls this when getting a user. unrelated to test.
         UserGroupAPI::shouldReceive('find')->with('supergroup')->andReturn($superGroup);
         UserGroupAPI::shouldReceive('find')->with('nonsupergroup')->andReturn($nonSuperGroup);
         RoleAPI::shouldReceive('all')->andReturn(collect([$superRole, $nonSuperRole]));        // the stache calls this when getting a user. unrelated to test.

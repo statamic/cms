@@ -19,6 +19,7 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Events\AssetContainerCreated;
+use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
@@ -286,6 +287,10 @@ class AssetContainerTest extends TestCase
 
         $this->assertEquals($container, $return);
 
+        Event::assertDispatched(AssetContainerCreating::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
+
         Event::assertDispatched(AssetContainerSaving::class, function ($event) use ($container) {
             return $event->container === $container;
         });
@@ -330,8 +335,28 @@ class AssetContainerTest extends TestCase
 
         $this->assertEquals($container, $return);
 
+        Event::assertNotDispatched(AssetContainerCreating::class);
         Event::assertNotDispatched(AssetContainerSaving::class);
         Event::assertNotDispatched(AssetContainerSaved::class);
+        Event::assertNotDispatched(AssetContainerCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_asset_container_doesnt_save()
+    {
+        Event::fake([AssetContainerCreated::class]);
+        Facades\AssetContainer::spy();
+
+        Event::listen(AssetContainerCreating::class, function () {
+            return false;
+        });
+
+        $container = new AssetContainer;
+
+        $return = $container->save();
+
+        $this->assertFalse($return);
+
         Event::assertNotDispatched(AssetContainerCreated::class);
     }
 

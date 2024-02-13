@@ -19,7 +19,9 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetDeleting;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
@@ -27,6 +29,7 @@ use Statamic\Events\AssetUploaded;
 use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -222,6 +225,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return $this->metaValue($key);
         }
 
+        if (! $this->exists()) {
+            return $this->generateMeta();
+        }
+
         if (! config('statamic.assets.cache_meta')) {
             return $this->generateMeta();
         }
@@ -287,7 +294,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     {
         $path = dirname($this->path()).'/.meta/'.$this->basename().'.yaml';
 
-        return ltrim($path, '/');
+        return (string) Str::of($path)->replaceFirst('./', '')->ltrim('/');
     }
 
     protected function metaExists()
@@ -616,6 +623,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function delete()
     {
+        if (AssetDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->disk()->delete($this->path());
         $this->disk()->delete($this->metaPath());
 
@@ -884,7 +895,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function download(string $name = null, array $headers = [])
+    public function download(?string $name = null, array $headers = [])
     {
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
     }
@@ -917,7 +928,19 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function blueprint()
     {
-        return $this->container()->blueprint();
+        $key = "asset-{$this->id()}-blueprint";
+
+        if (Blink::has($key)) {
+            return Blink::get($key);
+        }
+
+        $blueprint = $this->container()->blueprint($this);
+
+        Blink::put($key, $blueprint);
+
+        AssetContainerBlueprintFound::dispatch($blueprint, $this->container(), $this);
+
+        return $blueprint;
     }
 
     /**

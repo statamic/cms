@@ -61,7 +61,7 @@
                             <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
                                 <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
                                 <td>
-                                    <input type="text" class="input-text font-bold" v-model="element.key" :readonly="isReadOnly" @blur="keyUpdated(element)" />
+                                    <input type="text" class="input-text font-bold" v-model="element.key" :readonly="isReadOnly" />
                                 </td>
                                 <td>
                                     <input type="text" class="input-text" v-model="element.value" :readonly="isReadOnly" />
@@ -170,6 +170,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return _.reduce(this.value, (carry, value, key) => {
                 let str = `${key}: ${value}`;
                 if (carry) str = carry + ', ' + str;
@@ -210,21 +212,7 @@ export default {
 
         setKey(key) {
             this.selectedKey = key
-        },
-
-        keyUpdated(element) {
-            if (element.key === null || element.value !== null) {
-                return null;
-            }
-
-            let value = element.key.charAt(0).toUpperCase() + element.key.slice(1);
-
-            this.data.find((item, index) => {
-                if (item._id === element._id) {
-                    this.data[index].value = value;
-                }
-            })
-        },
+        }
     }
 
 }

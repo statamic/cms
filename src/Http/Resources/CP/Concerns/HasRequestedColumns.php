@@ -36,6 +36,8 @@ trait HasRequestedColumns
             return [];
         }
 
-        return explode(',', $columns);
+        return is_array($columns)
+            ? $columns
+            : explode(',', $columns);
     }
 }
