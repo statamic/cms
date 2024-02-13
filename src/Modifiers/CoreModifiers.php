@@ -2909,8 +2909,17 @@ class CoreModifiers extends Modifier
             }
         }
 
+        if (Str::contains($url, 'youtube.com/shorts/')) {
+            $url = str_replace('shorts/', 'embed/', $url);
+        }
+
         if (Str::contains($url, 'youtube.com')) {
             $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
+        }
+
+        // This avoids SSL issues when using the non-www version
+        if (Str::contains($url, '//youtube-nocookie.com')) {
+            $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
         }
 
         return $url;
