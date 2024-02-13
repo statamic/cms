@@ -2438,4 +2438,19 @@ class EntryTest extends TestCase
             ['7', '7'],
         ], $events->map(fn ($event) => [$event->entry->id(), $event->initiator->id()])->all());
     }
+
+    /** @test */
+    public function entry_is_json_serializable()
+    {
+        $entry = EntryFactory::collection('test')->create();
+        $entry->set('title', 'Serializable Title');
+
+        // Json serialize and deserialize
+        $json = json_encode($entry);
+        $array = json_decode($json, true);
+
+        $this->assertJson($json);
+        $this->assertArrayHasKey('title', $array);
+        $this->assertTrue(data_get($array, 'collection.handle') === 'test');
+    }
 }

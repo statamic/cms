@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\Localizable;
+use JsonSerializable;
 use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
@@ -52,7 +53,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
+class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, JsonSerializable, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
     use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
@@ -998,5 +999,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected function getComputedCallbacks()
     {
         return Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
     }
 }
