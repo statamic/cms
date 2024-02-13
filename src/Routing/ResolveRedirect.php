@@ -57,16 +57,18 @@ class ResolveRedirect
             $redirect = $redirect->url();
         }
 
-        if (Str::startsWith($redirect, 'entry::')) {
-            $id = Str::after($redirect, 'entry::');
+        if (is_string($redirect)) {
+            if (Str::startsWith($redirect, 'entry::')) {
+                $id = Str::after($redirect, 'entry::');
 
-            return $this->findEntry($id, $parent, $localize);
-        }
+                return $this->findEntry($id, $parent, $localize);
+            }
 
-        if (Str::startsWith($redirect, 'asset::')) {
-            $id = Str::after($redirect, 'asset::');
+            if (Str::startsWith($redirect, 'asset::')) {
+                $id = Str::after($redirect, 'asset::');
 
-            return Facades\Asset::find($id);
+                return Facades\Asset::find($id);
+            }
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;
