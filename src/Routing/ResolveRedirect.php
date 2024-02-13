@@ -54,7 +54,7 @@ class ResolveRedirect
         }
 
         if ($redirect instanceof ArrayableLink) {
-            $redirect = $redirect->value();
+            $redirect = $redirect->url();
         }
 
         if (Str::startsWith($redirect, 'entry::')) {
