@@ -925,6 +925,24 @@ class FrontendTest extends TestCase
             ],
         ]))->save();
 
+        Blueprint::shouldReceive('find')
+            ->with('collections/pages/page')
+            ->andReturn($entry->blueprint()->setContents([
+                'fields' => [
+                    ['handle' => 'title', 'field' => ['type' => 'text']],
+                    [
+                        'handle' => 'redirect',
+                        'field' => [
+                            'type' => 'group', 'required' => true, 'width' => '100',
+                            'fields' => [
+                                ['handle' => 'url', 'field' => ['type' => 'link']],
+                                ['handle' => 'status', 'field' => ['type' => 'radio', 'options' => [301 => __('301 (Permanent)'), 302 => __('302 (Temporary)')]]],
+                            ],
+                        ],
+                    ],
+                ],
+            ]));
+
         $response = $this->get('/about');
 
         $response->assertRedirect('/test');
