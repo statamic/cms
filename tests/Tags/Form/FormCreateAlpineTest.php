@@ -97,6 +97,7 @@ class FormCreateAlpineTest extends FormTestCase
             'fav_animals' => [],
             'fav_colour' => null,
             'fav_subject' => null,
+            'winnie' => null,
         ]);
 
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
@@ -122,6 +123,7 @@ class FormCreateAlpineTest extends FormTestCase
             'fav_animals' => [],
             'fav_colour' => null,
             'fav_subject' => null,
+            'winnie' => null,
         ]);
 
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
@@ -142,6 +144,7 @@ class FormCreateAlpineTest extends FormTestCase
                 'fav_animals' => [],
                 'fav_colour' => null,
                 'fav_subject' => null,
+                'winnie' => null,
             ],
         ]);
 
@@ -170,6 +173,7 @@ class FormCreateAlpineTest extends FormTestCase
                 'fav_animals' => ['cat'],
                 'fav_colour' => null,
                 'fav_subject' => null,
+                'winnie' => null,
             ],
         ]);
 
@@ -194,7 +198,7 @@ class FormCreateAlpineTest extends FormTestCase
             ],
         ];
 
-        $expected = 'x-data="'.$this->jsonEncode(['favourite_animals' => []]).'"';
+        $expected = 'x-data="'.$this->jsonEncode(['favourite_animals' => [], 'winnie' => null]).'"';
 
         $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
     }
@@ -211,7 +215,7 @@ class FormCreateAlpineTest extends FormTestCase
             ],
         ];
 
-        $expected = 'x-data="'.$this->jsonEncode(['selfies' => []]).'"';
+        $expected = 'x-data="'.$this->jsonEncode(['selfies' => [], 'winnie' => null]).'"';
 
         $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
     }

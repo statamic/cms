@@ -22,9 +22,7 @@ class FileUploader extends Uploader
 
     protected function uploadPath(UploadedFile $file)
     {
-        $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-
-        return now()->timestamp.'/'.$filename.'.'.$file->guessExtension();
+        return now()->timestamp.'/'.$file->getClientOriginalName();
     }
 
     protected function uploadPathPrefix()

@@ -17,7 +17,7 @@ class UserRoles extends Relationship
     {
         if ($role = Role::find($id)) {
             return [
-                'title' => $role->title(),
+                'title' => __($role->title()),
                 'id' => $role->handle(),
             ];
         }
@@ -42,7 +42,7 @@ class UserRoles extends Relationship
         return Role::all()->sortBy('title')->map(function ($role) {
             return [
                 'id' => $role->handle(),
-                'title' => $role->title(),
+                'title' => __($role->title()),
             ];
         })->values();
     }

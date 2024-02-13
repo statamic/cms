@@ -40,7 +40,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v42
         with:
           files: |
             config
@@ -58,7 +58,9 @@ jobs:
       - name: Determine whether tests should run
         id: should-run-tests
         if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
-        run: echo "result=true" >> $GITHUB_OUTPUT
+        run: |
+          echo "result=true" >> $GITHUB_OUTPUT
+          echo "result=true" >> $env:GITHUB_OUTPUT
 
       - name: Update apt sources
         if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
@@ -108,16 +110,19 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v42
         with:
           files: |
             **.{js,vue,ts}
             package.json
+            .github/workflows/tests.yml
 
       - name: Determine whether tests should run
         id: should-run-tests
         if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
-        run: echo "result=true" >> $GITHUB_OUTPUT
+        run: |
+          echo "result=true" >> $GITHUB_OUTPUT
+          echo "result=true" >> $env:GITHUB_OUTPUT
 
       - name: Install required npm version
         if: steps.should-run-tests.outputs.result == 'true'

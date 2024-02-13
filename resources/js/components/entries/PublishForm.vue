@@ -6,8 +6,8 @@
         <div class="flex items-center mb-6">
             <h1 class="flex-1">
                 <div class="flex items-center">
-                    <span v-if="! isCreating" class="little-dot mr-2" :class="activeLocalization.status" v-tooltip="activeLocalization.status" />
-                    <span v-html="$options.filters.striptags(title)" />
+                    <span v-if="! isCreating" class="little-dot mr-2" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                    <span v-html="$options.filters.striptags(__(title))" />
                 </div>
             </h1>
 
@@ -176,7 +176,7 @@
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
                                             }" />
-                                            {{ option.name }}
+                                            {{ __(option.name) }}
                                             <loading-graphic
                                                 :size="14"
                                                 text=""

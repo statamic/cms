@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
@@ -16,6 +17,7 @@ use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Search\Result;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 class UsersController extends CpController
 {
@@ -130,7 +132,7 @@ class UsersController extends CpController
         $viewData = [
             'values' => (object) $fields->values()->only($additional)->all(),
             'meta' => (object) $fields->meta()->only($additional)->all(),
-            'fields' => collect($fields->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
+            'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
@@ -184,7 +186,13 @@ class UsersController extends CpController
         if ($request->invitation['send']) {
             ActivateAccount::subject($request->invitation['subject']);
             ActivateAccount::body($request->invitation['message']);
-            $user->generateTokenAndSendActivateAccountNotification();
+
+            try {
+                $user->generateTokenAndSendActivateAccountNotification();
+            } catch (TransportException $e) {
+                Toast::error(__('statamic::messages.user_activation_email_not_sent_error'));
+            }
+
             $url = null;
         } else {
             $url = PasswordReset::url($user->generateActivateAccountToken(), PasswordReset::BROKER_ACTIVATIONS);
@@ -213,7 +221,7 @@ class UsersController extends CpController
         }
 
         if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
-            $blueprint->ensureField('super', ['type' => 'toggle']);
+            $blueprint->ensureField('super', ['type' => 'toggle', 'display' => __('permissions.super')]);
         }
 
         $values = $user->data()

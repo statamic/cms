@@ -26,7 +26,7 @@ class AssetUploader extends Uploader
 
     protected function uploadPath(UploadedFile $file)
     {
-        $ext = $this->getNewExtension() ?? $this->getFileExtension($file);
+        $ext = $this->getNewExtension() ?? $file->getClientOriginalExtension();
 
         if (config('statamic.assets.lowercase')) {
             $ext = strtolower($ext);
@@ -69,17 +69,6 @@ class AssetUploader extends Uploader
         }
 
         return $ext;
-    }
-
-    private function getFileExtension(UploadedFile $file)
-    {
-        $extension = $file->getClientOriginalExtension();
-        $guessed = $file->guessExtension();
-
-        // Only use the guessed extension if it's different than the original.
-        // This allows us to maintain the casing of the original extension
-        // if the the "lowercase filenames" config option is disabled.
-        return strtolower($extension) === strtolower($guessed) ? $extension : $guessed;
     }
 
     public static function getSafeFilename($string)

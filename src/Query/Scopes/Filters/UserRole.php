@@ -30,7 +30,7 @@ class UserRole extends Filter
         if ($values['role'] === 'super') {
             $query->where('super', true);
         } else {
-            $query->where('roles/'.$values['role'], true);
+            $query->whereRole($values['role']);
         }
     }
 
