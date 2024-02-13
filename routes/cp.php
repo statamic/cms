@@ -246,8 +246,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('updater', [UpdaterController::class, 'index'])->name('updater');
     Route::get('updater/count', [UpdaterController::class, 'count']);
-    Route::get('updater/{product}', [UpdateProductController::class, 'show'])->name('updater.product');
-    Route::get('updater/{product}/changelog', [UpdateProductController::class, 'changelog']);
+    Route::get('updater/{marketplaceProductSlug}', [UpdateProductController::class, 'show'])->name('updater.product');
+    Route::get('updater/{marketplaceProductSlug}/changelog', [UpdateProductController::class, 'changelog']);
 
     Route::group(['prefix' => 'duplicates'], function () {
         Route::get('/', [DuplicatesController::class, 'index'])->name('duplicates');
@@ -300,8 +300,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
-        Route::resource('addons', AddonsApiController::class);
-        Route::resource('templates', TemplatesController::class);
+        Route::resource('addons', AddonsApiController::class)->only('index');
+        Route::resource('templates', TemplatesController::class)->only('index');
     });
 
     Route::group(['prefix' => 'preferences', 'as' => 'preferences.'], function () {

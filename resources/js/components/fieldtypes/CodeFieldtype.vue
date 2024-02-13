@@ -105,6 +105,8 @@ export default {
             return 'theme-' + this.config.theme;
         },
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.value.code ? truncate(this.value.code, 60) : '';
         },
         readOnlyOption() {
@@ -134,6 +136,8 @@ export default {
     watch: {
         value(value, oldValue) {
             if (value.code == this.codemirror.doc.getValue()) return;
+            if (! value.code) value.code = '';
+
             this.codemirror.doc.setValue(value.code);
         },
         readOnlyOption(val) {

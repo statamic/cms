@@ -133,7 +133,7 @@ abstract class Index
     {
         return vsprintf('stache::indexes::%s::%s', [
             $this->store->key(),
-            str_replace('.', '::', $this->name),
+            str_replace(['.', '/'], ['::', '->'], $this->name),
         ]);
     }
 

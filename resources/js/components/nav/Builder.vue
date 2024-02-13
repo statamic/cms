@@ -6,7 +6,7 @@
             <breadcrumb v-if="indexUrl" :url="indexUrl" :title="__('CP Nav Preferences')" />
 
             <div class="flex items-center">
-                <h1 class="flex-1">{{ title }}</h1>
+                <h1 class="flex-1">{{ __(title) }}</h1>
 
                 <dropdown-list class="mr-2">
                     <dropdown-item :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"></dropdown-item>
@@ -43,7 +43,7 @@
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group">
                             <div class="flex items-start pr-4">
                                 <svg-icon :name="option.icon" class="text-gray shrink-0 mr-2 w-4 group-hover:text-white" />
-                                <span class="whitespace-normal">{{ option.label }}</span>
+                                <span class="whitespace-normal">{{ __(option.label) }}</span>
                             </div>
                         </dropdown-item>
                     </dropdown-list>

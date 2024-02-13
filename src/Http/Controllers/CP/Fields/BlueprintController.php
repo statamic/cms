@@ -22,7 +22,7 @@ class BlueprintController extends CpController
         $additional = Blueprint::getAdditionalNamespaces()
             ->map(function ($path, $key) {
                 return [
-                    'title' => Str::humanize($key),
+                    'title' => str_replace('.', ' ', Str::humanize($key)),
                     'blueprints' => Blueprint::in($key)
                         ->map(function ($blueprint) {
                             return [
