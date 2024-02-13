@@ -8,6 +8,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetCreating;
 use Statamic\Events\GlobalSetDeleted;
+use Statamic\Events\GlobalSetDeleting;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades;
@@ -128,6 +129,10 @@ class GlobalSet implements Contract
 
     public function delete()
     {
+        if (GlobalSetDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->localizations()->each->delete();
 
         Facades\GlobalSet::delete($this);

@@ -11,6 +11,7 @@
                     :restrict-container-navigation="restrictContainerNavigation"
                     :restrict-folder-navigation="restrictFolderNavigation"
                     :max-files="maxFiles"
+                    :query-scopes="queryScopes"
                     :autoselect-uploads="true"
                     :autofocus-search="true"
                     @selections-updated="selectionsUpdated"
@@ -57,6 +58,7 @@ export default {
         folder: String,
         selected: Array,
         maxFiles: Number,
+        queryScopes: Array,
         restrictContainerNavigation: {
             type: Boolean,
             default() {

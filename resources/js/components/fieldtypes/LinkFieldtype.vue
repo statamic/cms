@@ -119,7 +119,9 @@ export default {
             this.update(url);
         },
 
-        meta(meta) {
+        meta(meta, oldMeta) {
+            if (JSON.stringify(meta) === JSON.stringify(oldMeta)) return;
+
             this.metaChanging = true;
             this.urlValue = meta.initialUrl;
             this.option = meta.initialOption;

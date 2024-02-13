@@ -74,7 +74,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         ];
 
         foreach ($configs as $config) {
-            $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
+            $app['config']->set("statamic.$config", require (__DIR__."/../config/{$config}.php"));
         }
     }
 
@@ -177,7 +177,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     // This method is unavailable on earlier versions of Laravel.
-    public function partialMock($abstract, \Closure $mock = null)
+    public function partialMock($abstract, ?\Closure $mock = null)
     {
         $mock = \Mockery::mock(...array_filter(func_get_args()))->makePartial();
         $this->app->instance($abstract, $mock);

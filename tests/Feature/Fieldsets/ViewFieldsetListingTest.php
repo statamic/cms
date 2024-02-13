@@ -54,6 +54,7 @@ class ViewFieldsetListingTest extends TestCase
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
                         'is_deletable' => true,
+                        'imported_by' => collect(),
                     ],
                     [
                         'id' => 'bar',
@@ -63,6 +64,7 @@ class ViewFieldsetListingTest extends TestCase
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/bar/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/bar',
                         'is_deletable' => true,
+                        'imported_by' => collect(),
                     ],
                 ]),
                 'Baz' => collect([
@@ -74,6 +76,7 @@ class ViewFieldsetListingTest extends TestCase
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::foo/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::foo',
                         'is_deletable' => false,
+                        'imported_by' => collect(),
                     ],
                     [
                         'id' => 'baz::bar',
@@ -83,6 +86,7 @@ class ViewFieldsetListingTest extends TestCase
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
                         'is_deletable' => false,
+                        'imported_by' => collect(),
                     ],
                 ]),
             ]))

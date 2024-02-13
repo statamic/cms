@@ -68,7 +68,11 @@ class NavigationController extends CpController
         $site = $request->site ?? Site::selected()->handle();
 
         if (! $nav->existsIn($site)) {
-            return redirect($nav->trees()->first()->showUrl());
+            if ($nav->trees()->isNotEmpty()) {
+                return redirect($nav->trees()->first()->showUrl());
+            }
+
+            $nav->makeTree($site)->save();
         }
 
         $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));

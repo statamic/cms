@@ -8,6 +8,7 @@ use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Traits\Localizable;
 use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
@@ -34,6 +35,7 @@ use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
@@ -52,7 +54,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
-    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
     use HasOrigin {
         value as originValue;
@@ -143,6 +145,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
                 $blueprint = $this->collection()->entryBlueprint($blueprint, $this);
 
+                if (! $blueprint) {
+                    throw new BlueprintNotFoundException($this->value('blueprint'), 'collections/'.$this->collection()->handle());
+                }
+
                 Blink::put($key, $blueprint);
 
                 EntryBlueprintFound::dispatch($blueprint, $this);
@@ -185,7 +191,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                     if (optional($parent)->isRoot()) {
                         $parent = null;
                     }
-                    $this->page()->pages()->all()->each(function ($child) use ($tree, $parent) {
+                    $this->page()?->pages()->all()->each(function ($child) use ($tree, $parent) {
                         $tree->move($child->id(), optional($parent)->id());
                     });
                     $tree->remove($this);
@@ -499,7 +505,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                     return null;
                 }
 
-                if ($date instanceof \Carbon\Carbon) {
+                if ($date instanceof \Carbon\CarbonInterface) {
                     return $date;
                 }
 
@@ -921,7 +927,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        $title = (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+        $title = $this->withLocale($this->site()->locale(), fn () => (string) Antlers::parse($format, $this->augmented()->except('slug')->all()));
 
         return trim($title);
     }

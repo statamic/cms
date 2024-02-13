@@ -2,13 +2,14 @@
 
 namespace Statamic\Tags\Concerns;
 
+use Statamic\Facades\Scope;
 use Statamic\Support\Arr;
 
 trait QueriesScopes
 {
     public function queryScopes($query)
     {
-        $this->parseQueryScopes()->each(function ($handle) use ($query) {
+        $this->parseQueryScopes()->filter()->each(function ($handle) use ($query) {
             $query->applyScope($handle, $this->params);
         });
     }

@@ -18,7 +18,7 @@
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
-                <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
+                <svg-icon name="light/lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden md:flex items-center">
@@ -175,7 +175,7 @@
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
                                             }" />
-                                            {{ option.name }}
+                                            {{ __(option.name) }}
                                             <loading-graphic :size="14" text="" class="ml-2" v-if="localizing === option.handle" />
                                         </div>
                                         <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />

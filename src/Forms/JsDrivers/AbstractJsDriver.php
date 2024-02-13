@@ -136,6 +136,7 @@ abstract class AbstractJsDriver implements JsDriver
             ->fields()
             ->preProcess()
             ->values()
+            ->when($this->form->honeypot(), fn ($fields, $honeypot) => $fields->merge([$honeypot => null]))
             ->map(function ($defaultProcessedValue, $handle) use ($oldValues) {
                 return $oldValues->has($handle)
                     ? $oldValues->get($handle)
