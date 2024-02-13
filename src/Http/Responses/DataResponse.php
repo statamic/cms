@@ -80,7 +80,7 @@ class DataResponse implements Responsable
         $code = 302;
 
         if (is_array($redirect)) {
-            $code = $redirect['status'];
+            $code = $redirect['status']->value()->value();
             $redirect = $redirect['url'];
         }
 
