@@ -16,6 +16,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return (this.value ? '✓' : '✗') + ' ' + __(this.config.display);
         }
 

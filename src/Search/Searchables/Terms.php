@@ -3,6 +3,7 @@
 namespace Statamic\Search\Searchables;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Term;
 use Statamic\Support\Str;
@@ -19,7 +20,7 @@ class Terms extends Provider
         return 'term';
     }
 
-    public function provide(): Collection
+    public function provide(): Collection|LazyCollection
     {
         $query = Term::query();
 
@@ -31,7 +32,7 @@ class Terms extends Provider
             $query->where('site', $site);
         }
 
-        return $query->get()->filter($this->filter())->values();
+        return $query->lazy(100)->filter($this->filter())->values();
     }
 
     public function contains($searchable): bool

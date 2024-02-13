@@ -39,12 +39,16 @@ export default {
     mounted() {
         autosize(this.$refs.textarea);
 
+        if (this.focus) {
+            this.$refs.textarea.focus();
+        }
+
         setTimeout(() => {
             this.updateSize();
         }, 1);
         this.$events.$on('tab-switched', this.updateSize);
     },
-    
+
     beforeDestroy() {
         autosize.destroy(this.$refs.textarea);
     },

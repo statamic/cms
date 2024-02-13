@@ -13,6 +13,10 @@
         :activation-expiry="{{ $expiry }}"
         :separate-name-fields="{{ $str::bool($separateNameFields) }}"
         :can-send-invitation="{{ $str::bool($canSendInvitation) }}"
+        :blueprint="{{ json_encode($blueprint) }}"
+        :fields="{{ json_encode($fields) }}"
+        :meta="{{ json_encode($meta) }}"
+        :initial-values="{{ json_encode($values) }}"
     >
     </user-wizard>
 @stop

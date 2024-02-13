@@ -22,6 +22,7 @@ use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class Terms extends Relationship
 {
@@ -111,7 +112,7 @@ class Terms extends Relationship
         // entry, but could also be something else, like another taxonomy term.
         $parent = $this->field->parent();
 
-        $site = $parent && $parent instanceof Localization
+        $site = $parent && ($parent instanceof Localization || $parent instanceof LocalizedTerm)
             ? $parent->locale()
             : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
 
@@ -184,7 +185,9 @@ class Terms extends Relationship
                 }
 
                 return explode('::', $id, 2)[1];
-            })->all();
+            })
+                ->unique()
+                ->all();
 
             if ($this->field->get('max_items') === 1) {
                 return $data[0] ?? null;
@@ -214,6 +217,10 @@ class Terms extends Relationship
 
     public function getIndexItems($request)
     {
+        if ($this->config('mode') == 'typeahead' && ! $request->search) {
+            return collect();
+        }
+
         $query = $this->getIndexQuery($request);
 
         if ($sort = $this->getSortColumn($request)) {
@@ -410,12 +417,16 @@ class Terms extends Relationship
             ? Site::get($parent->locale())->lang()
             : Site::default()->lang();
 
-        $term = Facades\Term::make()
-            ->slug(Str::slug($string, '-', $lang))
-            ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
-            ->set('title', $string);
+        $slug = Str::slug($string, '-', $lang);
 
-        $term->save();
+        if (! $term = Facades\Term::find("{$taxonomy}::{$slug}")) {
+            $term = Facades\Term::make()
+                ->slug($slug)
+                ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
+                ->set('title', $string);
+
+            $term->save();
+        }
 
         return $term->id();
     }

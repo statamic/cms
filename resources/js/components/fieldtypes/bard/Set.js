@@ -1,6 +1,10 @@
 import { Node } from '@tiptap/core';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Slice, Fragment } from '@tiptap/pm/model';
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { VueNodeViewRenderer } from '@tiptap/vue-2'
 import SetComponent from './Set.vue';
+import { TextSelection } from '@tiptap/pm/state';
 
 export const Set = Node.create({
 
@@ -54,7 +58,10 @@ export const Set = Node.create({
                 const { selection } = tr;
                 const node = this.type.create(attrs);
                 if (dispatch) {
-                    const transaction = tr.insert(selection.$cursor.pos - 1, node);
+                    const transaction = selection instanceof TextSelection
+                        ? tr.insert(selection.$cursor.pos - 1, node)
+                        : tr.insert(selection.$head.pos, node);
+
                     dispatch(transaction);
                 }
             },
@@ -66,6 +73,44 @@ export const Set = Node.create({
                 }
             }
         }
+    },
+
+    addProseMirrorPlugins() {
+        const bard = this.options.bard;
+        const type = this.type;
+        return [
+            new Plugin({
+                key: new PluginKey('setSelectionDecorator'),
+                props: {
+                    decorations(state) {
+                        const { from, to } = state.selection;
+                        const decorations = [];
+                        state.doc.nodesBetween(from, to, (node, pos) => {
+                            if (node.type === type) {
+                                decorations.push(Decoration.node(pos, pos + node.nodeSize, {}, {
+                                    withinSelection: true,
+                                }));
+                            }
+                        });
+                        return DecorationSet.create(state.doc, decorations);
+                    }
+                },
+            }),
+            new Plugin({
+                key: new PluginKey('setPastedTransformer'),
+                props: {
+                    transformPasted: (slice) => {
+                        const { content } = slice.content;
+                        return new Slice(Fragment.fromArray(content.map(node => {
+                            if (node.type === type) {
+                                return node.type.create(bard.pasteSet(node.attrs));
+                            }
+                            return node.copy(node.content);
+                        })), slice.openStart, slice.openEnd);
+                    },
+                },
+            }),
+        ]
     },
 
 })

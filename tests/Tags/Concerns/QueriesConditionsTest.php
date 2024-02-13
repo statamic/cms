@@ -398,6 +398,39 @@ class QueriesConditionsTest extends TestCase
     }
 
     /** @test */
+    public function it_filters_by_is_after_or_before_date_range_conditions()
+    {
+        $this->collection->save();
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date', 'mode' => 'range', 'time_enabled' => true, 'time_seconds_enabled' => true]])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->once()->andReturn(collect([$blueprint]));
+
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+
+        $this->makeEntry('a')->data(['date_field' => ['start' => '2019-03-09', 'end' => '2019-03-10']])->save(); // definitely in past
+        $this->makeEntry('b')->data(['date_field' => ['start' => '2019-03-10', 'end' => '2019-03-11']])->save(); // today
+        $this->makeEntry('c')->data(['date_field' => ['start' => '2019-03-11', 'end' => '2019-03-18']])->save(); // today, but before "now"
+        $this->makeEntry('e')->data(['date_field' => ['start' => '2019-03-11', 'end' => '2019-03-16']])->save(); // today, and also "now"
+        $this->makeEntry('f')->data(['date_field' => ['start' => '2019-03-12', 'end' => '2019-03-14']])->save(); // today, but after "now"
+        $this->makeEntry('g')->data(['date_field' => ['start' => '2019-03-11', 'end' => '2019-03-12']])->save(); // definitely in future
+
+        $this->assertCount(6, $this->getEntries([]));
+
+        $this->assertCount(2, $this->getEntries(['date_field.start:is_before' => true]));
+        $this->assertCount(2, $this->getEntries(['date_field.start:is_past' => true]));
+        $this->assertCount(2, $this->getEntries(['date_field.start:is_before' => 'today']));
+        $this->assertCount(2, $this->getEntries(['date_field.start:is_past' => 'today']));
+        $this->assertCount(4, $this->getEntries(['date_field.start:is_before' => false]));
+        $this->assertCount(4, $this->getEntries(['date_field.start:is_past' => false]));
+
+        $this->assertCount(4, $this->getEntries(['date_field.start:is_after' => true]));
+        $this->assertCount(4, $this->getEntries(['date_field.start:is_future' => true]));
+        $this->assertCount(4, $this->getEntries(['date_field.start:is_after' => 'today']));
+        $this->assertCount(4, $this->getEntries(['date_field.start:is_future' => 'today']));
+        $this->assertCount(2, $this->getEntries(['date_field.start:is_after' => false]));
+        $this->assertCount(2, $this->getEntries(['date_field.start:is_future' => false]));
+    }
+
+    /** @test */
     public function it_filters_by_is_alpha_condition()
     {
         $this->makeEntry('a')->set('title', 'Post')->save();

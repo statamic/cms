@@ -45,7 +45,7 @@ class TermRepository implements RepositoryContract
         return $this->query()->where('id', $id)->first();
     }
 
-    public function findByUri(string $uri, string $site = null): ?Term
+    public function findByUri(string $uri, ?string $site = null): ?Term
     {
         $site = $site ?? $this->stache->sites()->first();
 
@@ -59,7 +59,7 @@ class TermRepository implements RepositoryContract
                     return true;
                 }
 
-                return Str::startsWith($uri, '/'.$collection->handle());
+                return Str::startsWith($uri.'/', '/'.$collection->handle().'/');
             });
 
         if ($collection) {
@@ -112,7 +112,7 @@ class TermRepository implements RepositoryContract
         return new TermQueryBuilder($this->store);
     }
 
-    public function make(string $slug = null): Term
+    public function make(?string $slug = null): Term
     {
         return app(Term::class)->slug($slug);
     }
