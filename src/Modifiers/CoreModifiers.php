@@ -2917,6 +2917,13 @@ class CoreModifiers extends Modifier
             $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
         }
 
+        /**
+         * This avoids SSL issues when using https://youtube-nocookie.com instead of https://www.youtube-nocookie.com
+         */
+        if (Str::contains($url, '//youtube-nocookie.com')) {
+            $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
+        }
+
         return $url;
     }
 
