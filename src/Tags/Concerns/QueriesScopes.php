@@ -2,7 +2,6 @@
 
 namespace Statamic\Tags\Concerns;
 
-use Statamic\Facades\Scope;
 use Statamic\Support\Arr;
 
 trait QueriesScopes

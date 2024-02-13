@@ -3,10 +3,10 @@
 namespace Tests\Data\Users;
 
 use Illuminate\Support\Arr;
-use Statamic\Facades\User;
-use Statamic\Query\Scopes\Scope;
 use Statamic\Facades\Role;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
