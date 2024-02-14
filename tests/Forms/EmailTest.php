@@ -104,7 +104,7 @@ class EmailTest extends TestCase
 
     public static function multipleAddressProvider()
     {
-        return array_merge($this->singleAddressProvider(), [
+        return array_merge(static::singleAddressProvider(), [
             'multiple emails' => ['foo@bar.com, baz@qux.com', [
                 ['address' => 'foo@bar.com', 'name' => null],
                 ['address' => 'baz@qux.com', 'name' => null],
