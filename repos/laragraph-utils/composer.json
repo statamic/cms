@@ -1,0 +1,62 @@
+{
+  "name": "laragraph/utils",
+  "description": "Utilities for using GraphQL with Laravel",
+  "license": "MIT",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Benedikt Franke",
+      "email": "benedikt@franke.tech"
+    }
+  ],
+  "homepage": "https://github.com/laragraph/utils",
+  "support": {
+    "issues": "https://github.com/laragraph/utils/issues",
+    "source": "https://github.com/laragraph/utils"
+  },
+  "require": {
+    "php": "^7.2 || ^8",
+    "illuminate/contracts": "~5.6.0 || ~5.7.0 || ~5.8.0 || ^6 || ^7 || ^8 || ^9 || ^10 || ^11",
+    "illuminate/http": "~5.6.0 || ~5.7.0 || ~5.8.0 || ^6 || ^7 || ^8 || ^9 || ^10 || ^11",
+    "thecodingmachine/safe": "^1.1 || ^2",
+    "webonyx/graphql-php": "^0.13.2 || ^14 || ^15"
+  },
+  "require-dev": {
+    "ergebnis/composer-normalize": "^2.11",
+    "jangregor/phpstan-prophecy": "^1",
+    "mll-lab/php-cs-fixer-config": "^4.4",
+    "orchestra/testbench": "~3.6.0 || ~3.7.0 || ~3.8.0 || ~3.9.0 || ^4 || ^5 || ^6 || ^7 || ^8",
+    "phpstan/extension-installer": "^1",
+    "phpstan/phpstan": "^1",
+    "phpstan/phpstan-deprecation-rules": "^1",
+    "phpstan/phpstan-phpunit": "^1",
+    "phpstan/phpstan-strict-rules": "^1",
+    "phpunit/phpunit": "^7.5 || ^8.5 || ^9",
+    "thecodingmachine/phpstan-safe-rule": "^1.1"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "Laragraph\\Utils\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Laragraph\\Utils\\Tests\\": "tests/"
+    },
+    "files": [
+      "vendor/symfony/var-dumper/Resources/functions/dump.php"
+    ]
+  },
+  "config": {
+    "allow-plugins": {
+      "ergebnis/composer-normalize": true,
+      "infection/extension-installer": true,
+      "kylekatarnls/update-helper": true,
+      "phpstan/extension-installer": true
+    },
+    "preferred-install": "dist",
+    "sort-packages": true
+  }
+}

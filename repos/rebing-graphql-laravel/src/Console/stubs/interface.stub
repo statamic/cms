@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DummyNamespace;
+
+use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\StringType;
+use Rebing\GraphQL\Support\InterfaceType;
+
+class DummyClass extends InterfaceType
+{
+    protected $attributes = [
+        'name' => 'DummyGraphqlName',
+        'description' => 'An example interface',
+    ];
+
+    public function resolveType($root): StringType
+    {
+        return Type::string();
+    }
+
+    public function fields(): array
+    {
+        return [
+            'test' => [
+                'type' => Type::string(),
+                'description' => 'A test field',
+            ],
+        ];
+    }
+}

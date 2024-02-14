@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DummyNamespace;
+
+use Rebing\GraphQL\Support\EnumType;
+
+class DummyClass extends EnumType
+{
+    protected $attributes = [
+        'name' => 'DummyGraphqlName',
+        'description' => 'An example enum',
+        'values' => [
+            'TEST' => [
+                'value' => 1,
+                'description' => 'test',
+            ],
+        ],
+    ];
+}

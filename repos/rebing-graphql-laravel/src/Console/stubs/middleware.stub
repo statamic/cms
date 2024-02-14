@@ -1,0 +1,17 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DummyNamespace;
+
+use Closure;
+use GraphQL\Type\Definition\ResolveInfo;
+use Rebing\GraphQL\Support\Middleware;
+
+class DummyClass extends Middleware
+{
+    public function handle($root, array $args, $context, ResolveInfo $info, Closure $next)
+    {
+        return $next($root, $args, $context, $info);
+    }
+}

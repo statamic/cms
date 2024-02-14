@@ -1,0 +1,18 @@
+<?php
+
+declare(strict_types = 1);
+namespace DummyNamespace;
+
+use Closure;
+use GraphQL\Executor\ExecutionResult;
+use GraphQL\Type\Schema;
+use Rebing\GraphQL\Support\ExecutionMiddleware\AbstractExecutionMiddleware;
+use Rebing\GraphQL\Support\OperationParams;
+
+class DummyClass extends AbstractExecutionMiddleware
+{
+    public function handle(string $schemaName, Schema $schema, OperationParams $params, $rootValue, $contextValue, Closure $next): ExecutionResult
+    {
+        return $next($schemaName, $schema, $params, $rootValue, $contextValue);
+    }
+}
