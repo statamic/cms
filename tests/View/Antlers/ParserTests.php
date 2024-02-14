@@ -2437,7 +2437,7 @@ EOT;
         ]));
     }
 
-    public function objectInConditionProvider()
+    public static function objectInConditionProvider()
     {
         return [
             'with __toString' => [new class()

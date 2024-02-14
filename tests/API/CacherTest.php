@@ -105,7 +105,7 @@ class CacherTest extends TestCase
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
     }
 
-    public function bypassCacheProvider()
+    public static function bypassCacheProvider()
     {
         $endpoint = '/api/collections/articles/entries';
 

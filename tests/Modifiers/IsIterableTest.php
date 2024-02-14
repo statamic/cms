@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class IsIterableTest extends TestCase
 {
-    public function iterables(): array
+    public static function iterablesProvider(): array
     {
         return [
             'array' => [true, ['foo', 'bar', 'baz']],
@@ -21,7 +21,7 @@ class IsIterableTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider iterables
+     * @dataProvider iterablesProvider
      */
     public function it_returns_true_if_input_is_iterable($expected, $input): void
     {

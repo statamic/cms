@@ -10,7 +10,7 @@ class SetQueryParamTest extends TestCase
     protected $baseUrl = 'https://www.google.com/search';
     protected $queryParam = ['q', 'test'];
 
-    public function existingQueryParametersProvider()
+    public static function existingQueryParametersProvider()
     {
         return [
             ['?q=', '?q=statamic', ['q']],
@@ -34,7 +34,7 @@ class SetQueryParamTest extends TestCase
         );
     }
 
-    public function nonExistingQueryParametersProvider()
+    public static function nonExistingQueryParametersProvider()
     {
         return [
             ['?q=', '', ['q']],

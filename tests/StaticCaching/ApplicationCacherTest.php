@@ -130,7 +130,7 @@ class ApplicationCacherTest extends TestCase
         });
     }
 
-    public function invalidateEventProvider()
+    public static function invalidateEventProvider()
     {
         return [
             'no domain' => [null, 'http://base.com/foo'],
