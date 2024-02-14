@@ -91,6 +91,8 @@ jobs:
           max_attempts: 5
           command: |
             composer config minimum-stability dev
+            composer require "laragraph/utils dev-make-statamic-work-kthx as 2.0.3" --no-update
+            composer require "rebing/graphql-laravel dev-make-statamic-work-kthx" --no-update
             composer require "laravel/framework 11.x-dev" --no-update
             composer require "orchestra/testbench 9.x-dev@dev" --dev --no-update
 
