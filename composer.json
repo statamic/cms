@@ -88,15 +88,5 @@
             "Tests\\": "tests",
             "Foo\\Bar\\": "tests/Fixtures/Addon"
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/jasonvarga/graphql-laravel"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/jasonvarga/laragraph-utils"
-        }
-    ]
+    }
 }
