@@ -18,46 +18,42 @@ class UpdatesOverview
     /**
      * Get updates count.
      *
-     * @param  bool  $clearCache
      * @return int
      */
-    public function count($clearCache = false)
+    public function count()
     {
-        return $this->getCached('updates-overview.count', $clearCache);
+        return $this->getCached('updates-overview.count');
     }
 
     /**
      * Check if statamic update is available.
      *
-     * @param  bool  $clearCache
      * @return bool
      */
-    public function hasStatamicUpdate($clearCache = false)
+    public function hasStatamicUpdate()
     {
-        return $this->getCached('updates-overview.statamic', $clearCache);
+        return $this->getCached('updates-overview.statamic');
     }
 
     /**
      * List updatable addons.
      *
-     * @param  bool  $clearCache
      * @return array
      */
-    public function updatableAddons($clearCache = false)
+    public function updatableAddons()
     {
-        return $this->getCached('updates-overview.addons', $clearCache);
+        return $this->getCached('updates-overview.addons');
     }
 
     /**
      * Get value from cache.
      *
      * @param  string  $key
-     * @param  bool  $clearCache
      * @return mixed
      */
-    public function getCached($key, $clearCache = false)
+    public function getCached($key)
     {
-        if (! Cache::has($key) || $clearCache) {
+        if (! Cache::has($key)) {
             $this->checkAndCache();
         }
 

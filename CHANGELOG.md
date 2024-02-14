@@ -1,5 +1,50 @@
 # Release Notes
 
+## 4.48.0 (2024-02-06)
+
+### What's new
+- Ability to customize Echo client configuration. [#9464](https://github.com/statamic/cms/issues/9464) by @jacksleight
+- Tags are macroable. [#9466](https://github.com/statamic/cms/issues/9466) by @SylvesterDamgaard
+- Statamic route views can be implied. [#9436](https://github.com/statamic/cms/issues/9436) by @jasonvarga
+- Add sites to support details output. [#9461](https://github.com/statamic/cms/issues/9461) by @jasonvarga
+
+### What's fixed
+- Fix unit translations. [#9472](https://github.com/statamic/cms/issues/9472) by @jasonvarga
+- Remove typo inside UserProvider. [#9459](https://github.com/statamic/cms/issues/9459) by @jonassiewertsen
+- Translate more untranslated strings. [#9451](https://github.com/statamic/cms/issues/9451) by @peimn
+- Fix timeout when using `nocache` tag. [#9449](https://github.com/statamic/cms/issues/9449) by @duncanmcclean
+- Revert Stache watcher performance PR. [#9448](https://github.com/statamic/cms/issues/9448) by @jasonvarga
+- Tidy up replicator field styles to match normal fields. [#9446](https://github.com/statamic/cms/issues/9446) by @duncanmcclean
+- Ensure template and termTemplate are accessed correctly in Taxonomy controller. [#9444](https://github.com/statamic/cms/issues/9444) by @ryanmitchell
+
+
+
+## 4.47.0 (2024-01-31)
+
+### What's new
+- Allow a custom static caching url store to be specified. [#9405](https://github.com/statamic/cms/issues/9405) by @ryanmitchell
+- Add reset button to color fieldtype. [#9419](https://github.com/statamic/cms/issues/9419) by @duncanmcclean
+- Ability to add inline scripts into the CP. [#9386](https://github.com/statamic/cms/issues/9386) by @jacksleight
+
+### What's improved
+- Improve the workflow around enabling Statamic Pro. [#9435](https://github.com/statamic/cms/issues/9435) by @jesseleite
+- Improve collection Stache watcher performance. [#9302](https://github.com/statamic/cms/issues/9302) by @JohnathonKoster
+- French translations. [#9402](https://github.com/statamic/cms/issues/9402) by @ebeauchamps
+
+### What's fixed
+- Fix issue with set previews in Bard. [#9422](https://github.com/statamic/cms/issues/9422) by @duncanmcclean
+- Improve UX of field conditions builder for select & toggle fields. [#9379](https://github.com/statamic/cms/issues/9379) by @duncanmcclean
+- Don't set termTemplate and template if they are the defaults. [#9421](https://github.com/statamic/cms/issues/9421) by @ryanmitchell
+- Prevent serialization errors with `@nocache` directive when using Blade view components. [#9409](https://github.com/statamic/cms/issues/9409) by @duncanmcclean
+- Fix user wizard error when user blueprint has Bard field. [#9416](https://github.com/statamic/cms/issues/9416) by @jesseleite
+- Hide listing filters when reordering entries. [#9420](https://github.com/statamic/cms/issues/9420) by @duncanmcclean
+- Rename route binding parameter to prevent overlapping. [#9415](https://github.com/statamic/cms/issues/9415) by @duncanmcclean
+- Fix Entries fieldtype tree view on Assets publish form. [#9404](https://github.com/statamic/cms/issues/9404) by @duncanmcclean
+- Fix translations in `nocache` tag. [#9400](https://github.com/statamic/cms/issues/9400) by @duncanmcclean
+- Translate dimension conjunction. [#9393](https://github.com/statamic/cms/issues/9393) by @peimn
+
+
+
 ## 4.46.0 (2024-01-25)
 
 ### What's new

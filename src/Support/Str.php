@@ -139,23 +139,23 @@ class Str
     public static function fileSizeForHumans($bytes, $decimals = 2)
     {
         if ($bytes >= 1073741824) {
-            return trans_choice('statamic::messages.units.GB', number_format($bytes / 1073741824, $decimals));
+            return trans('statamic::messages.units.GB', ['count' => number_format($bytes / 1073741824, $decimals)]);
         } elseif ($bytes >= 1048576) {
-            return trans_choice('statamic::messages.units.MB', number_format($bytes / 1048576, $decimals));
+            return trans('statamic::messages.units.MB', ['count' => number_format($bytes / 1048576, $decimals)]);
         } elseif ($bytes >= 1024) {
-            return trans_choice('statamic::messages.units.KB', number_format($bytes / 1024, $decimals));
+            return trans('statamic::messages.units.KB', ['count' => number_format($bytes / 1024, $decimals)]);
         }
 
-        return trans_choice('statamic::messages.units.B', $bytes);
+        return trans('statamic::messages.units.B', ['count' => $bytes]);
     }
 
     public static function timeForHumans($ms)
     {
         if ($ms < 1000) {
-            return trans_choice('statamic::messages.units.ms', $ms);
+            return trans('statamic::messages.units.ms', ['count' => $ms]);
         }
 
-        return trans_choice('statamic::messages.units.s', round($ms / 1000, 2));
+        return trans('statamic::messages.units.s', ['count' => round($ms / 1000, 2)]);
     }
 
     /**

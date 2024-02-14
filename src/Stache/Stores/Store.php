@@ -22,7 +22,6 @@ abstract class Store
     protected $storeIndexes = [];
     protected $usedIndexes;
     protected $fileChangesHandled = false;
-    protected $traverseRecursively = true;
     protected $paths;
     protected $fileItems;
     protected $shouldCacheFileItems = false;
@@ -181,7 +180,7 @@ abstract class Store
         $existing = collect(Cache::get($cacheKey, []));
 
         // Get the files and timestamps from the filesystem right now.
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this, $this->traverseRecursively);
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         // Cache the files and timestamps, ready for comparisons on the next request.
         // We'll do it now since there are multiple early returns coming up.
@@ -293,7 +292,7 @@ abstract class Store
             return $this->paths = collect($paths);
         }
 
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this, $this->traverseRecursively);
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         $fileItems = $files->map(function ($timestamp, $path) {
             return [

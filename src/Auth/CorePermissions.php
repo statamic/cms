@@ -77,7 +77,7 @@ class CorePermissions
         $this->register('access {site} site', function ($permission) {
             $permission->replacements('site', function () {
                 return Site::all()->map(function ($site) {
-                    return ['value' => $site->handle(), 'label' => $site->name().' ('.$site->handle().')', 'handle' => $site->handle()];
+                    return ['value' => $site->handle(), 'label' => __($site->name()).' ('.$site->handle().')', 'handle' => $site->handle()];
                 });
             });
         });
@@ -101,7 +101,7 @@ class CorePermissions
                 ]),
             ])->replacements('collection', function () {
                 return Collection::all()->map(function ($collection) {
-                    return ['value' => $collection->handle(), 'label' => $collection->title()];
+                    return ['value' => $collection->handle(), 'label' => __($collection->title())];
                 });
             });
         });
@@ -116,7 +116,7 @@ class CorePermissions
                 $this->permission('edit {nav} nav'),
             ])->replacements('nav', function () {
                 return Nav::all()->map(function ($nav) {
-                    return ['value' => $nav->handle(), 'label' => $nav->title()];
+                    return ['value' => $nav->handle(), 'label' => __($nav->title())];
                 });
             });
         });
@@ -129,7 +129,7 @@ class CorePermissions
         $this->register('edit {global} globals', function ($permission) {
             $permission->replacements('global', function () {
                 return GlobalSet::all()->map(function ($global) {
-                    return ['value' => $global->handle(), 'label' => $global->title()];
+                    return ['value' => $global->handle(), 'label' => __($global->title())];
                 });
             });
         });
@@ -147,7 +147,7 @@ class CorePermissions
                 ]),
             ])->replacements('taxonomy', function () {
                 return Taxonomy::all()->map(function ($taxonomy) {
-                    return ['value' => $taxonomy->handle(), 'label' => $taxonomy->title()];
+                    return ['value' => $taxonomy->handle(), 'label' => __($taxonomy->title())];
                 });
             });
         });
@@ -167,7 +167,7 @@ class CorePermissions
                 ]),
             ])->replacements('container', function () {
                 return AssetContainer::all()->map(function ($container) {
-                    return ['value' => $container->handle(), 'label' => $container->title()];
+                    return ['value' => $container->handle(), 'label' => __($container->title())];
                 });
             });
         });
@@ -206,7 +206,7 @@ class CorePermissions
                 $this->permission('delete {form} form submissions'),
             ])->replacements('form', function () {
                 return Form::all()->map(function ($form) {
-                    return ['value' => $form->handle(), 'label' => $form->title()];
+                    return ['value' => $form->handle(), 'label' => __($form->title())];
                 });
             });
         });
