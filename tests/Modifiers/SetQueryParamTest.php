@@ -8,16 +8,16 @@ use Tests\TestCase;
 class SetQueryParamTest extends TestCase
 {
     protected $baseUrl = 'https://www.google.com/search';
-    protected $queryParam = ['q', 'test'];
+    protected static $queryParam = ['q', 'test'];
 
     public static function existingQueryParametersProvider()
     {
         return [
             ['?q=', '?q=statamic', ['q']],
-            ['?q=test', '?q=statamic', $this->queryParam],
-            ['?q=test#test', '?q=statamic#test', $this->queryParam],
-            ['?q=test&sourceid=chrome', '?q=statamic&sourceid=chrome', $this->queryParam],
-            ['?sourceid=chrome&q=test', '?sourceid=chrome&q=statamic', $this->queryParam],
+            ['?q=test', '?q=statamic', static::$queryParam],
+            ['?q=test#test', '?q=statamic#test', static::$queryParam],
+            ['?q=test&sourceid=chrome', '?q=statamic&sourceid=chrome', static::$queryParam],
+            ['?sourceid=chrome&q=test', '?sourceid=chrome&q=statamic', static::$queryParam],
         ];
     }
 
@@ -38,9 +38,9 @@ class SetQueryParamTest extends TestCase
     {
         return [
             ['?q=', '', ['q']],
-            ['?q=test', '', $this->queryParam],
-            ['?q=test#test', '#test', $this->queryParam],
-            ['?sourceid=chrome&q=test', '?sourceid=chrome', $this->queryParam],
+            ['?q=test', '', static::$queryParam],
+            ['?q=test#test', '#test', static::$queryParam],
+            ['?sourceid=chrome&q=test', '?sourceid=chrome', static::$queryParam],
         ];
     }
 
