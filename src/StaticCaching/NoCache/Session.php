@@ -6,6 +6,7 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Data;
 
@@ -101,16 +102,18 @@ class Session
             return;
         }
 
-        Cache::forever('nocache::urls', collect(Cache::get('nocache::urls', []))->push($this->url)->unique()->all());
+        $store = $this->cacheStore();
 
-        Cache::forever('nocache::session.'.md5($this->url), [
+        $store->forever('nocache::urls', collect($store->get('nocache::urls', []))->push($this->url)->unique()->all());
+
+        $store->forever('nocache::session.'.md5($this->url), [
             'regions' => $this->regions,
         ]);
     }
 
     public function restore()
     {
-        $session = Cache::get('nocache::session.'.md5($this->url));
+        $session = $this->cacheStore()->get('nocache::session.'.md5($this->url));
 
         $this->regions = $this->regions->merge($session['regions'] ?? []);
         $this->cascade = $this->restoreCascade();
@@ -139,6 +142,17 @@ class Session
 
     private function cacheRegion(Region $region)
     {
-        Cache::forever('nocache::region.'.$region->key(), $region);
+        $this->cacheStore()->forever('nocache::region.'.$region->key(), $region);
+    }
+
+    private function cacheStore()
+    {
+        try {
+            $store = Cache::store('static_cache');
+        } catch (InvalidArgumentException $e) {
+            $store = Cache::store();
+        }
+
+        return $store;
     }
 }
