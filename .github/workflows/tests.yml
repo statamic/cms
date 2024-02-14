@@ -83,14 +83,15 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
 
-      - name: Install Testbench
+      - name: Install Laravel 11
         uses: nick-invision/retry@v2
         if: steps.should-run-tests.outputs.result == 'true' && matrix.laravel == '11.*'
         with:
           timeout_minutes: 5
           max_attempts: 5
           command: |
-            composer require "orchestra/testbench" --dev --no-update 9.x-dev@dev
+            composer require "laravel/framework 11.x-dev" --no-update
+            composer require "orchestra/testbench 9.x-dev@dev" --dev --no-update
 
       - name: Install dependencies
         uses: nick-invision/retry@v2
