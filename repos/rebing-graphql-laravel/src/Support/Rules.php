@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support;
 
 use GraphQL\Type\Definition\InputObjectField;
@@ -17,8 +18,8 @@ class Rules
     private $requestArguments;
 
     /**
-     * @param array<string,mixed> $queryArguments
-     * @param array<string,mixed> $requestArguments
+     * @param  array<string,mixed>  $queryArguments
+     * @param  array<string,mixed>  $requestArguments
      */
     public function __construct(array $queryArguments, array $requestArguments)
     {
@@ -35,8 +36,8 @@ class Rules
     }
 
     /**
-     * @param array<string,mixed>|string|callable $rules
-     * @param array<string,mixed> $arguments
+     * @param  array<string,mixed>|string|callable  $rules
+     * @param  array<string,mixed>  $arguments
      * @return array<string,mixed>|string
      */
     protected function resolveRules($rules, array $arguments)
@@ -49,7 +50,7 @@ class Rules
     }
 
     /**
-     * @param array<string,mixed> $resolutionArguments
+     * @param  array<string,mixed>  $resolutionArguments
      * @return array<string,mixed>
      */
     protected function inferRulesFromType(GraphqlType $type, string $prefix, array $resolutionArguments): array
@@ -85,7 +86,7 @@ class Rules
                 foreach ($resolutionArguments as $index => $input) {
                     $key = "$prefix.$index";
 
-                    if (null !== $input) {
+                    if ($input !== null) {
                         $rules = $rules + $this->getInputTypeRules($type, $key, $input);
                     }
                 }
@@ -100,7 +101,7 @@ class Rules
     }
 
     /**
-     * @param array<string,mixed> $resolutionArguments
+     * @param  array<string,mixed>  $resolutionArguments
      * @return array<string,mixed>
      */
     protected function getInputTypeRules(InputObjectType $input, string $prefix, array $resolutionArguments): array
@@ -111,8 +112,8 @@ class Rules
     /**
      * Get rules from fields.
      *
-     * @param array<string,mixed> $fields
-     * @param array<string,mixed> $resolutionArguments
+     * @param  array<string,mixed>  $fields
+     * @param  array<string,mixed>  $resolutionArguments
      * @return array<string,mixed>
      */
     protected function getRules(array $fields, ?string $prefix, array $resolutionArguments): array
@@ -122,7 +123,7 @@ class Rules
         foreach ($fields as $name => $field) {
             $field = $field instanceof InputObjectField ? $field : (object) $field;
 
-            $key = null === $prefix ? $name : "$prefix.$name";
+            $key = $prefix === null ? $name : "$prefix.$name";
 
             // get any explicitly set rules
             $fieldRules = $field->config['rules'] ?? $field->rules ?? null;

@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Console;
 
 use Illuminate\Console\GeneratorCommand;
@@ -15,11 +16,11 @@ class SchemaConfigMakeCommand extends GeneratorCommand
 
     protected function getStub(): string
     {
-        return __DIR__ . '/stubs/schemaConfig.stub';
+        return __DIR__.'/stubs/schemaConfig.stub';
     }
 
     protected function getDefaultNamespace($rootNamespace): string
     {
-        return $rootNamespace . '\GraphQL\Schemas';
+        return $rootNamespace.'\GraphQL\Schemas';
     }
 }

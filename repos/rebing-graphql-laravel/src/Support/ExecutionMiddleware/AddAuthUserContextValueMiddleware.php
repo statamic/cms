@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support\ExecutionMiddleware;
 
 use Closure;
@@ -21,7 +22,7 @@ class AddAuthUserContextValueMiddleware extends AbstractExecutionMiddleware
 
     public function handle(string $schemaName, Schema $schema, OperationParams $params, $rootValue, $contextValue, Closure $next): ExecutionResult
     {
-        if (null === $contextValue) {
+        if ($contextValue === null) {
             $contextValue = $this->auth->guard()->user();
         }
 

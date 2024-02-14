@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Console;
 
 use Illuminate\Console\GeneratorCommand;
@@ -15,12 +16,12 @@ class QueryMakeCommand extends GeneratorCommand
 
     protected function getStub(): string
     {
-        return __DIR__ . '/stubs/query.stub';
+        return __DIR__.'/stubs/query.stub';
     }
 
     protected function getDefaultNamespace($rootNamespace): string
     {
-        return $rootNamespace . '\GraphQL\Queries';
+        return $rootNamespace.'\GraphQL\Queries';
     }
 
     protected function buildClass($name): string

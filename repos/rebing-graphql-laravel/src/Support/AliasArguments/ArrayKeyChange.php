@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support\AliasArguments;
 
 use Rebing\GraphQL\Helpers;
@@ -57,7 +58,7 @@ class ArrayKeyChange
             return $target;
         }
 
-        if ('*' === $segment) {
+        if ($segment === '*') {
             foreach ($target as $index => $inner) {
                 if ($inner) {
                     $target[$index] = $this->changeKey($inner, $segments, $replaceKey);

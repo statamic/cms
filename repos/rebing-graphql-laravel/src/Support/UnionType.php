@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support;
 
 use GraphQL\Type\Definition\Type as GraphqlType;

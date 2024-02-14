@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository;
@@ -34,13 +34,13 @@ if ($routeConfig) {
             foreach ($schemas as $schemaName => $schemaConfig) {
                 $method = $schemaConfig['method'] ?? ['GET', 'POST'];
                 $actions = array_filter([
-                    'uses' => $schemaConfig['controller'] ?? $routeConfig['controller'] ?? GraphQLController::class . '@query',
+                    'uses' => $schemaConfig['controller'] ?? $routeConfig['controller'] ?? GraphQLController::class.'@query',
                     'middleware' => $schemaConfig['middleware'] ?? $routeConfig['middleware'] ?? null,
                 ]);
 
                 // Support array syntax: `[Some::class, 'method']`
                 if (\is_array($actions['uses']) && isset($actions['uses'][0], $actions['uses'][1])) {
-                    $actions['uses'] = $actions['uses'][0] . '@' . $actions['uses'][1];
+                    $actions['uses'] = $actions['uses'][0].'@'.$actions['uses'][1];
                 }
 
                 // Add route for each schema…

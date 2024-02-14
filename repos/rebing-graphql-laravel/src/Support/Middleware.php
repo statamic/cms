@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support;
 
 use Closure;
@@ -9,7 +10,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 abstract class Middleware
 {
     /**
-     * @param array<string,mixed> $args
+     * @param  array<string,mixed>  $args
      */
     public function handle($root, array $args, $context, ResolveInfo $info, Closure $next)
     {

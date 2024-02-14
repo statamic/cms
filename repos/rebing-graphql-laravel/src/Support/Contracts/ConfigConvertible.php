@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support\Contracts;
 
 use Rebing\GraphQL\Support\ExecutionMiddleware\AbstractExecutionMiddleware;

@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL;
 
 use Error as PhpError;
@@ -83,8 +84,8 @@ class GraphQL
     }
 
     /**
-     * @param array<string,mixed>|null $variables Optional GraphQL input variables for your query/mutation
-     * @param array<string,mixed> $opts Additional options, like 'schema', 'context' or 'operationName'
+     * @param  array<string,mixed>|null  $variables  Optional GraphQL input variables for your query/mutation
+     * @param  array<string,mixed>  $opts  Additional options, like 'schema', 'context' or 'operationName'
      * @return array<string,mixed>
      */
     public function query(string $query, ?array $variables = null, array $opts = []): array
@@ -95,8 +96,8 @@ class GraphQL
     }
 
     /**
-     * @param array<string,mixed>|null $variables Optional GraphQL input variables for your query/mutation
-     * @param array<string,mixed> $opts Additional options, like 'schema', 'context' or 'operationName'
+     * @param  array<string,mixed>|null  $variables  Optional GraphQL input variables for your query/mutation
+     * @param  array<string,mixed>  $opts  Additional options, like 'schema', 'context' or 'operationName'
      */
     public function queryAndReturnResult(string $query, ?array $variables = null, array $opts = []): ExecutionResult
     {
@@ -117,8 +118,8 @@ class GraphQL
     }
 
     /**
-     * @param mixed $rootValue
-     * @param mixed $contextValue
+     * @param  mixed  $rootValue
+     * @param  mixed  $contextValue
      * @return array<string,mixed>
      */
     public function execute(string $schemaName, OperationParams $operationParams, $rootValue = null, $contextValue = null): array
@@ -131,8 +132,8 @@ class GraphQL
     }
 
     /**
-     * @param mixed $rootValue
-     * @param mixed $contextValue
+     * @param  mixed  $rootValue
+     * @param  mixed  $contextValue
      */
     protected function executeAndReturnResult(string $schemaName, Schema $schema, OperationParams $params, $rootValue = null, $contextValue = null): ExecutionResult
     {
@@ -146,9 +147,9 @@ class GraphQL
     }
 
     /**
-     * @param array<string> $middleware
-     * @param mixed $rootValue
-     * @param mixed $contextValue
+     * @param  array<string>  $middleware
+     * @param  mixed  $rootValue
+     * @param  mixed  $contextValue
      */
     protected function executeViaMiddleware(array $middleware, string $schemaName, Schema $schema, OperationParams $params, $rootValue = null, $contextValue = null): ExecutionResult
     {
@@ -177,6 +178,7 @@ class GraphQL
 
     /**
      * @phpstan-param array<class-string> $middlewares
+     *
      * @phpstan-return array<class-string>
      */
     protected function appendGraphqlExecutionMiddleware(array $middlewares): array
@@ -187,7 +189,7 @@ class GraphQL
     }
 
     /**
-     * @param array<int|string,string> $types
+     * @param  array<int|string,string>  $types
      */
     public function addTypes(array $types): void
     {
@@ -197,11 +199,11 @@ class GraphQL
     }
 
     /**
-     * @param object|string $class
+     * @param  object|string  $class
      */
-    public function addType($class, string $name = null): void
+    public function addType($class, ?string $name = null): void
     {
-        if (!$name) {
+        if (! $name) {
             $type = \is_object($class) ? $class : $this->app->make($class);
             $name = $type->name;
         }
@@ -242,19 +244,19 @@ class GraphQL
             return $standardTypes[$name];
         }
 
-        if (!isset($this->types[$name])) {
+        if (! isset($this->types[$name])) {
             $error = "Type $name not found. Check that the config array key for the type matches the name attribute in the type's class.";
 
             throw new TypeNotFound($error);
         }
 
-        if (!$fresh && isset($this->typesInstances[$name])) {
+        if (! $fresh && isset($this->typesInstances[$name])) {
             return $this->typesInstances[$name];
         }
 
         $type = $this->types[$name];
 
-        if (!\is_object($type)) {
+        if (! \is_object($type)) {
             $type = $this->app->make($type);
         }
 
@@ -265,8 +267,8 @@ class GraphQL
     }
 
     /**
-     * @param ObjectType|array<int|string,class-string|array<string,mixed>>|string $type
-     * @param array<string,string> $opts
+     * @param  ObjectType|array<int|string,class-string|array<string,mixed>>|string  $type
+     * @param  array<string,string>  $opts
      */
     public function objectType($type, array $opts = []): Type
     {
@@ -297,16 +299,16 @@ class GraphQL
     }
 
     /**
-     * @param ObjectType|string $type
-     * @param array<string,string> $opts
+     * @param  ObjectType|string  $type
+     * @param  array<string,string>  $opts
      */
     protected function buildObjectTypeFromClass($type, array $opts = []): Type
     {
-        if (!\is_object($type)) {
+        if (! \is_object($type)) {
             $type = $this->app->make($type);
         }
 
-        if (!$type instanceof TypeConvertible) {
+        if (! $type instanceof TypeConvertible) {
             throw new TypeNotFound(
                 \Safe\sprintf(
                     'Unable to convert %s to a GraphQL type, please add/implement the interface %s',
@@ -324,8 +326,8 @@ class GraphQL
     }
 
     /**
-     * @param array<int|string,class-string|array<string,mixed>> $fields
-     * @param array<string,string> $opts
+     * @param  array<int|string,class-string|array<string,mixed>>  $fields
+     * @param  array<string,string>  $opts
      */
     protected function buildObjectTypeFromFields(array $fields, array $opts = []): ObjectType
     {
@@ -353,7 +355,7 @@ class GraphQL
     }
 
     /**
-     * @param array<string,mixed> $schemaConfig
+     * @param  array<string,mixed>  $schemaConfig
      */
     public function buildSchemaFromConfig(array $schemaConfig): Schema
     {
@@ -458,11 +460,11 @@ class GraphQL
         $this->typesInstances = [];
     }
 
-    public function paginate(string $typeName, string $customName = null): Type
+    public function paginate(string $typeName, ?string $customName = null): Type
     {
-        $name = $customName ?: $typeName . 'Pagination';
+        $name = $customName ?: $typeName.'Pagination';
 
-        if (!isset($this->typesInstances[$name])) {
+        if (! isset($this->typesInstances[$name])) {
             $paginationType = $this->config->get('graphql.pagination_type', PaginationType::class);
             $this->wrapType($typeName, $name, $paginationType);
         }
@@ -470,11 +472,11 @@ class GraphQL
         return $this->typesInstances[$name];
     }
 
-    public function simplePaginate(string $typeName, string $customName = null): Type
+    public function simplePaginate(string $typeName, ?string $customName = null): Type
     {
-        $name = $customName ?: $typeName . 'SimplePagination';
+        $name = $customName ?: $typeName.'SimplePagination';
 
-        if (!isset($this->typesInstances[$name])) {
+        if (! isset($this->typesInstances[$name])) {
             $paginationType = $this->config->get('graphql.simple_pagination_type', SimplePaginationType::class);
             $this->wrapType($typeName, $name, $paginationType);
         }
@@ -485,13 +487,13 @@ class GraphQL
     /**
      * To add customs result to the query or mutations.
      *
-     * @param string $typeName The original type name
-     * @param string $customTypeName The new type name
-     * @param class-string<Type> $wrapperTypeClass The class to create the new type
+     * @param  string  $typeName  The original type name
+     * @param  string  $customTypeName  The new type name
+     * @param  class-string<Type>  $wrapperTypeClass  The class to create the new type
      */
     public function wrapType(string $typeName, string $customTypeName, string $wrapperTypeClass): Type
     {
-        if (!isset($this->typesInstances[$customTypeName])) {
+        if (! isset($this->typesInstances[$customTypeName])) {
             $wrapperClass = new $wrapperTypeClass($typeName, $customTypeName);
             $this->typesInstances[$customTypeName] = $wrapperClass;
             $this->types[$customTypeName] = $wrapperClass;
@@ -502,6 +504,7 @@ class GraphQL
 
     /**
      * @see \GraphQL\Executor\ExecutionResult::setErrorFormatter
+     *
      * @return array<string,mixed>
      */
     public static function formatError(Error $e): array
@@ -536,7 +539,7 @@ class GraphQL
     }
 
     /**
-     * @param Error[] $errors
+     * @param  Error[]  $errors
      * @return Error[]
      */
     public static function handleErrors(array $errors, callable $formatter): array
@@ -550,14 +553,14 @@ class GraphQL
             // Don't report certain GraphQL errors
             if ($error instanceof ValidationError ||
                 $error instanceof AuthorizationError ||
-                !(
+                ! (
                     $error instanceof Exception ||
                     $error instanceof PhpError
                 )) {
                 continue;
             }
 
-            if (!$error instanceof Exception) {
+            if (! $error instanceof Exception) {
                 $error = new Exception(
                     $error->getMessage(),
                     $error->getCode(),
@@ -593,13 +596,13 @@ class GraphQL
     {
         $schemas = Config::get('graphql.schemas');
 
-        if (!\array_key_exists($schemaName, $schemas)) {
+        if (! \array_key_exists($schemaName, $schemas)) {
             throw new SchemaNotFound("No configuration for schema '$schemaName' found");
         }
 
         $schemaConfig = $schemas[$schemaName];
 
-        if (!\is_string($schemaConfig) && !\is_array($schemaConfig)) {
+        if (! \is_string($schemaConfig) && ! \is_array($schemaConfig)) {
             throw new SchemaNotFound(
                 \Safe\sprintf(
                     "Configuration for schema '%s' must be either an array or a class implementing %s, found type %s",
@@ -610,12 +613,12 @@ class GraphQL
             );
         }
 
-        if (!$schemaConfig) {
+        if (! $schemaConfig) {
             throw new SchemaNotFound("Empty configuration found for schema '$schemaName'");
         }
 
         if (\is_string($schemaConfig)) {
-            if (!class_exists($schemaConfig)) {
+            if (! class_exists($schemaConfig)) {
                 throw new SchemaNotFound("Cannot find class '$schemaConfig' for schema '$schemaName'");
             }
 

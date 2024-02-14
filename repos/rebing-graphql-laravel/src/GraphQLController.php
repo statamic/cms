@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL;
 
 use GraphQL\Server\OperationParams as BaseOperationParams;
@@ -28,7 +29,7 @@ class GraphQLController extends Controller
 
         $supportsBatching = $config->get('graphql.batching.enable', true);
 
-        if ($isBatch && !$supportsBatching) {
+        if ($isBatch && ! $supportsBatching) {
             $data = $this->createBatchingNotSupportedResponse($request->input());
 
             return response()->json($data, 200, $headers, $jsonOptions);
@@ -52,7 +53,7 @@ class GraphQLController extends Controller
      *
      * The returned format still matches the GraphQL specs
      *
-     * @param array<string,mixed> $input
+     * @param  array<string,mixed>  $input
      * @return array<array{errors:array<array{message:string}>}>
      */
     protected function createBatchingNotSupportedResponse(array $input): array
@@ -78,7 +79,7 @@ class GraphQLController extends Controller
     {
         $path = $request->getPathInfo();
 
-        if (!Str::startsWith($path, $routePrefix)) {
+        if (! Str::startsWith($path, $routePrefix)) {
             return null;
         }
 

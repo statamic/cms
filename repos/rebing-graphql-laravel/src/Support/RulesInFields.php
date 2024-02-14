@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support;
 
 use GraphQL\Error\InvariantViolation;
@@ -16,7 +17,7 @@ class RulesInFields
     protected $fieldsAndArguments;
 
     /**
-     * @param array<string,mixed> $fieldsAndArgumentsSelection
+     * @param  array<string,mixed>  $fieldsAndArgumentsSelection
      */
     public function __construct(Type $parentType, array $fieldsAndArgumentsSelection)
     {
@@ -35,8 +36,8 @@ class RulesInFields
     }
 
     /**
-     * @param array<string,mixed>|string|callable $rules
-     * @param array<string,mixed> $arguments
+     * @param  array<string,mixed>|string|callable  $rules
+     * @param  array<string,mixed>  $arguments
      * @return array<string,mixed>|string
      */
     protected function resolveRules($rules, array $arguments)
@@ -51,7 +52,7 @@ class RulesInFields
     /**
      * Get rules from fields.
      *
-     * @param array<string,mixed> $fields
+     * @param  array<string,mixed>  $fields
      * @return array<string,mixed>
      */
     protected function getRules(array $fields, ?string $prefix, Type $parentType): array
@@ -59,10 +60,10 @@ class RulesInFields
         $rules = [];
 
         foreach ($fields as $name => $field) {
-            $key = null === $prefix ? $name : "{$prefix}.{$name}";
+            $key = $prefix === null ? $name : "{$prefix}.{$name}";
 
             try {
-                if (!method_exists($parentType, 'getField')) {
+                if (! method_exists($parentType, 'getField')) {
                     continue;
                 }
                 $fieldObject = $parentType->getField($name);
@@ -71,14 +72,14 @@ class RulesInFields
             }
 
             if (\is_array($field['fields'])) {
-                $rules = $rules + $this->getRules($field['fields'], $key . '.fields', $fieldObject->getType());
+                $rules = $rules + $this->getRules($field['fields'], $key.'.fields', $fieldObject->getType());
             }
 
             $args = $fieldObject->config['args'] ?? [];
 
             foreach ($args as $argName => $info) {
                 if (isset($info['rules'])) {
-                    $rules[$key . '.args.' . $argName] = $this->resolveRules($info['rules'], $field['args']);
+                    $rules[$key.'.args.'.$argName] = $this->resolveRules($info['rules'], $field['args']);
                 }
             }
         }

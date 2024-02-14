@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support;
 
 use GraphQL\Error\Error;
@@ -47,8 +48,8 @@ class OperationParams extends BaseOperationParams
 
     public function getParsedQuery(): DocumentNode
     {
-        if (!$this->parsedQuery) {
-            if (!$this->query) {
+        if (! $this->parsedQuery) {
+            if (! $this->query) {
                 throw new Error('No GraphQL query available');
             }
 

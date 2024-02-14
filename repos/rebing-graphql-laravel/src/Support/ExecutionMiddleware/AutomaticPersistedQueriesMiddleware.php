@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support\ExecutionMiddleware;
 
 use Closure;
@@ -33,19 +34,19 @@ class AutomaticPersistedQueriesMiddleware extends AbstractExecutionMiddleware
         // Even if APQ is disabled, we keep this logic for the negotiation protocol
         $persistedQuery = $params->extensions['persistedQuery'] ?? null;
 
-        if ($persistedQuery && !$apqEnabled) {
+        if ($persistedQuery && ! $apqEnabled) {
             throw AutomaticPersistedQueriesError::persistedQueriesNotSupported();
         }
 
         // APQ disabled? Nothing to be done
-        if (!$apqEnabled) {
+        if (! $apqEnabled) {
             return $next($schemaName, $schema, $params, $rootValue, $contextValue);
         }
 
         // No hash? Nothing to be done
         $hash = $persistedQuery['sha256Hash'] ?? null;
 
-        if (null === $hash) {
+        if ($hash === null) {
             return $next($schemaName, $schema, $params, $rootValue, $contextValue);
         }
 
@@ -75,7 +76,7 @@ class AutomaticPersistedQueriesMiddleware extends AbstractExecutionMiddleware
         }
 
         // retrieve from cache
-        if (!$cache->has($apqCacheIdentifier)) {
+        if (! $cache->has($apqCacheIdentifier)) {
             throw AutomaticPersistedQueriesError::persistedQueriesNotFound();
         }
 

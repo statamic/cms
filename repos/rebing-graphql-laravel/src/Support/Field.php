@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support;
 
 use Closure;
@@ -30,10 +31,10 @@ abstract class Field
      * Override this in your queries or mutations
      * to provide custom authorization.
      *
-     * @param mixed $root
-     * @param mixed $ctx
+     * @param  mixed  $root
+     * @param  mixed  $ctx
      */
-    public function authorize($root, array $args, $ctx, ResolveInfo $resolveInfo = null, Closure $getSelectFields = null): bool
+    public function authorize($root, array $args, $ctx, ?ResolveInfo $resolveInfo = null, ?Closure $getSelectFields = null): bool
     {
         return true;
     }
@@ -56,7 +57,7 @@ abstract class Field
     /**
      * Define custom Laravel Validator messages as per Laravel 'custom error messages'.
      *
-     * @param array $args submitted arguments
+     * @param  array  $args  submitted arguments
      */
     public function validationErrorMessages(array $args = []): array
     {
@@ -66,7 +67,7 @@ abstract class Field
     /**
      * Define custom Laravel Validator attributes as per Laravel 'custom attributes'.
      *
-     * @param array<string,mixed> $args submitted arguments
+     * @param  array<string,mixed>  $args  submitted arguments
      * @return array<string,string>
      */
     public function validationAttributes(array $args = []): array
@@ -75,7 +76,7 @@ abstract class Field
     }
 
     /**
-     * @param array<string,mixed> $args
+     * @param  array<string,mixed>  $args
      * @return array<string,mixed>
      */
     protected function rules(array $args = []): array
@@ -84,7 +85,7 @@ abstract class Field
     }
 
     /**
-     * @param array<string,mixed> $arguments
+     * @param  array<string,mixed>  $arguments
      * @return array<string,mixed>
      */
     public function getRules(array $arguments = []): array
@@ -96,8 +97,8 @@ abstract class Field
     }
 
     /**
-     * @param array<string,mixed> $arguments
-     * @param array<string,mixed> $rules
+     * @param  array<string,mixed>  $arguments
+     * @param  array<string,mixed>  $rules
      */
     protected function validateArguments(array $arguments, array $rules): void
     {
@@ -109,13 +110,13 @@ abstract class Field
     }
 
     /**
-     * @param array<string,mixed> $fieldsAndArgumentsSelection
+     * @param  array<string,mixed>  $fieldsAndArgumentsSelection
      */
     public function validateFieldArguments(array $fieldsAndArgumentsSelection): void
     {
         $argsRules = (new RulesInFields($this->type(), $fieldsAndArgumentsSelection))->get();
 
-        if (!$argsRules) {
+        if (! $argsRules) {
             return;
         }
 
@@ -149,7 +150,7 @@ abstract class Field
     {
         $resolver = $this->originalResolver();
 
-        if (!$resolver) {
+        if (! $resolver) {
             return null;
         }
 
@@ -181,7 +182,7 @@ abstract class Field
 
     protected function originalResolver(): ?Closure
     {
-        if (!method_exists($this, 'resolve')) {
+        if (! method_exists($this, 'resolve')) {
             return null;
         }
 
@@ -213,7 +214,7 @@ abstract class Field
             $arguments[1] = $this->getArgs($arguments);
 
             // Authorize
-            if (true != \call_user_func_array($authorize, $arguments)) {
+            if (\call_user_func_array($authorize, $arguments) != true) {
                 throw new AuthorizationError($this->getAuthorizationMessage());
             }
 
@@ -230,7 +231,7 @@ abstract class Field
 
                 $className = $paramType->getName();
 
-                if (Closure::class === $className) {
+                if ($className === Closure::class) {
                     return function () use ($arguments, $fieldsAndArguments) {
                         return $this->instanciateSelectFields($arguments, $fieldsAndArguments);
                     };
@@ -240,7 +241,7 @@ abstract class Field
                     return $this->instanciateSelectFields($arguments, $fieldsAndArguments);
                 }
 
-                if (ResolveInfo::class === $className) {
+                if ($className === ResolveInfo::class) {
                     return $arguments[3];
                 }
 
@@ -255,8 +256,8 @@ abstract class Field
     }
 
     /**
-     * @param array<int,mixed> $arguments
-     * @param array<string,mixed> $fieldsAndArguments
+     * @param  array<int,mixed>  $arguments
+     * @param  array<string,mixed>  $fieldsAndArguments
      */
     protected function instanciateSelectFields(array $arguments, array $fieldsAndArguments): SelectFields
     {
@@ -325,8 +326,7 @@ abstract class Field
     /**
      * Dynamically retrieve the value of an attribute.
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return mixed
      */
     public function __get($key)

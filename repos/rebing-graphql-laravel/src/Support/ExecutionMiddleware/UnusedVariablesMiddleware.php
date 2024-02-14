@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support\ExecutionMiddleware;
 
 use Closure;
@@ -16,7 +17,7 @@ class UnusedVariablesMiddleware extends AbstractExecutionMiddleware
     {
         $unusedVariables = $params->variables;
 
-        if (!$unusedVariables) {
+        if (! $unusedVariables) {
             return $next($schemaName, $schema, $params, $rootValue, $contextValue);
         }
 

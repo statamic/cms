@@ -1,6 +1,7 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Rebing\GraphQL\Support;
 
 use GraphQL\Type\Definition\FieldDefinition;
@@ -47,7 +48,7 @@ abstract class Type implements TypeConvertible
             return $field['resolve'];
         }
 
-        $resolveMethod = 'resolve' . Str::studly($name) . 'Field';
+        $resolveMethod = 'resolve'.Str::studly($name).'Field';
 
         if (method_exists($this, $resolveMethod)) {
             $resolver = [$this, $resolveMethod];
@@ -59,7 +60,7 @@ abstract class Type implements TypeConvertible
             };
         }
 
-        if (isset($field['alias']) && \is_string($field['alias']) && !($this instanceof InputType)) {
+        if (isset($field['alias']) && \is_string($field['alias']) && ! ($this instanceof InputType)) {
             $alias = $field['alias'];
 
             return function ($type) use ($alias) {
@@ -103,6 +104,7 @@ abstract class Type implements TypeConvertible
 
     /**
      * Get the attributes from the container.
+     *
      * @return array<string,mixed>
      */
     public function getAttributes(): array
@@ -135,8 +137,7 @@ abstract class Type implements TypeConvertible
     /**
      * Dynamically retrieve the value of an attribute.
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return mixed
      */
     public function __get($key)
@@ -147,7 +148,7 @@ abstract class Type implements TypeConvertible
     }
 
     /**
-     * @param mixed $value
+     * @param  mixed  $value
      */
     public function __set(string $key, $value): void
     {
