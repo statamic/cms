@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Data;
+use Statamic\Facades\StaticCache;
 
 class Session
 {
@@ -102,7 +103,7 @@ class Session
             return;
         }
 
-        $store = $this->cacheStore();
+        $store = StaticCache::cacheStore();
 
         $store->forever('nocache::urls', collect($store->get('nocache::urls', []))->push($this->url)->unique()->all());
 
@@ -113,7 +114,7 @@ class Session
 
     public function restore()
     {
-        $session = $this->cacheStore()->get('nocache::session.'.md5($this->url));
+        $session = StaticCache::cacheStore()->get('nocache::session.'.md5($this->url));
 
         $this->regions = $this->regions->merge($session['regions'] ?? []);
         $this->cascade = $this->restoreCascade();
@@ -142,17 +143,6 @@ class Session
 
     private function cacheRegion(Region $region)
     {
-        $this->cacheStore()->forever('nocache::region.'.$region->key(), $region);
-    }
-
-    private function cacheStore()
-    {
-        try {
-            $store = Cache::store('static_cache');
-        } catch (InvalidArgumentException $e) {
-            $store = Cache::store();
-        }
-
-        return $store;
+        StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), $region);
     }
 }
