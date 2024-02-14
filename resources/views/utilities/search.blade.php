@@ -14,7 +14,7 @@
             <form method="POST" action="{{ cp_route('utilities.search', 'all') }}">
                 @csrf
                 @foreach (\Statamic\Facades\Search::indexes() as $index)
-                    <input type="hidden" name="indexes[]" value="{{ $index->name() }}">
+                    <input type="hidden" name="indexes[]" value="{{ $index->name() }}::{{ $index->locale() }}">
                 @endforeach
                 <button class="btn-primary">{{ __('Update All') }}</button>
             </form>

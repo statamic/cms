@@ -68,6 +68,8 @@ class Role extends BaseRole
 
         $this->permissions = collect($permissions);
 
+        app(PermissionCache::class)->clear();
+
         return $this;
     }
 
@@ -88,6 +90,8 @@ class Role extends BaseRole
         $this->permissions = $this->permissions
             ->diff(Arr::wrap($permission))
             ->values();
+
+        app(PermissionCache::class)->clear();
 
         return $this;
     }

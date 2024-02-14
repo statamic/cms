@@ -3,6 +3,7 @@
 namespace Statamic\Search\Searchables;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Entry;
 
@@ -18,7 +19,7 @@ class Entries extends Provider
         return 'entry';
     }
 
-    public function provide(): Collection
+    public function provide(): Collection|LazyCollection
     {
         $query = Entry::query();
 
@@ -30,7 +31,7 @@ class Entries extends Provider
             $query->where('site', $site);
         }
 
-        return $query->get()->filter($this->filter())->values();
+        return $query->lazy(100)->filter($this->filter())->values();
     }
 
     public function contains($searchable): bool

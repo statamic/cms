@@ -10,7 +10,7 @@
             'title' => __('User Groups')
         ])
         <div class="flex items-center">
-            <h1 class="flex-1">{{ $group->title() }}</h1>
+            <h1 class="flex-1">{{ __($group->title()) }}</h1>
             <dropdown-list class="mr-2">
                 @can('edit', $group)
                     <dropdown-item :text="__('Edit User Group')" redirect="{{ $group->editUrl() }}"></dropdown-item>

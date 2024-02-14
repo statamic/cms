@@ -13,6 +13,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionSaved;
 use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
@@ -614,6 +615,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
+    /** @deprecated */
     public function revisions($enabled = null)
     {
         return $this
@@ -727,6 +729,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function delete()
     {
+        if (CollectionDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->queryEntries()->get()->each(function ($entry) {
             $entry->deleteDescendants();
             $entry->delete();

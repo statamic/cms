@@ -136,8 +136,8 @@ class TaxonomiesController extends CpController
             'routes' => $taxonomy->routes()->unique()->count() === 1
                 ? $taxonomy->routes()->first()
                 : $taxonomy->routes()->all(),
-            'term_template' => $taxonomy->termTemplate(),
-            'template' => $taxonomy->template(),
+            'term_template' => $taxonomy->hasCustomTermTemplate() ? $taxonomy->termTemplate() : null,
+            'template' => $taxonomy->hasCustomTemplate() ? $taxonomy->template() : null,
             'layout' => $taxonomy->layout(),
         ];
 
