@@ -28,6 +28,10 @@ jobs:
             stability: prefer-stable
         exclude:
           - php: 8.0
+            laravel: 11.*
+          - php: 8.1
+            laravel: 11.*
+          - php: 8.0
             laravel: 10.*
           - php: 8.3
             laravel: 9.*
