@@ -146,7 +146,7 @@ class RequestCacheTest extends TestCase
         ], $requests->all());
     }
 
-    public function bypassCacheProvider()
+    public static function bypassCacheProvider()
     {
         return [
             ['/graphql?token=test-token', []],
