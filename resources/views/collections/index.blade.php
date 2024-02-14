@@ -1,15 +1,15 @@
 @extends('statamic::layout')
-@section('title', __('Collections'))
+@section('title', Statamic\trans('Collections'))
 
 @section('content')
 
     @unless($collections->isEmpty())
 
         <div class="flex items-center justify-between mb-6">
-            <h1>{{ __('Collections') }}</h1>
+            <h1>{{ Statamic\trans('Collections') }}</h1>
 
             @can('create', 'Statamic\Contracts\Entries\Collection')
-                <a href="{{ cp_route('collections.create') }}" class="btn-primary">{{ __('Create Collection') }}</a>
+                <a href="{{ cp_route('collections.create') }}" class="btn-primary">{{ Statamic\trans('Create Collection') }}</a>
             @endcan
         </div>
 
@@ -22,10 +22,10 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'title' => __('Collections'),
-            'description' => __('statamic::messages.collection_configure_intro'),
+            'title' => Statamic\trans('Collections'),
+            'description' => Statamic\trans('statamic::messages.collection_configure_intro'),
             'svg' => 'empty/content',
-            'button_text' => __('Create Collection'),
+            'button_text' => Statamic\trans('Create Collection'),
             'button_url' => cp_route('collections.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Entries\Collection')
         ])
@@ -33,7 +33,7 @@
     @endunless
 
     @include('statamic::partials.docs-callout', [
-        'topic' => __('Collections'),
+        'topic' => Statamic\trans('Collections'),
         'url' => Statamic::docsUrl('collections-and-entries')
     ])
 

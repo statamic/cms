@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Create Collection'))
+@section('title', Statamic\trans('Create Collection'))
 
 @section('content')
     <collection-create-form

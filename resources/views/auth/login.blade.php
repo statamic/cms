@@ -1,6 +1,6 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::outside')
-@section('title', __('Log in'))
+@section('title', Statamic\trans('Log in'))
 
 @section('content')
 
@@ -14,18 +14,18 @@
                 @foreach ($providers as $provider)
                     <div class="provider mb-2">
                         <a href="{{ $provider->loginUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}" class="w-full btn-primary">
-                            {{ __('Log in with :provider', ['provider' => $provider->label()]) }}
+                            {{ Statamic\trans('Log in with :provider', ['provider' => $provider->label()]) }}
                         </a>
                     </div>
                 @endforeach
             </div>
 
             @if($emailLoginEnabled)
-                <div class="text-center text-sm text-gray-700 py-6">&mdash; {{ __('or') }} &mdash;</div>
+                <div class="text-center text-sm text-gray-700 py-6">&mdash; {{ Statamic\trans('or') }} &mdash;</div>
 
                 <div class="login-with-email" v-if="! showEmailLogin">
                     <a class="btn w-full" @click.prevent="showEmailLogin = true">
-                        {{ __('Log in with email') }}
+                        {{ Statamic\trans('Log in with email') }}
                     </a>
                 </div>
             @endif
@@ -37,22 +37,22 @@
             <input type="hidden" name="referer" value="{{ $referer }}" />
 
             <div class="mb-8">
-                <label class="mb-2" for="input-email">{{ __('Email') }}</label>
+                <label class="mb-2" for="input-email">{{ Statamic\trans('Email') }}</label>
                 <input type="text" class="input-text input-text" name="email" value="{{ old('email') }}" autofocus id="input-email">
                 @if ($hasError('email'))<div class="text-red-500 text-xs mt-2">{{ $errors->first('email') }}</div>@endif
             </div>
 
             <div class="mb-8">
-                <label class="mb-2" for="input-password">{{ __('Password') }}</label>
+                <label class="mb-2" for="input-password">{{ Statamic\trans('Password') }}</label>
                 <input type="password" class="input-text input-text" name="password" id="input-password">
                 @if ($hasError('password'))<div class="text-red-500 text-xs mt-2">{{ $errors->first('password') }}</div>@endif
             </div>
             <div class="flex justify-between items-center">
                 <label for="remember-me" class="flex items-center cursor-pointer">
                     <input type="checkbox" name="remember" id="remember-me">
-                    <span class="ml-2">{{ __('Remember me') }}</span>
+                    <span class="ml-2">{{ Statamic\trans('Remember me') }}</span>
                 </label>
-                <button type="submit" class="btn-primary">{{ __('Log in') }}</button>
+                <button type="submit" class="btn-primary">{{ Statamic\trans('Log in') }}</button>
             </div>
         </form>
     </div>
@@ -61,7 +61,7 @@
 @if ($emailLoginEnabled)
     <div class="w-full text-center mt-4">
         <a href="{{ cp_route('password.request') }}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
-            {{ __('Forgot password?') }}
+            {{ Statamic\trans('Forgot password?') }}
         </a>
     </div>
 @endif

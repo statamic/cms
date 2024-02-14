@@ -1,14 +1,14 @@
 @extends('statamic::layout')
-@section('title', Statamic::crumb(__('Email'), __('Utilities')))
+@section('title', Statamic::crumb(Statamic\trans('Email'), Statamic\trans('Utilities')))
 
 @section('content')
 
     <header class="mb-6">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('utilities.index'),
-            'title' => __('Utilities')
+            'title' => Statamic\trans('Utilities')
         ])
-        <h1>{{ __('Email') }}</h1>
+        <h1>{{ Statamic\trans('Email') }}</h1>
     </header>
 
     <div class="card">
@@ -17,7 +17,7 @@
 
             <div class="flex items-center">
                 <input class="input-text mr-4" type="text" name="email" value="{{ old('email', $user->email()) }}" />
-                <button type="submit" class="btn-primary">{{ __('Send Test Email') }}</button>
+                <button type="submit" class="btn-primary">{{ Statamic\trans('Send Test Email') }}</button>
             </div>
             @if ($errors->has('email'))
                 <p class="mt-2"><small class="help-block text-red-500">{{ $errors->first('email') }}</small></p>
@@ -25,8 +25,8 @@
         </form>
     </div>
 
-    <h2 class="mt-10 mb-2 font-bold text-lg">{{ __('Configuration') }}</h2>
-    <p class="text-sm text-gray mb-4">{!! __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
+    <h2 class="mt-10 mb-2 font-bold text-lg">{{ Statamic\trans('Configuration') }}</h2>
+    <p class="text-sm text-gray mb-4">{!! Statamic\trans('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
     <div class="card p-0">
         <table class="data-table">
             @if (config('mail.mailers'))
@@ -35,7 +35,7 @@
                 @include('statamic::utilities.partials.email-l6')
             @endif
             <tr>
-                <th class="pl-4 py-2 w-1/4">{{ __('Default From Address') }}</th>
+                <th class="pl-4 py-2 w-1/4">{{ Statamic\trans('Default From Address') }}</th>
                 <td>
                     @if (config('mail.from.address'))
                         <code>{{ config('mail.from.address') }}</code>
@@ -43,7 +43,7 @@
                 </td>
             </tr>
             <tr>
-                <th class="pl-4 py-2 w-1/4">{{ __('Default From Name') }}</th>
+                <th class="pl-4 py-2 w-1/4">{{ Statamic\trans('Default From Name') }}</th>
                 <td>
                     @if (config('mail.from.name'))
                         <code>{{ config('mail.from.name') }}</code>
@@ -51,7 +51,7 @@
                 </td>
             </tr>
             <tr>
-                <th class="pl-4 py-2 w-1/4">{{ __('Markdown theme') }}</th>
+                <th class="pl-4 py-2 w-1/4">{{ Statamic\trans('Markdown theme') }}</th>
                 <td>
                     @if (config('mail.markdown.theme'))
                         <code>{{ config('mail.markdown.theme') }}</code>
@@ -59,7 +59,7 @@
                 </td>
             </tr>
             <tr>
-                <th class="pl-4 py-2 w-1/4">{{ __('Markdown paths') }}</th>
+                <th class="pl-4 py-2 w-1/4">{{ Statamic\trans('Markdown paths') }}</th>
                 <td>
                     @foreach (config('mail.markdown.paths') as $path)
                         <code>{{ $path }}</code><br>

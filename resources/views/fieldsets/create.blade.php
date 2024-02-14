@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Create Fieldset'))
+@section('title', Statamic\trans('Create Fieldset'))
 
 @section('content')
     <fieldset-create-form

@@ -1,13 +1,13 @@
 @extends('statamic::layout')
-@section('title', __('Fieldsets'))
+@section('title', Statamic\trans('Fieldsets'))
 
 @section('content')
 
     @unless($fieldsets->isEmpty())
 
         <div class="flex mb-6">
-            <h1 class="flex-1">{{ __('Fieldsets') }}</h1>
-            <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary">{{ __('Create Fieldset') }}</a>
+            <h1 class="flex-1">{{ Statamic\trans('Fieldsets') }}</h1>
+            <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary">{{ Statamic\trans('Create Fieldset') }}</a>
         </div>
 
         @foreach ($fieldsets as $key => $f)
@@ -20,17 +20,17 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'title' => __('Fieldsets'),
-            'description' => __('statamic::messages.fieldset_intro'),
+            'title' => Statamic\trans('Fieldsets'),
+            'description' => Statamic\trans('statamic::messages.fieldset_intro'),
             'svg' => 'empty/fieldsets',
-            'button_text' => __('Create Fieldset'),
+            'button_text' => Statamic\trans('Create Fieldset'),
             'button_url' => cp_route('fieldsets.create'),
         ])
 
     @endunless
 
     @include('statamic::partials.docs-callout', [
-        'topic' => __('Fieldsets'),
+        'topic' => Statamic\trans('Fieldsets'),
         'url' => Statamic::docsUrl('fieldsets')
     ])
 

@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Preferences'))
+@section('title', Statamic\trans('Preferences'))
 
 @section('content')
 
@@ -13,12 +13,12 @@
                 <td>
                     <div class="flex items-center">
                         <div class="w-4 h-4 mr-4">@cp_svg('icons/light/earth')</div>
-                        <a href="{{ cp_route('preferences.default.edit') }}">{{ __('Default') }}</a>
+                        <a href="{{ cp_route('preferences.default.edit') }}">{{ Statamic\trans('Default') }}</a>
                     </div>
                 </td>
                 <td class="text-right text-2xs text-gray-500">
                     @if (!empty(Statamic\Facades\Preference::default()->all()))
-                        {{ __('Modified') }}
+                        {{ Statamic\trans('Modified') }}
                     @endif
                 </td>
             </tr>
@@ -26,7 +26,7 @@
     </div>
 
     @if (Statamic\Facades\Role::all()->isNotEmpty())
-        <h3 class="little-heading pl-0 mb-2">{{ __('Override For Role') }}</h3>
+        <h3 class="little-heading pl-0 mb-2">{{ Statamic\trans('Override For Role') }}</h3>
         <div class="card p-0 mb-4">
             <table class="data-table">
                 @foreach (Statamic\Facades\Role::all() as $role)
@@ -34,12 +34,12 @@
                         <td>
                             <div class="flex items-center">
                                 <div class="w-4 h-4 mr-4">@cp_svg('icons/light/shield-key')</div>
-                                <a href="{{ cp_route('preferences.role.edit', [$role->handle()]) }}">{{ __($role->title()) }}</a>
+                                <a href="{{ cp_route('preferences.role.edit', [$role->handle()]) }}">{{ Statamic\trans($role->title()) }}</a>
                             </div>
                         </td>
                         <td class="text-right text-2xs text-gray-500">
                             @if (!empty($role->preferences()))
-                                {{ __('Modified') }}
+                                {{ Statamic\trans('Modified') }}
                             @endif
                         </td>
                     </tr>
@@ -48,19 +48,19 @@
         </div>
     @endif
 
-    <h3 class="little-heading pl-0 mb-2">{{ __('Override For User') }}</h3>
+    <h3 class="little-heading pl-0 mb-2">{{ Statamic\trans('Override For User') }}</h3>
     <div class="card p-0 mb-4">
         <table class="data-table">
             <tr>
                 <td>
                     <div class="flex items-center">
                         <div class="w-4 h-4 mr-4">@cp_svg('icons/light/user')</div>
-                        <a href="{{ cp_route('preferences.user.edit') }}">{{ __('My Preferences') }}</a>
+                        <a href="{{ cp_route('preferences.user.edit') }}">{{ Statamic\trans('My Preferences') }}</a>
                     </div>
                 </td>
                 <td class="text-right text-2xs text-gray-500">
                     @if (!empty(Statamic\Facades\User::current()->preferences()))
-                        {{ __('Modified') }}
+                        {{ Statamic\trans('Modified') }}
                     @endif
                 </td>
             </tr>
@@ -68,7 +68,7 @@
     </div>
 
     @include('statamic::partials.docs-callout', [
-        'topic' => __('Preferences'),
+        'topic' => Statamic\trans('Preferences'),
         'url' => Statamic::docsUrl('preferences')
     ])
 @endsection

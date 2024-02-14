@@ -1,11 +1,11 @@
 @extends('statamic::layout')
-@section('title', __('Edit Blueprint'))
+@section('title', Statamic\trans('Edit Blueprint'))
 
 @section('content')
 
     @include('statamic::partials.breadcrumb', [
         'url' => cp_route('taxonomies.blueprints.index', $taxonomy),
-        'title' => __('Blueprints')
+        'title' => Statamic\trans('Blueprints')
     ])
 
     <blueprint-builder
@@ -15,7 +15,7 @@
     ></blueprint-builder>
 
     @include('statamic::partials.docs-callout', [
-        'topic' => __('Blueprints'),
+        'topic' => Statamic\trans('Blueprints'),
         'url' => Statamic::docsUrl('blueprints')
     ])
 

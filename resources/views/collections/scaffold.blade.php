@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Scaffold Collection'))
+@section('title', Statamic\trans('Scaffold Collection'))
 
 @section('content')
     <header class="mb-6">
@@ -7,7 +7,7 @@
             'url' => cp_route('collections.show', $collection->handle()),
             'title' => $collection->title()
         ])
-        <h1> {{ __('Scaffold Views') }}</h1>
+        <h1> {{ Statamic\trans('Scaffold Views') }}</h1>
     </header>
 
     <collection-scaffolder

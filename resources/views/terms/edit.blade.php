@@ -1,6 +1,6 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', __('Edit Term'))
+@section('title', Statamic\trans('Edit Term'))
 @section('wrapper_class', 'max-w-3xl')
 
 @section('content')

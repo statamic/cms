@@ -1,11 +1,11 @@
 @extends('statamic::layout')
-@section('title', __('Licensing'))
+@section('title', Statamic\trans('Licensing'))
 
 @section('content')
 
     @include('statamic::partials.breadcrumb', [
         'url' => cp_route('utilities.index'),
-        'title' => __('Utilities')
+        'title' => Statamic\trans('Utilities')
     ])
 
     @if ($requestError)
@@ -13,11 +13,11 @@
         <div class="no-results md:pt-30 max-w-2xl mx-auto">
             <div class="flex flex-wrap items-center">
                 <div class="w-full md:w-1/2">
-                    <h1 class="mb-8">{{ __('Licensing') }}</h1>
+                    <h1 class="mb-8">{{ Statamic\trans('Licensing') }}</h1>
                     <p class="text-gray-700 leading-normal mb-8 text-lg antialiased">
-                        {{ __('statamic::messages.outpost_issue_try_later') }}
+                        {{ Statamic\trans('statamic::messages.outpost_issue_try_later') }}
                     </p>
-                    <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
+                    <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ Statamic\trans('Try again') }}</a>
                 </div>
                 <div class="hidden md:block w-1/2 pl-16">
                     @cp_svg('empty/navigation')
@@ -28,30 +28,30 @@
     @else
 
         <div class="flex mb-6">
-            <h1 class="flex-1">{{ __('Licensing') }}</h1>
+            <h1 class="flex-1">{{ Statamic\trans('Licensing') }}</h1>
         </div>
 
         @if ($configCached)
             <div class="text-xs border border-yellow-dark rounded p-4 bg-yellow">
-                <div class="font-bold mb-2">{{ __('Configuration is cached') }}</div>
-                <p>{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>
+                <div class="font-bold mb-2">{{ Statamic\trans('Configuration is cached') }}</div>
+                <p>{!! Statamic\trans('statamic::messages.licensing_config_cached_warning') !!}</p>
            </div>
         @endif
 
         @if ($site->key() && $site->usesIncorrectKeyFormat())
             <div class="text-xs border border-yellow-dark rounded p-4 bg-yellow {{ $configCached ? 'mt-8' : '' }}">
-                <div class="font-bold mb-2">{{ __('statamic::messages.licensing_incorrect_key_format_heading') }}</div>
-                <p>{!! __('statamic::messages.licensing_incorrect_key_format_body') !!}</p>
+                <div class="font-bold mb-2">{{ Statamic\trans('statamic::messages.licensing_incorrect_key_format_heading') }}</div>
+                <p>{!! Statamic\trans('statamic::messages.licensing_incorrect_key_format_body') !!}</p>
            </div>
         @endif
 
-        <h6 class="mt-8">{{ __('Site') }}</h6>
+        <h6 class="mt-8">{{ Statamic\trans('Site') }}</h6>
         <div class="card p-0 mt-2">
             <table class="data-table">
                 <tr>
                     <td class="w-64 font-bold">
                         <span class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-500' }} mr-2"></span>
-                        {{ $site->key() ?? __('No license key') }}
+                        {{ $site->key() ?? Statamic\trans('No license key') }}
                     </td>
                     <td class="relative">
                         {{ $site->domain()['url'] ?? '' }}
@@ -64,7 +64,7 @@
             </table>
         </div>
 
-        <h6 class="mt-8">{{ __('Core') }}</h6>
+        <h6 class="mt-8">{{ Statamic\trans('Core') }}</h6>
         <div class="card p-0 mt-2">
             <table class="data-table">
                 <tr>
@@ -78,9 +78,9 @@
             </table>
         </div>
 
-        <h6 class="mt-8">{{ __('Addons') }}</h6>
+        <h6 class="mt-8">{{ Statamic\trans('Addons') }}</h6>
         @if ($addons->isEmpty())
-        <p class="text-sm text-gray mt-2">{{ __('No addons installed') }}</p>
+        <p class="text-sm text-gray mt-2">{{ Statamic\trans('No addons installed') }}</p>
         @else
         <div class="card p-0 mt-2">
             <table class="data-table">
@@ -100,7 +100,7 @@
         @endif
 
         @if (!$unlistedAddons->isEmpty())
-        <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>
+        <h6 class="mt-8">{{ Statamic\trans('Unlisted Addons') }}</h6>
         <div class="card p-0 mt-2">
             <table class="data-table">
                 @foreach ($unlistedAddons as $addon)
@@ -117,16 +117,16 @@
         @endif
 
         <div class="mt-10 py-4 border-t flex items-center">
-            <a href="{{ $site->url() }}" target="_blank" class="btn btn-primary mr-4">{{ __('Edit Site') }}</a>
-            @if ($addToCartUrl) <a href="{{ $addToCartUrl }}" target="_blank" class="btn mr-4">{{ __('Buy Licenses') }}</a> @endif
-            <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn">{{ __('Sync') }}</a>
-            <p class="ml-4 text-2xs text-gray">{{ __('statamic::messages.licensing_sync_instructions') }}</p>
+            <a href="{{ $site->url() }}" target="_blank" class="btn btn-primary mr-4">{{ Statamic\trans('Edit Site') }}</a>
+            @if ($addToCartUrl) <a href="{{ $addToCartUrl }}" target="_blank" class="btn mr-4">{{ Statamic\trans('Buy Licenses') }}</a> @endif
+            <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn">{{ Statamic\trans('Sync') }}</a>
+            <p class="ml-4 text-2xs text-gray">{{ Statamic\trans('statamic::messages.licensing_sync_instructions') }}</p>
         </div>
 
     @endif
 
     @include('statamic::partials.docs-callout', [
-        'topic' => __('Licensing'),
+        'topic' => Statamic\trans('Licensing'),
         'url' => Statamic::docsUrl('licensing')
     ])
 

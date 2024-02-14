@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Dashboard'))
+@section('title', Statamic\trans('Dashboard'))
 
 @section('content')
 
@@ -12,7 +12,7 @@
     </div>
 
     @include('statamic::partials.docs-callout', [
-        'topic' => __('Widgets'),
+        'topic' => Statamic\trans('Widgets'),
         'url' => Statamic::docsUrl('widgets')
     ])
 

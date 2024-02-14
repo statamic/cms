@@ -1,6 +1,6 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', __('Create User'))
+@section('title', Statamic\trans('Create User'))
 
 @section('content')
     <user-wizard

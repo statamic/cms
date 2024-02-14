@@ -1,12 +1,12 @@
 @extends('statamic::layout')
-@section('title', __('Users'))
+@section('title', Statamic\trans('Users'))
 @section('wrapper_class', 'max-w-full')
 
 @section('content')
 
     <header class="flex items-center mb-6">
         <h1 class="flex-1">
-            {{ __('Users') }}
+            {{ Statamic\trans('Users') }}
         </h1>
 
         @can('configure fields')
@@ -16,7 +16,7 @@
         @endcan
 
         @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Auth\User'))
-            <a href="{{ cp_route('users.create') }}" class="btn-primary ml-4">{{ __('Create User') }}</a>
+            <a href="{{ cp_route('users.create') }}" class="btn-primary ml-4">{{ Statamic\trans('Create User') }}</a>
         @endif
     </header>
 
@@ -29,7 +29,7 @@
     ></user-listing>
 
     @include('statamic::partials.docs-callout', [
-        'topic' => __('Users'),
+        'topic' => Statamic\trans('Users'),
         'url' => Statamic::docsUrl('users')
     ])
 

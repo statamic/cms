@@ -4,7 +4,7 @@
             <div class="h-6 w-6 mr-2 text-gray-800">
                 @cp_svg('icons/light/loading-bar')
             </div>
-            <span>{{ __('Updates') }}</span>
+            <span>{{ Statamic\trans('Updates') }}</span>
         </h2>
         @if ($count)
             <a href="{{ cp_route('updater') }}" class="badge-sm bg-green-600 text-white">
@@ -14,7 +14,7 @@
     </header>
     <section class="px-4 py-2">
         @if (! $count)
-            <p class="text-base text-center text-gray-700">{{ __('Everything is up to date.') }}</p>
+            <p class="text-base text-center text-gray-700">{{ Statamic\trans('Everything is up to date.') }}</p>
         @endif
 
         @if ($hasStatamicUpdate)

@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Configure Asset Container'))
+@section('title', Statamic\trans('Configure Asset Container'))
 
 @section('content')
 

@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Configure User Group'))
+@section('title', Statamic\trans('Configure User Group'))
 
 @section('content')
 
