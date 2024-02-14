@@ -6,7 +6,6 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Data;
 use Statamic\Facades\StaticCache;
