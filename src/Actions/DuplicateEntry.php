@@ -21,7 +21,7 @@ class DuplicateEntry extends Action
 
     public function confirmationText()
     {
-        $hasDescendants = collect(config('statamic.sites'))->count() > 1 && $this->items
+        $hasDescendants = Site::hasMultiple() && $this->items
             ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
             ->unique()
             ->contains(fn ($entry) => $entry->descendants()->count());
