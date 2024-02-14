@@ -12,10 +12,9 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
 
     strategy:
-      fail-fast: false
       matrix:
         php: [8.0, 8.1, 8.2, 8.3]
-        laravel: [9.*, 10.*, 11.*]
+        laravel: [9.*, 10.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
@@ -28,10 +27,6 @@ jobs:
             laravel: 10.*
             stability: prefer-stable
         exclude:
-          - php: 8.0
-            laravel: 11.*
-          - php: 8.1
-            laravel: 11.*
           - php: 8.0
             laravel: 10.*
           - php: 8.3
@@ -84,21 +79,6 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
-
-      - name: Install Laravel 11
-        uses: nick-invision/retry@v2
-        if: steps.should-run-tests.outputs.result == 'true' && matrix.laravel == '11.*'
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: |
-            composer config minimum-stability dev
-            composer config repositories.graphql '{ "type": "vcs", "url": "https://github.com/jasonvarga/graphql-laravel" }'
-            composer config repositories.laragraph '{ "type": "vcs", "url": "https://github.com/jasonvarga/laragraph-utils" }'
-            composer require "laragraph/utils dev-make-statamic-work-kthx as 2.0.3" --no-update
-            composer require "rebing/graphql-laravel dev-make-statamic-work-kthx" --no-update
-            composer require "laravel/framework 11.x-dev" --no-update
-            composer require "orchestra/testbench 9.x-dev@dev" --dev --no-update
 
       - name: Install dependencies
         uses: nick-invision/retry@v2
