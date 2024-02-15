@@ -361,8 +361,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         Facades\Entry::save($this);
 
-        $this->syncOriginal();
-
         if ($this->id()) {
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
@@ -400,6 +398,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         }
 
         $stack->pop();
+
+        $this->syncOriginal();
 
         return true;
     }
