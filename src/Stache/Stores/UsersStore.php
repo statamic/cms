@@ -56,7 +56,6 @@ class UsersStore extends BasicStore
         }
 
         // $this->queueGroups($user);
-        $user->syncOriginal();
 
         return $user;
     }

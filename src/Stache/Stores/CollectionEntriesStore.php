@@ -98,8 +98,6 @@ class CollectionEntriesStore extends ChildStore
             $this->writeItemToDiskWithoutIncrementing($entry);
         }
 
-        $entry->syncOriginal();
-
         return $entry;
     }
 
