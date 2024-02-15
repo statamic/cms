@@ -93,7 +93,7 @@ foo: bar
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
     /** @test */
