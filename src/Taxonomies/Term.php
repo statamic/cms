@@ -281,7 +281,7 @@ class Term implements TermContract
         return $this;
     }
 
-    public function getDirtyArray(): array
+    public function getCurrentDirtyStateValues(): array
     {
         return array_merge([
             'slug' => $this->slug(),

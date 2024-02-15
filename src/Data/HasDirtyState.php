@@ -8,7 +8,7 @@ trait HasDirtyState
 {
     protected $original = [];
 
-    abstract public function getDirtyArray();
+    abstract public function getCurrentDirtyStateValues();
 
     /**
      * Is the item or property on the item dirty?
@@ -17,7 +17,7 @@ trait HasDirtyState
      */
     public function isDirty($properties = null): bool
     {
-        $currentValues = $this->getDirtyArray();
+        $currentValues = $this->getCurrentDirtyStateValues();
         $originalValues = $this->getOriginal();
 
         if (! $properties) {
@@ -45,7 +45,7 @@ trait HasDirtyState
 
     public function syncOriginal(): static
     {
-        $this->original = $this->getDirtyArray();
+        $this->original = $this->getCurrentDirtyStateValues();
 
         return $this;
     }

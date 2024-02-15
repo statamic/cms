@@ -1055,7 +1055,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $field->fieldtype()->toQueryableValue($value);
     }
 
-    public function getDirtyArray(): array
+    public function getCurrentDirtyStateValues(): array
     {
         return array_merge([
             'path' => $this->path(),
