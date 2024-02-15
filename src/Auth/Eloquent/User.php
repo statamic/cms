@@ -365,7 +365,7 @@ class User extends BaseUser
         return $this->$key = $value;
     }
 
-    public function getCurrentDirtyStateValues(): array
+    public function getCurrentDirtyStateAttributes(): array
     {
         return array_merge([
             'email' => $this->email(),

@@ -389,7 +389,7 @@ abstract class Tree implements Contract, Localization
         $this->syncOriginal();
     }
 
-    public function getCurrentDirtyStateValues()
+    public function getCurrentDirtyStateAttributes()
     {
         return [
             'tree' => $this->tree,

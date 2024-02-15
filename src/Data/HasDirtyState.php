@@ -8,23 +8,23 @@ trait HasDirtyState
 {
     protected $original = [];
 
-    abstract public function getCurrentDirtyStateValues();
+    abstract public function getCurrentDirtyStateAttributes();
 
     /**
-     * Is the item or property on the item dirty?
+     * Determine if the item or any of the given attribute(s) have been modified.
      *
-     * @param  null|string|array  $properties
+     * @param  null|string|array  $attributes
      */
-    public function isDirty($properties = null): bool
+    public function isDirty($attributes = null): bool
     {
-        $currentValues = $this->getCurrentDirtyStateValues();
+        $currentValues = $this->getCurrentDirtyStateAttributes();
         $originalValues = $this->getOriginal();
 
-        if (! $properties) {
+        if (! $attributes) {
             return json_encode($currentValues) !== json_encode($originalValues);
         }
 
-        return collect($properties)->contains(function ($property) use ($currentValues, $originalValues) {
+        return collect($attributes)->contains(function ($property) use ($currentValues, $originalValues) {
             if (! array_key_exists($property, $currentValues)) {
                 $property = 'data.'.$property;
             }
@@ -34,18 +34,18 @@ trait HasDirtyState
     }
 
     /**
-     * Is the item or property on the item clean?
+     * Determine if the item or all the given attribute(s) have remained the same.
      *
-     * @param  null|string|array  $properties
+     * @param  null|string|array  $attributes
      */
-    public function isClean($properties = null): bool
+    public function isClean($attributes = null): bool
     {
-        return ! $this->isDirty($properties);
+        return ! $this->isDirty($attributes);
     }
 
     public function syncOriginal(): static
     {
-        $this->original = $this->getCurrentDirtyStateValues();
+        $this->original = $this->getCurrentDirtyStateAttributes();
 
         return $this;
     }

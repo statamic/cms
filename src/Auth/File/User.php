@@ -357,7 +357,7 @@ class User extends BaseUser
         return Facades\User::find($this->id);
     }
 
-    public function getCurrentDirtyStateValues(): array
+    public function getCurrentDirtyStateAttributes(): array
     {
         return array_merge([
             'email' => $this->email(),
