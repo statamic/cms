@@ -6,9 +6,9 @@ use Statamic\Support\Arr;
 
 trait HasDirtyState
 {
-    protected $original = [];
+    protected array $original = [];
 
-    abstract public function getCurrentDirtyStateAttributes();
+    abstract public function getCurrentDirtyStateAttributes(): array;
 
     /**
      * Determine if the item or any of the given attribute(s) have been modified.
