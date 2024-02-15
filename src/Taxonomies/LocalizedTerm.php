@@ -16,7 +16,6 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\HasDirtyState;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
@@ -36,12 +35,7 @@ use Statamic\Support\Str;
 
 class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
 {
-    use ContainsSupplementalData, HasAugmentedInstance, HasDirtyState, Publishable, ResolvesValues, Revisable, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
-
-    public function getDirtyArray()
-    {
-        return [];
-    }
+    use ContainsSupplementalData, HasAugmentedInstance, Publishable, ResolvesValues, Revisable, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $locale;
     protected $term;
