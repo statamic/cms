@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Support\Traits;
+namespace Statamic\Data;
 
 use Statamic\Support\Arr;
 

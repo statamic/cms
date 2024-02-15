@@ -23,6 +23,7 @@ use Statamic\Data\ContainsComputedData;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
@@ -51,7 +52,6 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Support\Traits\HasDirtyState;
 
 class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {

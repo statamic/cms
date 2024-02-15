@@ -16,6 +16,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
@@ -32,7 +33,6 @@ use Statamic\Routing\Routable;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
-use Statamic\Support\Traits\HasDirtyState;
 
 class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
 {

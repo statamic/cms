@@ -4,6 +4,7 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\HasDirtyState;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
 use Statamic\Events\TermCreating;
@@ -18,7 +19,6 @@ use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Support\Traits\HasDirtyState;
 
 class Term implements TermContract
 {

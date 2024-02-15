@@ -21,6 +21,7 @@ use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsComputedData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\UserCreated;
@@ -36,7 +37,6 @@ use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
-use Statamic\Support\Traits\HasDirtyState;
 
 abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {

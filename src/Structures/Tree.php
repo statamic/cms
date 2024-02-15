@@ -5,12 +5,12 @@ namespace Statamic\Structures;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Structures\Tree as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\HasDirtyState;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Support\Traits\HasDirtyState;
 
 abstract class Tree implements Contract, Localization
 {

@@ -17,6 +17,7 @@ use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetContainerBlueprintFound;
@@ -41,7 +42,6 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Support\Traits\HasDirtyState;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
