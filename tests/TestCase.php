@@ -215,4 +215,17 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             return $this;
         });
     }
+
+    public function __call($name, $arguments)
+    {
+        if ($name == 'assertStringEqualsStringIgnoringLineEndings') {
+            return Assert::assertThat(
+                $arguments[1],
+                new StringEqualsStringIgnoringLineEndings($arguments[0]),
+                $arguments[2] ?? ''
+            );
+        }
+
+        throw new \BadMethodCallException("Method [$name] does not exist.");
+    }
 }
