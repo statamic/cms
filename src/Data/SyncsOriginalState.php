@@ -5,10 +5,9 @@ namespace Statamic\Data;
 use Statamic\Support\Arr;
 
 /**
- * Deprecated in favor of HasDirtyState
- *
  * @deprecated
- **/
+ * @see \Statamic\Data\HasDirtyState
+ */
 trait SyncsOriginalState
 {
     protected $original = [];
