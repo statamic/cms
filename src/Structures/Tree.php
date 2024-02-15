@@ -377,18 +377,6 @@ abstract class Tree implements Contract, Localization
         return $this;
     }
 
-    public function __sleep()
-    {
-        $vars = Arr::except(get_object_vars($this), ['original']);
-
-        return array_keys($vars);
-    }
-
-    public function __wakeup()
-    {
-        $this->syncOriginal();
-    }
-
     public function getCurrentDirtyStateAttributes(): array
     {
         return [
