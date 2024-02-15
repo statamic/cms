@@ -2176,17 +2176,33 @@ class AssetTest extends TestCase
             'drink' => 'Water',
         ])->save();
 
-        $this->assertEquals(false, $asset->isDirty());
-        $this->assertEquals(false, $asset->isDirty('title'));
-        $this->assertEquals(false, $asset->isDirty(['title']));
+        $this->assertFalse($asset->isDirty());
+        $this->assertFalse($asset->isDirty('title'));
+        $this->assertFalse($asset->isDirty('food'));
+        $this->assertFalse($asset->isDirty(['title']));
+        $this->assertFalse($asset->isDirty(['food']));
+        $this->assertFalse($asset->isDirty(['title', 'food']));
+        $this->assertTrue($asset->isClean());
+        $this->assertTrue($asset->isClean('title'));
+        $this->assertTrue($asset->isClean('food'));
+        $this->assertTrue($asset->isClean(['title']));
+        $this->assertTrue($asset->isClean(['food']));
+        $this->assertTrue($asset->isClean(['title', 'food']));
 
         $asset->merge(['title' => 'French']);
 
-        $this->assertEquals(true, $asset->isDirty());
-        $this->assertEquals(true, $asset->isDirty('title'));
-        $this->assertEquals(true, $asset->isDirty(['title']));
-        $this->assertEquals(false, $asset->isDirty('food'));
-        $this->assertEquals(false, $asset->isDirty(['food']));
+        $this->assertTrue($asset->isDirty());
+        $this->assertTrue($asset->isDirty('title'));
+        $this->assertFalse($asset->isDirty('food'));
+        $this->assertTrue($asset->isDirty(['title']));
+        $this->assertFalse($asset->isDirty(['food']));
+        $this->assertTrue($asset->isDirty(['title', 'food']));
+        $this->assertFalse($asset->isClean());
+        $this->assertFalse($asset->isClean('title'));
+        $this->assertTrue($asset->isClean('food'));
+        $this->assertFalse($asset->isClean(['title']));
+        $this->assertTrue($asset->isClean(['food']));
+        $this->assertFalse($asset->isClean(['title', 'food']));
     }
 
     /** @test */

@@ -2265,17 +2265,33 @@ class EntryTest extends TestCase
             'drink' => 'Water',
         ]))->save();
 
-        $this->assertEquals(false, $entry->isDirty());
-        $this->assertEquals(false, $entry->isDirty('title'));
-        $this->assertEquals(false, $entry->isDirty(['title']));
+        $this->assertFalse($entry->isDirty());
+        $this->assertFalse($entry->isDirty('title'));
+        $this->assertFalse($entry->isDirty('food'));
+        $this->assertFalse($entry->isDirty(['title']));
+        $this->assertFalse($entry->isDirty(['food']));
+        $this->assertFalse($entry->isDirty(['title', 'food']));
+        $this->assertTrue($entry->isClean());
+        $this->assertTrue($entry->isClean('title'));
+        $this->assertTrue($entry->isClean('food'));
+        $this->assertTrue($entry->isClean(['title']));
+        $this->assertTrue($entry->isClean(['food']));
+        $this->assertTrue($entry->isClean(['title', 'food']));
 
         $entry->merge(['title' => 'French']);
 
-        $this->assertEquals(true, $entry->isDirty());
-        $this->assertEquals(true, $entry->isDirty('title'));
-        $this->assertEquals(true, $entry->isDirty(['title']));
-        $this->assertEquals(false, $entry->isDirty('food'));
-        $this->assertEquals(false, $entry->isDirty(['food']));
+        $this->assertTrue($entry->isDirty());
+        $this->assertTrue($entry->isDirty('title'));
+        $this->assertFalse($entry->isDirty('food'));
+        $this->assertTrue($entry->isDirty(['title']));
+        $this->assertFalse($entry->isDirty(['food']));
+        $this->assertTrue($entry->isDirty(['title', 'food']));
+        $this->assertFalse($entry->isClean());
+        $this->assertFalse($entry->isClean('title'));
+        $this->assertTrue($entry->isClean('food'));
+        $this->assertFalse($entry->isClean(['title']));
+        $this->assertTrue($entry->isClean(['food']));
+        $this->assertFalse($entry->isClean(['title', 'food']));
     }
 
     /** @test */

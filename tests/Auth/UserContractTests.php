@@ -522,15 +522,33 @@ trait UserContractTests
         $user->email('test@test.com');
         $user->save();
 
-        $this->assertEquals(false, $user->isDirty());
-        $this->assertEquals(false, $user->isDirty('email'));
-        $this->assertEquals(false, $user->isDirty(['email']));
+        $this->assertFalse($user->isDirty());
+        $this->assertFalse($user->isDirty('email'));
+        $this->assertFalse($user->isDirty('name'));
+        $this->assertFalse($user->isDirty(['email']));
+        $this->assertFalse($user->isDirty(['name']));
+        $this->assertFalse($user->isDirty(['email', 'name']));
+        $this->assertTrue($user->isClean());
+        $this->assertTrue($user->isClean('email'));
+        $this->assertTrue($user->isClean('name'));
+        $this->assertTrue($user->isClean(['email']));
+        $this->assertTrue($user->isClean(['name']));
+        $this->assertTrue($user->isClean(['email', 'name']));
 
         $user->email('test@tester.com');
 
-        $this->assertEquals(true, $user->isDirty());
-        $this->assertEquals(true, $user->isDirty('email'));
-        $this->assertEquals(true, $user->isDirty(['email']));
+        $this->assertTrue($user->isDirty());
+        $this->assertTrue($user->isDirty('email'));
+        $this->assertFalse($user->isDirty('name'));
+        $this->assertTrue($user->isDirty(['email']));
+        $this->assertFalse($user->isDirty(['name']));
+        $this->assertTrue($user->isDirty(['email', 'name']));
+        $this->assertFalse($user->isClean());
+        $this->assertFalse($user->isClean('email'));
+        $this->assertTrue($user->isClean('name'));
+        $this->assertFalse($user->isClean(['email']));
+        $this->assertTrue($user->isClean(['name']));
+        $this->assertFalse($user->isClean(['email', 'name']));
     }
 
     private function createRole($handle)
