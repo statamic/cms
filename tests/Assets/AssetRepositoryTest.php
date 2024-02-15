@@ -27,7 +27,6 @@ class AssetRepositoryTest extends TestCase
 
         $container = tap(AssetContainer::make('test')->disk('test'))->save();
         $asset = $container->makeAsset('foo/image.jpg');
-
         $disk->assertMissing('foo/.meta/image.jpg.yaml');
 
         (new AssetRepository)->save($asset);
