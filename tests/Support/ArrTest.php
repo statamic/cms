@@ -76,7 +76,7 @@ class ArrTest extends TestCase
         $this->assertEquals($expected, Arr::addScope($arr, 'myscope'));
     }
 
-    public function multiDimensionalArrayScopeProvider()
+    public static function multiDimensionalArrayScopeProvider()
     {
         return [
             'array' => [null],

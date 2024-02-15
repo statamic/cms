@@ -153,7 +153,7 @@ class EntryRepositoryTest extends TestCase
         }
     }
 
-    public function entryByUriProvider()
+    public static function entryByUriProvider()
     {
         return [
             'case sensitive' => ['/alphabetical/bravo', 'Bravo'],

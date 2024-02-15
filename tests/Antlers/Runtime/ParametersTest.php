@@ -5,7 +5,7 @@ namespace Tests\Antlers\Runtime;
 use Carbon\Carbon;
 use Statamic\Tags\Tags;
 use Tests\Antlers\Fixtures\Addon\Tags\EchoMethod;
-use Tests\Antlers\Fixtures\Addon\Tags\Test;
+use Tests\Antlers\Fixtures\Addon\Tags\TestTags as Test;
 use Tests\Antlers\Fixtures\MethodClasses\ClassTwo;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;

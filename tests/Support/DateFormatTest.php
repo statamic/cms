@@ -23,7 +23,7 @@ class DateFormatTest extends TestCase
         $this->assertEquals($iso, DateFormat::toIso($php));
     }
 
-    public function formatProvider()
+    public static function formatProvider()
     {
         return collect(DateFormat::phpToIsoConversions())->mapWithKeys(function ($iso, $php) {
             return [$php => [$php, $iso]];

@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class SingularTest extends TestCase
 {
-    public function pluralWords(): array
+    public static function pluralWordsProvider(): array
     {
         return [
             ['nickle', 'nickles'],
@@ -19,7 +19,7 @@ class SingularTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider pluralWords
+     * @dataProvider pluralWordsProvider
      */
     public function it_returns_the_singular_word_of_an_english_word($expected, $input): void
     {

@@ -900,7 +900,7 @@ EOT;
         $this->assertEquals($expected, $this->bard(['inline' => $config, 'sets' => null])->augment($data));
     }
 
-    public function inlineProvider()
+    public static function inlineProvider()
     {
         return [
             'true' => [true],
@@ -1216,7 +1216,7 @@ EOT;
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
     }
 
-    public function groupedSetsProvider()
+    public static function groupedSetsProvider()
     {
         return [
             'grouped sets (new)' => [true],

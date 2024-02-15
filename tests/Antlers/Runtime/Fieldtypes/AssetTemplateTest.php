@@ -8,7 +8,7 @@ use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Fields\Value;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
-use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
+use Tests\Antlers\Fixtures\Addon\Tags\VarTestTags as VarTest;
 use Tests\Antlers\ParserTestCase;
 
 class AssetTemplateTest extends ParserTestCase

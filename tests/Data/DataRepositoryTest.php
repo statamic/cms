@@ -141,7 +141,7 @@ class DataRepositoryTest extends TestCase
         $this->findByRequestUrlTest($requestUrl, $entryId);
     }
 
-    public function findByRequestUrlProvider()
+    public static function findByRequestUrlProvider()
     {
         return [
             'root' => ['http://localhost', 'home'],
@@ -161,7 +161,7 @@ class DataRepositoryTest extends TestCase
         ];
     }
 
-    public function findByRequestUrlNoRootSiteProvider()
+    public static function findByRequestUrlNoRootSiteProvider()
     {
         return [
             'root' => ['http://localhost', null],

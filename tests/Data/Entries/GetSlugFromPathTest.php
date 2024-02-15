@@ -10,14 +10,14 @@ class GetSlugFromPathTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider paths
+     * @dataProvider pathsProvider
      **/
     public function it_gets_the_slug_from_a_path($expected, $path)
     {
         $this->assertEquals($expected, (new GetSlugFromPath)('path/to/'.$path));
     }
 
-    public function paths()
+    public static function pathsProvider()
     {
         return [
             'date' => ['post', '2015-01-01.post.md'],
