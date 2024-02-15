@@ -6,7 +6,7 @@ use PHPUnit\Framework\Constraint\Constraint;
 
 class StringEqualsStringIgnoringLineEndings extends Constraint
 {
-    private readonly string $string;
+    private string $string;
 
     public function __construct(string $string)
     {
