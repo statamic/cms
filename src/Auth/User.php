@@ -182,8 +182,6 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
         Facades\User::save($this);
 
-        $this->syncOriginal();
-
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
         }
@@ -195,6 +193,8 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
             UserSaved::dispatch($this);
         }
+
+        $this->syncOriginal();
 
         return $this;
     }
