@@ -65,7 +65,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
-
     use Routable {
         uri as routableUri;
     }
