@@ -513,6 +513,26 @@ trait UserContractTests
         return [];
     }
 
+    /**
+     * @test
+     */
+    public function it_has_a_dirty_state()
+    {
+        $user = $this->makeUser();
+        $user->email('test@test.com');
+        $user->save();
+
+        $this->assertEquals(false, $user->isDirty());
+        $this->assertEquals(false, $user->isDirty('email'));
+        $this->assertEquals(false, $user->isDirty(['email']));
+
+        $user->email('test@tester.com');
+
+        $this->assertEquals(true, $user->isDirty());
+        $this->assertEquals(true, $user->isDirty('email'));
+        $this->assertEquals(true, $user->isDirty(['email']));
+    }
+
     private function createRole($handle)
     {
         $class = new class($handle) extends Role
