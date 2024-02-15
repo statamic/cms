@@ -605,11 +605,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         Facades\Asset::save($this);
 
+        $this->clearCaches();
+
         if ($withEvents) {
             AssetSaved::dispatch($this);
         }
-
-        $this->clearCaches();
 
         $this->syncOriginal();
 
