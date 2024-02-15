@@ -4,6 +4,11 @@ namespace Statamic\Data;
 
 use Statamic\Support\Arr;
 
+/**
+ * Deprecated in favor of HasDirtyState
+ *
+ * @deprecated
+ **/
 trait SyncsOriginalState
 {
     protected $original = [];
@@ -16,10 +21,6 @@ trait SyncsOriginalState
             foreach ($this->syncOriginalProperties as $property) {
                 $this->original[$property] = $this->{$property};
             }
-        }
-
-        if (is_callable([$this, 'getDirtyArray'])) {
-            $this->original = array_merge($this->getDirtyArray(), $this->original);
         }
 
         return $this;

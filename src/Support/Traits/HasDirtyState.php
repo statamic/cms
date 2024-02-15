@@ -2,8 +2,14 @@
 
 namespace Statamic\Support\Traits;
 
+use Statamic\Support\Arr;
+
 trait HasDirtyState
 {
+    protected $original = [];
+
+    abstract public function getDirtyArray();
+
     /**
      * Is the item or property on the item dirty?
      *
@@ -35,5 +41,17 @@ trait HasDirtyState
     public function isClean($properties = null): bool
     {
         return ! $this->isDirty($properties);
+    }
+
+    public function syncOriginal(): static
+    {
+        $this->original = $this->getDirtyArray();
+
+        return $this;
+    }
+
+    public function getOriginal($key = null, $fallback = null)
+    {
+        return Arr::get($this->original, $key, $fallback);
     }
 }

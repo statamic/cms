@@ -32,10 +32,16 @@ use Statamic\Routing\Routable;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\HasDirtyState;
 
 class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
 {
-    use ContainsSupplementalData, HasAugmentedInstance, Publishable, ResolvesValues, Revisable, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsSupplementalData, HasAugmentedInstance, HasDirtyState, Publishable, ResolvesValues, Revisable, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
+
+    public function getDirtyArray()
+    {
+        return [];
+    }
 
     protected $locale;
     protected $term;

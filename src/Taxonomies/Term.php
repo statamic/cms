@@ -4,7 +4,6 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Data\SyncsOriginalState;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
 use Statamic\Events\TermCreating;
@@ -23,7 +22,7 @@ use Statamic\Support\Traits\HasDirtyState;
 
 class Term implements TermContract
 {
-    use ExistsAsFile, FluentlyGetsAndSets, HasDirtyState, SyncsOriginalState;
+    use ExistsAsFile, FluentlyGetsAndSets, HasDirtyState;
 
     protected $taxonomy;
     protected $slug;
@@ -32,7 +31,6 @@ class Term implements TermContract
     protected $data;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
-    protected $syncOriginalProperties = ['slug'];
 
     public function __construct()
     {

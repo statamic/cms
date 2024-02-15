@@ -25,7 +25,6 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
-use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
@@ -70,7 +69,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     use Routable {
         uri as routableUri;
     }
-    use SyncsOriginalState;
 
     protected $id;
     protected $collection;
@@ -81,7 +79,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
-    protected $syncOriginalProperties = [];
 
     public function __construct()
     {
