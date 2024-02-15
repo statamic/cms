@@ -61,7 +61,7 @@ class EntriesTest extends TestCase
         $this->assertEquals($expectedIds, $results->map->id()->all());
     }
 
-    public function augmentQueryBuilderProvider()
+    public static function augmentQueryBuilderProvider()
     {
         return [
             'published (default, no where clause)' => [['456', '123'], fn ($q) => null],

@@ -187,7 +187,7 @@ template-foo
 template-bar
 EOT;
 
-        $this->assertEquals($expected, trim($view->render()));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, trim($view->render()));
     }
 
     /** @test */
@@ -215,6 +215,6 @@ partial-foo
 partial-bar
 EOT;
 
-        $this->assertEquals($expected, trim($view->render()));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, trim($view->render()));
     }
 }

@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class IsFutureTest extends TestCase
 {
-    public function dates(): array
+    public static function datesProvider(): array
     {
         $futureDate = Carbon::createFromDate(2030, 10, 21);
         $pastDate = Carbon::createFromDate(2015, 10, 21);
@@ -27,7 +27,7 @@ class IsFutureTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider dates
+     * @dataProvider datesProvider
      */
     public function it_returns_true_if_date_is_future($expected, $input): void
     {

@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class CollapseWhitespaceTest extends TestCase
 {
-    public function stringsWithWeirdWhitespaces(): array
+    public static function stringsWithWeirdWhitespacesProvider(): array
     {
         return [
             'multiple_whitespace' => ['Bad at typing', 'Bad   at           typing'],
@@ -22,7 +22,7 @@ class CollapseWhitespaceTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider stringsWithWeirdWhitespaces
+     * @dataProvider stringsWithWeirdWhitespacesProvider
      */
     public function it_collapses_whitespaces($expected, $input): void
     {
