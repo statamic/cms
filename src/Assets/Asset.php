@@ -66,7 +66,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
-    protected $original = [];
 
     public function syncOriginal()
     {
