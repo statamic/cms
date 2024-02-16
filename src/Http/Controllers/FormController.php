@@ -98,7 +98,7 @@ class FormController extends Controller
      */
     private function formFailure($params, $errors, $form)
     {
-        if (request()->ajax()) {
+        if (request()->ajax() || request()->wantsJson()) {
             return response([
                 'errors' => (new MessageBag($errors))->all(),
                 'error' => collect($errors)->map(function ($errors, $field) {
