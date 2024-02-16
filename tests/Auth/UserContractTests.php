@@ -557,6 +557,12 @@ trait UserContractTests
     /** @test */
     public function it_syncs_original_at_the_right_time()
     {
+        // test fails without: https://github.com/laravel/framework/pull/46257
+        // which only appears in 10.1.5+
+        if (version_compare(app()->version(), '10.1.5', '<')) {
+            $this->markTestSkipped();
+        }
+
         // Creating and created events should be here but they're not because the
         // user model is created in the makeUser method of the Eloquent test.
         // The "saved" event is really the important one to be testing anyway.
