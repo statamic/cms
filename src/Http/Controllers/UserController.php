@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Events\UserRegistered;
@@ -96,8 +97,6 @@ class UserController extends Controller
 
         $user->save();
 
-        session()->flash('user.profile.success', __('Update successful.'));
-
         return $this->userProfileSuccess();
     }
 
@@ -109,8 +108,6 @@ class UserController extends Controller
 
         $user->save();
 
-        session()->flash('user.password.success', __('Change successful.'));
-
         return $this->userPasswordSuccess();
     }
 
@@ -121,6 +118,15 @@ class UserController extends Controller
 
     private function userRegistrationFailure($errors = null)
     {
+        if (request()->ajax() || request()->wantsJson()) {
+            return response([
+                'errors' => (new MessageBag($errors))->all(),
+                'error' => collect($errors)->map(function ($errors, $field) {
+                    return $errors[0];
+                })->all(),
+            ], 400);
+        }
+
         $errorResponse = request()->has('_error_redirect') ? redirect(request()->input('_error_redirect')) : back();
 
         return $errorResponse->withInput()->withErrors($errors, 'user.register');
@@ -129,6 +135,14 @@ class UserController extends Controller
     private function userRegistrationSuccess(bool $silentFailure = false)
     {
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response([
+                'success' => true,
+                'user_created' => ! $silentFailure,
+                'redirect' => $response->getTargetUrl(),
+            ]);
+        }
 
         session()->flash('user.register.success', __('Registration successful.'));
         session()->flash('user.register.user_created', ! $silentFailure);
@@ -140,6 +154,14 @@ class UserController extends Controller
     {
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
 
+        if (request()->ajax() || request()->wantsJson()) {
+            return response([
+                'success' => true,
+                'user_updated' => ! $silentFailure,
+                'redirect' => $response->getTargetUrl(),
+            ]);
+        }
+
         session()->flash('user.profile.success', __('Update successful.'));
 
         return $response;
@@ -148,6 +170,14 @@ class UserController extends Controller
     private function userPasswordSuccess(bool $silentFailure = false)
     {
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response([
+                'success' => true,
+                'password_updated' => ! $silentFailure,
+                'redirect' => $response->getTargetUrl(),
+            ]);
+        }
 
         session()->flash('user.password.success', __('Change successful.'));
 
