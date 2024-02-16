@@ -2295,6 +2295,36 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_syncs_original_at_the_right_time()
+    {
+        $eventsHandled = 0;
+
+        Event::listen(function (EntryCreating $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+        Event::listen(function (EntrySaving $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+        Event::listen(function (EntryCreated $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+        Event::listen(function (EntrySaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
+        $entry->save();
+
+        $this->assertFalse($entry->isDirty());
+        $this->assertEquals(4, $eventsHandled);
+    }
+
+    /** @test */
     public function it_gets_all_descendants()
     {
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
