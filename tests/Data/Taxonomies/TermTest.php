@@ -361,6 +361,38 @@ class TermTest extends TestCase
     }
 
     /** @test */
+    public function it_syncs_original_at_the_right_time()
+    {
+        $eventsHandled = 0;
+
+        Event::listen(function (TermCreating $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->term->isDirty());
+        });
+        Event::listen(function (TermSaving $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->term->isDirty());
+        });
+        Event::listen(function (TermCreated $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->term->isDirty());
+        });
+        Event::listen(function (TermSaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->term->isDirty());
+        });
+
+        tap(Taxonomy::make('tags'))->save();
+
+        $term = (new Term)->taxonomy('tags')->slug('test');
+        $term->dataForLocale('en', ['title' => 'The title']);
+        $term->save();
+
+        $this->assertFalse($term->isDirty());
+        $this->assertEquals(4, $eventsHandled);
+    }
+
+    /** @test */
     public function it_gets_and_sets_the_layout()
     {
         $taxonomy = tap(Taxonomy::make('tags'))->save();

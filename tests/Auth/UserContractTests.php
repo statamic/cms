@@ -5,10 +5,13 @@ namespace Tests\Auth;
 use BadMethodCallException;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Mockery;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
+use Statamic\Events\UserSaved;
+use Statamic\Events\UserSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
@@ -549,6 +552,34 @@ trait UserContractTests
         $this->assertFalse($user->isClean(['email']));
         $this->assertTrue($user->isClean(['name']));
         $this->assertFalse($user->isClean(['email', 'name']));
+    }
+
+    /** @test */
+    public function it_syncs_original_at_the_right_time()
+    {
+        // Creating and created events should be here but they're not because the
+        // user model is created in the makeUser method of the Eloquent test.
+        // The "saved" event is really the important one to be testing anyway.
+        // Also, events are faked because they get faked in the Eloquent test.
+        Event::fakeExcept([UserSaving::class, UserSaved::class]);
+
+        $eventsHandled = 0;
+
+        Event::listen(function (UserSaving $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->user->isDirty());
+        });
+        Event::listen(function (UserSaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->user->isDirty());
+        });
+
+        $user = $this->makeUser();
+        $user->email('test@test.com');
+        $user->save();
+
+        $this->assertFalse($user->isDirty());
+        $this->assertEquals(2, $eventsHandled);
     }
 
     private function createRole($handle)

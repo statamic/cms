@@ -2206,6 +2206,28 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_syncs_original_at_the_right_time()
+    {
+        $eventsHandled = 0;
+
+        Event::listen(function (AssetSaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->asset->isDirty());
+        });
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('test.jpg');
+
+        $asset
+            ->set('foo', 'bar')
+            ->save();
+
+        $this->assertFalse($asset->isDirty());
+        $this->assertEquals(1, $eventsHandled);
+    }
+
+    /** @test */
     public function it_augments_in_the_parser()
     {
         $container = Mockery::mock($this->container)->makePartial();
