@@ -691,7 +691,7 @@ class ReplicatorTest extends TestCase
         $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
     }
 
-    public function groupedSetsProvider()
+    public static function groupedSetsProvider()
     {
         return [
             'grouped sets (new)' => [true],

@@ -291,7 +291,7 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
     }
 
-    public function guzzleWatermarkProvider()
+    public static function guzzleWatermarkProvider()
     {
         return ['http' => ['http'], 'https' => ['https']];
     }
