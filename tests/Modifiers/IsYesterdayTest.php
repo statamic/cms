@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class IsYesterdayTest extends TestCase
 {
-    public function dates(): array
+    public static function datesProvider(): array
     {
         $futureDate = Carbon::createFromDate(2030, 10, 21);
         $tomorrow = Carbon::tomorrow();
@@ -28,7 +28,7 @@ class IsYesterdayTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider dates
+     * @dataProvider datesProvider
      */
     public function it_returns_true_if_date_is_yesterday($expected, $input): void
     {

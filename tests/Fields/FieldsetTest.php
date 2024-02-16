@@ -80,7 +80,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals($expectedTitle, $fieldset->title());
     }
 
-    public function titleProvider()
+    public static function titleProvider()
     {
         return [
             'title' => ['test_fieldset', 'The Provided Title', 'The Provided Title'],

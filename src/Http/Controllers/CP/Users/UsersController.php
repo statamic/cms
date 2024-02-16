@@ -126,13 +126,13 @@ class UsersController extends CpController
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
         $additional = $fields->all()
-            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups']))
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
             ->keys();
 
         $viewData = [
             'values' => (object) $fields->values()->only($additional)->all(),
             'meta' => (object) $fields->meta()->only($additional)->all(),
-            'fields' => collect($fields->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
+            'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
@@ -271,7 +271,7 @@ class UsersController extends CpController
             ->withReplacements(['id' => $user->id()])
             ->validate();
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles', 'super']);
 
         foreach ($values as $key => $value) {
             $user->set($key, $value);

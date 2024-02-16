@@ -23,7 +23,7 @@
 
                 <div class="publish-tabs tabs rounded-none rounded-t mb-3 shadow-none" v-if="showContainerTabs">
                     <button class="tab-button" v-for="item in containers" :key="item.id"
-                        v-text="item.title"
+                        v-text="__(item.title)"
                         :class="{
                             active: item.id === container.id,
                             'border-b border-gray-300': item.id !== container.id
@@ -444,6 +444,11 @@ export default {
     created() {
         this.$events.$on('editor-action-started', this.actionStarted);
         this.$events.$on('editor-action-completed', this.actionCompleted);
+    },
+
+    destroyed() {
+        this.$events.$off('editor-action-started', this.actionStarted);
+        this.$events.$off('editor-action-completed', this.actionCompleted);
     },
 
     watch: {

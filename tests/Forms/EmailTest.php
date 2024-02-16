@@ -78,7 +78,7 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->bcc);
     }
 
-    public function singleAddressProvider()
+    public static function singleAddressProvider()
     {
         return [
             'single email' => ['foo@bar.com', [
@@ -102,9 +102,9 @@ class EmailTest extends TestCase
         ];
     }
 
-    public function multipleAddressProvider()
+    public static function multipleAddressProvider()
     {
-        return array_merge($this->singleAddressProvider(), [
+        return array_merge(static::singleAddressProvider(), [
             'multiple emails' => ['foo@bar.com, baz@qux.com', [
                 ['address' => 'foo@bar.com', 'name' => null],
                 ['address' => 'baz@qux.com', 'name' => null],

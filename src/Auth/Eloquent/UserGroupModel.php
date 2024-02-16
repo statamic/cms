@@ -12,6 +12,7 @@ class UserGroupModel extends Eloquent
 
     protected $casts = [
         'roles' => 'json',
+        'data' => 'json',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

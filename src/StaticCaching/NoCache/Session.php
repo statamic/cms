@@ -2,8 +2,10 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Data;
 
@@ -113,6 +115,8 @@ class Session
         $this->regions = $this->regions->merge($session['regions'] ?? []);
         $this->cascade = $this->restoreCascade();
 
+        $this->resolvePageAndPathForPagination();
+
         return $this;
     }
 
@@ -122,6 +126,15 @@ class Session
             ->withContent(Data::findByRequestUrl($this->url))
             ->hydrate()
             ->toArray();
+    }
+
+    private function resolvePageAndPathForPagination(): void
+    {
+        AbstractPaginator::currentPathResolver(fn () => Str::before($this->url, '?'));
+
+        AbstractPaginator::currentPageResolver(function () {
+            return Str::of($this->url)->after('page=')->before('&')->__toString();
+        });
     }
 
     private function cacheRegion(Region $region)

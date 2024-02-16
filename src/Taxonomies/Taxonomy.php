@@ -518,4 +518,14 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             ];
         })->filter()->values()->all();
     }
+
+    public function hasCustomTemplate()
+    {
+        return $this->template !== null;
+    }
+
+    public function hasCustomTermTemplate()
+    {
+        return $this->termTemplate !== null;
+    }
 }

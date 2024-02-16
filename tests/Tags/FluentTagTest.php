@@ -81,7 +81,7 @@ class FluentTagTest extends TestCase
         $this->assertEquals('tag return value', $fluentTag->fetch());
     }
 
-    public function fluentTagProvider()
+    public static function fluentTagProvider()
     {
         return [
             'foo' => ['foo', 'foo', 'foo:index', 'index', 'index'],

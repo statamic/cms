@@ -8,7 +8,7 @@
 
         <header v-if="!loading" class="flex items-center sticky top-0 inset-x-0 bg-white shadow px-8 py-2 z-1 h-13">
             <h1 class="flex-1 flex items-center text-xl">
-                {{ values.display || config.display || config.handle }}
+                {{ __(values.display) || __(config.display) || config.handle }}
                 <small class="badge-pill bg-gray-100 ml-4 border text-xs text-gray-700 font-medium leading-none flex items-center">
                     <svg-icon class="h-4 w-4 mr-2 inline-block text-gray-700" :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`"></svg-icon>
                     {{ fieldtype.title }}

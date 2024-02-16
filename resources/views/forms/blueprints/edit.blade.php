@@ -5,7 +5,7 @@
 
     @include('statamic::partials.breadcrumb', [
         'url' => cp_route('forms.show', $form->handle()),
-        'title' => $form->title(),
+        'title' => __($form->title()),
     ])
 
     <blueprint-builder

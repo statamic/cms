@@ -11,12 +11,12 @@
             <div
                 v-if="item.invalid"
                 v-tooltip.top="__('An item with this ID could not be found')"
-                v-text="item.title" />
+                v-text="__(item.title)" />
 
 
-            <a v-if="!item.invalid && editable" @click.prevent="edit" v-text="item.title" class="truncate" v-tooltip="item.title" :href="item.edit_url" />
+            <a v-if="!item.invalid && editable" @click.prevent="edit" v-text="__(item.title)" class="truncate" v-tooltip="item.title" :href="item.edit_url" />
 
-            <div v-if="!item.invalid && !editable" v-text="item.title" />
+            <div v-if="!item.invalid && !editable" v-text="__(item.title)" />
 
             <inline-edit-form
                 v-if="isEditing"

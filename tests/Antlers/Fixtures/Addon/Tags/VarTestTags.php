@@ -4,7 +4,7 @@ namespace Tests\Antlers\Fixtures\Addon\Tags;
 
 use Statamic\Tags\Tags;
 
-class VarTest extends Tags
+class VarTestTags extends Tags
 {
     protected static $handle = 'var_test';
     public static $var = null;

@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Illuminate\Support\Traits\Macroable;
 use Statamic\Extend\HasAliases;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
@@ -10,7 +11,7 @@ use Statamic\Support\Arr;
 
 abstract class Tags
 {
-    use HasAliases, HasHandle, RegistersItself;
+    use HasAliases, HasHandle, Macroable, RegistersItself;
 
     protected static $binding = 'tags';
 
@@ -131,6 +132,16 @@ abstract class Tags
     {
         if ($this->wildcardHandled || ! method_exists($this, $this->wildcardMethod)) {
             throw new \BadMethodCallException("Call to undefined method {$method}.");
+        }
+
+        if (static::hasMacro($method)) {
+            $macro = static::$macros[$method];
+
+            if ($macro instanceof Closure) {
+                $macro = $macro->bindTo($this, static::class);
+            }
+
+            return $macro(...$args);
         }
 
         $this->wildcardHandled = true;

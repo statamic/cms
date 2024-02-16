@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class ExtensionTest extends TestCase
 {
-    public function filenames(): array
+    public static function filenamesProvider(): array
     {
         return [
             ['pdf', 'example.pdf'],
@@ -20,7 +20,7 @@ class ExtensionTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider filenames
+     * @dataProvider filenamesProvider
      */
     public function it_returns_the_extension_of_filename($expected, $input): void
     {

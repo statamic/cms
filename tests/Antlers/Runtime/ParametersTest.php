@@ -5,7 +5,7 @@ namespace Tests\Antlers\Runtime;
 use Carbon\Carbon;
 use Statamic\Tags\Tags;
 use Tests\Antlers\Fixtures\Addon\Tags\EchoMethod;
-use Tests\Antlers\Fixtures\Addon\Tags\Test;
+use Tests\Antlers\Fixtures\Addon\Tags\TestTags as Test;
 use Tests\Antlers\Fixtures\MethodClasses\ClassTwo;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
@@ -333,5 +333,36 @@ EOT;
         ], true);
 
         $this->assertSame('123:456', $result);
+    }
+
+    public function test_numeric_literals_inside_variable_bindings_stay_numbers()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'test';
+
+            public function index()
+            {
+                return $this->parse(array_merge($this->params->all(), $this->context->all()));
+            }
+        })::register();
+
+        $this->assertSame(
+            '124',
+            $this->renderString('{{ test :my_value="123" }}{{ my_value + 1 }}{{ /test }}', [], true),
+            'Simple addition'
+        );
+
+        $this->assertSame(
+            '-122',
+            $this->renderString('{{ test :my_value="-123" }}{{ my_value + 1 }}{{ /test }}', [], true),
+            'Negative numbers'
+        );
+
+        $this->assertSame(
+            '123.5',
+            $this->renderString('{{ test :my_value="123.0" }}{{ my_value + 0.5 }}{{ /test }}', [], true),
+            'Floats'
+        );
     }
 }
