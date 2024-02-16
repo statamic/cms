@@ -25,7 +25,7 @@ trait HasDirtyState
         }
 
         return collect($attributes)->contains(function ($property) use ($currentValues, $originalValues) {
-            // In an array, the data key holds all the data. It would be a breaking
+            // In an asset, the data key holds all the data. It would be a breaking
             // change to make it the root level, so we'll support both for now.
             if (! array_key_exists($property, $currentValues)) {
                 $property = 'data.'.$property;
