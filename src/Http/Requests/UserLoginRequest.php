@@ -32,7 +32,7 @@ class UserLoginRequest extends FormRequest
             return (new ValidationException($validator))->errorBag($this->errorBag);
         }
 
-        if ($this->ajax()) {
+        if ($this->ajax() || $this->wantsJson()) {
             $errors = $validator->errors();
 
             $response = response([
