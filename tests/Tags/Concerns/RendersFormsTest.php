@@ -161,7 +161,7 @@ EOT;
         $this->assertStringContainsString('>'.$rendered['value'].'</textarea', $rendered['field']);
     }
 
-    public function renderTextProvider()
+    public static function renderTextProvider()
     {
         return [
             'no value, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => null],
@@ -201,7 +201,7 @@ EOT;
         }
     }
 
-    public function renderToggleProvider()
+    public static function renderToggleProvider()
     {
         return [
             'no value, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => false],
@@ -299,7 +299,7 @@ EOT;
         }
     }
 
-    public function renderSingleSelectProvider()
+    public static function renderSingleSelectProvider()
     {
         return [
             'no value, no default, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => null],
@@ -386,7 +386,7 @@ EOT;
         }
     }
 
-    public function renderMultipleSelectProvider()
+    public static function renderMultipleSelectProvider()
     {
         return [
             'no value, no default, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => null],

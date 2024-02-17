@@ -64,6 +64,10 @@ class AssetUploader extends Uploader
             return null;
         }
 
+        if (! $this->asset->isImage()) {
+            return null;
+        }
+
         if (! $ext = Arr::get(Image::userManipulationPresets(), "$preset.fm")) {
             return null;
         }

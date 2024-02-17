@@ -31,7 +31,7 @@ class TimeTest extends TestCase
         $this->assertSame($expected, $this->fieldtype($config)->process($value));
     }
 
-    public function processProvider()
+    public static function processProvider()
     {
         return [
             'null' => [
@@ -76,7 +76,7 @@ class TimeTest extends TestCase
         $this->assertEquals($expected, $messages);
     }
 
-    public function validationProvider()
+    public static function validationProvider()
     {
         return [
             'valid time' => [

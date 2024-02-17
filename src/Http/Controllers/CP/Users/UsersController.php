@@ -126,7 +126,7 @@ class UsersController extends CpController
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
         $additional = $fields->all()
-            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups']))
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
             ->keys();
 
         $viewData = [
@@ -271,7 +271,7 @@ class UsersController extends CpController
             ->withReplacements(['id' => $user->id()])
             ->validate();
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles', 'super']);
 
         foreach ($values as $key => $value) {
             $user->set($key, $value);

@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class IsJsonTest extends TestCase
 {
-    public function bourneJsonBourne(): array
+    public static function bourneJsonBourneProvider(): array
     {
         return [
             'empty_json' => [true, '{}'],
@@ -19,7 +19,7 @@ class IsJsonTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider bourneJsonBourne
+     * @dataProvider bourneJsonBourneProvider
      */
     public function it_returns_true_if_string_is_valid_json($expected, $input): void
     {

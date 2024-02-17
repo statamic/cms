@@ -2,7 +2,7 @@
 
 namespace Tests\Antlers\Runtime\UseCaseTests;
 
-use Tests\Antlers\Fixtures\Addon\Tags\Test;
+use Tests\Antlers\Fixtures\Addon\Tags\TestTags as Test;
 use Tests\Antlers\ParserTestCase;
 
 class ConditionalParameterTest extends ParserTestCase
