@@ -84,11 +84,11 @@ class Fieldset
         return $this->contents['title'] ?? Str::humanize(Str::of($this->handle)->after('::')->afterLast('.'));
     }
 
-    public function fields(): Fields
+    public function fields(array $importedFieldsets = []): Fields
     {
         $fields = array_get($this->contents, 'fields', []);
 
-        return new Fields($fields);
+        return new Fields($fields, null, null, null, $importedFieldsets);
     }
 
     public function field(string $handle): ?Field

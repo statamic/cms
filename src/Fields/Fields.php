@@ -20,9 +20,12 @@ class Fields
     protected $filled = [];
     protected $withValidatableValues = false;
     protected $withComputedValues = false;
+    protected $importedFieldsets = [];
 
-    public function __construct($items = [], $parent = null, $parentField = null, $parentIndex = null)
+    public function __construct($items = [], $parent = null, $parentField = null, $parentIndex = null, array $importedFieldsets = [])
     {
+        $this->importedFieldsets = $importedFieldsets;
+
         $this
             ->setParent($parent)
             ->setParentField($parentField, $parentIndex)
@@ -265,14 +268,19 @@ class Fields
 
     private function getImportedFields(array $config): array
     {
+        if (count($this->importedFieldsets) > 1 && in_array($config['import'], $this->importedFieldsets)) {
+            return [];
+        }
+
         $blink = 'blueprint-imported-fields-'.md5(json_encode($config));
+        $this->importedFieldsets[] = $config['import'];
 
         return Blink::once($blink, function () use ($config) {
             if (! $fieldset = FieldsetRepository::find($config['import'])) {
                 throw new FieldsetNotFoundException($config['import']);
             }
 
-            $fields = $fieldset->fields()->all();
+            $fields = $fieldset->fields($this->importedFieldsets)->all();
 
             if ($overrides = $config['config'] ?? null) {
                 $fields = $fields->map(function ($field, $handle) use ($overrides) {
