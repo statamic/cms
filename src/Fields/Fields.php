@@ -5,6 +5,7 @@ namespace Statamic\Fields;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Statamic\Exceptions\FieldsetNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Fieldset as FieldsetRepository;
@@ -269,6 +270,11 @@ class Fields
     private function getImportedFields(array $config): array
     {
         if (count($this->importedFieldsets) > 1 && in_array($config['import'], $this->importedFieldsets)) {
+            Log::warning('Recursive fieldsets are not supported.', [
+                'importing' => $config['import'],
+                'imported' => $this->importedFieldsets,
+            ]);
+
             return [];
         }
 
