@@ -67,7 +67,7 @@ class Protection
 
     protected function url()
     {
-        return URL::tidy(request()->url());
+        return URL::tidy(request()->fullUrl());
     }
 
     protected function log($message)
