@@ -67,7 +67,7 @@ export default {
         },
 
         modalTitle() {
-            return __('Delete :resource', {resource: this.title});
+            return __('Delete :resource', {resource: __(this.title)});
         },
 
         deleteUrl() {

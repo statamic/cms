@@ -17,7 +17,7 @@
                 :step="step"
                 :disabled="disabled"
                 :readonly="isReadOnly"
-                :placeholder="placeholder"
+                :placeholder="__(placeholder)"
                 :autocomplete="autocomplete"
                 :autofocus="focus"
                 :min="min"

@@ -96,7 +96,7 @@ class StatusQueryBuilderTest extends TestCase
         $this->assertEquals('results', $query->get());
     }
 
-    public function statusQueryMethodProvider()
+    public static function statusQueryMethodProvider()
     {
         return collect([
             'where',

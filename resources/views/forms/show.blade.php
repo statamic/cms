@@ -11,7 +11,7 @@
         ])
         <div class="flex items-center">
             <h1 class="flex-1">
-                {{ $form->title() }}
+                {{ __($form->title()) }}
             </h1>
 
             @if(\Statamic\Facades\User::current()->can('edit', $form) || \Statamic\Facades\User::current()->can('delete', $form))

@@ -15,6 +15,7 @@ use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Statamic\View\Antlers\Language\Nodes\RecursiveNode;
 use Statamic\View\Antlers\Language\Nodes\TagIdentifier;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class AntlersNodeParser
@@ -569,6 +570,11 @@ class AntlersNodeParser
                 if (Str::startsWith($name, DocumentParser::Punctuation_Colon)) {
                     $parameterNode->isVariableReference = true;
                     $name = StringUtilities::substr($name, 1);
+
+                    if (is_numeric($content)) {
+                        $content = TypeCoercion::coerceType($content);
+                        $parameterNode->isVariableReference = false;
+                    }
                 }
 
                 $parameterNode->name = $name;

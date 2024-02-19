@@ -77,7 +77,7 @@ class FilesTest extends TestCase
         }
     }
 
-    public function uploadProvider()
+    public static function uploadProvider()
     {
         return [
             'no container' => [null, true, '1671484636/test.jpg', 50, 75],

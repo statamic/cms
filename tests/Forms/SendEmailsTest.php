@@ -117,7 +117,7 @@ class SendEmailsTest extends TestCase
         Queue::assertNotPushed(SendEmail::class);
     }
 
-    public function noEmailsProvider()
+    public static function noEmailsProvider()
     {
         return [
             'null' => [null],

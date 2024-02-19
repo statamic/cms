@@ -900,7 +900,7 @@ EOT;
         $this->assertEquals($expected, $this->bard(['inline' => $config, 'sets' => null])->augment($data));
     }
 
-    public function inlineProvider()
+    public static function inlineProvider()
     {
         return [
             'true' => [true],
@@ -1091,12 +1091,132 @@ EOT;
         $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
     }
 
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_generates_field_path_prefix($areSetsGrouped)
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public static function handle()
+            {
+                return 'custom';
+            }
+
+            public function preProcess($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function process($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function preload()
+            {
+                return ['fieldPathPrefix' => $this->field()->fieldPathPrefix()];
+            }
+
+            public function augment($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+        };
+
+        $fieldtype::register();
+
+        $field = (new Field('test', [
+            'type' => 'bard',
+            'sets' => $this->groupSets($areSetsGrouped, [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'custom']],
+                    ],
+                ],
+            ]),
+        ]))->setValue([
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id-1',
+                    'values' => [
+                        'type' => 'one',
+                        'words' => 'test',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id-2',
+                    'values' => [
+                        'type' => 'one',
+                        'words' => 'test',
+                    ],
+                ],
+            ],
+        ]);
+
+        $value = $field->augment()->value()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = json_decode($field->preProcess()->value(), true);
+        $this->assertEquals('test.0.words', $value[0]['attrs']['values']['words']);
+        $this->assertEquals('test.1.words', $value[1]['attrs']['values']['words']);
+
+        $field = (new Field('test', [
+            'type' => 'bard',
+            'sets' => $this->groupSets($areSetsGrouped, [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'custom']],
+                    ],
+                ],
+            ]),
+        ]))->setValue(json_encode([
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id-1',
+                    'values' => [
+                        'type' => 'one',
+                        'words' => 'test',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id-2',
+                    'values' => [
+                        'type' => 'one',
+                        'words' => 'test',
+                    ],
+                ],
+            ],
+        ]));
+
+        $value = $field->process()->value();
+        $this->assertEquals('test.0.words', $value[0]['attrs']['values']['words']);
+        $this->assertEquals('test.1.words', $value[1]['attrs']['values']['words']);
+
+        $value = $field->fieldtype()->preload();
+        $this->assertEquals('test.0.words', $value['existing']['set-id-1']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.1.words', $value['existing']['set-id-2']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.-1.words', $value['new']['one']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
     }
 
-    public function groupedSetsProvider()
+    public static function groupedSetsProvider()
     {
         return [
             'grouped sets (new)' => [true],

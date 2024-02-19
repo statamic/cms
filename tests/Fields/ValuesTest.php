@@ -85,7 +85,7 @@ class ValuesTest extends TestCase
         ], $values->toArray());
     }
 
-    public function queryBuilderProvider()
+    public static function queryBuilderProvider()
     {
         return [
             'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],

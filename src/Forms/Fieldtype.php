@@ -57,7 +57,7 @@ class Fieldtype extends Relationship
     {
         if ($form = Facades\Form::find($id)) {
             return [
-                'title' => $form->title(),
+                'title' => __($form->title()),
                 'id' => $form->handle(),
             ];
         }
@@ -85,7 +85,7 @@ class Fieldtype extends Relationship
         $formFields = function ($form) {
             return [
                 'id' => $form->handle(),
-                'title' => $form->title(),
+                'title' => __($form->title()),
                 'submissions' => $form->submissions()->count(),
             ];
         };
