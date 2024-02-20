@@ -557,12 +557,6 @@ trait UserContractTests
     /** @test */
     public function it_syncs_original_at_the_right_time()
     {
-        // Creating and created events should be here but they're not because the
-        // user model is created in the makeUser method of the Eloquent test.
-        // The "saved" event is really the important one to be testing anyway.
-        // Also, events are faked because they get faked in the Eloquent test.
-        Event::fakeExcept([UserSaving::class, UserSaved::class]);
-
         $eventsHandled = 0;
 
         Event::listen(function (UserSaving $event) use (&$eventsHandled) {
