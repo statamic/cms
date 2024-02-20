@@ -91,6 +91,6 @@
     display: none
 }
 
-.-max-h-screen-1 {
+.-max-h-screen-px {
     max-height: calc(100vh - 1px) !important;
 }
