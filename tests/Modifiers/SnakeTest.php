@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class SnakeTest extends TestCase
 {
-    public function raidersOfTheLostArk(): array
+    public static function raidersOfTheLostArkProvider(): array
     {
         return [
             ['foo_bar_baz', 'foo bar baz'],
@@ -18,7 +18,7 @@ class SnakeTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider raidersOfTheLostArk
+     * @dataProvider raidersOfTheLostArkProvider
      */
     public function it_converts_a_string_into_snake_case($expected, $input): void
     {

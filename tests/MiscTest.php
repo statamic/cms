@@ -59,7 +59,7 @@ EOT;
         $this->assertEquals($expected, View::make('test')->cascadeContent($a)->render());
     }
 
-    public function localesTagTestProvider()
+    public static function localesTagTestProvider()
     {
         return [
             'without parameter' => [false],

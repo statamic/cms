@@ -39,7 +39,7 @@ EOT;
         $this->assertEquals($expected, $this->tag($template));
     }
 
-    public function organizedProvider()
+    public static function organizedProvider()
     {
         $filledExpectation = <<<'EOT'
 
@@ -110,7 +110,7 @@ EOT;
         $this->assertEquals($expected, $this->tag($template));
     }
 
-    public function allProvider()
+    public static function allProvider()
     {
         $filledExpectation = <<<'EOT'
 
@@ -175,7 +175,7 @@ EOT;
         $this->assertEquals($expected, $this->tag($template));
     }
 
-    public function fieldProvider()
+    public static function fieldProvider()
     {
         $filledExpectation = <<<'EOT'
 

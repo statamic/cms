@@ -46,7 +46,7 @@ foo: bar
 the content
 EOT;
 
-        $this->assertEquals($expected, trim($item->fileContents()));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, trim($item->fileContents()));
     }
 
     /** @test */
@@ -66,7 +66,7 @@ foo: bar
 ---
 EOT;
 
-        $this->assertEquals($expected, trim($item->fileContents()));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, trim($item->fileContents()));
     }
 
     /** @test */

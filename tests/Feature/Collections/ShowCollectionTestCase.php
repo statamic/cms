@@ -7,7 +7,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-abstract class ShowCollectionTest extends TestCase
+abstract class ShowCollectionTestCase extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;

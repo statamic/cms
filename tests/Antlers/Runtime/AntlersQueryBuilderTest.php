@@ -9,7 +9,7 @@ use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Tests\Antlers\Fixtures\Addon\Modifiers\IsBuilder;
-use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
+use Tests\Antlers\Fixtures\Addon\Tags\VarTestTags as VarTest;
 use Tests\Antlers\ParserTestCase;
 
 class AntlersQueryBuilderTest extends ParserTestCase

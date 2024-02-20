@@ -35,7 +35,7 @@ class ResourceAuthorizerTest extends TestCase
         Facades\Form::make('newsletter')->save();
     }
 
-    public function configFileProvider()
+    public static function configFileProvider()
     {
         return [
             ['api'],
