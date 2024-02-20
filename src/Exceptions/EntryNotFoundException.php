@@ -4,10 +4,12 @@ namespace Statamic\Exceptions;
 
 class EntryNotFoundException extends \Exception
 {
-    protected string|int $id;
+    protected $entry;
 
-    public function __construct($id)
+    public function __construct($entry)
     {
-        parent::__construct("No entry results for id {$id}");
+        parent::__construct("Entry [{$entry}] not found");
+
+        $this->entry = $entry;
     }
 }
