@@ -9,7 +9,7 @@
         </button>
 
         <modal v-if="open" name="column-picker" @closed="open = false" draggable=".modal-drag-handle" click-to-close>
-            <div class="flex flex-col h-full">
+            <div class="flex flex-col h-full -max-h-screen-px">
 
                 <header class="modal-drag-handle p-4 bg-gray-200 border-b flex items-center justify-between cursor-grab active:cursor-grabbing">
                     <h2>{{ __('Customize Columns') }}</h2>
