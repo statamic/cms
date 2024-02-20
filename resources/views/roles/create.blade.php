@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic::crumb(Statamic\trans('Create Role'), Statamic\trans('Roles & Permissions')))
+@section('title', Statamic::crumb(__('Create Role'), __('Roles & Permissions')))
 
 @section('content')
 

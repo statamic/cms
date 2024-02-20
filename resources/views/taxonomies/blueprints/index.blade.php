@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Blueprints'))
+@section('title', __('Blueprints'))
 
 @section('content')
 
@@ -24,10 +24,10 @@
                             :class="{ 'disabled': !hasBeenReordered }"
                             :disabled="!hasBeenReordered"
                             @click="saveOrder"
-                        >{{ Statamic\trans('Save Order') }}</button>
+                        >{{ __('Save Order') }}</button>
                     @endif
 
-                    <a href="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}" class="btn-primary ml-2">{{ Statamic\trans('Create Blueprint') }}</a>
+                    <a href="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}" class="btn-primary ml-2">{{ __('Create Blueprint') }}</a>
                 </div>
             </div>
 
@@ -40,7 +40,7 @@
     </taxonomy-blueprint-listing>
 
     @include('statamic::partials.docs-callout', [
-        'topic' => Statamic\trans('Blueprints'),
+        'topic' => __('Blueprints'),
         'url' => Statamic::docsUrl('blueprints')
     ])
 

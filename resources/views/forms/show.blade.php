@@ -7,11 +7,11 @@
     <header class="mb-6">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('forms.index'),
-            'title' => Statamic\trans('Forms')
+            'title' => __('Forms')
         ])
         <div class="flex items-center">
             <h1 class="flex-1">
-                {{ Statamic\trans($form->title()) }}
+                {{ __($form->title()) }}
             </h1>
 
             @if(\Statamic\Facades\User::current()->can('edit', $form) || \Statamic\Facades\User::current()->can('delete', $form))
@@ -34,7 +34,7 @@
 
             @if (($exporters = $form->exporters()) && $exporters->isNotEmpty())
             <dropdown-list>
-                <button class="btn" slot="trigger">{{ Statamic\trans('Export Submissions') }}</button>
+                <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
                 @foreach ($exporters as $exporter)
                     <dropdown-item
                         text="{{ $exporter->title() }}"
@@ -68,7 +68,7 @@
         <div slot="no-results" class="text-center border-2 border-dashed rounded-lg">
             <div class="max-w-md mx-auto px-8 py-30">
                 @cp_svg('empty/form')
-                <h1 class="my-6">{{ Statamic\trans('No submissions') }}</h1>
+                <h1 class="my-6">{{ __('No submissions') }}</h1>
             </div>
         </div>
     </form-submission-listing>

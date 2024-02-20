@@ -13,7 +13,7 @@
     ></asset-manager>
 
     @include('statamic::partials.docs-callout', [
-        'topic' => Statamic\trans('Assets'),
+        'topic' => __('Assets'),
         'url' => Statamic::docsUrl('assets')
     ])
 

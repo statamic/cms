@@ -11,7 +11,7 @@
 @section('content')
 
     <div class="flex mb-10">
-        <h1>{{ Statamic\trans('The Statamic Playground') }}</h1>
+        <h1>{{ __('The Statamic Playground') }}</h1>
     </div>
 
     <h2 class="mb-2">

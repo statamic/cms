@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Create Taxonomy'))
+@section('title', __('Create Taxonomy'))
 
 @section('content')
 

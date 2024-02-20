@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Configure Global Set'))
+@section('title', __('Configure Global Set'))
 
 @section('content')
 

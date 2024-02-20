@@ -1,17 +1,17 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Duplicate IDs'))
+@section('title', __('Duplicate IDs'))
 
 @section('content')
 
     <header class="mb-6">
         <div class="flex items-center justify-between">
-            <h1>{{ Statamic\trans('Duplicate IDs') }}</h1>
+            <h1>{{ __('Duplicate IDs') }}</h1>
         </div>
     </header>
 
     @if ($duplicates->isEmpty())
         <div class="card flex items-center">
-            {{ Statamic\trans('No items with duplicate IDs.') }}
+            {{ __('No items with duplicate IDs.') }}
         </div>
     @endif
 
@@ -29,7 +29,7 @@
                             <form method="POST" action="{{ cp_route('duplicates.regenerate') }}">
                                 @csrf
                                 <input type="hidden" name="path" value="{{ $path }}" />
-                                <button class="text-blue">{{ Statamic\trans('Regenerate') }}</button>
+                                <button class="text-blue">{{ __('Regenerate') }}</button>
                             </form>
                         </td>
                     </tr>

@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Edit Fieldset'))
+@section('title', __('Edit Fieldset'))
 
 @section('content')
 

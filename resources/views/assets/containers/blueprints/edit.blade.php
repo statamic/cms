@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Edit Blueprint'))
+@section('title', __('Edit Blueprint'))
 
 @section('content')
 
@@ -15,7 +15,7 @@
     ></blueprint-builder>
 
     @include('statamic::partials.docs-callout', [
-        'topic' => Statamic\trans('Blueprints'),
+        'topic' => __('Blueprints'),
         'url' => Statamic::docsUrl('blueprints')
     ])
 

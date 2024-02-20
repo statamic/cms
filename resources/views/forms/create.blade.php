@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Create Form'))
+@section('title', __('Create Form'))
 
 @section('content')
     <form-create-form

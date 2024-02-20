@@ -1,1 +1,1 @@
-<h2 class="{{ $classes }}">{{ Statamic\trans($text) }}</h2>
+<h2 class="{{ $classes }}">{{ __($text) }}</h2>

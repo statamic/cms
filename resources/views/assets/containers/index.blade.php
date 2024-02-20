@@ -1,13 +1,13 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Asset Containers'))
+@section('title', __('Asset Containers'))
 
 @section('content')
 
     <div class="flex mb-6">
-        <h1 class="flex-1">{{ Statamic\trans('Asset Containers') }}</h1>
+        <h1 class="flex-1">{{ __('Asset Containers') }}</h1>
 
         @can('create', 'Statamic\Contracts\Assets\AssetContainer')
-            <a href="{{ cp_route('asset-containers.create') }}" class="btn">{{ Statamic\trans('Create Asset Container') }}</a>
+            <a href="{{ cp_route('asset-containers.create') }}" class="btn">{{ __('Create Asset Container') }}</a>
         @endcan
     </div>
 

@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Create Global Set'))
+@section('title', __('Create Global Set'))
 @section('content')
 
     <global-create-form

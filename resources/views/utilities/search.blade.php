@@ -1,22 +1,22 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Rebuild Search'))
+@section('title', __('Rebuild Search'))
 
 @section('content')
 
     <header class="mb-6">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('utilities.index'),
-            'title' => Statamic\trans('Utilities')
+            'title' => __('Utilities')
         ])
         <div class="flex items-center justify-between">
-            <h1>{{ Statamic\trans('Search Indexes') }}</h1>
+            <h1>{{ __('Search Indexes') }}</h1>
 
             <form method="POST" action="{{ cp_route('utilities.search', 'all') }}">
                 @csrf
                 @foreach (\Statamic\Facades\Search::indexes() as $index)
                     <input type="hidden" name="indexes[]" value="{{ $index->name() }}::{{ $index->locale() }}">
                 @endforeach
-                <button class="btn-primary">{{ Statamic\trans('Update All') }}</button>
+                <button class="btn-primary">{{ __('Update All') }}</button>
             </form>
         </div>
     </header>
@@ -29,10 +29,10 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>{{ Statamic\trans('Index') }}</th>
-                    <th>{{ Statamic\trans('Driver') }}</th>
-                    <th>{{ Statamic\trans('Searchables') }}</th>
-                    <th>{{ Statamic\trans('Fields') }}</th>
+                    <th>{{ __('Index') }}</th>
+                    <th>{{ __('Driver') }}</th>
+                    <th>{{ __('Searchables') }}</th>
+                    <th>{{ __('Fields') }}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -72,7 +72,7 @@
                             <form method="POST" action="{{ cp_route('utilities.search') }}">
                                 @csrf
                                 <input type="hidden" name="indexes[]" value="{{ $index->name() }}::{{ $index->locale() }}">
-                                <button type="submit" class="btn btn-xs">{{ Statamic\trans('Update') }}</button>
+                                <button type="submit" class="btn btn-xs">{{ __('Update') }}</button>
                             </form>
                         </td>
                     </tr>
@@ -82,7 +82,7 @@
     </div>
 
     @include('statamic::partials.docs-callout', [
-        'topic' => Statamic\trans('Search Indexes'),
+        'topic' => __('Search Indexes'),
         'url' => Statamic::docsUrl('search#indexes')
     ])
 

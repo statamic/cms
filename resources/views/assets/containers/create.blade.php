@@ -1,10 +1,10 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Create Asset Container'))
+@section('title', __('Create Asset Container'))
 
 @section('content')
 
     <asset-container-create-form
-        initial-title="{{ Statamic\trans('Create Asset Container') }}"
+        initial-title="{{ __('Create Asset Container') }}"
         :blueprint="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"

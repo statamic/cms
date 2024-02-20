@@ -7,10 +7,10 @@
     <header class="mb-6">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('taxonomies.index'),
-            'title' => Statamic\trans('Taxonomies')
+            'title' => __('Taxonomies')
         ])
         <div class="flex items-center">
-            <h1 class="flex-1">{{ Statamic\trans($taxonomy->title()) }}</h1>
+            <h1 class="flex-1">{{ __($taxonomy->title()) }}</h1>
 
             <dropdown-list class="mr-2">
                 @can('edit', $taxonomy)
@@ -54,7 +54,7 @@
     @else
 
         @component('statamic::partials.create-first', [
-            'resource' => Statamic\trans("{$taxonomy->title()} term"),
+            'resource' => __("{$taxonomy->title()} term"),
             'svg' => 'empty/taxonomy', // TODO: Do we want separate term SVG?
             'can' => $user->can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
         ])

@@ -5,15 +5,15 @@
 
         <h1 class="my-6">
             @if ($can ?? $user->can('super'))
-                {{ Statamic\trans("Create your first {$resource} now") }}
+                {{ __("Create your first {$resource} now") }}
             @else
-                {{ Statamic\trans('No ' . Statamic\Support\Str::plural($resource) . ' exist yet') }}
+                {{ __('No ' . Statamic\Support\Str::plural($resource) . ' exist yet') }}
             @endif
         </h1>
 
         @if ($description ?? false)
             <p class="text-gray mb-6">
-                {{ Statamic\trans($description) }}
+                {{ __($description) }}
             </p>
         @endif
 
@@ -21,7 +21,7 @@
             @if($button ?? false)
                 {{ $button }}
             @else
-                <a href="{{ $route ?? null }}" class="btn-primary btn-lg">{{ Statamic\trans("Create {$resource}") }}</a>
+                <a href="{{ $route ?? null }}" class="btn-primary btn-lg">{{ __("Create {$resource}") }}</a>
             @endif
         @endif
 

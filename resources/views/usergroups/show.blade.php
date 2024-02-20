@@ -7,10 +7,10 @@
 <header class="mb-6">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('user-groups.index'),
-            'title' => Statamic\trans('User Groups')
+            'title' => __('User Groups')
         ])
         <div class="flex items-center">
-            <h1 class="flex-1">{{ Statamic\trans($group->title()) }}</h1>
+            <h1 class="flex-1">{{ __($group->title()) }}</h1>
             <dropdown-list class="mr-2">
                 @can('edit', $group)
                     <dropdown-item :text="__('Edit User Group')" redirect="{{ $group->editUrl() }}"></dropdown-item>

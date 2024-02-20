@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Configure Collection'))
+@section('title', __('Configure Collection'))
 
 @section('content')
 

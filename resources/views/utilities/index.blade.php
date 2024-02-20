@@ -1,10 +1,10 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Utilities'))
+@section('title', __('Utilities'))
 
 @section('content')
 
     <header class="mb-6">
-        <h1>{{ Statamic\trans('Utilities') }}</h1>
+        <h1>{{ __('Utilities') }}</h1>
     </header>
 
     <div class="card p-4 content">
@@ -24,7 +24,7 @@
     </div>
 
     @include('statamic::partials.docs-callout', [
-        'topic' => Statamic\trans('Utilities'),
+        'topic' => __('Utilities'),
         'url' => Statamic::docsUrl('extending/utilities')
     ])
 

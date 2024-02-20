@@ -1,6 +1,6 @@
 @extends('statamic::layout')
 @section('content-class', 'publishing')
-@section('title', Statamic\trans('Settings'))
+@section('title', __('Settings'))
 
 @section('content')
 

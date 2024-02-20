@@ -1,20 +1,20 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('PHP Info'))
+@section('title', __('PHP Info'))
 
 @section('content')
 
     <header class="mb-6">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('utilities.index'),
-            'title' => Statamic\trans('Utilities')
+            'title' => __('Utilities')
         ])
-        <h1>{{ Statamic\trans('PHP Info') }}</h1>
+        <h1>{{ __('PHP Info') }}</h1>
     </header>
 
     <div class="card p-0">
         <table class="data-table">
             <tr>
-                <th class="pl-4 py-2 w-1/4">{{ Statamic\trans('PHP Version') }}</th>
+                <th class="pl-4 py-2 w-1/4">{{ __('PHP Version') }}</th>
                 <td>{{ PHP_VERSION }}</td>
             </tr>
         </table>

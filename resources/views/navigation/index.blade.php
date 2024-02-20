@@ -1,15 +1,15 @@
 @extends('statamic::layout')
-@section('title', Statamic\trans('Navigation'))
+@section('title', __('Navigation'))
 
 @section('content')
 
     @unless($navs->isEmpty())
 
         <header class="flex items-center justify-between mb-6">
-            <h1>{{ Statamic\trans('Navigation') }}</h1>
+            <h1>{{ __('Navigation') }}</h1>
 
             @can('create', 'Statamic\Contracts\Structures\Nav')
-                <a href="{{ cp_route('navigation.create') }}" class="btn-primary">{{ Statamic\trans('Create Navigation') }}</a>
+                <a href="{{ cp_route('navigation.create') }}" class="btn-primary">{{ __('Create Navigation') }}</a>
             @endcan
         </header>
 
@@ -20,10 +20,10 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'title' => Statamic\trans('Navigation'),
-            'description' => Statamic\trans('statamic::messages.navigation_configure_intro'),
+            'title' => __('Navigation'),
+            'description' => __('statamic::messages.navigation_configure_intro'),
             'svg' => 'empty/navigation',
-            'button_text' => Statamic\trans('Create Navigation'),
+            'button_text' => __('Create Navigation'),
             'button_url' => cp_route('navigation.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Structures\Nav')
         ])
@@ -31,7 +31,7 @@
     @endunless
 
     @include('statamic::partials.docs-callout', [
-        'topic' => Statamic\trans('Navigation'),
+        'topic' => __('Navigation'),
         'url' => Statamic::docsUrl('navigation')
     ])
 

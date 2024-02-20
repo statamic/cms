@@ -6,7 +6,7 @@
     @if($showBreadcrumb)
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('preferences.index'),
-            'title' => Statamic\trans('Preferences'),
+            'title' => __('Preferences'),
         ])
     @endif
 
