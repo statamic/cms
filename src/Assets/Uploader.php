@@ -16,7 +16,13 @@ abstract class Uploader
 
         $this->write($source, $path = $this->uploadPath($file));
 
-        app('files')->delete($source);
+        if (app()->runningInConsole()) {
+            app('files')->delete($source);
+
+            return $path;
+        }
+
+        dispatch(fn () => app('files')->delete($source))->afterResponse();
 
         return $path;
     }
