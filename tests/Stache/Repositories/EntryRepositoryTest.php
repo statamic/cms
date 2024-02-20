@@ -150,6 +150,7 @@ class EntryRepositoryTest extends TestCase
     public function test_find_or_fail_throws_exception_when_entry_does_not_exist()
     {
         $this->expectException(EntryNotFoundException::class);
+        $this->expectExceptionMessage('Entry [does-not-exist] not found');
 
         $this->repo->findOrFail('does-not-exist');
     }
