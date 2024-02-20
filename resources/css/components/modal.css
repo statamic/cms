@@ -6,12 +6,6 @@
     @apply rounded-lg !important;
 }
 
-/* Prevent height thrashing for https://github.com/statamic/cms/issues/9473 */
-.vm--modal > div:first-child {
-    /* 1px difference to prevent subtle shimmer */
-    max-height: calc(100vh - 1px) !important;
-}
-
 .vm--overlay {
     background: hsla(210, 20%, 10%, .15) !important;
 }
