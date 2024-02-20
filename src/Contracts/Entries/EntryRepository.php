@@ -12,7 +12,7 @@ interface EntryRepository
 
     public function find($id);
 
-    public function findOrFail(string|int $id);
+    public function findOrFail($id);
 
     public function findByUri(string $uri);
 
