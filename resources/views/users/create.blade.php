@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', __('Create User'))

@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('content-class', 'publishing')
 @section('title', __('Settings'))
