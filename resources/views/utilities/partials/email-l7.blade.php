@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 <tr>
     <th class="pl-4 py-2 w-1/4">{{ __('Default Mailer') }}</th>
     <td><code>{{ config('mail.default') }}</code></td>

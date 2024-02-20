@@ -1,4 +1,7 @@
-<?php $authed = \Statamic\Facades\User::current(); ?>
+@php
+use function Statamic\trans as __;
+$authed = \Statamic\Facades\User::current();
+@endphp
 
 @extends($authed ? 'statamic::layout' : 'statamic::outside')
 

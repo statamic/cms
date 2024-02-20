@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 <tr>
     <th class="pl-4 py-2 w-1/4">{{ __('Driver') }}</th>
     <td><code>{{ config('mail.driver') }}</code></td>

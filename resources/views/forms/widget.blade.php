@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 <div class="card p-0 overflow-hidden">
     <div class="flex justify-between items-center p-4">
         <h2>
