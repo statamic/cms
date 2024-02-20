@@ -40,6 +40,16 @@ class FieldTransformer
             unset($field['duplicate']);
         }
 
+        if (Arr::has($field, 'sets')) {
+            $sets = Arr::pull($field, 'sets');
+            $field['sets'] = $sets;
+        }
+
+        if (Arr::has($field, 'fields')) {
+            $fields = Arr::pull($field, 'fields');
+            $field['fields'] = $fields;
+        }
+
         return array_filter([
             'handle' => $submitted['handle'],
             'field' => $field,
