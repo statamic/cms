@@ -170,7 +170,6 @@ class FormController extends Controller
      * Remove any uploaded assets
      *
      * Triggered by a validation exception or silent failure
-     *
      */
     private function removeUploadedAssets(array $assets)
     {
