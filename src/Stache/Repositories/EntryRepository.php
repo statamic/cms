@@ -48,8 +48,8 @@ class EntryRepository implements RepositoryContract
     {
         $result = $this->query()->where('id', $id)->first();
 
-        if (is_null($result)) {
-            throw (new EntryNotFoundException)->setEntry($id);
+        if (! $result) {
+            throw (new EntryNotFoundException($id));
         }
 
         return $result;

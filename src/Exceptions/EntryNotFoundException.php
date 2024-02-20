@@ -6,10 +6,8 @@ class EntryNotFoundException extends \Exception
 {
     protected string|int $id;
 
-    public function setEntry(string|int $id): object
+    public function __construct($id)
     {
-        $this->message = "No entry results for id {$id}";
-
-        return $this;
+        parent::__construct("No entry results for id {$id}");
     }
 }
