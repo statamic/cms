@@ -829,6 +829,38 @@ EOT
     }
 
     /** @test */
+    public function it_uploads_assets()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'One',
+                            'instructions' => 'One Instructions',
+                            'fields' => [
+                                ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                ['handle' => 'bravo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $this
+            ->post('/!/forms/survey', [
+                'alpha' => 'test',
+                'bravo' => UploadedFile::fake()->image('avatar.jpg'),
+            ]);
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+    }
+
+    /** @test */
     public function it_removes_any_uploaded_assets_when_a_submission_silently_fails()
     {
         Storage::fake('avatars');
