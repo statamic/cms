@@ -44,7 +44,7 @@ class EntryRepository implements RepositoryContract
         return $this->query()->where('id', $id)->first();
     }
 
-    public function findOrFail($id): Entry|EntryNotFoundException
+    public function findOrFail($id): Entry
     {
         $result = $this->query()->where('id', $id)->first();
 
