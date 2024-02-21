@@ -78,7 +78,7 @@ class Outpost
     {
         if (File::exists(storage_path('license.key'))) {
             try {
-                $encrypter = new Encrypter(config('statamic.system.license_key') . 'ab');
+                $encrypter = new Encrypter(config('statamic.system.license_key'));
                 $licenseKey = $encrypter->decrypt(File::get(storage_path('license.key')));
                 $licenseKey = json_decode($licenseKey, true);
             } catch (DecryptException|RuntimeException $e) {
