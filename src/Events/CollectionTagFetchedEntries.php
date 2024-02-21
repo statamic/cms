@@ -8,7 +8,7 @@ use Statamic\Tags\Collection\Collection;
 
 class CollectionTagFetchedEntries extends Event
 {
-    public EntryCollection $entries;
+    public EntryCollection|LengthAwarePaginator $entries;
     public Collection $tag;
 
     public function __construct(EntryCollection|LengthAwarePaginator $entries, Collection $tag)
