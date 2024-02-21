@@ -2,6 +2,8 @@
 
 namespace Statamic\Tags\Collection;
 
+use Statamic\Events\CollectionTagFetchedEntries;
+use Statamic\Events\CollectionTagFetchingEntries;
 use Statamic\Facades\Entry;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
@@ -15,13 +17,11 @@ class Collection extends Tags
     /**
      * {{ collection:* }} ... {{ /collection:* }}.
      */
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         $this->params['from'] = $this->method;
 
-        return $this->output(
-            $this->entries()->get()
-        );
+        return $this->index();
     }
 
     /**
@@ -33,8 +33,10 @@ class Collection extends Tags
             return $this->context->value('collection');
         }
 
+        $entries = $this->entries()->get();
+        CollectionTagFetchedEntries::dispatch($entries, $this);
         return $this->output(
-            $this->entries()->get()
+            $entries
         );
     }
 
@@ -96,6 +98,7 @@ class Collection extends Tags
 
     protected function entries()
     {
+        CollectionTagFetchingEntries::dispatch($this);
         return new Entries($this->params);
     }
 
