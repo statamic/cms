@@ -32,8 +32,8 @@ class OutpostTest extends TestCase
         config(['statamic.editions.pro' => true]);
 
         Addon::shouldReceive('all')->once()->andReturn(collect([
-            new FakeOutpostAddon('foo/bar', '1.2.3', null),
-            new FakeOutpostAddon('baz/qux', '4.5.6', 'example'),
+            new FakeOutpostAddon('foo/bar', '1.2.3', null, true),
+            new FakeOutpostAddon('baz/qux', '4.5.6', 'example', true),
         ]));
 
         request()->server->set('SERVER_ADDR', '123.123.123.123');
@@ -113,6 +113,44 @@ class OutpostTest extends TestCase
         $this->assertArraySubset([
             'valid' => true,
             'foo' => 'bar',
+        ], $response);
+    }
+
+    /** @test */
+    public function license_key_file_response_merges_installed_addons_into_response()
+    {
+        config(['statamic.system.license_key' => 'testsitekey12345']);
+
+        $encrypter = new Encrypter('testsitekey12345');
+        $encryptedKeyFile = $encrypter->encrypt(json_encode(['packages' => [
+            'foo/bar' => ['valid' => true, 'exists' => true, 'version_limit' => null],
+        ]]));
+
+        File::shouldReceive('exists')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturnTrue();
+
+        File::shouldReceive('get')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturn($encryptedKeyFile);
+
+        Addon::shouldReceive('all')->once()->andReturn(collect([
+            (new FakeOutpostAddon('foo/bar', '1.2.3', null, true)),
+            (new FakeOutpostAddon('bar/baz', '1.2.3', null, true)),
+            (new FakeOutpostAddon('private/addon', '1.2.3', null, false)),
+        ]));
+
+        $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
+        $response = $outpost->response();
+
+        $this->assertArraySubset([
+            'packages' => [
+                'foo/bar' => ['valid' => true, 'exists' => true, 'version_limit' => null],
+                'bar/baz' => ['valid' => false, 'exists' => true, 'version_limit' => null],
+                'private/addon' => ['valid' => true, 'exists' => false, 'version_limit' => null],
+            ],
         ], $response);
     }
 
@@ -285,12 +323,14 @@ class FakeOutpostAddon
     protected $package;
     protected $version;
     protected $edition;
+    protected $existsOnMarketplace;
 
-    public function __construct($package, $version, $edition)
+    public function __construct($package, $version, $edition, $existsOnMarketplace)
     {
         $this->package = $package;
         $this->version = $version;
         $this->edition = $edition;
+        $this->existsOnMarketplace = $existsOnMarketplace;
     }
 
     public function package()
@@ -306,5 +346,10 @@ class FakeOutpostAddon
     public function edition()
     {
         return $this->edition;
+    }
+
+    public function existsOnMarketplace()
+    {
+        return $this->existsOnMarketplace;
     }
 }

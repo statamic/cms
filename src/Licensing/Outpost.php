@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use RuntimeException;
 use Statamic\Facades;
+use Statamic\Facades\Addon;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
@@ -84,6 +85,18 @@ class Outpost
             } catch (DecryptException|RuntimeException $e) {
                 return ['error' => 500];
             }
+
+            $licenseKey['packages'] = collect($licenseKey['packages'])
+                ->merge(
+                    Addon::all()
+                        ->reject(fn ($addon) => array_key_exists($addon->id(), $licenseKey['packages']))
+                        ->mapWithKeys(fn ($addon) => [$addon->package() => [
+                            'valid' => ! $addon->existsOnMarketplace(),
+                            'exists' => $addon->existsOnMarketplace(),
+                            'edition' => null,
+                        ]])
+                )
+                ->all();
 
             return $licenseKey;
         }
