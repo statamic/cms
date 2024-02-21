@@ -35,6 +35,7 @@ class Collection extends Tags
 
         $entries = $this->entries()->get();
         CollectionTagFetchedEntries::dispatch($entries, $this);
+
         return $this->output(
             $entries
         );
@@ -99,6 +100,7 @@ class Collection extends Tags
     protected function entries()
     {
         CollectionTagFetchingEntries::dispatch($this);
+
         return new Entries($this->params);
     }
 
