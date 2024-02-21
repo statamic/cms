@@ -449,4 +449,20 @@ HTML;
             $this->tag('{{ locales }}you should not see this{{ /locales }}', ['page' => ['id' => $value]])
         );
     }
+
+    /** @test */
+    public function it_falls_back_to_context_id_if_there_is_no_context_page()
+    {
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('english')
+            ->id('1')
+            ->data(['title' => 'hello'])
+            ->create();
+
+        $this->assertEquals(
+            '<hello>',
+            $this->tag('{{ locales }}<{{ title }}>{{ /locales }}', ['id' => '1'])
+        );
+    }
 }
