@@ -206,7 +206,7 @@ class Cascade
             'old' => Arr::sanitize(old(null, [])),
 
             'site' => $this->site,
-            'sites' => Facades\Site::all()->values(),
+            'sites' => Facades\Site::all(),
             'homepage' => $this->site->url(),
             'is_homepage' => $this->site->absoluteUrl() == $this->request->url(),
             'cp_url' => cp_route('index'),
