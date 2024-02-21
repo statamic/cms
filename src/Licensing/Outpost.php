@@ -89,11 +89,11 @@ class Outpost
             $licenseKey['packages'] = collect($licenseKey['packages'])
                 ->merge(
                     Addon::all()
-                        ->reject(fn ($addon) => array_key_exists($addon->id(), $licenseKey['packages']))
+                        ->reject(fn ($addon) => array_key_exists($addon->package(), $licenseKey['packages']))
                         ->mapWithKeys(fn ($addon) => [$addon->package() => [
                             'valid' => ! $addon->existsOnMarketplace(),
                             'exists' => $addon->existsOnMarketplace(),
-                            'edition' => null,
+                            'version_limit' => null,
                         ]])
                 )
                 ->all();

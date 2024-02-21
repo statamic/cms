@@ -95,7 +95,10 @@ class OutpostTest extends TestCase
         config(['statamic.system.license_key' => 'testsitekey12345']);
 
         $encrypter = new Encrypter('testsitekey12345');
-        $encryptedKeyFile = $encrypter->encrypt(json_encode(['valid' => true, 'foo' => 'bar']));
+        $encryptedKeyFile = $encrypter->encrypt(json_encode([
+            'foo' => 'bar',
+            'packages' => [],
+        ]));
 
         File::shouldReceive('exists')
             ->with(storage_path('license.key'))
@@ -111,8 +114,8 @@ class OutpostTest extends TestCase
         $response = $outpost->response();
 
         $this->assertArraySubset([
-            'valid' => true,
             'foo' => 'bar',
+            'packages' => [],
         ], $response);
     }
 
@@ -136,7 +139,7 @@ class OutpostTest extends TestCase
             ->once()
             ->andReturn($encryptedKeyFile);
 
-        Addon::shouldReceive('all')->once()->andReturn(collect([
+        Addon::shouldReceive('all')->andReturn(collect([
             (new FakeOutpostAddon('foo/bar', '1.2.3', null, true)),
             (new FakeOutpostAddon('bar/baz', '1.2.3', null, true)),
             (new FakeOutpostAddon('private/addon', '1.2.3', null, false)),
