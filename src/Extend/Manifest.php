@@ -58,6 +58,7 @@ class Manifest extends PackageManifest
             'marketplaceSlug' => data_get($marketplaceData, 'slug', null),
             'marketplaceUrl' => data_get($marketplaceData, 'url', null),
             'marketplaceSellerSlug' => data_get($marketplaceData, 'seller', null),
+            'isCommercial' => data_get($marketplaceData, 'is_commercial', false),
             'latestVersion' => data_get($marketplaceData, 'latest_version', null),
             'version' => Str::removeLeft($package['version'], 'v'),
             'namespace' => $namespace,
