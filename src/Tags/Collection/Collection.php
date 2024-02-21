@@ -21,9 +21,7 @@ class Collection extends Tags
     {
         $this->params['from'] = $this->method;
 
-        return $this->output(
-            $this->entries()->get()
-        );
+        return $this->index();
     }
 
     /**
