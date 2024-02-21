@@ -2,8 +2,6 @@
 
 namespace Statamic\Tags\Collection;
 
-use Statamic\Events\CollectionTagFetchedEntries;
-use Statamic\Events\CollectionTagFetchingEntries;
 use Statamic\Facades\Entry;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
