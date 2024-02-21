@@ -20,7 +20,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="site in sites" :key="site.handle">
-                        <td class="align-middle" v-text="site.name" />
+                        <td class="align-middle" v-text="__(site.name)" />
                         <td>
                             <text-input
                                 class="slug-field"

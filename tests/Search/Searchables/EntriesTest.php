@@ -55,7 +55,7 @@ class EntriesTest extends TestCase
         }
     }
 
-    public function entriesProvider()
+    public static function entriesProvider()
     {
         return [
             'all' => [
@@ -151,7 +151,7 @@ class EntriesTest extends TestCase
         $this->assertTrue($provider->contains($e));
     }
 
-    public function indexFilterProvider()
+    public static function indexFilterProvider()
     {
         return [
             'class' => [TestSearchableEntriesFilter::class],

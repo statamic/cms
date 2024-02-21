@@ -293,4 +293,13 @@ EOT;
         $this->assertInstanceOf(Collection::class, $all);
         $this->assertCount(0, $all);
     }
+
+    /** @test */
+    public function it_sets_the_namespace_when_passed_when_making()
+    {
+        $blueprint = $this->repo->make('test::handle');
+
+        $this->assertSame($blueprint->namespace(), 'test');
+        $this->assertSame($blueprint->handle(), 'handle');
+    }
 }

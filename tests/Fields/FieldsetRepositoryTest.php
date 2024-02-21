@@ -219,7 +219,7 @@ EOT;
         $this->repo->save($fieldset);
     }
 
-    public function saveProvider()
+    public static function saveProvider()
     {
         return [
             'standard' => ['test', '/path/to/resources/fieldsets/test.yaml'],

@@ -44,7 +44,7 @@ class APITest extends TestCase
         }
     }
 
-    public function entryNotFoundProvider()
+    public static function entryNotFoundProvider()
     {
         return [
             'valid entry id' => ['/api/collections/pages/entries/about', true],
@@ -53,7 +53,7 @@ class APITest extends TestCase
         ];
     }
 
-    public function exampleFilters()
+    public static function exampleFiltersProvider()
     {
         return [['status:is'], ['published:is'], ['title:is']];
     }
@@ -61,7 +61,7 @@ class APITest extends TestCase
     /**
      * @test
      *
-     * @dataProvider exampleFilters
+     * @dataProvider exampleFiltersProvider
      */
     public function it_cannot_filter_entries_by_default($filter)
     {
@@ -416,7 +416,7 @@ class APITest extends TestCase
         ]);
     }
 
-    public function userPasswordFilterProvider()
+    public static function userPasswordFilterProvider()
     {
         return collect([
             'password',
@@ -449,7 +449,7 @@ class APITest extends TestCase
         }
     }
 
-    public function termNotFoundProvider()
+    public static function termNotFoundProvider()
     {
         return [
             'valid term id' => ['/api/taxonomies/tags/terms/test', true],

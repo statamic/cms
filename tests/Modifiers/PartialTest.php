@@ -25,7 +25,7 @@ class PartialTest extends TestCase
         $expected = "<h1>Bubble Guppies</h1>\n<p>Science died a little bit today.</p>\n\n";
 
         $modified = $this->modify($data, ['demo'], []);
-        $this->assertEquals($expected, (string) $modified);
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, (string) $modified);
     }
 
     private function modify($value, array $params, array $context)

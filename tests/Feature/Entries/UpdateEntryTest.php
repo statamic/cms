@@ -151,7 +151,7 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals($expectedSlug.'.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
-    public function multipleSlugLangsProvider()
+    public static function multipleSlugLangsProvider()
     {
         return [
             'English' => ['en', 'foo-bar-baz-aeoa'],

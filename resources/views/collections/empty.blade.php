@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', Statamic::crumb($collection->title(), 'Collections'))
 
@@ -8,7 +10,7 @@
         'url' => cp_route('collections.index'),
         'title' => __('Collections')
     ])
-    <h1>{{ $collection->title() }}</h1>
+    <h1>{{ __($collection->title()) }}</h1>
 </header>
 
 <div class="card p-4 content">
