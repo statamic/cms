@@ -9,9 +9,13 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Cache\NoLock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
+use RuntimeException;
 use Statamic\Facades;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -72,6 +76,18 @@ class Outpost
 
     private function performRequest()
     {
+        if (File::exists(storage_path('license.key'))) {
+            try {
+                $encrypter = new Encrypter(config('statamic.system.license_key') . 'ab');
+                $licenseKey = $encrypter->decrypt(File::get(storage_path('license.key')));
+                $licenseKey = json_decode($licenseKey, true);
+            } catch (DecryptException|RuntimeException $e) {
+                return ['error' => 500];
+            }
+
+            return $licenseKey;
+        }
+
         $response = $this->client->request('POST', self::ENDPOINT, [
             'headers' => ['accept' => 'application/json'],
             'json' => $this->payload(),

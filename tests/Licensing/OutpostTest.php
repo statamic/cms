@@ -8,8 +8,10 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Statamic\Facades\Addon;
 use Statamic\Licensing\Outpost;
 use Tests\TestCase;
@@ -85,6 +87,33 @@ class OutpostTest extends TestCase
 
         $this->assertEquals($testCachedResponse, $first);
         $this->assertSame($first, $second);
+    }
+
+    /** @test */
+    public function license_key_file_is_used_when_it_exists()
+    {
+        config(['statamic.system.license_key' => 'testsitekey12345']);
+
+        $encrypter = new Encrypter('testsitekey12345');
+        $encryptedKeyFile = $encrypter->encrypt(json_encode(['valid' => true, 'foo' => 'bar']));
+
+        File::shouldReceive('exists')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturnTrue();
+
+        File::shouldReceive('get')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturn($encryptedKeyFile);
+
+        $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
+        $response = $outpost->response();
+
+        $this->assertArraySubset([
+            'valid' => true,
+            'foo' => 'bar',
+        ], $response);
     }
 
     /** @test */
