@@ -91,7 +91,7 @@ class Outpost
                     Addon::all()
                         ->reject(fn ($addon) => array_key_exists($addon->package(), $licenseKey['packages']))
                         ->mapWithKeys(fn ($addon) => [$addon->package() => [
-                            'valid' => ! $addon->existsOnMarketplace(),
+                            'valid' => ! $addon->isCommercial(),
                             'exists' => $addon->existsOnMarketplace(),
                             'version_limit' => null,
                         ]])
