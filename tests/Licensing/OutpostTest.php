@@ -32,8 +32,8 @@ class OutpostTest extends TestCase
         config(['statamic.editions.pro' => true]);
 
         Addon::shouldReceive('all')->once()->andReturn(collect([
-            new FakeOutpostAddon('foo/bar', '1.2.3', null, true),
-            new FakeOutpostAddon('baz/qux', '4.5.6', 'example', true),
+            new FakeOutpostAddon('foo/bar', '1.2.3', null, true, true),
+            new FakeOutpostAddon('baz/qux', '4.5.6', 'example', true, true),
         ]));
 
         request()->server->set('SERVER_ADDR', '123.123.123.123');
@@ -140,9 +140,9 @@ class OutpostTest extends TestCase
             ->andReturn($encryptedKeyFile);
 
         Addon::shouldReceive('all')->andReturn(collect([
-            (new FakeOutpostAddon('foo/bar', '1.2.3', null, true)),
-            (new FakeOutpostAddon('bar/baz', '1.2.3', null, true)),
-            (new FakeOutpostAddon('private/addon', '1.2.3', null, false)),
+            (new FakeOutpostAddon('foo/bar', '1.2.3', null, true, true)),
+            (new FakeOutpostAddon('bar/baz', '1.2.3', null, true, true)),
+            (new FakeOutpostAddon('private/addon', '1.2.3', null, false, false)),
         ]));
 
         $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
@@ -327,13 +327,15 @@ class FakeOutpostAddon
     protected $version;
     protected $edition;
     protected $existsOnMarketplace;
+    protected $isCommercial;
 
-    public function __construct($package, $version, $edition, $existsOnMarketplace)
+    public function __construct($package, $version, $edition, $existsOnMarketplace, $isCommercial)
     {
         $this->package = $package;
         $this->version = $version;
         $this->edition = $edition;
         $this->existsOnMarketplace = $existsOnMarketplace;
+        $this->isCommercial = $isCommercial;
     }
 
     public function package()
@@ -354,5 +356,10 @@ class FakeOutpostAddon
     public function existsOnMarketplace()
     {
         return $this->existsOnMarketplace;
+    }
+
+    public function isCommercial()
+    {
+        return $this->isCommercial;
     }
 }
