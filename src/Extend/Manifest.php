@@ -48,7 +48,9 @@ class Manifest extends PackageManifest
         $statamic = $json['extra']['statamic'] ?? [];
         $author = $json['authors'][0] ?? null;
 
-        $marketplaceData = Marketplace::package($package['name'], $package['version']);
+        $edition = config('statamic.editions.addons.'.$package['name']);
+
+        $marketplaceData = Marketplace::package($package['name'], $package['version'], $edition);
 
         return [
             'id' => $package['name'],
