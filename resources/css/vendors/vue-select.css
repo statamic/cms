@@ -156,7 +156,6 @@
 }
 
 .vs__dropdown-option--selected {
-	opacity: .25;
 	cursor: text;
 }
 

@@ -16,8 +16,13 @@
                     <div class="whitespace-nowrap">{{ __(option.name) }}</div>
                 </div>
             </template>
-            <template #option="{ name, handle }">
-                <div :class="{ 'text-gray-500': handle === active }">{{ __(name) }}</div>
+            <template #option="{ name, handle, header}">
+                <div :class="{
+                    'text-blue': handle === active,
+                    'font-semibold text-gray-700 opacity-100': header === true,
+                }">
+                    <span v-if="!header" class="text-gray-500">&ndash;&nbsp;</span>{{ __(name) }}
+                </div>
             </template>
         </v-select>
     </div>
@@ -29,7 +34,16 @@ export default {
 
     computed: {
         sites() {
-            return Statamic.$config.get('sites');
+            let sites = Statamic.$config.get('sites');
+
+            // group by each key's group
+            let newsites = _.groupBy(sites, 'group');
+
+            let grouped = _.reduce(newsites, (acc, sites, name) => {
+                return acc.concat({ name, header: true }, ...sites);
+            }, []);
+
+            return grouped;
         },
 
         active() {

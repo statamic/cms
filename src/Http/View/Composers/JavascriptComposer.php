@@ -16,7 +16,7 @@ use voku\helper\ASCII;
 
 class JavascriptComposer
 {
-    const VIEWS = ['statamic::partials.scripts'];
+    public const VIEWS = ['statamic::partials.scripts'];
 
     public function compose(View $view)
     {
@@ -79,6 +79,7 @@ class JavascriptComposer
                 'name' => $site->name(),
                 'handle' => $site->handle(),
                 'lang' => $site->lang(),
+                'group' => $site->group(),
             ];
         })->values();
     }

@@ -34,6 +34,11 @@ class Site implements Augmentable
         return $this->config['locale'];
     }
 
+    public function group()
+    {
+        return $this->config['group'] ?? __('Other');
+    }
+
     public function shortLocale()
     {
         return explode('-', str_replace('_', '-', $this->locale()))[0];
@@ -97,6 +102,7 @@ class Site implements Augmentable
         return [
             'handle' => $this->handle(),
             'name' => $this->name(),
+            'group' => $this->group(),
             'lang' => $this->lang(),
             'locale' => $this->locale(),
             'short_locale' => $this->shortLocale(),
