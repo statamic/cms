@@ -37,33 +37,76 @@ class TagsTest extends TestCase
     }
 
     /** @test */
-    public function tag_setup_hooks_are_run()
+    public function hooks_can_be_run()
     {
+        TestTags::addHook('constructed', function ($tag) {
+            $this->assertInstanceOf(TestTags::class, $tag);
+            $tag->setFoo('bar');
+        });
+
+        // Do it twice to ensure that they are executed in order
+        // and the tag is passed along through the closures.
+        TestTags::addHook('constructed', function ($tag) {
+            $this->assertInstanceOf(TestTags::class, $tag);
+            $tag->setFoo($tag->foo.'baz');
+        });
+
         $class = app(TestTags::class);
 
-        $params = ['limit' => 10];
+        $this->assertEquals('barbaz', $class->foo);
+    }
 
-        TestTags::addSetupHook(fn ($tag) => $tag->setParameters($params));
+    /** @test */
+    public function hooks_from_one_tag_class_dont_happen_on_another()
+    {
+        $hooksRan = 0;
 
-        $class->setProperties([
-            'parser' => $parser = Antlers::parser(),
-            'content' => 'This is the tag content',
-            'context' => ['foo' => 'bar'],
-            'params' => ['limit' => 3],
-            'tag' => 'test:listing',
-            'tag_method' => 'listing',
-        ]);
+        TestTags::addHook('constructed', function ($tag) use (&$hooksRan) {
+            $tag->setFoo('bar');
+            $hooksRan++;
+        });
 
-        $this->assertEquals(['limit' => 10], $class->params->all());
+        AnotherTestTags::addHook('constructed', function ($tag) use (&$hooksRan) {
+            $tag->setFoo($tag->foo.'baz');
+            $hooksRan++;
+        });
+
+        $class = app(AnotherTestTags::class);
+
+        $this->assertEquals(1, $hooksRan);
+        $this->assertEquals('baz', $class->foo);
     }
 }
 
 class TestTags extends Tags
 {
     public $dependency;
+    public $foo = '';
 
     public function __construct(TestDependency $dependency)
     {
         $this->dependency = $dependency;
+
+        $this->runHook('constructed');
+    }
+
+    public function setFoo(string $foo)
+    {
+        $this->foo = $foo;
+    }
+}
+
+class AnotherTestTags extends Tags
+{
+    public $foo = '';
+
+    public function __construct()
+    {
+        $this->runHook('constructed');
+    }
+
+    public function setFoo(string $foo)
+    {
+        $this->foo = $foo;
     }
 }

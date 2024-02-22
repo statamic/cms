@@ -94,7 +94,7 @@ abstract class Tags
         $this->tag = array_get($properties, 'tag');
         $this->method = array_get($properties, 'tag_method');
 
-        $this->runSetupHooks();
+        $this->runHook('setup');
     }
 
     public function setParser($parser)

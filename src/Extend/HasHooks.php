@@ -2,34 +2,20 @@
 
 namespace Statamic\Extend;
 
+use Closure;
+
 trait HasHooks
 {
-    protected static $setupHooks = [];
+    public static $hooks = [];
 
-    /**
-     * Add a hook into the setup point of the lifecycle
-     *
-     * @return void
-     */
-    public static function addSetupHook(array|callable $hook)
+    public static function addHook(string $name, Closure $hook)
     {
-        $handle = self::handle();
-
-        if (! isset(self::$setupHooks[$handle])) {
-            self::$setupHooks[$handle] = [];
-        }
-
-        self::$setupHooks[$handle][] = $hook;
+        static::$hooks[static::class][$name][] = $hook;
     }
 
-    /**
-     * Run any setup hooks registered
-     *
-     * @return void
-     */
-    protected function runSetupHooks()
+    protected function runHook(string $name)
     {
-        foreach ((static::$setupHooks[self::handle()] ?? []) as $hook) {
+        foreach ((static::$hooks[static::class][$name] ?? []) as $hook) {
             call_user_func($hook, $this);
         }
     }
