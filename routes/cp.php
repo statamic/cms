@@ -300,8 +300,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
-        Route::resource('addons', AddonsApiController::class);
-        Route::resource('templates', TemplatesController::class);
+        Route::resource('addons', AddonsApiController::class)->only('index');
+        Route::resource('templates', TemplatesController::class)->only('index');
     });
 
     Route::group(['prefix' => 'preferences', 'as' => 'preferences.'], function () {

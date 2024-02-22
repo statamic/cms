@@ -14,14 +14,14 @@ class SumTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider sums
+     * @dataProvider sumsProvider
      **/
     public function it_sums($sum, $key, $array)
     {
         $this->assertSame($sum, $this->modify($array, $key));
     }
 
-    public function sums()
+    public static function sumsProvider()
     {
         return [
             'list of ints' => [7, null, [1, 2, 3, 1]],

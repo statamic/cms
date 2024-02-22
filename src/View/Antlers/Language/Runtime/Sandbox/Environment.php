@@ -1567,7 +1567,11 @@ class Environment
             $varName = $this->nameOf($val);
 
             if ($val->isInterpolationReference) {
-                $interpolationValue = $this->adjustValue($this->nodeProcessor->reduceInterpolatedVariable($val), $val);
+                if (array_key_exists($varName->normalizedReference, $this->data)) {
+                    $interpolationValue = $this->adjustValue($this->data[$varName->normalizedReference], $val);
+                } else {
+                    $interpolationValue = $this->adjustValue($this->nodeProcessor->reduceInterpolatedVariable($val), $val);
+                }
 
                 // If the currently active node is an instance of ArithmeticNodeContract,
                 // we will ask the runtime type coercion to convert whatever value

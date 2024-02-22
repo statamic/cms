@@ -222,7 +222,7 @@ EOT;
         $this->assertSame(1, $result['info']['total_results']);
     }
 
-    public function searchesProvider()
+    public static function searchesProvider()
     {
         return [
             'string with single result' => ['jane', ['Jane Doe']],

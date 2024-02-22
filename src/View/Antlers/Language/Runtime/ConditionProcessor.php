@@ -104,7 +104,6 @@ class ConditionProcessor
                 }
 
                 if ($result == true) {
-
                     $this->processor->setIsConditionProcessor($condValueToRestore);
 
                     return $branch;

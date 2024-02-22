@@ -140,7 +140,7 @@ abstract class Tags
         if (static::hasMacro($method)) {
             $macro = static::$macros[$method];
 
-            if ($macro instanceof Closure) {
+            if ($macro instanceof \Closure) {
                 $macro = $macro->bindTo($this, static::class);
             }
 

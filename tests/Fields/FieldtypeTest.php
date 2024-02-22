@@ -365,7 +365,7 @@ class FieldtypeTest extends TestCase
         $this->assertEquals($expectedConfigFields, $fieldtype->configFields()->all()->map(fn ($field) => $field->type())->all());
     }
 
-    public function configBlueprintProvider()
+    public static function configBlueprintProvider()
     {
         return [
             'linear fields results in one section' => [

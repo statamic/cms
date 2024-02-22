@@ -281,7 +281,7 @@ EOT;
         $this->assertSame($builder, $variables->foo());
     }
 
-    public function queryBuilderProvider()
+    public static function queryBuilderProvider()
     {
         return [
             'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],

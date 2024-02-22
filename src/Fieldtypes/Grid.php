@@ -84,14 +84,14 @@ class Grid extends Fieldtype
 
     public function process($data)
     {
-        return collect($data)->map(function ($row) {
-            return $this->processRow($row);
+        return collect($data)->map(function ($row, $index) {
+            return $this->processRow($row, $index);
         })->all();
     }
 
-    private function processRow($row)
+    private function processRow($row, $index)
     {
-        $fields = $this->fields()->addValues($row)->process()->values()->all();
+        $fields = $this->fields($index)->addValues($row)->process()->values()->all();
 
         $row = array_merge([RowId::handle() => Arr::pull($row, '_id')], $row, $fields);
 
@@ -113,7 +113,7 @@ class Grid extends Fieldtype
 
     private function preProcessRow($row, $index)
     {
-        $fields = $this->fields()->addValues($row)->preProcess()->values()->all();
+        $fields = $this->fields($index)->addValues($row)->preProcess()->values()->all();
 
         $id = Arr::pull($row, RowId::handle()) ?? RowId::generate();
 
@@ -122,9 +122,9 @@ class Grid extends Fieldtype
         ]);
     }
 
-    public function fields()
+    public function fields($index = -1)
     {
-        return new Fields($this->config('fields'), $this->field()->parent(), $this->field());
+        return new Fields($this->config('fields'), $this->field()->parent(), $this->field(), $index);
     }
 
     public function rules(): array
@@ -154,7 +154,7 @@ class Grid extends Fieldtype
     protected function rowRules($data, $index)
     {
         $rules = $this
-            ->fields()
+            ->fields($index)
             ->addValues($data)
             ->validator()
             ->withContext([
@@ -174,9 +174,9 @@ class Grid extends Fieldtype
 
     public function extraValidationAttributes(): array
     {
-        $attributes = $this->fields()->validator()->attributes();
+        return collect($this->field->value())->map(function ($row, $index) {
+            $attributes = $this->fields($index)->validator()->attributes();
 
-        return collect($this->field->value())->map(function ($row, $index) use ($attributes) {
             return collect($attributes)->except('_id')->mapWithKeys(function ($attribute, $handle) use ($index) {
                 return [$this->rowRuleFieldPrefix($index).'.'.$handle => $attribute];
             });
@@ -190,8 +190,8 @@ class Grid extends Fieldtype
         return [
             'defaults' => $this->defaultRowData()->all(),
             'new' => $this->fields()->meta()->all(),
-            'existing' => collect($this->field->value())->mapWithKeys(function ($row) {
-                return [$row['_id'] => $this->fields()->addValues($row)->meta()];
+            'existing' => collect($this->field->value())->mapWithKeys(function ($row, $index) {
+                return [$row['_id'] => $this->fields($index)->addValues($row)->meta()];
             })->toArray(),
         ];
     }
@@ -217,8 +217,8 @@ class Grid extends Fieldtype
     {
         $method = $shallow ? 'shallowAugment' : 'augment';
 
-        return collect($value)->map(function ($row) use ($method) {
-            $values = $this->fields()->addValues($row)->{$method}()->values();
+        return collect($value)->map(function ($row, $index) use ($method) {
+            $values = $this->fields($index)->addValues($row)->{$method}()->values();
 
             return new Values($values->merge([RowId::handle() => $row[RowId::handle()] ?? null])->all());
         })->all();
@@ -247,8 +247,8 @@ class Grid extends Fieldtype
 
     public function preProcessValidatable($value)
     {
-        return collect($value)->map(function ($values) {
-            $processed = $this->fields()
+        return collect($value)->map(function ($values, $index) {
+            $processed = $this->fields($index)
                 ->addValues($values)
                 ->preProcessValidatables()
                 ->values()

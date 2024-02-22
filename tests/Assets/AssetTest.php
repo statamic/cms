@@ -299,7 +299,7 @@ class AssetTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider reAddRemovedData
+     * @dataProvider reAddRemovedDataProvider
      **/
     public function it_doesnt_try_to_re_remove_newly_added_data_from_meta($reAddRemovedData)
     {
@@ -341,7 +341,7 @@ class AssetTest extends TestCase
         $this->assertEquals(123, $asset->getRawMeta()['size']);
     }
 
-    public function reAddRemovedData()
+    public static function reAddRemovedDataProvider()
     {
         return [
             'by calling set method' => [fn ($asset) => $asset->set('one', 'new-foo')],
@@ -414,7 +414,7 @@ class AssetTest extends TestCase
         $this->assertSame($builder, $asset->foo());
     }
 
-    public function queryBuilderProvider()
+    public static function queryBuilderProvider()
     {
         return [
             'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],
@@ -1686,7 +1686,7 @@ class AssetTest extends TestCase
         $this->assertEquals(15, $meta['height']);
     }
 
-    public function formatParams()
+    public static function formatParamsProvider()
     {
         return [['format'], ['fm']];
     }
@@ -1694,7 +1694,7 @@ class AssetTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider formatParams
+     * @dataProvider formatParamsProvider
      **/
     public function it_can_upload_an_image_into_a_container_with_new_extension_format($formatParam)
     {
@@ -1753,7 +1753,7 @@ class AssetTest extends TestCase
         $this->assertStringNotContainsString('</script>', $asset->contents());
     }
 
-    public function nonGlideableFileExtensions()
+    public static function nonGlideableFileExtensionsProvider()
     {
         return [
             ['txt'], // not an image
@@ -1766,7 +1766,7 @@ class AssetTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider nonGlideableFileExtensions
+     * @dataProvider nonGlideableFileExtensionsProvider
      **/
     public function it_doesnt_process_or_error_when_uploading_non_glideable_file_with_glide_config($extension)
     {
@@ -2355,7 +2355,7 @@ YAML;
         $this->assertEquals($expectedWarm, $asset->warmPresets());
     }
 
-    public function warmPresetProvider()
+    public static function warmPresetProvider()
     {
         return [
             'portrait' => ['jpg', 'portrait', true, ['one', 'two', 'cp_thumbnail_small_portrait']],

@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\API;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Str;
 
 class TemplatesController extends CpController
 {
@@ -17,11 +18,17 @@ class TemplatesController extends CpController
 
                 foreach ($iterator as $file) {
                     if ($file->isFile()) {
-                        $views->push(str_before(str_replace_first($path.DIRECTORY_SEPARATOR, '', $file->getPathname()), '.'));
+                        $viewPath = Str::of($file->getPathname())
+                            ->after($path.DIRECTORY_SEPARATOR)
+                            ->before('.')
+                            ->replace('\\', '/')
+                            ->toString();
+
+                        $views->push($viewPath);
                     }
                 }
 
-                return $views->filter()->values();
+                return $views->filter()->sort()->values();
             })
             ->values();
     }

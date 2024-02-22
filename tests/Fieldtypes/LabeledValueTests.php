@@ -279,7 +279,7 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->label());
     }
 
-    public function noOptionsProvider()
+    public static function noOptionsProvider()
     {
         return [
             'empty_array' => [[]],
