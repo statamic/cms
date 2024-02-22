@@ -31,9 +31,11 @@ class Collection extends Tags
             return $this->context->value('collection');
         }
 
-        return $this->output(
-            $this->entries()->get()
-        );
+        $results = $this->entries()->get();
+
+        $this->runHook('fetched-entries', $results);
+
+        return $this->output($results);
     }
 
     /**
@@ -51,9 +53,11 @@ class Collection extends Tags
     {
         $this->params['from'] = $this->currentEntry()->collection()->handle();
 
-        return $this->output(
-            $this->entries()->next($this->currentEntry())
-        );
+        $results = $this->entries()->next($this->currentEntry());
+
+        $this->runHook('fetched-entries', $results);
+
+        return $this->output($results);
     }
 
     /**
@@ -63,9 +67,11 @@ class Collection extends Tags
     {
         $this->params['from'] = $this->currentEntry()->collection()->handle();
 
-        return $this->output(
-            $this->entries()->previous($this->currentEntry())
-        );
+        $results = $this->entries()->previous($this->currentEntry());
+
+        $this->runHook('fetched-entries', $results);
+
+        return $this->output($results);
     }
 
     /**
@@ -75,9 +81,11 @@ class Collection extends Tags
     {
         $this->params['from'] = $this->currentEntry()->collection()->handle();
 
-        return $this->output(
-            $this->entries()->older($this->currentEntry())
-        );
+        $results = $this->entries()->older($this->currentEntry());
+
+        $this->runHook('fetched-entries', $results);
+
+        return $this->output($results);
     }
 
     /**
@@ -87,13 +95,17 @@ class Collection extends Tags
     {
         $this->params['from'] = $this->currentEntry()->collection()->handle();
 
-        return $this->output(
-            $this->entries()->newer($this->currentEntry())
-        );
+        $results = $this->entries()->newer($this->currentEntry());
+
+        $this->runHook('fetched-entries', $results);
+
+        return $this->output($results);
     }
 
     protected function entries()
     {
+        $this->runHook('fetching-entries');
+
         return new Entries($this->params);
     }
 
