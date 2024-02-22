@@ -31,7 +31,7 @@ class Manifest extends PackageManifest
         $this->getManifest();
     }
 
-    protected function formatPackage($package)
+    public function formatPackage($package)
     {
         if (! $provider = $package['extra']['laravel']['providers'][0] ?? null) {
             return;
