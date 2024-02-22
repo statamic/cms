@@ -7,10 +7,7 @@ use Statamic\Tags\Collection\Collection;
 
 class FetchingEntries extends Event
 {
-    public Collection $tag;
-
-    public function __construct(Collection $tag)
+    public function __construct(public Collection $tag)
     {
-        $this->tag = $tag;
     }
 }
