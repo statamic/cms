@@ -158,9 +158,7 @@ class Locales extends Tags
             return $this->data;
         }
 
-        $contextId = $this->context->value('page.id') ?? $this->context->value('id');
-
-        $id = $this->params->get('id', $contextId);
+        $id = $this->params->get('id') ?? $this->context->value('page.id') ?? $this->context->value('id');
 
         $data = Data::find($id);
 
