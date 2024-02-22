@@ -2,9 +2,9 @@
 
 namespace Statamic\Extend;
 
-use Facades\Statamic\Marketplace\Marketplace;
 use Facades\Statamic\Version;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use ReflectionClass;
 use Statamic\Console\Processes\Composer;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
@@ -44,26 +44,25 @@ abstract class AddonTestCase extends OrchestraTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $path = dirname((new \ReflectionClass($this->addonServiceProvider))->getFileName()).'/../composer.json';
-        $composerJson = $app['files']->get($path);
+        $reflector = new ReflectionClass($this->addonServiceProvider);
+        $directory = dirname($reflector->getFileName());
 
-        $package = json_decode($composerJson, true);
-        $package['version'] = 'dev-main';
+        $providerParts = explode('\\', $this->addonServiceProvider, -1);
+        $namespace = implode('\\', $providerParts);
 
-        // TODO: Ideally, we shouldn't be mocking stuff in the TestCase.
-        Marketplace::shouldReceive('package')
-            ->once()
-            ->with($package['name'], $package['version'])
-            ->andReturn([
-                'id' => null,
-                'slug' => null,
-                'url' => null,
-                'seller' => null,
-                'latest_version' => null,
-            ]);
+        $json = json_decode($app['files']->get($directory.'/../composer.json'), true);
+        $statamic = $json['extra']['statamic'] ?? [];
+        $autoload = $json['autoload']['psr-4'][$namespace.'\\'];
 
         $app->make(Manifest::class)->manifest = [
-            $package['name'] => app(Manifest::class)->formatPackage($package),
+            $json['name'] => [
+                'id' => $json['name'],
+                'slug' => $statamic['slug'] ?? null,
+                'version' => 'dev-main',
+                'namespace' => $namespace,
+                'autoload' => $autoload,
+                'provider' => $this->addonServiceProvider,
+            ],
         ];
     }
 
