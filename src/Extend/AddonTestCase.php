@@ -26,11 +26,16 @@ abstract class AddonTestCase extends OrchestraTestCase
 
     protected function getPackageProviders($app)
     {
-        // TODO: When the GraphQL package is installed, register the service provider here.
-        return [
+        $serviceProviders = [
             StatamicServiceProvider::class,
             $this->addonServiceProvider,
         ];
+
+        if (class_exists('Rebing\GraphQL\GraphQLServiceProvider')) {
+            array_unshift($serviceProviders, 'Rebing\GraphQL\GraphQLServiceProvider');
+        }
+
+        return $serviceProviders;
     }
 
     protected function getPackageAliases($app)
@@ -64,21 +69,6 @@ abstract class AddonTestCase extends OrchestraTestCase
                 'provider' => $this->addonServiceProvider,
             ],
         ];
-    }
-
-    protected function resolveApplicationConfiguration($app)
-    {
-        parent::resolveApplicationConfiguration($app);
-
-        // TODO: Just grab all the files.
-        $configs = [
-            'assets', 'cp', 'forms', 'static_caching',
-            'sites', 'stache', 'system', 'users',
-        ];
-
-        foreach ($configs as $config) {
-            $app['config']->set("statamic.$config", require (__DIR__."/../../config/{$config}.php"));
-        }
 
         $app['config']->set('statamic.users.repository', 'file');
     }
