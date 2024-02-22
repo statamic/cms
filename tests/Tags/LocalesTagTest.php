@@ -139,7 +139,7 @@ EOT;
 
 HTML;
 
-        $this->assertEquals($expected, $this->tag($this->template('{{ locales }}'), ['page' => ['id' => '1']]));
+        $this->assertEquals($expected, $this->tag($this->template('{{ locales }}'), ['id' => '1']));
     }
 
     /** @test */
@@ -161,7 +161,7 @@ HTML;
 
         $this->assertEquals(
             '<hello><hola>',
-            $this->tag('{{ locales }}<{{ title }}>{{ /locales }}', ['page' => ['id' => '1']])
+            $this->tag('{{ locales }}<{{ title }}>{{ /locales }}', ['id' => '1'])
         );
     }
 
@@ -234,7 +234,7 @@ HTML;
 
 HTML;
 
-        $this->assertEquals($expected, $this->tag($this->template('{{ locales all="true" }}'), ['page' => ['id' => '1']]));
+        $this->assertEquals($expected, $this->tag($this->template('{{ locales all="true" }}'), ['id' => '1']));
     }
 
     /** @test */
@@ -264,7 +264,7 @@ HTML;
 
         $this->assertEquals(
             '<hello><hola>',
-            $this->tag('{{ locales }}<{{ title }}>{{ /locales }}', ['page' => ['id' => '1']])
+            $this->tag('{{ locales }}<{{ title }}>{{ /locales }}', ['id' => '1'])
         );
     }
 
@@ -345,7 +345,7 @@ HTML;
 
 HTML;
 
-        $this->assertEquals($expected, $this->tag($this->template('{{ locales all="true" }}'), ['page' => ['id' => '1']]));
+        $this->assertEquals($expected, $this->tag($this->template('{{ locales all="true" }}'), ['id' => '1']));
     }
 
     /** @test */
@@ -374,7 +374,7 @@ HTML;
 
         $this->assertEquals(
             '<bonjour><hola>',
-            $this->tag('{{ locales self="false" }}<{{ title }}>{{ /locales }}', ['page' => ['id' => '1']])
+            $this->tag('{{ locales self="false" }}<{{ title }}>{{ /locales }}', ['id' => '1'])
         );
     }
 
@@ -397,7 +397,7 @@ HTML;
 
         $this->assertEquals(
             '<hola>',
-            $this->tag('{{ locales:espanol }}<{{ title }}>{{ /locales:espanol }}', ['page' => ['id' => '1']])
+            $this->tag('{{ locales:espanol }}<{{ title }}>{{ /locales:espanol }}', ['id' => '1'])
         );
     }
 
@@ -413,7 +413,7 @@ HTML;
 
         $this->assertEquals(
             '',
-            $this->tag('{{ locales:espanol }}<{{ title }}>{{ /locales:espanol }}', ['page' => ['id' => '1']])
+            $this->tag('{{ locales:espanol }}<{{ title }}>{{ /locales:espanol }}', ['id' => '1'])
         );
     }
 
@@ -429,7 +429,7 @@ HTML;
 
         $this->assertEquals(
             '',
-            $this->tag('{{ locales self="false" }}you should not see this{{ /locales }}', ['page' => ['id' => '1']])
+            $this->tag('{{ locales self="false" }}you should not see this{{ /locales }}', ['id' => '1'])
         );
     }
 
@@ -446,7 +446,7 @@ HTML;
 
         $this->assertEquals(
             '',
-            $this->tag('{{ locales }}you should not see this{{ /locales }}', ['page' => ['id' => $value]])
+            $this->tag('{{ locales }}you should not see this{{ /locales }}', ['id' => $value])
         );
     }
 
