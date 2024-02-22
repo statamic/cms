@@ -28,7 +28,7 @@ class Glide extends Tags
      * @param  array  $args
      * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         $tag = explode(':', $this->tag, 2)[1];
 
