@@ -39,18 +39,24 @@ class TagsTest extends TestCase
     /** @test */
     public function hooks_can_be_run()
     {
-        TestTags::addHook('constructed', function ($tag, $payload) {
-            $this->assertInstanceOf(TestTags::class, $tag);
-            $this->assertEquals('initial', $payload);
-            $tag->setFoo('bar');
+        $test = $this;
+
+        TestTags::addHook('constructed', function ($payload, $next) use ($test) {
+            $test->assertEquals('initial', $payload);
+            $test->assertInstanceOf(TestTags::class, $this);
+            $this->setFoo('bar');
+
+            return $next($payload);
         });
 
         // Do it twice to ensure that they are executed in order
         // and the tag is passed along through the closures.
-        TestTags::addHook('constructed', function ($tag, $payload) {
-            $this->assertInstanceOf(TestTags::class, $tag);
-            $this->assertEquals('initial', $payload);
-            $tag->setFoo($tag->foo.'baz');
+        TestTags::addHook('constructed', function ($payload, $next) use ($test) {
+            $test->assertInstanceOf(TestTags::class, $this);
+            $test->assertEquals('initial', $payload);
+            $this->setFoo($this->foo.'baz');
+
+            return $next($payload);
         });
 
         $class = app(TestTags::class);
@@ -63,14 +69,18 @@ class TagsTest extends TestCase
     {
         $hooksRan = 0;
 
-        TestTags::addHook('constructed', function ($tag) use (&$hooksRan) {
-            $tag->setFoo('bar');
+        TestTags::addHook('constructed', function ($payload, $next) use (&$hooksRan) {
+            $this->setFoo('bar');
             $hooksRan++;
+
+            return $next($this);
         });
 
-        AnotherTestTags::addHook('constructed', function ($tag) use (&$hooksRan) {
-            $tag->setFoo($tag->foo.'baz');
+        AnotherTestTags::addHook('constructed', function ($payload, $next) use (&$hooksRan) {
+            $this->setFoo($this->foo.'baz');
             $hooksRan++;
+
+            return $next($this);
         });
 
         $class = app(AnotherTestTags::class);

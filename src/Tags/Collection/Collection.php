@@ -33,7 +33,7 @@ class Collection extends Tags
 
         $results = $this->entries()->get();
 
-        $this->runHook('fetched-entries', $results);
+        $results = $this->runHook('fetched-entries', $results);
 
         return $this->output($results);
     }
@@ -83,7 +83,7 @@ class Collection extends Tags
 
         $results = $this->entries()->older($this->currentEntry());
 
-        $this->runHook('fetched-entries', $results);
+        $results = $this->runHook('fetched-entries', $results);
 
         return $this->output($results);
     }
@@ -97,7 +97,7 @@ class Collection extends Tags
 
         $results = $this->entries()->newer($this->currentEntry());
 
-        $this->runHook('fetched-entries', $results);
+        $results = $this->runHook('fetched-entries', $results);
 
         return $this->output($results);
     }

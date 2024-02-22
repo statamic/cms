@@ -12,13 +12,16 @@ class LoaderTest extends TestCase
     public function loading_a_tag_will_run_the_init_hook()
     {
         TestTags::register();
+        $test = $this;
         $tag = null;
 
         // This hook should add to the tag's params, which we can assert about later.
-        TestTags::addHook('init', function ($t) use (&$tag) {
-            $this->assertInstanceOf(TestTags::class, $t);
-            $t->params['alfa'] = 'bravo';
-            $tag = $t;
+        TestTags::addHook('init', function ($payload, $next) use (&$tag, $test) {
+            $test->assertInstanceOf(TestTags::class, $this);
+            $this->params['alfa'] = 'bravo';
+            $tag = $this;
+
+            return $next($payload);
         });
 
         $this->assertEquals('bar', (string) Antlers::parse('{{ test :variable="foo" }}', ['foo' => 'bar']));

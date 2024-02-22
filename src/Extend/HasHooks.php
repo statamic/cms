@@ -3,6 +3,7 @@
 namespace Statamic\Extend;
 
 use Closure;
+use Illuminate\Pipeline\Pipeline;
 
 trait HasHooks
 {
@@ -15,8 +16,13 @@ trait HasHooks
 
     protected function runHook(string $name, $payload = null)
     {
-        foreach ((static::$hooks[static::class][$name] ?? []) as $hook) {
-            call_user_func($hook, $this, $payload);
-        }
+        $closures = collect(
+            static::$hooks[static::class][$name] ?? []
+        )->map->bindTo($this, $this);
+
+        return (new Pipeline)
+            ->send($payload)
+            ->through($closures->all())
+            ->thenReturn();
     }
 }
