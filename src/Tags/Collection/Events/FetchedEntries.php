@@ -1,12 +1,13 @@
 <?php
 
-namespace Statamic\Events;
+namespace Statamic\Tags\Collection\Events;
 
 use Statamic\Entries\EntryCollection;
+use Statamic\Events\Event;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Tags\Collection\Collection;
 
-class CollectionTagFetchedEntries extends Event
+class FetchedEntries extends Event
 {
     public EntryCollection|LengthAwarePaginator $entries;
     public Collection $tag;

@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags\Collection;
 
-use Statamic\Events\CollectionTagFetchedEntries;
-use Statamic\Events\CollectionTagFetchingEntries;
 use Statamic\Facades\Entry;
+use Statamic\Tags\Collection\Events\FetchedEntries;
+use Statamic\Tags\Collection\Events\FetchingEntries;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
 
@@ -34,7 +34,8 @@ class Collection extends Tags
         }
 
         $entries = $this->entries()->get();
-        CollectionTagFetchedEntries::dispatch($entries, $this);
+
+        FetchedEntries::dispatch($entries, $this);
 
         return $this->output(
             $entries
@@ -99,7 +100,7 @@ class Collection extends Tags
 
     protected function entries()
     {
-        CollectionTagFetchingEntries::dispatch($this);
+        FetchingEntries::dispatch($this);
 
         return new Entries($this->params);
     }

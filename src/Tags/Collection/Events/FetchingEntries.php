@@ -1,10 +1,11 @@
 <?php
 
-namespace Statamic\Events;
+namespace Statamic\Tags\Collection\Events;
 
+use Statamic\Events\Event;
 use Statamic\Tags\Collection\Collection;
 
-class CollectionTagFetchingEntries extends Event
+class FetchingEntries extends Event
 {
     public Collection $tag;
 
