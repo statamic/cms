@@ -13,10 +13,10 @@ trait HasHooks
         static::$hooks[static::class][$name][] = $hook;
     }
 
-    protected function runHook(string $name)
+    protected function runHook(string $name, $payload = null)
     {
         foreach ((static::$hooks[static::class][$name] ?? []) as $hook) {
-            call_user_func($hook, $this);
+            call_user_func($hook, $this, $payload);
         }
     }
 }

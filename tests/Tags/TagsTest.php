@@ -39,15 +39,17 @@ class TagsTest extends TestCase
     /** @test */
     public function hooks_can_be_run()
     {
-        TestTags::addHook('constructed', function ($tag) {
+        TestTags::addHook('constructed', function ($tag, $payload) {
             $this->assertInstanceOf(TestTags::class, $tag);
+            $this->assertEquals('initial', $payload);
             $tag->setFoo('bar');
         });
 
         // Do it twice to ensure that they are executed in order
         // and the tag is passed along through the closures.
-        TestTags::addHook('constructed', function ($tag) {
+        TestTags::addHook('constructed', function ($tag, $payload) {
             $this->assertInstanceOf(TestTags::class, $tag);
+            $this->assertEquals('initial', $payload);
             $tag->setFoo($tag->foo.'baz');
         });
 
@@ -81,13 +83,13 @@ class TagsTest extends TestCase
 class TestTags extends Tags
 {
     public $dependency;
-    public $foo = '';
+    public $foo = 'initial';
 
     public function __construct(TestDependency $dependency)
     {
         $this->dependency = $dependency;
 
-        $this->runHook('constructed');
+        $this->runHook('constructed', $this->foo);
     }
 
     public function setFoo(string $foo)
