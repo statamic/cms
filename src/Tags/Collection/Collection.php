@@ -3,7 +3,6 @@
 namespace Statamic\Tags\Collection;
 
 use Statamic\Facades\Entry;
-use Statamic\Tags\Collection\Events\FetchedEntries;
 use Statamic\Tags\Collection\Events\FetchingEntries;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
@@ -33,12 +32,8 @@ class Collection extends Tags
             return $this->context->value('collection');
         }
 
-        $entries = $this->entries()->get();
-
-        FetchedEntries::dispatch($entries, $this);
-
         return $this->output(
-            $entries
+            $this->entries()->get()
         );
     }
 
@@ -102,7 +97,7 @@ class Collection extends Tags
     {
         FetchingEntries::dispatch($this);
 
-        return new Entries($this->params);
+        return new Entries($this->params, $this);
     }
 
     protected function currentEntry()

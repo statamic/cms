@@ -15,17 +15,21 @@ use Statamic\Facades\Site;
 use Statamic\Query\OrderBy;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Tags\Collection\Collection as Tag;
+use Statamic\Tags\Collection\Events\FetchedEntries;
 use Statamic\Tags\Concerns;
 
 class Entries
 {
-    use Concerns\GetsQueryResults,
-        Concerns\GetsQuerySelectKeys,
+    use Concerns\GetsQuerySelectKeys,
         Concerns\QueriesOrderBys,
         Concerns\QueriesScopes,
         Concerns\QueriesTaxonomyTerms;
     use Concerns\QueriesConditions {
         queryableConditionParams as traitQueryableConditionParams;
+    }
+    use Concerns\GetsQueryResults {
+        results as traitResults;
     }
 
     protected $ignoredParams = ['as'];
@@ -36,10 +40,12 @@ class Entries
     protected $showUnpublished;
     protected $since;
     protected $until;
+    protected $tag;
 
-    public function __construct($params)
+    public function __construct($params, Tag $tag = null)
     {
         $this->parseParameters($params);
+        $this->tag = $tag;
     }
 
     public function get()
@@ -393,5 +399,14 @@ class Entries
         return $this->traitQueryableConditionParams()
             ->reject(fn ($value, $key) => Str::startsWith($key, 'taxonomy:'))
             ->reject(fn ($value, $key) => $value === '');
+    }
+
+    protected function results($query)
+    {
+        $results = $this->traitResults($query);
+
+        FetchedEntries::dispatch($results, $this->tag);
+
+        return $results;
     }
 }
