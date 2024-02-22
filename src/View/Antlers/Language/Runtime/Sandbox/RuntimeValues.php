@@ -12,7 +12,7 @@ class RuntimeValues
     {
         GlobalRuntimeState::$requiresRuntimeIsolation = true;
         try {
-            $value = $augmentable->toAugmentedArray();
+            $value = $augmentable->toDeferredAugmentedArray();
         } catch (Exception $e) {
             throw $e;
         } finally {

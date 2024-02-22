@@ -26,6 +26,11 @@ trait HasAugmentedInstance
         return $this->toAugmentedCollection($keys)->all();
     }
 
+    public function toDeferredAugmentedArray($keys = null)
+    {
+        return $this->toAugmentedCollection($keys)->deferredAll();
+    }
+
     public function toShallowAugmentedCollection()
     {
         return $this->augmented()->select($this->shallowAugmentedArrayKeys())->withShallowNesting();

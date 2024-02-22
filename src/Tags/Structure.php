@@ -123,7 +123,7 @@ class Structure extends Tags
         $pages = collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
             $page = $item['page'];
             $keys = $this->getQuerySelectKeys($page);
-            $data = $page->toAugmentedArray($keys);
+            $data = $page->toDeferredAugmentedArray($keys);
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
             $url = $page->urlWithoutRedirect();
