@@ -13,7 +13,7 @@ abstract class AddonTestCase extends OrchestraTestCase
 {
     protected string $addonServiceProvider;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -22,6 +22,9 @@ abstract class AddonTestCase extends OrchestraTestCase
 
         Version::shouldReceive('get')->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
         $this->addToAssertionCount(-1);
+
+        \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
+        $this->addToAssertionCount(-1); // Dont want to assert this
     }
 
     protected function getPackageProviders($app)
