@@ -9,12 +9,12 @@ trait HasHooks
 {
     public static $hooks = [];
 
-    public static function addHook(string $name, Closure $hook)
+    public static function hook(string $name, Closure $hook)
     {
         static::$hooks[static::class][$name][] = $hook;
     }
 
-    protected function runHook(string $name, $payload = null)
+    protected function runHooks(string $name, $payload = null)
     {
         $closures = collect(
             static::$hooks[static::class][$name] ?? []

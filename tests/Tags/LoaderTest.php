@@ -16,7 +16,7 @@ class LoaderTest extends TestCase
         $tag = null;
 
         // This hook should add to the tag's params, which we can assert about later.
-        TestTags::addHook('init', function ($payload, $next) use (&$tag, $test) {
+        TestTags::hook('init', function ($payload, $next) use (&$tag, $test) {
             $test->assertInstanceOf(TestTags::class, $this);
             $this->params['alfa'] = 'bravo';
             $tag = $this;

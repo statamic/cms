@@ -41,7 +41,7 @@ class TagsTest extends TestCase
     {
         $test = $this;
 
-        TestTags::addHook('constructed', function ($payload, $next) use ($test) {
+        TestTags::hook('constructed', function ($payload, $next) use ($test) {
             $test->assertEquals('initial', $payload);
             $test->assertInstanceOf(TestTags::class, $this);
             $this->setFoo('bar');
@@ -51,7 +51,7 @@ class TagsTest extends TestCase
 
         // Do it twice to ensure that they are executed in order
         // and the tag is passed along through the closures.
-        TestTags::addHook('constructed', function ($payload, $next) use ($test) {
+        TestTags::hook('constructed', function ($payload, $next) use ($test) {
             $test->assertInstanceOf(TestTags::class, $this);
             $test->assertEquals('initial', $payload);
             $this->setFoo($this->foo.'baz');
@@ -69,14 +69,14 @@ class TagsTest extends TestCase
     {
         $hooksRan = 0;
 
-        TestTags::addHook('constructed', function ($payload, $next) use (&$hooksRan) {
+        TestTags::hook('constructed', function ($payload, $next) use (&$hooksRan) {
             $this->setFoo('bar');
             $hooksRan++;
 
             return $next($this);
         });
 
-        AnotherTestTags::addHook('constructed', function ($payload, $next) use (&$hooksRan) {
+        AnotherTestTags::hook('constructed', function ($payload, $next) use (&$hooksRan) {
             $this->setFoo($this->foo.'baz');
             $hooksRan++;
 
@@ -99,7 +99,7 @@ class TestTags extends Tags
     {
         $this->dependency = $dependency;
 
-        $this->runHook('constructed', $this->foo);
+        $this->runHooks('constructed', $this->foo);
     }
 
     public function setFoo(string $foo)
@@ -114,7 +114,7 @@ class AnotherTestTags extends Tags
 
     public function __construct()
     {
-        $this->runHook('constructed');
+        $this->runHooks('constructed');
     }
 
     public function setFoo(string $foo)

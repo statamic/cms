@@ -33,7 +33,7 @@ class Collection extends Tags
 
         $results = $this->entries()->get();
 
-        $results = $this->runHook('fetched-entries', $results);
+        $results = $this->runHooks('fetched-entries', $results);
 
         return $this->output($results);
     }
@@ -55,7 +55,7 @@ class Collection extends Tags
 
         $results = $this->entries()->next($this->currentEntry());
 
-        $this->runHook('fetched-entries', $results);
+        $this->runHooks('fetched-entries', $results);
 
         return $this->output($results);
     }
@@ -69,7 +69,7 @@ class Collection extends Tags
 
         $results = $this->entries()->previous($this->currentEntry());
 
-        $this->runHook('fetched-entries', $results);
+        $this->runHooks('fetched-entries', $results);
 
         return $this->output($results);
     }
@@ -83,7 +83,7 @@ class Collection extends Tags
 
         $results = $this->entries()->older($this->currentEntry());
 
-        $results = $this->runHook('fetched-entries', $results);
+        $results = $this->runHooks('fetched-entries', $results);
 
         return $this->output($results);
     }
@@ -97,7 +97,7 @@ class Collection extends Tags
 
         $results = $this->entries()->newer($this->currentEntry());
 
-        $results = $this->runHook('fetched-entries', $results);
+        $results = $this->runHooks('fetched-entries', $results);
 
         return $this->output($results);
     }
