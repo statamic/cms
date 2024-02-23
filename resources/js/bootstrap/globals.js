@@ -110,12 +110,12 @@ export function replicatorPreviewHtml(html) {
 }
 
 export function closestVm(el, name) {
-    let node = el;
-    while (node) {
-        if (node.__vue__) break;
-        node = node.parentNode;
+    let parent = el;
+    while (parent) {
+        if (parent.__vue__) break;
+        parent = parent.parentElement;
     }
-    let vm = node.__vue__;
+    let vm = parent.__vue__;
     while (vm !== vm.$root) {
         if (!name || name === vm.$options.name) return vm;
         vm = vm.$parent;
