@@ -59,7 +59,9 @@ abstract class AbstractAugmented implements Augmented
 
         if ($this->methodExistsOnThisClass($method)) {
             return $this->wrapInvokable($method, true, $this, $handle);
-        } elseif (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
+        }
+
+        if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
             return $this->wrapInvokable($method, false, $this->data, $handle);
         }
 
