@@ -10,6 +10,7 @@ use Statamic\Contracts\Entries\EntryRepository;
  * @method static \Statamic\Entries\EntryCollection whereCollection(string $handle)
  * @method static \Statamic\Entries\EntryCollection whereInCollection(array $handles)
  * @method static null|\Statamic\Contracts\Entries\Entry find($id)
+ * @method static \Statamic\Contracts\Entries\Entry findOrFail($id)
  * @method static null|\Statamic\Contracts\Entries\Entry findByUri(string $uri, string $site)
  * @method static \Statamic\Contracts\Entries\Entry make()
  * @method static \Statamic\Contracts\Entries\QueryBuilder query()
