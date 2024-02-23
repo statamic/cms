@@ -49,7 +49,7 @@ class Session
 
     public function region(string $key): Region
     {
-        if ($this->regions->contains($key) && ($region = Cache::get('nocache::region.'.$key))) {
+        if ($this->regions->contains($key) && ($region = StaticCache::cacheStore()->get('nocache::region.'.$key))) {
             return $region;
         }
 
