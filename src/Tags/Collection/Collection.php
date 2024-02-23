@@ -104,8 +104,6 @@ class Collection extends Tags
 
     protected function entries()
     {
-        $this->runHook('fetching-entries');
-
         return new Entries($this->params);
     }
 
