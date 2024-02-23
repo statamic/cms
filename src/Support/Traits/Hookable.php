@@ -20,6 +20,15 @@ trait Hookable
             static::$hooks[static::class][$name] ?? []
         )->map->bindTo($this, $this);
 
+        if (debugbar()->isEnabled()) {
+            $message = vsprintf('Hook: %s (Listeners: %s)', [
+                static::class.'@'.$name,
+                $closures->count(),
+            ]);
+
+            debugbar()->addMessage($message, 'hooks');
+        }
+
         return (new Pipeline)
             ->send($payload)
             ->through($closures->all())
