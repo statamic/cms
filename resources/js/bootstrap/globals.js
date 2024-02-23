@@ -108,3 +108,16 @@ export function escapeHtml(string) {
 export function replicatorPreviewHtml(html) {
     return new PreviewHtml(html);
 }
+
+export function closestVm(el, name) {
+    let node = el;
+    while (node) {
+        if (node.__vue__) break;
+        node = node.parentNode;
+    }
+    let vm = node.__vue__;
+    while (vm !== vm.$root) {
+        if (!name || name === vm.$options.name) return vm;
+        vm = vm.$parent;
+    }
+}
