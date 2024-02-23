@@ -25,7 +25,7 @@ class Reveal {
 
     invalid() {
         Vue.nextTick(() => {
-            const el = document.querySelector('.publish-field.has-error:not(:has(.has-error))');
+            const el = document.querySelector('.publish-field.has-error:not(:has(.publish-field.has-error))');
             if (!el) return;
             this.element(el);
         });
