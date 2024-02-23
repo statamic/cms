@@ -194,4 +194,24 @@ EOT;
     {
         $this->assertThrowsParserError('{{ title | modifier_name(param1, param2) : something_else }}');
     }
+
+    public function test_shorthand_parameters_cannot_have_special_characters()
+    {
+        $this->assertThrowsParserError('{{ tag_name :$thing="that" }}');
+    }
+
+    public function test_shorthand_parameters_cannot_start_with_numbers()
+    {
+        $this->assertThrowsParserError('{{ tag_name :$1thing }}');
+    }
+
+    public function test_incomplete_shorthand_parameters_throws_error()
+    {
+        $this->assertThrowsParserError('{{ tag_name :$ }}');
+    }
+
+    public function test_incomplete_shorthand_parameters_throws_error_two()
+    {
+        $this->assertThrowsParserError('{{ tag_name :$}}');
+    }
 }
