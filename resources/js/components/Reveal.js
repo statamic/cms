@@ -18,13 +18,17 @@ class Reveal {
             parent = parent.parentElement;
         }
         Vue.nextTick(() => {
-            element.scrollIntoView();
+            element.scrollIntoView({
+                block: 'center',
+            });
         });
     }
 
     invalid() {
         Vue.nextTick(() => {
-            this.element(document.querySelector('.publish-field.has-error:not(:has(.has-error))'));
+            const element = document.querySelector('.publish-field.has-error:not(:has(.has-error))');
+            if (!element) return;
+            this.element(element);
         });
     }
 }
