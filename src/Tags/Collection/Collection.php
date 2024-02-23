@@ -15,13 +15,11 @@ class Collection extends Tags
     /**
      * {{ collection:* }} ... {{ /collection:* }}.
      */
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         $this->params['from'] = $this->method;
 
-        return $this->output(
-            $this->entries()->get()
-        );
+        return $this->index();
     }
 
     /**
