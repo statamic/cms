@@ -30,7 +30,7 @@ class SvgTagTest extends TestCase
     /** @test */
     public function it_renders_svg_with_additional_params()
     {
-        $this->assertStringStartsWith('<svg class="mb-2" xmlns="', $this->tag('{{ svg src="users" class="mb-2" }}'));
+        $this->assertStringStartsWith('<svg class="mb-2" xmlns="', $this->tag('{{ svg src="users" sanitize="false" class="mb-2" }}'));
     }
 
     /** @test */
@@ -47,12 +47,12 @@ SVG);
 
         $this->assertEquals(
             '<svg><path/></svg>',
-            $this->tag('{{ svg src="xss" sanitize="true" }}')
+            $this->tag('{{ svg src="xss" }}')
         );
 
         $this->assertEquals(
             '<svg><path onclick="clickxss"/><foreignObject/><mesh/></svg>',
-            $this->tag('{{ svg src="xss" sanitize="true" allow_tags="mesh|foreignObject" allow_attrs="onclick" }}')
+            $this->tag('{{ svg src="xss" allow_tags="mesh|foreignObject" allow_attrs="onclick" }}')
         );
     }
 
@@ -77,6 +77,6 @@ SVG);
 
         File::put(resource_path('xmltag.svg'), $svg);
 
-        $this->assertEquals($svg, $this->tag('{{ svg src="xmltag" sanitize="true" }}'));
+        $this->assertEquals($svg, $this->tag('{{ svg src="xmltag" }}'));
     }
 }
