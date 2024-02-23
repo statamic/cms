@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Support\Traits;
 
 use Closure;
 use Illuminate\Pipeline\Pipeline;
 
-trait HasHooks
+trait Hookable
 {
     public static $hooks = [];
 

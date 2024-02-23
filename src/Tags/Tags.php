@@ -5,14 +5,14 @@ namespace Statamic\Tags;
 use Illuminate\Support\Traits\Macroable;
 use Statamic\Extend\HasAliases;
 use Statamic\Extend\HasHandle;
-use Statamic\Extend\HasHooks;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Antlers;
 use Statamic\Support\Arr;
+use Statamic\Support\Traits\Hookable;
 
 abstract class Tags
 {
-    use HasAliases, HasHandle, HasHooks, Macroable, RegistersItself;
+    use HasAliases, HasHandle, Hookable, Macroable, RegistersItself;
 
     protected static $binding = 'tags';
 
