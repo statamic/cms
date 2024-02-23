@@ -7,7 +7,7 @@ use Illuminate\Pipeline\Pipeline;
 
 trait Hookable
 {
-    public static $hooks = [];
+    private static $hooks = [];
 
     public static function hook(string $name, Closure $hook)
     {
