@@ -1,9 +1,9 @@
 import { closestVm } from '../bootstrap/globals';
 
 class Reveal {
-    element(element) {
-        if (!element) return;
-        let parent = element;
+    element(el) {
+        if (!el) return;
+        let parent = el;
         while (parent) {
             if (parent.matches('.tab-panel')) {
                 closestVm(parent, 'publish-tabs').setActive(parent.dataset.tabHandle);
@@ -17,7 +17,7 @@ class Reveal {
             parent = parent.parentElement;
         }
         Vue.nextTick(() => {
-            element.scrollIntoView({
+            el.scrollIntoView({
                 block: 'center',
             });
         });
@@ -25,9 +25,9 @@ class Reveal {
 
     invalid() {
         Vue.nextTick(() => {
-            const element = document.querySelector('.publish-field.has-error:not(:has(.has-error))');
-            if (!element) return;
-            this.element(element);
+            const el = document.querySelector('.publish-field.has-error:not(:has(.has-error))');
+            if (!el) return;
+            this.element(el);
         });
     }
 }
