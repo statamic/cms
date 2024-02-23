@@ -21,7 +21,7 @@ class Asset extends Assets
      *
      * @return string
      */
-    public function __call($method, $arguments)
+    public function wildcard($method)
     {
         $value = Arr::get($this->context, $this->method);
         $value = (array) $value;
