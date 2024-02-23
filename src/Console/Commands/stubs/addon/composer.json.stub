@@ -5,6 +5,22 @@
             "DummyNamespace\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "DummyNamespace\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "statamic/cms": "^4.0",
+        "rebing/graphql-laravel": "^8.6"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^6.1",
+        "orchestra/testbench": "^7.0"
+    },
+    "scripts": {
+        "test": "php -d memory_limit=-1 ./vendor/bin/phpunit"
+    },
     "extra": {
         "statamic": {
             "name": "DummyTitle",

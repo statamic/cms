@@ -137,8 +137,10 @@ class MakeAddon extends GeneratorCommand
 
         $files = [
             'addon/provider.php.stub' => 'src/ServiceProvider.php',
+            'addon/TestCase.php.stub' => 'tests/TestCase.php',
             'addon/.gitignore.stub' => '.gitignore',
             'addon/README.md.stub' => 'README.md',
+            'addon/phpunit.xml.stub' => 'phpunit.xml',
         ];
 
         $data = [
