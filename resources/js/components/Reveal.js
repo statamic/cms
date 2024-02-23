@@ -1,7 +1,6 @@
 import { closestVm } from '../bootstrap/globals';
 
 class Reveal {
-
     element(element) {
         if (!element) return;
         let parent = element;
