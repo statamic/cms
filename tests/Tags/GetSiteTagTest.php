@@ -44,7 +44,7 @@ class GetSiteTagTest extends TestCase
     /** @test */
     public function it_throws_exception_if_handle_is_missing()
     {
-        $this->expectExceptionMessage("Please set the handle of a site");
+        $this->expectExceptionMessage('Please set the handle of a site');
 
         Antlers::parse('{{ get_site }}{{ name }}{{ /get_site }}');
     }
@@ -52,7 +52,7 @@ class GetSiteTagTest extends TestCase
     /** @test */
     public function it_throws_exception_if_site_doesnt_exist()
     {
-        $this->expectExceptionMessage("Site [nonexistent] does not exist.");
+        $this->expectExceptionMessage('Site [nonexistent] does not exist.');
 
         Antlers::parse('{{ get_site handle="nonexistent" }}{{ name }}{{ /get_site }}');
     }
