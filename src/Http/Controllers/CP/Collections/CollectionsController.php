@@ -24,7 +24,9 @@ class CollectionsController extends CpController
         $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
 
         $collections = Collection::all()->filter(function ($collection) {
-            return User::current()->can('view', $collection);
+            return User::current()->can('configure collections')
+                || User::current()->can('view', $collection)
+                && $collection->sites()->contains(Site::selected()->handle());
         })->map(function ($collection) {
             return [
                 'id' => $collection->handle(),
