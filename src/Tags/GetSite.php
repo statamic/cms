@@ -15,7 +15,7 @@ class GetSite extends Tags
         $handle = Str::before($tag, ':');
 
         if (! $site = Site::get($handle)) {
-            throw new \Exception("Site [$handle] does not exist.");
+            throw new \Exception('Site [$handle] does not exist.');
         }
 
         $data = $site->toAugmentedCollection();
@@ -31,7 +31,7 @@ class GetSite extends Tags
     public function index()
     {
         if (! $handle = $this->params->get('handle')) {
-            throw new \Exception("Please set the handle of a site");
+            throw new \Exception('Please set the handle of a site');
         }
 
         return $this->wildcard($handle);
