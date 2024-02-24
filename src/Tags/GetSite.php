@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Facades\Site;
 use Illuminate\Support\Str;
+use Statamic\Facades\Site;
 
 class GetSite extends Tags
 {
@@ -15,7 +15,7 @@ class GetSite extends Tags
         $handle = Str::before($tag, ':');
 
         if (! $site = Site::get($handle)) {
-            throw new \Exception('Site [$handle] does not exist.');
+            throw new \Exception("Site [$handle] does not exist.");
         }
 
         $data = $site->toAugmentedCollection();

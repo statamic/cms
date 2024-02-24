@@ -2,9 +2,9 @@
 
 namespace Tests\Tags;
 
-use Tests\TestCase;
-use Statamic\Facades\Site;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Site;
+use Tests\TestCase;
 
 class GetSiteTagTest extends TestCase
 {
