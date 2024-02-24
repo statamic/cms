@@ -99,7 +99,7 @@ use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
 
 Route::group(['prefix' => 'auth'], function () {
-    if (config('statamic.cp.auth', true)) {
+    if (config('statamic.cp.auth.enabled', true)) {
         Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
         Route::post('login', [LoginController::class, 'login']);
 
