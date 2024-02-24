@@ -43,10 +43,6 @@ export default {
         fieldsForConditionSuggestions() {
             return this.fields;
         },
-
-        // suggestableConditionFields() {
-        //     return this.suggestableConditionFieldsProvider?.suggestableFields || [];
-        // }
     },
 
     mounted() {
