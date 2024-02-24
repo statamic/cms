@@ -910,13 +910,6 @@ class CoreModifiers extends Modifier
         }
     }
 
-    public function hexToRgb($value)
-    {
-        $hex = ltrim($value, '#');
-        $rgb = sscanf($hex, "%02x%02x%02x");
-        return implode(', ', $rgb);
-    }
-
     private function renderAPStyleHeadline($value)
     {
         $exceptions = [
@@ -962,6 +955,18 @@ class CoreModifiers extends Modifier
         })->implode(' ');
 
         return $headline;
+    }
+
+    /**
+     * Converts a hex color to rgb values.
+     *
+     * @return string
+     */
+    public function hexToRgb($value)
+    {
+        $hex = ltrim($value, '#');
+        $rgb = sscanf($hex, "%02x%02x%02x");
+        return implode(', ', $rgb);
     }
 
     /**
