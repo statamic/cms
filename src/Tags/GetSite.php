@@ -34,6 +34,10 @@ class GetSite extends Tags
             throw new \Exception('Please set the handle of a site');
         }
 
-        return $this->wildcard($handle);
+        if (! $site = Site::get($handle)) {
+            throw new \Exception("Site [$handle] does not exist.");
+        }
+
+        return $site->toAugmentedCollection();
     }
 }
