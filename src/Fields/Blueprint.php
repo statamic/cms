@@ -42,6 +42,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     protected $ensuredFields = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected $lastEntryBlueprint = null;
+
     private ?Columns $columns = null;
 
     public function setHandle(string $handle)
@@ -305,7 +307,18 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     {
         $this->parent = $parent;
 
-        $this->resetFieldsCache();
+        $handle = (function () {
+            if (property_exists($this, 'blueprint')) {
+                return $this->blueprint;
+            }
+
+            return null;
+        })->call($parent);
+
+        if ($handle == null || $handle != $this->lastEntryBlueprint) {
+            $this->resetFieldsCache();
+            $this->lastEntryBlueprint = $handle;
+        }
 
         return $this;
     }
