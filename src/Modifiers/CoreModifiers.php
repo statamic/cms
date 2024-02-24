@@ -910,6 +910,13 @@ class CoreModifiers extends Modifier
         }
     }
 
+    public function hexToRgb($value)
+    {
+        $hex = ltrim($value, '#');
+        $rgb = sscanf($hex, "%02x%02x%02x");
+        return implode(', ', $rgb);
+    }
+
     private function renderAPStyleHeadline($value)
     {
         $exceptions = [
