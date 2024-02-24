@@ -6,7 +6,11 @@ trait InvadesProperties
 {
     protected function invade($object, $property)
     {
-        if (! is_callable($property)) {
+        if (! $property) {
+            return null;
+        }
+
+        if (is_string($property) || ! is_callable($property)) {
             return (fn () => $this->{$property})->call($object);
         }
 
