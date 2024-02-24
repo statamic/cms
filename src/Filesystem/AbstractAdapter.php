@@ -83,7 +83,6 @@ abstract class AbstractAdapter implements Filesystem
 
     public function lastModified($path)
     {
-        ray()->count();
         return $this->filesystem->lastModified($this->normalizePath($path));
     }
 
