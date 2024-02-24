@@ -63,6 +63,7 @@
                     :role="showTabs && 'tabpanel'"
                     :id="showTabs && tabPanelId(tab.handle)"
                     :aria-labelledby="showTabs && tabId(tab.handle)"
+                    :data-tab-handle="tab.handle"
                     tabindex="0"
                     :key="tab.handle"
                     v-for="tab in mainTabs"
@@ -116,10 +117,13 @@
 
 <script>
 import { uniq } from 'underscore';
+import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
 
     inject: ['storeName'],
+
+    mixins: [ValidatesFieldConditions],
 
     props: {
         readOnly: Boolean,
@@ -151,7 +155,7 @@ export default {
         },
 
         tabs() {
-            return this.state.blueprint.tabs;
+            return this.state.blueprint.tabs.filter(tab => this.tabHasVisibleFields(tab));
         },
 
         inStack() {
@@ -204,8 +208,11 @@ export default {
 
         actionsPortal() {
             return `publish-actions-${this.storeName}`;
-        }
+        },
 
+        values() {
+            return this.state.values;
+        },
     },
 
     beforeUpdate() {
@@ -228,6 +235,18 @@ export default {
 
         tabHasError(handle) {
             return this.tabsWithErrors.includes(handle);
+        },
+
+        tabHasVisibleFields(tab) {
+            let visibleFields = 0;
+
+            tab.sections.forEach(section => {
+                section.fields.forEach(field => {
+                    if (this.showField(field)) visibleFields++;
+                });
+            });
+
+            return visibleFields > 0;
         },
 
         setActive(handle) {

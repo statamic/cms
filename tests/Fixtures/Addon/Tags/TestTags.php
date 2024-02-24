@@ -1,18 +1,16 @@
 <?php
 
-namespace Tests\Antlers\Fixtures\Addon\Tags;
+namespace Tests\Fixtures\Addon\Tags;
 
 use Statamic\Tags\Tags;
 
-class Test extends Tags
+class TestTags extends Tags
 {
-    public static $lastValue = null;
+    protected static $handle = 'test';
 
     public function index()
     {
-        self::$lastValue = $this->params->get('variable');
-
-        return self::$lastValue;
+        return $this->params->get('variable');
     }
 
     /**

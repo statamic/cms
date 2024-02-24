@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class IsWeekendTest extends TestCase
 {
-    public function dates(): array
+    public static function datesProvider(): array
     {
         $sunday = Carbon::createFromDate(2022, 2, 13);
         $monday = Carbon::createFromDate(2022, 2, 14);
@@ -22,7 +22,7 @@ class IsWeekendTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider dates
+     * @dataProvider datesProvider
      */
     public function it_returns_true_if_date_is_weekend($expected, $input): void
     {

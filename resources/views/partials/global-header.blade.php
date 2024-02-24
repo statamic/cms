@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 <div class="global-header">
     <div class="lg:min-w-xl pl-2 md:pl-6 h-full flex items-center">
         <button class="nav-toggle hidden md:flex ml-1 shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@cp_svg('icons/light/burger', 'h-4 w-4')</button>
@@ -33,6 +35,12 @@
         @if (Route::has('horizon.index') && \Laravel\Horizon\Horizon::check(request()))
             <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
                 @cp_svg('icons/regular/horizon')
+            </a>
+        @endif
+
+        @if (Route::has('pulse') && (app()->environment('local') || $user->can('viewPulse')))
+            <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ route('pulse') }}" target="_blank" v-tooltip="'Laravel Pulse'">
+                @cp_svg('icons/regular/pulse')
             </a>
         @endif
 

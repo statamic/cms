@@ -18,7 +18,7 @@
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
-                <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
+                <svg-icon name="light/lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden md:flex items-center">
@@ -175,7 +175,7 @@
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
                                             }" />
-                                            {{ option.name }}
+                                            {{ __(option.name) }}
                                             <loading-graphic :size="14" text="" class="ml-2" v-if="localizing === option.handle" />
                                         </div>
                                         <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
@@ -445,6 +445,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
+                if (! response.data.saved) {
+                    return this.$toast.error(__(`Couldn't save term`));
+                }
                 this.title = response.data.data.title;
                 this.permalink = response.data.data.permalink;
                 this.isWorkingCopy = true;
@@ -504,6 +507,7 @@ export default {
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
+                this.$reveal.invalid();
             } else {
                 this.$toast.error(__('Something went wrong'));
             }

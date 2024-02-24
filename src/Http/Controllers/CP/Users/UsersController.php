@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
@@ -16,6 +17,7 @@ use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Search\Result;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 class UsersController extends CpController
 {
@@ -116,20 +118,22 @@ class UsersController extends CpController
         $this->authorize('create', UserContract::class);
 
         $blueprint = User::blueprint();
+        $blueprint->ensureFieldHasConfig('email', ['validate' => 'required']);
 
         $fields = $blueprint->fields()->preProcess();
 
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
+        $additional = $fields->all()
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
+            ->keys();
+
         $viewData = [
-            'title' => __('Create'),
-            'values' => $fields->values()->all(),
-            'meta' => $fields->meta(),
+            'values' => (object) $fields->values()->only($additional)->all(),
+            'meta' => (object) $fields->meta()->only($additional)->all(),
+            'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
-            'actions' => [
-                'save' => cp_route('users.store'),
-            ],
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
             'canSendInvitation' => config('statamic.users.wizard_invitation'),
@@ -149,11 +153,15 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->only(['email', 'name', 'first_name', 'last_name'])->addValues($request->all());
+        $fields = $blueprint->fields()->except(['roles', 'groups'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        if ($request->input('_validate_only')) {
+            return [];
+        }
+
+        $values = $fields->process()->values()->except(['email']);
 
         $user = User::make()
             ->email($request->email)
@@ -178,7 +186,13 @@ class UsersController extends CpController
         if ($request->invitation['send']) {
             ActivateAccount::subject($request->invitation['subject']);
             ActivateAccount::body($request->invitation['message']);
-            $user->generateTokenAndSendActivateAccountNotification();
+
+            try {
+                $user->generateTokenAndSendActivateAccountNotification();
+            } catch (TransportException $e) {
+                Toast::error(__('statamic::messages.user_activation_email_not_sent_error'));
+            }
+
             $url = null;
         } else {
             $url = PasswordReset::url($user->generateActivateAccountToken(), PasswordReset::BROKER_ACTIVATIONS);
@@ -207,7 +221,7 @@ class UsersController extends CpController
         }
 
         if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
-            $blueprint->ensureField('super', ['type' => 'toggle']);
+            $blueprint->ensureField('super', ['type' => 'toggle', 'display' => __('permissions.super')]);
         }
 
         $values = $user->data()
@@ -233,6 +247,7 @@ class UsersController extends CpController
                 'editBlueprint' => cp_route('users.blueprint.edit'),
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
+            'requiresCurrentPassword' => $request->user()->id === $user->id(),
         ];
 
         if ($request->wantsJson()) {
@@ -256,7 +271,7 @@ class UsersController extends CpController
             ->withReplacements(['id' => $user->id()])
             ->validate();
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles', 'super']);
 
         foreach ($values as $key => $value) {
             $user->set($key, $value);
@@ -276,9 +291,12 @@ class UsersController extends CpController
             $user->groups($request->groups);
         }
 
-        $user->save();
+        $save = $user->save();
 
-        return ['title' => $user->title()];
+        return [
+            'title' => $user->title(),
+            'saved' => is_bool($save) ? $save : true,
+        ];
     }
 
     public function destroy($user)

@@ -17,7 +17,8 @@
                 :step="step"
                 :disabled="disabled"
                 :readonly="isReadOnly"
-                :placeholder="placeholder"
+                :placeholder="__(placeholder)"
+                :autocomplete="autocomplete"
                 :autofocus="focus"
                 :min="min"
                 @input="$emit('input', $event.target.value)"
@@ -55,6 +56,7 @@ export default {
         prepend: { default: null },
         append: { default: null },
         focus: { type: Boolean },
+        autocomplete: { default: null },
         autoselect: { type: Boolean },
         min: { type: Number, default: undefined }
     },

@@ -53,6 +53,17 @@ class GlideTest extends TestCase
 
     /**
      * @test
+     * https://github.com/statamic/cms/pull/9031
+     */
+    public function it_outputs_an_absolute_url_when_the_url_does_not_have_a_valid_extension()
+    {
+        $parse = (string) Parse::template('{{ glide src="https://statamic.com/foo" }}');
+
+        $this->assertSame('https://statamic.com/foo', $parse);
+    }
+
+    /**
+     * @test
      */
     public function it_outputs_a_data_url()
     {

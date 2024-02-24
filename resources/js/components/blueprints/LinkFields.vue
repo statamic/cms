@@ -23,7 +23,7 @@
 
                     <div>
                         <p class="text-sm font-medium mb-2" v-text="__('Link a single field')" />
-                        <p class="text-2xs text-gray mb-2" v-text="__('Changes to this field will stay in sync.')" />
+                        <p class="text-2xs text-gray mb-2" v-text="__('Changes to this field in the fieldset will stay in sync.')" />
                         <v-select
                             name="field"
                             :placeholder="__('Fields')"
@@ -111,8 +111,8 @@ export default {
                 .filter(field => field.type !== 'import')
                 .map(field => ({
                     value: `${fieldset.handle}.${field.handle}`,
-                    label: field.config.display,
-                    fieldset: fieldset.title,
+                    label: __(field.config.display),
+                    fieldset: __(fieldset.title),
                 }));
         });
 
@@ -124,7 +124,7 @@ export default {
             fieldSuggestions,
             fieldsetSuggestions: fieldsets.map(fieldset => ({
                 value: fieldset.handle,
-                label: fieldset.title,
+                label: __(fieldset.title),
             })),
             fieldsets,
         }

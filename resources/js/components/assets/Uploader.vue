@@ -176,7 +176,14 @@ export default {
             const id = upload.id;
 
             upload.instance.upload().then(response => {
-                const json = JSON.parse(response.data);
+                let json = null;
+
+                try {
+                    json = JSON.parse(response.data);
+                } catch (error) {
+                    // If it fails, it's probably because the response is HTML.
+                }
+
                 response.status === 200
                     ? this.handleUploadSuccess(id, json)
                     : this.handleUploadError(id, status, json);
@@ -190,7 +197,7 @@ export default {
 
         handleUploadError(id, status, response) {
             const upload = this.findUpload(id);
-            let msg = response.message;
+            let msg = response?.message;
             if (! msg) {
                 if (status === 413) {
                     msg = __('Upload failed. The file is larger than is allowed by your server.');

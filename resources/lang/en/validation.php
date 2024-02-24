@@ -174,6 +174,7 @@ return [
     'date_fieldtype_start_date_invalid' => 'Not a valid start date.',
     'date_fieldtype_end_date_required' => 'End date is required.',
     'date_fieldtype_end_date_invalid' => 'Not a valid end date.',
+    'date_fieldtype_only_single_mode_allowed' => 'You can only use "Single" mode when the field handle is date.',
     'code_fieldtype_rulers' => 'This is invalid.',
     'options_require_keys' => 'All options must have keys.',
 

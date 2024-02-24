@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class EntitiesTest extends TestCase
 {
-    public function entityDataProvider(): array
+    public static function entityDataProvider(): array
     {
         return [
             ['The &#039;bacon&#039; is &lt;b&gt;crispy&lt;/b&gt;', "The 'bacon' is <b>crispy</b>"],

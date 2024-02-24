@@ -6,6 +6,7 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
+use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
 use Statamic\Support\Arr;
@@ -43,7 +44,18 @@ class EntryRepository implements RepositoryContract
         return $this->query()->where('id', $id)->first();
     }
 
-    public function findByUri(string $uri, string $site = null): ?Entry
+    public function findOrFail($id): Entry
+    {
+        $entry = $this->find($id);
+
+        if (! $entry) {
+            throw new EntryNotFoundException($id);
+        }
+
+        return $entry;
+    }
+
+    public function findByUri(string $uri, ?string $site = null): ?Entry
     {
         $site = $site ?? $this->stache->sites()->first();
 

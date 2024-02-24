@@ -184,8 +184,9 @@ export default class {
         let target = condition.field
             ? this.getFieldValue(condition.field)
             : null;
+        let targetHandle = condition.field;
 
-        return {functionName, params, target};
+        return {functionName, params, target, targetHandle};
     }
 
     prepareFunctionName(condition) {
@@ -258,6 +259,7 @@ export default class {
         let passes = customFunction({
             params: condition.params,
             target: condition.target,
+            targetHandle: condition.targetHandle,
             values: this.values,
             root: this.rootValues,
             store: this.store,

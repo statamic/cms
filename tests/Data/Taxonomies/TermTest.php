@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Event;
 use Mockery;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
+use Statamic\Events\TermCreating;
+use Statamic\Events\TermDeleted;
+use Statamic\Events\TermDeleting;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
 use Statamic\Facades;
@@ -128,6 +131,10 @@ class TermTest extends TestCase
 
         $this->assertTrue($return);
 
+        Event::assertDispatched(TermCreating::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+
         Event::assertDispatched(TermSaving::class, function ($event) use ($term) {
             return $event->term === $term;
         });
@@ -172,8 +179,28 @@ class TermTest extends TestCase
 
         $this->assertTrue($return);
 
+        Event::assertNotDispatched(TermCreating::class);
         Event::assertNotDispatched(TermSaving::class);
         Event::assertNotDispatched(TermSaved::class);
+        Event::assertNotDispatched(TermCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_term_doesnt_save()
+    {
+        Event::fake([TermCreated::class]);
+
+        Event::listen(TermCreating::class, function () {
+            return false;
+        });
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->save();
+
+        $this->assertFalse($return);
+
         Event::assertNotDispatched(TermCreated::class);
     }
 
@@ -287,5 +314,78 @@ class TermTest extends TestCase
             ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true', 'url' => 'http://preview.com/de/tags?preview=true'],
             ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/de/tags/das-foo?preview=true'],
         ], $termDe->previewTargets()->all());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_layout()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        // defaults to layout
+        $this->assertEquals('layout', $term->layout());
+
+        // taxonomy level overrides the default
+        $taxonomy->layout('foo');
+        $this->assertEquals('foo', $term->layout());
+
+        // term level overrides the origin
+        $return = $term->layout('baz');
+        $this->assertEquals($term, $return);
+        $this->assertEquals('baz', $term->layout());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_template()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        // defaults to taxonomy.show
+        $this->assertEquals('tags.show', $term->template());
+
+        // taxonomy level overrides the default
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $term->template());
+
+        // term level overrides the origin
+        $return = $term->template('baz');
+        $this->assertEquals($term, $return);
+        $this->assertEquals('baz', $term->template());
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $term->delete();
+
+        Event::assertDispatched(TermDeleting::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Term::spy();
+        Event::fake([TermDeleted::class]);
+
+        Event::listen(TermDeleting::class, function () {
+            return false;
+        });
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $return = $term->delete();
+
+        $this->assertFalse($return);
+        Facades\Term::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(TermDeleted::class);
     }
 }

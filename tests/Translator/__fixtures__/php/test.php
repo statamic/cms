@@ -21,6 +21,7 @@ class test
             trans_choice('php trans_choice double quote :param', 2, ['param']),
 
             __('php with/slash'),
+            __('php with bracket(s)'),
         ];
     }
 
@@ -58,5 +59,11 @@ class test
     {
         /** @translation */
         return 'php annotated return with/slash';
+    }
+
+    public function returnMethodSeven()
+    {
+        /** @translation */
+        return 'php annotated return with bracket(s)';
     }
 }
