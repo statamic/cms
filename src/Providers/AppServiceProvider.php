@@ -188,7 +188,6 @@ class AppServiceProvider extends ServiceProvider
 
         AboutCommand::add('Statamic', [
             'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
-            'Antlers' => config('statamic.antlers.version'),
             'Addons' => $addons->count(),
             'Stache Watcher' => config('statamic.stache.watcher') ? 'Enabled' : 'Disabled',
             'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',
