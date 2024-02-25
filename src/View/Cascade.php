@@ -163,7 +163,7 @@ class Cascade
         }
 
         $variables = $this->content instanceof Augmentable
-            ? $this->content->toAugmentedArray()
+            ? $this->content->toDeferredAugmentedArray()
             : $this->content->toArray();
 
         foreach ($variables as $key => $value) {

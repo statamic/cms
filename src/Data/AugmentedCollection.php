@@ -47,6 +47,22 @@ class AugmentedCollection extends Collection
         return $this;
     }
 
+    public function all()
+    {
+        return collect($this->items)->map(function ($item) {
+            if ($item instanceof InvokableValue) {
+                return $item->materialize();
+            }
+
+            return $item;
+        })->all();
+    }
+
+    public function deferredAll()
+    {
+        return parent::all();
+    }
+
     public function toArray()
     {
         return $this->map(function ($value) {

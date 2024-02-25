@@ -37,6 +37,11 @@ class Value implements IteratorAggregate, JsonSerializable
         return $this->raw;
     }
 
+    public function materialize()
+    {
+        return $this;
+    }
+
     public function value()
     {
         if (! $this->fieldtype) {

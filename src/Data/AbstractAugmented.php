@@ -44,20 +44,25 @@ abstract class AbstractAugmented implements Augmented
 
     abstract public function keys();
 
+    public function getAugmentedMethodValue($method)
+    {
+        if ($this->methodExistsOnThisClass($method)) {
+            return $this->$method();
+        }
+
+        return $this->data->$method();
+    }
+
     public function get($handle): Value
     {
         $method = Str::camel($handle);
 
         if ($this->methodExistsOnThisClass($method)) {
-            $value = $this->$method();
-
-            return $value instanceof Value
-                ? $value
-                : new Value($value, $method, null, $this->data);
+            return $this->wrapInvokable($method, true, $this, $handle);
         }
 
         if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
-            return $this->wrapValue($this->data->$method(), $handle);
+            return $this->wrapInvokable($method, false, $this->data, $handle);
         }
 
         return $this->wrapValue($this->getFromData($handle), $handle);
@@ -91,6 +96,18 @@ abstract class AbstractAugmented implements Augmented
         }
 
         return $value;
+    }
+
+    protected function wrapInvokable(string $method, bool $proxy, $methodTarget, string $handle)
+    {
+        $fields = $this->blueprintFields();
+
+        return (new InvokableValue(
+            null,
+            $handle,
+            optional($fields->get($handle))->fieldtype(),
+            $this->data
+        ))->setInvokableDetails($method, $proxy, $methodTarget);
     }
 
     protected function wrapValue($value, $handle)

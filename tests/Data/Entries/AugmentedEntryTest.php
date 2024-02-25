@@ -23,6 +23,7 @@ class AugmentedEntryTest extends AugmentedTestCase
     public function it_has_a_parent_method()
     {
         $entry = Mockery::mock(Entry::class);
+        $entry->shouldReceive('blueprint')->zeroOrMoreTimes();
         $entry->shouldReceive('parent')->andReturn('the parent');
 
         $augmented = new AugmentedEntry($entry);
