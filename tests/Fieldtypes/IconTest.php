@@ -21,7 +21,7 @@ class IconTest extends TestCase
     /** @test */
     public function it_accepts_svg_strings()
     {
-        $result = (string) Antlers::parse('{{ svg :src="test" class="w-4 h-4" }}', ['test' => new Value('add', $this->fieldtype())]);
+        $result = (string) Antlers::parse('{{ svg :src="test" class="w-4 h-4" sanitize="false" }}', ['test' => new Value('add', $this->fieldtype())]);
 
         $this->assertStringContainsString('<svg class="w-4 h-4"', $result);
     }
