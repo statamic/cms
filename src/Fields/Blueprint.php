@@ -26,10 +26,11 @@ use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\InvadesProperties;
 
 class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 {
-    use ExistsAsFile, HasAugmentedData;
+    use ExistsAsFile, HasAugmentedData, InvadesProperties;
 
     protected $handle;
     protected $namespace;
@@ -42,6 +43,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     protected $ensuredFields = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected $lastBlueprintHandle = null;
+
     private ?Columns $columns = null;
 
     public function setHandle(string $handle)
@@ -623,6 +626,22 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     protected function resetFieldsCache()
     {
+        if ($this->parent) {
+            $blueprintHandle = $this->invade($this->parent, function () {
+                if (property_exists($this, 'blueprint')) {
+                    return $this->blueprint;
+                }
+
+                return null;
+            });
+
+            if ($blueprintHandle && $blueprintHandle === $this->lastBlueprintHandle) {
+                return $this;
+            }
+
+            $this->lastBlueprintHandle = $blueprintHandle;
+        }
+
         $this->fieldsCache = null;
 
         Blink::forget($this->contentsBlinkKey());
