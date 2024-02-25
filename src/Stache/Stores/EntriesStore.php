@@ -8,6 +8,8 @@ class EntriesStore extends AggregateStore
 {
     protected $childStore = CollectionEntriesStore::class;
 
+    protected $storeIndexes = ['uri'];
+
     public function key()
     {
         return 'entries';

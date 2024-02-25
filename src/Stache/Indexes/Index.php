@@ -92,9 +92,12 @@ abstract class Index
 
         debugbar()->addMessage("Updating index: {$this->store->key()}/{$this->name}", 'stache');
 
+        Stache::flushIndexValues($this->name);
+        Stache::setShouldUseIndexValues(false);
         $this->items = $this->getItems();
 
         $this->cache();
+        Stache::setShouldUseIndexValues(true);
 
         return $this;
     }
@@ -113,7 +116,9 @@ abstract class Index
     {
         $this->load();
 
-        $this->put($this->store->getItemKey($item), $this->getItemValue($item));
+        Stache::withoutIndexedValues(function () use ($item) {
+            $this->put($this->store->getItemKey($item), $this->getItemValue($item));
+        });
 
         $this->cache();
     }
