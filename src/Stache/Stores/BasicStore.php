@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
+use Statamic\Facades\Stache;
 use Symfony\Component\Finder\SplFileInfo;
 
 abstract class BasicStore extends Store
@@ -38,7 +39,23 @@ abstract class BasicStore extends Store
     {
         $cacheKey = $this->getItemCacheKey($key);
 
-        return Cache::get($cacheKey);
+        $item = Cache::get($cacheKey);
+
+        if ($item && method_exists($item, 'receivesIndexValues')) {
+            $id = $item->id();
+
+            foreach ($item->receivesIndexValues() as $index) {
+                Stache::itemUsingIndexValues($index, $item);
+
+                $value = $this->resolveIndex($index)->get($id);
+
+                if ($value) {
+                    $item->withIndexedValue($index, $value);
+                }
+            }
+        }
+
+        return $item;
     }
 
     protected function cacheItem($item)

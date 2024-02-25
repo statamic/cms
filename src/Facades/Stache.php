@@ -24,6 +24,12 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed|null buildDate()
  * @method static self disableUpdatingIndexes()
  * @method static bool shouldUpdateIndexes()
+ * @method static bool shouldUseIndexValues()
+ * @method static self setShouldUseIndexValues($allowed = true)
+ * @method static self withoutIndexedValues(callable $callback)
+ * @method static void flushIndexValues($index)
+ * @method static void updateDependantIndexes($store, $handle)
+ * @method static void itemUsingIndexValues($index, $item)
  *
  * @see \Statamic\Stache\Stache
  */

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Extensions\FileStore;
 use Statamic\Facades\File;
+use Statamic\Stache\Stores\AggregateStore;
 use Statamic\Stache\Stores\Store;
 use Statamic\Support\Str;
 use Symfony\Component\Lock\LockFactory;
@@ -21,10 +22,105 @@ class Stache
     protected $lockFactory;
     protected $locks = [];
     protected $duplicates;
+    protected $indexedValuesAllowed = true;
+    protected $indexReferences = [];
+    protected $dependantIndexClasses = [];
+    protected $dependantIndexes = [];
 
     public function __construct()
     {
         $this->stores = collect();
+    }
+
+    protected function registerDependantIndexes($item)
+    {
+        $class = get_class($item);
+
+        if (array_key_exists($class, $this->dependantIndexClasses)) {
+            return;
+        }
+
+        // Prevent registering the same class multiple times.
+        $this->dependantIndexClasses[$class] = true;
+
+        $dependencies = $item->getDependantIndexes();
+
+        foreach ($dependencies as $store => $indexNames) {
+            if (! array_key_exists($store, $this->dependantIndexes)) {
+                $this->dependantIndexes[$store] = [];
+            }
+
+            $this->dependantIndexes[$store] = array_merge($this->dependantIndexes[$store], $indexNames);
+        }
+    }
+
+    public function updateDependantIndexes($store, $handle)
+    {
+        if (! array_key_exists($store, $this->dependantIndexes)) {
+            return;
+        }
+
+        $this->withoutIndexedValues(function () use ($store, $handle) {
+            $storeInstance = $this->store($store);
+            foreach ($this->dependantIndexes[$store] as $index) {
+                if ($storeInstance instanceof AggregateStore) {
+                    $storeInstance->store($handle)->index($index)->update();
+                } else {
+                    $storeInstance->index($index)->update();
+                }
+            }
+        });
+    }
+
+    public function itemUsingIndexValues($index, $item)
+    {
+        $this->registerDependantIndexes($item);
+
+        if (! array_key_exists($index, $this->indexReferences)) {
+            $this->indexReferences[$index] = [];
+        }
+
+        $this->indexReferences[$index][] = $item;
+    }
+
+    public function flushIndexValues($index)
+    {
+        if (! array_key_exists($index, $this->indexReferences)) {
+            return;
+        }
+
+        foreach ($this->indexReferences[$index] as $item) {
+            if (! method_exists($item, 'flushIndexedValue')) {
+                continue;
+            }
+
+            $item->flushIndexedValue($index);
+        }
+    }
+
+    public function shouldUseIndexValues()
+    {
+        return $this->indexedValuesAllowed;
+    }
+
+    public function setShouldUseIndexValues($allowed = true)
+    {
+        $this->indexedValuesAllowed = $allowed;
+
+        return $this;
+    }
+
+    public function withoutIndexedValues(callable $callback)
+    {
+        $currentSetting = $this->shouldUseIndexValues();
+
+        $this->setShouldUseIndexValues(false);
+
+        $result = $callback();
+
+        $this->setShouldUseIndexValues($currentSetting);
+
+        return $result;
     }
 
     public function sites($sites = null)
