@@ -8,13 +8,19 @@ use Statamic\Statamic;
 
 class AugmentedTerm extends AbstractAugmented
 {
+    protected $cachedKeys = null;
+
     public function keys()
     {
-        return $this->data->values()->keys()
-            ->merge($this->data->supplements()->keys())
-            ->merge($this->commonKeys())
-            ->merge($this->blueprintFields()->keys())
-            ->unique()->sort()->values()->all();
+        if (! $this->cachedKeys) {
+            $this->cachedKeys = $this->data->values()->keys()
+                ->merge($this->data->supplements()->keys())
+                ->merge($this->commonKeys())
+                ->merge($this->blueprintFields()->keys())
+                ->unique()->sort()->values()->all();
+        }
+
+        return $this->cachedKeys;
     }
 
     private function commonKeys()

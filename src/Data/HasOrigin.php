@@ -11,19 +11,25 @@ trait HasOrigin
      */
     protected $origin;
 
+    protected $cachedKeys = null;
+
     public function keys()
     {
-        $originFallbackKeys = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues()->keys() : collect();
+        if (! $this->cachedKeys) {
+            $originFallbackKeys = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues()->keys() : collect();
 
-        $originKeys = $this->hasOrigin() ? $this->origin()->keys() : collect();
+            $originKeys = $this->hasOrigin() ? $this->origin()->keys() : collect();
 
-        $computedKeys = method_exists($this, 'computedKeys') ? $this->computedKeys() : [];
+            $computedKeys = method_exists($this, 'computedKeys') ? $this->computedKeys() : [];
 
-        return collect()
-            ->merge($originFallbackKeys)
-            ->merge($originKeys)
-            ->merge($this->data->keys())
-            ->merge($computedKeys);
+            $this->cachedKeys = collect()
+                ->merge($originFallbackKeys)
+                ->merge($originKeys)
+                ->merge($this->data->keys())
+                ->merge($computedKeys);
+        }
+
+        return $this->cachedKeys;
     }
 
     public function values()

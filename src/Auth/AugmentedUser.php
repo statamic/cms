@@ -11,15 +11,21 @@ use Statamic\Support\Str;
 
 class AugmentedUser extends AbstractAugmented
 {
+    protected $cachedKeys = null;
+
     public function keys()
     {
-        return $this->data->data()->keys()
-            ->merge(collect($this->data->supplements() ?? [])->keys())
-            ->merge($this->commonKeys())
-            ->merge($this->roleHandles())
-            ->merge($this->groupHandles())
-            ->merge($this->blueprintFields()->keys())
-            ->unique()->sort()->values()->all();
+        if (! $this->cachedKeys) {
+            $this->cachedKeys = $this->data->data()->keys()
+                ->merge(collect($this->data->supplements() ?? [])->keys())
+                ->merge($this->commonKeys())
+                ->merge($this->roleHandles())
+                ->merge($this->groupHandles())
+                ->merge($this->blueprintFields()->keys())
+                ->unique()->sort()->values()->all();
+        }
+
+        return $this->cachedKeys;
     }
 
     private function commonKeys()

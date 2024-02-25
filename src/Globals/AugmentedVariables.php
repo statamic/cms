@@ -6,9 +6,15 @@ use Statamic\Data\AbstractAugmented;
 
 class AugmentedVariables extends AbstractAugmented
 {
+    protected $cachedKeys = null;
+
     public function keys()
     {
-        return $this->data->values()->keys()->all();
+        if (! $this->cachedKeys) {
+            $this->cachedKeys = $this->data->values()->keys()->all();
+        }
+
+        return $this->cachedKeys;
     }
 
     public function site()

@@ -8,13 +8,19 @@ use Statamic\Statamic;
 
 class AugmentedEntry extends AbstractAugmented
 {
+    protected $keysCache = null;
+
     public function keys()
     {
-        return $this->data->keys()
-            ->merge($this->data->supplements()->keys())
-            ->merge($this->commonKeys())
-            ->merge($this->blueprintFields()->keys())
-            ->unique()->sort()->values()->all();
+        if (! $this->keysCache) {
+            $this->keysCache = $this->data->keys()
+                ->merge($this->data->supplements()->keys())
+                ->merge($this->commonKeys())
+                ->merge($this->blueprintFields()->keys())
+                ->unique()->sort()->values()->all();
+        }
+
+        return $this->keysCache;
     }
 
     private function commonKeys()
