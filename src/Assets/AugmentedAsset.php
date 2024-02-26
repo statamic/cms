@@ -12,66 +12,66 @@ class AugmentedAsset extends AbstractAugmented
 
     public function keys()
     {
-        if (! $this->cachedKeys) {
-            $keys = $this->data->data()->keys()
-                ->merge($this->data->supplements()->keys())
-                ->merge([
-                    'id',
-                    'title',
-                    'path',
-                    'filename',
-                    'basename',
-                    'extension',
-                    'is_asset',
-                    'is_audio',
-                    'is_previewable',
-                    'is_image',
-                    'is_svg',
-                    'is_video',
-                    'blueprint',
-                    'edit_url',
-                    'container',
-                    'folder',
-                    'url',
-                    'permalink',
-                    'api_url',
-                ]);
-
-            if ($this->data->exists()) {
-                $keys = $keys->merge([
-                    'size',
-                    'size_bytes',
-                    'size_kilobytes',
-                    'size_megabytes',
-                    'size_gigabytes',
-                    'size_b',
-                    'size_kb',
-                    'size_mb',
-                    'size_gb',
-                    'last_modified',
-                    'last_modified_timestamp',
-                    'last_modified_instance',
-                    'focus',
-                    'has_focus',
-                    'focus_css',
-                    'height',
-                    'width',
-                    'orientation',
-                    'ratio',
-                    'mime_type',
-                    'duration',
-                    'duration_seconds',
-                    'duration_minutes',
-                    'duration_sec',
-                    'duration_min',
-                    'playtime',
-                ]);
-            }
-
-            $this->cachedKeys = $keys->merge($this->blueprintFields()->keys())->unique()->all();
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
         }
 
-        return $this->cachedKeys;
+        $keys = $this->data->data()->keys()
+            ->merge($this->data->supplements()->keys())
+            ->merge([
+                'id',
+                'title',
+                'path',
+                'filename',
+                'basename',
+                'extension',
+                'is_asset',
+                'is_audio',
+                'is_previewable',
+                'is_image',
+                'is_svg',
+                'is_video',
+                'blueprint',
+                'edit_url',
+                'container',
+                'folder',
+                'url',
+                'permalink',
+                'api_url',
+            ]);
+
+        if ($this->data->exists()) {
+            $keys = $keys->merge([
+                'size',
+                'size_bytes',
+                'size_kilobytes',
+                'size_megabytes',
+                'size_gigabytes',
+                'size_b',
+                'size_kb',
+                'size_mb',
+                'size_gb',
+                'last_modified',
+                'last_modified_timestamp',
+                'last_modified_instance',
+                'focus',
+                'has_focus',
+                'focus_css',
+                'height',
+                'width',
+                'orientation',
+                'ratio',
+                'mime_type',
+                'duration',
+                'duration_seconds',
+                'duration_minutes',
+                'duration_sec',
+                'duration_min',
+                'playtime',
+            ]);
+        }
+
+        return $this->cachedKeys = $keys->merge($this->blueprintFields()->keys())->unique()->all();
     }
 
     protected function isAsset()
