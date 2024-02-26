@@ -39,7 +39,7 @@ class AugmentedUser extends AbstractAugmented
         ];
     }
 
-    public function get($handle): Value
+    public function get($handle, $fieldtype = null): Value
     {
         if ($handle === 'is_user') {
             return new Value(true, 'is_user', null, $this->data);
@@ -57,7 +57,7 @@ class AugmentedUser extends AbstractAugmented
             return new Value(in_array(Str::after($handle, 'in_'), $this->groups()), $handle, null, $this->data);
         }
 
-        return parent::get($handle);
+        return parent::get($handle, $fieldtype);
     }
 
     protected function roles()
