@@ -91,7 +91,7 @@ class Svg extends Tags
 
     private function sanitize($svg)
     {
-        if ($this->params->bool('sanitize') === false) {
+        if ($this->params->bool('sanitize', true) === false) {
             return $svg;
         }
 
