@@ -69,7 +69,7 @@ trait RendersForms
             $attrs['enctype'] = 'multipart/form-data';
         }
 
-        $attrs = $this->renderAttributesFromParams($attrs);
+        $attrs = $this->renderAttributesFromParamsWith($attrs);
 
         $html = collect(['<form', $attrs])->filter()->implode(' ').'>';
 

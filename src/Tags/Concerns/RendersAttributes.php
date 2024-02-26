@@ -35,24 +35,32 @@ trait RendersAttributes
     }
 
     /**
-     * Render HTML attributes from rest of tag params.
+     * Render HTML attributes from tag params.
      *
      * Parameters that are not prefixed with attr: will be automatically removed.
      *
-     * @param  array  $additional  A set of additional values that will be merged with the rendered attributes.
      * @return string
      */
-    protected function renderAttributesFromParams($additional = [])
+    protected function renderAttributesFromParams()
     {
-        // Additional first to preserve existing order behavior.
-        $params = collect($additional)->mapWithKeys(function ($value, $attribute) {
-            return ['attr:'.$attribute => $value];
-        })
-            ->merge($this->params->all())
-            ->filter(function ($value, $attribute) {
-                return preg_match('/^attr:/', $attribute);
-            })->all();
+        $params = $this->params->filter(function ($value, $attribute) {
+            return preg_match('/^attr:/', $attribute);
+        })->all();
 
         return $this->renderAttributes($params);
+    }
+
+    /**
+     * Render HTML attributes and merge attributes from tag params.
+     *
+     * @param  array  $attrs
+     * @return string
+     */
+    protected function renderAttributesFromParamsWith(array $attrs)
+    {
+        return collect([
+            $this->renderAttributes($attrs),
+            $this->renderAttributesFromParams(),
+        ])->filter()->implode(' ');
     }
 }
