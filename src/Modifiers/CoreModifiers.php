@@ -968,7 +968,7 @@ class CoreModifiers extends Modifier
         $hex = ltrim($value, '#');
 
         // Parse the hex value into RGB components
-        $rgb = sscanf($hex, "%02x%02x%02x");
+        $rgb = sscanf($hex, '%02x%02x%02x');
 
         // Return the RGB values as a comma-separated string
         return implode(', ', $rgb);

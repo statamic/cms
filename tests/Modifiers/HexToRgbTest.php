@@ -15,7 +15,7 @@ class HexToRgbTest extends TestCase
 
         $modified = $this->modify('01D7B0');
         $this->assertEquals('1, 215, 176', $modified);
-        
+
         $modified = $this->modify('##B8FFF3');
         $this->assertEquals('184, 255, 243', $modified);
     }
