@@ -34,7 +34,7 @@ class Fieldtype extends Relationship
             ],
             'mode' => [
                 'display' => __('UI Mode'),
-                'instructions' => __('statamic::fieldtypes.form.config.mode'),
+                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
                 'type' => 'radio',
                 'default' => 'default',
                 'options' => [
