@@ -64,20 +64,20 @@ class AugmentedPage extends AugmentedEntry
 
     protected function blueprintFields()
     {
-        if ($this->fieldsCache === null) {
-            $fields = ($pageBlueprint = $this->page->blueprint())
-                ? $pageBlueprint->fields()->all()
-                : collect();
-
-            if ($this->page !== $this->data) {
-                $entryFields = $this->data->blueprint()->fields()->all();
-                $fields = $entryFields->merge($fields);
-            }
-
-            $this->fieldsCache = $fields;
+        if ($this->fieldsCache) {
+            return $this->fieldsCache;
         }
 
-        return $this->fieldsCache;
+        $fields = ($pageBlueprint = $this->page->blueprint())
+            ? $pageBlueprint->fields()->all()
+            : collect();
+
+        if ($this->page !== $this->data) {
+            $entryFields = $this->data->blueprint()->fields()->all();
+            $fields = $entryFields->merge($fields);
+        }
+
+        return $this->fieldsCache = $fields;
     }
 
     protected function id()
