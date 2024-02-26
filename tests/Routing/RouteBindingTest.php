@@ -169,8 +169,8 @@ class RouteBindingTest extends TestCase
      */
     public function binds_route_parameters_in_frontend_routes(
         $uri,
-        Closure $enabledCallback = null,
-        Closure $disabledCallback = null,
+        ?Closure $enabledCallback = null,
+        ?Closure $disabledCallback = null,
     ) {
         $this->setupContent();
 
@@ -193,8 +193,8 @@ class RouteBindingTest extends TestCase
      */
     public function binds_route_parameters_in_frontend_routes_with_bindings_disabled(
         $uri,
-        Closure $enabledCallback = null,
-        Closure $disabledCallback = null,
+        ?Closure $enabledCallback = null,
+        ?Closure $disabledCallback = null,
     ) {
         $this->setupContent();
 
@@ -232,7 +232,7 @@ class RouteBindingTest extends TestCase
         Facades\Form::make('contact')->title('Contact Us')->save();
     }
 
-    public function statamicRouteProvider()
+    public static function statamicRouteProvider()
     {
 
         return [
@@ -543,7 +543,7 @@ class RouteBindingTest extends TestCase
         ];
     }
 
-    public function frontendRouteProvider()
+    public static function frontendRouteProvider()
     {
         return [
 
@@ -956,7 +956,7 @@ class RouteBindingTest extends TestCase
         $this->assertEquals('test', $value);
     }
 
-    public function bypassForBroadcastingProvider()
+    public static function bypassForBroadcastingProvider()
     {
         return collect([
             'collection',

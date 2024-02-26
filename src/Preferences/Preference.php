@@ -8,7 +8,7 @@ class Preference
     protected $field;
     protected $tab = 'general';
 
-    public function handle(string $handle = null)
+    public function handle(?string $handle = null)
     {
         if (func_num_args() === 0) {
             return $this->handle;
@@ -19,7 +19,7 @@ class Preference
         return $this;
     }
 
-    public function field(array $field = null)
+    public function field(?array $field = null)
     {
         if (func_num_args() === 0) {
             return $this->field;
@@ -30,7 +30,7 @@ class Preference
         return $this;
     }
 
-    public function tab(string $tab = null)
+    public function tab(?string $tab = null)
     {
         if (func_num_args() === 0) {
             return $this->tab;

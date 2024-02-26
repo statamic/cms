@@ -9,7 +9,7 @@
         </label>
 
         <div
-            class="help-block"
+            class="help-block" :class="{ '-mt-2': showLabel }"
             v-if="instructions && field.instructions_position !== 'below'"
             v-html="instructions" />
 
@@ -23,6 +23,7 @@
             :field-path-prefix="fieldPath"
             :has-error="hasError || hasNestedError"
             :read-only="isReadOnly"
+            :show-field-previews="showFieldPreviews"
             @input="$emit('updated', $event)"
             @meta-updated="$emit('meta-updated', $event)"
             @focus="$emit('focus')"
@@ -36,7 +37,7 @@
             v-html="instructions" />
 
         <div v-if="hasError">
-            <small class="help-block text-red-500 mt-2" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
 
     </div>
@@ -69,6 +70,7 @@ export default {
             type: String
         },
         readOnly: Boolean,
+        showFieldPreviews: Boolean,
     },
 
     inject: ['storeName'],

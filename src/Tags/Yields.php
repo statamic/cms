@@ -8,7 +8,7 @@ class Yields extends Tags
 {
     protected static $aliases = ['yield'];
 
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         $name = explode(':', $this->tag)[1];
 

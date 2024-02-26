@@ -4,6 +4,7 @@ namespace Statamic\View\Antlers;
 
 use Closure;
 use Statamic\Contracts\View\Antlers\Parser;
+use Statamic\View\Antlers\Language\Parser\IdentifierFinder;
 
 class Antlers
 {
@@ -42,5 +43,10 @@ class Antlers
     public function parseLoop($content, $data, $supplement = true, $context = [])
     {
         return new AntlersLoop($this->parser(), $content, $data, $supplement, $context);
+    }
+
+    public function identifiers(string $content): array
+    {
+        return (new IdentifierFinder)->getIdentifiers($content);
     }
 }

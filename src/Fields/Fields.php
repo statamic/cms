@@ -5,6 +5,7 @@ namespace Statamic\Fields;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
+use Statamic\Exceptions\FieldsetNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Support\Arr;
@@ -15,15 +16,16 @@ class Fields
     protected $fields;
     protected $parent;
     protected $parentField;
+    protected $parentIndex;
     protected $filled = [];
     protected $withValidatableValues = false;
     protected $withComputedValues = false;
 
-    public function __construct($items = [], $parent = null, $parentField = null)
+    public function __construct($items = [], $parent = null, $parentField = null, $parentIndex = null)
     {
         $this
             ->setParent($parent)
-            ->setParentField($parentField)
+            ->setParentField($parentField, $parentIndex)
             ->setItems($items);
     }
 
@@ -58,12 +60,13 @@ class Fields
         return $this;
     }
 
-    public function setParentField($field)
+    public function setParentField($field, $index = null)
     {
         $this->parentField = $field;
+        $this->parentIndex = $index;
 
         if ($this->fields) {
-            $this->fields->each(fn ($f) => $f->setParentField($field));
+            $this->fields->each(fn ($f) => $f->setParentField($field, $index));
         }
 
         return $this;
@@ -114,7 +117,7 @@ class Fields
     {
         return (new static)
             ->setParent($this->parent)
-            ->setParentField($this->parentField)
+            ->setParentField($this->parentField, $this->parentIndex)
             ->setItems($this->items)
             ->setFields($this->fields)
             ->setFilled($this->filled);
@@ -244,7 +247,7 @@ class Fields
     {
         return (new Field($handle, $config))
             ->setParent($this->parent)
-            ->setParentField($this->parentField);
+            ->setParentField($this->parentField, $this->parentIndex);
     }
 
     private function getReferencedField(array $config): Field
@@ -257,7 +260,10 @@ class Fields
             $field->setConfig(array_merge($field->config(), $overrides));
         }
 
-        return $field->setParent($this->parent)->setHandle($config['handle']);
+        return $field
+            ->setParent($this->parent)
+            ->setParentField($this->parentField, $this->parentIndex)
+            ->setHandle($config['handle']);
     }
 
     private function getImportedFields(array $config): array
@@ -266,7 +272,7 @@ class Fields
 
         return Blink::once($blink, function () use ($config) {
             if (! $fieldset = FieldsetRepository::find($config['import'])) {
-                throw new \Exception("Fieldset {$config['import']} not found.");
+                throw new FieldsetNotFoundException($config['import']);
             }
 
             $fields = $fieldset->fields()->all();
@@ -288,7 +294,11 @@ class Fields
             }
 
             return $fields;
-        })->each->setParent($this->parent)->all();
+        })->each(function ($field) {
+            $field
+                ->setParent($this->parent)
+                ->setParentField($this->parentField, $this->parentIndex);
+        })->all();
     }
 
     public function meta()

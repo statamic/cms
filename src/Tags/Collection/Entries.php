@@ -357,6 +357,10 @@ class Entries
                 return;
             }
 
+            if (! is_iterable($values)) {
+                $values = [$values];
+            }
+
             $values = collect($values)->map(function ($term) use ($taxonomy) {
                 if ($term instanceof Term) {
                     return $term->id();

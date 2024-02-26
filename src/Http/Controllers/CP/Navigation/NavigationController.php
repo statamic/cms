@@ -68,7 +68,11 @@ class NavigationController extends CpController
         $site = $request->site ?? Site::selected()->handle();
 
         if (! $nav->existsIn($site)) {
-            return redirect($nav->trees()->first()->showUrl());
+            if ($nav->trees()->isNotEmpty()) {
+                return redirect($nav->trees()->first()->showUrl());
+            }
+
+            $nav->makeTree($site)->save();
         }
 
         $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
@@ -149,6 +153,16 @@ class NavigationController extends CpController
             'title' => 'required',
             'handle' => 'required|alpha_dash',
         ]);
+
+        if (Nav::find($values['handle'])) {
+            $error = __('A navigation with that handle already exists.');
+
+            if ($request->wantsJson()) {
+                throw new \Exception($error);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
 
         $structure = Nav::make()
             ->title($values['title'])

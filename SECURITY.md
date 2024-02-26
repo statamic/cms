@@ -11,7 +11,7 @@ While working to identify potential security vulnerabilities in Statamic, we ask
 ## Scope
 We are only interested in vulnerabilities that affect Statamic itself, tested against **your own local installation** of the software, running the latest version. You can install a local copy of Statamic by following these [installation instructions](https://statamic.dev/installing). Do not test against any Statamic installation that you don’t own, including [statamic.com](https:/statamic.com) or [statamic.dev](https://statamic.dev).
 
-### Qualifying Vulnerabilities
+### Potentially Qualifying Vulnerabilities
 
 - [Cross-Site Scripting (XSS)](https://en.wikipedia.org/wiki/Cross-site_scripting)
 - [Cross-Site Request Forgery (CSRF)](https://en.wikipedia.org/wiki/Cross-site_request_forgery)
@@ -22,19 +22,19 @@ We are only interested in vulnerabilities that affect Statamic itself, tested ag
 
 ### Non-Qualifying Vulnerabilities
 
+- XSS vectors or bugs that rely on an unlikely user interaction (i.e. a privileged user attacking themselves or their own site)
 - Reports from automated tools or scanners
 - Theoretical attacks without actual proof of exploitability
 - Attacks that can be guarded against by following our security recommendations.
 - Server configuration issues outside of Statamic’s control
 - [Denial of Service](https://en.wikipedia.org/wiki/Denial-of-service_attack) attacks
-- [Brute force attacks](https://en.wikipedia.org/wiki/Brute-force_attack) (e.g. on password or
+- [Brute force attacks](https://en.wikipedia.org/wiki/Brute-force_attack) (e.g. on password or email address)
 - Username or email address enumeration
-- Social engineering of Wilderborn staff or users of Statamic installations
+- Social engineering of Statamic staff or users of Statamic installations
 - Physical attacks against Statamic installations
 - Attacks involving physical access to a user’s device, or involving a device or network that is already seriously compromised (e.g. [man-in-the-middle attacks](https://en.wikipedia.org/wiki/Man-in-the-middle_attack))
 - Attacks that are the result of a 3rd party Statamic addon should be reported to the addon’s author
 - Attacks that are the result of a 3rd party library should be reported to the library maintainers
-- Bugs that rely on an unlikely user interaction (i.e. the user effectively attacking themselves)
 - Disclosure of tools or libraries used by Statamic and/or their versions
 - Issues that are the result of a user doing something silly (like sharing their password publicly)
 - Missing security headers which do not lead directly to a vulnerability via proof of concept

@@ -94,7 +94,7 @@ class DuplicateEntryTest extends TestCase
         $this->assertEquals($expectedToBeAuthorized, (new DuplicateEntry)->authorize($user, $item));
     }
 
-    public function authorizationProvider()
+    public static function authorizationProvider()
     {
         return [
             'no permission' => [
@@ -160,7 +160,7 @@ class DuplicateEntryTest extends TestCase
         $this->assertEquals($expectedToBeAuthorized, (new DuplicateEntry)->authorizeBulk($user, $items));
     }
 
-    public function bulkAuthorizationProvider()
+    public static function bulkAuthorizationProvider()
     {
         return [
             'no permission' => [

@@ -448,7 +448,7 @@ GQL;
             ]]);
     }
 
-    public function groupedSetsProvider()
+    public static function groupedSetsProvider()
     {
         return [
             'grouped sets (new)' => [true],

@@ -8,7 +8,7 @@
                 <h1 class="flex-1" v-text="__(title)" />
 
                 <div class="pt-px text-2xs text-gray-600 ml-4 flex" v-if="! canEdit">
-                    <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
+                    <svg-icon name="light/lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
                 </div>
 
                 <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-2">
@@ -222,6 +222,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
+                if (!response.data.saved) {
+                    return this.$toast.error(`Couldn't save global set`)
+                }
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);

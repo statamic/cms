@@ -26,7 +26,7 @@ class FieldTransformer
 
     private static function inlineTabField(array $submitted)
     {
-        $field = Arr::removeNullValues(array_except($submitted['config'], ['isNew']));
+        $field = Arr::removeNullValues(array_except($submitted['config'], ['isNew', 'icon']));
 
         if (Arr::get($field, 'width') === 100) {
             unset($field['width']);
@@ -38,6 +38,16 @@ class FieldTransformer
 
         if (Arr::get($field, 'duplicate', true) === true) {
             unset($field['duplicate']);
+        }
+
+        if (Arr::has($field, 'sets')) {
+            $sets = Arr::pull($field, 'sets');
+            $field['sets'] = $sets;
+        }
+
+        if (Arr::has($field, 'fields')) {
+            $fields = Arr::pull($field, 'fields');
+            $field['fields'] = $fields;
         }
 
         return array_filter([

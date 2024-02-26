@@ -3,6 +3,7 @@
 namespace Statamic\Http\Middleware\CP;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use Statamic\Facades\User;
 
 class RedirectIfAuthorized
@@ -16,10 +17,14 @@ class RedirectIfAuthorized
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (User::current()) {
-            return redirect(cp_route('index'));
+        if (! Auth::guard($guard)->check()) {
+            return $next($request);
         }
 
-        return $next($request);
+        $user = User::current();
+
+        $url = $user->can('access cp') ? cp_route('index') : '/';
+
+        return redirect($url)->withError(__("You can't do this while logged in"));
     }
 }

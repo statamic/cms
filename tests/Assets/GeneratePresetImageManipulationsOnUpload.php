@@ -46,7 +46,7 @@ class GeneratePresetImageManipulationsOnUpload extends TestCase
         $listener->handle(new $event($asset));
     }
 
-    public function presetProvider()
+    public static function presetProvider()
     {
         return [
             [AssetUploaded::class, 'jpg', true],

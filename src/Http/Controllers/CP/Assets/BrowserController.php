@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\FolderAssetsCollection;
 use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
+use Statamic\Support\Arr;
 
 class BrowserController extends CpController
 {
@@ -81,6 +83,8 @@ class BrowserController extends CpController
             $query->orderBy($container->sortField(), $container->sortDirection());
         }
 
+        $this->applyQueryScopes($query, $request->all());
+
         $assets = $query->paginate(request('perPage'));
 
         return (new FolderAssetsCollection($assets))->folder($folder);
@@ -98,6 +102,8 @@ class BrowserController extends CpController
             $query->where('folder', $path);
         }
 
+        $this->applyQueryScopes($query, $request->all());
+
         $assets = $query->paginate(request('perPage'));
 
         if ($container->hasSearchIndex()) {
@@ -105,5 +111,13 @@ class BrowserController extends CpController
         }
 
         return new SearchedAssetsCollection($assets);
+    }
+
+    protected function applyQueryScopes($query, $params)
+    {
+        collect(Arr::wrap($params['queryScopes'] ?? null))
+            ->map(fn ($handle) => Scope::find($handle))
+            ->filter()
+            ->each(fn ($scope) => $scope->apply($query, $params));
     }
 }
