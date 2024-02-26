@@ -11,11 +11,13 @@ use Statamic\Support\Str;
 
 class TaxonomyRepository implements RepositoryContract
 {
+    protected $stache;
     protected $store;
     protected $additionalPreviewTargets = [];
 
     public function __construct(Stache $stache)
     {
+        $this->stache = $stache;
         $this->store = $stache->store('taxonomies');
     }
 
@@ -78,7 +80,7 @@ class TaxonomyRepository implements RepositoryContract
         // the slash trimmed off at this point. We'll make sure it's there.
         $uri = Str::ensureLeft($uri, '/');
 
-        if (! $key = $this->findTaxonomyHandleByUri($uri)) {
+        if (! $key = $this->findTaxonomyHandleByUri($uri, $site)) {
             return null;
         }
 
@@ -92,9 +94,17 @@ class TaxonomyRepository implements RepositoryContract
         ];
     }
 
-    private function findTaxonomyHandleByUri($uri)
+    private function findTaxonomyHandleByUri($uri, $site)
     {
-        return $this->store->index('uri')->items()->flip()->get($uri);
+        $site = $site ?? $this->stache->sites()->first();
+
+        $routes = $this->store->index('routes')->items()->map(fn ($item) => $item->get($site))->filter()->flip();
+
+        if ($handle = $routes->get($uri)) {
+            return $handle;
+        }
+
+        return $routes->get(Str::removeLeft($uri, '/'));
     }
 
     public function addPreviewTargets($handle, $targets)
