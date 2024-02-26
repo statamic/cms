@@ -18,6 +18,7 @@ trait HasOrigin
         if ($this->cachedKeys) {
             return $this->cachedKeys;
         }
+
         $originFallbackKeys = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues()->keys() : collect();
 
         $originKeys = $this->hasOrigin() ? $this->origin()->keys() : collect();
