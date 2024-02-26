@@ -53,7 +53,6 @@ trait RendersAttributes
     /**
      * Render HTML attributes and merge attributes from tag params.
      *
-     * @param  array  $attrs
      * @return string
      */
     protected function renderAttributesFromParamsWith(array $attrs)
