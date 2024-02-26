@@ -1184,7 +1184,7 @@ EOT;
         $this->assertEquals('test.0.words', $value[0]['words']);
         $this->assertEquals('test.1.words', $value[1]['words']);
 
-        $value = json_decode($field->preProcess()->value(), true);
+        $value = $field->preProcess()->value();
         $this->assertEquals('test.0.words', $value[0]['attrs']['values']['words']);
         $this->assertEquals('test.1.words', $value[1]['attrs']['values']['words']);
 
@@ -1197,7 +1197,7 @@ EOT;
                     ],
                 ],
             ]),
-        ]))->setValue(json_encode([
+        ]))->setValue([
             [
                 'type' => 'set',
                 'attrs' => [
@@ -1218,7 +1218,7 @@ EOT;
                     ],
                 ],
             ],
-        ]));
+        ]);
 
         $value = $field->process()->value();
         $this->assertEquals('test.0.words', $value[0]['attrs']['values']['words']);
