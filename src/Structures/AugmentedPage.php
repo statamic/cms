@@ -9,6 +9,7 @@ class AugmentedPage extends AugmentedEntry
 {
     protected $page;
     protected $hasEntry = false;
+    protected $fieldsCache = null;
 
     public function __construct($page)
     {
@@ -57,16 +58,20 @@ class AugmentedPage extends AugmentedEntry
 
     protected function blueprintFields()
     {
-        $fields = ($pageBlueprint = $this->page->blueprint())
-            ? $pageBlueprint->fields()->all()
-            : collect();
+        if ($this->fieldsCache === null) {
+            $fields = ($pageBlueprint = $this->page->blueprint())
+                ? $pageBlueprint->fields()->all()
+                : collect();
 
-        if ($this->page !== $this->data) {
-            $entryFields = $this->data->blueprint()->fields()->all();
-            $fields = $entryFields->merge($fields);
+            if ($this->page !== $this->data) {
+                $entryFields = $this->data->blueprint()->fields()->all();
+                $fields = $entryFields->merge($fields);
+            }
+
+            $this->fieldsCache = $fields;
         }
 
-        return $fields;
+        return $this->fieldsCache;
     }
 
     protected function id()
