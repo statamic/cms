@@ -34,7 +34,8 @@ class ViewFieldsetListingTest extends TestCase
 
         // Custom policy to allow fieldsets to demonstrate how certain fieldset can be restricted
         app()->bind(\Statamic\Policies\FieldsetPolicy::class, function () {
-            return new class extends \Statamic\Policies\FieldsetPolicy {
+            return new class extends \Statamic\Policies\FieldsetPolicy
+            {
                 public function before($user, $ability, $fieldset)
                 {
                     return $fieldset->handle() === 'baz::baz'
