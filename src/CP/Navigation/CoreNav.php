@@ -17,9 +17,9 @@ use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Facades\Nav as NavAPI;
 use Statamic\Facades\Role as RoleAPI;
 use Statamic\Facades\Site;
-use Statamic\Facades\User;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
 use Statamic\Statamic;
@@ -69,7 +69,7 @@ class CoreNav
             ->children(function () {
                 return CollectionAPI::all()->sortBy->title()
                     ->filter(function ($collection) {
-                        return User::current()->can('configure collections') 
+                        return User::current()->can('configure collections')
                         || $collection->sites()->contains(Site::selected()->handle());
                     })
                     ->map(function ($collection) {
