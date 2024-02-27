@@ -11,8 +11,7 @@
         }
     },
     "require": {
-        "statamic/cms": "^4.0",
-        "rebing/graphql-laravel": "^8.6"
+        "statamic/cms": "^4.0"
     },
     "require-dev": {
         "nunomaduro/collision": "^6.1",
