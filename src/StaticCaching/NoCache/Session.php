@@ -4,10 +4,10 @@ namespace Statamic\StaticCaching\NoCache;
 
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Data;
+use Statamic\Facades\StaticCache;
 
 class Session
 {
@@ -48,7 +48,7 @@ class Session
 
     public function region(string $key): Region
     {
-        if ($this->regions->contains($key) && ($region = Cache::get('nocache::region.'.$key))) {
+        if ($this->regions->contains($key) && ($region = StaticCache::cacheStore()->get('nocache::region.'.$key))) {
             return $region;
         }
 
@@ -101,16 +101,18 @@ class Session
             return;
         }
 
-        Cache::forever('nocache::urls', collect(Cache::get('nocache::urls', []))->push($this->url)->unique()->all());
+        $store = StaticCache::cacheStore();
 
-        Cache::forever('nocache::session.'.md5($this->url), [
+        $store->forever('nocache::urls', collect($store->get('nocache::urls', []))->push($this->url)->unique()->all());
+
+        $store->forever('nocache::session.'.md5($this->url), [
             'regions' => $this->regions,
         ]);
     }
 
     public function restore()
     {
-        $session = Cache::get('nocache::session.'.md5($this->url));
+        $session = StaticCache::cacheStore()->get('nocache::session.'.md5($this->url));
 
         $this->regions = $this->regions->merge($session['regions'] ?? []);
         $this->cascade = $this->restoreCascade();
@@ -139,6 +141,6 @@ class Session
 
     private function cacheRegion(Region $region)
     {
-        Cache::forever('nocache::region.'.$region->key(), $region);
+        StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), $region);
     }
 }

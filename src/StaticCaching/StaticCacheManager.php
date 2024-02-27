@@ -31,18 +31,23 @@ class StaticCacheManager extends Manager
 
     public function createFileDriver(array $config)
     {
+        return new FileCacher(new Writer, $this->cacheStore(), $config);
+    }
+
+    public function createApplicationDriver(array $config)
+    {
+        return new ApplicationCacher($this->app[Repository::class], $config);
+    }
+
+    public function cacheStore()
+    {
         try {
             $store = Cache::store('static_cache');
         } catch (InvalidArgumentException $e) {
             $store = Cache::store();
         }
 
-        return new FileCacher(new Writer, $store, $config);
-    }
-
-    public function createApplicationDriver(array $config)
-    {
-        return new ApplicationCacher($this->app[Repository::class], $config);
+        return $store;
     }
 
     protected function getConfig($name)
@@ -62,13 +67,13 @@ class StaticCacheManager extends Manager
     {
         $this->driver()->flush();
 
-        collect(Cache::get('nocache::urls', []))->each(function ($url) {
-            $session = Cache::get($sessionKey = 'nocache::session.'.md5($url));
-            collect($session['regions'] ?? [])->each(fn ($region) => Cache::forget('nocache::region.'.$region));
-            Cache::forget($sessionKey);
+        collect($this->cacheStore()->get('nocache::urls', []))->each(function ($url) {
+            $session = $this->cacheStore()->get($sessionKey = 'nocache::session.'.md5($url));
+            collect($session['regions'] ?? [])->each(fn ($region) => $this->cacheStore()->forget('nocache::region.'.$region));
+            $this->cacheStore()->forget($sessionKey);
         });
 
-        Cache::forget('nocache::urls');
+        $this->cacheStore()->forget('nocache::urls');
     }
 
     public function nocacheJs(string $js)

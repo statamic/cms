@@ -507,6 +507,7 @@ export default {
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
+                this.$reveal.invalid();
             } else {
                 this.$toast.error(__('Something went wrong'));
             }
