@@ -49,7 +49,15 @@ export default {
                             : [field]
                     );
                 }, [])
-                .map(handle => prefix ? `${prefix}${handle}` : handle);
+                .map(handle => {
+                    if (prefix) {
+                        let prefixed = JSON.parse(JSON.stringify(handle)); // perform a deep clone (otherwise it changes the global version)
+                        prefixed.handle = prefix + prefixed.handle;
+                        return prefixed;
+                    }
+
+                    return handle;
+                });
         }
 
     }
