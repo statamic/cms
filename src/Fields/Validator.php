@@ -124,32 +124,10 @@ class Validator
 
     private function parse($rule)
     {
-        // support for class-based rules, such as:
-        //   rule:\App\Rules\MyCustomRule                   (no params)
-        //   rule:\App\Rules\MyCustomRule:a:valueA,b:valueB (with params)
-        if (is_string($rule) && Str::startsWith($rule, 'rule:')) {
-            // get rid of the 'rule:' prefix
-            $rule = Str::substr($rule, 5);
+        if (is_string($rule) && Str::startsWith($rule, 'new ')) {
+            [$class, $arguments] = (new ClassRuleParser)->parse($rule);
 
-            // get the rule (index 0) and the params (index 1)
-            $ruleParts = explode(':', $rule, 2);
-
-            // split the params in to a keyed array
-            // a:valueA,b:valueB needs to be:
-            // [
-            //     'a' => 'valueA',
-            //     'b' => 'valueB'
-            // ]
-            $params = [];
-            if (isset($ruleParts[1])) {
-                foreach (explode(',', $ruleParts[1]) as $param) {
-                    [$param, $value] = explode(':', $param);
-                    $params[$param] = $value;
-                }
-            }
-
-            // create and return
-            return app($ruleParts[0], $params);
+            return new $class(...$arguments);
         }
 
         if (! is_string($rule) ||
