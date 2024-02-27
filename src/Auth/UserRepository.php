@@ -63,10 +63,10 @@ abstract class UserRepository implements RepositoryContract
         }
 
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
-            'name' => ['type' => 'text', 'display' => 'Name', 'listable' => true],
+            'name' => ['type' => 'text', 'display' => __('Name'), 'listable' => true],
         ])->setHandle('user');
 
-        $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address', 'listable' => true]);
+        $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => __('Email Address'), 'listable' => true]);
 
         if (Statamic::pro()) {
             $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);

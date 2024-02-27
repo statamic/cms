@@ -106,6 +106,8 @@ export default {
             return this.config.fields;
         },
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return Object.values(this.value).join(', ');
         }
     },

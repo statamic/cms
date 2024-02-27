@@ -234,7 +234,7 @@ class CollectionsController extends CpController
             ->defaultPublishState($values['default_publish_state'])
             ->sortDirection($values['sort_direction'])
             ->mount($values['mount'] ?? null)
-            ->revisions($values['revisions'] ?? false)
+            ->revisionsEnabled($values['revisions'] ?? false)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
             ->pastDateBehavior(array_get($values, 'past_date_behavior'))
@@ -574,7 +574,7 @@ class CollectionsController extends CpController
     protected function ensureCollectionIsAvailableOnSite($collection, $site)
     {
         if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
-            return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
+            return redirect(cp_route('collections.index'))->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
     }
 }

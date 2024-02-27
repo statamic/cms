@@ -63,10 +63,11 @@ class BlueprintRepository
     public function findNamespacedBlueprintPath($handle)
     {
         [$namespace, $handle] = explode('::', $handle);
+        $namespaceDir = str_replace('.', '/', $namespace);
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
-        $overridePath = "{$this->directory}/vendor/{$namespace}/{$path}.yaml";
+        $overridePath = "{$this->directory}/vendor/{$namespaceDir}/{$path}.yaml";
 
         if (File::exists($overridePath)) {
             return $overridePath;
@@ -138,6 +139,15 @@ class BlueprintRepository
         $blueprint = new Blueprint;
 
         if ($handle) {
+            $handle = explode('::', $handle);
+
+            if (count($handle) > 1) {
+                $namespace = array_shift($handle);
+                $blueprint->setNamespace($namespace);
+            }
+
+            $handle = implode('::', $handle);
+
             $blueprint->setHandle($handle);
         }
 
@@ -216,7 +226,7 @@ class BlueprintRepository
             if (isset($this->additionalNamespaces[$namespace])) {
                 $directory = $this->additionalNamespaces[$namespace];
 
-                $overridePath = "{$this->directory}/vendor/{$namespace}";
+                $overridePath = "{$this->directory}/vendor/{$namespaceDir}";
 
                 if (File::exists($overridePath)) {
                     $directory = $overridePath;

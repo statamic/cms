@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 <div class="card p-0 content">
     <div class="py-6 px-8 border-b">
         <h1>{{ __('statamic::messages.getting_started_widget_header') }}</h1>

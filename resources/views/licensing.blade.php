@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', __('Licensing'))
 
@@ -45,7 +47,7 @@
            </div>
         @endif
 
-        <h6 class="mt-8">Site</h6>
+        <h6 class="mt-8">{{ __('Site') }}</h6>
         <div class="card p-0 mt-2">
             <table class="data-table">
                 <tr>
@@ -64,7 +66,7 @@
             </table>
         </div>
 
-        <h6 class="mt-8">Core</h6>
+        <h6 class="mt-8">{{ __('Core') }}</h6>
         <div class="card p-0 mt-2">
             <table class="data-table">
                 <tr>
