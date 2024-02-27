@@ -63,6 +63,7 @@ class JavascriptComposer
             'paginationSize' => config('statamic.cp.pagination_size'),
             'paginationSizeOptions' => config('statamic.cp.pagination_size_options'),
             'sites' => $this->sites(),
+            'groupedSites' => $this->groupedSites(),
             'selectedSite' => Site::selected()->handle(),
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
@@ -81,6 +82,15 @@ class JavascriptComposer
                 'lang' => $site->lang(),
                 'group' => $site->group(),
             ];
+        })->values();
+    }
+
+    protected function groupedSites()
+    {
+        return $this->sites()->groupBy('group')->flatMap(function ($sites, $group) {
+            return array_merge([
+                ['name' => $group, 'header' => true],
+            ], $sites->all());
         })->values();
     }
 

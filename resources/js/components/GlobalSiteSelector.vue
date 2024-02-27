@@ -34,16 +34,7 @@ export default {
 
     computed: {
         sites() {
-            let sites = Statamic.$config.get('sites');
-
-            // group by each key's group
-            let newsites = _.groupBy(sites, 'group');
-
-            let grouped = _.reduce(newsites, (acc, sites, name) => {
-                return acc.concat({ name, header: true }, ...sites);
-            }, []);
-
-            return grouped;
+            return Statamic.$config.get('groupedSites');
         },
 
         active() {
