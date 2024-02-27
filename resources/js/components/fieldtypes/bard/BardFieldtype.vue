@@ -288,8 +288,7 @@ export default {
 
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
-
-            const stack = JSON.parse(this.value);
+            const stack = [...this.value];
             let text = '';
             while (stack.length) {
                 const node = stack.shift();
@@ -346,8 +345,6 @@ export default {
 
         this.pageHeader = document.querySelector('.global-header');
 
-        this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
-
         this.$nextTick(() => {
             let el = document.querySelector(`label[for="${this.fieldId}"]`);
             if (el) {
@@ -361,8 +358,6 @@ export default {
     beforeDestroy() {
         this.editor.destroy();
         this.escBinding.destroy();
-
-        this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
 
     watch: {
@@ -370,22 +365,10 @@ export default {
         json(json) {
             if (!this.mounted) return;
 
-            let jsonValue = JSON.stringify(json);
-
-            if (jsonValue === this.value) return;
-
-            // Prosemirror's JSON will include spaces between tags.
-            // For example (this is not the actual json)...
-            // "<p>One <b>two</b> three</p>" becomes ['OneSPACE', '<b>two</b>', 'SPACEthree']
-            // But, Laravel's TrimStrings middleware would remove them.
-            // Those spaces need to be there, otherwise it would be rendered as <p>One<b>two</b>three</p>
-            // To combat this, we submit the JSON string instead of an object.
-            this.updateDebounced(jsonValue);
+            this.updateDebounced(json);
         },
 
-        value(value, oldValue) {
-            if (value === oldValue) return;
-
+        value(value, oldValue) {    
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
@@ -415,13 +398,6 @@ export default {
                 meta.previews = value;
                 this.updateMeta(meta);
             }
-        },
-
-        fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
-            this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
-            this.$nextTick(() => {
-                this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
-            });
         },
 
         fullScreenMode() {
@@ -696,9 +672,6 @@ export default {
         },
 
         valueToContent(value) {
-            // A json string is passed from PHP since that's what's submitted.
-            value = JSON.parse(value);
-
             return value.length
                 ? { type: 'doc', content: value }
                 : null;
