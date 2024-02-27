@@ -80,7 +80,8 @@ class MakeAddon extends GeneratorCommand
             $this
                 ->generateAddonFiles()
                 ->installAddon()
-                ->generateOptional();
+                ->generateOptional()
+                ->installComposerDependencies();
         } catch (\Exception $e) {
             $this->error($e->getMessage());
 
@@ -181,6 +182,30 @@ class MakeAddon extends GeneratorCommand
         });
 
         $this->checkInfo('Additional components created successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Installs the addon's composer dependencies.
+     *
+     * @return $this
+     */
+    protected function installComposerDependencies()
+    {
+        $this->output->newLine();
+
+        $this->line("Installing your addon's Composer dependencies. This may take a moment...");
+
+        try {
+            Composer::withoutQueue()->throwOnFailure()->install($this->addonPath());
+        } catch (ProcessException $exception) {
+            $this->line($exception->getMessage());
+            $this->output->newLine();
+            throw new \Exception("An error was encountered while installing your addon's Composer dependencies!");
+        }
+
+        $this->checkInfo('Composer dependencies installed successfully.');
 
         return $this;
     }
