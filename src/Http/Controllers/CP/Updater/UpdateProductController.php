@@ -12,16 +12,16 @@ class UpdateProductController extends CpController
      *
      * @param  string  $slug
      */
-    public function show($slug)
+    public function show($marketplaceProductSlug)
     {
         $this->authorize('view updates');
 
-        if (! $product = Marketplace::product($slug)) {
+        if (! $product = Marketplace::product($marketplaceProductSlug)) {
             return $this->pageNotFound();
         }
 
         return view('statamic::updater.show', [
-            'slug' => $slug,
+            'slug' => $marketplaceProductSlug,
             'package' => $product->package(),
             'name' => $product->name(),
         ]);
@@ -32,11 +32,11 @@ class UpdateProductController extends CpController
      *
      * @param  string  $slug
      */
-    public function changelog($slug)
+    public function changelog($marketplaceProductSlug)
     {
         $this->authorize('view updates');
 
-        if (! $product = Marketplace::product($slug)) {
+        if (! $product = Marketplace::product($marketplaceProductSlug)) {
             return $this->pageNotFound();
         }
 

@@ -480,6 +480,12 @@ abstract class Builder implements Contract
             throw new InvalidArgumentException('Illegal operator for date comparison');
         }
 
+        if (! ($value instanceof DateTimeInterface)) {
+            $value = Carbon::parse($value);
+        }
+
+        $value = $value->format('H:i:s'); // we only care about the time part
+
         $this->wheres[] = [
             'type' => 'Time',
             'column' => $column,

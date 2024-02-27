@@ -28,6 +28,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             var option = _.findWhere(this.config.options, {value: this.value});
             return (option) ? option.label : this.value;
         },

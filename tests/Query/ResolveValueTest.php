@@ -21,7 +21,7 @@ class ResolveValueTest extends TestCase
         $this->assertEquals($expected, $value);
     }
 
-    public function resolvesValueProvider()
+    public static function resolvesValueProvider()
     {
         $data = [
             'the_foo_field' => 'getfoo',
@@ -81,7 +81,7 @@ class ResolveValueTest extends TestCase
         $this->assertEquals($expected, $value);
     }
 
-    public function delegatesToClassProvider()
+    public static function delegatesToClassProvider()
     {
         return [
             'standard' => ['foo', 'bar'],
