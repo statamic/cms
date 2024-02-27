@@ -617,6 +617,7 @@ export default {
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
+                this.$reveal.invalid();
             } else if (e.response) {
                 this.$toast.error(e.response.data.message);
             } else {
