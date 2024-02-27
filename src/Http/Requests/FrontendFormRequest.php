@@ -60,19 +60,17 @@ class FrontendFormRequest extends FormRequest
 
     protected function failedValidation(Validator $validator)
     {
-        if (! $this->isPrecognitive()) {
-            if ($this->ajax() || $this->wantsJson()) {
-                $errors = $validator->errors();
+        if (! $this->isPrecognitive() && ($this->ajax() || $this->wantsJson())) {
+            $errors = $validator->errors();
 
-                $response = response([
-                    'errors' => $errors->all(),
-                    'error' => collect($errors->messages())->map(function ($errors, $field) {
-                        return $errors[0];
-                    })->all(),
-                ], 400);
+            $response = response([
+                'errors' => $errors->all(),
+                'error' => collect($errors->messages())->map(function ($errors, $field) {
+                    return $errors[0];
+                })->all(),
+            ], 400);
 
-                throw (new ValidationException($validator, $response));
-            }
+            throw (new ValidationException($validator, $response));
         }
 
         return parent::failedValidation($validator);
