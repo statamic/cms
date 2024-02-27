@@ -2160,6 +2160,73 @@ class AssetTest extends TestCase
         ], Arr::only($asset->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
 
+    /**
+     * @test
+     */
+    public function it_has_a_dirty_state()
+    {
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+
+        $asset = (new Asset)->container($container)->path('test.jpg');
+
+        $asset->data([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ])->save();
+
+        $this->assertFalse($asset->isDirty());
+        $this->assertFalse($asset->isDirty('title'));
+        $this->assertFalse($asset->isDirty('food'));
+        $this->assertFalse($asset->isDirty(['title']));
+        $this->assertFalse($asset->isDirty(['food']));
+        $this->assertFalse($asset->isDirty(['title', 'food']));
+        $this->assertTrue($asset->isClean());
+        $this->assertTrue($asset->isClean('title'));
+        $this->assertTrue($asset->isClean('food'));
+        $this->assertTrue($asset->isClean(['title']));
+        $this->assertTrue($asset->isClean(['food']));
+        $this->assertTrue($asset->isClean(['title', 'food']));
+
+        $asset->merge(['title' => 'French']);
+
+        $this->assertTrue($asset->isDirty());
+        $this->assertTrue($asset->isDirty('title'));
+        $this->assertFalse($asset->isDirty('food'));
+        $this->assertTrue($asset->isDirty(['title']));
+        $this->assertFalse($asset->isDirty(['food']));
+        $this->assertTrue($asset->isDirty(['title', 'food']));
+        $this->assertFalse($asset->isClean());
+        $this->assertFalse($asset->isClean('title'));
+        $this->assertTrue($asset->isClean('food'));
+        $this->assertFalse($asset->isClean(['title']));
+        $this->assertTrue($asset->isClean(['food']));
+        $this->assertFalse($asset->isClean(['title', 'food']));
+    }
+
+    /** @test */
+    public function it_syncs_original_at_the_right_time()
+    {
+        $eventsHandled = 0;
+
+        Event::listen(function (AssetSaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->asset->isDirty());
+        });
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('test.jpg');
+
+        $asset
+            ->set('foo', 'bar')
+            ->save();
+
+        $this->assertFalse($asset->isDirty());
+        $this->assertEquals(1, $eventsHandled);
+    }
+
     /** @test */
     public function it_augments_in_the_parser()
     {
