@@ -18,9 +18,6 @@
         "nunomaduro/collision": "^6.1",
         "orchestra/testbench": "^7.0"
     },
-    "scripts": {
-        "test": "php -d memory_limit=-1 ./vendor/bin/phpunit"
-    },
     "extra": {
         "statamic": {
             "name": "DummyTitle",

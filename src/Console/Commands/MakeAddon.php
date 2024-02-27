@@ -154,6 +154,7 @@ class MakeAddon extends GeneratorCommand
         foreach ($files as $stub => $file) {
             $this->createFromStub($stub, $this->addonPath($file), $data);
         }
+
         $this->checkInfo('Addon boilerplate created successfully.');
 
         return $this;
