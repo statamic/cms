@@ -12,15 +12,15 @@ class AugmentedEntry extends AbstractAugmented
 
     public function keys()
     {
-        if (! $this->keysCache) {
-            $this->keysCache = $this->data->keys()
-                ->merge($this->data->supplements()->keys())
-                ->merge($this->commonKeys())
-                ->merge($this->blueprintFields()->keys())
-                ->unique()->sort()->values()->all();
+        if ($this->keysCache) {
+            return $this->keysCache;
         }
 
-        return $this->keysCache;
+        return $this->keysCache = $this->data->keys()
+            ->merge($this->data->supplements()->keys())
+            ->merge($this->commonKeys())
+            ->merge($this->blueprintFields()->keys())
+            ->unique()->sort()->values()->all();
     }
 
     private function commonKeys()

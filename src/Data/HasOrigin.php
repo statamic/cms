@@ -15,21 +15,21 @@ trait HasOrigin
 
     public function keys()
     {
-        if (! $this->cachedKeys) {
-            $originFallbackKeys = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues()->keys() : collect();
-
-            $originKeys = $this->hasOrigin() ? $this->origin()->keys() : collect();
-
-            $computedKeys = method_exists($this, 'computedKeys') ? $this->computedKeys() : [];
-
-            $this->cachedKeys = collect()
-                ->merge($originFallbackKeys)
-                ->merge($originKeys)
-                ->merge($this->data->keys())
-                ->merge($computedKeys);
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
         }
 
-        return $this->cachedKeys;
+        $originFallbackKeys = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues()->keys() : collect();
+
+        $originKeys = $this->hasOrigin() ? $this->origin()->keys() : collect();
+
+        $computedKeys = method_exists($this, 'computedKeys') ? $this->computedKeys() : [];
+
+        return $this->cachedKeys = collect()
+            ->merge($originFallbackKeys)
+            ->merge($originKeys)
+            ->merge($this->data->keys())
+            ->merge($computedKeys);
     }
 
     public function values()

@@ -10,11 +10,11 @@ class AugmentedVariables extends AbstractAugmented
 
     public function keys()
     {
-        if (! $this->cachedKeys) {
-            $this->cachedKeys = $this->data->values()->keys()->all();
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
         }
 
-        return $this->cachedKeys;
+        return $this->cachedKeys = $this->data->values()->keys()->all();
     }
 
     public function site()

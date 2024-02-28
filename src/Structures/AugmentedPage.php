@@ -27,22 +27,22 @@ class AugmentedPage extends AugmentedEntry
 
     public function keys()
     {
-        if (! $this->cachedKeys) {
-            $keys = collect($this->hasEntry
-                ? parent::keys()
-                : ['title', 'url', 'uri', 'permalink', 'id']);
-
-            $keys = $keys
-                ->merge($this->page->data()->keys())
-                ->merge($this->page->supplements()->keys())
-                ->merge(['entry_id']);
-
-            $keys = Statamic::isApiRoute() ? $this->apiKeys($keys) : $keys;
-
-            $this->cachedKeys = $keys->unique()->sort()->values()->all();
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
         }
 
-        return $this->cachedKeys;
+        $keys = collect($this->hasEntry
+            ? parent::keys()
+            : ['title', 'url', 'uri', 'permalink', 'id']);
+
+        $keys = $keys
+            ->merge($this->page->data()->keys())
+            ->merge($this->page->supplements()->keys())
+            ->merge(['entry_id']);
+
+        $keys = Statamic::isApiRoute() ? $this->apiKeys($keys) : $keys;
+
+        return $this->cachedKeys = $keys->unique()->sort()->values()->all();
     }
 
     private function apiKeys($keys)
