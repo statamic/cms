@@ -4,7 +4,6 @@ namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
