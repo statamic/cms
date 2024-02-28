@@ -10,6 +10,7 @@
         :searchable="true"
         :select-on-key-codes="[9, 13, 188]"
         :taggable="true"
+        :append-to-body="true"
         :value="value"
         @input="update"
         @search:focus="$emit('focus')"
