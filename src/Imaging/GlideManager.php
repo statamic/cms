@@ -141,8 +141,12 @@ class GlideManager
         $pathPrefix = ImageGenerator::assetCachePathPrefix($asset);
         $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
 
-        // Delete generated glide cache for asset.
-        $this->server()->deleteCache($pathPrefix.'/'.$asset->path());
+        // Delete generated glide cache for asset, making sure to use the default cache path callable.
+        $server = $this->server();
+        $customCallable = $server->getCachePathCallable();
+        $server->setCachePathCallable(null);
+        $server->deleteCache($pathPrefix.'/'.$asset->path());
+        $server->setCachePathCallable($customCallable);
 
         // Use manifest to clear each manipulation key from cache store.
         collect($this->cacheStore()->get($manifestKey, []))->each(function ($manipulationKey) {
