@@ -353,7 +353,7 @@ class Bard extends Replicator
         if (is_array($value)) {
             $value = collect($value)->filter(function ($node) {
                 return array_key_exists('type', $node);
-            })->all();
+            })->values()->all();
         }
 
         if (empty($value) || $value === '[]') {
