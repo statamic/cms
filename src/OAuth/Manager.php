@@ -2,6 +2,8 @@
 
 namespace Statamic\OAuth;
 
+use Statamic\Support\Arr;
+
 class Manager
 {
     protected static $providers = [];
@@ -20,14 +22,25 @@ class Manager
     public function providers()
     {
         return collect(config('statamic.oauth.providers'))
-            ->map(function ($provider, $key) {
-                // Allow users to specify just the name as a string, or as a name/label pair.
-                // eg. ['github' => 'GitHub', 'facebook']
-                $expanded = is_string($key);
+            ->mapWithKeys(function ($key, $value) {
+                $provider = $key;
+                $config = null;
 
-                return $this
-                    ->provider($expanded ? $key : $provider)
-                    ->label($expanded ? $provider : null);
+                // When the $value is NOT an integer, it means the provider has config settings.
+                // eg. ['github' => 'GitHub', 'facebook' => ['label' => 'Facebook', 'stateless' => true]]
+                if (! is_int($value)) {
+                  $provider = $value;
+                  $config = is_array($key)
+                    ? $key
+                    : ['label' => $key];
+                }
+
+                $oAuthProvider = $this
+                    ->provider($provider)
+                    ->label(Arr::get($config, 'label'))
+                    ->config($config);
+
+                return [$provider => $oAuthProvider];
             });
     }
 }

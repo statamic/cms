@@ -13,6 +13,7 @@ class Provider
 {
     protected $name;
     protected $label;
+    protected $config;
     protected $userCallback;
     protected $userDataCallback;
 
@@ -117,6 +118,17 @@ class Provider
         }
 
         $this->label = $label;
+
+        return $this;
+    }
+
+    public function config($config = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->config ?? [];
+        }
+
+        $this->config = $config;
 
         return $this;
     }
