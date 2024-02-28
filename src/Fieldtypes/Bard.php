@@ -351,7 +351,7 @@ class Bard extends Replicator
     {
         // Filter out broken nodes
         if (is_array($value)) {
-            $value = collect($value)->filter(function($node) {
+            $value = collect($value)->filter(function ($node) {
                 return array_key_exists('type', $node);
             })->all();
         }

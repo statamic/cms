@@ -1217,7 +1217,7 @@ EOT;
         $data = [
             [],
             ['type' => 'text', 'text' => 'This is inline text.'],
-            ['text' => 'I have no type']
+            ['text' => 'I have no type'],
         ];
 
         $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
