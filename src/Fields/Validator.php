@@ -124,6 +124,12 @@ class Validator
 
     private function parse($rule)
     {
+        if (is_string($rule) && Str::startsWith($rule, 'new ')) {
+            [$class, $arguments] = (new ClassRuleParser)->parse($rule);
+
+            return new $class(...$arguments);
+        }
+
         if (! is_string($rule) ||
             ! Str::contains($rule, '{') ||
             Str::startsWith($rule, 'regex:') ||
