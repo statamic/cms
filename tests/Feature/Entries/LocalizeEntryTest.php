@@ -4,6 +4,7 @@ namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -61,6 +62,25 @@ class LocalizeEntryTest extends TestCase
             ->localize($entry, ['site' => ''])
             ->assertRedirect('/original')
             ->assertSessionHasErrors('site');
+    }
+
+    /** @test */
+    public function cant_localize_entry_without_edit_permissions()
+    {
+        $user = $this->user();
+        $this->setTestRoles(['view' => ['access cp', 'access en site', 'access fr site', 'view blog entries']]);
+        $user->assignRole('view')->removeRole('test')->save();
+
+        $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(false))->save())->slug('test')->create();
+        $this->assertNull($entry->in('fr'));
+
+        $this
+            ->actingAs($user->fresh())
+            ->localize($entry, ['site' => 'fr'])
+            ->assertRedirect();
+
+        $localized = $entry->fresh()->in('fr');
+        $this->assertNull($localized);
     }
 
     /** @test */
@@ -232,7 +252,15 @@ class LocalizeEntryTest extends TestCase
 
     private function user()
     {
-        $this->setTestRoles(['test' => ['access cp']]);
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'access en site',
+            'access fr site',
+            'view blog entries',
+            'edit blog entries',
+            'view pages entries',
+            'edit pages entries',
+        ]]);
 
         return User::make()->assignRole('test')->save();
     }
