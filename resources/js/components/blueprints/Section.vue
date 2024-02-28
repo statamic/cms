@@ -123,7 +123,22 @@ export default {
 
     computed: {
 
+        isInsideSetsFieldtype() {
+            let parent = this;
+
+            while (parent.$options.name !== 'sets-fieldtype') {
+                parent = parent.$parent;
+                if (parent === this.$root) return false;
+            }
+
+            return parent.$options.name === 'sets-fieldtype';
+        },
+
         suggestableConditionFields() {
+            if (this.isInsideSetsFieldtype) {
+                return this.section.fields
+            }
+
             return this.suggestableConditionFieldsProvider?.suggestableFields || [];
         },
 
