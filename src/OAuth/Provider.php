@@ -22,6 +22,11 @@ class Provider
         $this->name = $name;
     }
 
+    public function name()
+    {
+        return $this->name;
+    }
+
     /**
      * Get a Statamic user ID from an OAuth user ID.
      *

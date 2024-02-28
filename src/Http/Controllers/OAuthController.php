@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 use Statamic\Facades\OAuth;
+use Statamic\Support\Arr;
 
 class OAuthController
 {
@@ -17,7 +18,14 @@ class OAuthController
     public function handleProviderCallback($provider)
     {
         try {
-            $providerUser = Socialite::driver($provider)->user();
+            $socialiteProvider = Socialite::driver($provider);
+            $providerConfig = OAuth::providers()->first(fn ($prov) => $provider === $prov->name())->config();
+
+            if (Arr::get($providerConfig, 'stateless', false)) {
+                $socialiteProvider->stateless();
+            }
+
+            $providerUser = $socialiteProvider->user();
         } catch (InvalidStateException $e) {
             return $this->redirectToProvider($provider);
         }
