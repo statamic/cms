@@ -22,8 +22,8 @@ class ClassRuleParser
             ->mapWithKeys(function ($arg, $key) {
                 $arg = trim($arg);
 
-                if (str_contains($arg, ':')) {
-                    [$key, $arg] = explode(':', $arg);
+                if (preg_match('/^[a-zA-Z]+: ?/', $arg)) {
+                    [$key, $arg] = explode(':', $arg, 2);
                     $key = trim($key);
                     $arg = trim($arg);
                 }

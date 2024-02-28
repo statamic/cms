@@ -58,6 +58,14 @@ class ClassRuleParserTest extends TestCase
                 'new App\MyRule("foo", c: 123)',
                 ['App\MyRule', ['foo', 'c' => 123]],
             ],
+            'non-named argument with colon' => [
+                'new App\MyRule("foo:bar")',
+                ['App\MyRule', ['foo:bar']],
+            ],
+            'named argument with colon' => [
+                'new App\MyRule(a: "foo:bar")',
+                ['App\MyRule', ['a' => 'foo:bar']],
+            ],
         ];
     }
 }
