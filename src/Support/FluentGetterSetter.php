@@ -3,17 +3,15 @@
 namespace Statamic\Support;
 
 use Closure;
-use Statamic\Support\Traits\InvadesProperties;
 
 class FluentGetterSetter
 {
-    use InvadesProperties;
-
     protected $object;
     protected $property;
     protected $getter;
     protected $setter;
     protected $afterSetter;
+    protected $invader;
 
     /**
      * Instantiate fluent getter/setter helper.
@@ -25,6 +23,7 @@ class FluentGetterSetter
     {
         $this->object = $object;
         $this->property = $property;
+        $this->invader = invade($object);
     }
 
     /**
@@ -106,7 +105,7 @@ class FluentGetterSetter
      */
     protected function runGetterLogic()
     {
-        $value = $this->invade($this->object, $this->property);
+        $value = $this->invader->{$this->property};
 
         if ($getter = $this->getter) {
             $value = $getter($value);
@@ -126,7 +125,7 @@ class FluentGetterSetter
             $value = $setter($value);
         }
 
-        $this->invadeSetter($this->object, $this->property, $value);
+        $this->invader->{$this->property} = $value;
 
         if ($afterSetter = $this->afterSetter) {
             $afterSetter($value);
