@@ -141,7 +141,7 @@ class GlideManager
         $pathPrefix = ImageGenerator::assetCachePathPrefix($asset);
         $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
 
-        // Delete generated glide cache for asset
+        // Delete generated glide cache for asset.
         if (config('statamic.assets.image_manipulation.append_original_filename', false)) {
             // Make sure to use the default cache path when clearing the cache
             tap($this->server(), function ($server) use ($pathPrefix, $asset) {
