@@ -10,6 +10,7 @@ use Statamic\CP\Utilities\UtilityRepository;
 use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
 use Statamic\Facades\User;
+use Statamic\Fieldtypes\Sets;
 use Statamic\Http\View\Composers\CustomLogoComposer;
 use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Http\View\Composers\JavascriptComposer;
@@ -35,6 +36,8 @@ class CpServiceProvider extends ServiceProvider
         Blade::directive('cp_svg', function ($expression) {
             return "<?php echo Statamic::svg({$expression}) ?>";
         });
+
+        Sets::setIconsDirectory();
 
         $this->registerMiddlewareGroups();
     }

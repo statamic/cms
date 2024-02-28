@@ -11,12 +11,12 @@
             <div
                 v-if="item.invalid"
                 v-tooltip.top="__('An item with this ID could not be found')"
-                v-text="item.title" />
+                v-text="__(item.title)" />
 
 
-            <a v-if="!item.invalid && editable" @click="edit" v-text="item.title" class="truncate" v-tooltip="item.title" />
+            <a v-if="!item.invalid && editable" @click.prevent="edit" v-text="__(item.title)" class="truncate" v-tooltip="item.title" :href="item.edit_url" />
 
-            <div v-if="!item.invalid && !editable" v-text="item.title" />
+            <div v-if="!item.invalid && !editable" v-text="__(item.title)" />
 
             <inline-edit-form
                 v-if="isEditing"
@@ -28,7 +28,7 @@
             />
 
             <div class="flex items-center flex-1 justify-end">
-                <div v-if="item.collection" v-text="item.collection.title" class="text-4xs text-gray-600 uppercase whitespace-nowrap mr-2 hidden @sm:block" />
+                <div v-if="item.collection" v-text="__(item.collection.title)" class="text-4xs text-gray-600 uppercase whitespace-nowrap mr-2 hidden @sm:block" />
 
                 <div class="flex items-center" v-if="!readOnly">
                     <dropdown-list>

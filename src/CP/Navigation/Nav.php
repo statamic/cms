@@ -45,12 +45,13 @@ class Nav
     }
 
     /**
-     * Find or create nav item.
+     * Find nav item.
      *
      * @param  string  $section
      * @param  string  $name
+     * @return NavItem|null
      */
-    public function findOrCreate($section, $name)
+    public function find($section, $name)
     {
         $item = collect($this->items)->first(function ($item) use ($section, $name) {
             return $item->section() === $section
@@ -58,7 +59,19 @@ class Nav
                 && ! $item->isChild();
         });
 
-        return $item ?: $this->create($name)->section($section);
+        return $item;
+    }
+
+    /**
+     * Find or create nav item.
+     *
+     * @param  string  $section
+     * @param  string  $name
+     * @return NavItem
+     */
+    public function findOrCreate($section, $name)
+    {
+        return $this->find($section, $name) ?: $this->create($name)->section($section);
     }
 
     /**
@@ -66,10 +79,15 @@ class Nav
      *
      * @param  string  $section
      * @param  string|null  $name
+     * @param  string|null  $childName
      * @return $this
      */
-    public function remove($section, $name = null)
+    public function remove($section, $name = null, $childName = null)
     {
+        if ($childName) {
+            return $this->removeChildItem($section, $name, $childName);
+        }
+
         $this->items = collect($this->items)
             ->reject(function ($item) use ($section, $name) {
                 return $name
@@ -77,6 +95,29 @@ class Nav
                     : $item->section() === $section;
             })
             ->all();
+
+        return $this;
+    }
+
+    /**
+     * Remove nav item.
+     *
+     * @param  string  $section
+     * @param  string|null  $name
+     * @param  string|null  $childName
+     * @return $this
+     */
+    protected function removeChildItem($section, $name, $childName)
+    {
+        if (! $parent = $this->find($section, $name)) {
+            return $this;
+        }
+
+        if (! $children = $parent->resolveChildren()->children()) {
+            return $this;
+        }
+
+        $parent->children($children->reject(fn ($child) => $child->display() === $childName));
 
         return $this;
     }
@@ -100,6 +141,14 @@ class Nav
     public function buildWithoutPreferences($withHidden = false)
     {
         return $this->build(false, $withHidden);
+    }
+
+    /**
+     * Clear cached urls.
+     */
+    public function clearCachedUrls()
+    {
+        return NavBuilder::clearCachedUrls();
     }
 
     /**

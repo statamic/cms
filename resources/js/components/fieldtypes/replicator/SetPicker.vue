@@ -27,9 +27,7 @@
             <div class="p-1 max-h-[21rem] overflow-auto">
                 <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">
-                            <svg-icon :name="item.icon ? `plump/${item.icon}` : 'folder-generic'" class="text-gray-800" />
-                        </div>
+                        <svg-icon :name="groupIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2 text-gray-800" />
                         <div class="flex-1">
                             <div class="text-md font-medium text-gray-800 truncate w-52">{{ __(item.display || item.handle) }}</div>
                             <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ __(item.instructions) }}</div>
@@ -37,9 +35,7 @@
                         <svg-icon name="micro/chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
                     </div>
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">
-                            <svg-icon :name="item.icon ? `plump/${item.icon}` : 'light/add'" class="text-gray-800" />
-                        </div>
+                        <svg-icon :name="setIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2 text-gray-800" />
                         <div class="flex-1">
                             <div class="text-md font-medium text-gray-800 truncate w-52">{{ __(item.display || item.handle) }}</div>
                             <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ __(item.instructions) }}</div>
@@ -139,7 +135,26 @@ export default {
 
         noSearchResults() {
             return this.search && this.visibleSets.length === 0;
-        }
+        },
+
+        iconBaseDirectory() {
+            return this.$config.get('setIconsDirectory');
+        },
+
+        iconSubFolder() {
+            return this.$config.get('setIconsFolder');
+        },
+
+        iconDirectory() {
+            let iconDirectory = this.$config.get('setIconsDirectory');
+            let iconFolder = this.$config.get('setIconsFolder');
+
+            if (iconFolder) {
+                iconDirectory = iconDirectory+'/'+iconFolder;
+            }
+
+            return iconDirectory;
+        },
 
     },
 
@@ -221,7 +236,23 @@ export default {
             if (! this.hasMultipleSets) {
                 this.addSet(this.sets[0].sets[0].handle);
             }
-        }
+        },
+
+        groupIconName(name) {
+            if (! name) return 'folder-generic';
+
+            return this.iconSubFolder
+                ? this.iconSubFolder+'/'+name
+                : name;
+        },
+
+        setIconName(name) {
+            if (! name) return 'light/add';
+
+            return this.iconSubFolder
+                ? this.iconSubFolder+'/'+name
+                : name;
+        },
 
     }
 

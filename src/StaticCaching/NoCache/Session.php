@@ -2,10 +2,12 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Data;
+use Statamic\Facades\StaticCache;
 
 class Session
 {
@@ -41,12 +43,12 @@ class Session
      */
     public function regions(): Collection
     {
-        return $this->regions;
+        return $this->regions->mapWithKeys(fn ($key) => [$key => $this->region($key)]);
     }
 
     public function region(string $key): Region
     {
-        if ($region = $this->regions[$key] ?? null) {
+        if ($this->regions->contains($key) && ($region = StaticCache::cacheStore()->get('nocache::region.'.$key))) {
             return $region;
         }
 
@@ -57,14 +59,22 @@ class Session
     {
         $region = new StringRegion($this, trim($contents), $context, $extension);
 
-        return $this->regions[$region->key()] = $region;
+        $this->cacheRegion($region);
+
+        $this->regions[] = $region->key();
+
+        return $region;
     }
 
     public function pushView($view, $context): ViewRegion
     {
         $region = new ViewRegion($this, $view, $context);
 
-        return $this->regions[$region->key()] = $region;
+        $this->cacheRegion($region);
+
+        $this->regions[] = $region->key();
+
+        return $region;
     }
 
     public function cascade()
@@ -91,19 +101,23 @@ class Session
             return;
         }
 
-        Cache::forever('nocache::urls', collect(Cache::get('nocache::urls', []))->push($this->url)->unique()->all());
+        $store = StaticCache::cacheStore();
 
-        Cache::forever('nocache::session.'.md5($this->url), [
+        $store->forever('nocache::urls', collect($store->get('nocache::urls', []))->push($this->url)->unique()->all());
+
+        $store->forever('nocache::session.'.md5($this->url), [
             'regions' => $this->regions,
         ]);
     }
 
     public function restore()
     {
-        $session = Cache::get('nocache::session.'.md5($this->url));
+        $session = StaticCache::cacheStore()->get('nocache::session.'.md5($this->url));
 
         $this->regions = $this->regions->merge($session['regions'] ?? []);
         $this->cascade = $this->restoreCascade();
+
+        $this->resolvePageAndPathForPagination();
 
         return $this;
     }
@@ -114,5 +128,19 @@ class Session
             ->withContent(Data::findByRequestUrl($this->url))
             ->hydrate()
             ->toArray();
+    }
+
+    private function resolvePageAndPathForPagination(): void
+    {
+        AbstractPaginator::currentPathResolver(fn () => Str::before($this->url, '?'));
+
+        AbstractPaginator::currentPageResolver(function () {
+            return Str::of($this->url)->after('page=')->before('&')->__toString();
+        });
+    }
+
+    private function cacheRegion(Region $region)
+    {
+        StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), $region);
     }
 }

@@ -177,7 +177,7 @@ trait UserContractTests
         $this->assertSame($builder, $user->foo());
     }
 
-    public function queryBuilderProvider()
+    public static function queryBuilderProvider()
     {
         return [
             'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],

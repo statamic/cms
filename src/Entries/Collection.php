@@ -11,8 +11,11 @@ use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\CollectionCreated;
+use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionSaved;
+use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -342,7 +345,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         ]);
 
         if ($this->requiresSlugs()) {
-            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
+            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true, 'validate' => 'max:200'], 'sidebar');
         }
 
         if ($this->dated()) {
@@ -360,6 +363,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         }
 
         foreach ($this->taxonomies() as $taxonomy) {
+            if ($blueprint->hasField($taxonomy->handle())) {
+                continue;
+            }
+
             $blueprint->ensureField($taxonomy->handle(), [
                 'type' => 'terms',
                 'taxonomies' => [$taxonomy->handle()],
@@ -431,6 +438,14 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function save()
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
+
+        if ($isNew && CollectionCreating::dispatch($this) === false) {
+            return false;
+        }
+
+        if (CollectionSaving::dispatch($this) === false) {
+            return false;
+        }
 
         Facades\Collection::save($this);
 
@@ -600,16 +615,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
-    public function revisions($enabled = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('revisions')
-            ->getter(function ($behavior) {
-                return $behavior ?? false;
-            })
-            ->args(func_get_args());
-    }
-
     public function revisionsEnabled($enabled = null)
     {
         return $this
@@ -664,7 +669,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
-    public function structureContents(array $contents = null)
+    public function structureContents(?array $contents = null)
     {
         return $this
             ->fluentlyGetOrSet('structureContents')
@@ -713,7 +718,18 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function delete()
     {
-        $this->queryEntries()->get()->each->delete();
+        if (CollectionDeleting::dispatch($this) === false) {
+            return false;
+        }
+
+        $this->queryEntries()->get()->each(function ($entry) {
+            $entry->deleteDescendants();
+            $entry->delete();
+        });
+
+        if ($this->hasStructure()) {
+            $this->structure()->trees()->each->delete();
+        }
 
         Facades\Collection::delete($this);
 

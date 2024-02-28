@@ -5,6 +5,7 @@ namespace Tests\Tags;
 use Statamic\Facades\Data;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Site;
+use Statamic\Tags\Link;
 use Tests\TestCase;
 
 class LinkTest extends TestCase
@@ -149,5 +150,15 @@ class LinkTest extends TestCase
         Data::shouldReceive('find')->with('123')->andReturnNull();
 
         $this->assertEquals('', $this->tag('{{ link:123 }}'));
+    }
+
+    /** @test */
+    public function it_outputs_statamic_website_using_macroable()
+    {
+        Link::macro('statamic', function () {
+            return 'https://www.statamic.com';
+        });
+
+        $this->assertEquals('https://www.statamic.com', $this->tag('{{ link:statamic }}'));
     }
 }

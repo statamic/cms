@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\CP\Column;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -33,6 +34,7 @@ class Entries extends Relationship
     protected $canSearch = true;
     protected $statusIcons = true;
     protected $formComponent = 'entry-publish-form';
+    protected $activeFilterBadges;
 
     protected $formComponentProps = [
         'initialActions' => 'actions',
@@ -165,9 +167,9 @@ class Entries extends Relationship
 
     public function getSortColumn($request)
     {
-        $column = $request->get('sort');
+        $column = $request->sort ?? 'title';
 
-        if (! $column && ! $request->search) {
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
@@ -176,13 +178,23 @@ class Entries extends Relationship
 
     public function getSortDirection($request)
     {
-        $order = $request->get('order', 'asc');
+        $order = $request->order ?? 'asc';
 
-        if (! $request->sort && ! $request->search) {
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
         }
 
         return $order;
+    }
+
+    public function initialSortColumn()
+    {
+        return $this->getSortColumn(optional());
+    }
+
+    public function initialSortDirection()
+    {
+        return $this->getSortDirection(optional());
     }
 
     protected function getIndexQuery($request)
@@ -375,6 +387,22 @@ class Entries extends Relationship
 
     public function getColumns()
     {
+        if (count($this->getConfiguredCollections()) === 1) {
+            $columns = $this->getBlueprint()->columns();
+
+            $status = Column::make('status')
+                ->listable(true)
+                ->visible(true)
+                ->defaultVisibility(true)
+                ->sortable(false);
+
+            $columns->put('status', $status);
+
+            $columns->setPreferred("collections.{$this->getConfiguredCollections()[0]}.columns");
+
+            return $columns->rejectUnlisted()->values();
+        }
+
         return $this->getBlueprint()->columns()->values()->all();
     }
 
@@ -392,5 +420,23 @@ class Entries extends Relationship
     public function filter()
     {
         return new EntriesFilter($this);
+    }
+
+    public function preload()
+    {
+        $collection = count($this->getConfiguredCollections()) === 1
+            ? Collection::findByHandle($this->getConfiguredCollections()[0])
+            : null;
+
+        if (! $collection || ! $collection->hasStructure()) {
+            return parent::preload();
+        }
+
+        return array_merge(parent::preload(), ['tree' => [
+            'title' => $collection->title(),
+            'url' => cp_route('collections.tree.index', $collection),
+            'showSlugs' => $collection->structure()->showSlugs(),
+            'expectsRoot' => $collection->structure()->expectsRoot(),
+        ]]);
     }
 }

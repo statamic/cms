@@ -7,7 +7,7 @@
             <breadcrumb :url="breadcrumbUrl" :title="__('Collections')" />
 
             <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+                <h1 class="flex-1" v-text="__(title)" />
 
                 <dropdown-list class="mr-2" v-if="!!this.$scopedSlots.twirldown">
                     <slot name="twirldown" />
@@ -103,7 +103,6 @@
         <page-tree
             v-if="canUseStructureTree && view === 'tree'"
             ref="tree"
-            :has-collection="true"
             :collections="[handle]"
             :create-url="createUrl"
             :pages-url="structurePagesUrl"
@@ -134,7 +133,7 @@
                         v-for="blueprint in blueprints"
                         :key="blueprint.handle"
                         @click="createEntry(blueprint.handle, branch.id)"
-                        v-text="blueprints.length > 1 ? blueprint.title : __('Create Child Entry')" />
+                        v-text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')" />
                 </template>
                 <template v-if="branch.can_delete">
                     <li class="divider"></li>

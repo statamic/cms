@@ -24,7 +24,9 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\UserCreated;
+use Statamic\Events\UserCreating;
 use Statamic\Events\UserDeleted;
+use Statamic\Events\UserDeleting;
 use Statamic\Events\UserSaved;
 use Statamic\Events\UserSaving;
 use Statamic\Facades;
@@ -168,6 +170,10 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && UserCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (UserSaving::dispatch($this) === false) {
                 return false;
             }
@@ -192,6 +198,10 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function delete()
     {
+        if (UserDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\User::delete($this);
 
         UserDeleted::dispatch($this);

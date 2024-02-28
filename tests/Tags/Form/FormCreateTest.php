@@ -2,6 +2,11 @@
 
 namespace Tests\Tags\Form;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
 use Statamic\Statamic;
 
@@ -31,7 +36,7 @@ class FormCreateTest extends FormTestCase
     /** @test */
     public function it_renders_form_with_params()
     {
-        $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /form:contact }}');
+        $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" attr:class="form" attr:id="form" }}{{ /form:contact }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/forms/contact" class="form" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_redirect" value="/submitted" />', $output);
@@ -757,7 +762,6 @@ EOT
     /** @test */
     public function it_can_render_an_inline_error_when_multiple_rules_fail()
     {
-        $this->withoutExceptionHandling();
         $this->assertEmpty(Form::find('contact')->submissions());
 
         $this
@@ -822,5 +826,109 @@ EOT
 
         $this->assertEquals($form['honeypot'], 'winnie');
         $this->assertEquals($form['js_driver'], 'alpine');
+    }
+
+    /** @test */
+    public function it_uploads_assets()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'One',
+                            'instructions' => 'One Instructions',
+                            'fields' => [
+                                ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                ['handle' => 'bravo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $this
+            ->post('/!/forms/survey', [
+                'alpha' => 'test',
+                'bravo' => UploadedFile::fake()->image('avatar.jpg'),
+            ]);
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+    }
+
+    /** @test */
+    public function it_removes_any_uploaded_assets_when_a_submission_silently_fails()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            return false;
+        });
+
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'One',
+                            'instructions' => 'One Instructions',
+                            'fields' => [
+                                ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                ['handle' => 'bravo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $this
+            ->post('/!/forms/survey', [
+                'alpha' => 'test',
+                'bravo' => UploadedFile::fake()->image('avatar.jpg'),
+            ]);
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
+    }
+
+    /** @test */
+    public function it_removes_any_uploaded_assets_when_a_listener_throws_a_validation_exception()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['custom' => 'This is a custom message']);
+        });
+
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'One',
+                            'instructions' => 'One Instructions',
+                            'fields' => [
+                                ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                ['handle' => 'bravo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $this
+            ->post('/!/forms/survey', [
+                'alpha' => 'test',
+                'bravo' => UploadedFile::fake()->image('avatar.jpg'),
+            ]);
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
     }
 }

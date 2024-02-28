@@ -32,7 +32,7 @@ class RoleNavController extends Controller
             : Nav::buildWithoutPreferences(true);
 
         return $this->navBuilder($nav, [
-            'title' => $role->title(),
+            'title' => __($role->title()),
             'updateUrl' => cp_route('preferences.nav.role.update', $role->handle()),
             'destroyUrl' => cp_route('preferences.nav.role.destroy', $role->handle()),
         ]);
@@ -46,6 +46,8 @@ class RoleNavController extends Controller
 
         $role->setPreference('nav', $nav)->save();
 
+        Nav::clearCachedUrls();
+
         $this->success(__('Saved'));
 
         return true;
@@ -56,6 +58,8 @@ class RoleNavController extends Controller
         abort_unless($role = Role::find($handle), 404);
 
         $role->removePreference('nav')->save();
+
+        Nav::clearCachedUrls();
 
         return true;
     }

@@ -51,6 +51,7 @@ class RenameAsset extends Action
                 'classes' => 'mousetrap',
                 'focus' => true,
                 'placeholder' => $this->items->containsOneItem() ? $this->items->first()->filename() : null,
+                'debounce' => false,
             ],
         ];
     }

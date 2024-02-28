@@ -16,46 +16,25 @@
                 <p class="text-gray" v-text="__('messages.user_wizard_intro')" />
             </div>
 
-            <!-- Email Address -->
-            <div class="max-w-md mx-auto px-4 pb-10">
-                <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}*</label>
-                <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
-
-                <div class="text-2xs text-red-500 mt-2 flex items-center" v-if="userExists">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
-                    {{ __('This user already exists.') }}
-                </div>
-                <div class="text-2xs text-gray-600 mt-2 flex items-center" v-else>
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
-                    {{ __('messages.user_wizard_email_instructions') }}
-                </div>
-            </div>
-
-            <!-- Name -->
-            <div v-if="! separateNameFields" class="max-w-md mx-auto px-4 pb-20">
-                <label class="font-bold text-base mb-1" for="name">{{ __('Name') }}</label>
-                <input type="text" v-model="user.name" id="name" class="input-text" tabindex="2">
-                <div class="text-2xs text-gray-600 mt-2 flex items-center">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
-                    {{ __('messages.user_wizard_name_instructions') }}
-                </div>
-            </div>
-
-            <div v-else class="max-w-md mx-auto px-4 pb-20 flex space-x-4">
-                <div class="flex-1">
-                    <label class="font-bold text-base mb-1" for="first_name">{{ __('First Name') }}</label>
-                    <input type="text" v-model="user.first_name" id="first_name" class="input-text" tabindex="2">
-                    <div class="text-2xs text-gray-600 mt-2 flex items-center">
-                        <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
-                        {{ __('messages.user_wizard_name_instructions') }}
+            <publish-container
+                :name="storeName"
+                :blueprint="blueprint"
+                :values="values"
+                :meta="meta"
+                :track-dirty-state="false"
+                class="max-w-md mx-auto -mt-6 py-0 px-4 pb-20"
+                @updated="values = $event"
+            >
+                <div slot-scope="{ setFieldValue, setFieldMeta }">
+                    <div class="-mx-6">
+                        <publish-fields
+                            :fields="fields"
+                            @updated="setFieldValue"
+                            @meta-updated="setFieldMeta"
+                        />
                     </div>
                 </div>
-
-                <div class="flex-1">
-                    <label class="font-bold text-base mb-1" for="last_name">{{ __('Last Name') }}</label>
-                    <input type="text" v-model="user.last_name" id="last_name" class="input-text" tabindex="2">
-                </div>
-            </div>
+            </publish-container>
         </div>
 
         <!-- Step: Roles & Groups -->
@@ -147,7 +126,7 @@
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-4 pb-20" v-else>
-                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
+                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share_before', { email: values.email })" />
             </div>
         </div>
 
@@ -160,7 +139,7 @@
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-4 pb-10">
-                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
+                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share', { email: values.email })" />
             </div>
             <div class="max-w-md mx-auto px-4 pb-10">
                 <label class="font-bold text-base mb-1" for="email">{{ __('Activation URL') }}</label>
@@ -168,7 +147,7 @@
             </div>
             <div class="max-w-md mx-auto px-4 pb-20">
                 <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="user.email" />
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="values.email" />
             </div>
         </div>
 
@@ -177,7 +156,10 @@
                 <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="! completed && ! onFirstStep">
                     &larr; {{ __('Previous')}}
                 </button>
-                <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="next" v-if="! completed && ! onLastStep">
+                <button tabindex="4" class="btn mx-4 w-32" @click="nextStep" v-if="onUserInfoStep">
+                    {{ __('Next')}} &rarr;
+                </button>
+                <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="nextStep" v-if="!onUserInfoStep && ! completed && ! onLastStep">
                     {{ __('Next')}} &rarr;
                 </button>
                 <button tabindex="4" class="btn-primary mx-4" @click="submit" v-if="! completed && onLastStep">
@@ -194,11 +176,19 @@
     </div>
 </template>
 
+<style scoped>
+>>> .publish-fields .form-group .field-inner > label {
+    @apply text-base font-bold mb-1;
+    & + .help-block { @apply -mt-1 !important; }
+}
+</style>
+
 <script>
 // Yer a wizard Harry
 
 import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
+import uniq from 'underscore/modules/uniq.js';
 
 export default {
 
@@ -214,12 +204,15 @@ export default {
         activationExpiry: { type: Number },
         separateNameFields: { type: Boolean },
         canSendInvitation: { type: Boolean },
+        blueprint: { type: Object },
+        initialValues: { type: Object },
+        fields: { type: Array },
+        meta: { type: Object }
     },
 
     data() {
         return {
             user: {
-                email: null,
                 super: this.canCreateSupers,
                 roles: [],
                 groups: []
@@ -233,6 +226,10 @@ export default {
             completed: false,
             activationUrl: null,
             editUrl: null,
+            errors: {},
+            error: null,
+            storeName: 'userwizard',
+            values: this.initialValues,
         }
     },
 
@@ -258,33 +255,50 @@ export default {
         },
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
-        },
-        isValidEmail() {
-            return this.user.email && isEmail(this.user.email)
         }
     },
 
     methods: {
         canGoToStep(step) {
+            // If we've created the user, you shouldn't be allowed to go back anywhere.
             if (this.completed) return false;
 
-            if (step >= 1) {
-                return this.isValidEmail && ! this.userExists;
-            }
+            // You can go back to the first step from anywhere.
+            if (step === 0) return true;
 
-            return true;
+            // Otherwise, you can only go to a step if the first one is complete/valid.
+            return this.valid;
         },
-        checkIfUserExists() {
-            this.$axios.post(cp_url('user-exists'), {email: this.user.email}).then(response => {
+        checkIfUserExists(email) {
+            this.$axios.post(cp_url('user-exists'), { email }).then(response => {
                 this.userExists = response.data.exists
             }).catch(error => {
                 this.$toast.error(error.response.data.message);
             });
         },
-        submit() {
-            let payload = {...this.user, invitation: this.invitation};
+        nextStep() {
+            if (this.onUserInfoStep) {
+                return this.submit(true).then(this.next).catch(() => {})
+            }
 
-            this.$axios.post(this.route, payload).then(response => {
+            this.next();
+        },
+        submit(validateOnly) {
+            let payload = {...this.user, ...this.values, invitation: this.invitation};
+
+            if (validateOnly === true) {
+                payload._validate_only = true;
+            }
+
+            this.clearErrors();
+
+            return this.$axios.post(this.route, payload).then(response => {
+                this.valid = true;
+
+                if (payload._validate_only) {
+                    return;
+                }
+
                 if (this.invitation.send) {
                     window.location = response.data.redirect;
                 } else {
@@ -292,17 +306,46 @@ export default {
                     this.editUrl = response.data.redirect;
                     this.activationUrl = response.data.activationUrl;
                 }
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
+            }).catch(e => {
+                this.handleAxiosError(e);
+                throw e;
             });
-        }
+        },
+        handleAxiosError(e) {
+            if (e.response && e.response.status === 422) {
+                const { message, errors } = e.response.data;
+                this.error = message;
+                this.errors = errors;
+                this.valid = false;
+                this.$toast.error(message);
+            } else {
+                this.$toast.error(__(e.response.data.message));
+            }
+        },
+        clearErrors() {
+            this.error = null;
+            this.errors = {};
+        },
     },
 
     watch: {
-        'user.email': function(email) {
-            if (this.isValidEmail) {
-                this.checkIfUserExists()
+        'values.email': function(email) {
+            if (email && isEmail(email)) this.checkIfUserExists(email);
+        },
+
+        userExists(exists) {
+            let emailErrors = this.errors.email || [];
+            const error = __('statamic::validation.unique');
+            if (exists) {
+                emailErrors.push(error);
+            } else {
+                emailErrors = emailErrors.filter(error => error !== error);
             }
+            this.errors = { ...this.errors, email: uniq(emailErrors) };
+        },
+
+        'errors': function (errors) {
+            if (this.onUserInfoStep) this.$store.commit(`publish/${this.storeName}/setErrors`, errors);
         }
     },
 

@@ -64,6 +64,12 @@ export const Link = Mark.create({
         ]
     },
 
+    addKeyboardShortcuts() {
+        return {
+            'Mod-k': () => this.options.vm.$emit('link-toggle'),
+        }
+    },
+
     addProseMirrorPlugins() {
         const vm = this.options.vm;
         return [

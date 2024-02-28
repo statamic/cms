@@ -182,6 +182,19 @@ class TaxonomyTermsStore extends ChildStore
 
     public function save($term)
     {
+        // Since we store terms by slug, if the slug changes it's technically
+        // a completely new term, and we'll need to delete the existing one.
+        if (($originalSlug = $term->getOriginal('slug')) && $originalSlug != $term->slug()) {
+            $existing = Term::find($term->taxonomyHandle().'::'.$originalSlug);
+            $this->delete($existing->term());
+        }
+
+        // The "old" state shouldn't be maintained within the Stache, otherwise it'll be there
+        // when the term is retrieved again. Ideally this should be done in a more generic
+        // location. We'll also use a clone to avoid modifying the original instance.
+        $term = clone $term;
+        $term->syncOriginal();
+
         $this->writeItemToDisk($term);
 
         foreach ($term->localizations() as $item) {
@@ -194,6 +207,21 @@ class TaxonomyTermsStore extends ChildStore
             $this->resolveIndexes()->each->updateItem($item);
 
             $this->cacheItem($item);
+        }
+    }
+
+    public function delete($term)
+    {
+        $this->deleteItemFromDisk($term);
+
+        foreach ($term->localizations() as $item) {
+            $key = $this->getItemKey($item);
+
+            $this->forgetItem($key);
+
+            $this->forgetPath($key);
+
+            $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
         }
     }
 

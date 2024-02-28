@@ -181,6 +181,16 @@ EOT;
         $this->assertEquals('Chewy', Git::gitUserName());
         $this->assertEquals('chew@bacca.com', Git::gitUserEmail());
 
+        $han = User::make()
+            ->email('han@solo.com')
+            ->data(['name' => 'Han Solo'])
+            ->makeSuper();
+
+        $this->assertEquals('Han Solo', Git::as($han)->gitUserName());
+        $this->assertEquals('han@solo.com', Git::as($han)->gitUserEmail());
+        $this->assertEquals('Chewy', Git::gitUserName());
+        $this->assertEquals('chew@bacca.com', Git::gitUserEmail());
+
         Config::set('statamic.git.use_authenticated', false);
 
         $this->assertEquals('Spock', Git::gitUserName());

@@ -3,7 +3,7 @@
     <div class="asset-manager">
 
         <div class="flex items-center mb-6">
-            <h1 class="flex-1">{{ container.title }}</h1>
+            <h1 class="flex-1">{{ __(container.title) }}</h1>
 
             <dropdown-list v-if="container.can_edit || container.can_delete" class="ml-4">
                 <dropdown-item
@@ -23,7 +23,7 @@
                 >
                     <resource-deleter
                         ref="deleter"
-                        :resource-title="container.title"
+                        :resource-title="__(container.title)"
                         :route="container.delete_url">
                     </resource-deleter>
                 </dropdown-item>
