@@ -148,7 +148,7 @@ class Cascade
         }
 
         if ($mainGlobal = $this->get('global')) {
-            foreach ($mainGlobal->toAugmentedCollection() as $key => $value) {
+            foreach ($mainGlobal->toDeferredAugmentedArray() as $key => $value) {
                 $this->set($key, $value);
             }
         }
