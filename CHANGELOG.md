@@ -1,5 +1,38 @@
 # Release Notes
 
+## 4.50.0 (2024-02-26)
+
+### What's new
+- Add `hex_to_rgb` modifier. [#9582](https://github.com/statamic/cms/issues/9582) by @DanielDarrenJones
+- Add UI mode option to forms fieldtype config. [#9591](https://github.com/statamic/cms/issues/9591) by @jacksleight
+- First invalid field will be scrolled into view when submitting publish forms. [#9577](https://github.com/statamic/cms/issues/9577) by @jacksleight
+- Add Antlers shorthand parameter value syntax. [#9505](https://github.com/statamic/cms/issues/9505) by @JohnathonKoster
+- Hooks. [#9481](https://github.com/statamic/cms/issues/9481) by @ryanmitchell
+- Add `Entry::findOrFail`. [#9506](https://github.com/statamic/cms/issues/9506) by @benfurfie
+
+### What's fixed
+- Fix field conditions in Grid fields. [#9586](https://github.com/statamic/cms/issues/9586) by @duncanmcclean
+- Fix pixel gap on relationship fieldtype items. [#9579](https://github.com/statamic/cms/issues/9579) by @jasonvarga
+- Use static_cache store for nocache. [#9527](https://github.com/statamic/cms/issues/9527) by @ryanmitchell
+- Make tags using old-style __call method compatible with Macroable. [#9553](https://github.com/statamic/cms/issues/9553) by @SylvesterDamgaard
+- Fix `locales` tag inside replicator, bard, and grid. [#9566](https://github.com/statamic/cms/issues/9566) by @aerni
+- Add `accepted_if` validation to Bard `enable_input_rules` [#9555](https://github.com/statamic/cms/issues/9555) by @robdekort
+- Add `accepted_if` validation rule [#9557](https://github.com/statamic/cms/issues/9557) by @robdekort
+- Fix modal height UI issue. [#9538](https://github.com/statamic/cms/issues/9538) by @JohnathonKoster
+- Fix arrays being returned by translations. [#9525](https://github.com/statamic/cms/issues/9525) by @duncanmcclean
+- Fix Stache pathing issue on Windows. [#9537](https://github.com/statamic/cms/issues/9537) by @JohnathonKoster
+- Antlers: Resolve values from augmented values when there is more data to process. [#9548](https://github.com/statamic/cms/issues/9548) by @JohnathonKoster
+- Antlers: Stop double-initial execution of tags within conditions. [#9504](https://github.com/statamic/cms/issues/9504) by @JohnathonKoster
+- Fix error in event listener when uploading file in front-end forms. [#9542](https://github.com/statamic/cms/issues/9542) by @ryanmitchell
+- Drop Laravel 6 mail view. [#9545](https://github.com/statamic/cms/issues/9545) by @duncanmcclean
+- Remove any uploaded assets when submission silently fails or validation fails. [#9549](https://github.com/statamic/cms/issues/9549) by @ryanmitchell
+- Check if form request wantsJson. [#9533](https://github.com/statamic/cms/issues/9533) by @ryanmitchell
+- Pass parent field and index down to imported fields. [#9550](https://github.com/statamic/cms/issues/9550) by @jacksleight
+- Fix protection redirect URLs when they contain query parameters. [#9543](https://github.com/statamic/cms/issues/9543) by @duncanmcclean
+- Fix issues when saving entries with `JsonResource::withoutWrapping()`. [#9519](https://github.com/statamic/cms/issues/9519) by @duncanmcclean
+
+
+
 ## 4.49.0 (2024-02-16)
 
 ### What's new
