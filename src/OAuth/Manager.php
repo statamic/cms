@@ -29,10 +29,10 @@ class Manager
                 // When the $value is NOT an integer, it means the provider has config settings.
                 // eg. ['github' => 'GitHub', 'facebook' => ['label' => 'Facebook', 'stateless' => true]]
                 if (! is_int($value)) {
-                  $provider = $value;
-                  $config = is_array($key)
-                    ? $key
-                    : ['label' => $key];
+                    $provider = $value;
+                    $config = is_array($key)
+                      ? $key
+                      : ['label' => $key];
                 }
 
                 $oAuthProvider = $this

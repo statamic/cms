@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Statamic\Auth\Protect\Protectors\Password\Controller as PasswordProtectController;
 use Statamic\Facades\OAuth;
