@@ -136,15 +136,9 @@ class Provider
         return $this;
     }
 
-    public function config($config = null)
+    public function config()
     {
-        if (func_num_args() === 0) {
-            return $this->config ?? [];
-        }
-
-        $this->config = $config;
-
-        return $this;
+        return $this->config;
     }
 
     protected function getIds()
