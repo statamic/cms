@@ -24,11 +24,6 @@ class Provider
         $this->name = $name;
     }
 
-    public function name()
-    {
-        return $this->name;
-    }
-
     public function getSocialiteUser()
     {
         $driver = Socialite::driver($this->name);

@@ -16,15 +16,15 @@ class OAuthController
 
     public function handleProviderCallback($provider)
     {
-        $provider = OAuth::provider($provider);
+        $OAuthProvider = OAuth::provider($provider);
 
         try {
-            $providerUser = $provider->getSocialiteUser();
+            $providerUser = $OAuthProvider->getSocialiteUser();
         } catch (InvalidStateException $e) {
-            return $this->redirectToProvider($provider->name());
+            return $this->redirectToProvider($provider);
         }
 
-        $user = $provider->findOrCreateUser($providerUser);
+        $user = $OAuthProvider->findOrCreateUser($providerUser);
 
         session()->put('oauth-provider', $provider);
 
