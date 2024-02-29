@@ -106,7 +106,7 @@ EOT;
     }
 
     /** @test */
-    public function test_find_or_fail_throws_exception_when_collection_does_not_exist()
+    public function test_find_or_fail_throws_exception_when_asset_does_not_exist()
     {
         $assetRepository = new AssetRepository;
 
