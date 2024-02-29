@@ -442,7 +442,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function order()
     {
-        if (! $this->hasStructure()) {
+        if (! $this->hasStructure() || ! $this->structure()->in($this->locale())) {
             return $this->value('order');
         }
 
@@ -815,7 +815,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function page()
     {
-        if (! $this->hasStructure()) {
+        if (! $this->hasStructure() || ! $this->structure()->in($this->locale())) {
             return null;
         }
 
