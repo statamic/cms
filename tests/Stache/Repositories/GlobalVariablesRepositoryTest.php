@@ -5,7 +5,6 @@ namespace Tests\Stache\Repositories;
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Exceptions\GlobalVariablesNotFoundException;
 use Statamic\Facades\GlobalSet;
-use Statamic\Facades\GlobalVariables;
 use Statamic\Facades\Site;
 use Statamic\Globals\VariablesCollection;
 use Statamic\Stache\Repositories\GlobalRepository;
