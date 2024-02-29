@@ -1,8 +1,8 @@
 <template>
 
     <div class="flex">
-        <slot name="branch-action" :branch="page" v-if="editable">
-            <div class="page-move w-6" />
+        <slot name="branch-action" :branch="page">
+            <div v-if="editable" class="page-move w-6" />
         </slot>
         <div class="flex items-center flex-1 p-2 ml-2 text-xs leading-normal">
             <div class="flex items-center flex-1" @click="$emit('branch-clicked', page)">

@@ -18,7 +18,14 @@
         @dragend="$emit('blur')"
         @input="(rows) => $emit('sorted', rows)"
     >
-        <div class="grid-stacked" slot-scope="{}">
+        <div
+            class="grid-stacked"
+            :class="{
+                'mt-12': !grid.fullScreenMode && hideDisplay,
+                'mt-6': !grid.fullScreenMode && !hideDisplay,
+            }"
+            slot-scope="{}"
+        >
             <stacked-row
                 v-for="(row, index) in rows"
                 :key="`row-${row._id}`"
@@ -54,7 +61,7 @@ export default {
     components: {
         StackedRow,
         SortableList
-    }
+    },
 
 }
 </script>

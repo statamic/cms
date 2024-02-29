@@ -21,7 +21,7 @@ export default {
                 return fields.concat(
                     field.type === 'import'
                         ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
-                        : [field.handle]
+                        : [field]
                 );
             }, []);
 
@@ -46,10 +46,10 @@ export default {
                     return fields.concat(
                         field.type === 'import'
                             ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
-                            : [field.handle]
+                            : [field]
                     );
                 }, [])
-                .map(handle => prefix ? `${prefix}${handle}` : handle);
+                .map(field => prefix ? { ...field, handle: prefix + field.handle } : field);
         }
 
     }

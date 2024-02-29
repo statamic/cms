@@ -299,7 +299,7 @@ class AssetTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider reAddRemovedData
+     * @dataProvider reAddRemovedDataProvider
      **/
     public function it_doesnt_try_to_re_remove_newly_added_data_from_meta($reAddRemovedData)
     {
@@ -341,7 +341,7 @@ class AssetTest extends TestCase
         $this->assertEquals(123, $asset->getRawMeta()['size']);
     }
 
-    public function reAddRemovedData()
+    public static function reAddRemovedDataProvider()
     {
         return [
             'by calling set method' => [fn ($asset) => $asset->set('one', 'new-foo')],
@@ -414,7 +414,7 @@ class AssetTest extends TestCase
         $this->assertSame($builder, $asset->foo());
     }
 
-    public function queryBuilderProvider()
+    public static function queryBuilderProvider()
     {
         return [
             'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],
@@ -1613,7 +1613,7 @@ class AssetTest extends TestCase
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
         // This should only get called when glide processing source image on upload...
-        ImageValidator::shouldReceive('isValidImage')->never();
+        ImageValidator::partialMock()->shouldReceive('isValidImage')->never();
 
         $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
 
@@ -1663,7 +1663,8 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
-        ImageValidator::shouldReceive('isValidImage')
+        ImageValidator::partialMock()
+            ->shouldReceive('isValidImage')
             ->with('jpg', 'image/jpeg')
             ->andReturnTrue()
             ->once();
@@ -1685,7 +1686,7 @@ class AssetTest extends TestCase
         $this->assertEquals(15, $meta['height']);
     }
 
-    public function formatParams()
+    public static function formatParamsProvider()
     {
         return [['format'], ['fm']];
     }
@@ -1693,7 +1694,7 @@ class AssetTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider formatParams
+     * @dataProvider formatParamsProvider
      **/
     public function it_can_upload_an_image_into_a_container_with_new_extension_format($formatParam)
     {
@@ -1710,7 +1711,8 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
-        ImageValidator::shouldReceive('isValidImage')
+        ImageValidator::partialMock()
+            ->shouldReceive('isValidImage')
             ->with('jpg', 'image/jpeg')
             ->andReturnTrue()
             ->once();
@@ -1729,7 +1731,29 @@ class AssetTest extends TestCase
         Event::assertDispatched(AssetSaved::class);
     }
 
-    public function nonGlideableFileExtensions()
+    /** @test */
+    public function it_sanitizes_svgs_on_upload()
+    {
+        Event::fake();
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.svg');
+
+        $return = $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>'));
+
+        $this->assertEquals($asset, $return);
+        Storage::disk('test')->assertExists('path/to/asset.svg');
+        $this->assertEquals('path/to/asset.svg', $asset->path());
+
+        // Ensure the inline scripts were stripped out.
+        $this->assertStringNotContainsString('<script', $asset->contents());
+        $this->assertStringNotContainsString('Bad stuff could go in here.', $asset->contents());
+        $this->assertStringNotContainsString('</script>', $asset->contents());
+    }
+
+    public static function nonGlideableFileExtensionsProvider()
     {
         return [
             ['txt'], // not an image
@@ -1742,7 +1766,7 @@ class AssetTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider nonGlideableFileExtensions
+     * @dataProvider nonGlideableFileExtensionsProvider
      **/
     public function it_doesnt_process_or_error_when_uploading_non_glideable_file_with_glide_config($extension)
     {
@@ -1763,7 +1787,7 @@ class AssetTest extends TestCase
         // Ensure a glide server is never instantiated for these extensions...
         Facades\Glide::partialMock()->shouldReceive('server')->never();
 
-        $return = $asset->upload(UploadedFile::fake()->create("file.{$extension}"));
+        $return = $asset->upload(UploadedFile::fake()->createWithContent("file.{$extension}", '<svg width="20" height="30"></svg>'));
 
         $this->assertEquals($asset, $return);
         $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
@@ -2136,6 +2160,73 @@ class AssetTest extends TestCase
         ], Arr::only($asset->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
 
+    /**
+     * @test
+     */
+    public function it_has_a_dirty_state()
+    {
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+
+        $asset = (new Asset)->container($container)->path('test.jpg');
+
+        $asset->data([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ])->save();
+
+        $this->assertFalse($asset->isDirty());
+        $this->assertFalse($asset->isDirty('title'));
+        $this->assertFalse($asset->isDirty('food'));
+        $this->assertFalse($asset->isDirty(['title']));
+        $this->assertFalse($asset->isDirty(['food']));
+        $this->assertFalse($asset->isDirty(['title', 'food']));
+        $this->assertTrue($asset->isClean());
+        $this->assertTrue($asset->isClean('title'));
+        $this->assertTrue($asset->isClean('food'));
+        $this->assertTrue($asset->isClean(['title']));
+        $this->assertTrue($asset->isClean(['food']));
+        $this->assertTrue($asset->isClean(['title', 'food']));
+
+        $asset->merge(['title' => 'French']);
+
+        $this->assertTrue($asset->isDirty());
+        $this->assertTrue($asset->isDirty('title'));
+        $this->assertFalse($asset->isDirty('food'));
+        $this->assertTrue($asset->isDirty(['title']));
+        $this->assertFalse($asset->isDirty(['food']));
+        $this->assertTrue($asset->isDirty(['title', 'food']));
+        $this->assertFalse($asset->isClean());
+        $this->assertFalse($asset->isClean('title'));
+        $this->assertTrue($asset->isClean('food'));
+        $this->assertFalse($asset->isClean(['title']));
+        $this->assertTrue($asset->isClean(['food']));
+        $this->assertFalse($asset->isClean(['title', 'food']));
+    }
+
+    /** @test */
+    public function it_syncs_original_at_the_right_time()
+    {
+        $eventsHandled = 0;
+
+        Event::listen(function (AssetSaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->asset->isDirty());
+        });
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('test.jpg');
+
+        $asset
+            ->set('foo', 'bar')
+            ->save();
+
+        $this->assertFalse($asset->isDirty());
+        $this->assertEquals(1, $eventsHandled);
+    }
+
     /** @test */
     public function it_augments_in_the_parser()
     {
@@ -2331,7 +2422,7 @@ YAML;
         $this->assertEquals($expectedWarm, $asset->warmPresets());
     }
 
-    public function warmPresetProvider()
+    public static function warmPresetProvider()
     {
         return [
             'portrait' => ['jpg', 'portrait', true, ['one', 'two', 'cp_thumbnail_small_portrait']],

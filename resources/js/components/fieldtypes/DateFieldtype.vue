@@ -159,6 +159,7 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
             if (! this.value.date) return;
 
             if (this.isRange) {

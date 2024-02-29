@@ -5,7 +5,9 @@ namespace Tests\Data\Users;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Role;
 use Statamic\Facades\User;
+use Statamic\Facades\UserGroup;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -297,5 +299,159 @@ class UserQueryBuilderTest extends TestCase
         EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'author' => 'John Doe'])->create();
 
         return $entry;
+    }
+  
+    /** @test **/
+    public function users_are_found_using_where_group()
+    {
+        $groupOne = tap(UserGroup::make()->handle('one'))->save();
+        $groupTwo = tap(UserGroup::make()->handle('two'))->save();
+
+        $userOne = tap(User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf']))->save();
+        $userTwo = tap(User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol']))->save();
+        $userThree = tap(User::make()->email('frodo@precious.com')->data(['name' => 'Frodo']))->save();
+
+        $userOne->addToGroup($groupOne)->save();
+        $userTwo->addToGroup($groupOne)->save();
+        $userThree->addToGroup($groupTwo)->save();
+
+        $users = User::query()->whereGroup('one')->get();
+
+        $this->assertCount(2, $users);
+        $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
+
+        $users = User::query()->whereGroup('two')->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(['Frodo'], $users->map->name->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_where_group_in()
+    {
+        $groupOne = tap(UserGroup::make()->handle('one'))->save();
+        $groupTwo = tap(UserGroup::make()->handle('two'))->save();
+        $groupThree = tap(UserGroup::make()->handle('three'))->save();
+
+        $userOne = tap(User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf']))->save();
+        $userTwo = tap(User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol']))->save();
+        $userThree = tap(User::make()->email('frodo@precious.com')->data(['name' => 'Frodo']))->save();
+
+        $userOne->addToGroup($groupOne)->save();
+        $userTwo->addToGroup($groupThree)->save();
+        $userThree->addToGroup($groupTwo)->save();
+
+        $users = User::query()->whereGroupIn(['one', 'three'])->get();
+
+        $this->assertCount(2, $users);
+        $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
+
+        $users = User::query()->whereGroupIn(['two'])->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(['Frodo'], $users->map->name->all());
+
+        $users = User::query()->whereGroupIn(['one', 'two'])->orWhereGroupIn(['three'])->get();
+
+        $this->assertCount(3, $users);
+        $this->assertEquals(['Gandalf', 'Frodo', 'Smeagol'], $users->map->name->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_or_where_group()
+    {
+        $groupOne = tap(UserGroup::make()->handle('one'))->save();
+        $groupTwo = tap(UserGroup::make()->handle('two'))->save();
+        $groupThree = tap(UserGroup::make()->handle('three'))->save();
+
+        $userOne = tap(User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf']))->save();
+        $userTwo = tap(User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol']))->save();
+        $userThree = tap(User::make()->email('frodo@precious.com')->data(['name' => 'Frodo']))->save();
+
+        $userOne->addToGroup($groupOne)->save();
+        $userTwo->addToGroup($groupThree)->save();
+        $userThree->addToGroup($groupTwo)->save();
+
+        $users = User::query()->whereGroup('one')->orWhereGroup('three')->get();
+
+        $this->assertCount(2, $users);
+        $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_where_role()
+    {
+        $roleOne = tap(Role::make()->handle('one'))->save();
+        $roleTwo = tap(Role::make()->handle('two'))->save();
+
+        $userOne = tap(User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf']))->save();
+        $userTwo = tap(User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol']))->save();
+        $userThree = tap(User::make()->email('frodo@precious.com')->data(['name' => 'Frodo']))->save();
+
+        $userOne->assignRole($roleOne)->save();
+        $userTwo->assignRole($roleOne)->save();
+        $userThree->assignRole($roleTwo)->save();
+
+        $users = User::query()->whereRole('one')->get();
+
+        $this->assertCount(2, $users);
+        $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
+
+        $users = User::query()->whereRole('two')->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(['Frodo'], $users->map->name->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_where_role_in()
+    {
+        $roleOne = tap(Role::make()->handle('one'))->save();
+        $roleTwo = tap(Role::make()->handle('two'))->save();
+        $roleThree = tap(Role::make()->handle('three'))->save();
+
+        $userOne = tap(User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf']))->save();
+        $userTwo = tap(User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol']))->save();
+        $userThree = tap(User::make()->email('frodo@precious.com')->data(['name' => 'Frodo']))->save();
+
+        $userOne->assignRole($roleOne)->save();
+        $userTwo->assignRole($roleThree)->save();
+        $userThree->assignRole($roleTwo)->save();
+
+        $users = User::query()->whereRoleIn(['one', 'three'])->get();
+
+        $this->assertCount(2, $users);
+        $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
+
+        $users = User::query()->whereRoleIn(['two'])->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(['Frodo'], $users->map->name->all());
+
+        $users = User::query()->whereRoleIn(['one', 'two'])->orWhereRoleIn(['three'])->get();
+
+        $this->assertCount(3, $users);
+        $this->assertEquals(['Gandalf', 'Frodo', 'Smeagol'], $users->map->name->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_or_where_role()
+    {
+        $roleOne = tap(Role::make()->handle('one'))->save();
+        $roleTwo = tap(Role::make()->handle('two'))->save();
+        $roleThree = tap(Role::make()->handle('three'))->save();
+
+        $userOne = tap(User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf']))->save();
+        $userTwo = tap(User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol']))->save();
+        $userThree = tap(User::make()->email('frodo@precious.com')->data(['name' => 'Frodo']))->save();
+
+        $userOne->assignRole($roleOne)->save();
+        $userTwo->assignRole($roleThree)->save();
+        $userThree->assignRole($roleTwo)->save();
+
+        $users = User::query()->whereRole('one')->orWhereRole('three')->get();
+
+        $this->assertCount(2, $users);
+        $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
     }
 }

@@ -817,7 +817,7 @@ class FrontendTest extends TestCase
         }
     }
 
-    public function redirectProvider()
+    public static function redirectProvider()
     {
         return [
             'valid redirect' => [
@@ -844,7 +844,7 @@ class FrontendTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider redirectProviderNoBlueprint
+     * @dataProvider redirectProviderNoBlueprintProvider
      */
     public function redirect_is_followed_when_no_field_is_present_in_blueprint(
         $dataValue,
@@ -881,7 +881,7 @@ class FrontendTest extends TestCase
         }
     }
 
-    public function redirectProviderNoBlueprint()
+    public static function redirectProviderNoBlueprintProvider()
     {
         return [
             'valid redirect' => [

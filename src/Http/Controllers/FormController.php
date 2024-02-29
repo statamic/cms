@@ -4,10 +4,13 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Asset;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
@@ -48,7 +51,9 @@ class FormController extends Controller
         try {
             throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
 
-            $values = array_merge($values, $submission->uploadFiles($assets));
+            $uploadedAssets = $submission->uploadFiles($assets);
+
+            $values = array_merge($values, $uploadedAssets);
 
             $submission->data(
                 $fields->addValues($values)->process()->values()
@@ -57,7 +62,15 @@ class FormController extends Controller
             // If any event listeners return false, we'll do a silent failure.
             // If they want to add validation errors, they can throw an exception.
             throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException);
+        } catch (ValidationException $e) {
+            $this->removeUploadedAssets($uploadedAssets);
+
+            return $this->formFailure($params, $e->errors(), $form->handle());
         } catch (SilentFormFailureException $e) {
+            if (isset($uploadedAssets)) {
+                $this->removeUploadedAssets($uploadedAssets);
+            }
+
             return $this->formSuccess($params, $submission, true);
         }
 
@@ -79,9 +92,35 @@ class FormController extends Controller
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
-        if ($type !== 'multipart/form-data' && $form->hasFiles()) {
+        if ($type !== 'multipart/form-data' && $form->hasFiles() && $request->assets()) {
             throw new FileContentTypeRequiredException;
         }
+    }
+
+    /**
+     * The steps for a failed form submission.
+     *
+     * @param  array  $params
+     * @param  array  $submission
+     * @param  string  $form
+     * @return Response|RedirectResponse
+     */
+    private function formFailure($params, $errors, $form)
+    {
+        if (request()->ajax() || request()->wantsJson()) {
+            return response([
+                'errors' => (new MessageBag($errors))->all(),
+                'error' => collect($errors)->map(function ($errors, $field) {
+                    return $errors[0];
+                })->all(),
+            ], 400);
+        }
+
+        $redirect = Arr::get($params, '_error_redirect');
+
+        $response = $redirect ? redirect($redirect) : back();
+
+        return $response->withInput()->withErrors($errors, 'form.'.$form);
     }
 
     /**
@@ -125,5 +164,21 @@ class FormController extends Controller
         }
 
         return $redirect;
+    }
+
+    /**
+     * Remove any uploaded assets
+     *
+     * Triggered by a validation exception or silent failure
+     */
+    private function removeUploadedAssets(array $assets)
+    {
+        collect($assets)
+            ->flatten()
+            ->each(function ($id) {
+                if ($asset = Asset::find($id)) {
+                    $asset->delete();
+                }
+            });
     }
 }

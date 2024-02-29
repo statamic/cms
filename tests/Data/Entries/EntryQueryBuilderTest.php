@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Carbon;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -174,6 +175,15 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 1', 'Post 4'], $entries->map->title->all());
+
+        // if we send full dates it should only consider the time part
+        $entries = Entry::query()->whereTime('test_date', '2021-11-13 09:00')->get();
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereTime('test_date', Carbon::createFromFormat('Y-m-d H:i', '2021-11-13 09:00'))->get();
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
     }
 
     private function createWhereDateTestEntries()
@@ -822,7 +832,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals($expected, Entry::query()->where('title', 'like', $like)->get()->map->title->all());
     }
 
-    public function likeProvider()
+    public static function likeProvider()
     {
         return collect([
             'foo' => ['foo'],

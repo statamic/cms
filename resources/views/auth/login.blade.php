@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::outside')
 @section('title', __('Log in'))

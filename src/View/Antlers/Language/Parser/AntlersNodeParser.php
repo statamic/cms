@@ -15,6 +15,7 @@ use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Statamic\View\Antlers\Language\Nodes\RecursiveNode;
 use Statamic\View\Antlers\Language\Nodes\TagIdentifier;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class AntlersNodeParser
@@ -371,6 +372,15 @@ class AntlersNodeParser
         );
     }
 
+    private function isValidShorthandCharacter($char)
+    {
+        if (ctype_alpha($char) || $char == '_' || $char == '-' || ctype_digit($char)) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Parses the content of the provided node, and returns any parameters.
      *
@@ -388,6 +398,7 @@ class AntlersNodeParser
         StringUtilities::prepareSplit($content);
         $chars = StringUtilities::split(trim($content));
         $parameters = [];
+        $parsingShorthandVariable = false;
 
         $hasFoundName = false;
         $currentChars = [];
@@ -440,6 +451,89 @@ class AntlersNodeParser
             } else {
                 $prev = '';
                 $ignorePrevious = false;
+            }
+
+            if ($current == DocumentParser::Punctuation_Colon && $next == DocumentParser::Punctuation_Dollar) {
+                $startAt = $i;
+                $parsingShorthandVariable = true;
+                $currentChars = [];
+
+                $currentChars[] = $current;
+                $currentChars[] = $next;
+
+                if ($i + 2 < $charCount) {
+                    $peek = $chars[$i + 2];
+
+                    if (ctype_digit($peek)) {
+                        throw ErrorFactory::makeSyntaxError(
+                            AntlersErrorCodes::TYPE_UNEXPECTED_CHARACTER_WHILE_PARSING_SHORTHAND_PARAMETER,
+                            $node,
+                            'Shorthand variable parameters cannot start with a number.'
+                        );
+                    } elseif (ctype_space($peek)) {
+                        throw ErrorFactory::makeSyntaxError(
+                            AntlersErrorCodes::TYPE_UNEXPECTED_EOI_PARSING_SHORTHAND_PARAMETER,
+                            $node,
+                            'Unexpected end of input while parsing shorthand variable parameter.'
+                        );
+                    }
+                } else {
+                    throw ErrorFactory::makeSyntaxError(
+                        AntlersErrorCodes::TYPE_UNEXPECTED_EOI_PARSING_SHORTHAND_PARAMETER,
+                        $node,
+                        'Unexpected end of input while parsing shorthand variable parameter.'
+                    );
+                }
+
+                $i += 1;
+
+                continue;
+            }
+
+            if ($parsingShorthandVariable && ! ctype_space($current) && ! $this->isValidShorthandCharacter($current)) {
+                throw ErrorFactory::makeSyntaxError(
+                    AntlersErrorCodes::TYPE_UNEXPECTED_CHARACTER_WHILE_PARSING_SHORTHAND_PARAMETER,
+                    $node,
+                    'Unexpected character while parsing shorthand variable parameter.'
+                );
+            }
+
+            if ((ctype_space($current) || $next == null) && $parsingShorthandVariable) {
+                $endAt = $i;
+
+                if ($next == null) {
+                    $currentChars[] = $current;
+                    $endAt += 1;
+                }
+
+                $parameterNode = new ParameterNode();
+                $parameterNode->isVariableReference = true;
+
+                $name = implode('', array_slice($currentChars, 2));
+
+                $parameterNode->name = $name;
+                $parameterNode->value = $name;
+                $parameterNode->startPosition = $node->relativePositionFromOffset($startAt, $nameStart);
+
+                if (in_array($name, ['as', 'scope', 'handle_prefix'])) {
+                    $node->hasScopeAdjustingParameters = true;
+                }
+
+                $parameterNode->endPosition = $node->relativePositionFromOffset($endAt, $endAt);
+                $parameterNode->parent = $node;
+
+                $parameters[] = $parameterNode;
+
+                if ($next == null) {
+                    break;
+                }
+
+                $currentChars = [];
+                $hasFoundName = false;
+                $parsingShorthandVariable = false;
+                $name = '';
+
+                continue;
             }
 
             if ($hasFoundName == false && ctype_space($current)) {
@@ -569,6 +663,11 @@ class AntlersNodeParser
                 if (Str::startsWith($name, DocumentParser::Punctuation_Colon)) {
                     $parameterNode->isVariableReference = true;
                     $name = StringUtilities::substr($name, 1);
+
+                    if (is_numeric($content)) {
+                        $content = TypeCoercion::coerceType($content);
+                        $parameterNode->isVariableReference = false;
+                    }
                 }
 
                 $parameterNode->name = $name;

@@ -15,6 +15,7 @@ use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
 use Statamic\Statamic;
 use Statamic\StaticCaching\NoCache\Controller as NoCacheController;
+use Statamic\StaticCaching\NoCache\NoCacheLocalize;
 
 Route::name('statamic.')->group(function () {
     Route::group(['prefix' => config('statamic.routes.action')], function () {
@@ -45,6 +46,7 @@ Route::name('statamic.')->group(function () {
 
     Route::prefix(config('statamic.routes.action'))
         ->post('nocache', NoCacheController::class)
+        ->middleware(NoCacheLocalize::class)
         ->withoutMiddleware('App\Http\Middleware\VerifyCsrfToken');
 
     if (OAuth::enabled()) {

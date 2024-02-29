@@ -378,7 +378,7 @@ class TermsTest extends TestCase
         }
     }
 
-    public function collectionAttachmentProvider()
+    public static function collectionAttachmentProvider()
     {
         $expectCollection = $parentIsEntry = $isRootLevel = $collectionUsesTaxonomy = true;
         $dontExpectCollection = $parentIsNotEntry = $isNested = $collectionDoesNotUseTaxonomy = false;

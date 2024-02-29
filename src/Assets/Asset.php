@@ -17,6 +17,7 @@ use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetContainerBlueprintFound;
@@ -46,7 +47,7 @@ use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
-    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance,
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, HasDirtyState,
         Searchable,
         TracksQueriedColumns, TracksQueriedRelations {
             set as traitSet;
@@ -65,7 +66,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
-    protected $original = [];
 
     public function syncOriginal()
     {
@@ -1052,6 +1052,14 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'path' => $this->path(),
+            'data' => $this->data()->toArray(),
+        ]);
     }
 
     public function getCpSearchResultBadge(): string

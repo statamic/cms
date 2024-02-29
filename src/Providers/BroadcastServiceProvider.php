@@ -24,6 +24,9 @@ class BroadcastServiceProvider extends ServiceProvider
                 'key' => config('broadcasting.connections.pusher.key'),
                 'cluster' => config('broadcasting.connections.pusher.options.cluster'),
                 'encrypted' => config('broadcasting.connections.pusher.options.encrypted'),
+                'scheme' => config('broadcasting.connections.pusher.options.scheme'),
+                'host' => config('broadcasting.connections.pusher.options.host'),
+                'port' => config('broadcasting.connections.pusher.options.port'),
             ],
         ];
     }
