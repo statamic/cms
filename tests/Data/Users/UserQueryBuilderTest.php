@@ -300,7 +300,7 @@ class UserQueryBuilderTest extends TestCase
 
         return $entry;
     }
-  
+
     /** @test **/
     public function users_are_found_using_where_group()
     {
