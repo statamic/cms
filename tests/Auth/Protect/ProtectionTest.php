@@ -49,6 +49,20 @@ class ProtectionTest extends TestCase
     }
 
     /** @test */
+    public function scheme_comes_from_data_even_when_sitewide_scheme_is_defined()
+    {
+        config(['statamic.protect.default' => 'logged_in']);
+        config(['statamic.protect.schemes.logged_in' => [
+            'driver' => 'auth',
+            'form_url' => '/login',
+        ]]);
+
+        $this->protection->setData($this->createEntryWithScheme('password'));
+
+        $this->assertEquals('password', $this->protection->scheme());
+    }
+
+    /** @test */
     public function if_the_data_isnt_protectable_it_doesnt_get_a_scheme()
     {
         $this->assertNull($this->protection->scheme());
