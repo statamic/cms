@@ -2,6 +2,7 @@
 
 namespace Statamic\View;
 
+use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Statamic\Facades\Cascade;
 use Statamic\Support\Arr;
@@ -105,7 +106,7 @@ class View
 
             // Put the sections back. The ->render() will have flushed the sections.
             Cascade::sections()->each(function ($content, $section) use ($factory) {
-                $factory->startSection($section, (string) $content);
+                $factory->startSection($section, new HtmlString((string) $content));
             });
 
             $contents = view($this->layoutViewName(), array_merge($cascade, GlobalRuntimeState::$layoutVariables, [
