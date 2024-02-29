@@ -101,6 +101,13 @@ class View
             GlobalRuntimeState::$containsLayout = false;
             GlobalRuntimeState::$shareVariablesTemplateTrigger = '';
 
+            $factory = app('view');
+
+            // Put the sections back. The ->render() will have flushed the sections.
+            Cascade::sections()->each(function ($content, $section) use ($factory) {
+                $factory->startSection($section, (string) $content);
+            });
+
             $contents = view($this->layoutViewName(), array_merge($cascade, GlobalRuntimeState::$layoutVariables, [
                 'template_content' => $contents,
             ]));
