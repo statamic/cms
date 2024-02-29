@@ -4,7 +4,6 @@ namespace Tests\Imaging;
 
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
-use Statamic\Facades\Config;
 use Statamic\Imaging\GlideUrlBuilder;
 use Tests\TestCase;
 
