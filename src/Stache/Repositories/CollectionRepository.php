@@ -6,6 +6,7 @@ use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
 use Statamic\Data\StoresScopedComputedFieldCallbacks;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Stache\Stache;
 
@@ -49,6 +50,17 @@ class CollectionRepository implements RepositoryContract
         return $this->all()->first(function ($collection) use ($mount) {
             return optional($collection->mount())->id() === $mount->id();
         });
+    }
+
+    public function findOrFail($id): Collection
+    {
+        $collection = $this->find($id);
+
+        if (! $collection) {
+            throw new CollectionNotFoundException($id);
+        }
+
+        return $collection;
     }
 
     public function make(?string $handle = null): Collection
