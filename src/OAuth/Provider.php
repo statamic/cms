@@ -13,15 +13,16 @@ use Statamic\Support\Str;
 
 class Provider
 {
-    protected $name;
+    /** @deprecated */
     protected $label;
-    protected $config;
+
     protected $userCallback;
     protected $userDataCallback;
 
-    public function __construct(string $name)
-    {
-        $this->name = $name;
+    public function __construct(
+        protected string $name,
+        protected array $config = []
+    ) {
     }
 
     public function getSocialiteUser()
@@ -127,7 +128,7 @@ class Provider
     public function label($label = null)
     {
         if (func_num_args() === 0) {
-            return $this->label ?? Str::title($this->name);
+            return $this->label ?? $this->config['label'] ?? Str::title($this->name);
         }
 
         $this->label = $label;
