@@ -252,7 +252,7 @@ EOT;
         $this->assertSame('FINAL_LITERAL</figure>', $nodes[2]->content);
 
         $template = <<<'EOT'
- <div class="list-of-classes">     {{ partial src="svg/" values="{{ article_icon_color:key }} {{ article_icon_size:key }}" }}FINAL_LITERAL </div>
+ <div class="list-of-classes">     {{ partial src="svg/" values="{{ article_icon_color:key }} {{ article_icon_size:key }}" }}FINAL_LITERAL </div> 
 EOT;
 
         $nodes = $this->parseNodes($template);
