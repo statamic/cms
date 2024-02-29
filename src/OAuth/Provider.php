@@ -3,11 +3,13 @@
 namespace Statamic\OAuth;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Statamic\Contracts\Auth\User as StatamicUser;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class Provider
 {
@@ -25,6 +27,17 @@ class Provider
     public function name()
     {
         return $this->name;
+    }
+
+    public function getSocialiteUser()
+    {
+        $driver = Socialite::driver($this->name);
+
+        if (Arr::get($this->config, 'stateless', false)) {
+            $driver->stateless();
+        }
+
+        return $driver->user();
     }
 
     /**
