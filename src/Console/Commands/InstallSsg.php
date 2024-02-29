@@ -10,7 +10,7 @@ use Statamic\Facades\File;
 
 class InstallSsg extends Command
 {
-    use RunsInPlease, EnhancesCommands;
+    use EnhancesCommands, RunsInPlease;
 
     /**
      * The name and signature of the console command.
@@ -34,28 +34,28 @@ class InstallSsg extends Command
     public function handle()
     {
         if (Composer::isInstalled('statamic/ssg')) {
-            return $this->error("The Static Site Generator package is already installed.");
+            return $this->error('The Static Site Generator package is already installed.');
         }
 
-        $this->info("Installing the statamic/ssg package...");
+        $this->info('Installing the statamic/ssg package...');
         Composer::withoutQueue()->throwOnFailure()->require('statamic/ssg');
-        $this->checkLine("Installed statamic/ssg package");
+        $this->checkLine('Installed statamic/ssg package');
 
-        if ($this->confirm("Would you like to publish the config file?")) {
+        if ($this->confirm('Would you like to publish the config file?')) {
             File::copy(
                 base_path('vendor/statamic/ssg/config/ssg.php'),
                 config_path('statamic/ssg.php')
             );
 
-            $this->checkLine("Config file published. You can find it at config/statamic/ssg.php");
+            $this->checkLine('Config file published. You can find it at config/statamic/ssg.php');
         }
 
         if (
             ! Composer::isInstalled('spatie/fork')
-            && $this->confirm("Would you like to install spatie/fork? It allows for running multiple workers at once.")
+            && $this->confirm('Would you like to install spatie/fork? It allows for running multiple workers at once.')
         ) {
             Composer::withoutQueue()->throwOnFailure()->require('spatie/fork');
-            $this->checkLine("Installed spatie/fork package");
+            $this->checkLine('Installed spatie/fork package');
         }
     }
 }
