@@ -34,9 +34,7 @@ class Manager
                 // eg. ['github' => 'GitHub', 'facebook' => ['label' => 'Facebook', 'stateless' => true]]
                 if (! is_int($key)) {
                     $provider = $key;
-                    $config = is_array($value)
-                      ? $value
-                      : ['label' => $value];
+                    $config = is_array($value) ? $value : ['label' => $value];
                 }
 
                 $oAuthProvider = (new Provider($provider))
