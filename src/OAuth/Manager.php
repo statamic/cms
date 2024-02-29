@@ -16,7 +16,11 @@ class Manager
 
     public function provider($provider)
     {
-        return static::$providers[$provider] = static::$providers[$provider] ?? new Provider($provider);
+        if (isset(static::$providers[$provider])) {
+            return static::$providers[$provider];
+        }
+
+        return $this->providers()->get($provider);
     }
 
     public function providers()
@@ -35,8 +39,7 @@ class Manager
                       : ['label' => $key];
                 }
 
-                $oAuthProvider = $this
-                    ->provider($provider)
+                $oAuthProvider = (new Provider($provider))
                     ->label(Arr::get($config, 'label'))
                     ->config($config);
 
