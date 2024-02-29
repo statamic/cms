@@ -20,7 +20,7 @@ class Manager
             return static::$providers[$provider];
         }
 
-        return $this->providers()->get($provider);
+        return static::$providers[$provider] = $this->providers()->get($provider);
     }
 
     public function providers()
