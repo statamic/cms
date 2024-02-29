@@ -26,17 +26,17 @@ class Manager
     public function providers()
     {
         return collect(config('statamic.oauth.providers'))
-            ->mapWithKeys(function ($key, $value) {
-                $provider = $key;
+            ->mapWithKeys(function ($value, $key) {
+                $provider = $value;
                 $config = null;
 
-                // When the $value is NOT an integer, it means the provider has config settings.
+                // When the $key is NOT an integer, it means the provider has config settings.
                 // eg. ['github' => 'GitHub', 'facebook' => ['label' => 'Facebook', 'stateless' => true]]
-                if (! is_int($value)) {
-                    $provider = $value;
-                    $config = is_array($key)
-                      ? $key
-                      : ['label' => $key];
+                if (! is_int($key)) {
+                    $provider = $key;
+                    $config = is_array($value)
+                      ? $value
+                      : ['label' => $value];
                 }
 
                 $oAuthProvider = (new Provider($provider))
