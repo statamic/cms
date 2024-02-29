@@ -5,11 +5,11 @@ namespace Statamic\OAuth;
 use Closure;
 use Illuminate\Support\Arr;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
+use Laravel\Socialite\Facades\Socialite;
 use Statamic\Contracts\Auth\User as StatamicUser;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
-use Laravel\Socialite\Facades\Socialite;
 
 class Provider
 {
