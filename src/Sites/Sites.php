@@ -3,6 +3,7 @@
 namespace Statamic\Sites;
 
 use Closure;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
@@ -21,6 +22,8 @@ class Sites
 
     public function all()
     {
+        // TODO: resolve antlers stuff
+
         return $this->sites;
     }
 
@@ -95,6 +98,8 @@ class Sites
         $sites ??= $this->getSavedSites();
 
         $this->sites = collect($sites)->map(fn ($site, $handle) => new Site($handle, $site));
+
+        return $this;
     }
 
     public function setSiteValue($site, $key, $value)
@@ -104,6 +109,11 @@ class Sites
         }
 
         $this->sites->get($site)?->set($key, $value);
+    }
+
+    public function path()
+    {
+        return base_path('content/sites.yaml');
     }
 
     protected function getSavedSites()
@@ -116,15 +126,136 @@ class Sites
             ],
         ];
 
-        $sitesPath = base_path('content/sites.yaml');
-
-        return File::exists($sitesPath)
+        return File::exists($sitesPath = $this->path())
             ? YAML::file($sitesPath)->parse()
             : $default;
     }
 
+    public function save()
+    {
+        File::put($this->path(), YAML::dump($this->toArray()));
+    }
+
+    public function blueprint()
+    {
+        $siteFields = [
+            [
+                'handle' => 'name',
+                'field' => [
+                    'type' => 'text',
+                    'required' => true,
+                    'width' => 50,
+                ],
+            ],
+            [
+                'handle' => 'handle',
+                'field' => [
+                    'type' => 'slug',
+                    'separator' => '_',
+                    'generate' => true,
+                    'show_regenerate' => true,
+                    'from' => 'name',
+                    'required' => true,
+                    'width' => 50,
+                ],
+            ],
+            [
+                'handle' => 'url',
+                'field' => [
+                    'type' => 'text',
+                    'required' => true,
+                ],
+            ],
+            [
+                'handle' => 'locale',
+                'field' => [
+                    'type' => 'text',
+                    'required' => true,
+                    'width' => 33,
+                ],
+            ],
+            [
+                'handle' => 'lang',
+                'field' => [
+                    'type' => 'text',
+                    'width' => 33,
+                ],
+            ],
+            [
+                'handle' => 'direction',
+                'field' => [
+                    'type' => 'select',
+                    'options' => ['ltr', 'rtl'],
+                    'width' => 33,
+                ],
+            ],
+            [
+                'handle' => 'attributes',
+                'field' => [
+                    'type' => 'array',
+                ],
+            ],
+        ];
+
+        // If multisite, nest fields in a grid
+        if (config('statamic.sites.enabled')) {
+            $siteFields = [
+                [
+                    'handle' => 'sites',
+                    'field' => [
+                        'type' => 'grid',
+                        'hide_display' => true,
+                        'fullscreen' => false,
+                        'mode' => 'stacked',
+                        'add_row' => __('Add Site'),
+                        'fields' => $siteFields,
+                    ],
+                ],
+            ];
+        }
+
+        return Blueprint::make('sites')->setContents([
+            'sections' => [
+                [
+                    'display' => __('Sites'),
+                    'fields' => $siteFields,
+                ],
+            ],
+        ]);
+    }
+
+    public function toArray()
+    {
+        return $this->sites
+            ->map(function ($site) {
+                return [
+                    'name' => $site->name(),
+                    'locale' => $site->locale(),
+                    'url' => $site->url(),
+                    'lang' => $site->lang(),
+                    'direction' => $site->direction(),
+                    'attributes' => $site->attributes(),
+                ];
+            })
+            ->all();
+    }
+
+    public function toPublishArray()
+    {
+        $sites = collect($this->toArray())
+            ->map(fn ($site, $handle) => array_merge(['handle' => $handle], $site))
+            ->values()
+            ->all();
+
+        if (! config('statamic.sites.enabled')) {
+            return $sites[0];
+        }
+
+        return ['sites' => $sites];
+    }
+
     /**
-     * This is being replaced by `setSites()` and `setSiteValue()`.
+     * Deprecated! This is being replaced by `setSites()` and `setSiteValue()`.
      *
      * Though Statamic sites can be updated for this breaking change,
      * this gives time for addons to follow suit, and allows said
