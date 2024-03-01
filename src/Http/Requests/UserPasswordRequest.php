@@ -30,11 +30,11 @@ class UserPasswordRequest extends FormRequest
 
     protected function failedValidation(Validator $validator)
     {
-        if ($this->isPrecognitive()) {
+        if ($this->isPrecognitive() || $this->wantsJson()) {
             return (new ValidationException($validator))->errorBag($this->errorBag);
         }
 
-        if ($this->ajax() || $this->wantsJson()) {
+        if ($this->ajax()) {
             $errors = $validator->errors();
 
             $response = response([

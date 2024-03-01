@@ -70,7 +70,7 @@ class UserController extends Controller
 
             throw_if(UserRegistering::dispatch($user) === false, new SilentFormFailureException);
         } catch (ValidationException $e) {
-            return $this->userRegistrationFailure($e->errors());
+            return $this->userRegistrationFailure($e);
         } catch (SilentFormFailureException $e) {
             return $this->userRegistrationSuccess(true);
         }
@@ -116,15 +116,21 @@ class UserController extends Controller
         return 'email';
     }
 
-    private function userRegistrationFailure($errors = null)
+    private function userRegistrationFailure($validator)
     {
-        if (request()->ajax() || request()->wantsJson()) {
+        $errors = $validator->errors();
+
+        if (request()->ajax()) {
             return response([
                 'errors' => (new MessageBag($errors))->all(),
                 'error' => collect($errors)->map(function ($errors, $field) {
                     return $errors[0];
                 })->all(),
             ], 400);
+        }
+
+        if (request()->wantsJson()) {
+            return (new ValidationException($validator))->errorBag(new MessageBag($errors));
         }
 
         $errorResponse = request()->has('_error_redirect') ? redirect(request()->input('_error_redirect')) : back();
