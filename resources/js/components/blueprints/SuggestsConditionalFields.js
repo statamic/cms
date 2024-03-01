@@ -49,7 +49,7 @@ export default {
                             : [field]
                     );
                 }, [])
-                .map(handle => prefix ? `${prefix}${handle}` : handle);
+                .map(field => prefix ? { ...field, handle: prefix + field.handle } : field);
         }
 
     }
