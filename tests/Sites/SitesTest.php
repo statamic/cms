@@ -91,6 +91,14 @@ class SitesTest extends TestCase
     /** @test */
     public function can_change_specific_config_items()
     {
+        $this->sites->setSiteValue('en', 'url', 'http://foobar.com/');
+
+        $this->assertEquals('http://foobar.com', $this->sites->get('en')->url());
+    }
+
+    /** @test */
+    public function can_change_specific_config_items_the_legacy_deprecated_way()
+    {
         $this->sites->setConfig('sites.en.url', 'http://foobar.com/');
 
         $this->assertEquals('http://foobar.com', $this->sites->get('en')->url());
