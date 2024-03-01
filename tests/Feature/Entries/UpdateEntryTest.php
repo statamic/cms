@@ -125,9 +125,7 @@ class UpdateEntryTest extends TestCase
      */
     public function slug_is_not_required_and_will_get_created_from_the_submitted_title_and_correct_language_if_slug_is_in_the_blueprint_and_the_submitted_slug_was_empty($lang, $expectedSlug)
     {
-        Site::setConfig(['sites' => [
-            'en' => array_merge(config('statamic.sites.sites.en'), ['lang' => $lang]),
-        ]]);
+        Site::setSiteValue('en', 'lang', $lang);
 
         [$user, $collection] = $this->seedUserAndCollection();
 
