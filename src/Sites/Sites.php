@@ -108,11 +108,7 @@ class Sites
 
     protected function getSavedSites()
     {
-        if (is_array($configuredSitesArray = config('statamic.sites.sites'))) {
-            $legacySitesConfig = $configuredSitesArray;
-        }
-
-        $default = $legacySitesConfig ?? [
+        $default = [
             'default' => [
                 'name' => config('app.name'),
                 'locale' => 'en_US',
