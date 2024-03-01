@@ -108,15 +108,26 @@ class Multisite extends Command
             ]];
         });
 
-        $sites = config('statamic.sites.sites') + $this->newSiteConfigs->all();
+        $existingSites = Site::all()
+            ->map(function ($site) {
+                return [
+                    'name' => $site->name(),
+                    'locale' => $site->locale(),
+                    'url' => $site->url(),
+                ];
+            })
+            ->all();
 
-        Site::setConfig('sites', $sites);
+        $sites = $existingSites + $this->newSiteConfigs->all();
+
+        Site::setSites($sites);
 
         Stache::sites(Site::all()->map->handle());
 
         return $sites;
     }
 
+    // TODO: update this to write to content/sites.yaml
     protected function attemptToWriteSiteConfig($config)
     {
         try {
