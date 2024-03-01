@@ -9,6 +9,8 @@ use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Symfony\Component\Process\PhpExecutableFinder;
 
+use function Laravel\Prompts\confirm;
+
 class InstallSsg extends Command
 {
     use EnhancesCommands, RunsInPlease;
@@ -42,7 +44,7 @@ class InstallSsg extends Command
         Composer::withoutQueue()->throwOnFailure()->require('statamic/ssg');
         $this->checkLine('Installed statamic/ssg package');
 
-        if ($this->confirm('Would you like to publish the config file?')) {
+        if (confirm('Would you like to publish the config file?')) {
             Process::run([
                 (new PhpExecutableFinder())->find(false) ?: 'php',
                 defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
@@ -56,7 +58,7 @@ class InstallSsg extends Command
 
         if (
             ! Composer::isInstalled('spatie/fork')
-            && $this->confirm('Would you like to install spatie/fork? It allows for running multiple workers at once.')
+            && confirm('Would you like to install spatie/fork? It allows for running multiple workers at once.')
         ) {
             Composer::withoutQueue()->throwOnFailure()->require('spatie/fork');
             $this->checkLine('Installed spatie/fork package');
