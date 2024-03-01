@@ -28,12 +28,9 @@ class SitesTest extends TestCase
         parent::setUp();
 
         $this->sites = new Sites([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['url' => 'http://test.com/'],
-                'fr' => ['url' => 'http://fr.test.com/'],
-                'de' => ['url' => 'http://test.com/de/'],
-            ],
+            'en' => ['url' => 'http://test.com/'],
+            'fr' => ['url' => 'http://fr.test.com/'],
+            'de' => ['url' => 'http://test.com/de/'],
         ]);
     }
 
@@ -173,11 +170,8 @@ class SitesTest extends TestCase
     public function gets_site_from_url_when_using_relative_urls()
     {
         $sites = new Sites([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['url' => '/'],
-                'fr' => ['url' => '/fr/'],
-            ],
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
         ]);
 
         $this->assertEquals('en', $sites->findByUrl('http://absolute-url-resolved-from-request.com/something')->handle());
