@@ -4,9 +4,10 @@ namespace Statamic\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Process;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
-use Statamic\Facades\File;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class InstallSsg extends Command
 {
@@ -42,10 +43,13 @@ class InstallSsg extends Command
         $this->checkLine('Installed statamic/ssg package');
 
         if ($this->confirm('Would you like to publish the config file?')) {
-            File::copy(
-                base_path('vendor/statamic/ssg/config/ssg.php'),
-                config_path('statamic/ssg.php')
-            );
+            Process::run([
+                (new PhpExecutableFinder())->find(false) ?: 'php',
+                defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+                'vendor:publish',
+                '--provider',
+                'Statamic\\StaticSite\\ServiceProvider',
+            ]);
 
             $this->checkLine('Config file published. You can find it at config/statamic/ssg.php');
         }
