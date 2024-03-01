@@ -18,6 +18,7 @@ class CorePermissions
     {
         $this->group('cp', function () {
             $this->register('access cp');
+            $this->register('configure sites');
             $this->register('configure fields');
             $this->register('configure form fields');
             $this->register('configure addons');
