@@ -124,7 +124,7 @@ class Sites
     }
 
     /**
-     * This is being replaced by `setSites()`.
+     * This is being replaced by `setSites()` and `setSiteValue()`.
      *
      * Though Statamic sites can be updated for this breaking change,
      * this gives time for addons to follow suit, and allows said
