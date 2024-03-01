@@ -15,7 +15,6 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Statamic;
-use Symfony\Component\VarExporter\VarExporter;
 
 class Multisite extends Command
 {
@@ -86,8 +85,6 @@ class Multisite extends Command
         Cache::clear();
         $this->checkLine('Cache cleared.');
 
-        $this->attemptToWriteSiteConfig($config);
-
         $this->checkInfo('Done!');
     }
 
@@ -108,65 +105,14 @@ class Multisite extends Command
             ]];
         });
 
-        $existingSites = Site::all()
-            ->map(function ($site) {
-                return [
-                    'name' => $site->name(),
-                    'locale' => $site->locale(),
-                    'url' => $site->url(),
-                ];
-            })
-            ->all();
+        // TODO: Make sure we're doing correct merge behaviour here...
+        $sites = Site::toArray() + $this->newSiteConfigs->all();
 
-        $sites = $existingSites + $this->newSiteConfigs->all();
-
-        Site::setSites($sites);
+        Site::setSites($sites)->save();
 
         Stache::sites(Site::all()->map->handle());
 
         return $sites;
-    }
-
-    // TODO: update this to write to content/sites.yaml
-    protected function attemptToWriteSiteConfig($config)
-    {
-        try {
-            $this->writeSiteConfig($config);
-        } catch (\Exception $e) {
-            $this->error('Could not automatically update the sites config file.');
-            $this->comment('[!] Update <comment>config/statamic/sites.php</comment>\'s "sites" array to the following:');
-            $this->line(VarExporter::export($config));
-        }
-    }
-
-    protected function writeSiteConfig($config)
-    {
-        $contents = File::get($path = config_path('statamic/sites.php'));
-
-        // Create the php that should be added to the config file. Add the appropriate indentation.
-        $newConfig = $this->newSiteConfigs->map(function ($config, $site) {
-            $newConfig = '\''.$site.'\' => '.VarExporter::export($config);
-            $newConfig = collect(explode("\n", $newConfig))->map(function ($line) {
-                return '        '.$line;
-            })->join("\n").',';
-
-            return $newConfig;
-        })->join("\n\n");
-
-        // Use the closing square brace of the first site as the hook for injecting the second.
-        // We'll assume the indentation is what you'd get on a fresh Statamic installation.
-        // Otherwise, it'll likely break. The exception in the next step will handle it.
-        $find = '        ],';
-        $contents = preg_replace('/'.$find.'/', $find."\n\n".$newConfig, $contents);
-
-        // Check that the new contents would be the same as what the config would be.
-        // If not, fail and we'll give the user instructions on how to do it manually.
-        $evaluated = eval(str_replace('<?php', '', $contents));
-        $expected = ['sites' => $config];
-        throw_if($evaluated !== $expected, new \Exception('The config could not be written.'));
-
-        File::put($path, $contents);
-        $this->checkLine('Site config file updated.');
     }
 
     protected function moveCollectionContent($collection)
@@ -300,6 +246,5 @@ class Multisite extends Command
             $role->save();
             $this->checkLine("Site permissions added to [<comment>{$role->handle()}</comment>] role.");
         });
-
     }
 }
