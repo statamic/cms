@@ -19,7 +19,6 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
-use Statamic\Support\Arr;
 use Statamic\Taxonomies\Taxonomy;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -156,9 +155,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_gets_the_url_when_the_site_is_using_a_subdirectory()
     {
-        $config = config('statamic.sites');
-        Arr::set($config, 'sites.en.url', '/subdirectory/');
-        Site::setConfig($config);
+        Site::setSiteValue('en', 'url', '/subdirectory/');
 
         $taxonomy = (new Taxonomy)->handle('tags');
 
