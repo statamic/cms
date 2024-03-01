@@ -17,6 +17,11 @@
         "nunomaduro/collision": "^6.1",
         "orchestra/testbench": "^7.0"
     },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
     "extra": {
         "statamic": {
             "name": "DummyTitle",
