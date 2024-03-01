@@ -4,22 +4,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Sites
+    | Enable Multi-site
     |--------------------------------------------------------------------------
     |
-    | Each site should have root URL that is either relative or absolute. Sites
-    | are typically used for localization (eg. English/French) but may also
-    | be used for related content (eg. different franchise locations).
+    | Whether Statamic's multi-site functionality should be enabled.
+    | This assumes you have Statamic Pro enabled. After enabling,
+    | you can manage your Statamic sites in the control panel.
+    |
+    | Read more: https://statamic.dev/multi-site
     |
     */
 
-    'sites' => [
+    'enabled' => true,
 
-        'default' => [
-            'name' => config('app.name'),
-            'locale' => 'en_US',
-            'url' => '/',
-        ],
-
-    ],
 ];
