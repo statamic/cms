@@ -101,7 +101,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Sites::class, function () {
-            return new Sites(config('statamic.sites'));
+            return new Sites;
         });
 
         collect([
