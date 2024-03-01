@@ -85,6 +85,13 @@ class Site implements Augmentable
         return $path === '' ? '/' : $path;
     }
 
+    public function set($key, $value)
+    {
+        $this->config[$key] = $value;
+
+        return $this;
+    }
+
     private function removePath($url)
     {
         $parsed = parse_url($url);
