@@ -53,6 +53,10 @@ class Collection extends Tags
     {
         $this->params['from'] = $this->currentEntry()->collection()->handle();
 
+        if (! $this->params->get('sort')) {
+            $this->params['sort'] = 'order:asc';
+        }
+
         $results = $this->entries()->next($this->currentEntry());
 
         $this->runHooks('fetched-entries', $results);
@@ -66,6 +70,10 @@ class Collection extends Tags
     public function previous()
     {
         $this->params['from'] = $this->currentEntry()->collection()->handle();
+
+        if (! $this->params->get('sort')) {
+            $this->params['sort'] = 'order:asc';
+        }
 
         $results = $this->entries()->previous($this->currentEntry());
 

@@ -474,6 +474,16 @@ class CollectionTest extends TestCase
         // Grape
         // Egg
 
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'limit' => 1]);
+
+        $this->assertEquals(['Fig'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Ice Cream'], $this->runTagAndGetTitles('previous'));
+
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'limit' => 3]);
+
+        $this->assertEquals(['Fig', 'Grape', 'Egg'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Hummus', 'Apple', 'Ice Cream'], $this->runTagAndGetTitles('previous'));
+
         $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
 
         $this->assertEquals(['Fig'], $this->runTagAndGetTitles('next'));
