@@ -5,6 +5,8 @@ namespace Tests;
 use Illuminate\Testing\Assert as IlluminateAssert;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -36,6 +38,15 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         $this->addGqlMacros();
+
+        // We changed the default sites setup but the tests assume defaults like the following.
+        File::put(base_path('content/sites.yaml'), YAML::dump([
+            'en' => [
+                'name' => 'English',
+                'locale' => 'en_US',
+                'url' => 'http://localhost/',
+            ],
+        ]));
     }
 
     public function tearDown(): void
@@ -80,13 +91,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        // We changed the default sites setup but the tests assume defaults like the following.
-        $app['config']->set('statamic.sites', [
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
-            ],
-        ]);
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.users.repository', 'file');
