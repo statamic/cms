@@ -122,6 +122,11 @@ class CoreNav
                 })->filter();
             });
 
+        Nav::content(config('statamic.sites.enabled') ? 'Sites' : 'Site')
+            ->route('sites.edit')
+            ->icon('/sites')
+            ->can('configure sites');
+
         return $this;
     }
 
