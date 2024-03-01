@@ -64,10 +64,6 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_site()
     {
-        config(['statamic.sites.sites' => [
-            'en' => ['locale' => 'en_US'],
-        ]]);
-
         $entry = (new Entry)->locale('en');
 
         $site = $entry->site();
@@ -2000,11 +1996,6 @@ class EntryTest extends TestCase
     public function it_deletes_descendants()
     {
         Event::fake();
-        config(['statamic.sites.sites' => [
-            'en' => [],
-            'fr' => [],
-            'de' => [],
-        ]]);
 
         $entry = EntryFactory::collection('test')->locale('en')->id('1')->create();
         $localization = EntryFactory::collection('test')->locale('fr')->id('2')->origin('1')->create();
@@ -2026,11 +2017,6 @@ class EntryTest extends TestCase
     public function it_detaches_localizations()
     {
         Event::fake();
-        config(['statamic.sites.sites' => [
-            'en' => [],
-            'fr' => [],
-            'fr_ca' => [],
-        ]]);
 
         $english = EntryFactory::collection('test')->locale('en')->id('en')->data([
             'title' => 'English',
