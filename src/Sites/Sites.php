@@ -3,19 +3,20 @@
 namespace Statamic\Sites;
 
 use Closure;
+use Statamic\Facades\File;
 use Statamic\Facades\User;
+use Statamic\Facades\YAML;
 use Statamic\Support\Str;
 
 class Sites
 {
-    protected $config;
     protected $sites;
     protected $current;
     protected ?Closure $currentUrlCallback = null;
 
-    public function __construct($config)
+    public function __construct($sites = null)
     {
-        $this->setConfig($config);
+        $this->setSites($sites);
     }
 
     public function all()
@@ -48,9 +49,11 @@ class Sites
         $url = Str::before($url, '?');
         $url = Str::ensureRight($url, '/');
 
-        return collect($this->sites)->filter(function ($site) use ($url) {
-            return Str::startsWith($url, Str::ensureRight($site->absoluteUrl(), '/'));
-        })->sortByDesc->url()->first();
+        return $this->sites
+            ->filter(fn ($site) => Str::startsWith($url, Str::ensureRight($site->absoluteUrl(), '/')))
+            ->sortByDesc
+            ->url()
+            ->first();
     }
 
     public function current()
@@ -87,23 +90,62 @@ class Sites
         session()->put('statamic.cp.selected-site', $site);
     }
 
-    public function setConfig($key, $value = null)
+    public function setSites($sites)
     {
-        // If no value is provided, then the key must've been the entire config.
-        // Otherwise, we should just replace the specific key in the config.
-        if (is_null($value)) {
-            $this->config = $key;
-        } else {
-            array_set($this->config, $key, $value);
-        }
+        $sites ??= $this->getSavedSites();
 
-        $this->sites = $this->toSites($this->config['sites']);
+        $this->sites = collect($sites)->map(fn ($site, $handle) => new Site($handle, $site));
     }
 
-    protected function toSites($config)
+    public function setSiteValue($site, $key, $value)
     {
-        return collect($config)->map(function ($site, $handle) {
-            return new Site($handle, $site);
-        });
+        if (! $this->sites->has($site)) {
+            throw new \Exception("Could not find site [{$site}]");
+        }
+
+        $this->sites->get($site)?->set($key, $value);
+    }
+
+    protected function getSavedSites()
+    {
+        if (is_array($configuredSitesArray = config('statamic.sites.sites'))) {
+            $legacySitesConfig = $configuredSitesArray;
+        }
+
+        $default = $legacySitesConfig ?? [
+            'default' => [
+                'name' => config('app.name'),
+                'locale' => 'en_US',
+                'url' => '/',
+            ],
+        ];
+
+        $sitesPath = base_path('content/sites.yaml');
+
+        return File::exists($sitesPath)
+            ? YAML::file($sitesPath)->parse()
+            : $default;
+    }
+
+    /**
+     * This is being replaced by `setSites()`.
+     *
+     * Though Statamic sites can be updated for this breaking change,
+     * this gives time for addons to follow suit, and allows said
+     * addons to continue working across versions for a while.
+     *
+     * @deprecated
+     */
+    public function setConfig($key, $value = null)
+    {
+        if (is_null($value)) {
+            $this->setSites($key['sites']);
+
+            return;
+        }
+
+        $keyParts = explode('.', $key);
+
+        $this->setSiteValue($keyParts[1], $keyParts[2], $value);
     }
 }
