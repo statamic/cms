@@ -30,12 +30,15 @@ abstract class AbstractAugmented implements Augmented
         return $this->select(array_diff($this->keys(), Arr::wrap($keys)));
     }
 
-    public function select($keys = null)
+    public function select($keys = null, $fields = null)
     {
         $arr = [];
 
+        if (! $fields) {
+            $fields = $this->blueprintFields();
+        }
+
         $keys = $this->filterKeys(Arr::wrap($keys ?: $this->keys()));
-        $fields = $this->blueprintFields();
 
         $this->isSelecting = true;
 
