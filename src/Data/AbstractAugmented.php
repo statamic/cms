@@ -163,7 +163,7 @@ abstract class AbstractAugmented implements Augmented
         return optional($this->blueprintFields()->get($handle))->fieldtype();
     }
 
-    protected function blueprintFields()
+    public function blueprintFields()
     {
         if (! isset($this->blueprintFields)) {
             $this->blueprintFields = (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
