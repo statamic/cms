@@ -76,7 +76,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function handle($handle = null)
     {
-        if ($handle === null) {
+        if (func_num_args() === 0) {
             return $this->handle;
         }
 
