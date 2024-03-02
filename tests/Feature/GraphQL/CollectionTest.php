@@ -110,12 +110,9 @@ GQL;
         // Start with fresh slate for this test so it's easier to mock things with one pages collection...
         Collection::all()->each->delete();
 
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'french', 'locale' => 'fr_FR', 'url' => 'http://test.com/fr/'],
-            ],
+        Site::setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'french', 'locale' => 'fr_FR', 'url' => 'http://test.com/fr/'],
         ]);
 
         BlueprintRepository::partialMock();

@@ -25,12 +25,12 @@ class VariablesTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'a' => ['url' => '/', 'locale' => 'en'],
             'b' => ['url' => '/b/', 'locale' => 'fr'],
             'c' => ['url' => '/b/', 'locale' => 'fr'],
             'd' => ['url' => '/d/', 'locale' => 'fr'],
-        ]]);
+        ]);
     }
 
     /** @test */

@@ -66,10 +66,10 @@ class NavTreeTest extends TestCase
     /** @test */
     public function it_gets_the_path_when_using_multisite()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'one' => ['locale' => 'en_US', 'url' => '/one'],
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
-        ]]);
+        ]);
         $tree = Nav::make('links')->makeTree('en');
         $this->assertEquals($this->directory.'/en/links.yaml', $tree->path());
     }

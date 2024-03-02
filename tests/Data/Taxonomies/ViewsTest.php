@@ -24,10 +24,10 @@ class ViewsTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->withStandardFakeViews();
 

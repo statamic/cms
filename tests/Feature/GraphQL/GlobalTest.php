@@ -114,12 +114,9 @@ GQL;
     /** @test */
     public function it_queries_a_global_set_in_a_specific_site()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-            ],
+        Site::setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
         ]);
 
         $set = GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();

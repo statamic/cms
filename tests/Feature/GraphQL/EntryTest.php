@@ -271,10 +271,10 @@ GQL;
     /** @test */
     public function it_queries_an_entry_in_a_specific_site()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::find('events')->routes('/events/{slug}')->sites(['en', 'fr'])->save();
 

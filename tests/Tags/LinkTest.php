@@ -14,10 +14,10 @@ class LinkTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr'],
-        ]]);
+        ]);
     }
 
     private function tag($tag, $data = [])

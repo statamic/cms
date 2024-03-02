@@ -22,10 +22,10 @@ class AddSitePermissionsTest extends TestCase
     /** @test */
     public function it_can_add_site_permissions()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'first' => ['name' => 'First Site', 'locale' => 'en_US', 'url' => '/'],
             'second' => ['name' => 'Second Site', 'locale' => 'en_US', 'url' => '/second'],
-        ]]);
+        ]);
 
         Role::make()
             ->title('Webmaster')

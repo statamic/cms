@@ -45,10 +45,10 @@ class UpdateEntryTest extends TestCase
     /** @test */
     public function it_denies_access_if_you_dont_have_site_permission()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
-        ]]);
+        ]);
 
         [$user, $collection] = $this->seedUserAndCollection();
         $collection->sites(['en', 'fr'])->save();
@@ -270,10 +270,10 @@ class UpdateEntryTest extends TestCase
     /** @test */
     public function auto_title_only_gets_saved_on_localization_when_different_from_origin()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr/'],
-        ]]);
+        ]);
 
         [$user, $collection] = $this->seedUserAndCollection();
         $collection->sites(['en', 'fr']);

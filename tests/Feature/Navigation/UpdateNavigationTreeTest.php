@@ -162,10 +162,10 @@ class UpdateNavigationTreeTest extends TestCase
     /** @test */
     public function it_denies_access_if_you_dont_have_site_permission()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr'],
-        ]]);
+        ]);
         $this->setTestRoles(['test' => ['access cp', 'edit test nav']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $nav = tap(Nav::make('test'))->save();
@@ -181,10 +181,10 @@ class UpdateNavigationTreeTest extends TestCase
     public function it_updates_a_specific_sites_tree()
     {
         $this->withoutExceptionHandling();
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr'],
-        ]]);
+        ]);
         $this->setTestRoles(['test' => ['access cp', 'edit test nav', 'access fr site']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $nav = tap(Nav::make('test'))->save();

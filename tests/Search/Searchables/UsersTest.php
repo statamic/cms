@@ -19,10 +19,10 @@ class UsersTest extends TestCase
      */
     public function it_gets_users($locale, $config, $expected)
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         User::make()->email('alfa@test.com')->save();
         User::make()->email('bravo@test.com')->save();

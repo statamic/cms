@@ -433,13 +433,10 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        Site::setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $taxonomy1 = tap(Facades\Taxonomy::make('has_some_french')->sites(['en', 'fr', 'de']))->save();

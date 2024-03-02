@@ -57,10 +57,10 @@ class DeleteCollectionTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/fr', 'locale' => 'fr_FR'],
-        ]]);
+        ]);
 
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -105,10 +105,10 @@ class DeleteCollectionTest extends TestCase
     /** @test */
     public function it_deletes_tree_files_in_a_multisite()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/fr', 'locale' => 'fr_FR'],
-        ]]);
+        ]);
 
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
         $user = tap(User::make()->assignRole('test'))->save();

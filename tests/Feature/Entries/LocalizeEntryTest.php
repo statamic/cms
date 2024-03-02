@@ -24,10 +24,10 @@ class LocalizeEntryTest extends TestCase
         config(['cache.default' => 'file']);
         \Illuminate\Support\Facades\Cache::clear();
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
     }
 
     /** @test */

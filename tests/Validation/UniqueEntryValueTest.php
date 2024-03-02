@@ -62,10 +62,10 @@ class UniqueEntryValueTest extends TestCase
     /** @test */
     public function it_passes_when_theres_a_duplicate_entry_value_in_a_different_site()
     {
-        \Statamic\Facades\Site::setConfig(['sites' => [
+        \Statamic\Facades\Site::setSites([
             'site-one' => ['url' => '/', 'locale' => 'en_US'],
             'site-two' => ['url' => '/', 'locale' => 'fr_FR'],
-        ]]);
+        ]);
 
         EntryFactory::id(123)->slug('foo')->collection('collection-one')->locale('site-one')->create();
 
