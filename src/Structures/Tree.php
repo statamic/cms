@@ -5,7 +5,7 @@ namespace Statamic\Structures;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Structures\Tree as Contract;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Data\SyncsOriginalState;
+use Statamic\Data\HasDirtyState;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -14,7 +14,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class Tree implements Contract, Localization
 {
-    use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState;
+    use ExistsAsFile, FluentlyGetsAndSets, HasDirtyState;
 
     protected $handle;
     protected $locale;
@@ -22,7 +22,6 @@ abstract class Tree implements Contract, Localization
     protected $cachedFlattenedPages;
     protected $withEntries = false;
     protected $uriCacheEnabled = true;
-    protected $syncOriginalProperties = ['tree'];
 
     public function idKey()
     {
@@ -378,15 +377,10 @@ abstract class Tree implements Contract, Localization
         return $this;
     }
 
-    public function __sleep()
+    public function getCurrentDirtyStateAttributes(): array
     {
-        $vars = Arr::except(get_object_vars($this), ['original']);
-
-        return array_keys($vars);
-    }
-
-    public function __wakeup()
-    {
-        $this->syncOriginal();
+        return [
+            'tree' => $this->tree,
+        ];
     }
 }

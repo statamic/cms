@@ -24,6 +24,7 @@ use Statamic\Data\ContainsComputedData;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\ReceivesIndexValues;
@@ -57,6 +58,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 {
     use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, ReceivesIndexValues, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
+    use HasDirtyState;
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -184,6 +186,19 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedEntry($this);
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'collection' => $this->collectionHandle(),
+            'locale' => $this->locale(),
+            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
+            'slug' => $this->slug(),
+            'date' => optional($this->date())->format('Y-m-d-Hi'),
+            'published' => $this->published(),
+            'path' => $this->initialPath() ?? $this->path(),
+        ], $this->data()->except(['updated_at'])->toArray());
     }
 
     public function delete()
@@ -398,6 +413,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         $stack->pop();
+
+        $this->syncOriginal();
 
         return true;
     }
