@@ -35,7 +35,7 @@ class CascadeTest extends TestCase
             return $this->cascade;
         }
 
-        return $this->cascade = new Cascade(request(), new \Statamic\Sites\Site('en', $this->siteConfig['sites']['en']));
+        return $this->cascade = new Cascade(request(), new \Statamic\Sites\Site('en', $this->siteConfig['en']));
     }
 
     /** @test */
@@ -494,7 +494,7 @@ class CascadeTest extends TestCase
     {
         config(['app.url' => 'http://test.com']);
         url()->forceRootUrl(config('app.url'));
-        Site::setSites([
+        Site::setSites($this->siteConfig = [
             'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
             'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
