@@ -2,10 +2,13 @@
 
 namespace Statamic\Data;
 
+use Statamic\Data\Concerns\ResolvesValues;
 use Statamic\Fields\Value;
 
 class DeferredValue extends Value
 {
+    use ResolvesValues;
+
     protected $augmentedReference = null;
     protected $hasResolved = false;
 
@@ -29,38 +32,5 @@ class DeferredValue extends Value
         $this->augmentedReference = $instance;
 
         return $this;
-    }
-
-    public function materialize()
-    {
-        $this->resolve();
-
-        return $this->toValue();
-    }
-
-    protected function toValue()
-    {
-        return new Value($this->raw, $this->handle, $this->fieldtype, $this->augmentable, $this->shallow);
-    }
-
-    public function raw()
-    {
-        $this->resolve();
-
-        return parent::raw();
-    }
-
-    public function value()
-    {
-        $this->resolve();
-
-        return parent::value();
-    }
-
-    public function shallow()
-    {
-        $this->resolve();
-
-        return parent::shallow();
     }
 }
