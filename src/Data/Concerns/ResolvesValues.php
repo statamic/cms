@@ -40,4 +40,11 @@ trait ResolvesValues
 
         return parent::shallow();
     }
+
+    public function isRelationship(): bool
+    {
+        $this->resolve();
+
+        return parent::isRelationship();
+    }
 }
