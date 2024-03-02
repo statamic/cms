@@ -89,13 +89,15 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
     }
 
-    public function getAugmentationReferenceKey(): string
+    public function getAugmentationReferenceKey(): ?string
     {
         if ($this->augmentationReferenceKey) {
             return $this->augmentationReferenceKey;
         }
 
-        return $this->augmentationReferenceKey = 'Entry::'.$this->blueprint()->namespace();
+        $dataPart = implode('|', $this->data->keys()->sort()->all());
+
+        return $this->augmentationReferenceKey = 'Entry::'.$this->blueprint()->namespace().'::'.$dataPart;
     }
 
     public function locale($locale = null)

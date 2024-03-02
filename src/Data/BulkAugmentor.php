@@ -12,8 +12,8 @@ class BulkAugmentor
 
     protected function getAugmentationReference($item)
     {
-        if ($item instanceof BulkAugmentable) {
-            return $item->getAugmentationReferenceKey();
+        if ($item instanceof BulkAugmentable && $key = $item->getAugmentationReferenceKey()) {
+            return $key;
         }
 
         return 'Ref::'.get_class($item).spl_object_hash($item);

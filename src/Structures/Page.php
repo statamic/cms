@@ -41,25 +41,26 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     protected $depth;
     protected $data = [];
     protected $augmentationReferenceKey;
+    protected $setAugmentationReferenceKey = false;
 
     public function __construct()
     {
         $this->supplements = collect();
     }
 
-    public function getAugmentationReferenceKey(): string
+    public function getAugmentationReferenceKey(): ?string
     {
-        if ($this->augmentationReferenceKey) {
+        if ($this->setAugmentationReferenceKey) {
             return $this->augmentationReferenceKey;
         }
 
-        $this->augmentationReferenceKey = 'Page::';
+        $this->setAugmentationReferenceKey = true;
 
         if ($entry = $this->entry()) {
-            $this->augmentationReferenceKey .= $entry->getAugmentationReferenceKey();
+            return $this->augmentationReferenceKey = 'Page::'.$entry->getAugmentationReferenceKey();
         }
 
-        return $this->augmentationReferenceKey;
+        return $this->augmentationReferenceKey = 'Page::';
     }
 
     public function setUrl($url)
