@@ -40,7 +40,7 @@ abstract class AbstractAugmented implements Augmented
         $this->isSelecting = true;
 
         foreach ($keys as $key) {
-            $arr[$key] = $this->get($key, optional($fields->get($key))->fieldtype());
+            $arr[$key] = (new TransientValue(null, $key, null))->withAugmentationReferences($this, $fields->get($key));
         }
 
         $this->isSelecting = false;

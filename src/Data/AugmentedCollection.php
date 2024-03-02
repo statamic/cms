@@ -50,7 +50,8 @@ class AugmentedCollection extends Collection
     protected function requiresMaterialization($item)
     {
         return $item instanceof InvokableValue ||
-                $item instanceof DeferredValue;
+                $item instanceof DeferredValue ||
+                $item instanceof TransientValue;
     }
 
     public function all()
