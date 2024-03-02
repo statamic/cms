@@ -21,7 +21,7 @@ class CoreNavTest extends TestCase
     {
         $expected = collect([
             'Top Level' => ['Dashboard', 'Playground'],
-            'Content' => ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'],
+            'Content' => ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Site'],
             'Fields' => ['Blueprints', 'Fieldsets'],
             'Tools' => ['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL'],
             'Users' => ['Users', 'Groups', 'Permissions'],
@@ -36,6 +36,21 @@ class CoreNavTest extends TestCase
         $this->assertEquals($expected->get('Fields'), $nav->get('Fields')->map->display()->all());
         $this->assertEquals($expected->get('Tools'), $nav->get('Tools')->map->display()->all());
         $this->assertEquals($expected->get('Users'), $nav->get('Users')->map->display()->all());
+    }
+
+    /** @test */
+    public function it_builds_plural_sites_item_when_multisite_is_enabled()
+    {
+        Facades\Config::set('statamic.sites.enabled', true);
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $nav = $this->build();
+
+        $this->assertEquals(
+            ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Sites'],
+            $nav->get('Content')->map->display()->all()
+        );
     }
 
     /** @test */
