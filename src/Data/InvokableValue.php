@@ -2,11 +2,14 @@
 
 namespace Statamic\Data;
 
+use Statamic\Data\Concerns\ResolvesValues;
 use Statamic\Fields\Value;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
 class InvokableValue extends Value
 {
+    use ResolvesValues;
+
     protected $methodTarget = null;
     protected bool $hasResolved = false;
     protected string $methodName;
@@ -73,31 +76,5 @@ class InvokableValue extends Value
         }
 
         return $this->toValue();
-    }
-
-    protected function toValue()
-    {
-        return new Value($this->raw, $this->handle, $this->fieldtype, $this->augmentable, $this->shallow);
-    }
-
-    public function raw()
-    {
-        $this->resolve();
-
-        return parent::raw();
-    }
-
-    public function value()
-    {
-        $this->resolve();
-
-        return parent::value();
-    }
-
-    public function shallow()
-    {
-        $this->resolve();
-
-        return parent::shallow();
     }
 }

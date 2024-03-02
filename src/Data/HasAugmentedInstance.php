@@ -14,11 +14,11 @@ trait HasAugmentedInstance
         return $this->augmented()->get($key);
     }
 
-    public function toAugmentedCollection($keys = null)
+    public function toAugmentedCollection($keys = null, $fields = null)
     {
         return $this->augmented()
             ->withRelations($this->defaultAugmentedRelations())
-            ->select($keys ?? $this->defaultAugmentedArrayKeys());
+            ->select($keys ?? $this->defaultAugmentedArrayKeys(), $fields);
     }
 
     public function toAugmentedArray($keys = null)
@@ -26,9 +26,9 @@ trait HasAugmentedInstance
         return $this->toAugmentedCollection($keys)->all();
     }
 
-    public function toDeferredAugmentedArray($keys = null)
+    public function toDeferredAugmentedArray($keys = null, $fields = null)
     {
-        return $this->toAugmentedCollection($keys)->deferredAll();
+        return $this->toAugmentedCollection($keys, $fields)->deferredAll();
     }
 
     public function toShallowAugmentedCollection()
