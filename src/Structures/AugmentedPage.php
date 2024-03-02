@@ -46,7 +46,7 @@ class AugmentedPage extends AugmentedEntry
             });
     }
 
-    protected function getFromData($key)
+    public function getFromData($key)
     {
         if ($key === 'title') {
             return $this->page->title();

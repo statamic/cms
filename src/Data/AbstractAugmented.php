@@ -73,14 +73,20 @@ abstract class AbstractAugmented implements Augmented
         $method = Str::camel($handle);
 
         if ($this->methodExistsOnThisClass($method)) {
-            return $this->wrapInvokable($method, true, $this, $handle, $fieldtype);
+            $value = $this->wrapInvokable($method, true, $this, $handle, $fieldtype);
+        } elseif (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
+            $value = $this->wrapInvokable($method, false, $this->data, $handle, $fieldtype);
+        } else {
+            $value = $this->wrapDeferredValue($handle, $fieldtype);
         }
 
-        if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
-            return $this->wrapInvokable($method, false, $this->data, $handle, $fieldtype);
+        // If someone is calling ->get() directly they probably
+        // don't want to remember to also ->materialize() it.
+        if (! $this->isSelecting) {
+            return $value->materialize();
         }
 
-        return $this->wrapValue($this->getFromData($handle), $handle, $fieldtype);
+        return $value;
     }
 
     protected function filterKeys($keys)
@@ -100,7 +106,7 @@ abstract class AbstractAugmented implements Augmented
         return method_exists($this, $method) && ! in_array($method, ['select', 'except']);
     }
 
-    protected function getFromData($handle)
+    public function getFromData($handle)
     {
         $value = method_exists($this->data, 'value') ? $this->data->value($handle) : $this->data->get($handle);
 
@@ -111,6 +117,18 @@ abstract class AbstractAugmented implements Augmented
         }
 
         return $value;
+    }
+
+    protected function wrapDeferredValue($handle, $fieldtype = null)
+    {
+        $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
+
+        return (new DeferredValue(
+            null,
+            $handle,
+            $fieldtype,
+            $this->data
+        ))->withAugmentedReference($this);
     }
 
     protected function wrapInvokable(string $method, bool $proxy, $methodTarget, string $handle, $fieldtype = null)
