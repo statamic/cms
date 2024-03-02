@@ -27,6 +27,7 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Support\Arr;
+use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Stringy\StaticStringy as Stringy;
@@ -487,7 +488,7 @@ class CoreModifiers extends Modifier
      */
     public function ddd($value)
     {
-        ddd($value);
+        ddd(Dumper::materializeValues($value));
     }
 
     /**
@@ -495,7 +496,7 @@ class CoreModifiers extends Modifier
      */
     public function debug($value)
     {
-        debug($value);
+        debug(Dumper::materializeValues($value));
     }
 
     /**
@@ -544,7 +545,7 @@ class CoreModifiers extends Modifier
      */
     public function dd($value)
     {
-        function_exists('ddd') ? ddd($value) : dd($value);
+        Dumper::dd($value);
     }
 
     /**
@@ -552,7 +553,7 @@ class CoreModifiers extends Modifier
      */
     public function dump($value)
     {
-        dump($value);
+        Dumper::dump($value);
     }
 
     /**
