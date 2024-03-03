@@ -47,4 +47,11 @@ trait ResolvesValues
 
         return parent::isRelationship();
     }
+
+    public function fieldtype()
+    {
+        $this->resolve();
+
+        return parent::fieldtype();
+    }
 }
