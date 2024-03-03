@@ -14,9 +14,15 @@ use Statamic\Facades\Stache;
 
 class CollectionTree extends Tree implements TreeContract
 {
+    protected $structureCache;
+
     public function structure()
     {
-        return Blink::once('collection-tree-structure-'.$this->handle(), function () {
+        if ($this->structureCache) {
+            return $this->structureCache;
+        }
+
+        return $this->structureCache = Blink::once('collection-tree-structure-'.$this->handle(), function () {
             return Collection::findByHandle($this->handle())->structure();
         });
     }
