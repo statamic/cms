@@ -78,6 +78,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
+    protected $hasDate;
+    protected $hasTime;
+    protected $hasSeconds;
 
     public function __construct()
     {
@@ -118,6 +121,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return $this
             ->fluentlyGetOrSet('collection')
             ->setter(function ($collection) {
+                $this->clearDateTimePropertyCaches();
+
                 return $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
             })
             ->getter(function ($collection) {
@@ -158,6 +163,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                 return $blueprint;
             })
             ->setter(function ($blueprint) use ($key) {
+                $this->clearDateTimePropertyCaches();
+
                 Blink::forget($key);
 
                 return $blueprint instanceof \Statamic\Fields\Blueprint ? $blueprint->handle() : $blueprint;
@@ -539,27 +546,46 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             ->args(func_get_args());
     }
 
+    protected function clearDateTimePropertyCaches()
+    {
+        $this->hasDate = null;
+        $this->hasTime = null;
+        $this->hasSeconds = null;
+    }
+
     public function hasDate()
     {
-        return $this->collection()->dated();
+        if ($this->hasDate !== null) {
+            return $this->hasDate;
+        }
+
+        return $this->hasDate = $this->collection()->dated();
     }
 
     public function hasTime()
     {
-        if (! $this->hasDate()) {
-            return false;
+        if ($this->hasTime !== null) {
+            return $this->hasTime;
         }
 
-        return $this->blueprint()->field('date')->fieldtype()->timeEnabled();
+        if (! $this->hasDate()) {
+            return $this->hasTime = false;
+        }
+
+        return $this->hasTime = $this->blueprint()->field('date')->fieldtype()->timeEnabled();
     }
 
     public function hasSeconds()
     {
-        if (! $this->hasTime()) {
-            return false;
+        if ($this->hasSeconds !== null) {
+            return $this->hasSeconds;
         }
 
-        return $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
+        if (! $this->hasTime()) {
+            return $this->hasSeconds = false;
+        }
+
+        return $this->hasSeconds = $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
     }
 
     public function sites()
