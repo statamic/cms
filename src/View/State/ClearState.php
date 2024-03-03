@@ -2,8 +2,8 @@
 
 namespace Statamic\View\State;
 
-use Statamic\Statamic;
 use Statamic\Facades\URL;
+use Statamic\Statamic;
 
 class ClearState
 {
