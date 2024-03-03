@@ -2,15 +2,13 @@
 
 namespace Statamic\Support;
 
-use Spatie\Blink\Blink as SpatieBlink;
-
 class Blink
 {
     protected $stores = [];
 
     public function store($name = 'default')
     {
-        return $this->stores[$name] = $this->stores[$name] ?? new SpatieBlink;
+        return $this->stores[$name] = $this->stores[$name] ?? new BlinkWrapper();
     }
 
     public function __call($method, $args)
