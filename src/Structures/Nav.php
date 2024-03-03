@@ -22,6 +22,7 @@ class Nav extends Structure implements Contract
     use ExistsAsFile;
 
     protected $collections;
+    protected $blueprintCache;
 
     public function save()
     {
@@ -121,8 +122,12 @@ class Nav extends Structure implements Contract
 
     public function blueprint()
     {
+        if ($this->blueprintCache) {
+            return $this->blueprintCache;
+        }
+
         if (Blink::has($blink = 'nav-blueprint-'.$this->handle())) {
-            return Blink::get($blink);
+            return $this->blueprintCache = Blink::get($blink);
         }
 
         $blueprint = Blueprint::find('navigation.'.$this->handle())
@@ -132,6 +137,6 @@ class Nav extends Structure implements Contract
 
         NavBlueprintFound::dispatch($blueprint, $this);
 
-        return $blueprint;
+        return $this->blueprintCache = $blueprint;
     }
 }
