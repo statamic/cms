@@ -78,7 +78,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
-    protected $cachedCollectionInstance;
+    protected $computedCallbackCache;
 
     public function __construct()
     {
@@ -117,16 +117,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     public function collection($collection = null)
     {
         if (func_num_args() === 0) {
-            if ($this->cachedCollectionInstance) {
-                return $this->cachedCollectionInstance;
-            }
-
-            return $this->cachedCollectionInstance = $this->collection ? Blink::once("collection-{$this->collection}", function () {
+            return $this->collection ? Blink::once("collection-{$this->collection}", function () {
                 return Collection::findByHandle($this->collection);
             }) : null;
         }
 
-        $this->cachedCollectionInstance = null;
+        $this->computedCallbackCache = null;
         $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
 
         return $this;
@@ -1018,6 +1014,22 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     protected function getComputedCallbacks()
     {
-        return Facades\Collection::getComputedCallbacks($this->collection);
+        if ($this->computedCallbackCache) {
+            return $this->computedCallbackCache;
+        }
+
+        return $this->computedCallbackCache = Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function __serialize(): array
+    {
+        return Arr::except(get_object_vars($this), ['computedCallbackCache']);
+    }
+
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
     }
 }
