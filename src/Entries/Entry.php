@@ -80,6 +80,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     protected $template;
     protected $layout;
     protected $augmentationReferenceKey;
+    protected $computedCallbackCache;
 
     public function __construct()
     {
@@ -128,17 +129,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function collection($collection = null)
     {
-        return $this
-            ->fluentlyGetOrSet('collection')
-            ->setter(function ($collection) {
-                return $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
-            })
-            ->getter(function ($collection) {
-                return $collection ? Blink::once("collection-{$collection}", function () use ($collection) {
-                    return Collection::findByHandle($collection);
-                }) : null;
-            })
-            ->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->collection ? Blink::once("collection-{$this->collection}", function () {
+                return Collection::findByHandle($this->collection);
+            }) : null;
+        }
+
+        $this->computedCallbackCache = null;
+        $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
+
+        return $this;
     }
 
     public function blueprint($blueprint = null)
@@ -1047,6 +1047,22 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function getComputedCallbacks()
     {
-        return Facades\Collection::getComputedCallbacks($this->collection);
+        if ($this->computedCallbackCache) {
+            return $this->computedCallbackCache;
+        }
+
+        return $this->computedCallbackCache = Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function __serialize(): array
+    {
+        return Arr::except(get_object_vars($this), ['computedCallbackCache']);
+    }
+
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
     }
 }
