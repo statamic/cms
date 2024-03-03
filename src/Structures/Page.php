@@ -42,6 +42,8 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     protected $data = [];
     protected $augmentationReferenceKey;
     protected $setAugmentationReferenceKey = false;
+    protected $absoluteUrl;
+    protected $absoluteUrlWithoutRedirect;
 
     public function __construct()
     {
@@ -228,20 +230,28 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
 
     public function absoluteUrl()
     {
-        if ($this->url) {
-            return URL::makeAbsolute($this->url);
+        if ($this->absoluteUrl !== null) {
+            return $this->absoluteUrl;
         }
 
-        return optional($this->entry())->absoluteUrl();
+        if ($this->url) {
+            return $this->absoluteUrl = URL::makeAbsolute($this->url);
+        }
+
+        return $this->absoluteUrl = optional($this->entry())->absoluteUrl();
     }
 
     public function absoluteUrlWithoutRedirect()
     {
-        if ($this->url) {
-            return $this->absoluteUrl();
+        if ($this->absoluteUrlWithoutRedirect !== null) {
+            return $this->absoluteUrlWithoutRedirect;
         }
 
-        return optional($this->entry())->absoluteUrlWithoutRedirect();
+        if ($this->url) {
+            return $this->absoluteUrlWithoutRedirect = $this->absoluteUrl();
+        }
+
+        return $this->absoluteUrlWithoutRedirect = optional($this->entry())->absoluteUrlWithoutRedirect();
     }
 
     public function isRoot()
