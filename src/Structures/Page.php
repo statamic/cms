@@ -39,6 +39,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
     protected $title;
     protected $depth;
     protected $data = [];
+    protected $status;
 
     public function __construct()
     {
@@ -413,7 +414,11 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
 
     public function status()
     {
-        return optional($this->entry())->status();
+        if ($this->status !== null) {
+            return $this->status;
+        }
+
+        return $this->status = optional($this->entry())->status();
     }
 
     public function blueprint()
