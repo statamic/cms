@@ -47,6 +47,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     protected $blueprint;
     protected $routeData;
     protected $structure;
+    protected $status;
 
     public function __construct()
     {
@@ -452,7 +453,11 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
 
     public function status()
     {
-        return optional($this->entry())->status();
+        if ($this->status !== null) {
+            return $this->status;
+        }
+
+        return $this->status = optional($this->entry())->status();
     }
 
     public function blueprint()
