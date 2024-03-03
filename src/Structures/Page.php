@@ -39,6 +39,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
     protected $title;
     protected $depth;
     protected $data = [];
+    protected $routeData;
 
     public function __construct()
     {
@@ -398,7 +399,11 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
 
     public function routeData()
     {
-        return $this->entry()->routeData();
+        if ($this->routeData !== null) {
+            return $this->routeData;
+        }
+
+        return $this->routeData = $this->entry()->routeData();
     }
 
     public function published()
