@@ -45,6 +45,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     protected $absoluteUrl;
     protected $absoluteUrlWithoutRedirect;
     protected $blueprint;
+    protected $routeData;
 
     public function __construct()
     {
@@ -427,7 +428,11 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
 
     public function routeData()
     {
-        return $this->entry()->routeData();
+        if ($this->routeData !== null) {
+            return $this->routeData;
+        }
+
+        return $this->routeData = $this->entry()->routeData();
     }
 
     public function published()
