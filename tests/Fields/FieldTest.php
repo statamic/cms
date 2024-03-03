@@ -62,7 +62,7 @@ class FieldTest extends TestCase
 
         $field = new Field('test', ['type' => 'the_fieldtype']);
 
-        $this->assertEquals($fieldtype, $field->fieldtype());
+        $this->assertEquals($fieldtype, $field->fieldtype()->withoutField());
     }
 
     /** @test */
@@ -517,7 +517,7 @@ class FieldTest extends TestCase
             $this->assertNotSame($field, $augmented);
             $value = $augmented->value();
             $this->assertInstanceOf(Value::class, $value);
-            $this->assertEquals($fieldtype, $value->fieldtype());
+            $this->assertEquals($fieldtype, $value->fieldtype()->withoutField());
             $this->assertEquals('test', $value->handle());
             $this->assertEquals('foo', $value->raw());
             $this->assertEquals('foo augmented', $value->value());
@@ -527,7 +527,7 @@ class FieldTest extends TestCase
             $this->assertNotSame($field, $augmented);
             $value = $augmented->value();
             $this->assertInstanceOf(Value::class, $value);
-            $this->assertEquals($fieldtype, $value->fieldtype());
+            $this->assertEquals($fieldtype, $value->fieldtype()->withoutField());
             $this->assertEquals('test', $value->handle());
             $this->assertEquals('foo', $value->raw());
             $this->assertEquals('foo shallow augmented', $value->value());
