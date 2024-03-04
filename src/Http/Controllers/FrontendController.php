@@ -76,9 +76,6 @@ class FrontendController extends Controller
         }
     }
 
-    /**
-     * Ping the site and have it phone home.
-     */
     public function elliot(Outpost $outpost, $hash)
     {
         if (! password_verify(Config::getLicenseKey(), base64_decode($hash))) {
