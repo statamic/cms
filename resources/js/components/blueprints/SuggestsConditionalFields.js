@@ -6,10 +6,22 @@ export default {
         }
     },
 
+    computed: {
+
+        fieldsForConditionSuggestions() {
+            return this.tabs.reduce((fields, tab) => {
+                return fields.concat(tab.sections.reduce((fields, section) => {
+                    return fields.concat(section.fields);
+                }, []));
+            }, []);
+        }
+
+    },
+
     methods: {
 
         suggestableConditionFields(section = null) {
-            let fields = this.fieldsForConditionSuggestions(section).reduce((fields, field) => {
+            let fields = this.getSectionFieldsForConditionSuggestions(section).reduce((fields, field) => {
                 return fields.concat(
                     field.type === 'import'
                         ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
@@ -39,12 +51,8 @@ export default {
                 .map(field => prefix ? { ...field, handle: prefix + field.handle } : field);
         },
 
-        fieldsForConditionSuggestions(vm = null) {
-            return this.tabs.reduce((fields, tab) => {
-                return fields.concat(tab.sections.reduce((fields, section) => {
-                    return fields.concat(section.fields);
-                }, []));
-            }, []);
+        getSectionFieldsForConditionSuggestions(vm = null) {
+            return this.fieldsForConditionSuggestions;
         }
 
     }

@@ -45,7 +45,7 @@ export default {
             this.update(tabs);
         },
 
-        fieldsForConditionSuggestions(vm = null) {
+        getSectionFieldsForConditionSuggestions(vm = null) {
             return vm.section.fields;
         }
 
