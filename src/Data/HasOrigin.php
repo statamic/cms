@@ -60,9 +60,21 @@ trait HasOrigin
     {
         return $this->fluentlyGetOrSet('origin')
             ->getter(function ($origin) {
-                return $origin
-                    ? Blink::once($this->getOriginBlinkKey(), fn () => $this->getOriginByString($origin))
-                    : null;
+                if (! $origin) {
+                    return null;
+                }
+
+                if ($found = Blink::get($this->getOriginBlinkKey())) {
+                    return $found;
+                }
+
+                $found = $this->getOriginByString($origin);
+
+                if ($found) {
+                    Blink::put($this->getOriginBlinkKey(), $found);
+                }
+
+                return $found;
             })
             ->setter(function ($origin) {
                 Blink::forget($this->getOriginBlinkKey());
