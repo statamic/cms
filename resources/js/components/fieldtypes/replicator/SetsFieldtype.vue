@@ -43,6 +43,10 @@ export default {
 
         tabsUpdated(tabs) {
             this.update(tabs);
+        },
+
+        fieldsForConditionSuggestions(vm = null) {
+            return vm.section.fields;
         }
 
     }

@@ -6,18 +6,10 @@ export default {
         }
     },
 
-    computed: {
+    methods: {
 
-        fieldsForConditionSuggestions() {
-            return this.tabs.reduce((fields, tab) => {
-                return fields.concat(tab.sections.reduce((fields, section) => {
-                    return fields.concat(section.fields);
-                }, []));
-            }, []);
-        },
-
-        suggestableConditionFields() {
-            let fields = this.fieldsForConditionSuggestions.reduce((fields, field) => {
+        suggestableConditionFields(section = null) {
+            let fields = this.fieldsForConditionSuggestions(section).reduce((fields, field) => {
                 return fields.concat(
                     field.type === 'import'
                         ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
@@ -28,15 +20,10 @@ export default {
             return _.unique(fields);
         },
 
-    },
-
-    methods: {
-
         makeConditionsProvider() {
-            const provide = {};
-            Object.defineProperties(provide, {
-                suggestableFields: { get: () => this.suggestableConditionFields },
-            });
+            const provide = {
+                suggestableFields: (vm) => this.suggestableConditionFields(vm),
+            };
             return provide;
         },
 
@@ -50,6 +37,14 @@ export default {
                     );
                 }, [])
                 .map(field => prefix ? { ...field, handle: prefix + field.handle } : field);
+        },
+
+        fieldsForConditionSuggestions(vm = null) {
+            return this.tabs.reduce((fields, tab) => {
+                return fields.concat(tab.sections.reduce((fields, section) => {
+                    return fields.concat(section.fields);
+                }, []));
+            }, []);
         }
 
     }
