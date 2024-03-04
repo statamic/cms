@@ -15,6 +15,7 @@ use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Licensing\Outpost;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
@@ -923,5 +924,53 @@ class FrontendTest extends TestCase
             ->actingAs(User::make())
             ->get('/does-not-exist')
             ->assertStatus(404);
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider phoneHomeProvider
+     */
+    public function it_contacts_the_outpost_when_a_correct_key_is_provided($algo)
+    {
+        config(['statamic.system.license_key' => 'test-key']);
+
+        // Assume that the key is hashed and base64 encoded. The base 64 encoding is necessary
+        // because the hash might include a slash which would screw with the route parameter.
+        $key = base64_encode(password_hash('test-key', $algo));
+
+        $this->mock(Outpost::class)->shouldReceive('radio')->once();
+
+        $this->get('/et/phone/home/'.$key)->assertOk();
+    }
+
+    public static function phoneHomeProvider()
+    {
+        return [
+            [PASSWORD_DEFAULT],
+            [PASSWORD_BCRYPT],
+            [PASSWORD_ARGON2I],
+            [PASSWORD_ARGON2ID],
+        ];
+    }
+
+    /** @test */
+    public function it_does_not_contact_the_outpost_when_an_incorrect_key_is_provided()
+    {
+        config(['statamic.system.license_key' => 'test-key']);
+
+        $this->mock(Outpost::class)->shouldReceive('radio')->never();
+
+        $this->get('/et/phone/home/invalid')->assertNotFound();
+    }
+
+    /** @test */
+    public function it_does_not_contact_the_outpost_when_key_is_missing()
+    {
+        config(['statamic.system.license_key' => 'test-key']);
+
+        $this->mock(Outpost::class)->shouldReceive('radio')->never();
+
+        $this->get('/et/phone/home')->assertNotFound();
     }
 }
