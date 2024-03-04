@@ -1,0 +1,184 @@
+<?php
+
+namespace Statamic\Console\Commands;
+
+use Facades\Statamic\Console\Processes\Composer;
+use Illuminate\Console\Command;
+use Illuminate\Contracts\Process\ProcessResult;
+use Illuminate\Support\Facades\Process;
+use Statamic\Console\EnhancesCommands;
+use Statamic\Console\RunsInPlease;
+use Statamic\Facades\File;
+use Statamic\Support\Str;
+use Symfony\Component\Process\PhpExecutableFinder;
+
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\error;
+use function Laravel\Prompts\multiselect;
+use function Laravel\Prompts\warning;
+use function Laravel\Prompts\info;
+
+class InstallEloquentDriver extends Command
+{
+    use EnhancesCommands, RunsInPlease;
+
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'statamic:install:eloquent-driver';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = "Install & configure Statamic's Eloquent Driver package";
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        if (! Composer::isInstalled('statamic/eloquent-driver')) {
+            $this->info('Installing the statamic/eloquent-driver package...');
+            Composer::withoutQueue()->throwOnFailure()->require('statamic/eloquent-driver');
+            $this->checkLine('Installed statamic/eloquent-driver package');
+        }
+
+        if (! File::exists(config_path('statamic/eloquent-driver.php'))) {
+            $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-config');
+
+            // By default, all repositories are set `eloquent`. We'll change them back to `file` since we'll switch them one by one
+            $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+            $configContents = Str::of($configContents)
+                ->replace("=> 'eloquent'", "=> 'file'")
+                ->__toString();
+            File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+            $this->checkLine('Config file published. You can find it at config/statamic/eloquent-driver.php');
+        }
+
+        $repositories = multiselect(
+            label: 'Which repositories would you like to migrate?',
+            options: [
+                'assets' => 'Assets',
+                'blueprints' => 'Blueprints & Fieldsets',
+                'collections' => 'Collections',
+                'entries' => 'Entries',
+                'forms' => 'Forms',
+                'globals' => 'Globals',
+                'navs' => 'Navs',
+                'revisions' => 'Revisions',
+                'taxonomies' => 'Taxonomies',
+            ],
+            default: ['assets', 'blueprints', 'collections', 'entries', 'forms', 'globals', 'navs', 'revisions', 'taxonomies'],
+            hint: 'You can always import other repositories later.'
+        );
+
+        foreach ($repositories as $repository) {
+            $method = 'migrate'.Str::studly($repository);
+            $this->$method();
+        }
+    }
+
+    protected function migrateAssets(): void
+    {
+        if (
+            config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent'
+            || config('statamic.eloquent-driver.assets.driver') === 'eloquent'
+        ) {
+            warning('Assets have already been migrated. Skipping...');
+            return;
+        }
+
+        info('Migrating assets...');
+
+        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-asset-migrations');
+
+        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+        $configContents = Str::of($configContents)
+            ->replace("'asset_containers' => [\n        'driver' => 'file'", "'asset_containers' => [\n        'driver' => 'eloquent'")
+            ->replace("'assets' => [\n        'driver' => 'file'", "'assets' => [\n        'driver' => 'eloquent'")
+            ->__toString();
+        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+        $this->runArtisanCommand('migrate');
+
+        $this->checkLine('Configured assets');
+
+        if (confirm('Would you like to import existing assets?')) {
+            $this->runArtisanCommand('statamic:eloquent:import-assets --force');
+            $this->checkLine("Imported existing assets");
+        }
+    }
+
+    protected function migrateBlueprints(): void
+    {
+        //
+    }
+
+    protected function migrateCollections(): void
+    {
+        //
+    }
+
+    protected function migrateEntries(): void
+    {
+        //
+    }
+
+    protected function migrateForms(): void
+    {
+        //
+    }
+
+    protected function migrateGlobals(): void
+    {
+        //
+    }
+
+    protected function migrateNavs(): void
+    {
+        //
+    }
+
+    protected function migrateRevisions(): void
+    {
+        //
+    }
+
+    protected function migrateTaxonomies(): void
+    {
+        //
+    }
+
+    private function runArtisanCommand(string $command, bool $writeOutput = false): ProcessResult
+    {
+        $components = array_merge(
+            [
+                (new PhpExecutableFinder())->find(false) ?: 'php',
+                defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+            ],
+            explode(' ', $command)
+        );
+
+        $result = Process::run($components, function ($type, $line) use ($writeOutput) {
+            if ($writeOutput) {
+                $this->output->write($line);
+            }
+        });
+
+        // We're doing this instead of ->throw() so we can control the output of errors.
+        if ($result->failed()) {
+            error('Failed to run command: '.$command);
+            $this->output->write($result->output());
+            exit(1);
+        }
+
+        return $result;
+    }
+}
