@@ -941,7 +941,9 @@ class FrontendTest extends TestCase
 
         $this->mock(Outpost::class)->shouldReceive('radio')->once();
 
-        $this->get('/et/phone/home/'.$key)->assertOk();
+        $this->get($url = '/et/phone/home/'.$key)->assertOk();
+
+        $this->get($url)->assertStatus(429);
     }
 
     public static function phoneHomeProvider()

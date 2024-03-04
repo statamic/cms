@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Route;
 use Statamic\Auth\Protect\Protectors\Password\Controller as PasswordProtectController;
 use Statamic\Facades\OAuth;
@@ -57,7 +58,7 @@ Route::name('statamic.')->group(function () {
     }
 });
 
-Route::get('et/phone/home/{token}', [FrontendController::class, 'elliot']);
+Route::get('et/phone/home/{token}', [FrontendController::class, 'elliot'])->middleware(ThrottleRequests::class.':1');
 
 if (config('statamic.routes.enabled')) {
     Statamic::additionalWebRoutes();
