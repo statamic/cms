@@ -13,8 +13,8 @@ use Tests\TestCase;
 /** @group graphql */
 class UsersFieldtypeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['collections'];
 

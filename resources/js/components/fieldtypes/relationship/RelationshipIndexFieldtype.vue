@@ -4,7 +4,7 @@
             <div
                 v-for="(item, i) in items"
                 :key="item.id"
-                class="relationship-index-field-item"
+                class="relationship-index-field-item h-5"
                 :class="{ 'mb-1.5': i < items.length-1 }"
             >
                 <div class="flex items-center shrink">
@@ -33,11 +33,11 @@ export default {
 
     computed: {
         items() {
-            return this.showingAll ? this.value : this.value.slice(0, 2);
+            return this.showingAll ? this.value : this.value?.slice(0, 2);
         },
 
         hasMore() {
-            return this.value.length > 2;
+            return this.value?.length > 2;
         },
     },
 

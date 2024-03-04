@@ -108,10 +108,13 @@
     .v-select { @apply h-full }
     .vs__dropdown-toggle { @apply border-none bg-none }
     .vs__actions { @apply hidden }
-    .vs__search { @apply hidden }
+    .vs__search { @apply p-0 }
     .vs__selected-options { @apply border-none shadow-none p-0 bg-none }
     .vs__selected { @apply flex }
-    .vs__dropdown-toggle { @apply h-full rounded-none bg-transparent }
+    .vs__dropdown-toggle {
+        @apply h-full rounded-none bg-transparent;
+        box-shadow: none;
+    }
 
     .vs--single.vs--unsearchable .vs__selected-options { @apply bg-none }
 }
@@ -138,4 +141,28 @@
 .global-header .white-label-logo {
     max-height: 32px;
     max-width: 280px;
+}
+
+@keyframes rotate {
+	100% {
+		transform: rotate(1turn);
+	}
+}
+
+.animate-radar {
+    @apply relative z-0;
+
+	&::after {
+        @apply absolute bg-transparent bg-no-repeat;
+		content: '';
+		z-index: 2;
+		left: -50%;
+		top: -50%;
+		width: 200%;
+		height: 200%;
+		background-size: 50% 50%, 50% 50%;
+		background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+		background-image: linear-gradient(transparent, rgba(255,255,255,.7), transparent);
+		animation: rotate 4s linear infinite;
+	}
 }

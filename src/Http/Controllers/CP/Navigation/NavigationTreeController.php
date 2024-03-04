@@ -39,6 +39,8 @@ class NavigationTreeController extends CpController
 
         $tree = $nav->in($request->site);
 
+        $this->authorize('edit', $tree);
+
         $this->data = $this->flattenExistingBranchData([], $tree->tree());
 
         $blueprint = $nav->blueprint()

@@ -360,6 +360,92 @@ class UpdateTermReferencesTest extends TestCase
                     'field' => [
                         'type' => 'replicator',
                         'sets' => [
+                            'group_one' => [
+                                'sets' => [
+                                    'set_one' => [
+                                        'fields' => [
+                                            [
+                                                'handle' => 'favourite',
+                                                'field' => [
+                                                    'type' => 'terms',
+                                                    'taxonomies' => ['topics'],
+                                                    'max_items' => 1,
+                                                ],
+                                            ],
+                                            [
+                                                'handle' => 'favourites',
+                                                'field' => [
+                                                    'type' => 'terms',
+                                                    'taxonomies' => ['topics'],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                    'set_two' => [
+                                        'fields' => [
+                                            [
+                                                'handle' => 'not_term',
+                                                'field' => [
+                                                    'type' => 'text',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'reppy' => [
+                [
+                    'type' => 'set_one',
+                    'favourite' => 'norris',
+                    'favourites' => ['hoff', 'norris'],
+                ],
+                [
+                    'type' => 'set_two',
+                    'not_term' => 'not a term',
+                ],
+                [
+                    'type' => 'set_one',
+                    'favourite' => 'hoff',
+                    'favourites' => ['hoff', 'norris', 'lee'],
+                ],
+            ],
+        ]))->save();
+
+        $this->assertEquals('norris', Arr::get($entry->data(), 'reppy.0.favourite'));
+        $this->assertEquals(['hoff', 'norris'], Arr::get($entry->data(), 'reppy.0.favourites'));
+        $this->assertEquals('not a term', Arr::get($entry->data(), 'reppy.1.not_term'));
+        $this->assertEquals('hoff', Arr::get($entry->data(), 'reppy.2.favourite'));
+        $this->assertEquals(['hoff', 'norris', 'lee'], Arr::get($entry->data(), 'reppy.2.favourites'));
+
+        $this->termNorris->slug('norris-new')->save();
+        $this->termHoff->delete();
+
+        $this->assertEquals('norris-new', Arr::get($entry->fresh()->data(), 'reppy.0.favourite'));
+        $this->assertEquals(['norris-new'], Arr::get($entry->fresh()->data(), 'reppy.0.favourites'));
+        $this->assertEquals('not a term', Arr::get($entry->fresh()->data(), 'reppy.1.not_term'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'reppy.2.favourite'));
+        $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'reppy.2.favourites'));
+    }
+
+    /** @test */
+    public function it_updates_nested_term_fields_within_legacy_replicator_configs()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'reppy',
+                    'field' => [
+                        'type' => 'replicator',
+                        'sets' => [
                             'set_one' => [
                                 'fields' => [
                                     [
@@ -492,6 +578,102 @@ class UpdateTermReferencesTest extends TestCase
 
     /** @test */
     public function it_updates_nested_term_fields_within_bard_fields()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'sets' => [
+                            'group_one' => [
+                                'sets' => [
+                                    'set_one' => [
+                                        'fields' => [
+                                            [
+                                                'handle' => 'favourite',
+                                                'field' => [
+                                                    'type' => 'terms',
+                                                    'taxonomies' => ['topics'],
+                                                    'max_items' => 1,
+                                                ],
+                                            ],
+                                            [
+                                                'handle' => 'favourites',
+                                                'field' => [
+                                                    'type' => 'terms',
+                                                    'taxonomies' => ['topics'],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                    'set_two' => [
+                                        'fields' => [
+                                            [
+                                                'handle' => 'not_term',
+                                                'field' => [
+                                                    'type' => 'text',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'bardo' => [
+                [
+                    'type' => 'set',
+                    'attrs' => [
+                        'values' => [
+                            'type' => 'set_one',
+                            'favourite' => 'norris',
+                            'favourites' => ['hoff', 'norris'],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'paragraph',
+                    'not_term' => 'not a term',
+                ],
+                [
+                    'type' => 'set',
+                    'attrs' => [
+                        'values' => [
+                            'type' => 'set_one',
+                            'favourite' => 'hoff',
+                            'favourites' => ['hoff', 'norris', 'lee'],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $this->assertEquals('norris', Arr::get($entry->data(), 'bardo.0.attrs.values.favourite'));
+        $this->assertEquals(['hoff', 'norris'], Arr::get($entry->data(), 'bardo.0.attrs.values.favourites'));
+        $this->assertEquals('not a term', Arr::get($entry->data(), 'bardo.1.not_term'));
+        $this->assertEquals('hoff', Arr::get($entry->data(), 'bardo.2.attrs.values.favourite'));
+        $this->assertEquals(['hoff', 'norris', 'lee'], Arr::get($entry->data(), 'bardo.2.attrs.values.favourites'));
+
+        $this->termNorris->slug('norris-new')->save();
+        $this->termHoff->delete();
+
+        $this->assertEquals('norris-new', Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.favourite'));
+        $this->assertEquals(['norris-new'], Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.favourites'));
+        $this->assertEquals('not a term', Arr::get($entry->fresh()->data(), 'bardo.1.not_term'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'bardo.2.attrs.values.favourite'));
+        $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.favourites'));
+    }
+
+    /** @test */
+    public function it_updates_nested_term_fields_within_legacy_bard_config()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
 

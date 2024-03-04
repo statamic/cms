@@ -192,7 +192,7 @@ class AssetFolderTest extends TestCase
         Storage::fake('local');
 
         $container = $this->mock(AssetContainer::class);
-        $container->shouldReceive('contents')->andReturn(new AssetContainerContents($container));
+        $container->shouldReceive('contents')->andReturn((new AssetContainerContents)->container($container));
         $container->shouldReceive('disk')->andReturn(new FlysystemAdapter($disk = Storage::disk('local')));
         $container->shouldReceive('foldersCacheKey')->andReturn('irrelevant for test');
         $container->shouldReceive('handle')->andReturn('local');
@@ -216,7 +216,7 @@ class AssetFolderTest extends TestCase
         Storage::fake('local');
 
         $container = $this->mock(AssetContainer::class);
-        $container->shouldReceive('contents')->andReturn(new AssetContainerContents($container));
+        $container->shouldReceive('contents')->andReturn((new AssetContainerContents)->container($container));
         $container->shouldReceive('disk')->andReturn(new FlysystemAdapter($disk = Storage::disk('local')));
         $container->shouldReceive('foldersCacheKey')->andReturn('irrelevant for test');
         $container->shouldReceive('handle')->andReturn('local');

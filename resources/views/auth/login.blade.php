@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::outside')
 @section('title', __('Log in'))
@@ -21,7 +23,7 @@
             </div>
 
             @if($emailLoginEnabled)
-                <div class="text-center text-sm text-gray-700 py-6">&mdash; or &mdash;</div>
+                <div class="text-center text-sm text-gray-700 py-6">&mdash; {{ __('or') }} &mdash;</div>
 
                 <div class="login-with-email" v-if="! showEmailLogin">
                     <a class="btn w-full" @click.prevent="showEmailLogin = true">

@@ -12,13 +12,17 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetDeleting;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
@@ -26,10 +30,12 @@ use Statamic\Events\AssetUploaded;
 use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
@@ -39,17 +45,20 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract
+class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
-        TracksQueriedRelations,
-        Searchable, ContainsData {
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, HasDirtyState,
+        Searchable,
+        TracksQueriedColumns, TracksQueriedRelations {
             set as traitSet;
             get as traitGet;
             remove as traitRemove;
             data as traitData;
             merge as traitMerge;
         }
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
 
     protected $container;
     protected $path;
@@ -57,7 +66,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
-    protected $original = [];
 
     public function syncOriginal()
     {
@@ -217,6 +225,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             return $this->metaValue($key);
         }
 
+        if (! $this->exists()) {
+            return $this->generateMeta();
+        }
+
         if (! config('statamic.assets.cache_meta')) {
             return $this->generateMeta();
         }
@@ -282,7 +294,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     {
         $path = dirname($this->path()).'/.meta/'.$this->basename().'.yaml';
 
-        return ltrim($path, '/');
+        return (string) Str::of($path)->replaceFirst('./', '')->ltrim('/');
     }
 
     protected function metaExists()
@@ -611,6 +623,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function delete()
     {
+        if (AssetDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->disk()->delete($this->path());
         $this->disk()->delete($this->metaPath());
 
@@ -879,7 +895,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function download(string $name = null, array $headers = [])
+    public function download(?string $name = null, array $headers = [])
     {
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
     }
@@ -912,7 +928,19 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function blueprint()
     {
-        return $this->container()->blueprint();
+        $key = "asset-{$this->id()}-blueprint";
+
+        if (Blink::has($key)) {
+            return Blink::get($key);
+        }
+
+        $blueprint = $this->container()->blueprint($this);
+
+        Blink::put($key, $blueprint);
+
+        AssetContainerBlueprintFound::dispatch($blueprint, $this->container(), $this);
+
+        return $blueprint;
     }
 
     /**
@@ -1024,6 +1052,14 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'path' => $this->path(),
+            'data' => $this->data()->toArray(),
+        ]);
     }
 
     public function getCpSearchResultBadge(): string

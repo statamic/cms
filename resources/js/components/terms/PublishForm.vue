@@ -18,7 +18,7 @@
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
-                <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
+                <svg-icon name="light/lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden md:flex items-center">
@@ -98,13 +98,14 @@
                             @blur="container.$emit('blur', $event)"
                         >
                             <template #actions="{ shouldShowSidebar }">
+                            <div class="card p-0" :class="{ 'mb-5': showLivePreviewButton || showVisitUrlButton || localizations.length > 1 }">
 
                                 <div :class="{ 'hi': !shouldShowSidebar }">
 
                                     <div class="p-4 flex items-center -mx-2" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-2 px-2"
-                                            v-if="isBase"
+                                            v-if="showLivePreviewButton"
                                             @click="openLivePreview">
                                             <svg-icon name="light/synchronize" class="h-4 w-4 mr-2" />
                                             <span>{{ __('Live Preview') }}</span>
@@ -174,7 +175,7 @@
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
                                             }" />
-                                            {{ option.name }}
+                                            {{ __(option.name) }}
                                             <loading-graphic :size="14" text="" class="ml-2" v-if="localizing === option.handle" />
                                         </div>
                                         <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
@@ -183,6 +184,7 @@
                                     </div>
                                 </div>
 
+                            </div>
                             </template>
                         </publish-tabs>
                     </transition>
@@ -343,7 +345,7 @@ export default {
         },
 
         livePreviewUrl() {
-            return _.findWhere(this.localizations, { active: true }).url + '/preview';
+            return _.findWhere(this.localizations, { active: true }).livePreviewUrl;
         },
 
         showLivePreviewButton() {
@@ -443,6 +445,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
+                if (! response.data.saved) {
+                    return this.$toast.error(__(`Couldn't save term`));
+                }
                 this.title = response.data.data.title;
                 this.permalink = response.data.data.permalink;
                 this.isWorkingCopy = true;
@@ -502,6 +507,7 @@ export default {
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
+                this.$reveal.invalid();
             } else {
                 this.$toast.error(__('Something went wrong'));
             }

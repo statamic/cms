@@ -83,6 +83,9 @@ class Parser
                 new \League\CommonMark\Extension\Table\TableExtension,
                 new \League\CommonMark\Extension\Attributes\AttributesExtension,
                 new \League\CommonMark\Extension\Strikethrough\StrikethroughExtension,
+                new \League\CommonMark\Extension\DescriptionList\DescriptionListExtension,
+                new \League\CommonMark\Extension\Footnote\FootnoteExtension,
+                new \League\CommonMark\Extension\TaskList\TaskListExtension,
             ];
         });
     }
@@ -112,6 +115,20 @@ class Parser
     {
         return $this->newInstance()->addExtension(function () {
             return new SmartPunctExtension;
+        });
+    }
+
+    public function withTableOfContents(): self
+    {
+        return $this->newInstance()->withHeadingPermalinks()->addExtension(function () {
+            return new \League\CommonMark\Extension\TableOfContents\TableOfContentsExtension;
+        });
+    }
+
+    public function withHeadingPermalinks(): self
+    {
+        return $this->newInstance()->addExtension(function () {
+            return new \League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
         });
     }
 

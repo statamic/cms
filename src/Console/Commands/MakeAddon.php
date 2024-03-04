@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class MakeAddon extends GeneratorCommand
 {
-    use RunsInPlease, ValidatesInput, EnhancesCommands;
+    use EnhancesCommands, RunsInPlease, ValidatesInput;
 
     /**
      * The name of the console command.

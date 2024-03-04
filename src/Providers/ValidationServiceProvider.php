@@ -4,6 +4,7 @@ namespace Statamic\Providers;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Validation\CodeFieldtypeRulers;
 use Statamic\Validation\UniqueEntryValue;
 use Statamic\Validation\UniqueFormHandle;
 use Statamic\Validation\UniqueTermValue;
@@ -16,6 +17,7 @@ class ValidationServiceProvider extends ServiceProvider
         'unique_term_value' => UniqueTermValue::class,
         'unique_user_value' => UniqueUserValue::class,
         'unique_form_handle' => UniqueFormHandle::class,
+        'code_fieldtype_rulers' => CodeFieldtypeRulers::class,
     ];
 
     public function boot()

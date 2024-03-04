@@ -13,9 +13,9 @@ use Tests\View\Antlers\ParserTests;
 
 class TemplateTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesViews;
     use ParserTests;
+    use PreventSavingStacheItemsToDisk;
 
     /** @test */
     public function non_arrays_cannot_be_looped()

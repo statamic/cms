@@ -240,4 +240,11 @@ class Cascade
     {
         return $this->sections;
     }
+
+    public function clearSections()
+    {
+        $this->sections = collect();
+
+        return $this;
+    }
 }

@@ -1,0 +1,33 @@
+<?php
+
+namespace Tests\Fieldtypes;
+
+use Statamic\Facades\Antlers;
+use Statamic\Fields\Field;
+use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Icon;
+use Tests\TestCase;
+
+class IconTest extends TestCase
+{
+    /** @test */
+    public function it_finds_default_icons()
+    {
+        $result = (string) Antlers::parse('{{ svg src="{test|raw}" }}', ['test' => new Value('add', $this->fieldtype())]);
+
+        $this->assertStringContainsString('<svg', $result);
+    }
+
+    /** @test */
+    public function it_accepts_svg_strings()
+    {
+        $result = (string) Antlers::parse('{{ svg :src="test" class="w-4 h-4" }}', ['test' => new Value('add', $this->fieldtype())]);
+
+        $this->assertStringContainsString('<svg class="w-4 h-4"', $result);
+    }
+
+    private function fieldtype($config = [])
+    {
+        return (new Icon)->setField(new Field('test', array_merge(['type' => 'icon'], $config)));
+    }
+}

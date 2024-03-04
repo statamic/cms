@@ -1,7 +1,7 @@
 <template>
     <div class="time-fieldtype-container">
         <div class="input-group" :class="{'w-[120px]': useSeconds, 'w-[96px]': ! useSeconds}">
-            <button class="input-group-prepend flex items-center" v-tooltip="__('Set to now')" @click="setToNow">
+            <button class="input-group-prepend flex items-center" v-tooltip="__('Set to now')" @click="setToNow" v-if="!isReadOnly">
                 <svg-icon name="light/time" class="w-4 h-4" />
             </button>
             <input

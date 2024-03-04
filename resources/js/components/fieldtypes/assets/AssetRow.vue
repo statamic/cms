@@ -41,11 +41,11 @@
         </td>
         <td class="p-0 w-8 text-right align-middle" v-if="!readOnly">
             <button
-                class="flex items-center p-1 w-6 h-8 text-gray-600 hover:text-gray-900"
+                class="flex items-center p-1 w-6 h-8 text-lg antialiased text-gray-600 hover:text-gray-900"
                 @click="remove"
                 :aria-label="__('Remove Asset')"
             >
-                <svg-icon name="micro/trash" class="w-6 h-6" />
+                ×
             </button>
 
             <asset-editor

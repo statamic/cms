@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', __('Updater'))
 
@@ -27,7 +29,7 @@
             <h1 class="flex-1">{{ __('Updates') }}</h1>
         </div>
 
-        <h6 class="mt-8">Core</h6>
+        <h6 class="mt-8">{{ __('Core') }}</h6>
         <div class="card p-0 mt-2">
             <table class="data-table">
                 <tr>
@@ -61,17 +63,19 @@
             </table>
         </div>
 
-        <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>
-        <div class="card p-0 mt-2">
-            <table class="data-table">
-                @foreach ($unlistedAddons as $addon)
-                    <tr>
-                        <td class="w-64">{{ $addon->name() }}</td>
-                        <td>{{ $addon->version() }}</td>
-                    </tr>
-                @endforeach
-            </table>
-        </div>
+        @if($unlistedAddons->count())
+            <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>
+            <div class="card p-0 mt-2">
+                <table class="data-table">
+                    @foreach ($unlistedAddons as $addon)
+                        <tr>
+                            <td class="w-64">{{ $addon->name() }}</td>
+                            <td>{{ $addon->version() }}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+        @endif
 
         @include('statamic::partials.docs-callout', [
             'topic' => __('Updates'),

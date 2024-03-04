@@ -5,10 +5,12 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\UserType;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
+use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
 class Users extends Relationship
@@ -55,6 +57,11 @@ class Users extends Relationship
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'users',
                     ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
             ],
         ];
@@ -87,16 +94,36 @@ class Users extends Relationship
         $query = User::query();
 
         if ($search = $request->search) {
-            $query->where('name', 'like', '%'.$search.'%');
+            if (Search::indexes()->has('users')) {
+                $query = Search::index('users')->ensureExists()->search($search);
+            } else {
+                $query->where(function ($query) use ($search) {
+                    $query
+                        ->where('email', 'like', '%'.$search.'%')
+                        ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
+                            foreach (explode(' ', $search) as $word) {
+                                $query
+                                    ->orWhere('first_name', 'like', '%'.$word.'%')
+                                    ->orWhere('last_name', 'like', '%'.$word.'%');
+                            }
+                        }, function ($query) use ($search) {
+                            $query->orWhere('name', 'like', '%'.$search.'%');
+                        });
+                });
+            }
         }
 
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
         }
 
-        $query->orderBy('name');
+        $this->applyIndexQueryScopes($query, $request->all());
 
         $userFields = function ($user) {
+            if ($user instanceof Result) {
+                $user = $user->getSearchable();
+            }
+
             return [
                 'id' => $user->id(),
                 'title' => $user->name(),

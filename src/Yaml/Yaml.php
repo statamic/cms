@@ -83,7 +83,7 @@ class Yaml
      */
     public function dump($data, $content = null)
     {
-        if ($content) {
+        if (! is_null($content)) {
             if (is_string($content)) {
                 return $this->dumpFrontMatter($data, $content);
             }
@@ -103,7 +103,7 @@ class Yaml
      */
     public function dumpFrontMatter($data, $content = null)
     {
-        if ($content && ! is_string($content)) {
+        if (! is_null($content) && ! is_string($content)) {
             $data['content'] = $content;
             $content = '';
         }

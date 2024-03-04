@@ -172,7 +172,7 @@ class PluckTest extends TestCase
 // So a "get" method would need to be used. e.g. a form Submission.
 class Item
 {
-    use FluentlyGetsAndSets, ContainsData;
+    use ContainsData, FluentlyGetsAndSets;
 
     public function __construct($data)
     {
@@ -183,17 +183,23 @@ class Item
 // Represents an object that could have an origin and therefore a "value" method. e.g. an Entry.
 class ItemWithOrigin
 {
-    use FluentlyGetsAndSets, ContainsData, HasOrigin;
+    use ContainsData, FluentlyGetsAndSets, HasOrigin;
 
     public function __construct($data, $origin = null)
     {
         $this->data($data);
-        $this->origin($origin);
+        $this->origin = $origin;
+    }
+
+    public function origin($origin = null)
+    {
+        // Bypass the logic to load the origin. Just use what was passed in.
+        return $this->origin;
     }
 
     public function getOriginByString($origin)
     {
-        //
+        // Required by trait
     }
 }
 

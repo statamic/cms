@@ -24,6 +24,12 @@ class Toggle extends Fieldtype
                         'type' => 'text',
                         'default' => '',
                     ],
+                    'inline_label_when_true' => [
+                        'display' => __('Inline Label when True'),
+                        'instructions' => __('statamic::fieldtypes.toggle.config.inline_label_when_true'),
+                        'type' => 'text',
+                        'default' => '',
+                    ],
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),

@@ -12,8 +12,8 @@ use Tests\TestCase;
 
 class DuplicateTermTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     /** @test */
     public function it_duplicates_a_term()

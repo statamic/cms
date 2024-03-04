@@ -16,7 +16,7 @@ export const Image = Node.create({
 
     draggable: true,
 
-    selectable: false,
+    selectable: true,
 
     addAttributes() {
         return {

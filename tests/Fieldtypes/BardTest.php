@@ -2,16 +2,17 @@
 
 namespace Tests\Fieldtypes;
 
-use Facades\Statamic\Fieldtypes\RowId;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Mockery\MockInterface;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Fieldtypes\RowId;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Tiptap\Core\Node;
@@ -115,6 +116,59 @@ class BardTest extends TestCase
                     'fields' => [
                         ['handle' => 'image', 'field' => ['type' => 'test']],
                         ['handle' => 'caption', 'field' => ['type' => 'test']],
+                    ],
+                ],
+            ],
+        ])->augment($data);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals($expected, collect($augmented)->toArray());
+    }
+
+    /** @test */
+    public function it_augments_ids_and_sets_id_correctly_with_a_custom_id_handle()
+    {
+        config()->set('statamic.system.row_id_handle', '_id');
+
+        (new class extends Fieldtype
+        {
+            public static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $data = [
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id', // Set id. Auto generated
+                    'values' => [
+                        'id' => 'value-id', // Value id. User Input.
+                        'type' => 'image',
+                        'image' => 'test.jpg',
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                '_id' => 'set-id',
+                'id' => 'value-id',
+                'type' => 'image',
+                'image' => 'test.jpg (augmented)',
+            ],
+        ];
+
+        $augmented = $this->bard([
+            'sets' => [
+                'image' => [
+                    'fields' => [
+                        ['handle' => 'id', 'field' => ['type' => 'text']],
+                        ['handle' => 'image', 'field' => ['type' => 'test']],
                     ],
                 ],
             ],
@@ -427,7 +481,9 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_into_prosemirror_structure()
     {
-        RowId::shouldReceive('generate')->andReturn('random-string-1');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1');
+        });
 
         $data = [
             ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
@@ -485,7 +541,9 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
     {
-        RowId::shouldReceive('generate')->andReturn('random-string-1');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1');
+        });
 
         $data = [
             ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
@@ -578,14 +636,16 @@ class BardTest extends TestCase
      */
     public function it_preloads($areSetsGrouped)
     {
-        RowId::shouldReceive('generate')->andReturn(
-            'random-string-1',
-            'random-string-2',
-            'random-string-3',
-            'random-string-4',
-            'random-string-5',
-            'random-string-6',
-        );
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn(
+                'random-string-1',
+                'random-string-2',
+                'random-string-3',
+                'random-string-4',
+                'random-string-5',
+                'random-string-6',
+            );
+        });
 
         // For this test, use a grid field with min_rows.
         // It doesn't have to be, but it's a fieldtype that would
@@ -819,20 +879,33 @@ EOT;
         $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
     }
 
-    /** @test */
-    public function it_augments_inline_value()
+    /**
+     * @test
+     *
+     * @dataProvider inlineProvider
+     */
+    public function it_augments_inline_value($config)
     {
         $data = [
             ['type' => 'text', 'text' => 'This is inline text with '],
             ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
-            ['type' => 'text', 'text' => ' and '],
+            ['type' => 'text', 'text' => ' and'],
+            ['type' => 'hardBreak'],
             ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
             ['type' => 'text', 'text' => ' text.'],
         ];
 
-        $expected = 'This is inline text with <strong>bold</strong> and <em>italic</em> text.';
+        $expected = 'This is inline text with <strong>bold</strong> and<br><em>italic</em> text.';
 
-        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->augment($data));
+        $this->assertEquals($expected, $this->bard(['inline' => $config, 'sets' => null])->augment($data));
+    }
+
+    public static function inlineProvider()
+    {
+        return [
+            'true' => [true],
+            'break' => ['break'],
+        ];
     }
 
     /** @test */
@@ -1018,12 +1091,146 @@ EOT;
         $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
     }
 
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_generates_field_path_prefix($areSetsGrouped)
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public static function handle()
+            {
+                return 'custom';
+            }
+
+            public function preProcess($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function process($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function preload()
+            {
+                return ['fieldPathPrefix' => $this->field()->fieldPathPrefix()];
+            }
+
+            public function augment($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+        };
+
+        $fieldtype::register();
+
+        $field = (new Field('test', [
+            'type' => 'bard',
+            'sets' => $this->groupSets($areSetsGrouped, [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'custom']],
+                    ],
+                ],
+            ]),
+        ]))->setValue([
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id-1',
+                    'values' => [
+                        'type' => 'one',
+                        'words' => 'test',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id-2',
+                    'values' => [
+                        'type' => 'one',
+                        'words' => 'test',
+                    ],
+                ],
+            ],
+        ]);
+
+        $value = $field->augment()->value()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = json_decode($field->preProcess()->value(), true);
+        $this->assertEquals('test.0.words', $value[0]['attrs']['values']['words']);
+        $this->assertEquals('test.1.words', $value[1]['attrs']['values']['words']);
+
+        $field = (new Field('test', [
+            'type' => 'bard',
+            'sets' => $this->groupSets($areSetsGrouped, [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'custom']],
+                    ],
+                ],
+            ]),
+        ]))->setValue(json_encode([
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id-1',
+                    'values' => [
+                        'type' => 'one',
+                        'words' => 'test',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id-2',
+                    'values' => [
+                        'type' => 'one',
+                        'words' => 'test',
+                    ],
+                ],
+            ],
+        ]));
+
+        $value = $field->process()->value();
+        $this->assertEquals('test.0.words', $value[0]['attrs']['values']['words']);
+        $this->assertEquals('test.1.words', $value[1]['attrs']['values']['words']);
+
+        $value = $field->fieldtype()->preload();
+        $this->assertEquals('test.0.words', $value['existing']['set-id-1']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.1.words', $value['existing']['set-id-2']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.-1.words', $value['new']['one']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
+    }
+
+    /** @test */
+    public function it_filters_away_bad_nodes()
+    {
+        $data = [
+            [],
+            ['type' => 'text', 'text' => 'This is inline text.'],
+            ['text' => 'I have no type'],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
     }
 
-    public function groupedSetsProvider()
+    public static function groupedSetsProvider()
     {
         return [
             'grouped sets (new)' => [true],

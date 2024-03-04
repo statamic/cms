@@ -29,7 +29,7 @@
                 <div class="editor-preview bg-gray-800 md:rounded-tr-md flex flex-col justify-between flex-1 min-h-[45vh] md:min-h-auto md:flex-auto md:grow w-full md:w-1/2 lg:w-2/3 shadow-[inset_0px_4px_3px_0px_black]">
 
                     <!-- Toolbar -->
-                    <div id="asset-editor-toolbar" class="@container/toolbar flex items-center justify-center py-4 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3" v-if="!readOnly">
+                    <div id="asset-editor-toolbar" class="@container/toolbar flex items-center justify-center py-4 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3" v-if="isToolbarVisible">
                         <button v-if="isImage && isFocalPointEditorEnabled" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center justify-center px-3 py-1.5" @click.prevent="openFocalPointEditor">
                             <svg-icon name="focal-point" class="h-4" />
                             <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Focal Point') }}</span>
@@ -143,7 +143,7 @@
                 <div id="asset-meta-data" class="flex-1 hidden sm:flex space-x-3 py-1 h-full text-xs text-gray-800">
                     <div class="flex items-center bg-gray-400 rounded py-1 pl-2 pr-3" v-if="isImage">
                         <svg-icon name="image-picture" class="h-3 mr-2" />
-                        <div class="">{{ asset.width }} x {{ asset.height }}</div>
+                        <div class="">{{ __('messages.width_x_height', { width: asset.width, height: asset.height }) }}</div>
                     </div>
                     <div class="flex items-center bg-gray-400 rounded py-1 pl-2 pr-3">
                         <svg-icon name="sd-card" class="h-3 mr-2" />
@@ -215,6 +215,10 @@ export default {
         readOnly: {
             type: Boolean,
         },
+        showToolbar: {
+            type: Boolean,
+            default: true,
+        },
         allowDeleting: {
             type: Boolean,
             default() {
@@ -263,6 +267,11 @@ export default {
         {
             return Statamic.$config.get("focalPointEditorEnabled");
         },
+
+        isToolbarVisible()
+        {
+            return ! this.readOnly && this.showToolbar;
+        }
     },
 
     mounted() {

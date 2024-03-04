@@ -25,8 +25,8 @@ use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
 {
-    use RunsInPlease;
     use EnhancesCommands;
+    use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
         {--queue : Queue the requests}
@@ -186,6 +186,10 @@ class StaticWarm extends Command
 
         $entries = Facades\Entry::all()->map(function (Entry $entry) {
             if (! $entry->published() || $entry->private()) {
+                return null;
+            }
+
+            if ($entry->isRedirect()) {
                 return null;
             }
 

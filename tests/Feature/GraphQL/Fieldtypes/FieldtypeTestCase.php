@@ -11,8 +11,8 @@ use Tests\TestCase;
 
 abstract class FieldtypeTestCase extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['collections'];
 

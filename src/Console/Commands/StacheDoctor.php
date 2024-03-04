@@ -11,7 +11,7 @@ use Statamic\Support\Str;
 
 class StacheDoctor extends Command
 {
-    use RunsInPlease, EnhancesCommands;
+    use EnhancesCommands, RunsInPlease;
 
     protected $signature = 'statamic:stache:doctor';
     protected $description = 'Diagnose any problems with the Stache';

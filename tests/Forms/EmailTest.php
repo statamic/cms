@@ -7,6 +7,7 @@ use Facades\Tests\Factories\GlobalFactory;
 use Mockery;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Forms\Email;
 use Statamic\Forms\Submission;
@@ -77,7 +78,7 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->bcc);
     }
 
-    public function singleAddressProvider()
+    public static function singleAddressProvider()
     {
         return [
             'single email' => ['foo@bar.com', [
@@ -92,12 +93,18 @@ class EmailTest extends TestCase
             'single email with name using antlers' => ['{{ name }} <{{ email }}>', [
                 ['address' => 'foo@bar.com', 'name' => 'Foo Bar'],
             ]],
+            'single email from global set using antlers' => ['{{ company_information:email }}', [
+                ['address' => 'info@example.com', 'name' => null],
+            ]],
+            'single email with name from global set using antlers' => ['{{ company_information:name }} <{{ company_information:email }}>', [
+                ['address' => 'info@example.com', 'name' => 'Example Company'],
+            ]],
         ];
     }
 
-    public function multipleAddressProvider()
+    public static function multipleAddressProvider()
     {
-        return array_merge($this->singleAddressProvider(), [
+        return array_merge(static::singleAddressProvider(), [
             'multiple emails' => ['foo@bar.com, baz@qux.com', [
                 ['address' => 'foo@bar.com', 'name' => null],
                 ['address' => 'baz@qux.com', 'name' => null],
@@ -190,12 +197,28 @@ class EmailTest extends TestCase
 
     private function makeEmailWithConfig(array $config)
     {
+        $globalSet = GlobalSet::make()->handle('company_information');
+        $globalSet->addLocalization($globalSet->makeLocalization('en')->data([
+            'name' => 'Example Company',
+            'email' => 'info@example.com',
+        ]));
+        $globalSet->save();
+
         $formBlueprint = Blueprint::makeFromFields([
             'name' => ['type' => 'text'],
             'email' => ['type' => 'text'],
         ]);
+
+        $companyInformationBlueprint = Blueprint::makeFromFields([
+            'name' => ['type' => 'text'],
+            'email' => ['type' => 'text'],
+        ]);
+
         BlueprintRepository::shouldReceive('find')->with('forms.test')->andReturn($formBlueprint);
+        BlueprintRepository::shouldReceive('find')->with('globals.company_information')->andReturn($companyInformationBlueprint);
+
         $form = tap(Form::make('test'))->save();
+
         $submission = $form->makeSubmission()->data([
             'name' => 'Foo Bar',
             'email' => 'foo@bar.com',

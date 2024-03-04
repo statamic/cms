@@ -3,10 +3,11 @@
 namespace Statamic\Modifiers;
 
 use ArrayAccess;
-use Carbon\Carbon;
+use Carbon\CarbonInterface as Carbon;
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -897,6 +898,82 @@ class CoreModifiers extends Modifier
         return Stringy::hasUpperCase($value);
     }
 
+    public function headline($value, $params)
+    {
+        $style = Arr::get($params, 0, 'ap');
+
+        switch ($style) {
+            case 'mla':
+                return $this->renderMLAStyleHeadline($value);
+            default:
+                return $this->renderAPStyleHeadline($value);
+        }
+    }
+
+    private function renderAPStyleHeadline($value)
+    {
+        $exceptions = [
+            'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with',
+        ];
+
+        $words = explode(' ', $value);
+        $wordCount = count($words);
+
+        $headline = collect($words)->map(function ($word, $index) use ($exceptions, $wordCount) {
+            $word = strtolower($word);
+            $isFirstOrLast = ($index === 0 || $index === $wordCount - 1);
+
+            // Handle hyphenated words
+            if (strpos($word, '-') !== false) {
+                $subWords = explode('-', $word);
+
+                return collect($subWords)->map(function ($subWord) use ($isFirstOrLast, $exceptions) {
+                    return ($isFirstOrLast || ! in_array($subWord, $exceptions)) ? Str::ucfirst($subWord) : $subWord;
+                })->implode('-');
+            }
+
+            return ($isFirstOrLast || ! in_array($word, $exceptions)) ? Str::ucfirst($word) : $word;
+        })->implode(' ');
+
+        return $headline;
+    }
+
+    private function renderMLAStyleHeadline($value)
+    {
+        $exceptions = [
+            'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with',
+        ];
+
+        $words = explode(' ', $value);
+        $wordCount = count($words);
+
+        $headline = collect($words)->map(function ($word, $index) use ($exceptions, $wordCount) {
+            $word = strtolower($word);
+            $isFirstOrLast = ($index === 0 || $index === $wordCount - 1);
+
+            return ($isFirstOrLast || ! in_array($word, $exceptions)) ? Str::ucfirst($word) : $word;
+        })->implode(' ');
+
+        return $headline;
+    }
+
+    /**
+     * Converts a hex color to rgb values.
+     *
+     * @return string
+     */
+    public function hexToRgb($value)
+    {
+        // Remove the hash (#) if present
+        $hex = ltrim($value, '#');
+
+        // Parse the hex value into RGB components
+        $rgb = sscanf($hex, '%02x%02x%02x');
+
+        // Return the RGB values as a comma-separated string
+        return implode(', ', $rgb);
+    }
+
     /**
      * Get the date difference in hours.
      *
@@ -946,7 +1023,7 @@ class CoreModifiers extends Modifier
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param $value
+     * @param  $value
      * @return bool
      */
     public function inArray($haystack, $params, $context)
@@ -1433,7 +1510,7 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param $params
+     * @param  $params
      * @return string
      */
     public function md5($value)
@@ -1709,6 +1786,14 @@ class CoreModifiers extends Modifier
      */
     public function random($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         return array_random($value);
     }
 
@@ -1727,11 +1812,11 @@ class CoreModifiers extends Modifier
      *
      * @return void
      */
-    public function ray($value)
+    public function ray($value, $params)
     {
         throw_unless(function_exists('ray'), new \Exception('Ray is not installed. Run `composer require spatie/laravel-ray --dev`'));
 
-        ray($value);
+        ray($value)->color(Arr::get($params, 0, 'gray'));
 
         return $value;
     }
@@ -1743,6 +1828,14 @@ class CoreModifiers extends Modifier
      */
     public function readTime($value, $params)
     {
+        if (is_array($value)) {
+            $value = collect($value)
+                ->map(fn (Values $values) => $values->all())
+                ->where('type', 'text')
+                ->map(fn ($item) => $item['text']->raw())
+                ->implode(' ');
+        }
+
         $words = $this->wordCount(strip_tags($value));
 
         return ceil($words / Arr::get($params, 0, 200));
@@ -2745,6 +2838,12 @@ class CoreModifiers extends Modifier
             return $value;
         }
 
+        if (is_array($value)) {
+            return array_map(function ($item) use ($params) {
+                return $this->wrap($item, $params);
+            }, $value);
+        }
+
         $attributes = '';
         $tag = Arr::get($params, 0);
 
@@ -2827,8 +2926,17 @@ class CoreModifiers extends Modifier
             }
         }
 
+        if (Str::contains($url, 'youtube.com/shorts/')) {
+            $url = str_replace('shorts/', 'embed/', $url);
+        }
+
         if (Str::contains($url, 'youtube.com')) {
             $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
+        }
+
+        // This avoids SSL issues when using the non-www version
+        if (Str::contains($url, '//youtube-nocookie.com')) {
+            $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
         }
 
         return $url;
@@ -2927,7 +3035,7 @@ class CoreModifiers extends Modifier
     private function carbon($value)
     {
         if (! $value instanceof Carbon) {
-            $value = (is_numeric($value)) ? Carbon::createFromTimestamp($value) : Carbon::parse($value);
+            $value = (is_numeric($value)) ? Date::createFromTimestamp($value) : Date::parse($value);
         }
 
         return $value;

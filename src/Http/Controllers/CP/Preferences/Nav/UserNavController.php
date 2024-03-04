@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Preferences\Nav;
 
 use Illuminate\Http\Request;
+use Statamic\Facades\CP\Nav;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Controller;
 
@@ -26,6 +27,8 @@ class UserNavController extends Controller
 
         User::current()->setPreference('nav', $nav)->save();
 
+        Nav::clearCachedUrls();
+
         $this->success(__('Saved'));
 
         return true;
@@ -34,6 +37,8 @@ class UserNavController extends Controller
     public function destroy()
     {
         User::current()->removePreference('nav')->save();
+
+        Nav::clearCachedUrls();
 
         return true;
     }

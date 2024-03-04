@@ -16,7 +16,7 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card overflow-hidden p-0 relative">
-                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
+                    <div v-if="!reordering" class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
 
                         <data-list-filter-presets
                             ref="presets"
@@ -77,10 +77,10 @@
                             @reordered="reordered"
                         >
                             <template slot="cell-title" slot-scope="{ row: entry }">
-                                <div class="title-index-field">
-                                    <div class="little-dot mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
-                                    <a :href="entry.edit_url" @click.stop>{{ entry.title }}</a>
-                                </div>
+                                <a class="title-index-field inline-flex items-center" :href="entry.edit_url" @click.stop>
+                                    <span class="little-dot mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
+                                    <span v-text="entry.title" />
+                                </a>
                             </template>
                             <template slot="cell-status" slot-scope="{ row: entry }">
                                 <div class="status-index-field select-none" v-tooltip="getStatusTooltip(entry)" :class="`status-${entry.status}`" v-text="getStatusLabel(entry)" />
@@ -222,6 +222,7 @@ export default {
 
             this.page = 1;
             this.sortColumn = 'order';
+            this.sortDirection = 'asc';
         },
 
         cancelReordering() {

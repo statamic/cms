@@ -10,6 +10,7 @@ use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
@@ -72,6 +73,10 @@ class EntriesController extends CpController
             $query->where('title', 'like', '%'.$search.'%');
         }
 
+        if (Site::hasMultiple()) {
+            $query->whereIn('site', Site::authorized()->map->handle()->all());
+        }
+
         return $query;
     }
 
@@ -126,7 +131,7 @@ class EntriesController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'permalink' => $entry->absoluteUrl(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
 
@@ -142,7 +147,7 @@ class EntriesController extends CpController
                     'url' => $exists ? $localized->editUrl() : null,
                     'livePreviewUrl' => $exists ? $localized->livePreviewUrl() : null,
                 ];
-            })->all(),
+            })->values()->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
@@ -237,31 +242,38 @@ class EntriesController extends CpController
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled() && $entry->published()) {
-            $entry
+            $saved = $entry
                 ->makeWorkingCopy()
                 ->user(User::current())
                 ->save();
+
+            // catch any changes through RevisionSaving event
+            $entry = $entry->fromWorkingCopy();
         } else {
             if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($request->published);
             }
 
-            $entry->updateLastModified(User::current())->save();
+            $saved = $entry->updateLastModified(User::current())->save();
         }
 
         [$values] = $this->extractFromFields($entry, $blueprint);
 
-        return (new EntryResource($entry->fresh()))
-            ->additional([
-                'data' => [
-                    'values' => $values,
-                ],
-            ]);
+        return [
+            'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
+                'values' => $values,
+            ]),
+            'saved' => $saved,
+        ];
     }
 
     public function create(Request $request, $collection, $site)
     {
-        $this->authorize('create', [EntryContract::class, $collection]);
+        $this->authorize('create', [EntryContract::class, $collection, $site]);
+
+        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, $site)) {
+            return $response;
+        }
 
         $blueprint = $collection->entryBlueprint($request->blueprint);
 
@@ -303,7 +315,7 @@ class EntriesController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site, $blueprint) {
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($collection, $site, $blueprint) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -313,7 +325,7 @@ class EntriesController extends CpController
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle, 'blueprint' => $blueprint->handle()]),
                     'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
                 ];
-            })->all(),
+            })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
@@ -386,15 +398,18 @@ class EntriesController extends CpController
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled()) {
-            $entry->store([
+            $saved = $entry->store([
                 'message' => $request->message,
                 'user' => User::current(),
             ]);
         } else {
-            $entry->updateLastModified(User::current())->save();
+            $saved = $entry->updateLastModified(User::current())->save();
         }
 
-        return new EntryResource($entry);
+        return [
+            'data' => (new EntryResource($entry))->resolve()['data'],
+            'saved' => $saved,
+        ];
     }
 
     private function resolveSlug($request)
@@ -524,7 +539,12 @@ class EntriesController extends CpController
         }
 
         if (! $tree) {
-            return $entry->uri();
+            return app(\Statamic\Contracts\Routing\UrlBuilder::class)
+                ->content($entry)
+                ->merge([
+                    'id' => $entry->id() ?? Stache::generateId(),
+                ])
+                ->build($entry->route());
         }
 
         $parent = $parent ? $tree->find($parent) : null;
@@ -552,5 +572,19 @@ class EntriesController extends CpController
                 'url' => $collection->showUrl(),
             ],
         ]);
+    }
+
+    protected function getAuthorizedSitesForCollection($collection)
+    {
+        return $collection
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
+    }
+
+    protected function ensureCollectionIsAvailableOnSite($collection, $site)
+    {
+        if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
+            return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
+        }
     }
 }

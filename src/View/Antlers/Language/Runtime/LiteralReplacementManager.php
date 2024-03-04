@@ -12,6 +12,29 @@ class LiteralReplacementManager
     protected static $registeredSections = [];
     protected static $retargeted = [];
 
+    public static $cachedSections = [];
+
+    public static function clearCachedSections()
+    {
+        self::$cachedSections = [];
+    }
+
+    public static function getCachedSections()
+    {
+        return self::$cachedSections;
+    }
+
+    public static function restoreCachedSections($cachedSections)
+    {
+        foreach ($cachedSections as $section) {
+            self::registerRegionReplacement(
+                $section[0],
+                $section[1],
+                $section[2]
+            );
+        }
+    }
+
     public static function resetLiteralState()
     {
         self::$regions = [];

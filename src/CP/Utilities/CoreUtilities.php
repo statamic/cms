@@ -10,6 +10,7 @@ use Statamic\Http\Controllers\CP\Utilities\GitController;
 use Statamic\Http\Controllers\CP\Utilities\PhpInfoController;
 use Statamic\Http\Controllers\CP\Utilities\UpdateSearchController;
 use Statamic\Statamic;
+
 use function Statamic\trans as __;
 
 class CoreUtilities
@@ -67,7 +68,7 @@ class CoreUtilities
         if (config('statamic.git.enabled') && Statamic::pro()) {
             Utility::register('git')
                 ->action([GitController::class, 'index'])
-                ->title('Git')
+                ->title(__('Git'))
                 ->icon('git')
                 ->description(__('statamic::messages.git_utility_description'))
                 ->docsUrl(Statamic::docsUrl('utilities/git'))

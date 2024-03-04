@@ -2,6 +2,7 @@
     <div class="flex">
         <v-select
             ref="input"
+            :input-id="fieldId"
             class="flex-1"
             append-to-body
             :calculate-position="positionOptions"
@@ -9,7 +10,7 @@
             :clearable="config.clearable"
             :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
             :options="options"
-            :placeholder="config.placeholder"
+            :placeholder="__(config.placeholder)"
             :searchable="config.searchable || config.taggable"
             :taggable="config.taggable"
             :push-tags="config.push_tags"
@@ -19,12 +20,13 @@
             :value="selectedOptions"
             :create-option="(value) => ({ value, label: value })"
             @input="vueSelectUpdated"
+            @focus="$emit('focus')"
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')">
                 <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
                 <template #search="{ events, attributes }" v-if="config.multiple">
                     <input
-                        :placeholder="config.placeholder"
+                        :placeholder="__(config.placeholder)"
                         class="vs__search"
                         type="search"
                         v-on="events"
@@ -54,7 +56,7 @@
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item">
                             <div v-if="config.label_html" v-html="option.label"></div>
-                            <template v-else>{{ option.label }}</template>
+                            <template v-else>{{ __(option.label) }}</template>
                             <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                                 <span>×</span>
                             </button>
@@ -108,6 +110,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.selectedOptions.map(option => option.label).join(', ');
         },
 

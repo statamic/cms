@@ -6,6 +6,15 @@ use Statamic\Facades\User;
 
 class AssetPolicy
 {
+    public function before($user)
+    {
+        $user = User::fromUser($user);
+
+        if ($user->hasPermission('configure asset containers')) {
+            return true;
+        }
+    }
+
     public function view($user, $asset)
     {
         return User::fromUser($user)->hasPermission("view {$asset->containerHandle()} assets");

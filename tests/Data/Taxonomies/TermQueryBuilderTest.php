@@ -204,6 +204,9 @@ class TermQueryBuilderTest extends TestCase
 
         $terms = Term::query()->orderBy('test')->get();
         $this->assertEquals(['c', 'b', 'e', 'a', 'd'], $terms->map->slug()->all());
+
+        $terms = Term::query()->orderByDesc('test')->get();
+        $this->assertEquals(['d', 'a', 'e', 'b', 'c'], $terms->map->slug()->all());
     }
 
     /** @test **/

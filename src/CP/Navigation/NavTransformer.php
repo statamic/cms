@@ -104,7 +104,7 @@ class NavTransformer
         $display = Arr::get($section, 'display');
         $displayOriginal = Arr::get($section, 'display_original', $display);
 
-        if ($display !== $displayOriginal) {
+        if ($display !== $displayOriginal || $transformed['action'] === '@create') {
             $transformed['display'] = $display;
         }
 

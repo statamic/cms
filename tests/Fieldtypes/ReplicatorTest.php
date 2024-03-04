@@ -3,11 +3,12 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldRepository;
-use Facades\Statamic\Fieldtypes\RowId;
+use Mockery\MockInterface;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Replicator;
+use Statamic\Fieldtypes\RowId;
 use Tests\TestCase;
 
 class ReplicatorTest extends TestCase
@@ -47,7 +48,9 @@ class ReplicatorTest extends TestCase
      */
     public function it_preprocesses_the_values($areSetsGrouped)
     {
-        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        });
 
         FieldRepository::shouldReceive('find')
             ->with('testfieldset.numbers')
@@ -113,7 +116,9 @@ class ReplicatorTest extends TestCase
      */
     public function it_preprocesses_the_values_recursively($areSetsGrouped)
     {
-        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        });
 
         FieldRepository::shouldReceive('find')
             ->with('testfieldset.numbers')
@@ -310,6 +315,81 @@ class ReplicatorTest extends TestCase
         ], $field->process()->value());
     }
 
+    /** @test */
+    public function it_processes_the_values_recursively_with_a_custom_id()
+    {
+        config()->set('statamic.system.row_id_handle', '_id');
+
+        FieldRepository::shouldReceive('find')
+            ->with('testfieldset.numbers')
+            ->andReturnUsing(function () {
+                return new Field('numbers', ['type' => 'integer']);
+            });
+
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'numbers', 'field' => 'testfieldset.numbers'],
+                        ['handle' => 'words', 'field' => ['type' => 'text']],
+                        ['handle' => 'nested_replicator', 'field' => [
+                            'type' => 'replicator',
+                            'sets' => [
+                                'two' => [
+                                    'fields' => [
+                                        ['handle' => 'nested_age', 'field' => 'testfieldset.numbers'],
+                                        ['handle' => 'nested_food', 'field' => ['type' => 'text']],
+                                    ],
+                                ],
+                            ],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->setValue([
+            [
+                '_id' => 'set-id-1',
+                'id' => 'user-input-id-1',
+                'type' => 'one',
+                'numbers' => '2', // corresponding fieldtype has preprocessing
+                'words' => 'test', // corresponding fieldtype has no preprocessing
+                'foo' => 'bar', // no corresponding fieldtype, so theres no preprocessing
+                'nested_replicator' => [
+                    [
+                        '_id' => 'set-id-2',
+                        'id' => 'user-input-id-2',
+                        'type' => 'two',
+                        'nested_age' => '13', // corresponding fieldtype has preprocessing
+                        'nested_food' => 'pizza', // corresponding fieldtype has no preprocessing
+                        'nested_foo' => 'more bar', // no corresponding fieldtype, so theres no preprocessing
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame([
+            [
+                '_id' => 'set-id-1',
+                'id' => 'user-input-id-1',
+                'type' => 'one',
+                'numbers' => 2,
+                'words' => 'test',
+                'foo' => 'bar',
+                'nested_replicator' => [
+                    [
+                        '_id' => 'set-id-2',
+                        'id' => 'user-input-id-2',
+                        'type' => 'two',
+                        'nested_age' => 13,
+                        'nested_food' => 'pizza',
+                        'nested_foo' => 'more bar',
+                    ],
+                ],
+            ],
+        ], $field->process()->value());
+    }
+
     /**
      * @test
      *
@@ -317,14 +397,16 @@ class ReplicatorTest extends TestCase
      */
     public function it_preloads($areSetsGrouped)
     {
-        RowId::shouldReceive('generate')->andReturn(
-            'random-string-1',
-            'random-string-2',
-            'random-string-3',
-            'random-string-4',
-            'random-string-5',
-            'random-string-6',
-        );
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn(
+                'random-string-1',
+                'random-string-2',
+                'random-string-3',
+                'random-string-4',
+                'random-string-5',
+                'random-string-6',
+            );
+        });
 
         // For this test, use a grid field with min_rows.
         // It doesn't have to be, but it's a fieldtype that would
@@ -483,6 +565,47 @@ class ReplicatorTest extends TestCase
     }
 
     /** @test */
+    public function it_augments_with_custom_row_id_handle()
+    {
+        config(['statamic.system.row_id_handle' => '_id']);
+
+        (new class extends Fieldtype
+        {
+            public static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $field = new Field('test', [
+            'type' => 'replicator',
+            'sets' => [
+                'a' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'test']],
+                        ['handle' => 'id', 'field' => ['type' => 'test']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $augmented = $field->fieldtype()->augment([
+            ['_id' => '1', 'id' => '7', 'type' => 'a', 'words' => 'one'],
+            ['type' => 'a', 'id' => '8', 'words' => 'two'], // row id intentionally omitted
+            ['_id' => '3', 'type' => 'a', 'words' => 'three'], // id field intentionally omitted
+        ]);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals([
+            ['_id' => '1', 'id' => '7 (augmented)', 'type' => 'a', 'words' => 'one (augmented)'],
+            ['_id' => null, 'id' => '8 (augmented)', 'type' => 'a', 'words' => 'two (augmented)'],
+            ['_id' => '3', 'id' => ' (augmented)', 'type' => 'a', 'words' => 'three (augmented)'],
+        ], collect($augmented)->toArray());
+    }
+
+    /** @test */
     public function it_converts_a_queryable_value()
     {
         $this->assertNull((new Replicator)->toQueryableValue(null));
@@ -490,7 +613,85 @@ class ReplicatorTest extends TestCase
         $this->assertEquals([['foo' => 'bar']], (new Replicator)->toQueryableValue([['foo' => 'bar']]));
     }
 
-    public function groupedSetsProvider()
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_generates_field_path_prefix($areSetsGrouped)
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public static function handle()
+            {
+                return 'custom';
+            }
+
+            public function preProcess($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function process($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function preload()
+            {
+                return ['fieldPathPrefix' => $this->field()->fieldPathPrefix()];
+            }
+
+            public function augment($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+        };
+
+        $fieldtype::register();
+
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => $this->groupSets($areSetsGrouped, [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'custom']],
+                    ],
+                ],
+            ]),
+        ]))->setValue([
+            [
+                '_id' => 'set-id-1',
+                'type' => 'one',
+                'words' => 'test',
+            ],
+            [
+                '_id' => 'set-id-2',
+                'type' => 'one',
+                'words' => 'test',
+            ],
+        ]);
+
+        $value = $field->augment()->value()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = $field->preProcess()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = $field->process()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = $field->fieldtype()->preload();
+        $this->assertEquals('test.0.words', $value['existing']['set-id-1']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.1.words', $value['existing']['set-id-2']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.-1.words', $value['new']['one']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
+    }
+
+    public static function groupedSetsProvider()
     {
         return [
             'grouped sets (new)' => [true],

@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import Validator from '../field-conditions/Validator.js';
 import PublishField from '../publish/Field.vue';
 
 export default {
@@ -105,8 +106,12 @@ export default {
         isFilterComplete() {
             if (! this.filter) return false;
 
-            let fields = _.chain(this.filter.fields).mapObject(field => field.handle).values().value();
-            let allFieldsFilled = _.values(this.fieldValues).filter(value => value).length === fields.length;
+            let visibleFields = _.chain(this.filter.fields).filter(function (field) {
+                let validator = new Validator(field, this.fieldValues);
+                return validator.passesConditions();
+            }, this).mapObject(field => field.handle).values().value();
+
+            let allFieldsFilled = _.chain(this.fieldValues).filter((value, handle) => visibleFields.includes(handle) && value).values().value().length === visibleFields.length;
 
             return this.field !== null && allFieldsFilled;
         },

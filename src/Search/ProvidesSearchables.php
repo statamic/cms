@@ -3,6 +3,7 @@
 namespace Statamic\Search;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 
 interface ProvidesSearchables
 {
@@ -12,7 +13,7 @@ interface ProvidesSearchables
 
     public function setKeys(array $keys): self;
 
-    public function provide(): Collection;
+    public function provide(): Collection|LazyCollection;
 
     public function contains($searchable): bool;
 

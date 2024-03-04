@@ -2,8 +2,13 @@
 
 namespace Statamic\Data;
 
+use Statamic\Facades\Blink;
+
 trait HasOrigin
 {
+    /**
+     * @var string
+     */
     protected $origin;
 
     public function keys()
@@ -55,16 +60,37 @@ trait HasOrigin
     {
         return $this->fluentlyGetOrSet('origin')
             ->getter(function ($origin) {
-                if (is_string($origin)) {
-                    $this->origin = $origin = $this->getOriginByString($origin);
+                if (! $origin) {
+                    return null;
                 }
 
-                return $origin;
+                if ($found = Blink::get($this->getOriginBlinkKey())) {
+                    return $found;
+                }
+
+                return tap($this->getOriginByString($origin), function ($found) {
+                    Blink::put($this->getOriginBlinkKey(), $found);
+                });
+            })
+            ->setter(function ($origin) {
+                Blink::forget($this->getOriginBlinkKey());
+
+                return is_object($origin) ? $this->getOriginIdFromObject($origin) : $origin;
             })
             ->args(func_get_args());
     }
 
     abstract public function getOriginByString($origin);
+
+    protected function getOriginBlinkKey()
+    {
+        return 'origin-'.class_basename($this).'-'.$this->id();
+    }
+
+    protected function getOriginIdFromObject($origin)
+    {
+        return $origin->id();
+    }
 
     public function hasOrigin()
     {

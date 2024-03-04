@@ -16,4 +16,12 @@ trait RunsUpdateScripts
 
         $script->update();
     }
+
+    protected function assertUpdateScriptRegistered($class)
+    {
+        $this->assertTrue(
+            app('statamic.update-scripts')->map->class->contains($class),
+            "Update script $class is not registered."
+        );
+    }
 }

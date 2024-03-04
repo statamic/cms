@@ -3,7 +3,7 @@
         <div class="input-group">
             <slot name="prepend" v-if="prepend">
                 <div class="input-group-prepend">
-                    {{ prepend }}
+                    {{ __(prepend) }}
                 </div>
             </slot>
             <input
@@ -17,7 +17,8 @@
                 :step="step"
                 :disabled="disabled"
                 :readonly="isReadOnly"
-                :placeholder="placeholder"
+                :placeholder="__(placeholder)"
+                :autocomplete="autocomplete"
                 :autofocus="focus"
                 :min="min"
                 @input="$emit('input', $event.target.value)"
@@ -27,7 +28,7 @@
             >
             <slot name="append" v-if="append">
                 <div class="input-group-append">
-                    {{ append }}
+                    {{ __(append) }}
                 </div>
             </slot>
         </div>
@@ -55,6 +56,7 @@ export default {
         prepend: { default: null },
         append: { default: null },
         focus: { type: Boolean },
+        autocomplete: { default: null },
         autoselect: { type: Boolean },
         min: { type: Number, default: undefined }
     },

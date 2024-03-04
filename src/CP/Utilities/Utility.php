@@ -99,7 +99,7 @@ class Utility
         return cp_route('utilities.index').'/'.$this->slug();
     }
 
-    public function routes(Closure $routes = null)
+    public function routes(?Closure $routes = null)
     {
         return $this->fluentlyGetOrSet('routes')->args(func_get_args());
     }

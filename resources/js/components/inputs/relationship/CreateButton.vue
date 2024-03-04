@@ -8,7 +8,8 @@
                     @click="create"
                 >
                     <svg-icon name="light/content-writing" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
-                    {{ __('Create & Link Item') }}
+                    <span class="hidden @sm:block" v-text="__('Create & Link Item')" />
+                    <span class="@sm:hidden" v-text="__('Create')" />
                 </button>
             </template>
 

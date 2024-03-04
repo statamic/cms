@@ -9,6 +9,7 @@ use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Fieldtypes\Icon;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use voku\helper\ASCII;
@@ -39,7 +40,7 @@ class JavascriptComposer
             'flash' => Statamic::flash(),
             'toasts' => Toast::toArray(),
             'translationLocale' => app('translator')->locale(),
-            'translations' => app('translator')->toJson(),
+            'translations' => $this->translations(),
             'locale' => config('app.locale'),
             'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
             'charmap' => ASCII::charsArray($replaceSymbols),
@@ -67,12 +68,13 @@ class JavascriptComposer
             'livePreview' => config('statamic.live_preview'),
             'permissions' => $this->permissions($user),
             'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
+            'customSvgIcons' => Icon::getCustomSvgIcons(),
         ];
     }
 
     protected function sites()
     {
-        return Site::all()->map(function ($site) {
+        return Site::authorized()->map(function ($site) {
             return [
                 'name' => $site->name(),
                 'handle' => $site->handle(),
@@ -98,5 +100,13 @@ class JavascriptComposer
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
         ])->toArray();
+    }
+
+    protected function translations(): array
+    {
+        $translations = app('translator')->toJson();
+        $fallbackTranslations = tap(app('translator'))->setLocale(app('translator')->getFallback())->toJson();
+
+        return array_merge($fallbackTranslations, $translations);
     }
 }

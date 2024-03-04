@@ -33,7 +33,7 @@
         :can-edit-blueprint="{{ $str::bool($user->can('configure fields')) }}"
         :can-manage-publish-state="{{ $str::bool($canManagePublishState) }}"
         create-another-url="{{ cp_route('collections.entries.create', [$collection, $locale]) }}"
-        listing-url="{{ cp_route('collections.show', $collection) }}"
+        initial-listing-url="{{ cp_route('collections.show', $collection) }}"
         :preview-targets="{{ json_encode($previewTargets) }}"
         :autosave-interval="{{ json_encode($autosaveInterval) }}"
     ></entry-publish-form>

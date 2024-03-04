@@ -1,3 +1,4 @@
+@php use function Statamic\trans as __; @endphp
 @inject('licenses', 'Statamic\Licensing\LicenseManager')
 
 @if ($licenses->requestFailed())
@@ -16,7 +17,7 @@
     </div>
 @else
     @if ($licenses->invalid())
-        <div class="p-2 w-full fixed bottom-0 z-20" v-show="showBanner">
+        <div class="p-2 w-full fixed bottom-0 z-2" v-show="showBanner">
             <div class="
                 py-3 px-4 text-sm w-full rounded-md
                 @if ($licenses->isOnTestDomain()) bg-gray-800 text-gray-300 @endif

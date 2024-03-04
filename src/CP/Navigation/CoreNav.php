@@ -18,7 +18,6 @@ use Statamic\Facades\Nav as NavAPI;
 use Statamic\Facades\Role as RoleAPI;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
-use Statamic\Facades\User;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
 use Statamic\Statamic;
@@ -116,10 +115,6 @@ class CoreNav
             ->children(function () {
                 return GlobalSetAPI::all()->sortBy->title()->map(function ($globalSet) {
                     $localized = $globalSet->inSelectedSite();
-
-                    if (! $localized && User::current()->cant('edit', $globalSet)) {
-                        return null;
-                    }
 
                     return Nav::item($globalSet->title())
                         ->url($localized ? $localized->editUrl() : $globalSet->editUrl())

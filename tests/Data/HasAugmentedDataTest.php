@@ -27,7 +27,7 @@ class HasAugmentedDataTest extends TestCase
 
         $thing = new class implements Augmentable
         {
-            use HasAugmentedData, ContainsData;
+            use ContainsData, HasAugmentedData;
 
             public function __construct()
             {

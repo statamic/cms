@@ -91,6 +91,7 @@ class Environment
     protected $interpolationKeys = [];
     protected $assignments = [];
     protected $dataManagerInterpolations = [];
+    private $protectedScopes = ['view'];
 
     /**
      * @var LanguageOperatorManager|null
@@ -277,7 +278,6 @@ class Environment
 
     /**
      * @param  SemanticGroup[]  $statements
-     * @return null
      *
      * @throws RuntimeException
      * @throws SyntaxErrorException
@@ -965,10 +965,12 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $right;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $right;
 
-                if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
-                    GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                    if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
+                        GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                    }
                 }
 
                 return null;
@@ -1010,7 +1012,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $newVal;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $newVal;
+                }
 
                 return null;
             } elseif ($operand instanceof DivisionAssignmentOperator) {
@@ -1037,7 +1041,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof ModulusAssignmentOperator) {
@@ -1063,7 +1069,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof MultiplicationAssignmentOperator) {
@@ -1089,7 +1097,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof SubtractionAssignmentOperator) {
@@ -1115,7 +1125,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof ConditionalVariableFallbackOperator) {
@@ -1341,7 +1353,7 @@ class Environment
             }
         }
 
-        if (! empty($this->interpolationReplacements)) {
+        if (! empty($this->interpolationReplacements) && is_string($value)) {
             if (Str::contains($value, $this->interpolationKeys)) {
                 $value = strtr($value, $this->interpolationReplacements);
             }
@@ -1555,7 +1567,11 @@ class Environment
             $varName = $this->nameOf($val);
 
             if ($val->isInterpolationReference) {
-                $interpolationValue = $this->adjustValue($this->nodeProcessor->reduceInterpolatedVariable($val), $val);
+                if (array_key_exists($varName->normalizedReference, $this->data)) {
+                    $interpolationValue = $this->adjustValue($this->data[$varName->normalizedReference], $val);
+                } else {
+                    $interpolationValue = $this->adjustValue($this->nodeProcessor->reduceInterpolatedVariable($val), $val);
+                }
 
                 // If the currently active node is an instance of ArithmeticNodeContract,
                 // we will ask the runtime type coercion to convert whatever value

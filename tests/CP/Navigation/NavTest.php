@@ -2,7 +2,6 @@
 
 namespace Tests\CP\Navigation;
 
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
@@ -32,29 +31,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    public function it_can_build_a_default_nav()
-    {
-        $expected = collect([
-            'Top Level' => ['Dashboard', 'Playground'],
-            'Content' => ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'],
-            'Fields' => ['Blueprints', 'Fieldsets'],
-            'Tools' => ['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL'],
-            'Users' => ['Users', 'Groups', 'Permissions'],
-        ]);
-
-        $this->actingAs(tap(User::make()->makeSuper())->save());
-
-        $nav = $this->build();
-
-        $this->assertEquals($expected->keys(), $nav->keys());
-        $this->assertEquals($expected->get('Content'), $nav->get('Content')->map->display()->all());
-        $this->assertEquals($expected->get('Fields'), $nav->get('Fields')->map->display()->all());
-        $this->assertEquals($expected->get('Tools'), $nav->get('Tools')->map->display()->all());
-        $this->assertEquals($expected->get('Users'), $nav->get('Users')->map->display()->all());
-    }
-
-    /** @test */
-    public function is_can_create_a_nav_item()
+    public function it_can_create_a_nav_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -146,7 +123,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_and_modify_an_existing_item()
+    public function it_can_find_and_modify_an_existing_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -154,6 +131,27 @@ class NavTest extends TestCase
             ->url('/pit-droid')
             ->icon('<svg>...</svg>');
 
+        Nav::find('Droids', 'WAC-47')
+            ->url('/d-squad');
+
+        $item = $this->build()->get('Droids')->first();
+
+        $this->assertEquals('Droids', $item->section());
+        $this->assertEquals('WAC-47', $item->display());
+        $this->assertEquals('<svg>...</svg>', $item->icon());
+        $this->assertEquals('http://localhost/d-squad', $item->url());
+    }
+
+    /** @test */
+    public function it_can_find_and_modify_an_existing_item_using_magic_constructor()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::droids('WAC-47')
+            ->url('/pit-droid')
+            ->icon('<svg>...</svg>');
+
+        // Callign the same constructor does a `findOrCreate()` under the hood...
         Nav::droids('WAC-47')
             ->url('/d-squad');
 
@@ -367,6 +365,41 @@ class NavTest extends TestCase
     }
 
     /** @test */
+    public function it_can_remove_a_specific_nav_child_item()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::ships('Y-Wing')
+            ->url('/y-wing')
+            ->icon('y-wing')
+            ->children(function () {
+                return [
+                    Nav::item('Foo'),
+                    Nav::item('Bar'),
+                ];
+            });
+
+        Nav::ships('A-Wing')
+            ->url('/a-wing')
+            ->icon('a-wing')
+            ->children(function () {
+                return [
+                    Nav::item('Foo'),
+                    Nav::item('Bar'),
+                ];
+            });
+
+        $this->assertCount(2, $this->build()->get('Ships'));
+
+        Nav::remove('Ships', 'Y-Wing', 'Foo');
+
+        $this->assertCount(2, $ships = $this->build()->get('Ships'));
+
+        $this->assertEquals(['Bar'], $ships->first()->resolveChildren()->children()->map->display()->all());
+        $this->assertEquals(['Foo', 'Bar'], $ships->last()->resolveChildren()->children()->map->display()->all());
+    }
+
+    /** @test */
     public function it_can_use_extend_to_defer_until_after_statamic_core_nav_items_are_built()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -401,69 +434,30 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    public function it_checks_if_active()
+    public function it_can_use_extend_to_remove_a_default_statamic_child_nav_item()
     {
-        $hello = Nav::create('hello')->url('http://localhost/cp/hello');
-        $helloWithQueryParams = Nav::create('helloWithAnchor')->url('http://localhost/cp/hello?params');
-        $helloWithAnchor = Nav::create('helloWithAnchor')->url('http://localhost/cp/hello#anchor');
-        $hell = Nav::create('hell')->url('http://localhost/cp/hell');
-        $localNotCp = Nav::create('localNotCp')->url('/dashboard');
-        $external = Nav::create('external')->url('http://external.com');
-        $externalSecure = Nav::create('externalSecure')->url('https://external.com');
+        Facades\Collection::make('articles')->save();
+        Facades\Collection::make('pages')->save();
 
-        Request::swap(Request::create('http://localhost/cp/hell'));
-        $this->assertFalse($hello->isActive());
-        $this->assertFalse($helloWithQueryParams->isActive());
-        $this->assertFalse($helloWithAnchor->isActive());
-        $this->assertTrue($hell->isActive());
-        $this->assertFalse($localNotCp->isActive());
-        $this->assertFalse($external->isActive());
-        $this->assertFalse($externalSecure->isActive());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
-        Request::swap(Request::create('http://localhost/cp/hello'));
-        $this->assertTrue($hello->isActive());
-        $this->assertTrue($helloWithQueryParams->isActive());
-        $this->assertTrue($helloWithAnchor->isActive());
-        $this->assertFalse($hell->isActive());
-        $this->assertFalse($localNotCp->isActive());
-        $this->assertFalse($external->isActive());
-        $this->assertFalse($externalSecure->isActive());
+        $nav = Nav::build();
 
-        Request::swap(Request::create('http://localhost/cp/hell/test'));
-        $this->assertFalse($hello->isActive());
-        $this->assertFalse($helloWithQueryParams->isActive());
-        $this->assertFalse($helloWithAnchor->isActive());
-        $this->assertTrue($hell->isActive());
-        $this->assertFalse($localNotCp->isActive());
-        $this->assertFalse($external->isActive());
-        $this->assertFalse($externalSecure->isActive());
+        $collectionsChildren = function () {
+            return $this->build()
+                ->get('Content')
+                ->first(fn ($item) => $item->display() === 'Collections')
+                ->resolveChildren()
+                ->children();
+        };
 
-        Request::swap(Request::create('http://localhost/cp/hello/test'));
-        $this->assertTrue($hello->isActive());
-        $this->assertTrue($helloWithQueryParams->isActive());
-        $this->assertTrue($helloWithAnchor->isActive());
-        $this->assertFalse($hell->isActive());
-        $this->assertFalse($localNotCp->isActive());
-        $this->assertFalse($external->isActive());
-        $this->assertFalse($externalSecure->isActive());
+        $this->assertEquals(['Articles', 'Pages'], $collectionsChildren()->map->display()->all());
 
-        Request::swap(Request::create('http://localhost/cp/hello?params'));
-        $this->assertTrue($hello->isActive());
-        $this->assertTrue($helloWithQueryParams->isActive());
-        $this->assertTrue($helloWithAnchor->isActive());
-        $this->assertFalse($hell->isActive());
-        $this->assertFalse($localNotCp->isActive());
-        $this->assertFalse($external->isActive());
-        $this->assertFalse($externalSecure->isActive());
+        Nav::extend(function ($nav) {
+            $nav->remove('Content', 'Collections', 'Articles');
+        });
 
-        Request::swap(Request::create('http://localhost/cp/hello#anchor'));
-        $this->assertTrue($hello->isActive());
-        $this->assertTrue($helloWithQueryParams->isActive());
-        $this->assertTrue($helloWithAnchor->isActive());
-        $this->assertFalse($hell->isActive());
-        $this->assertFalse($localNotCp->isActive());
-        $this->assertFalse($external->isActive());
-        $this->assertFalse($externalSecure->isActive());
+        $this->assertEquals(['Pages'], $collectionsChildren()->map->display()->all());
     }
 
     /** @test */
@@ -502,7 +496,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_automatically_add_an_active_pattern_when_setting_url_if_one_is_already_defined()
+    public function it_does_not_automatically_add_a_resolve_children_pattern_when_setting_url_if_one_is_already_defined()
     {
         $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
         $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());

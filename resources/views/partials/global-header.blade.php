@@ -1,8 +1,10 @@
+@php use function Statamic\trans as __; @endphp
+
 <div class="global-header">
     <div class="lg:min-w-xl pl-2 md:pl-6 h-full flex items-center">
-        <button class="nav-toggle hidden md:block ml-1 shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@cp_svg('icons/light/burger')</button>
-        <button class="nav-toggle md:hidden ml-1 shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen" aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('icons/light/burger')</button>
-        <button class="nav-toggle md:hidden ml-1 shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('icons/light/close')</button>
+        <button class="nav-toggle hidden md:flex ml-1 shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@cp_svg('icons/light/burger', 'h-4 w-4')</button>
+        <button class="nav-toggle md:hidden ml-1 shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen" aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('icons/light/burger', 'h-4 w-4')</button>
+        <button class="nav-toggle md:hidden ml-1 shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('icons/light/close', 'h-3 w-3')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block shrink-0">
                 @if ($customLogo)
@@ -22,7 +24,7 @@
 
     <div class="head-link h-full md:pr-6 flex items-center justify-end">
 
-        @if (Statamic\Facades\Site::hasMultiple())
+        @if (Statamic\Facades\Site::authorized()->count() > 1)
             <global-site-selector>
                 <template slot="icon">@cp_svg('icons/light/sites')</template>
             </global-site-selector>
@@ -33,6 +35,12 @@
         @if (Route::has('horizon.index') && \Laravel\Horizon\Horizon::check(request()))
             <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
                 @cp_svg('icons/regular/horizon')
+            </a>
+        @endif
+
+        @if (Route::has('pulse') && (app()->environment('local') || $user->can('viewPulse')))
+            <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ route('pulse') }}" target="_blank" v-tooltip="'Laravel Pulse'">
+                @cp_svg('icons/regular/pulse')
             </a>
         @endif
 
@@ -89,11 +97,11 @@
         </a>
         <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <a class="dropdown-toggle items-center ml-4 h-full hide flex">
+                <a class="dropdown-toggle items-center ml-4 h-full hide flex relative group">
                     @if ($user->avatar())
-                        <div class="icon-header-avatar"><img src="{{ $user->avatar() }}" /></div>
+                        <div class="icon-header-avatar {{ session()->get('statamic_impersonated_by') ? 'animate-radar' : '' }}"><img src="{{ $user->avatar() }}" /></div>
                     @else
-                        <div class="icon-header-avatar icon-user-initials">{{ $user->initials() }}</div>
+                        <div class="icon-header-avatar {{ session()->get('statamic_impersonated_by') ? 'animate-radar' : '' }} icon-user-initials">{{ $user->initials() }}</div>
                     @endif
                 </a>
             </template>
@@ -101,13 +109,18 @@
             <div class="px-2">
                 <div class="text-base mb-px">{{ $user->email() }}</div>
                 @if ($user->isSuper())
-                    <div class="text-2xs mt-px text-gray-600">{{ __('Super Admin') }}</div>
+                    <div class="text-2xs mt-px text-gray-600">{{ __('Super Admin') }} @if (session()->get('statamic_impersonated_by'))(Impersonating)@endif</div>
+                @elseif (session()->get('statamic_impersonated_by'))
+                    <div class="text-2xs mt-px text-gray-600">{{ __('Impersonating') }}</div>
                 @endif
             </div>
             <div class="divider"></div>
 
             <dropdown-item :text="__('Profile')" redirect="{{ route('statamic.cp.account') }}"></dropdown-item>
-            <dropdown-item :text="__('Log out')" redirect="{{ route('statamic.cp.logout') }}"></dropdown-item>
+            @if (session()->get('statamic_impersonated_by'))
+                <dropdown-item :text="__('Stop Impersonating')" redirect="{{ cp_route('impersonation.stop') }}"></dropdown-item>
+            @endif
+            <dropdown-item :text="__('Log out')" redirect="{{ route('statamic.cp.logout', ['redirect' => cp_route('index')]) }}"></dropdown-item>
         </dropdown-list>
     </div>
 </div>

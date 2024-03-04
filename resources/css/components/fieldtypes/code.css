@@ -1,26 +1,17 @@
-.code-fieldtype-container {
-    @apply relative;
+.code-fieldtype-toolbar {
+    @apply bg-white shadow-none rounded-t border border-b-0 text-sm flex flex-wrap items-center justify-end gap-2;
+    padding: 4px 8px;
+}
 
-    .code-mode-picker {
-        @apply z-10 right-0 uppercase absolute outline-none shadow-none;
-        right: 0;
+.code-fieldtype-toolbar select {
+    @apply h-8 text-sm leading-none;
+}
 
-        select {
-            @apply text-white w-auto text-2xs p-2 text-right;
-            opacity: .5;
-            background: none;
-            border: none;
-            &:focus {
-                @apply outline-none shadow-none text-blue-300;
-            }
-        }
-        select:hover:not(:disabled) {
-            @apply text-white opacity-100;
-            background: none;
-            border: none;
-        }
-        .select-input-toggle {
-            display: none;
-        }
+
+.code-fieldtype-container.code-fullscreen {
+    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none pt-12;
+
+    .code-fieldtype-toolbar {
+        @apply fixed z-2 top-0 w-full px-6 py-2 h-12 shadow text-base rounded-none bg-gradient-to-b from-white to-gray-100;
     }
 }

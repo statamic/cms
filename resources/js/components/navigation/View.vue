@@ -6,9 +6,9 @@
             <breadcrumb :url="breadcrumbUrl" :title="__('Navigation')" />
 
             <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+                <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list class="mr-2">
+                <dropdown-list v-if="editable" class="mr-2">
                     <slot name="twirldown" />
                 </dropdown-list>
 
@@ -22,7 +22,7 @@
                     @input="siteSelected"
                 />
 
-                <dropdown-list :disabled="! hasCollections">
+                <dropdown-list v-if="canEdit" :disabled="! hasCollections">
                     <template #trigger>
                         <button
                             class="btn"
@@ -38,6 +38,7 @@
                 </dropdown-list>
 
                 <button
+                    v-if="canEdit"
                     class="btn-primary ml-4"
                     :class="{ 'disabled': !changed }"
                     :disabled="!changed"
@@ -48,7 +49,6 @@
 
         <page-tree
             ref="tree"
-            :has-collection="false"
             :pages-url="pagesUrl"
             :submit-url="submitUrl"
             :submit-parameters="{ data: submissionData }"
@@ -56,6 +56,7 @@
             :expects-root="expectsRoot"
             :site="site"
             :preferences-prefix="preferencesPrefix"
+            :editable="canEdit"
             @edit-page="editPage"
             @changed="changed = true; targetParent = null;"
             @saved="treeSaved"
@@ -102,7 +103,7 @@
                 <svg-icon v-if="isTextBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="light/file-text" v-tooltip="__('Text')" />
             </template>
 
-            <template #branch-options="{ branch, removeBranch, orphanChildren, vm, depth }">
+            <template v-if="canEdit" #branch-options="{ branch, removeBranch, orphanChildren, vm, depth }">
                 <dropdown-item
                     v-if="isEntryBranch(branch)"
                     :text="__('Edit Entry')"
@@ -139,6 +140,7 @@
             :publish-info="publishInfo[editingPage.page.id]"
             :blueprint="blueprint"
             :handle="handle"
+            :read-only="!canEdit"
             @publish-info-updated="updatePublishInfo"
             @localized-fields-updated="updateLocalizedFields"
             @closed="closePageEditor"
@@ -151,6 +153,7 @@
             :site="site"
             :blueprint="blueprint"
             :handle="handle"
+            :read-only="!canEdit"
             @publish-info-updated="updatePendingCreatedPagePublishInfo"
             @localized-fields-updated="updatePendingCreatedPageLocalizedFields"
             @closed="closePageCreator"
@@ -198,7 +201,8 @@ export default {
         expectsRoot: { type: Boolean, required: true },
         site: { type: String, required: true },
         sites: { type: Array, required: true },
-        blueprint: { type: Object, required: true }
+        blueprint: { type: Object, required: true },
+        canEdit: { type: Boolean, required: true }
     },
 
     data() {
@@ -383,9 +387,9 @@ export default {
         },
 
         treeSaved(response) {
-            this.changed = false;
-
             this.replaceGeneratedIds(response.data.generatedIds);
+
+            this.changed = false;
         },
 
         replaceGeneratedIds(ids) {

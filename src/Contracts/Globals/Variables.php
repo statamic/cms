@@ -4,4 +4,5 @@ namespace Statamic\Contracts\Globals;
 
 interface Variables
 {
+    //
 }

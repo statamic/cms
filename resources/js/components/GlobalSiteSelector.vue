@@ -13,11 +13,11 @@
             <template #selected-option="option">
                 <div class="flex items-center px-2 text-sm text-gray hover:text-gray-800 anti">
                     <svg-icon name="light/sites" class="mr-2 h-4 w-4" />
-                    <div class="whitespace-nowrap">{{ option.name }}</div>
+                    <div class="whitespace-nowrap">{{ __(option.name) }}</div>
                 </div>
             </template>
             <template #option="{ name, handle }">
-                <div :class="{ 'text-gray-500': handle === active }">{{ name }}</div>
+                <div :class="{ 'text-gray-500': handle === active }">{{ __(name) }}</div>
             </template>
         </v-select>
     </div>

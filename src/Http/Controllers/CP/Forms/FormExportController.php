@@ -2,10 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\Exceptions\FatalException;
-use Statamic\Facades\File;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Support\Str;
 
 class FormExportController extends CpController
 {
@@ -13,25 +11,10 @@ class FormExportController extends CpController
     {
         $this->authorize('view', $form);
 
-        $exporter = 'Statamic\Forms\Exporters\\'.Str::studly($type).'Exporter';
-
-        if (! class_exists($exporter)) {
-            throw new FatalException("Exporter of type [$type] does not exist.");
+        if (! $exporter = $form->exporter($type)) {
+            throw new NotFoundHttpException;
         }
 
-        $exporter = new $exporter;
-        $exporter->form($form);
-
-        $content = $exporter->export();
-
-        if ($this->request->has('download')) {
-            $path = storage_path('statamic/tmp/forms/'.$form->handle().'-'.time().'.'.$type);
-            File::put($path, $content);
-            $response = response()->download($path)->deleteFileAfterSend(true);
-        } else {
-            $response = response($content)->header('Content-Type', $exporter->contentType());
-        }
-
-        return $response;
+        return $this->request->has('download') ? $exporter->download() : $exporter->response();
     }
 }

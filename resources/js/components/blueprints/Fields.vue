@@ -21,6 +21,7 @@
                 @updated="$emit('field-updated', i, $event)"
                 @deleted="$emit('field-deleted', i)"
                 @editor-closed="$emit('editor-closed')"
+                @duplicate="duplicateField(field)"
             />
         </div>
 
@@ -140,7 +141,24 @@ export default {
 
             this.$toast.success(__('Field added'));
             this.pendingCreatedField = null;
-        }
+        },
+
+        duplicateField(field) {
+            let handle = `${field.handle}_duplicate`;
+            let display = field.config.display ? `${field.config.display} (Duplicate)` : `${field.handle} (Duplicate)`;
+
+            let pending = {
+                ...field,
+                _id: uniqid(),
+                handle: handle,
+                config: {
+                    ...field.config,
+                    display,
+                }
+            };
+
+            this.$nextTick(() => this.pendingCreatedField = pending);
+        },
 
     }
 

@@ -34,7 +34,7 @@
                     :aria-selected="isActive(tab.handle)"
                     :tabindex="isActive(tab.handle) ? 0 : -1"
                     @click="setActive(tab.handle)"
-                    v-text="tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`"
+                    v-text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
                 />
             </div>
             <div class="fade-left" v-if="canScrollLeft" />
@@ -46,7 +46,7 @@
                     v-for="(tab, index) in mainTabs"
                     v-show="shouldShowInDropdown(index)"
                     :key="tab.handle"
-                    :text="tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`"
+                    :text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
                     @click.prevent="setActive(tab.handle)"
                 />
             </dropdown-list>
@@ -63,6 +63,7 @@
                     :role="showTabs && 'tabpanel'"
                     :id="showTabs && tabPanelId(tab.handle)"
                     :aria-labelledby="showTabs && tabId(tab.handle)"
+                    :data-tab-handle="tab.handle"
                     tabindex="0"
                     :key="tab.handle"
                     v-for="tab in mainTabs"
@@ -85,7 +86,7 @@
             <!-- Sidebar(ish) -->
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-tab">
-                    <div class="publish-tab-actions card p-0 mb-5" :class="{ 'as-sidebar': shouldShowSidebar }">
+                    <div class="publish-tab-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
                         <v-portal :to="actionsPortal" :disabled="shouldShowSidebar">
                             <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
                         </v-portal>
@@ -116,10 +117,13 @@
 
 <script>
 import { uniq } from 'underscore';
+import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
 
     inject: ['storeName'],
+
+    mixins: [ValidatesFieldConditions],
 
     props: {
         readOnly: Boolean,
@@ -151,7 +155,7 @@ export default {
         },
 
         tabs() {
-            return this.state.blueprint.tabs;
+            return this.state.blueprint.tabs.filter(tab => this.tabHasVisibleFields(tab));
         },
 
         inStack() {
@@ -204,8 +208,11 @@ export default {
 
         actionsPortal() {
             return `publish-actions-${this.storeName}`;
-        }
+        },
 
+        values() {
+            return this.state.values;
+        },
     },
 
     beforeUpdate() {
@@ -228,6 +235,18 @@ export default {
 
         tabHasError(handle) {
             return this.tabsWithErrors.includes(handle);
+        },
+
+        tabHasVisibleFields(tab) {
+            let visibleFields = 0;
+
+            tab.sections.forEach(section => {
+                section.fields.forEach(field => {
+                    if (this.showField(field)) visibleFields++;
+                });
+            });
+
+            return visibleFields > 0;
         },
 
         setActive(handle) {

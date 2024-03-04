@@ -23,6 +23,9 @@
             </button>
         </div>
         <button v-if="!singleTab && tabs.length === 0" class="btn" @click="addAndEditTab" v-text="addTabText" />
+        <div v-if="errors" class="-mt-2">
+            <small class="help-block text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
+        </div>
         <tab-content
             v-for="tab in tabs"
             ref="tabContent"
@@ -93,6 +96,9 @@ export default {
             type: Boolean,
             default: false
         },
+        errors: {
+            type: Array
+        }
     },
 
     data() {
