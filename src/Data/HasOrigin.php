@@ -68,13 +68,9 @@ trait HasOrigin
                     return $found;
                 }
 
-                $found = $this->getOriginByString($origin);
-
-                if ($found) {
+                return tap($this->getOriginByString($origin), function ($found) {
                     Blink::put($this->getOriginBlinkKey(), $found);
-                }
-
-                return $found;
+                });
             })
             ->setter(function ($origin) {
                 Blink::forget($this->getOriginBlinkKey());
