@@ -182,7 +182,29 @@ class InstallEloquentDriver extends Command
 
     protected function migrateForms(): void
     {
-        //
+        if (config('statamic.eloquent-driver.forms.driver') === 'eloquent') {
+            warning('Forms have already been migrated. Skipping...');
+            return;
+        }
+
+        info('Migrating forms...');
+
+        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-form-migrations');
+
+        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+        $configContents = Str::of($configContents)
+            ->replace("'forms' => [\n        'driver'           => 'file'", "'forms' => [\n        'driver'           => 'eloquent'")
+            ->__toString();
+        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+        $this->runArtisanCommand('migrate');
+
+        $this->checkLine('Configured forms');
+
+        if (confirm('Would you like to import existing forms?')) {
+            $this->runArtisanCommand('statamic:eloquent:import-forms');
+            $this->checkLine("Imported existing forms");
+        }
     }
 
     protected function migrateGlobals(): void
