@@ -67,8 +67,7 @@ class LocalizeEntryTest extends TestCase
     public function cant_localize_entry_without_edit_permissions()
     {
         $user = $this->user();
-        $this->setTestRoles(['view' => ['access cp', 'access en site', 'access fr site', 'view blog entries']]);
-        $user->assignRole('view')->removeRole('test')->save();
+        $this->setTestRoles(['test' => ['access cp', 'access en site', 'access fr site', 'view blog entries']]);
 
         $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(false))->save())->slug('test')->create();
         $this->assertNull($entry->in('fr'));
