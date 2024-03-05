@@ -58,7 +58,11 @@ Route::name('statamic.')->group(function () {
     }
 });
 
-Route::get('et/phone/home/{token}', [FrontendController::class, 'elliot'])->middleware(ThrottleRequests::class.':1');
+if (config('statamic.system.phone_home_route_enabled', true)) {
+    Route::get('et/phone/home/{token}', [FrontendController::class, 'elliot'])
+        ->name('statamic.phone-home')
+        ->middleware(ThrottleRequests::class.':1');
+}
 
 if (config('statamic.routes.enabled')) {
     Statamic::additionalWebRoutes();

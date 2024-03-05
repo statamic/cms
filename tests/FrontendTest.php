@@ -933,6 +933,8 @@ class FrontendTest extends TestCase
      */
     public function it_contacts_the_outpost_when_a_correct_key_is_provided($algo)
     {
+        $this->assertTrue(app('router')->getRoutes()->hasNamedRoute('statamic.phone-home'));
+
         config(['statamic.system.license_key' => 'test-key']);
 
         // Assume that the key is hashed and base64 encoded. The base 64 encoding is necessary
@@ -954,6 +956,27 @@ class FrontendTest extends TestCase
             [PASSWORD_ARGON2I],
             [PASSWORD_ARGON2ID],
         ];
+    }
+
+    /**
+     * @test
+     *
+     * @define-env disablePhoneHome
+     */
+    public function it_does_not_contact_the_outpost_if_disabled()
+    {
+        config(['statamic.system.license_key' => 'test-key']);
+        $key = base64_encode(password_hash('test-key', PASSWORD_BCRYPT));
+        $this->mock(Outpost::class)->shouldReceive('radio')->never();
+
+        $this->assertFalse(app('router')->getRoutes()->hasNamedRoute('statamic.phone-home'));
+
+        $this->get('/et/phone/home/'.$key)->assertNotFound();
+    }
+
+    public function disablePhoneHome($app)
+    {
+        $app['config']->set('statamic.system.phone_home_route_enabled', false);
     }
 
     /** @test */
