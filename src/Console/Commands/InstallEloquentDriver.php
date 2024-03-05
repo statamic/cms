@@ -271,7 +271,29 @@ class InstallEloquentDriver extends Command
 
     protected function migrateRevisions(): void
     {
-        //
+        if (config('statamic.eloquent-driver.revisions.driver') === 'eloquent') {
+            warning('Revisions have already been migrated. Skipping...');
+            return;
+        }
+
+        info('Migrating revisions...');
+
+        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-revision-migrations');
+
+        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+        $configContents = Str::of($configContents)
+            ->replace("'revisions' => [\n        'driver' => 'file'", "'revisions' => [\n        'driver' => 'eloquent'")
+            ->__toString();
+        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+        $this->runArtisanCommand('migrate');
+
+        $this->checkLine('Configured revisions');
+
+        if (confirm('Would you like to import existing revisions?')) {
+            $this->runArtisanCommand('statamic:eloquent:import-revisions');
+            $this->checkLine("Imported existing revisions");
+        }
     }
 
     protected function migrateTaxonomies(): void
