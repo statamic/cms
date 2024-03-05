@@ -209,7 +209,30 @@ class InstallEloquentDriver extends Command
 
     protected function migrateGlobals(): void
     {
-        //
+        if (config('statamic.eloquent-driver.global_sets.driver') === 'eloquent') {
+            warning('Globals have already been migrated. Skipping...');
+            return;
+        }
+
+        info('Migrating globals...');
+
+        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-global-migrations');
+
+        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+        $configContents = Str::of($configContents)
+            ->replace("'global_sets' => [\n        'driver' => 'file'", "'forms' => [\n        'driver' => 'eloquent'")
+            ->replace("'global_set_variables' => [\n        'driver' => 'file'", "'global_set_variables' => [\n        'driver' => 'eloquent'")
+            ->__toString();
+        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+        $this->runArtisanCommand('migrate');
+
+        $this->checkLine('Configured globals');
+
+        if (confirm('Would you like to import existing globals?')) {
+            $this->runArtisanCommand('statamic:eloquent:import-globals');
+            $this->checkLine("Imported existing globals");
+        }
     }
 
     protected function migrateNavs(): void
