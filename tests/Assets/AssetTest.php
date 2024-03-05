@@ -958,6 +958,50 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('path/to/asset.txt', '');
+        $disk->put('path/to/another-asset.txt', '');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = (new Asset)->container($container)->path('path/to/asset.txt');
+        $disk->assertExists('path/to/asset.txt');
+        $this->assertEquals([
+            'path/to/another-asset.txt',
+            'path/to/asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'path/to/asset.txt' => [],
+            'path/to/another-asset.txt' => [],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+
+        $return = $asset->deleteQuietly();
+
+        $this->assertEquals($asset, $return);
+        $disk->assertMissing('path/to/asset.txt');
+        $this->assertEquals([
+            'path/to/another-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'path/to/another-asset.txt' => [],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/another-asset.txt',
+        ], $container->contents()->cached()->keys()->all());
+        Event::assertNotDispatched(AssetDeleted::class);
+    }
+
+    /** @test */
     public function it_can_be_moved_to_another_folder()
     {
         Event::fake();
