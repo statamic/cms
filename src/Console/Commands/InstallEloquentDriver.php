@@ -14,9 +14,9 @@ use Symfony\Component\Process\PhpExecutableFinder;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
+use function Laravel\Prompts\info;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\warning;
-use function Laravel\Prompts\info;
 
 class InstallEloquentDriver extends Command
 {
@@ -92,6 +92,7 @@ class InstallEloquentDriver extends Command
             || config('statamic.eloquent-driver.assets.driver') === 'eloquent'
         ) {
             warning('Assets have already been migrated. Skipping...');
+
             return;
         }
 
@@ -112,7 +113,7 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing assets?')) {
             $this->runArtisanCommand('statamic:eloquent:import-assets --force');
-            $this->checkLine("Imported existing assets");
+            $this->checkLine('Imported existing assets');
         }
     }
 
@@ -120,6 +121,7 @@ class InstallEloquentDriver extends Command
     {
         if (config('statamic.eloquent-driver.blueprints.driver') === 'eloquent') {
             warning('Blueprints have already been migrated. Skipping...');
+
             return;
         }
 
@@ -139,7 +141,7 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing blueprints?')) {
             $this->runArtisanCommand('statamic:eloquent:import-blueprints');
-            $this->checkLine("Imported existing blueprints");
+            $this->checkLine('Imported existing blueprints');
         }
     }
 
@@ -150,6 +152,7 @@ class InstallEloquentDriver extends Command
             || config('statamic.eloquent-driver.collection_trees.driver') === 'eloquent'
         ) {
             warning('Collections have already been migrated. Skipping...');
+
             return;
         }
 
@@ -171,7 +174,7 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing collections?')) {
             $this->runArtisanCommand('statamic:eloquent:import-collections --force');
-            $this->checkLine("Imported existing collections");
+            $this->checkLine('Imported existing collections');
         }
     }
 
@@ -179,6 +182,7 @@ class InstallEloquentDriver extends Command
     {
         if (config('statamic.eloquent-driver.entries.driver') === 'eloquent') {
             warning('Entries have already been migrated. Skipping...');
+
             return;
         }
 
@@ -196,7 +200,8 @@ class InstallEloquentDriver extends Command
             $this->runArtisanCommand('migrate');
             $this->runArtisanCommand('statamic:eloquent:import-entries');
 
-            $this->checkLine("Configured & imported existing entries");
+            $this->checkLine('Configured & imported existing entries');
+
             return;
         }
 
@@ -225,6 +230,7 @@ class InstallEloquentDriver extends Command
     {
         if (config('statamic.eloquent-driver.forms.driver') === 'eloquent') {
             warning('Forms have already been migrated. Skipping...');
+
             return;
         }
 
@@ -244,7 +250,7 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing forms?')) {
             $this->runArtisanCommand('statamic:eloquent:import-forms');
-            $this->checkLine("Imported existing forms");
+            $this->checkLine('Imported existing forms');
         }
     }
 
@@ -255,6 +261,7 @@ class InstallEloquentDriver extends Command
             || config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent'
         ) {
             warning('Globals have already been migrated. Skipping...');
+
             return;
         }
 
@@ -275,7 +282,7 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing globals?')) {
             $this->runArtisanCommand('statamic:eloquent:import-globals');
-            $this->checkLine("Imported existing globals");
+            $this->checkLine('Imported existing globals');
         }
     }
 
@@ -286,6 +293,7 @@ class InstallEloquentDriver extends Command
             || config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent'
         ) {
             warning('Navs have already been migrated. Skipping...');
+
             return;
         }
 
@@ -306,7 +314,7 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing navs?')) {
             $this->runArtisanCommand('statamic:eloquent:import-navs --force');
-            $this->checkLine("Imported existing navs");
+            $this->checkLine('Imported existing navs');
         }
     }
 
@@ -314,6 +322,7 @@ class InstallEloquentDriver extends Command
     {
         if (config('statamic.eloquent-driver.revisions.driver') === 'eloquent') {
             warning('Revisions have already been migrated. Skipping...');
+
             return;
         }
 
@@ -333,7 +342,7 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing revisions?')) {
             $this->runArtisanCommand('statamic:eloquent:import-revisions');
-            $this->checkLine("Imported existing revisions");
+            $this->checkLine('Imported existing revisions');
         }
     }
 
@@ -344,6 +353,7 @@ class InstallEloquentDriver extends Command
             || config('statamic.eloquent-driver.terms.driver') === 'eloquent'
         ) {
             warning('Taxonomies have already been migrated. Skipping...');
+
             return;
         }
 
@@ -364,7 +374,7 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing taxonomies?')) {
             $this->runArtisanCommand('statamic:eloquent:import-taxonomies --force');
-            $this->checkLine("Imported existing taxonomies");
+            $this->checkLine('Imported existing taxonomies');
         }
     }
 
