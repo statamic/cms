@@ -145,7 +145,34 @@ class InstallEloquentDriver extends Command
 
     protected function migrateCollections(): void
     {
-        //
+        if (
+            config('statamic.eloquent-driver.collections.driver') === 'eloquent'
+            || config('statamic.eloquent-driver.collection_trees.driver') === 'eloquent'
+        ) {
+            warning('Collections have already been migrated. Skipping...');
+            return;
+        }
+
+        info('Migrating collections...');
+
+        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-collection-migrations');
+        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
+
+        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+        $configContents = Str::of($configContents)
+            ->replace("'collections' => [\n        'driver' => 'file'", "'collections' => [\n        'driver' => 'eloquent'")
+            ->replace("'collection_trees' => [\n        'driver' => 'file'", "'collection_trees' => [\n        'driver' => 'eloquent'")
+            ->__toString();
+        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+        $this->runArtisanCommand('migrate');
+
+        $this->checkLine('Configured collections');
+
+        if (confirm('Would you like to import existing collections?')) {
+            $this->runArtisanCommand('statamic:eloquent:import-collections --force');
+            $this->checkLine("Imported existing collections");
+        }
     }
 
     protected function migrateEntries(): void
