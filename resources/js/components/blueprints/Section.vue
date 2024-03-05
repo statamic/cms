@@ -124,7 +124,7 @@ export default {
     computed: {
 
         suggestableConditionFields() {
-            return this.suggestableConditionFieldsProvider?.suggestableFields || [];
+            return this.suggestableConditionFieldsProvider?.suggestableFields(this) || [];
         },
 
         iconBaseDirectory() {

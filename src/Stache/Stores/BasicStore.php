@@ -24,12 +24,20 @@ abstract class BasicStore extends Store
         }
 
         if ($item = $this->getCachedItem($key)) {
+            if (method_exists($item, 'syncOriginal')) {
+                $item->syncOriginal();
+            }
+
             return $item;
         }
 
         $item = $this->makeItemFromFile($path, File::get($path));
 
         $this->cacheItem($item);
+
+        if (method_exists($item, 'syncOriginal')) {
+            $item->syncOriginal();
+        }
 
         return $item;
     }

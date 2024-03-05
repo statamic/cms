@@ -37,12 +37,19 @@ class MakeAddonTest extends TestCase
 
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/README.md'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/.gitignore'));
+        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/phpunit.xml'));
 
         $this->assertFileExists($composerJson = base_path('addons/hasselhoff/knight-rider/composer.json'));
         $this->assertStringContainsString('"Hasselhoff\\\KnightRider\\\": "src"', $this->files->get($composerJson));
 
         $this->assertFileExists($provider = base_path('addons/hasselhoff/knight-rider/src/ServiceProvider.php'));
         $this->assertStringContainsString('namespace Hasselhoff\KnightRider;', $this->files->get($provider));
+
+        $this->assertFileExists($testCase = base_path('addons/hasselhoff/knight-rider/tests/TestCase.php'));
+        $this->assertStringContainsString('namespace Hasselhoff\KnightRider\Tests;', $this->files->get($testCase));
+
+        $this->assertFileExists($exampleTest = base_path('addons/hasselhoff/knight-rider/tests/ExampleTest.php'));
+        $this->assertStringContainsString('namespace Hasselhoff\KnightRider\Tests;', $this->files->get($exampleTest));
     }
 
     /** @test */

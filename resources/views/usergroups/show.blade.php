@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', Statamic::crumb($group->title(), 'User Group'))
 @section('wrapper_class', 'max-w-full')

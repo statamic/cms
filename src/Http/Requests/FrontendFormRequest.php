@@ -61,6 +61,7 @@ class FrontendFormRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         if ($this->ajax()) {
+
             $errors = $validator->errors();
 
             $response = response([
