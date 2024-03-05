@@ -298,7 +298,33 @@ class InstallEloquentDriver extends Command
 
     protected function migrateTaxonomies(): void
     {
-        //
+        if (
+            config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent'
+            || config('statamic.eloquent-driver.terms.driver') === 'eloquent'
+        ) {
+            warning('Taxonomies have already been migrated. Skipping...');
+            return;
+        }
+
+        info('Migrating taxonomies...');
+
+        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-taxonomy-migrations');
+
+        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+        $configContents = Str::of($configContents)
+            ->replace("'taxonomies' => [\n        'driver' => 'file'", "'taxonomies' => [\n        'driver' => 'eloquent'")
+            ->replace("'terms' => [\n        'driver' => 'file'", "'terms' => [\n        'driver' => 'eloquent'")
+            ->__toString();
+        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+        $this->runArtisanCommand('migrate');
+
+        $this->checkLine('Configured taxonomies');
+
+        if (confirm('Would you like to import existing taxonomies?')) {
+            $this->runArtisanCommand('statamic:eloquent:import-taxonomies --force');
+            $this->checkLine("Imported existing taxonomies");
+        }
     }
 
     private function runArtisanCommand(string $command, bool $writeOutput = false): ProcessResult
