@@ -7,8 +7,7 @@
     	</button>
 
         <div v-if="hasDate || config.inline"
-            class="date-time-container flex flow-col @sm:flex-row"
-            :class="config.time_seconds_enabled ? 'space-x-1' : 'space-x-3'"
+            class="date-time-container flex flex-col @sm:flex-row gap-2"
         >
             <component
                 :is="pickerComponent"
@@ -18,7 +17,7 @@
                 @blur="focusedField = null"
             />
 
-            <div v-if="config.time_enabled && !isRange" class="time-container @xs:ml-2 @xs:mt-0 time-fieldtype">
+            <div v-if="config.time_enabled && !isRange" class="time-container time-fieldtype">
 				<time-fieldtype
                     v-if="hasTime"
                     ref="time"

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full">
+    <div class="flex-1">
 
         <v-portal :disabled="!open" :to="portalTarget">
             <v-date-picker
