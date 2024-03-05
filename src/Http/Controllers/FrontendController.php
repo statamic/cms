@@ -5,10 +5,8 @@ namespace Statamic\Http\Controllers;
 use Illuminate\Http\Request;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\Config;
 use Statamic\Facades\Data;
 use Statamic\Http\Responses\DataResponse;
-use Statamic\Licensing\Outpost;
 use Statamic\Support\Arr;
 use Statamic\View\View;
 
@@ -74,16 +72,5 @@ class FrontendController extends Controller
         if ($data = Data::findByUri($item)) {
             return $data;
         }
-    }
-
-    public function elliot(Outpost $outpost, $token)
-    {
-        if (! password_verify(Config::getLicenseKey(), base64_decode($token))) {
-            throw new NotFoundHttpException;
-        }
-
-        $outpost->radio();
-
-        return response()->json(['success' => true]);
     }
 }
