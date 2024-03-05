@@ -485,6 +485,18 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->saveQuietly();
+
+        Event::assertNotDispatched(CollectionSaved::class);
+        Event::assertNotDispatched(CollectionSaving::class);
+    }
+
+    /** @test */
     public function it_dispatches_collection_saved()
     {
         Event::fake();

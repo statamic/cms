@@ -62,6 +62,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     protected $titleFormats = [];
     protected $previewTargets = [];
     protected $autosave;
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -435,16 +436,28 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $translation;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
 
-        if ($isNew && CollectionCreating::dispatch($this) === false) {
-            return false;
-        }
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
 
-        if (CollectionSaving::dispatch($this) === false) {
-            return false;
+        if ($withEvents) {
+            if ($isNew && CollectionCreating::dispatch($this) === false) {
+                return false;
+            }
+
+            if (CollectionSaving::dispatch($this) === false) {
+                return false;
+            }
         }
 
         Facades\Collection::save($this);
@@ -452,11 +465,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         Blink::forget('collection-handles');
         Blink::flushStartingWith("collection-{$this->id()}");
 
-        if ($isNew) {
-            CollectionCreated::dispatch($this);
-        }
+        if ($withEvents) {
+            if ($isNew) {
+                CollectionCreated::dispatch($this);
+            }
 
-        CollectionSaved::dispatch($this);
+            CollectionSaved::dispatch($this);
+        }
 
         return $this;
     }
