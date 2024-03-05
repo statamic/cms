@@ -727,15 +727,25 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this->structure !== null || $this->structureContents !== null;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (CollectionDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && CollectionDeleting::dispatch($this) === false) {
             return false;
         }
 
-        $this->queryEntries()->get()->each(function ($entry) {
-            $entry->deleteDescendants();
-            $entry->delete();
+        $this->queryEntries()->get()->each(function ($entry) use ($withEvents) {
+            $entry->deleteDescendants($withEvents);
+            $withEvents ? $entry->delete() : $entry->deleteQuietly();
         });
 
         if ($this->hasStructure()) {
@@ -744,7 +754,9 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         Facades\Collection::delete($this);
 
-        CollectionDeleted::dispatch($this);
+        if ($withEvents) {
+            CollectionDeleted::dispatch($this);
+        }
 
         return true;
     }

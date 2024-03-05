@@ -998,4 +998,19 @@ class CollectionTest extends TestCase
         Facades\Collection::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(CollectionDeleted::class);
     }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $collection = Facades\Collection::make('test')->save();
+
+        $return = $collection->deleteQuietly();
+
+        Event::assertNotDispatched(CollectionDeleting::class);
+        Event::assertNotDispatched(CollectionDeleted::class);
+
+        $this->assertTrue($return);
+    }
 }
