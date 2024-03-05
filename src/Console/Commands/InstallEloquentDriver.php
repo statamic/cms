@@ -118,7 +118,29 @@ class InstallEloquentDriver extends Command
 
     protected function migrateBlueprints(): void
     {
-        //
+        if (config('statamic.eloquent-driver.blueprints.driver') === 'eloquent') {
+            warning('Blueprints have already been migrated. Skipping...');
+            return;
+        }
+
+        info('Migrating blueprints...');
+
+        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-blueprint-migrations');
+
+        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+        $configContents = Str::of($configContents)
+            ->replace("'blueprints' => [\n        'driver'          => 'file',", "'blueprints' => [\n        'driver'          => 'eloquent',")
+            ->__toString();
+        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+        $this->runArtisanCommand('migrate');
+
+        $this->checkLine('Configured blueprints');
+
+        if (confirm('Would you like to import existing blueprints?')) {
+            $this->runArtisanCommand('statamic:eloquent:import-blueprints');
+            $this->checkLine("Imported existing blueprints");
+        }
     }
 
     protected function migrateCollections(): void
