@@ -177,7 +177,48 @@ class InstallEloquentDriver extends Command
 
     protected function migrateEntries(): void
     {
-        //
+        if (config('statamic.eloquent-driver.entries.driver') === 'eloquent') {
+            warning('Entries have already been migrated. Skipping...');
+            return;
+        }
+
+        info('Migrating entries...');
+
+        if (confirm('Would you like to import existing entries?')) {
+            $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+            $configContents = Str::of($configContents)
+                ->replace("'entries' => [\n        'driver' => 'file'", "'entries' => [\n        'driver' => 'eloquent'")
+                ->replace("'model'  => \Statamic\Eloquent\Entries\EntryModel::class", "'model'  => \Statamic\Eloquent\Entries\UuidEntryModel::class")
+                ->__toString();
+            File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+            $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-entries-table-with-string-ids');
+            $this->runArtisanCommand('migrate');
+            $this->runArtisanCommand('statamic:eloquent:import-entries');
+
+            $this->checkLine("Configured & imported existing entries");
+            return;
+        }
+
+        if (File::exists(base_path('content/collections/pages/home.md'))) {
+            File::delete(base_path('content/collections/pages/home.md'));
+        }
+
+        if (File::exists(base_path('content/trees/collections/pages.yaml'))) {
+            File::put(base_path('content/trees/collections/pages.yaml'), 'tree: {}');
+        }
+
+        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-entries-table');
+
+        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+        $configContents = Str::of($configContents)
+            ->replace("'entries' => [\n        'driver' => 'file'", "'entries' => [\n        'driver' => 'eloquent'")
+            ->__toString();
+        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+        $this->runArtisanCommand('migrate');
+
+        $this->checkLine('Configured entries');
     }
 
     protected function migrateForms(): void
