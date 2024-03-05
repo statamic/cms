@@ -87,12 +87,7 @@ jobs:
           max_attempts: 5
           command: |
             composer config minimum-stability dev
-            composer config repositories.graphql '{ "type": "vcs", "url": "https://github.com/jasonvarga/graphql-laravel" }'
-            composer config repositories.laragraph '{ "type": "vcs", "url": "https://github.com/jasonvarga/laragraph-utils" }'
-            composer require "laragraph/utils dev-make-statamic-work-kthx as 2.0.3" --no-update
-            composer require "rebing/graphql-laravel dev-make-statamic-work-kthx" --no-update
-            composer require "laravel/framework 11.x-dev" --no-update
-            composer require "orchestra/testbench 9.x-dev@dev" --dev --no-update
+            composer config prefer-stable true
 
       - name: Install dependencies
         uses: nick-invision/retry@v2
