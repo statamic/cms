@@ -209,7 +209,10 @@ class InstallEloquentDriver extends Command
 
     protected function migrateGlobals(): void
     {
-        if (config('statamic.eloquent-driver.global_sets.driver') === 'eloquent') {
+        if (
+            config('statamic.eloquent-driver.global_sets.driver') === 'eloquent'
+            || config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent'
+        ) {
             warning('Globals have already been migrated. Skipping...');
             return;
         }
@@ -220,7 +223,7 @@ class InstallEloquentDriver extends Command
 
         $configContents = File::get(config_path('statamic/eloquent-driver.php'));
         $configContents = Str::of($configContents)
-            ->replace("'global_sets' => [\n        'driver' => 'file'", "'forms' => [\n        'driver' => 'eloquent'")
+            ->replace("'global_sets' => [\n        'driver' => 'file'", "'global_sets' => [\n        'driver' => 'eloquent'")
             ->replace("'global_set_variables' => [\n        'driver' => 'file'", "'global_set_variables' => [\n        'driver' => 'eloquent'")
             ->__toString();
         File::put(config_path('statamic/eloquent-driver.php'), $configContents);
@@ -237,7 +240,33 @@ class InstallEloquentDriver extends Command
 
     protected function migrateNavs(): void
     {
-        //
+        if (
+            config('statamic.eloquent-driver.navigations.driver') === 'eloquent'
+            || config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent'
+        ) {
+            warning('Navs have already been migrated. Skipping...');
+            return;
+        }
+
+        info('Migrating navs...');
+
+        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
+
+        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+        $configContents = Str::of($configContents)
+            ->replace("'navigations' => [\n        'driver'     => 'file'", "'navigations' => [\n        'driver'     => 'eloquent'")
+            ->replace("'navigation_trees' => [\n        'driver' => 'file'", "'navigation_trees' => [\n        'driver' => 'eloquent'")
+            ->__toString();
+        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+
+        $this->runArtisanCommand('migrate');
+
+        $this->checkLine('Configured navs');
+
+        if (confirm('Would you like to import existing navs?')) {
+            $this->runArtisanCommand('statamic:eloquent:import-navs --force');
+            $this->checkLine("Imported existing navs");
+        }
     }
 
     protected function migrateRevisions(): void
