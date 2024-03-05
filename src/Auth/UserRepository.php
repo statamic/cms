@@ -8,7 +8,7 @@ use Statamic\Data\StoresComputedFieldCallbacks;
 use Statamic\Events\UserBlueprintFound;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
-use Statamic\OAuth\Provider;
+use Statamic\Facades\OAuth;
 use Statamic\Statamic;
 
 abstract class UserRepository implements RepositoryContract
@@ -86,7 +86,7 @@ abstract class UserRepository implements RepositoryContract
     public function findByOAuthId(string $provider, string $id): ?User
     {
         return $this->find(
-            (new Provider($provider))->getUserId($id)
+            OAuth::provider($provider)->getUserId($id)
         );
     }
 }
