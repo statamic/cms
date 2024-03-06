@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Process\ProcessResult;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Schema;
 use Statamic\Console\EnhancesCommands;
@@ -63,21 +64,17 @@ class InstallEloquentDriver extends Command
             $this->checkLine('Config file published. You can find it at config/statamic/eloquent-driver.php');
         }
 
+        if ($this->availableRepositories()->isEmpty()) {
+            return warning("No repositories left to migrate. You're already using the Eloquent Driver for all repositories.");
+        }
+
         $repositories = multiselect(
             label: 'Which repositories would you like to migrate?',
-            options: [
-                'assets' => 'Assets',
-                'blueprints' => 'Blueprints & Fieldsets',
-                'collections' => 'Collections',
-                'entries' => 'Entries',
-                'forms' => 'Forms',
-                'globals' => 'Globals',
-                'navs' => 'Navs',
-                'revisions' => 'Revisions',
-                'taxonomies' => 'Taxonomies',
-            ],
-            default: ['assets', 'blueprints', 'collections', 'entries', 'forms', 'globals', 'navs', 'revisions', 'taxonomies'],
-            hint: 'You can always import other repositories later.'
+            hint: 'You can always import other repositories later.',
+            options: $this->availableRepositories()->all(),
+            validate: fn (array $values) => count($values) === 0
+                ? 'You must select at least one repository to migrate.'
+                : null
         );
 
         foreach ($repositories as $repository) {
@@ -86,17 +83,57 @@ class InstallEloquentDriver extends Command
         }
     }
 
+    protected function availableRepositories(): Collection
+    {
+        return collect([
+            'assets' => 'Assets',
+            'blueprints' => 'Blueprints & Fieldsets',
+            'collections' => 'Collections',
+            'entries' => 'Entries',
+            'forms' => 'Forms',
+            'globals' => 'Globals',
+            'navs' => 'Navigations',
+            'revisions' => 'Revisions',
+            'taxonomies' => 'Taxonomies',
+        ])->reject(function ($value, $key) {
+            switch ($key) {
+                case 'assets':
+                    return config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent'
+                        || config('statamic.eloquent-driver.assets.driver') === 'eloquent';
+
+                case 'blueprints':
+                    return config('statamic.eloquent-driver.blueprints.driver') === 'eloquent';
+
+                case 'collections':
+                    return config('statamic.eloquent-driver.collections.driver') === 'eloquent'
+                        || config('statamic.eloquent-driver.collection_trees.driver') === 'eloquent';
+
+                case 'entries':
+                    return config('statamic.eloquent-driver.entries.driver') === 'eloquent';
+
+                case 'forms':
+                    return config('statamic.eloquent-driver.forms.driver') === 'eloquent';
+
+                case 'globals':
+                    return config('statamic.eloquent-driver.global_sets.driver') === 'eloquent'
+                        || config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent';
+
+                case 'navs':
+                    return config('statamic.eloquent-driver.navigations.driver') === 'eloquent'
+                        || config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent';
+
+                case 'revisions':
+                    return config('statamic.eloquent-driver.revisions.driver') === 'eloquent';
+
+                case 'taxonomies':
+                    return config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent'
+                        || config('statamic.eloquent-driver.terms.driver') === 'eloquent';
+            }
+        });
+    }
+
     protected function migrateAssets(): void
     {
-        if (
-            config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent'
-            || config('statamic.eloquent-driver.assets.driver') === 'eloquent'
-        ) {
-            warning('Assets have already been migrated. Skipping...');
-
-            return;
-        }
-
         info('Migrating assets...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-asset-migrations');
@@ -120,12 +157,6 @@ class InstallEloquentDriver extends Command
 
     protected function migrateBlueprints(): void
     {
-        if (config('statamic.eloquent-driver.blueprints.driver') === 'eloquent') {
-            warning('Blueprints have already been migrated. Skipping...');
-
-            return;
-        }
-
         info('Migrating blueprints...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-blueprint-migrations');
@@ -148,15 +179,6 @@ class InstallEloquentDriver extends Command
 
     protected function migrateCollections(): void
     {
-        if (
-            config('statamic.eloquent-driver.collections.driver') === 'eloquent'
-            || config('statamic.eloquent-driver.collection_trees.driver') === 'eloquent'
-        ) {
-            warning('Collections have already been migrated. Skipping...');
-
-            return;
-        }
-
         info('Migrating collections...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-collection-migrations');
@@ -184,12 +206,6 @@ class InstallEloquentDriver extends Command
 
     protected function migrateEntries(): void
     {
-        if (config('statamic.eloquent-driver.entries.driver') === 'eloquent') {
-            warning('Entries have already been migrated. Skipping...');
-
-            return;
-        }
-
         info('Migrating entries...');
 
         if (confirm('Would you like to import existing entries?')) {
@@ -232,12 +248,6 @@ class InstallEloquentDriver extends Command
 
     protected function migrateForms(): void
     {
-        if (config('statamic.eloquent-driver.forms.driver') === 'eloquent') {
-            warning('Forms have already been migrated. Skipping...');
-
-            return;
-        }
-
         info('Migrating forms...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-form-migrations');
@@ -260,15 +270,6 @@ class InstallEloquentDriver extends Command
 
     protected function migrateGlobals(): void
     {
-        if (
-            config('statamic.eloquent-driver.global_sets.driver') === 'eloquent'
-            || config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent'
-        ) {
-            warning('Globals have already been migrated. Skipping...');
-
-            return;
-        }
-
         info('Migrating globals...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-global-migrations');
@@ -292,15 +293,6 @@ class InstallEloquentDriver extends Command
 
     protected function migrateNavs(): void
     {
-        if (
-            config('statamic.eloquent-driver.navigations.driver') === 'eloquent'
-            || config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent'
-        ) {
-            warning('Navs have already been migrated. Skipping...');
-
-            return;
-        }
-
         info('Migrating navs...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
@@ -328,12 +320,6 @@ class InstallEloquentDriver extends Command
 
     protected function migrateRevisions(): void
     {
-        if (config('statamic.eloquent-driver.revisions.driver') === 'eloquent') {
-            warning('Revisions have already been migrated. Skipping...');
-
-            return;
-        }
-
         info('Migrating revisions...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-revision-migrations');
@@ -356,15 +342,6 @@ class InstallEloquentDriver extends Command
 
     protected function migrateTaxonomies(): void
     {
-        if (
-            config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent'
-            || config('statamic.eloquent-driver.terms.driver') === 'eloquent'
-        ) {
-            warning('Taxonomies have already been migrated. Skipping...');
-
-            return;
-        }
-
         info('Migrating taxonomies...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-taxonomy-migrations');
