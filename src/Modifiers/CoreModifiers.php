@@ -2542,13 +2542,13 @@ class CoreModifiers extends Modifier
     public function toJson($value, $params)
     {
         $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : 0;
-//        if (Compare::isQueryBuilder($value)) {
-//            $value = $value->get();
-//        }
-//
-//        if ($value instanceof Collection || $value instanceof Augmentable) {
-//            $value = $value->toAugmentedArray();
-//        }
+        //        if (Compare::isQueryBuilder($value)) {
+        //            $value = $value->get();
+        //        }
+        //
+        //        if ($value instanceof Collection || $value instanceof Augmentable) {
+        //            $value = $value->toAugmentedArray();
+        //        }
 
         return json_encode($value, $options);
     }
