@@ -166,8 +166,11 @@
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="text-sm flex items-center -mx-4 px-4 py-2 cursor-pointer"
-                                        :class="option.active ? 'bg-blue-100' : 'hover:bg-gray-200'"
+                                        class="text-sm flex items-center -mx-4 px-4 py-2"
+                                        :class="[
+                                            option.active ? 'bg-blue-100' : 'hover:bg-gray-200',
+                                            !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
+                                        ]"
                                         @click="localizationSelected(option)"
                                     >
                                         <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
@@ -626,6 +629,11 @@ export default {
         },
 
         localizationSelected(localization) {
+            if (!this.canSave) {
+                if (localization.exists) this.editLocalization(localization);
+                return;
+            }
+
             if (localization.active) return;
 
             if (this.isDirty) {
