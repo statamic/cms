@@ -137,15 +137,10 @@ class InstallEloquentDriver extends Command
         info('Migrating assets...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-asset-migrations');
-
-        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-        $configContents = Str::of($configContents)
-            ->replace("'asset_containers' => [\n        'driver' => 'file'", "'asset_containers' => [\n        'driver' => 'eloquent'")
-            ->replace("'assets' => [\n        'driver' => 'file'", "'assets' => [\n        'driver' => 'eloquent'")
-            ->__toString();
-        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
-
         $this->runArtisanCommand('migrate');
+
+        $this->switchToEloquentDriver('asset_containers');
+        $this->switchToEloquentDriver('assets');
 
         $this->checkLine('Configured assets');
 
@@ -160,14 +155,9 @@ class InstallEloquentDriver extends Command
         info('Migrating blueprints...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-blueprint-migrations');
-
-        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-        $configContents = Str::of($configContents)
-            ->replace("'blueprints' => [\n        'driver'          => 'file',", "'blueprints' => [\n        'driver'          => 'eloquent',")
-            ->__toString();
-        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
-
         $this->runArtisanCommand('migrate');
+
+        $this->switchToEloquentDriver('blueprints');
 
         $this->checkLine('Configured blueprints');
 
@@ -187,14 +177,10 @@ class InstallEloquentDriver extends Command
             $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-tree-migrations');
         }
 
-        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-        $configContents = Str::of($configContents)
-            ->replace("'collections' => [\n        'driver' => 'file'", "'collections' => [\n        'driver' => 'eloquent'")
-            ->replace("'collection_trees' => [\n        'driver' => 'file'", "'collection_trees' => [\n        'driver' => 'eloquent'")
-            ->__toString();
-        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
-
         $this->runArtisanCommand('migrate');
+
+        $this->switchToEloquentDriver('collections');
+        $this->switchToEloquentDriver('collection_trees');
 
         $this->checkLine('Configured collections');
 
@@ -208,16 +194,19 @@ class InstallEloquentDriver extends Command
     {
         info('Migrating entries...');
 
+        $this->switchToEloquentDriver('entries');
+
         if (confirm('Would you like to import existing entries?')) {
-            $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-            $configContents = Str::of($configContents)
-                ->replace("'entries' => [\n        'driver' => 'file'", "'entries' => [\n        'driver' => 'eloquent'")
-                ->replace("'model'  => \Statamic\Eloquent\Entries\EntryModel::class", "'model'  => \Statamic\Eloquent\Entries\UuidEntryModel::class")
-                ->__toString();
-            File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+            File::put(
+                config_path('statamic/eloquent-driver.php'),
+                Str::of(File::get(config_path('statamic/eloquent-driver.php')))
+                    ->replace("'model'  => \Statamic\Eloquent\Entries\EntryModel::class", "'model'  => \Statamic\Eloquent\Entries\UuidEntryModel::class")
+                    ->__toString()
+            );
 
             $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-entries-table-with-string-ids');
             $this->runArtisanCommand('migrate');
+
             $this->runArtisanCommand('statamic:eloquent:import-entries');
 
             $this->checkLine('Configured & imported existing entries');
@@ -234,13 +223,6 @@ class InstallEloquentDriver extends Command
         }
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-entries-table');
-
-        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-        $configContents = Str::of($configContents)
-            ->replace("'entries' => [\n        'driver' => 'file'", "'entries' => [\n        'driver' => 'eloquent'")
-            ->__toString();
-        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
-
         $this->runArtisanCommand('migrate');
 
         $this->checkLine('Configured entries');
@@ -251,14 +233,9 @@ class InstallEloquentDriver extends Command
         info('Migrating forms...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-form-migrations');
-
-        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-        $configContents = Str::of($configContents)
-            ->replace("'forms' => [\n        'driver'           => 'file'", "'forms' => [\n        'driver'           => 'eloquent'")
-            ->__toString();
-        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
-
         $this->runArtisanCommand('migrate');
+
+        $this->switchToEloquentDriver('forms');
 
         $this->checkLine('Configured forms');
 
@@ -273,15 +250,10 @@ class InstallEloquentDriver extends Command
         info('Migrating globals...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-global-migrations');
-
-        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-        $configContents = Str::of($configContents)
-            ->replace("'global_sets' => [\n        'driver' => 'file'", "'global_sets' => [\n        'driver' => 'eloquent'")
-            ->replace("'global_set_variables' => [\n        'driver' => 'file'", "'global_set_variables' => [\n        'driver' => 'eloquent'")
-            ->__toString();
-        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
-
         $this->runArtisanCommand('migrate');
+
+        $this->switchToEloquentDriver('global_sets');
+        $this->switchToEloquentDriver('global_set_variables');
 
         $this->checkLine('Configured globals');
 
@@ -301,14 +273,10 @@ class InstallEloquentDriver extends Command
             $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-tree-migrations');
         }
 
-        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-        $configContents = Str::of($configContents)
-            ->replace("'navigations' => [\n        'driver'     => 'file'", "'navigations' => [\n        'driver'     => 'eloquent'")
-            ->replace("'navigation_trees' => [\n        'driver' => 'file'", "'navigation_trees' => [\n        'driver' => 'eloquent'")
-            ->__toString();
-        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
-
         $this->runArtisanCommand('migrate');
+
+        $this->switchToEloquentDriver('navigations');
+        $this->switchToEloquentDriver('navigation_trees');
 
         $this->checkLine('Configured navs');
 
@@ -323,14 +291,9 @@ class InstallEloquentDriver extends Command
         info('Migrating revisions...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-revision-migrations');
-
-        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-        $configContents = Str::of($configContents)
-            ->replace("'revisions' => [\n        'driver' => 'file'", "'revisions' => [\n        'driver' => 'eloquent'")
-            ->__toString();
-        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
-
         $this->runArtisanCommand('migrate');
+
+        $this->switchToEloquentDriver('revisions');
 
         $this->checkLine('Configured revisions');
 
@@ -345,15 +308,10 @@ class InstallEloquentDriver extends Command
         info('Migrating taxonomies...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-taxonomy-migrations');
-
-        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-        $configContents = Str::of($configContents)
-            ->replace("'taxonomies' => [\n        'driver' => 'file'", "'taxonomies' => [\n        'driver' => 'eloquent'")
-            ->replace("'terms' => [\n        'driver' => 'file'", "'terms' => [\n        'driver' => 'eloquent'")
-            ->__toString();
-        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
-
         $this->runArtisanCommand('migrate');
+
+        $this->switchToEloquentDriver('taxonomies');
+        $this->switchToEloquentDriver('terms');
 
         $this->checkLine('Configured taxonomies');
 
@@ -361,6 +319,20 @@ class InstallEloquentDriver extends Command
             $this->runArtisanCommand('statamic:eloquent:import-taxonomies --force');
             $this->checkLine('Imported existing taxonomies');
         }
+    }
+
+    private function switchToEloquentDriver(string $repository): void
+    {
+        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
+
+        $configContents = Str::of($configContents)
+            ->replace(
+                "'{$repository}' => [\n        'driver' => 'file'",
+                "'{$repository}' => [\n        'driver' => 'eloquent'"
+            )
+            ->__toString();
+
+        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
     }
 
     private function runArtisanCommand(string $command, bool $writeOutput = false): ProcessResult
