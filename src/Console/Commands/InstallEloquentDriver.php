@@ -267,9 +267,10 @@ class InstallEloquentDriver extends Command
     {
         info('Migrating navs...');
 
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
-
-        if (! Schema::hasTable(config('statamic.eloquent-driver.table_prefix', '').'trees')) {
+        if (
+            ! Schema::hasTable(config('statamic.eloquent-driver.table_prefix', '').'navigations')
+            && ! Schema::hasTable(config('statamic.eloquent-driver.table_prefix', '').'trees')
+        ) {
             $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
         }
 
