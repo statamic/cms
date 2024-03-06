@@ -70,6 +70,10 @@ class UserProvider implements UserProviderContract
 
     public function rehashPasswordIfRequired(Authenticatable $user, array $credentials, bool $force = false)
     {
+        if (! Hash::needsRehash($user->getAuthPassword()) && ! $force) {
+            return;
+        }
 
+        $user->password($credentials['password'])->save();
     }
 }
