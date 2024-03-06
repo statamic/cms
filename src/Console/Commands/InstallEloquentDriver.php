@@ -6,6 +6,7 @@ use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Schema;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
@@ -159,7 +160,10 @@ class InstallEloquentDriver extends Command
         info('Migrating collections...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-collection-migrations');
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
+
+        if (! Schema::hasTable(config('statamic.eloquent-driver.table_prefix', '').'trees')) {
+            $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-tree-migrations');
+        }
 
         $configContents = File::get(config_path('statamic/eloquent-driver.php'));
         $configContents = Str::of($configContents)
@@ -300,6 +304,10 @@ class InstallEloquentDriver extends Command
         info('Migrating navs...');
 
         $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
+
+        if (! Schema::hasTable(config('statamic.eloquent-driver.table_prefix', '').'trees')) {
+            $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-tree-migrations');
+        }
 
         $configContents = File::get(config_path('statamic/eloquent-driver.php'));
         $configContents = Str::of($configContents)
