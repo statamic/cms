@@ -2178,18 +2178,16 @@ class CoreModifiers extends Modifier
      */
     public function shuffle($value, array $params)
     {
-        $seed = Arr::get($params, 0);
-
         if (Compare::isQueryBuilder($value)) {
             $value = $value->get();
         }
 
         if (is_array($value)) {
-            return collect($value)->shuffle($seed)->all();
+            return collect($value)->shuffle()->all();
         }
 
         if ($value instanceof Collection) {
-            return $value->shuffle($seed);
+            return $value->shuffle();
         }
 
         return Stringy::shuffle($value);
