@@ -26,7 +26,19 @@ class FieldTransformer
 
     private static function inlineTabField(array $submitted)
     {
-        $field = Arr::removeNullValues(array_except($submitted['config'], ['isNew', 'icon']));
+        $fieldtype = FieldtypeRepository::find($submitted['fieldtype']);
+        $defaultConfig = $fieldtype->configFields()->all()->map->defaultValue()->filter();
+
+        $field = collect($submitted['config'])
+            ->reject(function ($value, $key) use ($defaultConfig) {
+                if (in_array($key, ['isNew', 'icon'])) {
+                    return true;
+                }
+
+                return $defaultConfig->has($key) && $defaultConfig->get($key) === $value;
+            })
+            ->filter()
+            ->all();
 
         if (Arr::get($field, 'width') === 100) {
             unset($field['width']);

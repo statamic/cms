@@ -64,4 +64,25 @@ class FieldTransformerTest extends TestCase
             $this->configToVue(['required' => true, 'validate' => 'min:3|required|email'])['validate']
         );
     }
+
+    /** @test */
+    public function it_removes_redundent_config_options()
+    {
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text',
+            'handle' => 'test',
+            'type' => 'inline',
+            'config' => [
+                'input_type' => 'text', // Fieldtype default.
+                'icon' => 'text',  // Fieldtype default.
+                'character_limit' => 100, // This one has been changed.
+                'instructions_position' => 'above', // Not fieldtype related, should be kept.
+            ],
+        ]);
+
+        $this->assertEquals([
+            'character_limit' => 100,
+            'instructions_position' => 'above',
+        ], $fromVue['field']);
+    }
 }
