@@ -123,13 +123,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('view.paths', $viewPaths);
     }
 
-    public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
-    {
-        $args = static::normalizeArgsForWindows(func_get_args());
-
-        parent::assertEquals(...$args);
-    }
-
     protected function assertEveryItem($items, $callback)
     {
         if ($items instanceof \Illuminate\Support\Collection) {
@@ -221,5 +214,18 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
             return $this;
         });
+    }
+
+    public function __call($name, $arguments)
+    {
+        if ($name == 'assertStringEqualsStringIgnoringLineEndings') {
+            return Assert::assertThat(
+                $arguments[1],
+                new StringEqualsStringIgnoringLineEndings($arguments[0]),
+                $arguments[2] ?? ''
+            );
+        }
+
+        throw new \BadMethodCallException("Method [$name] does not exist.");
     }
 }

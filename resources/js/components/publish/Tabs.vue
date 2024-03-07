@@ -63,6 +63,7 @@
                     :role="showTabs && 'tabpanel'"
                     :id="showTabs && tabPanelId(tab.handle)"
                     :aria-labelledby="showTabs && tabId(tab.handle)"
+                    :data-tab-handle="tab.handle"
                     tabindex="0"
                     :key="tab.handle"
                     v-for="tab in mainTabs"

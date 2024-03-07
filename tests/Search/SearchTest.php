@@ -31,7 +31,7 @@ class SearchTest extends TestCase
         $search->updateWithinIndexes($item);
     }
 
-    public function saveProvider()
+    public static function saveProvider()
     {
         return [
             'contains entry' => [
@@ -87,7 +87,7 @@ class SearchTest extends TestCase
         $search->deleteFromIndexes($item);
     }
 
-    public function deleteProvider()
+    public static function deleteProvider()
     {
         return [
             'index exists' => [

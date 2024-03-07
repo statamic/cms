@@ -43,7 +43,7 @@ foo: bar
 some content
 EOT;
 
-        $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], 'some content'));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar'], 'some content'));
     }
 
     /** @test */
@@ -93,7 +93,7 @@ foo: bar
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
     /** @test */
@@ -106,7 +106,7 @@ foo: bar
 some content
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], 'some content'));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], 'some content'));
     }
 
     /** @test */
@@ -121,7 +121,7 @@ content:
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], ['baz' => 'qux']));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
     /** @test */
@@ -135,7 +135,7 @@ content: {  }
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], []));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], []));
     }
 
     /** @test */
@@ -148,8 +148,8 @@ foo: bar
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], null));
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], null));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
     /**
@@ -188,7 +188,7 @@ $symfonyDumpedYaml
 content
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter($array, 'content'));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter($array, 'content'));
     }
 
     /** @test */

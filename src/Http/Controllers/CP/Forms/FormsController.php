@@ -30,7 +30,7 @@ class FormsController extends CpController
             ->map(function ($form) {
                 return [
                     'id' => $form->handle(),
-                    'title' => $form->title(),
+                    'title' => __($form->title()),
                     'submissions' => $form->submissions()->count(),
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
@@ -143,7 +143,7 @@ class FormsController extends CpController
 
         $values = [
             'handle' => $form->handle(),
-            'title' => $form->title(),
+            'title' => __($form->title()),
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
             'email' => $form->email(),

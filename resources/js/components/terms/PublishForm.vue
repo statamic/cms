@@ -175,7 +175,7 @@
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
                                             }" />
-                                            {{ option.name }}
+                                            {{ __(option.name) }}
                                             <loading-graphic :size="14" text="" class="ml-2" v-if="localizing === option.handle" />
                                         </div>
                                         <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
@@ -507,6 +507,7 @@ export default {
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
+                this.$reveal.invalid();
             } else {
                 this.$toast.error(__('Something went wrong'));
             }

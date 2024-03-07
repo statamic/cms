@@ -149,12 +149,12 @@ class Augmentor
     {
         $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
 
-        return $value->map(function ($set) use ($augmentMethod) {
+        return $value->map(function ($set, $index) use ($augmentMethod) {
             if (! Arr::get($this->fieldtype->flattenedSetsConfig(), "{$set['type']}.fields")) {
                 return $set;
             }
 
-            $values = $this->fieldtype->fields($set['type'])->addValues($set)->{$augmentMethod}()->values()->all();
+            $values = $this->fieldtype->fields($set['type'], $index)->addValues($set)->{$augmentMethod}()->values()->all();
 
             return array_merge($values, [RowId::handle() => $set[RowId::handle()] ?? null, 'type' => $set['type']]);
         })->all();
