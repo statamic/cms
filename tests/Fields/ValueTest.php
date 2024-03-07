@@ -156,17 +156,27 @@ class ValueTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_the_default_if_the_value_is_empty()
+    public function it_uses_the_default_value()
     {
         $fieldtype = new class extends Fieldtype
         {
+            public function augment($value)
+            {
+                return $value.'!';
+            }
         };
 
         $fieldtype->setField(new Field('search_engine_url', ['default' => 'https://google.com']));
 
-        $value = new Value(null, null, $fieldtype);
+        tap(new Value(null, null, $fieldtype), function ($value) {
+            $this->assertNull($value->raw());
+            $this->assertEquals('https://google.com!', $value->value());
+        });
 
-        $this->assertEquals('https://google.com', $value->value());
+        tap(new Value('foo', null, $fieldtype), function ($value) {
+            $this->assertEquals('foo', $value->raw());
+            $this->assertEquals('foo!', $value->value());
+        });
     }
 }
 
