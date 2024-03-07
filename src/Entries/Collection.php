@@ -472,6 +472,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         Facades\Collection::save($this);
 
         Blink::forget('collection-handles');
+        Blink::forget('mounted-collections');
         Blink::flushStartingWith("collection-{$this->id()}");
 
         if ($isNew) {
@@ -756,6 +757,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         Facades\Collection::delete($this);
 
         CollectionDeleted::dispatch($this);
+
+        Blink::forget('mounted-collections');
 
         return true;
     }

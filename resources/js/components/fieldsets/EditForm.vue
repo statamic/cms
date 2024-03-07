@@ -37,7 +37,7 @@
                 :fields="fieldset.fields"
                 :editing-field="editingField"
                 :exclude-fieldset="fieldset.handle"
-                :suggestable-condition-fields="suggestableConditionFields"
+                :suggestable-condition-fields="suggestableConditionFields(this)"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-linked="fieldLinked"
