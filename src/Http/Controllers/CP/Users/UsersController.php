@@ -303,10 +303,6 @@ class UsersController extends CpController
     {
         throw_unless($user = User::find($user), new NotFoundHttpException);
 
-        if (! $user = User::find($user)) {
-            return $this->pageNotFound();
-        }
-
         $this->authorize('delete', $user);
 
         $user->delete();
