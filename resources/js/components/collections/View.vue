@@ -104,6 +104,7 @@
             v-if="canUseStructureTree && view === 'tree'"
             ref="tree"
             :collections="[handle]"
+            :blueprints="blueprints"
             :create-url="createUrl"
             :pages-url="structurePagesUrl"
             :submit-url="structureSubmitUrl"
