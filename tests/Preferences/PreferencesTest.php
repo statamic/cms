@@ -205,12 +205,10 @@ class PreferencesTest extends TestCase
     /** @test */
     public function it_uses_preferences_with_priority()
     {
-        // This test will check a handful of preferences, adding them step by step.
-        // With each step up in priority, less values are being added. This is to
-        // so that the assertions can demonstrate that the lower level preferences
-        // are still being applied. ie. defaults sets 8 prefs, group2role2 sets 7,
-        // and so on. The final assertion will be able to show that all 8 preferences
-        // have been applied from different priority levels.
+        // This test will check a handful of preferences, adding them step by step. With each step up in priority, fewer
+        // values are being added. This is so that the assertions can demonstrate that the lower level preferences are
+        // still being applied. i.e. defaults sets 8 prefs, group2-role2 sets 7, and so on. The final assertion will
+        // be able to show that all 8 preferences have been applied from all the different priority levels.
 
         $preferences = new Preferences;
 
