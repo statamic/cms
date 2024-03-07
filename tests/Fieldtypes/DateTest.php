@@ -35,7 +35,7 @@ class DateTest extends TestCase
         $this->assertEquals($expected, $augmented->format('Y M d H:i:s'));
     }
 
-    public function augmentProvider()
+    public static function augmentProvider()
     {
         return [
             'date' => [
@@ -124,7 +124,7 @@ class DateTest extends TestCase
         $this->assertSame($expected, $this->fieldtype($config)->process($value));
     }
 
-    public function processProvider()
+    public static function processProvider()
     {
         return [
             'null' => [
@@ -217,7 +217,7 @@ class DateTest extends TestCase
         $this->assertSame($expected, $this->fieldtype($config)->preProcess($value));
     }
 
-    public function preProcessProvider()
+    public static function preProcessProvider()
     {
         return [
             'null' => [
@@ -321,7 +321,7 @@ class DateTest extends TestCase
         $this->assertSame($expected, $this->fieldtype($config)->preProcessIndex($value));
     }
 
-    public function preProcessIndexProvider()
+    public static function preProcessIndexProvider()
     {
         return [
             'null' => [
@@ -468,7 +468,7 @@ class DateTest extends TestCase
         }
     }
 
-    public function validatablesProvider()
+    public static function validatablesProvider()
     {
         // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
 
@@ -535,7 +535,7 @@ class DateTest extends TestCase
         }
     }
 
-    public function rangeValidatablesProvider()
+    public static function rangeValidatablesProvider()
     {
         // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
 
@@ -596,7 +596,7 @@ class DateTest extends TestCase
         $this->assertEquals($expected, $messages);
     }
 
-    public function validationProvider()
+    public static function validationProvider()
     {
         return [
             'valid date' => [

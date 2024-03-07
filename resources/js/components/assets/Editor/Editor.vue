@@ -143,7 +143,7 @@
                 <div id="asset-meta-data" class="flex-1 hidden sm:flex space-x-3 py-1 h-full text-xs text-gray-800">
                     <div class="flex items-center bg-gray-400 rounded py-1 pl-2 pr-3" v-if="isImage">
                         <svg-icon name="image-picture" class="h-3 mr-2" />
-                        <div class="">{{ asset.width }} x {{ asset.height }}</div>
+                        <div class="">{{ __('messages.width_x_height', { width: asset.width, height: asset.height }) }}</div>
                     </div>
                     <div class="flex items-center bg-gray-400 rounded py-1 pl-2 pr-3">
                         <svg-icon name="sd-card" class="h-3 mr-2" />

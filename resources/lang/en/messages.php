@@ -224,6 +224,7 @@ return [
     'updater_require_version_command' => 'To require a specific version, run the following command',
     'updater_update_to_latest_command' => 'To update to the latest version, run the following command',
     'updates_available' => 'Updates are available!',
+    'user_activation_email_not_sent_error' => 'The activation email couldn\'t be sent. Please check your email configuration and try again.',
     'user_groups_handle_instructions' => 'Used to reference this user group on the frontend. It\'s non-trivial to change later.',
     'user_groups_intro' => 'User groups allow you to organize users and apply permission-based roles in aggregate.',
     'user_groups_role_instructions' => 'Assign roles to give users in this group all of their corresponding permissions.',
@@ -240,4 +241,5 @@ return [
     'user_wizard_roles_groups_intro' => 'Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.',
     'user_wizard_super_admin_instructions' => 'Super admins have complete control and access to everything in the control panel. Grant this role wisely.',
     'view_more_count' => 'View :count more',
+    'width_x_height' => ':width x :height',
 ];

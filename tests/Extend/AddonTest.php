@@ -254,7 +254,7 @@ class AddonTest extends TestCase
         ])->isLatestVersion());
     }
 
-    public function isLatestVersionProvider()
+    public static function isLatestVersionProvider()
     {
         return [
             ['1.0.0', '1.0.0', true],

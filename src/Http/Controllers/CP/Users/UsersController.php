@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
@@ -16,6 +17,7 @@ use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Search\Result;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 class UsersController extends CpController
 {
@@ -66,9 +68,19 @@ class UsersController extends CpController
             'blueprints' => ['user'],
         ]);
 
-        $users = $query
-            ->orderBy(request('sort', 'email'), request('order', 'asc'))
-            ->paginate(request('perPage'));
+        $sortField = request('sort');
+        $sortDirection = request('order', 'asc');
+
+        if (! $sortField && ! request('search')) {
+            $sortField = config('statamic.user.sort_field', 'email');
+            $sortDirection = config('statamic.user.sort_direction', 'asc');
+        }
+
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $users = $query->paginate(request('perPage'));
 
         if ($users->getCollection()->first() instanceof Result) {
             $users->setCollection($users->getCollection()->map->getSearchable());
@@ -124,13 +136,13 @@ class UsersController extends CpController
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
         $additional = $fields->all()
-            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups']))
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
             ->keys();
 
         $viewData = [
             'values' => (object) $fields->values()->only($additional)->all(),
             'meta' => (object) $fields->meta()->only($additional)->all(),
-            'fields' => collect($fields->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
+            'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
@@ -184,7 +196,13 @@ class UsersController extends CpController
         if ($request->invitation['send']) {
             ActivateAccount::subject($request->invitation['subject']);
             ActivateAccount::body($request->invitation['message']);
-            $user->generateTokenAndSendActivateAccountNotification();
+
+            try {
+                $user->generateTokenAndSendActivateAccountNotification();
+            } catch (TransportException $e) {
+                Toast::error(__('statamic::messages.user_activation_email_not_sent_error'));
+            }
+
             $url = null;
         } else {
             $url = PasswordReset::url($user->generateActivateAccountToken(), PasswordReset::BROKER_ACTIVATIONS);
@@ -263,7 +281,7 @@ class UsersController extends CpController
             ->withReplacements(['id' => $user->id()])
             ->validate();
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles', 'super']);
 
         foreach ($values as $key => $value) {
             $user->set($key, $value);
@@ -294,10 +312,6 @@ class UsersController extends CpController
     public function destroy($user)
     {
         throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (! $user = User::find($user)) {
-            return $this->pageNotFound();
-        }
 
         $this->authorize('delete', $user);
 

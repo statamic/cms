@@ -487,14 +487,6 @@ export default {
             this.$refs.uploader.browse();
         },
 
-        getReplicatorPreviewText() {
-            return _.map(this.assets, (asset) => {
-                return asset.is_image ?
-                    `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
-                    : asset.basename;
-            }).join(', ');
-        },
-
         idChanged(oldId, newId) {
             const index = this.value.indexOf(oldId);
             this.update([...this.value.slice(0, index), newId, ...this.value.slice(index + 1)]);
