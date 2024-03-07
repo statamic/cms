@@ -111,10 +111,12 @@ export default {
     ],
 
     props: {
+        id: String,
         config: Object,
         overrides: { type: Array, default: () => [] },
         type: String,
         root: Boolean,
+        fields: Array,
         suggestableConditionFields: Array,
     },
 
@@ -240,8 +242,10 @@ export default {
             this.clearErrors();
 
             this.$axios.post(cp_url('fields/update'), {
+                id: this.id,
                 type: this.type,
-                values: this.values
+                values: this.values,
+                fields: this.fields
             }).then(response => {
                 this.$emit('committed', response.data, this.editedFields);
                 this.close();
