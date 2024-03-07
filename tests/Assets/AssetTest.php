@@ -702,8 +702,7 @@ class AssetTest extends TestCase
         ]));
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/test.txt');
-        Facades\Asset::shouldReceive('save')->with($asset);
-        Facades\Asset::shouldReceive('find')->andReturn($asset);
+        Facades\Asset::partialMock()->shouldReceive('save')->with($asset);
         $asset->save();
 
         $this->assertEquals($expectedBeforeMerge, $asset->meta());
@@ -765,7 +764,6 @@ class AssetTest extends TestCase
 
         $container = Facades\AssetContainer::make('test')->disk('test');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
-        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $asset = $container->makeAsset('foo/image.jpg')->set('foo', 'bar');
 
         $metaWithoutData = [
@@ -859,8 +857,7 @@ class AssetTest extends TestCase
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
-        Facades\Asset::shouldReceive('find')->andReturn(null);
-        Facades\Asset::shouldReceive('save')->with($asset);
+        Facades\Asset::partialMock()->shouldReceive('save')->with($asset);
 
         $return = $asset->save();
 
@@ -891,8 +888,7 @@ class AssetTest extends TestCase
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
-        Facades\Asset::shouldReceive('find')->andReturn(null);
-        Facades\Asset::shouldReceive('save')->with($asset);
+        Facades\Asset::partialMock()->shouldReceive('save')->with($asset);
 
         Event::listen(AssetSaving::class, function ($event) {
             return false;
@@ -914,8 +910,7 @@ class AssetTest extends TestCase
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
-        Facades\Asset::shouldReceive('find')->andReturn(null);
-        Facades\Asset::shouldReceive('save')->with($asset);
+        Facades\Asset::partialMock()->shouldReceive('save')->with($asset);
 
         $return = $asset->saveQuietly();
 
@@ -932,8 +927,7 @@ class AssetTest extends TestCase
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
-        Facades\Asset::shouldReceive('find')->andReturn(null);
-        Facades\Asset::shouldReceive('save')->with($asset);
+        Facades\Asset::partialMock()->shouldReceive('save')->with($asset);
 
         $return = $asset->saveQuietly();
 

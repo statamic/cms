@@ -603,7 +603,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function save()
     {
-        $isNew = is_null(Facades\Asset::find($this->id()));
+        $isNew = is_null($this->container()->asset($this->path()));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
