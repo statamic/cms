@@ -1135,7 +1135,6 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
-        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
         $oldMeta = $disk->get('old/.meta/asset.txt.yaml');
@@ -1931,7 +1930,6 @@ class AssetTest extends TestCase
         Carbon::setTestNow(Carbon::createFromTimestamp(1549914700));
         $asset = $this->container->makeAsset('path/to/asset.jpg');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
-        Facades\Asset::partialMock()->shouldReceive('find')->andReturn(null);
         Storage::disk('test')->put('path/to/asset.jpg', '');
         Storage::disk('test')->assertExists('path/to/asset.jpg');
 
