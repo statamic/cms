@@ -435,7 +435,6 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_can_be_moved_to_another_folder_with_a_new_folder_name()
     {
-
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -539,7 +538,6 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_lowercases_when_moving_to_another_foldre_with_a_new_folder_name()
     {
-
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -712,7 +710,6 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_cannot_be_moved_to_its_own_subfolder()
     {
-
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -751,7 +748,6 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_cannot_be_moved_if_the_destination_already_exists()
     {
-
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -798,7 +794,6 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_can_be_renamed()
     {
-
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -866,7 +861,6 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_cannot_be_renamed_if_the_destination_exists()
     {
-
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
 
@@ -907,7 +901,6 @@ class AssetFolderTest extends TestCase
     /** @test */
     public function it_lowercases_when_renaming_by_default()
     {
-
         $container = $this->containerWithDisk();
         $disk = $container->disk()->filesystem();
         $path = 'before/sub/foo.txt';
