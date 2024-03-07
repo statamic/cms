@@ -317,16 +317,15 @@ class InstallEloquentDriver extends Command
 
     private function switchToEloquentDriver(string $repository): void
     {
-        $configContents = File::get(config_path('statamic/eloquent-driver.php'));
-
-        $configContents = Str::of($configContents)
-            ->replace(
-                "'{$repository}' => [\n        'driver' => 'file'",
-                "'{$repository}' => [\n        'driver' => 'eloquent'"
-            )
-            ->__toString();
-
-        File::put(config_path('statamic/eloquent-driver.php'), $configContents);
+        File::put(
+            config_path('statamic/eloquent-driver.php'),
+            Str::of(File::get(config_path('statamic/eloquent-driver.php')))
+                ->replace(
+                    "'{$repository}' => [\n        'driver' => 'file'",
+                    "'{$repository}' => [\n        'driver' => 'eloquent'"
+                )
+                ->__toString()
+        );
     }
 
     private function runArtisanCommand(string $command, bool $writeOutput = false): ProcessResult
