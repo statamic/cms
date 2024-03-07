@@ -477,6 +477,7 @@ class CollectionTest extends TestCase
         Facades\Collection::shouldReceive('save')->with($collection)->once();
         Facades\Collection::shouldReceive('handleExists')->with('test')->once();
         Facades\Blink::shouldReceive('forget')->with('collection-handles')->once();
+        Facades\Blink::shouldReceive('forget')->with('mounted-collections')->once();
         Facades\Blink::shouldReceive('flushStartingWith')->with('collection-test')->once();
 
         $return = $collection->save();
