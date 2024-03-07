@@ -136,6 +136,8 @@ export default {
     watch: {
         value(value, oldValue) {
             if (value.code == this.codemirror.doc.getValue()) return;
+            if (! value.code) value.code = '';
+
             this.codemirror.doc.setValue(value.code);
         },
         readOnlyOption(val) {

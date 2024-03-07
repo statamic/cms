@@ -158,11 +158,25 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you can configure if impersonation is available, and what URL to
-    | redirect to after impersonation begins
+    | redirect to after impersonation begins.
     |
     */
+
     'impersonate' => [
         'enabled' => env('STATAMIC_IMPERSONATE_ENABLED', true),
         'redirect' => env('STATAMIC_IMPERSONATE_REDIRECT', null),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Sorting
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the default sort behavior for user listings.
+    |
+    */
+
+    'sort_field' => 'email',
+    'sort_direction' => 'asc',
+
 ];

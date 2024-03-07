@@ -46,6 +46,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\ImportGroups::class,
         Commands\ImportRoles::class,
         Commands\ImportUsers::class,
+        Commands\ProEnable::class,
     ];
 
     public function boot()

@@ -16,7 +16,7 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card overflow-hidden p-0 relative">
-                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
+                    <div v-if="!reordering" class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
 
                         <data-list-filter-presets
                             ref="presets"
