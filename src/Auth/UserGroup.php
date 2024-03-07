@@ -29,7 +29,7 @@ abstract class UserGroup implements Arrayable, ArrayAccess, Augmentable, UserGro
         $this->data = collect();
     }
 
-    public function title(string $title = null)
+    public function title(?string $title = null)
     {
         if (func_num_args() === 0) {
             return $this->title;
@@ -45,7 +45,7 @@ abstract class UserGroup implements Arrayable, ArrayAccess, Augmentable, UserGro
         return $this->handle();
     }
 
-    public function handle(string $handle = null)
+    public function handle(?string $handle = null)
     {
         if (is_null($handle)) {
             return $this->handle;

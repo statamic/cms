@@ -9,14 +9,25 @@ use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\Subscriber;
 use Statamic\Facades\Glide;
+use Statamic\Imaging\PresetGenerator;
 
 class ClearAssetGlideCache extends Subscriber implements ShouldQueue
 {
+    /**
+     * @var PresetGenerator
+     */
+    private $generator;
+
     protected $listeners = [
         AssetSaved::class => 'handleSaved',
         AssetDeleted::class => 'handleDeleted',
         AssetReuploaded::class => 'handleReuploaded',
     ];
+
+    public function __construct(PresetGenerator $generator)
+    {
+        $this->generator = $generator;
+    }
 
     public function handleReuploaded(AssetReuploaded $event)
     {
@@ -32,6 +43,7 @@ class ClearAssetGlideCache extends Subscriber implements ShouldQueue
     {
         if ($event->asset->getOriginal('data.focus') != $event->asset->get('focus')) {
             $this->clear($event->asset);
+            $this->generator->generate($event->asset);
         }
     }
 

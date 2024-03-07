@@ -474,7 +474,10 @@ class AntlersNode extends AbstractNode
     public function reduceParameterInterpolations(ParameterNode $param, NodeProcessor $processor, $mutateVar, $data)
     {
         if ($param->parent != null && ! empty($param->interpolations)) {
-            foreach ($param->interpolations as $interpolationVar) {
+            $parameterInterpolations = $param->interpolations;
+            rsort($parameterInterpolations);
+
+            foreach ($parameterInterpolations as $interpolationVar) {
                 if (array_key_exists($interpolationVar, $param->parent->processedInterpolationRegions)) {
                     $interpolationResult = $processor->cloneProcessor()
                         ->setData($data)

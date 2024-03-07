@@ -9,7 +9,7 @@
             :name="name"
             :disabled="config.disabled || isReadOnly"
             :options="options"
-            :placeholder="__(config.placeholder || 'Search ...')"
+            :placeholder="__(config.placeholder || 'Search...')"
             :searchable="true"
             :multiple="false"
             :close-on-select="true"

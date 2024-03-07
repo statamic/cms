@@ -7,7 +7,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 
-class ShowStructuredCollectionTest extends ShowCollectionTest
+class ShowStructuredCollectionTest extends ShowCollectionTestCase
 {
     use PreventSavingStacheItemsToDisk;
 

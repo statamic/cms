@@ -55,6 +55,12 @@ class CollectionsController extends CpController
     {
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
+        $site = $request->site ? Site::get($request->site) : Site::selected();
+
+        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, $site)) {
+            return $response;
+        }
+
         $blueprints = $collection
             ->entryBlueprints()
             ->reject->hidden()
@@ -64,8 +70,6 @@ class CollectionsController extends CpController
                     'title' => $blueprint->title(),
                 ];
             })->values();
-
-        $site = $request->site ? Site::get($request->site) : Site::selected();
 
         $blueprint = $collection->entryBlueprint();
 
@@ -230,7 +234,7 @@ class CollectionsController extends CpController
             ->defaultPublishState($values['default_publish_state'])
             ->sortDirection($values['sort_direction'])
             ->mount($values['mount'] ?? null)
-            ->revisions($values['revisions'] ?? false)
+            ->revisionsEnabled($values['revisions'] ?? false)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
             ->pastDateBehavior(array_get($values, 'past_date_behavior'))
@@ -565,5 +569,12 @@ class CollectionsController extends CpController
             })
             ->values()
             ->all();
+    }
+
+    protected function ensureCollectionIsAvailableOnSite($collection, $site)
+    {
+        if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
+            return redirect(cp_route('collections.index'))->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
+        }
     }
 }

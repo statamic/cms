@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Http\Request;
+use Statamic\Events\UrlInvalidated;
 
 class ApplicationCacher extends AbstractCacher
 {
@@ -108,5 +109,7 @@ class ApplicationCacher extends AbstractCacher
                 $this->cache->forget($this->normalizeKey('responses:'.$key));
                 $this->forgetUrl($key);
             });
+
+        UrlInvalidated::dispatch($url, $domain);
     }
 }

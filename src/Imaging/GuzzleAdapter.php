@@ -40,7 +40,7 @@ class GuzzleAdapter implements FilesystemAdapter
      * @param  string  $base  The base URL.
      * @param  \GuzzleHttp\ClientInterface  $client  An optional Guzzle client.
      */
-    public function __construct($base, ClientInterface $client = null)
+    public function __construct($base, ?ClientInterface $client = null)
     {
         $this->base = rtrim($base, '/').'/';
         $this->client = $client ?: new Client();

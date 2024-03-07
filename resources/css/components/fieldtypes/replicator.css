@@ -33,6 +33,10 @@
         @apply flex items-center;
     }
 
+    .replicator-set-header-inner {
+        min-height: 32px;
+    }
+
     &.invalid {
         .replicator-set-header-inner {
             @apply bg-red-100;

@@ -24,7 +24,7 @@ class ArrayableLink extends ArrayableString
         return $this->url(); // Use a string for backwards compatibility in the REST API, etc.
     }
 
-    private function url()
+    public function url()
     {
         return is_object($this->value) ? $this->value?->url() : $this->value;
     }

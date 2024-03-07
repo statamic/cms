@@ -8,6 +8,7 @@ use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\NavBlueprintFound;
 use Statamic\Events\NavDeleted;
+use Statamic\Events\NavDeleting;
 use Statamic\Events\NavSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -33,6 +34,10 @@ class Nav extends Structure implements Contract
 
     public function delete()
     {
+        if (NavDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\Nav::delete($this);
 
         NavDeleted::dispatch($this);

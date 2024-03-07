@@ -104,9 +104,11 @@ class GlobalVariablesController extends CpController
 
         $set->data($values);
 
-        $set->globalSet()->addLocalization($set)->save();
+        $save = $set->globalSet()->addLocalization($set)->save();
 
-        return response('', 204);
+        return response()->json([
+            'saved' => is_bool($save) ? $save : true,
+        ]);
     }
 
     protected function extractFromFields($set, $blueprint)

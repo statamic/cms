@@ -33,7 +33,7 @@ class AssetContainerRepository implements RepositoryContract
         return $this->store->getItem($handle);
     }
 
-    public function make(string $handle = null): AssetContainer
+    public function make(?string $handle = null): AssetContainer
     {
         return app(AssetContainer::class)->handle($handle);
     }

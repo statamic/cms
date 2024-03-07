@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', Statamic::crumb(__('Email'), __('Utilities')))
 
@@ -29,10 +31,49 @@
     <p class="text-sm text-gray mb-4">{!! __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
     <div class="card p-0">
         <table class="data-table">
-            @if (config('mail.mailers'))
-                @include('statamic::utilities.partials.email-l7')
-            @else
-                @include('statamic::utilities.partials.email-l6')
+            <tr>
+                <th class="pl-4 py-2 w-1/4">{{ __('Default Mailer') }}</th>
+                <td><code>{{ config('mail.default') }}</code></td>
+            </tr>
+            @if (config('mail.default') == 'smtp')
+            <tr>
+                <th class="pl-4 py-2 w-1/4">{{ __('Host') }}</th>
+                <td><code>{{ config('mail.mailers.smtp.host') }}</code></td>
+            </tr>
+            <tr>
+                <th class="pl-4 py-2 w-1/4">{{ __('Port') }}</th>
+                <td><code>{{ config('mail.mailers.smtp.port') }}</code></td>
+            </tr>
+            <tr>
+                <th class="pl-4 py-2 w-1/4">{{ __('Encryption') }}</th>
+                <td>
+                    @if (config('mail.mailers.smtp.encryption'))
+                        <code>{{ config('mail.mailers.smtp.encryption') }}</code>
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <th class="pl-4 py-2 w-1/4">{{ __('Username') }}</th>
+                <td>
+                    @if (config('mail.mailers.smtp.username'))
+                        <code>{{ config('mail.mailers.smtp.username') }}</code>
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <th class="pl-4 py-2 w-1/4">{{ __('Password') }}</th>
+                <td>
+                    @if (config('mail.mailers.smtp.password'))
+                        <code>{{ config('mail.mailers.smtp.password') }}</code>
+                    @endif
+                </td>
+            </tr>
+            @endif
+            @if (config('mail.default') == 'sendmail')
+            <tr>
+                <th class="pl-4 py-2 w-1/4">{{ __('Sendmail') }}</th>
+                <td><code>{{ config('mail.mailers.sendmail.path') }}</code></td>
+            </tr>
             @endif
             <tr>
                 <th class="pl-4 py-2 w-1/4">{{ __('Default From Address') }}</th>

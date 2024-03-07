@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', __('Create Blueprint'))
 
@@ -16,6 +18,9 @@
                 <div class="text-2xs text-gray-600 mt-2 flex items-center">
                     {{ __('statamic::messages.blueprints_title_instructions') }}
                 </div>
+                @if ($errors->has('title'))
+                    <div class="text-red-500 text-xs mt-2">{{ $errors->first('title') }}</div>
+                @endif
             </div>
         </div>
 

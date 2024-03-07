@@ -10,6 +10,7 @@
         </div>
         <div class="publish-fields p-4 pb-0 w-96">
             <form-group
+                v-if="requiresCurrentPassword"
                 handle="password"
                 :display="__('Current Password')"
                 v-model="currentPassword"
@@ -49,6 +50,7 @@ export default {
 
     props: {
         saveUrl: String,
+        requiresCurrentPassword: Boolean,
     },
 
     data() {

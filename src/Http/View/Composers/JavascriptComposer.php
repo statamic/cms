@@ -9,6 +9,7 @@ use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Fieldtypes\Icon;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use voku\helper\ASCII;
@@ -67,6 +68,7 @@ class JavascriptComposer
             'livePreview' => config('statamic.live_preview'),
             'permissions' => $this->permissions($user),
             'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
+            'customSvgIcons' => Icon::getCustomSvgIcons(),
         ];
     }
 

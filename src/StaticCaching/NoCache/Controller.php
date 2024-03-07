@@ -16,6 +16,10 @@ class Controller
             $url = explode('?', $url)[0];
         }
 
+        if (Str::endsWith($url, '?')) {
+            $url = Str::replaceLast('?', '', $url);
+        }
+
         if (Str::contains($url, '?')) {
             $url = Str::before($url, '?').'?'.Request::normalizeQueryString(Str::after($url, '?'));
         }
