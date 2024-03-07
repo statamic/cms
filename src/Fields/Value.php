@@ -45,7 +45,7 @@ class Value implements IteratorAggregate, JsonSerializable
             return $raw;
         }
 
-        if (! $raw && ($default = $this->fieldtype->config('default'))) {
+        if (! $raw && ($default = $this->fieldtype->field()->defaultValue())) {
             $raw = $default;
         }
 
