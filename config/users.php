@@ -172,8 +172,7 @@ return [
     | Default Sorting
     |--------------------------------------------------------------------------
     |
-    | Here you can configure the default sort field and direction for the
-    | Users listing table in the Control Panel.
+    | Here you may configure the default sort behavior for user listings.
     |
     */
 
