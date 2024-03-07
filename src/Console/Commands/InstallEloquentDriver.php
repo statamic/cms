@@ -346,6 +346,11 @@ class InstallEloquentDriver extends Command
 
         // We're doing this instead of ->throw() so we can control the output of errors.
         if ($result->failed()) {
+            if (Str::of($result->output())->contains('Unknown database')) {
+                error('The database does not exist. Please create it before running this command.');
+                exit(1);
+            }
+
             error('Failed to run command: '.$command);
             $this->output->write($result->output());
             exit(1);
