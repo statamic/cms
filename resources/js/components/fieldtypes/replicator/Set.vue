@@ -7,7 +7,13 @@
             <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2 cursor-pointer"/>
+                    <label class="text-xs whitespace-nowrap mr-2 cursor-pointer">
+                        <template v-if="replicatorSets.length > 1">
+                            {{ setGroup.display }}
+                            <svg-icon name="micro/chevron-right" class="w-4" />
+                        </template>
+                        {{ display || config.handle }}
+                    </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
                         <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
                     </div>
@@ -44,6 +50,7 @@
                     :set-index="index"
                     :field-path="fieldPath(field)"
                     :read-only="isReadOnly"
+                    :show-field-previews="showFieldPreviews"
                     @updated="updated(field.handle, $event)"
                     @meta-updated="metaUpdated(field.handle, $event)"
                     @focus="$emit('focus')"
@@ -76,6 +83,8 @@ export default {
     components: { SetField },
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText],
+
+    inject: ['replicatorSets'],
 
     props: {
         config: {
@@ -145,6 +154,12 @@ export default {
 
         instructions() {
             return this.config.instructions ? markdown(__(this.config.instructions)) : null;
+        },
+
+        setGroup() {
+            return this.replicatorSets.find((group) => {
+                return group.sets.filter((set) => set.handle === this.config.handle).length > 0;
+            });
         },
 
         hasMultipleFields() {

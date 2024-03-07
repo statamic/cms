@@ -2,14 +2,20 @@
 
     <node-view-wrapper>
         <div class="bard-set whitespace-normal my-6 rounded bg-white border shadow-md"
-            :class="{ 'border-blue-400': selected, 'has-error': hasError }"
+            :class="{ 'border-blue-400': selected || withinSelection, 'has-error': hasError }"
             contenteditable="false" @copy.stop @paste.stop @cut.stop
         >
             <div ref="content" hidden />
             <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" data-drag-handle />
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2"/>
+                    <label class="text-xs whitespace-nowrap mr-2">
+                        <template v-if="bardSets.length > 1">
+                            {{ setGroup.display }}
+                            <svg-icon name="micro/chevron-right" class="w-4" />
+                        </template>
+                        {{ display || config.handle }}
+                    </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
                         <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
                     </div>
@@ -44,6 +50,7 @@
                     :set-index="index"
                     :field-path="fieldPath(field)"
                     :read-only="isReadOnly"
+                    :show-field-previews="showFieldPreviews"
                     @updated="updated(field.handle, $event)"
                     @meta-updated="metaUpdated(field.handle, $event)"
                     @focus="focused"
@@ -79,7 +86,7 @@ export default {
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText],
 
-    inject: ['bard'],
+    inject: ['bard', 'bardSets'],
 
     computed: {
 
@@ -96,11 +103,11 @@ export default {
         },
 
         meta() {
-            return this.extension.options.bard.meta.existing[this.node.attrs.id];
+            return this.extension.options.bard.meta.existing[this.node.attrs.id] || {};
         },
 
         previews() {
-            return this.extension.options.bard.meta.previews[this.node.attrs.id];
+            return this.extension.options.bard.meta.previews[this.node.attrs.id] || {};
         },
 
         collapsed() {
@@ -113,6 +120,12 @@ export default {
 
         setConfigs() {
             return this.bard.setConfigs;
+        },
+
+        setGroup() {
+            return this.bardSets.find((group) => {
+                return group.sets.filter((set) => set.handle === this.config.handle).length > 0;
+            });
         },
 
         isReadOnly() {
@@ -152,6 +165,14 @@ export default {
             return Object.keys(this.config).length === 0;
         },
 
+        decorationSpecs() {
+            return Object.assign({}, ...this.decorations.map((decoration) => decoration.type.spec));
+        },
+
+        withinSelection() {
+            return this.decorationSpecs.withinSelection;
+        },
+
     },
 
     methods: {
@@ -170,9 +191,7 @@ export default {
         },
 
         previewUpdated(handle, value) {
-            let previews = clone(this.previews);
-            previews[handle] = value;
-            this.extension.options.bard.updateSetPreviews(this.node.attrs.id, previews);
+            this.extension.options.bard.updateSetPreviews(this.node.attrs.id, { ...this.previews, [handle]: value });
         },
 
         focused() {

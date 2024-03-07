@@ -21,6 +21,10 @@ class ProviderTest extends TestCase
             'driver' => 'local',
             'root' => $this->tempDir = __DIR__.'/tmp',
         ]]);
+
+        config(['statamic.oauth.providers' => [
+            'test',
+        ]]);
     }
 
     public function tearDown(): void
@@ -29,6 +33,22 @@ class ProviderTest extends TestCase
         app('files')->deleteDirectory(storage_path('statamic/oauth'));
 
         parent::tearDown();
+    }
+
+    /** @test */
+    public function it_gets_the_config()
+    {
+        $this->assertEquals([], (new Provider('test'))->config());
+
+        $this->assertEquals(['foo' => 'bar'], (new Provider('test', ['foo' => 'bar']))->config());
+    }
+
+    /** @test */
+    public function it_gets_the_label_through_the_config()
+    {
+        $this->assertEquals('Test', (new Provider('test'))->label());
+
+        $this->assertEquals('Foo Bar', (new Provider('test', ['label' => 'Foo Bar']))->label());
     }
 
     /** @test */

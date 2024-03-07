@@ -42,6 +42,7 @@
                     :is-open="page.open"
                     :has-children="page.children.length > 0"
                     :show-slugs="showSlugs"
+                    :show-blueprint="blueprints.length > 1"
                     :editable="editable"
                     @edit="$emit('edit-page', page, vm, store, $event)"
                     @toggle-open="store.toggleOpen(page)"
@@ -93,6 +94,7 @@ export default {
         showSlugs: { type: Boolean, default: false },
         preferencesPrefix: { type: String },
         editable: { type: Boolean, default: true },
+        blueprints: { type: Array },
     },
 
     data() {

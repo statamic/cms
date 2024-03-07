@@ -136,7 +136,8 @@ export default {
             previews: this.meta.previews,
             fullScreenMode: false,
             provide: {
-                storeName: this.storeName
+                storeName: this.storeName,
+                replicatorSets: this.config.sets
             }
         }
     },
@@ -172,6 +173,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
         }
     },

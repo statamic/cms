@@ -59,7 +59,7 @@ class CorePreferences
                 [
                     'handle' => 'url',
                     'field' => [
-                        'display' => 'URL',
+                        'display' => __('URL'),
                         'type' => 'text',
                     ],
                 ],
