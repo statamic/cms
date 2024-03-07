@@ -23,8 +23,11 @@ class Tags extends \Statamic\Tags\Tags
     {
         if ($this->params->has('select')) {
             $fields = $this->params->explode('select');
-        } elseif (config('statamic.antlers.version') === 'runtime') {
-            $fields = Antlers::identifiers($this->content);
+
+            if (in_array('@auto', $fields)) {
+                $identifiers = Antlers::identifiers($this->content);
+                $fields = array_merge(array_diff($fields, ['@auto']), $identifiers);
+            }
         }
 
         return $this

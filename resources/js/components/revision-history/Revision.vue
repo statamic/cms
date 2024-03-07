@@ -16,12 +16,12 @@
                 <div class="flex-1">
                     <div class="revision-author text-gray-700 text-2xs">
                         <template v-if="revision.user">{{ revision.user.name || revision.user.email }} &ndash;</template>
-                        {{ date.isBefore($moment().startOf('day')) ? date.format('LT') : date.fromNow() }}
+                        {{ date.toDate().toLocaleTimeString($config.get('locale').replace('_', '-'), { hour: 'numeric', minute: '2-digit' }) }}
                     </div>
                 </div>
 
                 <span class="badge" v-if="revision.working" v-text="__('Working Copy')" />
-                <span class="badge" :class="revision.action" v-else v-text="revision.action" />
+                <span class="badge" :class="revision.action" v-else v-text="__(revision.action)" />
                 <span class="badge bg-orange" v-if="revision.attributes.current" v-text="__('Current')" />
 
                 <revision-preview

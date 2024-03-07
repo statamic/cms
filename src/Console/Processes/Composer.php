@@ -109,7 +109,7 @@ class Composer extends Process
      *
      * @param  mixed  $extraParams
      */
-    public function require(string $package, string $version = null, ...$extraParams)
+    public function require(string $package, ?string $version = null, ...$extraParams)
     {
         if ($version) {
             $parts[] = $version;
@@ -125,7 +125,7 @@ class Composer extends Process
     /**
      * Require a dev package.
      */
-    public function requireDev(string $package, string $version = null, ...$extraParams)
+    public function requireDev(string $package, ?string $version = null, ...$extraParams)
     {
         $this->require($package, $version, '--dev', ...$extraParams);
     }
@@ -202,6 +202,16 @@ class Composer extends Process
     public function update(string $package)
     {
         $this->queueComposerCommand('update', $package, '--with-dependencies');
+    }
+
+    /**
+     * Install Composer dependencies.
+     *
+     * @return void
+     */
+    public function install(string $workingDirectory)
+    {
+        $this->runComposerCommand('install', '--working-dir='.$workingDirectory);
     }
 
     /**

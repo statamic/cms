@@ -54,12 +54,12 @@ class TaxonomyRepository implements RepositoryContract
         $this->store->delete($taxonomy);
     }
 
-    public function make(string $handle = null): Taxonomy
+    public function make(?string $handle = null): Taxonomy
     {
         return app(Taxonomy::class)->handle($handle);
     }
 
-    public function findByUri(string $uri, string $site = null): ?Taxonomy
+    public function findByUri(string $uri, ?string $site = null): ?Taxonomy
     {
         $collection = Facades\Collection::all()
             ->first(function ($collection) use ($uri, $site) {
@@ -67,7 +67,7 @@ class TaxonomyRepository implements RepositoryContract
                     return true;
                 }
 
-                return Str::startsWith($uri, '/'.$collection->handle());
+                return Str::startsWith($uri.'/', '/'.$collection->handle().'/');
             });
 
         if ($collection) {

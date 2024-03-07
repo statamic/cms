@@ -5,14 +5,16 @@
                 {{ __(title) }}
             </header>
             <div class="flex-1 px-5 py-6 text-gray">
-                <p v-if="bodyText" v-text="bodyText" />
-                <slot v-else>
-                    <p>{{ __('Are you sure?') }}</p>
+                <slot name="body">
+                    <p v-if="bodyText" v-text="bodyText" />
+                    <slot v-else>
+                        <p>{{ __('Are you sure?') }}</p>
+                    </slot>
                 </slot>
             </div>
             <div class="px-5 py-3 bg-gray-200 rounded-b-lg border-t flex items-center justify-end text-sm">
                 <button class="text-gray hover:text-gray-900" @click="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" />
-                <button class="ml-4" :class="buttonClass" v-text="__(buttonText)" @click="$emit('confirm')" />
+                <button class="ml-4" :class="buttonClass" :disabled="disabled" v-text="__(buttonText)" @click="$emit('confirm')" />
             </div>
         </div>
     </modal>
@@ -42,6 +44,10 @@ export default {
         danger: {
             type: Boolean,
             default: false
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
         }
     },
 

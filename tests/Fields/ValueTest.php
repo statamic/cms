@@ -22,7 +22,7 @@ class ValueTest extends TestCase
         $this->assertEquals($isRelationship, $value->isRelationship());
     }
 
-    public function isRelationshipFieldtypeProvider()
+    public static function isRelationshipFieldtypeProvider()
     {
         return [
             'relationship' => [true, new class extends Fieldtype

@@ -6,8 +6,8 @@
         <div class="flex items-center mb-6">
             <h1 class="flex-1">
                 <div class="flex items-center">
-                    <span v-if="! isCreating" class="little-dot mr-2" :class="activeLocalization.status" v-tooltip="activeLocalization.status" />
-                    <span v-html="$options.filters.striptags(title)" />
+                    <span v-if="! isCreating" class="little-dot mr-2" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                    <span v-html="$options.filters.striptags(__(title))" />
                 </div>
             </h1>
 
@@ -16,7 +16,7 @@
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
-                <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
+                <svg-icon name="light/lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden md:flex items-center">
@@ -176,7 +176,7 @@
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
                                             }" />
-                                            {{ option.name }}
+                                            {{ __(option.name) }}
                                             <loading-graphic
                                                 :size="14"
                                                 text=""
@@ -337,7 +337,7 @@ export default {
         canEditBlueprint: Boolean,
         canManagePublishState: Boolean,
         createAnotherUrl: String,
-        listingUrl: String,
+        initialListingUrl: String,
         collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
@@ -412,6 +412,10 @@ export default {
 
         published() {
             return this.values.published;
+        },
+
+        listingUrl() {
+            return `${this.initialListingUrl}?site=${this.site}`;
         },
 
         livePreviewUrl() {
@@ -534,6 +538,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
+                if (! response.data.saved) {
+                    return this.$toast.error(__(`Couldn't save entry`));
+                }
                 this.title = response.data.data.title;
                 this.isWorkingCopy = true;
                 if (this.isBase) {
@@ -558,7 +565,10 @@ export default {
                 .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
+                        clearTimeout(this.trackDirtyStateTimeout)
+                        this.trackDirtyState = false
                         this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350)
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
@@ -579,7 +589,10 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
+                        clearTimeout(this.trackDirtyStateTimeout);
+                        this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
@@ -604,6 +617,7 @@ export default {
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
+                this.$reveal.invalid();
             } else if (e.response) {
                 this.$toast.error(e.response.data.message);
             } else {
@@ -660,6 +674,7 @@ export default {
                 this.site = localization.handle;
                 this.localizing = false;
                 this.initialPublished = data.values.published;
+                this.readOnly = data.readOnly;
 
                 this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
             })

@@ -111,6 +111,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, this.visibleValues).then(response => {
                 this.title = response.data.title;
+                if (!response.data.saved) {
+                    return this.$toast.error(`Couldn't save user`)
+                }
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
@@ -120,6 +123,7 @@ export default {
                     this.error = message;
                     this.errors = errors;
                     this.$toast.error(message);
+                    this.$reveal.invalid();
                 } else {
                     this.$toast.error(__('Something went wrong'));
                 }

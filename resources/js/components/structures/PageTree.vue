@@ -47,6 +47,7 @@
                     @toggle-open="store.toggleOpen(page)"
                     @removed="pageRemoved"
                     @children-orphaned="childrenOrphaned"
+                    @branch-clicked="$emit('branch-clicked', page)"
                 >
                     <template #branch-action="props">
                         <slot name="branch-action" v-bind="{ ...props, vm }" />

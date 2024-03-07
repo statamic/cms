@@ -6,7 +6,7 @@ export default {
                 ...this.meta,
                 existing: {
                     ...this.meta.existing,
-                    [row]: value
+                    [row]: clone(value)
                 }
             });
         },

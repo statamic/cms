@@ -504,6 +504,10 @@ class EntriesTest extends TestCase
         $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy' => 'tags::rad|tags::meh|categories::news']));
         $this->assertEquals([1], $this->getEntryIds(['taxonomy::all' => 'tags::rad|categories::news'])); // modifier still expected to be 3rd segment
         $this->assertEquals([1], $this->getEntryIds(['taxonomy' => 'tags::rad|tags::meh', 'taxonomy:categories' => 'news'])); // mix and match
+
+        // Ensure it works when passing terms (eg from a term fieldtype)
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy:tags:in' => Term::query()->whereIn('slug', ['rad', 'meh'])->get()]));
+        $this->assertEquals([1, 3], $this->getEntryIds(['taxonomy:tags:in' => Term::find('tags::rad')]));
     }
 
     /** @test */
