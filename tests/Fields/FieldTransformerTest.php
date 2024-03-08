@@ -73,16 +73,20 @@ class FieldTransformerTest extends TestCase
             'handle' => 'test',
             'type' => 'inline',
             'config' => [
-                'input_type' => 'text', // Fieldtype default.
-                'icon' => 'text',  // Fieldtype default.
+                // Fieldtype config options
+                'input_type' => 'text', // The default.
+                'icon' => 'text', // The default.
                 'character_limit' => 100, // This one has been changed.
-                'instructions_position' => 'above', // Not fieldtype related, should be kept.
+
+                // Common field options
+                'instructions_position' => 'above', // The default.
+                'listable' => true, // This one has been changed.
             ],
         ]);
 
         $this->assertEquals([
             'character_limit' => 100,
-            'instructions_position' => 'above',
+            'listable' => true,
         ], $fromVue['field']);
     }
 
@@ -151,7 +155,7 @@ class FieldTransformerTest extends TestCase
                 'display' => 'Test',
                 'sets' => ['set_group' => ['sets' => ['set' => ['fields' => ['import' => 'seo']]]]],
                 'instructions' => 'Some instructions',
-                'visibility' => 'visible',
+                'listable' => true,
                 'foo' => 'bar',
             ],
         ]);
@@ -161,7 +165,7 @@ class FieldTransformerTest extends TestCase
             'field' => [
                 'display' => 'Test',
                 'instructions' => 'Some instructions',
-                'visibility' => 'visible',
+                'listable' => true,
                 'foo' => 'bar',
                 'sets' => ['set_group' => ['sets' => ['set' => ['fields' => ['import' => 'seo']]]]],
             ],
@@ -172,7 +176,7 @@ class FieldTransformerTest extends TestCase
                 'display' => 'Test',
                 'fields' => [['import' => 'seo'], ['handle' => 'foo']],
                 'instructions' => 'Some instructions',
-                'visibility' => 'visible',
+                'listable' => true,
                 'foo' => 'bar',
             ],
         ]);
@@ -182,7 +186,7 @@ class FieldTransformerTest extends TestCase
             'field' => [
                 'display' => 'Test',
                 'instructions' => 'Some instructions',
-                'visibility' => 'visible',
+                'listable' => true,
                 'foo' => 'bar',
                 'fields' => [['import' => 'seo'], ['handle' => 'foo']],
             ],

@@ -27,11 +27,14 @@ class FieldTransformer
     private static function inlineTabField(array $submitted)
     {
         $fieldtype = FieldtypeRepository::find($submitted['fieldtype'] ?? $submitted['config']['type']);
-        $defaultConfig = $fieldtype->configFields()->all()->map->defaultValue()->filter();
+
+        $defaultConfig = Field::commonFieldOptions()->all()
+            ->merge($fieldtype->configFields()->all())
+            ->map->defaultValue()->filter();
 
         $field = collect($submitted['config'])
             ->reject(function ($value, $key) use ($defaultConfig) {
-                if (in_array($key, ['isNew', 'icon'])) {
+                if (in_array($key, ['isNew', 'icon', 'duplicate'])) {
                     return true;
                 }
 
@@ -40,10 +43,6 @@ class FieldTransformer
                 }
 
                 if ($key === 'localizable' && $value === false && ! Site::hasMultiple()) {
-                    return true;
-                }
-
-                if ($key === 'duplicate') {
                     return true;
                 }
 
