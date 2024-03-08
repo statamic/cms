@@ -17,6 +17,7 @@ use Statamic\Events\BlueprintCreated;
 use Statamic\Events\BlueprintCreating;
 use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintDeleting;
+use Statamic\Events\BlueprintReset;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
 use Statamic\Exceptions\DuplicateFieldException;
@@ -412,6 +413,12 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return ! $this->isNamespaced();
     }
 
+    public function isResetable()
+    {
+        return $this->isNamespaced()
+            && File::exists($this->path());
+    }
+
     public function toPublishArray()
     {
         return [
@@ -483,6 +490,15 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         BlueprintRepository::delete($this);
 
         BlueprintDeleted::dispatch($this);
+
+        return true;
+    }
+
+    public function reset()
+    {
+        BlueprintRepository::reset($this);
+
+        BlueprintReset::dispatch($this);
 
         return true;
     }
@@ -692,6 +708,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     public function toQueryableValue()
     {
         return $this->handle();
+    }
+
+    public function resetUrl()
+    {
+        return cp_route('blueprints.reset', [$this->namespace(), $this->handle()]);
     }
 
     public function writeFile($path = null)

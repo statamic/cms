@@ -118,6 +118,15 @@ class BlueprintRepository
         $blueprint->deleteFile();
     }
 
+    public function reset(Blueprint $blueprint)
+    {
+        if (! $blueprint->isNamespaced()) {
+            throw new \Exception('Non-namespaced blueprints cannot be reset');
+        }
+
+        File::delete($blueprint->path());
+    }
+
     private function clearBlinkCaches()
     {
         Blink::store(self::BLINK_FOUND)->flush();
