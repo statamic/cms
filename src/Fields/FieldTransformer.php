@@ -50,17 +50,15 @@ class FieldTransformer
                 return $defaultConfig->has($key) && $defaultConfig->get($key) === $value;
             })
             ->filter()
+            ->sortBy(function ($value, $key) {
+                // Push sets & fields to the end of the config.
+                if ($key === 'sets' || $key === 'fields') {
+                    return 2;
+                }
+
+                return 1;
+            })
             ->all();
-
-        if (Arr::has($field, 'sets')) {
-            $sets = Arr::pull($field, 'sets');
-            $field['sets'] = $sets;
-        }
-
-        if (Arr::has($field, 'fields')) {
-            $fields = Arr::pull($field, 'fields');
-            $field['fields'] = $fields;
-        }
 
         return array_filter([
             'handle' => $submitted['handle'],
