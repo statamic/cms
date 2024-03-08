@@ -63,6 +63,7 @@ return [
     'collections_mount_instructions' => 'Choose an entry on which this collection should be mounted. Learn more in the [documentation](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Enable manual ordering via drag & drop.',
     'collections_past_date_behavior_instructions' => 'How past dated entries should behave.',
+    'collections_prevent_entry_creation_instructions' => 'Should it be possible to add new entries to this collection?',
     'collections_preview_targets_instructions' => 'The URLs to be viewable within Live Preview. Learn more in the [documentation](https://statamic.dev/live-preview#preview-targets).',
     'collections_route_instructions' => 'The route controls entries URL pattern. Learn more in the [documentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'The default sort direction.',

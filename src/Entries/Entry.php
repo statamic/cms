@@ -332,6 +332,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     {
         $isNew = is_null(Facades\Entry::find($this->id()));
 
+        if ($isNew && $this->collection()->preventEntryCreation()) {
+            return false;
+        }
+
         $withEvents = $this->withEvents;
         $this->withEvents = true;
 

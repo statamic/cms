@@ -8,7 +8,7 @@
         title="{{ $collection->title() }}"
         handle="{{ $collection->handle() }}"
         breadcrumb-url="{{ cp_route('collections.index') }}"
-        :can-create="@can('create', ['Statamic\Contracts\Entries\Entry', $collection]) true @else false @endcan"
+        :can-create="@can('create', ['Statamic\Contracts\Entries\Entry', $collection]) @if ($collection->preventEntryCreation()) false @else true @endif @else false @endcan"
         :create-urls='@json($createUrls)'
         create-label="{{ $collection->createLabel() }}"
         :blueprints='@json($blueprints)'

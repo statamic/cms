@@ -275,6 +275,10 @@ class EntriesController extends CpController
             return $response;
         }
 
+        if ($collection->preventEntryCreation()) {
+            throw new \Exception(__('Entries cannot be created on this collection.'));
+        }
+
         $blueprint = $collection->entryBlueprint($request->blueprint);
 
         if (! $blueprint) {

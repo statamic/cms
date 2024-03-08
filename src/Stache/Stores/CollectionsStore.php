@@ -51,6 +51,7 @@ class CollectionsStore extends BasicStore
             ->searchIndex(array_get($data, 'search_index'))
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->defaultPublishState($this->getDefaultPublishState($data))
+            ->preventEntryCreation(array_get($data, 'prevent_entry_creation', false))
             ->originBehavior(array_get($data, 'origin_behavior', 'select'))
             ->structureContents(array_get($data, 'structure'))
             ->sortField(array_get($data, 'sort_by'))

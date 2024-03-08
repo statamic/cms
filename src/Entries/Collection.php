@@ -53,6 +53,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     protected $positions;
     protected $defaultPublishState = true;
     protected $originBehavior = 'select';
+    protected $preventEntryCreation = false;
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
@@ -508,6 +509,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'past_date_behavior' => $this->pastDateBehavior(),
             'future_date_behavior' => $this->futureDateBehavior(),
             'default_publish_state' => $this->defaultPublishState,
+            'prevent_entry_creation' => $this->preventEntryCreation,
             'sites' => $this->sites,
             'propagate' => $this->propagate(),
             'template' => $this->template,
@@ -611,6 +613,16 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->fluentlyGetOrSet('pastDateBehavior')
             ->getter(function ($behavior) {
                 return $behavior ?? 'public';
+            })
+            ->args(func_get_args());
+    }
+
+    public function preventEntryCreation($preventEntryCreation = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('preventEntryCreation')
+            ->getter(function ($prevent) {
+                return $prevent ?? false;
             })
             ->args(func_get_args());
     }

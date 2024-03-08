@@ -24,6 +24,7 @@
                 <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
             </div>
         </a>
+        @if (! $collection->preventEntryCreation())
         <?php $multipleBlueprints = $collection->entryBlueprints()->count() > 1 ?>
         @if ($multipleBlueprints)<div
         @else<a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}"
@@ -44,6 +45,7 @@
                 @endif
             </div>
         @if ($multipleBlueprints)</div>@else</a>@endif
+        @endif
         <a href="{{ cp_route('collections.blueprints.index', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
             <div class="h-8 w-8 mr-4 text-gray-800">
                 @cp_svg('icons/light/blueprint')

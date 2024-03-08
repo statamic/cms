@@ -1575,6 +1575,22 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function if_collection_prevents_entry_creation_it_does_not_save()
+    {
+        Facades\Entry::spy();
+        Event::fake([EntryCreated::class]);
+
+        $collection = tap(Collection::make('test')->preventEntryCreation(true))->save();
+        $entry = (new Entry)->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertFalse($return);
+        Facades\Entry::shouldNotHaveReceived('save');
+        Event::assertNotDispatched(EntryCreated::class);
+    }
+
+    /** @test */
     public function it_adds_propagated_entry_to_structure()
     {
         Event::fake();

@@ -153,6 +153,7 @@ class CollectionsController extends CpController
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
             'revisions' => $collection->revisionsEnabled(),
             'default_publish_state' => $collection->defaultPublishState(),
+            'prevent_entry_creation' => $collection->preventEntryCreation(),
             'template' => $collection->template(),
             'layout' => $collection->layout(),
             'sites' => $collection->sites()->all(),
@@ -232,6 +233,7 @@ class CollectionsController extends CpController
             ->template($values['template'])
             ->layout($values['layout'])
             ->defaultPublishState($values['default_publish_state'])
+            ->preventEntryCreation($values['prevent_entry_creation'])
             ->sortDirection($values['sort_direction'])
             ->mount($values['mount'] ?? null)
             ->revisionsEnabled($values['revisions'] ?? false)
@@ -428,6 +430,11 @@ class CollectionsController extends CpController
                     'default_publish_state' => [
                         'display' => __('Publish by Default'),
                         'instructions' => __('statamic::messages.collections_default_publish_state_instructions'),
+                        'type' => 'toggle',
+                    ],
+                    'prevent_entry_creation' => [
+                        'display' => __('Prevent new entries from being created'),
+                        'instructions' => __('statamic::messages.collections_prevent_entry_creation_instructions'),
                         'type' => 'toggle',
                     ],
                     'template' => [

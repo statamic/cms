@@ -61,6 +61,7 @@ class NavigationTreeController extends CpController
     private function updateData(array $data, Blueprint $blueprint)
     {
         collect($data)->each(function ($branch, $id) use ($blueprint) {
+            dd($branch);
             $data = $blueprint->fields()
                 ->addValues($branch['values'] ?? [])
                 ->process()
@@ -72,6 +73,8 @@ class NavigationTreeController extends CpController
                 $this->generatedIds[$id] = $newId;
                 $id = $newId;
             }
+
+            dd($data);
 
             $this->data[$id] = Arr::removeNullValues([
                 'id' => $id,
