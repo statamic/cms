@@ -16,7 +16,9 @@
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"
+                            :id="field._id"
                             :root="isRoot"
+                            :fields="fields"
                             :config="fieldConfig"
                             @committed="settingsUpdated"
                             @closed="editorClosed"

@@ -6,8 +6,8 @@
         <div class="flex items-center mb-6">
             <h1 class="flex-1">
                 <div class="flex items-center">
-                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2" :class="activeLocalization.status" v-tooltip="activeLocalization.status" />
-                    <span v-html="$options.filters.striptags(title)" />
+                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                    <span v-html="$options.filters.striptags(__(title))" />
                 </div>
             </h1>
 
@@ -166,8 +166,11 @@
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="text-sm flex items-center -mx-4 px-4 py-2 cursor-pointer"
-                                        :class="option.active ? 'bg-blue-100' : 'hover:bg-gray-200'"
+                                        class="text-sm flex items-center -mx-4 px-4 py-2"
+                                        :class="[
+                                            option.active ? 'bg-blue-100' : 'hover:bg-gray-200',
+                                            !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
+                                        ]"
                                         @click="localizationSelected(option)"
                                     >
                                         <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
@@ -176,7 +179,7 @@
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
                                             }" />
-                                            {{ option.name }}
+                                            {{ __(option.name) }}
                                             <loading-graphic
                                                 :size="14"
                                                 text=""
@@ -617,6 +620,7 @@ export default {
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
+                this.$reveal.invalid();
             } else if (e.response) {
                 this.$toast.error(e.response.data.message);
             } else {
@@ -625,6 +629,11 @@ export default {
         },
 
         localizationSelected(localization) {
+            if (!this.canSave) {
+                if (localization.exists) this.editLocalization(localization);
+                return;
+            }
+
             if (localization.active) return;
 
             if (this.isDirty) {

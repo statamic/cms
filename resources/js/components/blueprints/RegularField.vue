@@ -6,7 +6,7 @@
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 rtl:pl-4 ltr:pr-4 py-2 rtl:pr-2 ltr:pl-2">
                     <svg-icon class="text-gray-800 rtl:ml-2 ltr:mr-2 h-4 w-4 flex-none" :name="field.icon.startsWith('<svg') ? field.icon : `light/${field.icon}`" v-tooltip="tooltipText" default="light/generic-field" />
-                    <a class="break-all" v-text="labelText" @click="$emit('edit')" />
+                    <a class="break-all" v-text="__(labelText)" @click="$emit('edit')" />
                     <svg-icon name="light/hyperlink" v-if="isReferenceField" class="text-gray-600 text-3xs rtl:mr-2 ltr:ml-2 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
                 <div class="flex-none rtl:pl-2 ltr:pr-2 flex">
@@ -33,8 +33,10 @@
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"
+                            :id="field._id"
                             :type="field.fieldtype"
                             :root="isRoot"
+                            :fields="fields"
                             :config="fieldConfig"
                             :overrides="field.config_overrides || []"
                             :suggestable-condition-fields="suggestableConditionFields"

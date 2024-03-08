@@ -265,4 +265,67 @@ EOT;
         $this->assertSame(' <div class="list-of-classes">     ', $nodes[0]->content);
         $this->assertSame('FINAL_LITERAL </div> ', $nodes[2]->content);
     }
+
+    public function test_shorthand_variable_syntax()
+    {
+        $template = <<<'EOT'
+{{ tag_name :$class }}
+EOT;
+
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
+
+        $this->assertCount(1, $nodes[0]->parameters);
+
+        $this->assertParameterNameValue($nodes[0]->parameters[0], 'class', 'class');
+        $this->assertTrue($nodes[0]->parameters[0]->isVariableReference);
+    }
+
+    public function test_multiple_shorthand_variable_parameters()
+    {
+        $template = <<<'EOT'
+{{ tag_name :$class :$another_one }}
+EOT;
+
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
+
+        $this->assertCount(2, $nodes[0]->parameters);
+
+        $this->assertParameterNameValue($nodes[0]->parameters[0], 'class', 'class');
+        $this->assertTrue($nodes[0]->parameters[0]->isVariableReference);
+
+        $this->assertParameterNameValue($nodes[0]->parameters[1], 'another_one', 'another_one');
+        $this->assertTrue($nodes[0]->parameters[1]->isVariableReference);
+    }
+
+    public function test_it_parses_shorthand_parameters_and_regular_parameters()
+    {
+        $template = <<<'EOT'
+{{ tag_name this="that" :$class cool="beans" :$another_one lucky="egg" }}
+EOT;
+
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
+
+        $this->assertCount(5, $nodes[0]->parameters);
+
+        $this->assertParameterNameValue($nodes[0]->parameters[0], 'this', 'that');
+        $this->assertParameterNameValue($nodes[0]->parameters[1], 'class', 'class');
+        $this->assertParameterNameValue($nodes[0]->parameters[2], 'cool', 'beans');
+        $this->assertParameterNameValue($nodes[0]->parameters[3], 'another_one', 'another_one');
+        $this->assertParameterNameValue($nodes[0]->parameters[4], 'lucky', 'egg');
+
+        $this->assertFalse($nodes[0]->parameters[0]->isVariableReference);
+        $this->assertTrue($nodes[0]->parameters[1]->isVariableReference);
+        $this->assertFalse($nodes[0]->parameters[2]->isVariableReference);
+        $this->assertTrue($nodes[0]->parameters[3]->isVariableReference);
+        $this->assertFalse($nodes[0]->parameters[4]->isVariableReference);
+    }
 }

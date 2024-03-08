@@ -111,8 +111,8 @@ export default {
                 .filter(field => field.type !== 'import')
                 .map(field => ({
                     value: `${fieldset.handle}.${field.handle}`,
-                    label: field.config.display,
-                    fieldset: fieldset.title,
+                    label: __(field.config.display),
+                    fieldset: __(fieldset.title),
                 }));
         });
 
@@ -124,7 +124,7 @@ export default {
             fieldSuggestions,
             fieldsetSuggestions: fieldsets.map(fieldset => ({
                 value: fieldset.handle,
-                label: fieldset.title,
+                label: __(fieldset.title),
             })),
             fieldsets,
         }

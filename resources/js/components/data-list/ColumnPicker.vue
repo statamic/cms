@@ -9,7 +9,7 @@
         </button>
 
         <modal v-if="open" name="column-picker" @closed="open = false" draggable=".modal-drag-handle" click-to-close>
-            <div class="flex flex-col h-full">
+            <div class="flex flex-col h-full -max-h-screen-px">
 
                 <header class="modal-drag-handle p-4 bg-gray-200 border-b flex items-center justify-between cursor-grab active:cursor-grabbing">
                     <h2>{{ __('Customize Columns') }}</h2>
@@ -24,7 +24,7 @@
                             <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field" v-if="hiddenColumns.length">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="checkbox" class="rtl:ml-2 ltr:mr-2" v-model="column.visible" @change="columnToggled(column) "/>
-                                    {{ column.label }}
+                                    {{ __(column.label) }}
                                 </label>
                             </div>
                         </div>
@@ -48,7 +48,7 @@
                                         <div class="item-move py-1">&nbsp;</div>
                                         <div class="flex flex-1 rtl:mr-2 ltr:ml-2 items-center p-0">
                                             <input type="checkbox" class="rtl:ml-2 ltr:mr-2" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
-                                            {{ column.label }}
+                                            {{ __(column.label) }}
                                         </div>
                                     </div>
                                 </div>

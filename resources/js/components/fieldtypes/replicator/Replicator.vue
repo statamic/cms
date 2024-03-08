@@ -136,7 +136,8 @@ export default {
             previews: this.meta.previews,
             fullScreenMode: false,
             provide: {
-                storeName: this.storeName
+                storeName: this.storeName,
+                replicatorSets: this.config.sets
             }
         }
     },

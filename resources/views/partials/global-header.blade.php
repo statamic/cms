@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 <div class="global-header">
     <div class="lg:min-w-xl rtl:pr-2 ltr:pl-2 rtl:md:pr-6 ltr:md:pl-6 h-full flex items-center">
         <button class="nav-toggle hidden md:flex rtl:mr-1 ltr:ml-1 shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@cp_svg('icons/light/burger', 'h-4 w-4')</button>

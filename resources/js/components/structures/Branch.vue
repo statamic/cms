@@ -5,7 +5,7 @@
             <div v-if="editable" class="page-move w-6" />
         </slot>
         <div class="flex items-center flex-1 p-2 rtl:mr-2 ltr:ml-2 text-xs leading-normal">
-            <div class="flex items-center flex-1" @click="$emit('branch-clicked', page)">
+            <div class="flex items-center grow" @click="$emit('branch-clicked', page)">
                 <div class="little-dot rtl:ml-2 ltr:mr-2" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
                 <svg-icon name="home-page" class="rtl:ml-2 ltr:mr-2 h-4 w-4 text-gray-800" v-if="isRoot" v-tooltip="__('This is the root page')" />
                 <a
@@ -37,9 +37,11 @@
             </div>
 
             <div class="rtl:pl-2 ltr:pr-2 flex items-center">
+                <div v-if="showBlueprint && page.entry_blueprint" v-text="__(page.entry_blueprint.title)" class="shrink text-4xs text-gray-600 uppercase ml-4" />
+
                 <slot name="branch-icon" :branch="page" />
 
-                <dropdown-list class="rtl:mr-4 ltr:ml-4" v-if="!isRoot && editable">
+                <dropdown-list class="rtl:mr-4 ltr:ml-4" :class="{'invisible': isRoot, 'hidden': !editable}">
                     <slot name="branch-options"
                         :branch="page"
                         :depth="depth"
@@ -68,6 +70,7 @@ export default {
         isOpen: Boolean,
         hasChildren: Boolean,
         showSlugs: Boolean,
+        showBlueprint: Boolean,
         editable: Boolean,
     },
 

@@ -8,7 +8,7 @@
                 <div class="p-2 flex-1 flex items-center">
                     <a class="flex items-center flex-1 group" @click="edit">
                         <svg-icon :name="iconName(section.icon)" :directory="iconBaseDirectory" class="h-4 w-4 rtl:ml-2 ltr:mr-2 text-gray-700 group-hover:text-blue-500" />
-                        <div class="rtl:ml-2 ltr:mr-2" v-text="section.display" />
+                        <div class="rtl:ml-2 ltr:mr-2" v-text="__(section.display)" />
                     </a>
                     <button class="flex items-center text-gray-700 hover:text-gray-950 rtl:ml-3 ltr:mr-3" @click="edit">
                         <svg-icon class="h-4 w-4" name="pencil" />
@@ -124,7 +124,7 @@ export default {
     computed: {
 
         suggestableConditionFields() {
-            return this.suggestableConditionFieldsProvider?.suggestableFields || [];
+            return this.suggestableConditionFieldsProvider?.suggestableFields(this) || [];
         },
 
         iconBaseDirectory() {

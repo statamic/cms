@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 <style>
   #__impersonator-link__ {
     position: fixed;

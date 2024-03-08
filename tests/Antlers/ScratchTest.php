@@ -37,7 +37,7 @@ class ScratchTest extends TestCase
     /** @test */
     public function interpolated_parameter_with_extra_space_should_work()
     {
-        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
+        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\TestTags::class;
 
         $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{bar }" }}', ['bar' => 'baz']));
         $this->assertEquals('baz', (string) Antlers::parse('{{ test variable="{ bar}" }}', ['bar' => 'baz']));

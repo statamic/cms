@@ -13,7 +13,7 @@
     >
         <svg-icon v-if="tab.icon" :name="iconName(tab.icon)" :directory="iconBaseDirectory" class="w-4 h-4 rtl:ml-1 ltr:mr-1" />
 
-        {{ tab.display }}
+        {{ __(tab.display) }}
 
         <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="rtl:text-right ltr:text-left">
             <template #trigger>

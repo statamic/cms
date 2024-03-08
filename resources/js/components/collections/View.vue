@@ -104,6 +104,7 @@
             v-if="canUseStructureTree && view === 'tree'"
             ref="tree"
             :collections="[handle]"
+            :blueprints="blueprints"
             :create-url="createUrl"
             :pages-url="structurePagesUrl"
             :submit-url="structureSubmitUrl"
@@ -133,7 +134,7 @@
                         v-for="blueprint in blueprints"
                         :key="blueprint.handle"
                         @click="createEntry(blueprint.handle, branch.id)"
-                        v-text="blueprints.length > 1 ? blueprint.title : __('Create Child Entry')" />
+                        v-text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')" />
                 </template>
                 <template v-if="branch.can_delete">
                     <li class="divider"></li>

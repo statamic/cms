@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', __('Users'))
 @section('wrapper_class', 'max-w-full')
@@ -22,8 +24,8 @@
 
     <user-listing
         listing-key="users"
-        initial-sort-column="email"
-        initial-sort-direction="asc"
+        initial-sort-column="{{ config('statamic.users.sort_field', 'email') }}"
+        initial-sort-direction="{{ config('statamic.users.sort_direction', 'asc') }}"
         :filters="{{ $filters->toJson() }}"
         action-url="{{ cp_route('users.actions.run') }}"
     ></user-listing>
