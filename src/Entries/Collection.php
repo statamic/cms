@@ -509,7 +509,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'past_date_behavior' => $this->pastDateBehavior(),
             'future_date_behavior' => $this->futureDateBehavior(),
             'default_publish_state' => $this->defaultPublishState,
-            'prevent_entry_creation' => $this->preventEntryCreation,
+            'prevent_entry_creation' => $this->preventEntryCreation ?: null,
             'sites' => $this->sites,
             'propagate' => $this->propagate(),
             'template' => $this->template,
