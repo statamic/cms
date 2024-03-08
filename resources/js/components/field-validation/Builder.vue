@@ -78,7 +78,7 @@
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
-                    distance="5"
+                    :distance="5"
                     :mirror="false"
                     v-model="rules"
                 >
