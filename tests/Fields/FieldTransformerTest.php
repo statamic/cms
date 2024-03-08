@@ -85,4 +85,107 @@ class FieldTransformerTest extends TestCase
             'instructions_position' => 'above',
         ], $fromVue['field']);
     }
+
+    /** @test */
+    public function it_removes_full_width_from_field_config()
+    {
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text', 'handle' => 'test', 'type' => 'inline', 'config' => ['width' => 100, 'display' => 'Test'],
+        ]);
+
+        $this->assertEquals([
+            'handle' => 'test',
+            'field' => ['display' => 'Test'],
+        ], $fromVue);
+
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text', 'handle' => 'test', 'type' => 'inline', 'config' => ['width' => 50, 'display' => 'Test'],
+        ]);
+
+        $this->assertEquals([
+            'handle' => 'test',
+            'field' => ['width' => 50, 'display' => 'Test'],
+        ], $fromVue);
+    }
+
+    /** @test */
+    public function it_removes_localizable_false_from_field_config()
+    {
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text', 'handle' => 'test', 'type' => 'inline', 'config' => ['display' => 'Test', 'localizable' => false],
+        ]);
+
+        $this->assertEquals([
+            'handle' => 'test',
+            'field' => ['display' => 'Test'],
+        ], $fromVue);
+
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text', 'handle' => 'test', 'type' => 'inline', 'config' => ['display' => 'Test', 'localizable' => true],
+        ]);
+
+        $this->assertEquals([
+            'handle' => 'test',
+            'field' => ['display' => 'Test', 'localizable' => true],
+        ], $fromVue);
+    }
+
+    /** @test */
+    public function it_removes_duplicate_from_field_config()
+    {
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text', 'handle' => 'test', 'type' => 'inline', 'config' => ['display' => 'Test', 'duplicate' => true],
+        ]);
+
+        $this->assertEquals([
+            'handle' => 'test',
+            'field' => ['display' => 'Test'],
+        ], $fromVue);
+    }
+
+    /** @test */
+    public function sets_and_fields_are_always_at_the_end_of_field_configs()
+    {
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text', 'handle' => 'test', 'type' => 'inline', 'config' => [
+                'display' => 'Test',
+                'sets' => ['set_group' => ['sets' => ['set' => ['fields' => ['import' => 'seo']]]]],
+                'instructions' => 'Some instructions',
+                'visibility' => 'visible',
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->assertEquals([
+            'handle' => 'test',
+            'field' => [
+                'display' => 'Test',
+                'instructions' => 'Some instructions',
+                'visibility' => 'visible',
+                'foo' => 'bar',
+                'sets' => ['set_group' => ['sets' => ['set' => ['fields' => ['import' => 'seo']]]]],
+            ],
+        ], $fromVue);
+
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text', 'handle' => 'test', 'type' => 'inline', 'config' => [
+                'display' => 'Test',
+                'fields' => [['import' => 'seo'], ['handle' => 'foo']],
+                'instructions' => 'Some instructions',
+                'visibility' => 'visible',
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->assertEquals([
+            'handle' => 'test',
+            'field' => [
+                'display' => 'Test',
+                'instructions' => 'Some instructions',
+                'visibility' => 'visible',
+                'foo' => 'bar',
+                'fields' => [['import' => 'seo'], ['handle' => 'foo']],
+            ],
+        ], $fromVue);
+    }
 }
