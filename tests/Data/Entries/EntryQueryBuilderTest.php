@@ -4,6 +4,7 @@ namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -768,5 +769,35 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Support\LazyCollection::class, $entries);
         $this->assertCount(3, $entries);
+    }
+
+    /** @test */
+    public function pluck_can_be_used_to_retrieve_values_from_index()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertEquals(collect([1, 2, 3]), Entry::query()->pluck('id'));
+
+        $paths = Entry::query()->pluck('path')->map(fn ($path) => Str::afterLast($path, '/'));
+
+        $this->assertEquals(collect([
+            'post-1.md',
+            'post-2.md',
+            'post-3.md',
+        ]), $paths);
+
+        $this->assertEquals(collect([
+            1 => 'post-1',
+            2 => 'post-2',
+            3 => 'post-3',
+        ]), Entry::query()->pluck('slug', 'id'));
+
+        $this->assertEquals(collect([
+            3 => 'post-3',
+        ]), Entry::query()->where('id', 3)->pluck('slug', 'id'));
+
+        $this->assertEquals(collect([
+            'post-3' => 3,
+        ]), Entry::query()->where('id', 3)->pluck('id', 'slug'));
     }
 }
