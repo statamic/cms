@@ -35,22 +35,22 @@ class FieldTransformer
                     return true;
                 }
 
+                if ($key === 'width' && $value === 100) {
+                    return true;
+                }
+
+                if ($key === 'localizable' && $value === false && ! Site::hasMultiple()) {
+                    return true;
+                }
+
+                if ($key === 'duplicate') {
+                    return true;
+                }
+
                 return $defaultConfig->has($key) && $defaultConfig->get($key) === $value;
             })
             ->filter()
             ->all();
-
-        if (Arr::get($field, 'width') === 100) {
-            unset($field['width']);
-        }
-
-        if (Arr::get($field, 'localizable', false) === false && ! Site::hasMultiple()) {
-            unset($field['localizable']);
-        }
-
-        if (Arr::get($field, 'duplicate', true) === true) {
-            unset($field['duplicate']);
-        }
 
         if (Arr::has($field, 'sets')) {
             $sets = Arr::pull($field, 'sets');
