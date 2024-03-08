@@ -26,7 +26,7 @@ class FieldTransformer
 
     private static function inlineTabField(array $submitted)
     {
-        $fieldtype = FieldtypeRepository::find($submitted['fieldtype']);
+        $fieldtype = FieldtypeRepository::find($submitted['fieldtype'] ?? $submitted['config']['type']);
         $defaultConfig = $fieldtype->configFields()->all()->map->defaultValue()->filter();
 
         $field = collect($submitted['config'])
