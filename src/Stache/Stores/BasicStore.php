@@ -47,7 +47,7 @@ abstract class BasicStore extends Store
             foreach ($item->receivesIndexValues() as $index) {
                 Stache::itemUsingIndexValues($index, $item);
 
-                $value = $this->resolveIndex($index)->get($id);
+                $value = $this->resolveIndex($index)->load()->get($id);
 
                 if ($value) {
                     $item->withIndexedValue($index, $value);
