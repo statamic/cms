@@ -23,7 +23,6 @@
                         <td class="align-middle" v-text="__(site.name)" />
                         <td>
                             <text-input
-                                dir="ltr"
                                 class="slug-field"
                                 :value="value[site.handle]"
                                 @input="updateSiteValue(site.handle, $event)" />
@@ -34,7 +33,7 @@
         </div>
 
         <div v-if="!hasMultipleSites || !inMultipleMode">
-            <text-input :value="value" @input="update" class="slug-field" dir="ltr" />
+            <text-input :value="value" @input="update" class="slug-field" />
         </div>
     </div>
 
