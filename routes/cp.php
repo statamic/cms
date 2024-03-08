@@ -271,7 +271,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('users/actions/list', [UserActionController::class, 'bulkActions'])->name('users.actions.bulk');
     Route::get('users/blueprint', [UserBlueprintController::class, 'edit'])->name('users.blueprint.edit');
     Route::patch('users/blueprint', [UserBlueprintController::class, 'update'])->name('users.blueprint.update');
-    Route::resource('users', UsersController::class);
+    Route::resource('users', UsersController::class)->except('destroy');
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
     Route::get('account', AccountController::class)->name('account');
     Route::get('user-groups/blueprint', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.blueprint.edit');
