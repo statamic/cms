@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Statamic\Auth\File\PasskeyRepository;
 use Statamic\Auth\File\RoleRepository;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\File\UserGroupRepository;
@@ -18,6 +19,7 @@ class UserRepository extends BaseRepository
     protected $config;
     protected $roleRepository = RoleRepository::class;
     protected $userGroupRepository = UserGroupRepository::class;
+    protected $passkeyRepository = PasskeyRepository::class;
 
     public function __construct(Stache $stache, array $config = [])
     {

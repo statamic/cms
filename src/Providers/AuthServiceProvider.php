@@ -11,6 +11,7 @@ use Statamic\Auth\Permissions;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Auth\UserProvider;
 use Statamic\Auth\UserRepositoryManager;
+use Statamic\Contracts\Auth\PasskeyRepository;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
@@ -62,6 +63,10 @@ class AuthServiceProvider extends ServiceProvider
 
         $this->app->singleton(UserGroupRepository::class, function ($app) {
             return $app[UserRepository::class]->userGroupRepository();
+        });
+
+        $this->app->singleton(PasskeyRepository::class, function ($app) {
+            return $app[UserRepository::class]->passkeyRepository();
         });
 
         $this->app->singleton(ProtectorManager::class, function ($app) {
