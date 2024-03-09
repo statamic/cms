@@ -139,9 +139,9 @@ class TermEntriesTest extends TestCase
         $this->assertEquals(['rouge-shirt'], Term::find('colors::red')->in('fr')->entries()->map->slug()->all());
 
         $this->assertEquals(2, Term::find('colors::black')->in('en')->entriesCount());
-        $this->assertEquals(['black-shirt', 'panther'], Term::find('colors::black')->in('en')->entries()->map->slug()->sort()->values()->all());
+        $this->assertEquals(['panther', 'black-shirt'], Term::find('colors::black')->in('en')->entries()->map->slug()->all());
         $this->assertEquals(2, Term::find('colors::black')->in('fr')->entriesCount());
-        $this->assertEquals(['noir-shirt', 'panthere'], Term::find('colors::black')->in('fr')->entries()->map->slug()->sort()->values()->all());
+        $this->assertEquals(['panthere', 'noir-shirt'], Term::find('colors::black')->in('fr')->entries()->map->slug()->all());
 
         $this->assertEquals(1, Term::find('colors::yellow')->in('en')->entriesCount());
         $this->assertEquals(['cheetah'], Term::find('colors::yellow')->in('en')->entries()->map->slug()->all());
@@ -151,13 +151,13 @@ class TermEntriesTest extends TestCase
         // and for the base Term class, it should not filter by locale
 
         $this->assertEquals(2, Term::find('colors::red')->term()->entriesCount());
-        $this->assertEquals(['red-shirt', 'rouge-shirt'], Term::find('colors::red')->term()->entries()->map->slug()->sort()->values()->all());
+        $this->assertEquals(['red-shirt', 'rouge-shirt'], Term::find('colors::red')->term()->entries()->map->slug()->all());
 
         $this->assertEquals(4, Term::find('colors::black')->term()->entriesCount());
-        $this->assertEquals(['black-shirt', 'noir-shirt', 'panther', 'panthere'], Term::find('colors::black')->term()->entries()->map->slug()->sort()->values()->all());
+        $this->assertEquals(['panther', 'panthere', 'black-shirt', 'noir-shirt'], Term::find('colors::black')->term()->entries()->map->slug()->all());
 
         $this->assertEquals(2, Term::find('colors::yellow')->term()->entriesCount());
-        $this->assertEquals(['cheetah', 'guepard'], Term::find('colors::yellow')->term()->entries()->map->slug()->sort()->values()->all());
+        $this->assertEquals(['cheetah', 'guepard'], Term::find('colors::yellow')->term()->entries()->map->slug()->all());
     }
 
     /** @test */
@@ -233,16 +233,16 @@ class TermEntriesTest extends TestCase
         $this->assertEquals([], Term::find('colors::red')->collection($animals)->term()->entries()->map->slug()->all());
 
         $this->assertEquals(2, Term::find('colors::black')->collection($animals)->term()->entriesCount());
-        $this->assertEquals(['panther', 'panthere'], Term::find('colors::black')->collection($animals)->term()->entries()->map->slug()->sort()->values()->all());
+        $this->assertEquals(['panther', 'panthere'], Term::find('colors::black')->collection($animals)->term()->entries()->map->slug()->all());
 
         $this->assertEquals(2, Term::find('colors::yellow')->collection($animals)->term()->entriesCount());
-        $this->assertEquals(['cheetah', 'guepard'], Term::find('colors::yellow')->collection($animals)->term()->entries()->map->slug()->sort()->values()->all());
+        $this->assertEquals(['cheetah', 'guepard'], Term::find('colors::yellow')->collection($animals)->term()->entries()->map->slug()->all());
 
         $this->assertEquals(2, Term::find('colors::red')->collection($clothes)->term()->entriesCount());
-        $this->assertEquals(['red-shirt', 'rouge-shirt'], Term::find('colors::red')->collection($clothes)->term()->entries()->map->slug()->sort()->values()->all());
+        $this->assertEquals(['red-shirt', 'rouge-shirt'], Term::find('colors::red')->collection($clothes)->term()->entries()->map->slug()->all());
 
         $this->assertEquals(2, Term::find('colors::black')->collection($clothes)->term()->entriesCount());
-        $this->assertEquals(['black-shirt', 'noir-shirt'], Term::find('colors::black')->collection($clothes)->term()->entries()->map->slug()->sort()->values()->all());
+        $this->assertEquals(['black-shirt', 'noir-shirt'], Term::find('colors::black')->collection($clothes)->term()->entries()->map->slug()->all());
 
         $this->assertEquals(0, Term::find('colors::yellow')->collection($clothes)->term()->entriesCount());
         $this->assertEquals([], Term::find('colors::yellow')->collection($clothes)->term()->entries()->map->slug()->all());

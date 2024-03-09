@@ -68,7 +68,7 @@ class UserGroupTest extends TestCase
 
         $userB->addToGroup($group)->save();
         $this->assertCount(2, $group->users());
-        $this->assertSame([$userB, $userA], $group->users()->all());
+        $this->assertSame([$userA, $userB], $group->users()->all());
         $this->assertTrue($group->hasUser($userA));
         $this->assertTrue($group->hasUser($userB));
     }

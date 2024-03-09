@@ -21,8 +21,8 @@ class TermQueryBuilderTest extends TestCase
     public function it_gets_terms()
     {
         Site::setConfig(['sites' => [
-            'en' => ['url' => '/', 'locale' => 'en_US'],
-            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
         ]]);
 
         Taxonomy::make('tags')->sites(['en', 'fr'])->save();
@@ -83,7 +83,7 @@ class TermQueryBuilderTest extends TestCase
         Term::make('d')->taxonomy('tags')->data(['test' => 'foo'])->save();
         Term::make('e')->taxonomy('tags')->data(['test' => 'raz'])->save();
 
-        $terms = Term::query()->whereIn('test', ['foo', 'bar'])->orWhereIn('test', ['foo', 'raz'])->orderBy('slug')->get();
+        $terms = Term::query()->whereIn('test', ['foo', 'bar'])->orWhereIn('test', ['foo', 'raz'])->get();
 
         $this->assertEquals(['a', 'b', 'd', 'e'], $terms->map->slug()->values()->all());
     }

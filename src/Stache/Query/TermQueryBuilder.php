@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Query;
 
-use Illuminate\Support\Str;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Taxonomies\TermCollection;
@@ -11,13 +10,6 @@ class TermQueryBuilder extends Builder
 {
     protected $taxonomies;
     protected $collections;
-
-    protected function prepareKeysForOptimizedSort($keys)
-    {
-        return $keys->map(function ($value) {
-            return Str::after($value, '::');
-        })->combine($keys);
-    }
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {

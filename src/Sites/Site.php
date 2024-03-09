@@ -32,7 +32,7 @@ class Site implements Augmentable
 
     public function locale()
     {
-        return $this->config['locale'] ?? null;
+        return $this->config['locale'];
     }
 
     public function shortLocale()

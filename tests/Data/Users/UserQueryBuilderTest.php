@@ -34,10 +34,10 @@ class UserQueryBuilderTest extends TestCase
         User::make()->email('aragorn@precious.com')->data(['name' => 'Aragorn'])->save();
         User::make()->email('bombadil@precious.com')->data(['name' => 'Tommy'])->save();
 
-        $users = User::query()->whereIn('name', ['Gandalf', 'Frodo'])->orWhereIn('name', ['Gandalf', 'Aragorn', 'Tommy'])->orderBy('name')->get();
+        $users = User::query()->whereIn('name', ['Gandalf', 'Frodo'])->orWhereIn('name', ['Gandalf', 'Aragorn', 'Tommy'])->get();
 
         $this->assertCount(4, $users);
-        $this->assertEquals(['Aragorn', 'Frodo', 'Gandalf', 'Tommy'], $users->map->name->all());
+        $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn', 'Tommy'], $users->map->name->all());
     }
 
     /** @test **/
@@ -53,7 +53,7 @@ class UserQueryBuilderTest extends TestCase
         $users = User::query()->whereNotIn('name', ['Gandalf', 'Frodo'])->orWhereNotIn('name', ['Gandalf', 'Sauron'])->get();
 
         $this->assertCount(3, $users);
-        $this->assertEquals(['Aragorn', 'Smeagol', 'Tommy'], $users->map->name->all());
+        $this->assertEquals(['Smeagol', 'Aragorn', 'Tommy'], $users->map->name->all());
     }
 
     /** @test **/
@@ -119,19 +119,17 @@ class UserQueryBuilderTest extends TestCase
 
         $users = User::query()
             ->where('content->value', 1)
-            ->orderBy('name')
             ->get();
 
         $this->assertCount(2, $users);
-        $this->assertEquals(['Aragorn', 'Gandalf'], $users->map->name->all());
+        $this->assertEquals(['Gandalf', 'Aragorn'], $users->map->name->all());
 
         $users = User::query()
             ->where('content->value', '<>', 1)
-            ->orderBy('name', 'desc')
             ->get();
 
         $this->assertCount(6, $users);
-        $this->assertEquals(['Tommy', 'Smeagol', 'Sauron', 'Frodo', 'Bilbo', 'Arwen'], $users->map->name->all());
+        $this->assertEquals(['Smeagol', 'Frodo', 'Tommy', 'Sauron', 'Arwen', 'Bilbo'], $users->map->name->all());
     }
 
     /** @test **/
@@ -227,7 +225,7 @@ class UserQueryBuilderTest extends TestCase
         $userTwo->addToGroup($groupOne)->save();
         $userThree->addToGroup($groupTwo)->save();
 
-        $users = User::query()->whereGroup('one')->orderBy('name')->get();
+        $users = User::query()->whereGroup('one')->get();
 
         $this->assertCount(2, $users);
         $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
@@ -304,7 +302,7 @@ class UserQueryBuilderTest extends TestCase
         $userTwo->assignRole($roleOne)->save();
         $userThree->assignRole($roleTwo)->save();
 
-        $users = User::query()->whereRole('one')->orderBy('name')->get();
+        $users = User::query()->whereRole('one')->get();
 
         $this->assertCount(2, $users);
         $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
