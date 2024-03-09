@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Indexes;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Compare;
 use Statamic\Facades\Stache;
 use Statamic\Statamic;
 
@@ -107,8 +108,20 @@ abstract class Index
         return Cache::has($this->cacheKey());
     }
 
+    protected function orderIndex()
+    {
+        // Order all indexes in ascending order. If we want
+        // a descending sort later, we can reverse the
+        // keys after doing our index comparisons.
+        uasort($this->items, function ($a, $b) {
+            return Compare::values($a, $b);
+        });
+    }
+
     public function cache()
     {
+        $this->orderIndex();
+
         Cache::forever($this->cacheKey(), $this->items);
     }
 

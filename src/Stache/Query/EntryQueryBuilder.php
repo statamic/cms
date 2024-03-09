@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Query;
 
+use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
@@ -11,6 +12,13 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
     use QueriesTaxonomizedEntries;
 
     protected $collections;
+
+    protected function prepareKeysForOptimizedSort($keys)
+    {
+        return $keys->map(function ($value) {
+            return Str::after($value, '::');
+        })->combine($keys);
+    }
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
