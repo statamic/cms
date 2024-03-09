@@ -8,10 +8,16 @@ use Statamic\Facades\Site;
 class Comparator
 {
     protected $locale;
+    protected static $hasCheckedCollator = false;
+    protected static $canUseCollator = false;
 
     public function __construct()
     {
         $this->locale = Site::current()->locale();
+
+        if (! self::$hasCheckedCollator) {
+            self::$canUseCollator = class_exists(Collator::class);
+        }
     }
 
     public function locale($locale)
@@ -85,10 +91,10 @@ class Comparator
      */
     public function strings(string $one, string $two): int
     {
-        $one = Str::lower($one);
-        $two = Str::lower($two);
+        $one = mb_strtolower($one);
+        $two = mb_strtolower($two);
 
-        if (! class_exists(Collator::class)) {
+        if (! self::$canUseCollator) {
             return strcmp($one, $two);
         }
 
