@@ -511,7 +511,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 1', 'Post 5'], $entries->map->title->all());
 
-        $entries = Entry::query()->where('content->value', '<>', 1)->get();
+        $entries = Entry::query()->where('content->value', '<>', 1)->orderBy('title')->get();
 
         $this->assertCount(5, $entries);
         $this->assertEquals(['Post 2', 'Post 3', 'Post 4', 'Post 6', 'Post 7'], $entries->map->title->all());
@@ -719,17 +719,17 @@ class EntryQueryBuilderTest extends TestCase
                 ->create();
         });
 
-        $this->assertEquals($expected, Entry::query()->where('title', 'like', $like)->get()->map->title->all());
+        $this->assertEquals($expected, Entry::query()->where('title', 'like', $like)->orderBy('title')->get()->map->title->all());
     }
 
     public static function likeProvider()
     {
         return collect([
             'foo' => ['foo'],
-            'foo%' => ['foo', 'food', 'foo bar', 'foo_bar', 'foodbar'],
+            'foo%' => ['foo', 'foo bar', 'foo_bar', 'food', 'foodbar'],
             '%world' => ['hello world', 'waterworld'],
             '%world%' => ['hello world', 'waterworld', 'world of warcraft'],
-            '_oo' => ['foo', 'boo'],
+            '_oo' => ['boo', 'foo'],
             'o_' => ['on'],
             'foo_bar' => ['foo bar', 'foo_bar', 'foodbar'],
             'foo__bar' => [],

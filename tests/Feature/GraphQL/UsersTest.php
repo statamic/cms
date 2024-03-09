@@ -220,7 +220,7 @@ GQL;
             contains: "rad",
             ends_with: "!"
         }
-    }) {
+    }, sort: "id") {
         data {
             id
             bio

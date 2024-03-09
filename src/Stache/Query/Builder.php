@@ -4,6 +4,7 @@ namespace Statamic\Stache\Query;
 
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
+use Statamic\Stache\Stores\AggregateStore;
 use Statamic\Stache\Stores\Store;
 
 abstract class Builder extends BaseBuilder
@@ -57,6 +58,60 @@ abstract class Builder extends BaseBuilder
         return $this;
     }
 
+    protected function prepareKeysForOptimizedSort($keys)
+    {
+        return $keys->combine($keys);
+    }
+
+    protected function getOptimizedSortIndex()
+    {
+        if (count($this->orderBys) != 1) {
+            return null;
+        }
+
+        $indexName = $this->orderBys[0]->sort;
+
+        $store = $this->store;
+
+        if ($this->store instanceof AggregateStore) {
+            if ($this->store->stores()->count() != 1) {
+                return null;
+            }
+
+            $store = $this->store->stores()->first();
+        }
+
+        if (! $store->indexes()->has($indexName)) {
+            return null;
+        }
+
+        return $store->index($indexName);
+    }
+
+    private function sortUsingIndex($sortIndex, $keys)
+    {
+        $indexKeys = $sortIndex->items()->keys();
+        $preparedKeys = $this->prepareKeysForOptimizedSort($keys);
+        $sortKeys = $indexKeys->intersect($preparedKeys->keys());
+
+        $sortedKeys = [];
+
+        // Reassemble our keys using their indexed order.
+        // Some builders may change how keys look, and
+        // we cannot blindly return the index keys.
+        foreach ($sortKeys as $key) {
+            $sortedKeys[] = $preparedKeys[$key];
+        }
+
+        $sortedKeys = collect($sortedKeys);
+
+        if ($this->orderBys[0]->direction === 'desc') {
+            $sortedKeys = $sortedKeys->reverse()->values();
+        }
+
+        return $sortedKeys;
+    }
+
     protected function orderKeys($keys)
     {
         if ($this->randomize) {
@@ -65,6 +120,10 @@ abstract class Builder extends BaseBuilder
 
         if (empty($this->orderBys)) {
             return $keys;
+        }
+
+        if ($sortIndex = $this->getOptimizedSortIndex()) {
+            return $this->sortUsingIndex($sortIndex, $keys);
         }
 
         // Get key/value pairs for each orderBy's corresponding index, grouped by index.
