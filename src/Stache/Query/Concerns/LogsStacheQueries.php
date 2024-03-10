@@ -14,7 +14,7 @@ trait LogsStacheQueries
     public function dumpStacheQuery()
     {
         return (new StacheQueryDumper(
-            $this,
+            $this->store,
             $this->wheres,
             $this->columns,
             $this->orderBys,
