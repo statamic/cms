@@ -84,4 +84,11 @@ class GlobalVariablesStore extends BasicStore
             $item->globalSet()->removeLocalization($item)->writeFile();
         }
     }
+
+    protected function storeIndexes()
+    {
+        return [
+            'handle',
+        ];
+    }
 }
