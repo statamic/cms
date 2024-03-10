@@ -12,9 +12,12 @@ use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
+use Statamic\Stache\Query\Concerns\LogsStacheQueries;
 
 abstract class Builder implements Contract
 {
+    use LogsStacheQueries;
+
     protected $columns;
     protected $limit;
     protected $offset = 0;

@@ -15,6 +15,8 @@ abstract class Builder extends BaseBuilder
     public function __construct(Store $store)
     {
         $this->store = $store;
+        $this->loggerEnabled = config('statamic.stache.query_logging.enabled', false);
+        $this->logRealValues = config('statamic.stache.query_logging.dump_values', false);
     }
 
     public function count()
@@ -24,6 +26,8 @@ abstract class Builder extends BaseBuilder
 
     protected function resolveKeys()
     {
+        $startTime = hrtime(true);
+
         $keys = $this->getFilteredKeys();
 
         $keys = $this->orderKeys($keys);
@@ -63,7 +67,13 @@ abstract class Builder extends BaseBuilder
             ->selectedQueryColumns($this->columns ?? $columns)
             ->selectedQueryRelations($this->with));
 
-        return $this->collect($items)->values();
+        $values = $this->collect($items)->values();
+
+        $endTime = hrtime(true);
+
+        $this->emitQueryEvent($startTime, $endTime);
+
+        return $values;
     }
 
     abstract protected function getFilteredKeys();
