@@ -124,4 +124,20 @@ return [
         'timeout' => 30,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Query Logging
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, the Stache query builders will log queries
+    | like normal SQL Queries. To log actual query values,
+    | set the dump_values configuration option to true.
+    |
+    */
+
+    'query_logging' => [
+        'enabled' => true,
+        'dump_values' => false,
+    ],
+
 ];
