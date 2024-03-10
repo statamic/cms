@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string generateId()
  * @method static self clear()
  * @method static void refresh()
- * @method static void warm()
+ * @method static void warm($stores = [])
  * @method static self instance()
  * @method static mixed fileCount()
  * @method static mixed|null fileSize()

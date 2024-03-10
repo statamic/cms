@@ -11,7 +11,7 @@ class StacheWarm extends Command
 {
     use RunsInPlease;
 
-    protected $signature = 'statamic:stache:warm';
+    protected $signature = 'statamic:stache:warm {store?}';
     protected $description = 'Build the "Stache" cache';
 
     public function handle()
@@ -20,7 +20,11 @@ class StacheWarm extends Command
 
         $this->line('Please wait. This may take a while if you have a lot of content.');
 
-        Stache::warm();
+        if ($stores = $this->argument('store')) {
+            $stores = collect(explode(',', $stores))->map(fn ($store) => trim($store))->all();
+        }
+
+        Stache::warm($stores ?? []);
 
         $this->info('You have poured oil over the Stache and polished it until it shines. It is warm and ready');
     }

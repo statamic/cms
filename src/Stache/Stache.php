@@ -194,7 +194,7 @@ class Stache
         return $this->clear()->warm();
     }
 
-    public function warm()
+    public function warm($stores = [])
     {
         Partyline::comment('Warming Stache...');
 
@@ -202,7 +202,13 @@ class Stache
 
         $this->startTimer();
 
-        $this->stores()->each->warm();
+        $this->stores()->where(function ($store, $key) use ($stores) {
+            if (count($stores) == 0) {
+                return true;
+            }
+
+            return in_array($key, $stores);
+        })->each->warm();
 
         $this->stopTimer();
 
