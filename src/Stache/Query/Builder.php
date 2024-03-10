@@ -26,8 +26,6 @@ abstract class Builder extends BaseBuilder
 
     protected function resolveKeys()
     {
-        $startTime = hrtime(true);
-
         $keys = $this->getFilteredKeys();
 
         $keys = $this->orderKeys($keys);
@@ -61,6 +59,8 @@ abstract class Builder extends BaseBuilder
 
     public function get($columns = ['*'])
     {
+        $startTime = hrtime(true);
+
         $items = $this->getItems($this->resolveKeys());
 
         $items->each(fn ($item) => $item
