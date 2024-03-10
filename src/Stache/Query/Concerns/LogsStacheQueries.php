@@ -4,6 +4,7 @@ namespace Statamic\Stache\Query\Concerns;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
+use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Query\StacheQueryDumper;
 
 trait LogsStacheQueries
@@ -13,6 +14,14 @@ trait LogsStacheQueries
 
     public function dumpStacheQuery()
     {
+        $extraFrom = '';
+
+        if ($this instanceof EntryQueryBuilder) {
+            if (is_array($this->collections)) {
+                $extraFrom = implode(', ', $this->collections);
+            }
+        }
+
         return (new StacheQueryDumper(
             $this->store,
             $this->wheres,
@@ -22,6 +31,7 @@ trait LogsStacheQueries
             $this->offset
         ))
             ->setDumpActualValues($this->logRealValues)
+            ->setExtraFromStatement($extraFrom)
             ->dump();
     }
 
