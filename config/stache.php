@@ -136,7 +136,7 @@ return [
     */
 
     'query_logging' => [
-        'enabled' => true,
+        'enabled' => false,
         'dump_values' => false,
     ],
 
