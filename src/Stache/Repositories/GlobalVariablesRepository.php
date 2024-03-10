@@ -6,7 +6,6 @@ use Statamic\Contracts\Globals\GlobalVariablesRepository as RepositoryContract;
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Globals\VariablesCollection;
 use Statamic\Stache\Stache;
-use Statamic\Support\Str;
 
 class GlobalVariablesRepository implements RepositoryContract
 {
@@ -31,12 +30,21 @@ class GlobalVariablesRepository implements RepositoryContract
         return $this->store->getItem($id);
     }
 
+    private function getIdsForSet($handle)
+    {
+        return $this->store
+            ->index('handle')
+            ->items()
+            ->where(function ($value) use ($handle) {
+                return $value == $handle;
+            })->keys()->all();
+    }
+
     public function whereSet($handle): VariablesCollection
     {
-        return $this
-            ->all()
-            ->filter(fn ($variable) => Str::before($variable->id(), '::') == $handle)
-            ->values();
+        return new VariablesCollection(
+            $this->store->getItems($this->getIdsForSet($handle))
+        );
     }
 
     public function save($variable)
