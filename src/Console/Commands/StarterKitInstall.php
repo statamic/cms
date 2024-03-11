@@ -10,6 +10,9 @@ use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\StarterKits\Installer as StarterKitInstaller;
 use Statamic\StarterKits\LicenseManager as StarterKitLicenseManager;
 
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\text;
+
 class StarterKitInstall extends Command
 {
     use RunsInPlease, ValidatesInput;
@@ -91,7 +94,7 @@ class StarterKitInstall extends Command
      */
     protected function getPackage()
     {
-        return $this->argument('package') ?: $this->ask('Package');
+        return $this->argument('package') ?: text('Package');
     }
 
     /**
@@ -104,7 +107,7 @@ class StarterKitInstall extends Command
         if ($this->option('clear-site')) {
             return true;
         } elseif ($this->input->isInteractive()) {
-            return $this->confirm('Clear site first?', false);
+            return confirm('Clear site first?', false);
         }
 
         return false;
