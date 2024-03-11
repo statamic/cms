@@ -66,7 +66,7 @@ class FieldTransformerTest extends TestCase
     }
 
     /** @test */
-    public function it_removes_redundent_config_options()
+    public function it_removes_redundant_config_options()
     {
         $fromVue = FieldTransformer::fromVue([
             'fieldtype' => 'text',
