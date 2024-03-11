@@ -1,17 +1,16 @@
 <template>
     <div class="time-fieldtype-container">
-        <div class="input-group" :class="{'w-[120px]': useSeconds, 'w-[96px]': ! useSeconds}">
+        <div class="input-group">
             <button class="input-group-prepend flex items-center" v-tooltip="__('Set to now')" @click="setToNow" v-if="!isReadOnly">
                 <svg-icon name="light/time" class="w-4 h-4" />
             </button>
             <input
-                type="text"
+                type="time"
                 ref="time"
-                class="input-text"
+                class="input-text [&::-webkit-calendar-picker-indicator]:hidden"
+                :step="useSeconds ? '1' : null"
                 :readonly="isReadOnly"
                 @keydown.esc="clear"
-                @keydown.up.prevent="incrementPart"
-                @keydown.down.prevent="decrementPart"
                 @focus="focused"
                 @blur="$emit('blur')"
                 @change="updateActualValue"
@@ -158,24 +157,6 @@ export default {
             this.$nextTick(() => {
                 e.target.selectionStart = caretPosition;
                 e.target.selectionEnd = caretPosition;
-            });
-        },
-
-        incrementPart(e) {
-            this.adjustPart(e, 'increment', (part, value) => {
-                if ((part === 0 && value > 23) || (part !== 0 && value > 59)) {
-                    return '00';
-                }
-            });
-        },
-
-        decrementPart(e) {
-            this.adjustPart(e, 'decrement', (part, value) => {
-                if (part === 0 && value == -1) {
-                    return '23';
-                } else if (part !== 0 && value == -1) {
-                    return '59';
-                }
             });
         },
     }

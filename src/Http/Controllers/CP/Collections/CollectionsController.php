@@ -419,7 +419,7 @@ class CollectionsController extends CpController
                         'type' => 'html',
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <span class="mr-4">'.$collection->entryBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <span class="rtl:ml-4 ltr:mr-4">'.$collection->entryBlueprints()->map->title()->join(', ').'</span>'.
                             '   <a href="'.cp_route('collections.blueprints.index', $collection).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
@@ -543,6 +543,7 @@ class CollectionsController extends CpController
                                 'field' => [
                                     'display' => __('Format'),
                                     'type' => 'text',
+                                    'dir' => 'ltr',
                                 ],
                             ],
                             [

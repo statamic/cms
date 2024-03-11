@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class IsUrlTest extends TestCase
 {
-    public function urls(): array
+    public static function urlsProvider(): array
     {
         return [
             'valid_url_http' => [true, 'http://google.com/'],
@@ -22,7 +22,7 @@ class IsUrlTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider urls()
+     * @dataProvider urlsProvider
      */
     public function it_returns_true_if_value_is_valid_url($expected, $input): void
     {

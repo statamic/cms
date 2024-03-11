@@ -148,7 +148,7 @@ trait MultipleLabeledValueTests
         ], $field->augment([null, false, true, 'missing']));
     }
 
-    public function noMultipleOptionsProvider()
+    public static function noMultipleOptionsProvider()
     {
         return [
             'empty_array' => [[]],

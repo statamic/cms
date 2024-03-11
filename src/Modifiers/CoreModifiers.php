@@ -958,6 +958,23 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a hex color to rgb values.
+     *
+     * @return string
+     */
+    public function hexToRgb($value)
+    {
+        // Remove the hash (#) if present
+        $hex = ltrim($value, '#');
+
+        // Parse the hex value into RGB components
+        $rgb = sscanf($hex, '%02x%02x%02x');
+
+        // Return the RGB values as a comma-separated string
+        return implode(', ', $rgb);
+    }
+
+    /**
      * Get the date difference in hours.
      *
      * @param  Carbon  $value
@@ -2909,8 +2926,17 @@ class CoreModifiers extends Modifier
             }
         }
 
+        if (Str::contains($url, 'youtube.com/shorts/')) {
+            $url = str_replace('shorts/', 'embed/', $url);
+        }
+
         if (Str::contains($url, 'youtube.com')) {
             $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
+        }
+
+        // This avoids SSL issues when using the non-www version
+        if (Str::contains($url, '//youtube-nocookie.com')) {
+            $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
         }
 
         return $url;
