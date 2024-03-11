@@ -3,12 +3,12 @@
 
         <div class="mb-2 flex justify-end">
             <a
-                class="text-2xs text-blue mr-4 underline"
+                class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
                 v-text="__('Expand All')"
                 @click="expandAll"
             />
             <a
-                class="text-2xs text-blue mr-2 underline"
+                class="text-2xs text-blue rtl:ml-2 ltr:mr-2 underline"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
@@ -29,6 +29,7 @@
                 :data="treeData"
                 :space="1"
                 :indent="24"
+                :dir="direction"
                 @change="treeChanged"
                 @drag="treeDragstart"
                 @nodeOpenChanged="saveTreeState"
@@ -114,6 +115,10 @@ export default {
 
         preferencesKey() {
             return this.preferencesPrefix ? `${this.preferencesPrefix}.${this.site}.pagetree` : null;
+        },
+
+        direction() {
+            return this.$config.get('direction', 'rtl');
         },
 
     },

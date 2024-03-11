@@ -15,7 +15,7 @@
                 />
             </div>
 
-            <loading-graphic inline v-if="saving" text="" class="ml-4" />
+            <loading-graphic inline v-if="saving" text="" class="rtl:mr-4 ltr:ml-4" />
         </div>
     </div>
 </template>
