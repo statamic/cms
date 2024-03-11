@@ -9,11 +9,17 @@
             <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" data-drag-handle />
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2"/>
+                    <label class="text-xs whitespace-nowrap rtl:ml-2 ltr:mr-2">
+                        <template v-if="bardSets.length > 1">
+                            {{ setGroup.display }}
+                            <svg-icon name="micro/chevron-right" class="w-4" />
+                        </template>
+                        {{ display || config.handle }}
+                    </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
                         <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
                     </div>
-                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8">
+                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
                         <div
                             v-html="previewText"
                             class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
@@ -22,7 +28,7 @@
                 <div class="replicator-set-controls">
                     <toggle-fieldtype
                         handle="set-enabled"
-                        class="toggle-sm mr-4"
+                        class="toggle-sm rtl:ml-4 ltr:mr-4"
                         v-model="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list class="-mt-1">
@@ -80,7 +86,7 @@ export default {
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText],
 
-    inject: ['bard'],
+    inject: ['bard', 'bardSets'],
 
     computed: {
 
@@ -114,6 +120,12 @@ export default {
 
         setConfigs() {
             return this.bard.setConfigs;
+        },
+
+        setGroup() {
+            return this.bardSets.find((group) => {
+                return group.sets.filter((set) => set.handle === this.config.handle).length > 0;
+            });
         },
 
         isReadOnly() {

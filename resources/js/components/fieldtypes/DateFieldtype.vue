@@ -1,8 +1,8 @@
 <template>
     <div class="datetime min-w-[145px]">
 
-        <button type="button" class="btn flex mb-2 md:mb-0 items-center pl-3" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
-            <svg-icon name="light/calendar" class="w-4 h-4 mr-2"></svg-icon>
+        <button type="button" class="btn flex mb-2 md:mb-0 items-center rtl:pr-3 ltr:pl-3" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
+            <svg-icon name="light/calendar" class="w-4 h-4 rtl:ml-2 ltr:mr-2"></svg-icon>
     		{{ __('Add Date') }}
     	</button>
 

@@ -433,11 +433,22 @@ class Entries extends Relationship
             return parent::preload();
         }
 
+        $blueprints = $collection
+            ->entryBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
+
         return array_merge(parent::preload(), ['tree' => [
             'title' => $collection->title(),
             'url' => cp_route('collections.tree.index', $collection),
             'showSlugs' => $collection->structure()->showSlugs(),
             'expectsRoot' => $collection->structure()->expectsRoot(),
+            'blueprints' => $blueprints,
         ]]);
     }
 }
