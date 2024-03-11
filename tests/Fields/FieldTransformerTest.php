@@ -77,6 +77,7 @@ class FieldTransformerTest extends TestCase
                 'input_type' => 'text', // The default.
                 'icon' => 'text', // The default.
                 'character_limit' => 100, // This one has been changed.
+                'foo' => 'bar', // Manually added by user.
 
                 // Common field options
                 'instructions_position' => 'above', // The default.
@@ -87,6 +88,7 @@ class FieldTransformerTest extends TestCase
         $this->assertEquals([
             'character_limit' => 100,
             'listable' => true,
+            'foo' => 'bar',
         ], $fromVue['field']);
     }
 
