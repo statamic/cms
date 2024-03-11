@@ -6,8 +6,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\Site;
-use Statamic\Fields\Value;
-use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Fields\Values;
 use Statamic\Structures\Page;
 use Statamic\Support\Str;
 
@@ -28,14 +27,6 @@ class ResolveRedirect
             return 404;
         }
 
-        if ($item instanceof \Statamic\Fields\Values) {
-            return $item->all();
-        }
-
-        if ($item instanceof \Statamic\Fields\Value) {
-            return $item->value();
-        }
-
         return is_object($item) ? $item->url() : $item;
     }
 
@@ -53,26 +44,21 @@ class ResolveRedirect
             $redirect = $redirect['url'];
         }
 
-        if ($redirect instanceof Value) {
-            $redirect = $redirect->value();
+        if ($redirect instanceof Values) {
+            // Assume it's a `group` fieldtype with a `url` subfield.
+            return $redirect->url;
         }
 
-        if ($redirect instanceof ArrayableLink) {
-            $redirect = $redirect->value();
+        if (Str::startsWith($redirect, 'entry::')) {
+            $id = Str::after($redirect, 'entry::');
+
+            return $this->findEntry($id, $parent, $localize);
         }
 
-        if (is_string($redirect)) {
-            if (Str::startsWith($redirect, 'entry::')) {
-                $id = Str::after($redirect, 'entry::');
+        if (Str::startsWith($redirect, 'asset::')) {
+            $id = Str::after($redirect, 'asset::');
 
-                return $this->findEntry($id, $parent, $localize);
-            }
-
-            if (Str::startsWith($redirect, 'asset::')) {
-                $id = Str::after($redirect, 'asset::');
-
-                return Facades\Asset::find($id);
-            }
+            return Facades\Asset::find($id);
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;

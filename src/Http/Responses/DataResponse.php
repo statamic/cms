@@ -69,7 +69,7 @@ class DataResponse implements Responsable
 
     protected function getRedirect()
     {
-        if (! $this->data->get('redirect')) {
+        if (! $raw = $this->data->get('redirect')) {
             return;
         }
 
@@ -82,18 +82,11 @@ class DataResponse implements Responsable
         // they might have set one of the magic values like @child or entry::some-id.
         $redirect = ResolveRedirect::resolve($redirect, $this->data);
 
-        $code = 302;
-
-        if (is_array($redirect)) {
-            $code = (string) $redirect['status'];
-            $redirect = $redirect['url'];
-        }
-
         if ($redirect === 404) {
             throw new NotFoundHttpException;
         }
 
-        return redirect($redirect, $code);
+        return redirect($redirect, $raw['status'] ?? 302);
     }
 
     protected function protect()

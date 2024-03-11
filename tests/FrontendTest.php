@@ -915,7 +915,17 @@ class FrontendTest extends TestCase
      */
     public function redirect_http_status_is_applied_when_present_in_blueprint()
     {
-        $entry = tap($this->createPage('about', [
+        $blueprint = Blueprint::makeFromFields([
+            'redirect' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'url', 'field' => ['type' => 'link']],
+                    ['handle' => 'status', 'field' => ['type' => 'radio', 'options' => [301, 302]]],
+                ],
+            ]]);
+        Blueprint::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
+
+        tap($this->createPage('about', [
             'with' => [
                 'title' => 'About',
                 'redirect' => [
@@ -925,23 +935,26 @@ class FrontendTest extends TestCase
             ],
         ]))->save();
 
-        Blueprint::shouldReceive('find')
-            ->with('collections/pages/page')
-            ->andReturn($entry->blueprint()->setContents([
-                'fields' => [
-                    ['handle' => 'title', 'field' => ['type' => 'text']],
-                    [
-                        'handle' => 'redirect',
-                        'field' => [
-                            'type' => 'group', 'required' => true, 'width' => '100',
-                            'fields' => [
-                                ['handle' => 'url', 'field' => ['type' => 'link']],
-                                ['handle' => 'status', 'field' => ['type' => 'radio', 'options' => [301 => __('301 (Permanent)'), 302 => __('302 (Temporary)')]]],
-                            ],
-                        ],
-                    ],
+        $response = $this->get('/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
+    }
+
+    /**
+     * @test
+     */
+    public function redirect_http_status_is_applied_when_missing_from_blueprint()
+    {
+        tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
                 ],
-            ]));
+            ],
+        ]))->save();
 
         $response = $this->get('/about');
 
