@@ -11,6 +11,11 @@ export default [
         value: 'accepted'
     },
     {
+        label: 'Accepted If',
+        value: 'accepted_if:',
+        example: 'accepted_if:anotherfield,value,...'
+    },
+    {
         label: 'Active URL',
         value: 'active_url'
     },
