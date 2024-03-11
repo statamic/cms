@@ -227,6 +227,8 @@ class Sites
     public function toArray()
     {
         return $this->sites
+            ->keyBy
+            ->handle()
             ->map(function ($site) {
                 return [
                     'name' => $site->name(),
