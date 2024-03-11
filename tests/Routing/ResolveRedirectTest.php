@@ -9,6 +9,7 @@ use Statamic\Facades;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Link;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Routing\ResolveRedirect;
 use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
@@ -224,8 +225,10 @@ class ResolveRedirectTest extends TestCase
 
         $resolver = new ResolveRedirect;
 
+        $fieldtype = Mockery::mock(Link::class)->makePartial()->shouldReceive('augment')->andReturn(new ArrayableLink('/test'))->getMock();
+
         $value = new Values([
-            'url' => new Value('/test'),
+            'url' => new Value('/test', 'url', $fieldtype),
             'code' => '', // irrelevant for this test
         ]);
 
@@ -242,7 +245,7 @@ class ResolveRedirectTest extends TestCase
 
         $entry = Mockery::mock(Entry::class)->shouldReceive('url')->once()->andReturn('/the-entry')->getMock();
 
-        $fieldtype = Mockery::mock(Link::class)->makePartial()->shouldReceive('augment')->andReturn($entry)->getMock();
+        $fieldtype = Mockery::mock(Link::class)->makePartial()->shouldReceive('augment')->andReturn(new ArrayableLink($entry))->getMock();
 
         $value = new Values([
             'url' => new Value('entry::123', 'url', $fieldtype),

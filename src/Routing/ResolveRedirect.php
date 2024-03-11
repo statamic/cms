@@ -46,7 +46,7 @@ class ResolveRedirect
 
         if ($redirect instanceof Values) {
             // Assume it's a `group` fieldtype with a `url` subfield.
-            return $redirect->url;
+            return $redirect->url->value();
         }
 
         if (Str::startsWith($redirect, 'entry::')) {
