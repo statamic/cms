@@ -966,11 +966,11 @@ trait TestsIlluminateArr
         $classes = Arr::toCssClasses([
             'font-bold',
             'mt-4',
-            'rtl:mr-2 ltr:ml-2' => true,
-            'rtl:ml-2 ltr:mr-2' => false,
+            'ml-2' => true,
+            'mr-2' => false,
         ]);
 
-        $this->assertSame('font-bold mt-4 rtl:mr-2 ltr:ml-2', $classes);
+        $this->assertSame('font-bold mt-4 ml-2', $classes);
     }
 
     public function testToCssStyles()
@@ -986,7 +986,7 @@ trait TestsIlluminateArr
             'font-weight: bold;',
             'margin-top: 4px',
             'margin-left: 2px;' => true,
-            'margin-right: 2px;' => false,
+            'margin-right: 2px' => false,
         ]);
 
         $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px;', $styles);

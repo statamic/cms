@@ -29,9 +29,9 @@ EOT;
     </div>
     <div class="px-16 pt-8 pb-4">
         
-        <span class="inline-block bg-gray-200 rounded-full px-6 py-2 text-sm font-semibold text-gray-700 rtl:ml-4 ltr:mr-4 mb-4">#tag1</span>
-        <span class="inline-block bg-gray-200 rounded-full px-6 py-2 text-sm font-semibold text-gray-700 rtl:ml-4 ltr:mr-4 mb-4">#tag2</span>
-        <span class="inline-block bg-gray-200 rounded-full px-6 py-2 text-sm font-semibold text-gray-700 rtl:ml-4 ltr:mr-4 mb-4">#tag3</span>
+        <span class="inline-block bg-gray-200 rounded-full px-6 py-2 text-sm font-semibold text-gray-700 mr-4 mb-4">#tag1</span>
+        <span class="inline-block bg-gray-200 rounded-full px-6 py-2 text-sm font-semibold text-gray-700 mr-4 mb-4">#tag2</span>
+        <span class="inline-block bg-gray-200 rounded-full px-6 py-2 text-sm font-semibold text-gray-700 mr-4 mb-4">#tag3</span>
         
     </div>
 </div>

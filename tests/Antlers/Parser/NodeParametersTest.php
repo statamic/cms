@@ -191,11 +191,11 @@ EOT;
     {
         $template = <<<'EOT'
 <figure>
-{{ params_tag class="absolute rtl:left-0 ltr:right-0 top-0 w-2/3 md:w-1/3 h-auto opacity-70"
+{{ params_tag class="absolute right-0 top-0 w-2/3 md:w-1/3 h-auto opacity-70"
             animation="/visuals/pattern-0{{ count }}.json"
         }}
 
-    <div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 rtl:md:left-0 ltr:md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
+    <div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
         {{ partial:typography/paragraph as="span" :content="title" class="block !mb-8" }}
     </div>
 </figure>
@@ -209,16 +209,16 @@ EOT;
         $this->assertInstanceOf(AntlersNode::class, $nodes[3]);
         $this->assertInstanceOf(LiteralNode::class, $nodes[4]);
 
-        $checkString = '<div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 rtl:md:left-0 ltr:md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">';
+        $checkString = '<div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">';
         $this->assertStringContainsString($checkString, $nodes[2]->content);
 
         $template = <<<'EOT'
 <figure>
-{{ params_tag class="absolute rtl:left-0 ltr:right-0 top-0 w-2/3 md:w-1/3 h-auto opacity-70"
+{{ params_tag class="absolute right-0 top-0 w-2/3 md:w-1/3 h-auto opacity-70"
             animation="/visuals/pattern-0{{ count }}- {{two}} {{three}four}.json"
         }}
 
-    <div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 rtl:md:left-0 ltr:md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
+    <div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
         {{ partial:typography/paragraph as="span" :content="title" class="block !mb-8" }}
     </div>
 </figure>
@@ -238,7 +238,7 @@ EOT;
     public function test_double_braces_inside_a_parameter_emits_final_literal_node_if_no_other_antlers()
     {
         $template = <<<'EOT'
-<figure>{{ params_tag class="absolute rtl:left-0 ltr:right-0 top-0 w-2/3 md:w-1/3 h-auto opacity-70"
+<figure>{{ params_tag class="absolute right-0 top-0 w-2/3 md:w-1/3 h-auto opacity-70"
             animation="/visuals/pattern-0{{ count }}.json"
         }}FINAL_LITERAL</figure>
 EOT;
@@ -252,7 +252,7 @@ EOT;
         $this->assertSame('FINAL_LITERAL</figure>', $nodes[2]->content);
 
         $template = <<<'EOT'
- <div class="list-of-classes">     {{ partial src="svg/" values="{{ article_icon_color:key }} {{ article_icon_size:key }}" }}FINAL_LITERAL </div> 
+ <div class="list-of-classes">     {{ partial src="svg/" values="{{ article_icon_color:key }} {{ article_icon_size:key }}" }}FINAL_LITERAL </div>
 EOT;
 
         $nodes = $this->parseNodes($template);
