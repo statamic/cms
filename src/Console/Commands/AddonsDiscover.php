@@ -6,6 +6,9 @@ use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Extend\Manifest;
 
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\note;
+
 class AddonsDiscover extends Command
 {
     use RunsInPlease;
@@ -34,9 +37,9 @@ class AddonsDiscover extends Command
         $manifest->build();
 
         foreach (array_keys($manifest->manifest) as $package) {
-            $this->line("Discovered Addon: <info>{$package}</info>");
+            note("Discovered Addon: <info>{$package}</info>");
         }
 
-        $this->info('Addon manifest generated successfully.');
+        info('Addon manifest generated successfully.');
     }
 }
