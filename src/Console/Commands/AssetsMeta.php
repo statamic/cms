@@ -7,6 +7,8 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 
+use function Laravel\Prompts\progress;
+
 class AssetsMeta extends Command
 {
     use RunsInPlease;
@@ -19,18 +21,16 @@ class AssetsMeta extends Command
     {
         $assets = $this->getAssets();
 
-        $bar = $this->output->createProgressBar($assets->count());
-
-        $assets->each(function ($asset) use ($bar) {
-            $asset->hydrate();
-            $asset->save();
-            $bar->advance();
-        });
-
-        $bar->finish();
-
-        $this->line('');
-        $this->info('Asset metadata generated');
+        progress(
+            label: 'Generating asset metadata...',
+            steps: $assets,
+            callback: function ($asset, $progress) {
+                $asset->hydrate();
+                $asset->save();
+                $progress->advance();
+            },
+            hint: 'This may take a while if you have a lot of assets.'
+        );
     }
 
     /**
