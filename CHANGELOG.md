@@ -1,5 +1,23 @@
 # Release Notes
 
+## 4.52.0 (2024-03-04)
+
+### What's new
+- OAuth improvements including support for SAML2 providers. [#9612](https://github.com/statamic/cms/issues/9612) by @duncanmcclean
+
+### What's fixed
+- Fix entries not being "linked" to their localizations corrected. [#9661](https://github.com/statamic/cms/issues/9661) by @ryanmitchell
+- Fix prop type warning in validation builder. [#9665](https://github.com/statamic/cms/issues/9665) by @jasonvarga
+- Only suggest fields in the same replicator set. [#9663](https://github.com/statamic/cms/issues/9663) by @jasonvarga
+- Roll back to initial simple isAjax() check on front end forms. [#9629](https://github.com/statamic/cms/issues/9629) by @ryanmitchell
+- Fix Antlers sections not being yieldable in Blade layouts. [#9614](https://github.com/statamic/cms/issues/9614) by @JohnathonKoster
+- Fix Antlers strict equality inside conditions. [#9621](https://github.com/statamic/cms/issues/9621) by @JohnathonKoster
+- Fix test that fails on February 29th. [#9620](https://github.com/statamic/cms/issues/9620) by @jasonvarga
+- Filter away bad bard nodes during preprocessing. [#9608](https://github.com/statamic/cms/issues/9608) by @SylvesterDamgaard
+- Fix page url value in TreeBuilder. [#9611](https://github.com/statamic/cms/issues/9611) by @0kyn
+
+
+
 ## 4.51.0 (2024-02-28)
 
 ### What's new
