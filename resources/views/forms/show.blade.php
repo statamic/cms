@@ -35,8 +35,11 @@
             @endif
 
             @if (($exporters = $form->exporters()) && $exporters->isNotEmpty())
-            <dropdown-list>
-                <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
+            <dropdown-list class="inline-block">
+                <button class="btn-primary flex items-center rtl:pl-4 ltr:pr-4" slot="trigger">
+                    {{ __('Export Submissions') }}
+                <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-2 ltr:ml-2"/>
+                </button>
                 @foreach ($exporters as $exporter)
                     <dropdown-item
                         text="{{ $exporter->title() }}"
