@@ -259,10 +259,8 @@ class ResolveRedirectTest extends TestCase
     /** @test */
     public function it_can_resolve_arrays_with_url_and_code()
     {
-        // Usually an array would mean that they've used a link blueprint which contains a
-        // `redirect` field with a `group` type, with nested `url` and `code` fields. In
-        // that case the value would be a `Values` object. However, if they've manually
-        // added an array to their data without a blueprint field it will just be an array.
+        // Same as above, but without a blueprint field.
+        // Maybe a user put an array directly in their data.
 
         $resolver = new ResolveRedirect;
 
