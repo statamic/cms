@@ -64,6 +64,24 @@ class LocalizeEntryTest extends TestCase
     }
 
     /** @test */
+    public function cant_localize_entry_without_edit_permissions()
+    {
+        $user = $this->user();
+        $this->setTestRoles(['test' => ['access cp', 'access en site', 'access fr site', 'view blog entries']]);
+
+        $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(false))->save())->slug('test')->create();
+        $this->assertNull($entry->in('fr'));
+
+        $this
+            ->actingAs($user->fresh())
+            ->localize($entry, ['site' => 'fr'])
+            ->assertRedirect();
+
+        $localized = $entry->fresh()->in('fr');
+        $this->assertNull($localized);
+    }
+
+    /** @test */
     public function it_adds_an_entry_to_the_structure_tree_if_its_nested()
     {
         $collection = tap(Collection::make('pages')->sites(['en', 'fr']))->save();
@@ -232,7 +250,15 @@ class LocalizeEntryTest extends TestCase
 
     private function user()
     {
-        $this->setTestRoles(['test' => ['access cp']]);
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'access en site',
+            'access fr site',
+            'view blog entries',
+            'edit blog entries',
+            'view pages entries',
+            'edit pages entries',
+        ]]);
 
         return User::make()->assignRole('test')->save();
     }
