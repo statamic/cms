@@ -9,6 +9,7 @@ class AugmentedPage extends AugmentedEntry
 {
     protected $page;
     protected $hasEntry = false;
+    private $cachedKeys;
     private $fieldsCache;
 
     public function __construct($page)
@@ -25,6 +26,10 @@ class AugmentedPage extends AugmentedEntry
 
     public function keys()
     {
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
+        }
+
         $keys = collect($this->hasEntry
             ? parent::keys()
             : ['title', 'url', 'uri', 'permalink', 'id']);
@@ -36,7 +41,7 @@ class AugmentedPage extends AugmentedEntry
 
         $keys = Statamic::isApiRoute() ? $this->apiKeys($keys) : $keys;
 
-        return $keys->unique()->sort()->values()->all();
+        return $this->cachedKeys = $keys->unique()->sort()->values()->all();
     }
 
     private function apiKeys($keys)
