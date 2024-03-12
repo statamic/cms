@@ -6,7 +6,6 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Event;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
@@ -43,10 +42,6 @@ class EloquentUserTest extends TestCase
         }
 
         $this->loadMigrationsFrom($tmpDir);
-
-        // Prevent the anonymous role classes throwing errors when getting serialized
-        // during event handling unrelated to these tests.
-        Event::fake();
     }
 
     private static function migrationsDir()

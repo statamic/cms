@@ -180,7 +180,8 @@ export default {
             showAddSetButton: false,
             provide: {
                 bard: this.makeBardProvide(),
-                storeName: this.storeName
+                storeName: this.storeName,
+                bardSets: this.config.sets
             }
         }
     },
