@@ -122,10 +122,8 @@ class View
 
         $renderedContents = $contents->render();
 
-        if (config('statamic.antlers.version') == 'runtime') {
-            $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
-            $renderedContents = StackReplacementManager::processReplacements($renderedContents);
-        }
+        $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
+        $renderedContents = StackReplacementManager::processReplacements($renderedContents);
 
         return $renderedContents;
     }
