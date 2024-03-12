@@ -69,10 +69,9 @@ trait RendersForms
             $attrs['enctype'] = 'multipart/form-data';
         }
 
-        $attrs = $this->renderAttributes($attrs);
-        $paramAttrs = $this->renderAttributesFromParams(array_merge(['method', 'action'], $knownTagParams));
+        $attrs = $this->renderAttributesFromParamsWith($attrs);
 
-        $html = collect(['<form', $attrs, $paramAttrs])->filter()->implode(' ').'>';
+        $html = collect(['<form', $attrs])->filter()->implode(' ').'>';
 
         if ($this->params->bool('csrf', true)) {
             $html .= csrf_field();

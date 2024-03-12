@@ -461,4 +461,16 @@ class Statamic
             return $path;
         });
     }
+
+    public static function cpLocale(): string
+    {
+        return config('app.locale');
+    }
+
+    public static function cpDirection()
+    {
+        $rtl = ['ar', 'fa', 'he', 'ps', 'ur'];
+
+        return in_array(static::cpLocale(), $rtl) ? 'rtl' : 'ltr';
+    }
 }

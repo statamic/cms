@@ -33,7 +33,7 @@
                 >
             </template>
              <template #no-options>
-                <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
             </template>
             <template #footer="{ deselect }" v-if="multiple">
                 <sortable-list
