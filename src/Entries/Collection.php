@@ -38,6 +38,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     protected $handle;
     protected $routes = [];
+    private $cachedRoutes = null;
     protected $mount;
     protected $title;
     protected $template;
@@ -75,7 +76,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function handle($handle = null)
     {
-        return $this->fluentlyGetOrSet('handle')->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->handle;
+        }
+
+        $this->handle = $handle;
+
+        return $this;
     }
 
     public function routes($routes = null)
@@ -83,12 +90,17 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this
             ->fluentlyGetOrSet('routes')
             ->getter(function ($routes) {
-                return $this->sites()->mapWithKeys(function ($site) use ($routes) {
+                if ($this->cachedRoutes !== null) {
+                    return $this->cachedRoutes;
+                }
+
+                return $this->cachedRoutes = $this->sites()->mapWithKeys(function ($site) use ($routes) {
                     $siteRoute = is_string($routes) ? $routes : ($routes[$site] ?? null);
 
                     return [$site => $siteRoute];
                 });
             })
+            ->afterSetter(fn () => $this->cachedRoutes = null)
             ->args(func_get_args());
     }
 
@@ -389,6 +401,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
                 return collect($sites);
             })
+            ->afterSetter(fn () => $this->cachedRoutes = null)
             ->args(func_get_args());
     }
 
