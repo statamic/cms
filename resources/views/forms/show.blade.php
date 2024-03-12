@@ -17,7 +17,7 @@
             </h1>
 
             @if(\Statamic\Facades\User::current()->can('edit', $form) || \Statamic\Facades\User::current()->can('delete', $form))
-                <dropdown-list class="mr-2">
+                <dropdown-list class="rtl:ml-2 ltr:mr-2">
                     @can('edit', $form)
                         <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
                     @endcan
