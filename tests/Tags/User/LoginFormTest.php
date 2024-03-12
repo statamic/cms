@@ -30,7 +30,7 @@ class LoginFormTest extends TestCase
     /** @test */
     public function it_renders_form_with_params()
     {
-        $output = $this->tag('{{ user:login_form redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /user:login_form }}');
+        $output = $this->tag('{{ user:login_form redirect="/submitted" error_redirect="/errors" attr:class="form" attr:id="form" }}{{ /user:login_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/login" class="form" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_redirect" value="/submitted" />', $output);
