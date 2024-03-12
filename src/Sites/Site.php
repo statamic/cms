@@ -12,7 +12,7 @@ class Site implements Augmentable
 
     protected $handle;
     protected $config;
-    protected $absoluteUrlCache;
+    private $absoluteUrlCache;
 
     public function __construct($handle, $config)
     {
