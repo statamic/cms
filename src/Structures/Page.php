@@ -39,7 +39,13 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
     protected $title;
     protected $depth;
     protected $data = [];
+    private $absoluteUrl;
+    private $absoluteUrlWithoutRedirect;
+    private $blueprint;
     private $entry;
+    private $routeData;
+    private $status;
+    private $structure;
 
     public function __construct()
     {
@@ -215,20 +221,28 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
 
     public function absoluteUrl()
     {
-        if ($this->url) {
-            return URL::makeAbsolute($this->url);
+        if ($this->absoluteUrl !== null) {
+            return $this->absoluteUrl;
         }
 
-        return optional($this->entry())->absoluteUrl();
+        if ($this->url) {
+            return $this->absoluteUrl = URL::makeAbsolute($this->url);
+        }
+
+        return $this->absoluteUrl = optional($this->entry())->absoluteUrl();
     }
 
     public function absoluteUrlWithoutRedirect()
     {
-        if ($this->url) {
-            return $this->absoluteUrl();
+        if ($this->absoluteUrlWithoutRedirect !== null) {
+            return $this->absoluteUrlWithoutRedirect;
         }
 
-        return optional($this->entry())->absoluteUrlWithoutRedirect();
+        if ($this->url) {
+            return $this->absoluteUrlWithoutRedirect = $this->absoluteUrl();
+        }
+
+        return $this->absoluteUrlWithoutRedirect = optional($this->entry())->absoluteUrlWithoutRedirect();
     }
 
     public function isRoot()
@@ -398,12 +412,20 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
 
     public function structure()
     {
-        return $this->tree->structure();
+        if ($this->structure !== null) {
+            return $this->structure;
+        }
+
+        return $this->structure = $this->tree->structure();
     }
 
     public function routeData()
     {
-        return $this->entry()->routeData();
+        if ($this->routeData !== null) {
+            return $this->routeData;
+        }
+
+        return $this->routeData = $this->entry()->routeData();
     }
 
     public function published()
@@ -418,13 +440,21 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
 
     public function status()
     {
-        return optional($this->entry())->status();
+        if ($this->status !== null) {
+            return $this->status;
+        }
+
+        return $this->status = optional($this->entry())->status();
     }
 
     public function blueprint()
     {
+        if ($this->blueprint !== null) {
+            return $this->blueprint;
+        }
+
         if ($this->structure() instanceof Nav) {
-            return $this->structure()->blueprint();
+            return $this->blueprint = $this->structure()->blueprint();
         }
     }
 
