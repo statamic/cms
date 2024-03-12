@@ -14,7 +14,7 @@ use Statamic\Facades\Stache;
 
 class NavTree extends Tree implements TreeContract
 {
-    protected $structureCache;
+    private $structureCache;
 
     public function structure()
     {
