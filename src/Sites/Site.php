@@ -94,6 +94,10 @@ class Site implements Augmentable
     {
         $this->config[$key] = $value;
 
+        if ($key === 'url') {
+            $this->absoluteUrlCache = null;
+        }
+
         return $this;
     }
 
