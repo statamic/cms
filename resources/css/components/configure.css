@@ -11,6 +11,6 @@
        > .publish-fields > .toggle-fieldtype {
            @apply flex justify-between items-center flex-wrap;
            .help-block, .help-block p { @apply mb-0; }
-           .field-inner { @apply pr-8; }
+           .field-inner { @apply rtl:pl-8 ltr:pr-8; }
        }
    }

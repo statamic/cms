@@ -7,7 +7,7 @@
     z-index: 100;
     align-items: center;
     bottom: 0;
-    right: 0;
+    right: 0 ; [dir="rtl"] & { right: auto ; left: 0 ; }
     padding: 6px 10px;
     color: #726e23;
     font-size: 14px;
@@ -24,7 +24,7 @@
     transform: translateX(0);
   }
   #__impersonator-link__ svg {
-    margin-right: 10px;
+    margin-right: 10px ; [dir="rtl"] & { margin-left: 10px ; margin-right: 0 ; }
   }
 </style>
 
