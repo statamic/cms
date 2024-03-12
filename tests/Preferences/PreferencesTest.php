@@ -5,6 +5,7 @@ namespace Tests\Preferences;
 use Statamic\Facades\File;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
+use Statamic\Facades\UserGroup;
 use Statamic\Preferences\Preferences;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -19,6 +20,7 @@ class PreferencesTest extends TestCase
 
         File::delete(resource_path('preferences.yaml'));
         Role::all()->each->delete();
+        UserGroup::all()->each->delete();
     }
 
     /** @test */
@@ -169,6 +171,19 @@ class PreferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_uses_fresh_role_preferences_via_group()
+    {
+        $preferences = new Preferences;
+
+        tap(Role::make('role')->setPreference('alfa', 'bravo'))->save();
+        tap(UserGroup::make()->handle('group')->assignRole('role'))->save();
+
+        $this->actingAs(User::make()->addToGroup('group'));
+
+        $this->assertEquals(['alfa' => 'bravo'], $preferences->all());
+    }
+
+    /** @test */
     public function it_uses_fresh_user_preferences()
     {
         $preferences = new Preferences;
@@ -184,6 +199,130 @@ class PreferencesTest extends TestCase
         $this->assertEquals([
             'alfa' => 'bravo',
             'charlie' => 'delta',
+        ], $preferences->all());
+    }
+
+    /** @test */
+    public function it_uses_preferences_with_priority()
+    {
+        // This test will check a handful of preferences, adding them step by step. With each step up in priority, fewer
+        // values are being added. This is so that the assertions can demonstrate that the lower level preferences are
+        // still being applied. i.e. defaults sets 8 prefs, group2-role2 sets 7, and so on. The final assertion will
+        // be able to show that all 8 preferences have been applied from all the different priority levels.
+
+        $preferences = new Preferences;
+
+        $this->actingAs($user = User::make());
+        $this->assertEquals([], $preferences->all());
+
+        // Defaults get applied first.
+
+        $preferences->default()->merge([
+            'alfa' => $value = 'default',
+            'bravo' => $value,
+            'charlie' => $value,
+            'delta' => $value,
+            'echo' => $value,
+            'foxtrot' => $value,
+            'golf' => $value,
+            'hotel' => $value,
+        ])->save();
+
+        $this->assertEquals([
+            'alfa' => 'default',
+            'bravo' => 'default',
+            'charlie' => 'default',
+            'delta' => 'default',
+            'echo' => 'default',
+            'foxtrot' => 'default',
+            'golf' => 'default',
+            'hotel' => 'default',
+        ], $preferences->all());
+
+        // Preferences get applied from roles through groups, and the order of the roles in the group matters.
+
+        tap(Role::make($handle = 'first_role_in_first_group')->setPreferences([
+            'alfa' => $handle,
+            'bravo' => $handle,
+            'charlie' => $handle,
+            'delta' => $handle,
+        ]))->save();
+        tap(Role::make($handle = 'second_role_in_first_group')->setPreferences([
+            'alfa' => $handle,
+            'bravo' => $handle,
+            'charlie' => $handle,
+            'delta' => $handle,
+            'echo' => $handle,
+        ]))->save();
+        tap(Role::make($handle = 'first_role_in_second_group')->setPreferences([
+            'alfa' => $handle,
+            'bravo' => $handle,
+            'charlie' => $handle,
+            'delta' => $handle,
+            'echo' => $handle,
+            'foxtrot' => $handle,
+        ]))->save();
+        tap(Role::make($handle = 'second_role_in_second_group')->setPreferences([
+            'alfa' => $handle,
+            'bravo' => $handle,
+            'charlie' => $handle,
+            'delta' => $handle,
+            'echo' => $handle,
+            'foxtrot' => $handle,
+            'golf' => $handle,
+        ]))->save();
+        tap(UserGroup::make()->handle('first_group')->assignRole('first_role_in_first_group')->assignRole('second_role_in_first_group'))->save();
+        tap(UserGroup::make()->handle('second_group')->assignRole('first_role_in_second_group')->assignRole('second_role_in_second_group'))->save();
+        $user->addToGroup('first_group')->addToGroup('second_group')->save();
+
+        $this->assertEquals([
+            'alfa' => 'first_role_in_first_group',
+            'bravo' => 'first_role_in_first_group',
+            'charlie' => 'first_role_in_first_group',
+            'delta' => 'first_role_in_first_group',
+            'echo' => 'second_role_in_first_group',
+            'foxtrot' => 'first_role_in_second_group',
+            'golf' => 'second_role_in_second_group',
+            'hotel' => 'default',
+        ], $preferences->all());
+
+        // Roles applied directly to the user take priority over those applied through groups.
+
+        tap(Role::make($handle = 'first_direct_role')->setPreferences([
+            'alfa' => $handle,
+            'bravo' => $handle,
+        ]))->save();
+        tap(Role::make($handle = 'second_direct_role')->setPreferences([
+            'alfa' => $handle,
+            'bravo' => $handle,
+            'charlie' => $handle,
+        ]))->save();
+        $user->assignRole('first_direct_role')->assignRole('second_direct_role')->save();
+
+        $this->assertEquals([
+            'alfa' => 'first_direct_role',
+            'bravo' => 'first_direct_role',
+            'charlie' => 'second_direct_role',
+            'delta' => 'first_role_in_first_group',
+            'echo' => 'second_role_in_first_group',
+            'foxtrot' => 'first_role_in_second_group',
+            'golf' => 'second_role_in_second_group',
+            'hotel' => 'default',
+        ], $preferences->all());
+
+        // User preferences take priority over roles.
+
+        $user->setPreference('alfa', 'user')->save();
+
+        $this->assertEquals([
+            'alfa' => 'user',
+            'bravo' => 'first_direct_role',
+            'charlie' => 'second_direct_role',
+            'delta' => 'first_role_in_first_group',
+            'echo' => 'second_role_in_first_group',
+            'foxtrot' => 'first_role_in_second_group',
+            'golf' => 'second_role_in_second_group',
+            'hotel' => 'default',
         ], $preferences->all());
     }
 }

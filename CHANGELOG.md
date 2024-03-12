@@ -1,5 +1,37 @@
 # Release Notes
 
+## 4.53.1 (2024-03-12)
+
+### What's fixed
+- Fix broken navigation tree. [#9709](https://github.com/statamic/cms/issues/9709) by @duncanmcclean
+
+
+
+## 4.53.0 (2024-03-11)
+
+### What's new
+- Persian translation. [#9707](https://github.com/statamic/cms/issues/9707) by @peimn
+- Japanese translation. [#9683](https://github.com/statamic/cms/issues/9683) by @kusaka-kouki
+- Field based redirects may provide a status. [#9417](https://github.com/statamic/cms/issues/9417) by @ryanmitchell
+- RTL support in the Control Panel. [#9447](https://github.com/statamic/cms/issues/9447) by @peimn
+- Add AssetCreating, AssetCreated and AssetSaving events. [#9378](https://github.com/statamic/cms/issues/9378) by @ryanmitchell
+- Add validation to prevent duplicate field handles. [#9337](https://github.com/statamic/cms/issues/9337) by @duncanmcclean
+- Show blueprint title in tree view. [#9413](https://github.com/statamic/cms/issues/9413) by @mmodler
+- Bard & Replicators: Show set group in UI. [#9670](https://github.com/statamic/cms/issues/9670) by @duncanmcclean
+- Users Listing: Allow for configuring default sort field & direction. [#9671](https://github.com/statamic/cms/issues/9671) by @duncanmcclean
+- E.T. Phone Home. [#8416](https://github.com/statamic/cms/issues/8416) by @jackmcdade
+- Date/time fieldtypes use native time fields. [#9662](https://github.com/statamic/cms/issues/9662) by @aaronbushnell
+
+### What's fixed
+- Fix "Create Entry" button on collection widget in multisite. [#9699](https://github.com/statamic/cms/issues/9699) by @duncanmcclean
+- Ensure submission values take precedence over globals data. [#9698](https://github.com/statamic/cms/issues/9698) by @duncanmcclean
+- Fix preferences when user has role via group. [#8957](https://github.com/statamic/cms/issues/8957) by @duncanmcclean
+- Fix bug in deleting users in the CP controller. [#9677](https://github.com/statamic/cms/issues/9677) by @ryanmitchell
+- Fix Collection::computed docblock. [#9673](https://github.com/statamic/cms/issues/9673) by @ajnsn
+- Prevent localizing entries without edit permission. [#9605](https://github.com/statamic/cms/issues/9605) by @duncanmcclean
+
+
+
 ## 4.52.0 (2024-03-04)
 
 ### What's new

@@ -69,7 +69,7 @@ class DataResponse implements Responsable
 
     protected function getRedirect()
     {
-        if (! $this->data->get('redirect')) {
+        if (! $raw = $this->data->get('redirect')) {
             return;
         }
 
@@ -86,7 +86,7 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
-        return redirect($redirect);
+        return redirect($redirect, $raw['status'] ?? 302);
     }
 
     protected function protect()
