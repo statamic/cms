@@ -99,9 +99,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
                     return [$site => $siteRoute];
                 });
-            })->afterSetter(function () {
-                $this->cachedRoutes = null;
             })
+            ->afterSetter(fn () => $this->cachedRoutes = null)
             ->args(func_get_args());
     }
 
