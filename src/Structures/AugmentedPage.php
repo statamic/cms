@@ -9,6 +9,7 @@ class AugmentedPage extends AugmentedEntry
 {
     protected $page;
     protected $hasEntry = false;
+    private $cachedKeys;
 
     public function __construct($page)
     {
@@ -21,8 +22,6 @@ class AugmentedPage extends AugmentedEntry
             parent::__construct($page);
         }
     }
-
-    private $cachedKeys;
 
     public function keys()
     {
