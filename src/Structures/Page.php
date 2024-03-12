@@ -39,7 +39,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
     protected $title;
     protected $depth;
     protected $data = [];
-    protected $structure;
+    private $structure;
 
     public function __construct()
     {
