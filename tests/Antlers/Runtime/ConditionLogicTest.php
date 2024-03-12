@@ -14,7 +14,7 @@ use Statamic\Tags\Tags;
 use Statamic\Taxonomies\TermCollection;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Statamic\View\Cascade;
-use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
+use Tests\Antlers\Fixtures\Addon\Tags\VarTestTags as VarTest;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;

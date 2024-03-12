@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 <div class="no-results border-dashed border-2">
     <div class="text-center max-w-md mx-auto mt-10 rounded-lg px-8 py-30">
 

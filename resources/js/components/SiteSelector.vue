@@ -5,7 +5,7 @@
         :value="site"
         :clearable="false"
         :searchable="false"
-        :get-option-label="site => site.name"
+        :get-option-label="site => __(site.name)"
         :options="sites"
         @input="$emit('input', $event)"
     />
