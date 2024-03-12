@@ -4,7 +4,7 @@
     <div class="flex justify-between items-center p-4">
         <h2>
             <a class="flex items-center" href="{{ $form->showUrl() }}">
-                <div class="h-6 w-6 mr-2 text-gray-800">
+                <div class="h-6 w-6 rtl:ml-2 ltr:mr-2 text-gray-800">
                     @cp_svg('icons/light/drawer-file')
                 </div>
                 <span v-pre>{{ $title }}</span>
@@ -21,7 +21,7 @@
                         @foreach($fields as $key => $field)
                         <td><a href="{{ cp_route('forms.submissions.show', [$form->handle(), $submission['id']]) }}">{{ array_get($submission, $field) }}</a></td>
                         @endforeach
-                        <td class="text-right">
+                        <td class="rtl:text-left ltr:text-right">
                             {{ ($submission['date']->diffInDays() <= 14) ? $submission['date']->diffForHumans() : $submission['date']->format($format) }}
                         </td>
                     </tr>

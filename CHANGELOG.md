@@ -1,5 +1,55 @@
 # Release Notes
 
+## 4.53.1 (2024-03-12)
+
+### What's fixed
+- Fix broken navigation tree. [#9709](https://github.com/statamic/cms/issues/9709) by @duncanmcclean
+
+
+
+## 4.53.0 (2024-03-11)
+
+### What's new
+- Persian translation. [#9707](https://github.com/statamic/cms/issues/9707) by @peimn
+- Japanese translation. [#9683](https://github.com/statamic/cms/issues/9683) by @kusaka-kouki
+- Field based redirects may provide a status. [#9417](https://github.com/statamic/cms/issues/9417) by @ryanmitchell
+- RTL support in the Control Panel. [#9447](https://github.com/statamic/cms/issues/9447) by @peimn
+- Add AssetCreating, AssetCreated and AssetSaving events. [#9378](https://github.com/statamic/cms/issues/9378) by @ryanmitchell
+- Add validation to prevent duplicate field handles. [#9337](https://github.com/statamic/cms/issues/9337) by @duncanmcclean
+- Show blueprint title in tree view. [#9413](https://github.com/statamic/cms/issues/9413) by @mmodler
+- Bard & Replicators: Show set group in UI. [#9670](https://github.com/statamic/cms/issues/9670) by @duncanmcclean
+- Users Listing: Allow for configuring default sort field & direction. [#9671](https://github.com/statamic/cms/issues/9671) by @duncanmcclean
+- E.T. Phone Home. [#8416](https://github.com/statamic/cms/issues/8416) by @jackmcdade
+- Date/time fieldtypes use native time fields. [#9662](https://github.com/statamic/cms/issues/9662) by @aaronbushnell
+
+### What's fixed
+- Fix "Create Entry" button on collection widget in multisite. [#9699](https://github.com/statamic/cms/issues/9699) by @duncanmcclean
+- Ensure submission values take precedence over globals data. [#9698](https://github.com/statamic/cms/issues/9698) by @duncanmcclean
+- Fix preferences when user has role via group. [#8957](https://github.com/statamic/cms/issues/8957) by @duncanmcclean
+- Fix bug in deleting users in the CP controller. [#9677](https://github.com/statamic/cms/issues/9677) by @ryanmitchell
+- Fix Collection::computed docblock. [#9673](https://github.com/statamic/cms/issues/9673) by @ajnsn
+- Prevent localizing entries without edit permission. [#9605](https://github.com/statamic/cms/issues/9605) by @duncanmcclean
+
+
+
+## 4.52.0 (2024-03-04)
+
+### What's new
+- OAuth improvements including support for SAML2 providers. [#9612](https://github.com/statamic/cms/issues/9612) by @duncanmcclean
+
+### What's fixed
+- Fix entries not being "linked" to their localizations corrected. [#9661](https://github.com/statamic/cms/issues/9661) by @ryanmitchell
+- Fix prop type warning in validation builder. [#9665](https://github.com/statamic/cms/issues/9665) by @jasonvarga
+- Only suggest fields in the same replicator set. [#9663](https://github.com/statamic/cms/issues/9663) by @jasonvarga
+- Roll back to initial simple isAjax() check on front end forms. [#9629](https://github.com/statamic/cms/issues/9629) by @ryanmitchell
+- Fix Antlers sections not being yieldable in Blade layouts. [#9614](https://github.com/statamic/cms/issues/9614) by @JohnathonKoster
+- Fix Antlers strict equality inside conditions. [#9621](https://github.com/statamic/cms/issues/9621) by @JohnathonKoster
+- Fix test that fails on February 29th. [#9620](https://github.com/statamic/cms/issues/9620) by @jasonvarga
+- Filter away bad bard nodes during preprocessing. [#9608](https://github.com/statamic/cms/issues/9608) by @SylvesterDamgaard
+- Fix page url value in TreeBuilder. [#9611](https://github.com/statamic/cms/issues/9611) by @0kyn
+
+
+
 ## 4.51.0 (2024-02-28)
 
 ### What's new
