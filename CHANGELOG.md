@@ -1,5 +1,12 @@
 # Release Notes
 
+## 4.53.1 (2024-03-12)
+
+### What's fixed
+- Fix broken navigation tree. [#9709](https://github.com/statamic/cms/issues/9709) by @duncanmcclean
+
+
+
 ## 4.53.0 (2024-03-11)
 
 ### What's new
