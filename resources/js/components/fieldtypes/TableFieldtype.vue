@@ -1,9 +1,9 @@
 <template>
     <portal name="table-fullscreen" :disabled="!fullScreenMode" target-class="table-fieldtype">
         <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white': fullScreenMode }">
-            <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
+            <header class="bg-gray-200 border-b py-3 rtl:pr-3 ltr:pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
                 <h2 v-text="__(config.display)" />
-                <button class="btn-close absolute top-2 right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
+                <button class="btn-close absolute top-2 rtl:left-5 ltr:right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
             </header>
             <section :class="{'p-4': fullScreenMode}">
                 <table class="table-fieldtype-table" v-if="rowCount">
@@ -18,7 +18,7 @@
                                     </a>
                                 </div>
                             </th>
-                            <th class="row-controls pr-0">
+                            <th class="row-controls rtl:pl-0 ltr:pr-0">
                                 <button @click="fullScreenMode = !fullScreenMode" class="flex items-center w-full h-full justify-center text-gray-600 hover:text-gray-800">
                                     <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
                                     <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
@@ -54,7 +54,7 @@
                     {{ __('Add Row') }}
                 </button>
 
-                <button class="btn ml-2" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
+                <button class="btn rtl:mr-2 ltr:ml-2" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
                     {{ __('Add Column') }}
                 </button>
             </section>
