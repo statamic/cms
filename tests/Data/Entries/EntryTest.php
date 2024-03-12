@@ -2253,6 +2253,77 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
     }
 
+    /**
+     * @test
+     */
+    public function it_has_a_dirty_state()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $entry = tap((new Entry)->collection($collection)->locale('en')->id('en')->data([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ]))->save();
+
+        $this->assertFalse($entry->isDirty());
+        $this->assertFalse($entry->isDirty('title'));
+        $this->assertFalse($entry->isDirty('food'));
+        $this->assertFalse($entry->isDirty(['title']));
+        $this->assertFalse($entry->isDirty(['food']));
+        $this->assertFalse($entry->isDirty(['title', 'food']));
+        $this->assertTrue($entry->isClean());
+        $this->assertTrue($entry->isClean('title'));
+        $this->assertTrue($entry->isClean('food'));
+        $this->assertTrue($entry->isClean(['title']));
+        $this->assertTrue($entry->isClean(['food']));
+        $this->assertTrue($entry->isClean(['title', 'food']));
+
+        $entry->merge(['title' => 'French']);
+
+        $this->assertTrue($entry->isDirty());
+        $this->assertTrue($entry->isDirty('title'));
+        $this->assertFalse($entry->isDirty('food'));
+        $this->assertTrue($entry->isDirty(['title']));
+        $this->assertFalse($entry->isDirty(['food']));
+        $this->assertTrue($entry->isDirty(['title', 'food']));
+        $this->assertFalse($entry->isClean());
+        $this->assertFalse($entry->isClean('title'));
+        $this->assertTrue($entry->isClean('food'));
+        $this->assertFalse($entry->isClean(['title']));
+        $this->assertTrue($entry->isClean(['food']));
+        $this->assertFalse($entry->isClean(['title', 'food']));
+    }
+
+    /** @test */
+    public function it_syncs_original_at_the_right_time()
+    {
+        $eventsHandled = 0;
+
+        Event::listen(function (EntryCreating $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+        Event::listen(function (EntrySaving $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+        Event::listen(function (EntryCreated $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+        Event::listen(function (EntrySaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
+        $entry->save();
+
+        $this->assertFalse($entry->isDirty());
+        $this->assertEquals(4, $eventsHandled);
+    }
+
     /** @test */
     public function it_gets_all_descendants()
     {

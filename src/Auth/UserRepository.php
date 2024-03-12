@@ -83,10 +83,10 @@ abstract class UserRepository implements RepositoryContract
         return $blueprint;
     }
 
-    public function findByOAuthId(string $provider, string $id): ?User
+    public function findByOAuthId(Provider $provider, string $id): ?User
     {
         return $this->find(
-            (new Provider($provider))->getUserId($id)
+            $provider->getUserId($id)
         );
     }
 }

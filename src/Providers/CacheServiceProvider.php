@@ -42,7 +42,7 @@ class CacheServiceProvider extends ServiceProvider
                     $this->app['files'],
                     $this->app['config']['cache.stores.file']['path'],
                     $this->app['config']['cache.stores.file']['permission'] ?? null
-                ));
+                ), $this->app['config']['cache.stores.file']);
             });
 
             if (config('cache.default') === 'file') {

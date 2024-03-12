@@ -10,7 +10,7 @@
         <div v-if="revision.message" class="revision-item-note truncate" v-text="revision.message" />
 
         <div class="flex items-center">
-            <avatar v-if="revision.user" :user="revision.user" class="shrink-0 mr-2 w-6" />
+            <avatar v-if="revision.user" :user="revision.user" class="shrink-0 rtl:ml-2 ltr:mr-2 w-6" />
 
             <div class="revision-item-content w-full flex">
                 <div class="flex-1">
@@ -36,7 +36,7 @@
                             :revision="revision"
                             :url="restoreUrl"
                             :reference="reference"
-                            class="ml-4" />
+                            class="rtl:mr-4 ltr:ml-4" />
                     </template>
                 </revision-preview>
             </div>

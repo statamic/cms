@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ config('app.locale') }}" dir="{{ Statamic\Facades\Site::selected()->direction() }}">
+<html lang="{{ Statamic::cpLocale() }}" dir="{{ Statamic::cpDirection() }}">
 <head>
     @include('statamic::partials.head')
 </head>
