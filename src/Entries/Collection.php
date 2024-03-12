@@ -150,7 +150,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->getter(function ($sortField) {
                 if ($sortField) {
                     return $sortField;
-                } elseif ($this->orderable()) {
+                } elseif ($this->orderable() || $this->hasStructure()) {
                     return 'order';
                 } elseif ($this->dated()) {
                     return 'date';

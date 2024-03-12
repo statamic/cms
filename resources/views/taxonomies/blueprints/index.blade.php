@@ -29,7 +29,7 @@
                         >{{ __('Save Order') }}</button>
                     @endif
 
-                    <a href="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}" class="btn-primary ml-2">{{ __('Create Blueprint') }}</a>
+                    <a href="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}" class="btn-primary rtl:mr-2 ltr:ml-2">{{ __('Create Blueprint') }}</a>
                 </div>
             </div>
 
