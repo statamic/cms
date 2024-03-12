@@ -8,15 +8,15 @@ use Statamic\Statamic;
 
 class AugmentedEntry extends AbstractAugmented
 {
-    protected $keysCache = null;
+    private $cachedKeys;
 
     public function keys()
     {
-        if ($this->keysCache) {
-            return $this->keysCache;
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
         }
 
-        return $this->keysCache = $this->data->keys()
+        return $this->cachedKeys = $this->data->keys()
             ->merge($this->data->supplements()->keys())
             ->merge($this->commonKeys())
             ->merge($this->blueprintFields()->keys())

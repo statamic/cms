@@ -6,7 +6,7 @@ use Statamic\Data\AbstractAugmented;
 
 class AugmentedVariables extends AbstractAugmented
 {
-    protected $cachedKeys = null;
+    private $cachedKeys;
 
     public function keys()
     {

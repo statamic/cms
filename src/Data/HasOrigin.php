@@ -11,7 +11,7 @@ trait HasOrigin
      */
     protected $origin;
 
-    protected $cachedKeys = null;
+    private $cachedKeys;
 
     public function keys()
     {

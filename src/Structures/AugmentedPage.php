@@ -22,7 +22,7 @@ class AugmentedPage extends AugmentedEntry
         }
     }
 
-    protected $cachedKeys = null;
+    private $cachedKeys;
 
     public function keys()
     {
