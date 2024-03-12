@@ -38,7 +38,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     protected $handle;
     protected $routes = [];
-    protected $cachedRoutes = null;
+    private $cachedRoutes = null;
     protected $mount;
     protected $title;
     protected $template;
