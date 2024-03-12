@@ -142,6 +142,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this->password();
     }
 
+    public function getAuthPasswordName()
+    {
+        return 'password';
+    }
+
     /**
      * Get or set the blueprint.
      *

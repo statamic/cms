@@ -17,11 +17,14 @@ use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Assets\PendingMeta;
 use Statamic\Assets\ReplacementFile;
+use Statamic\Events\AssetCreated;
+use Statamic\Events\AssetCreating;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetDeleting;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
+use Statamic\Events\AssetSaving;
 use Statamic\Events\AssetUploaded;
 use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
@@ -699,7 +702,7 @@ class AssetTest extends TestCase
         ]));
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/test.txt');
-        Facades\Asset::shouldReceive('save')->with($asset);
+        Facades\Asset::partialMock()->shouldReceive('save')->with($asset);
         $asset->save();
 
         $this->assertEquals($expectedBeforeMerge, $asset->meta());
@@ -854,17 +857,50 @@ class AssetTest extends TestCase
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
-        Facades\Asset::shouldReceive('save')->with($asset);
+        Facades\Asset::partialMock()->shouldReceive('save')->with($asset);
 
         $return = $asset->save();
 
         $this->assertTrue($return);
 
+        Event::assertDispatched(AssetSaving::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+
         Event::assertDispatched(AssetSaved::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
 
+        Event::assertDispatched(AssetCreating::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+
+        Event::assertDispatched(AssetCreated::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
         // Assertion about the meta file is in the AssetRepository test
+    }
+
+    /** @test */
+    public function it_doesnt_save_when_asset_saving_event_returns_false()
+    {
+        Event::fake([AssetSaved::class]);
+        Storage::fake('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::partialMock()->shouldReceive('save')->with($asset);
+
+        Event::listen(AssetSaving::class, function ($event) {
+            return false;
+        });
+
+        $return = $asset->save();
+
+        $this->assertFalse($return);
+
+        Event::assertNotDispatched(AssetSaved::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
     }
 
     /** @test */
@@ -874,23 +910,24 @@ class AssetTest extends TestCase
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
-        Facades\Asset::shouldReceive('save')->with($asset);
+        Facades\Asset::partialMock()->shouldReceive('save')->with($asset);
 
         $return = $asset->saveQuietly();
 
         $this->assertTrue($return);
 
         Event::assertNotDispatched(AssetSaved::class);
+        Event::assertNotDispatched(AssetSaving::class);
     }
 
     /** @test */
-    public function when_saving_quietly_the_cached_assetss_withEvents_flag_will_be_set_back_to_true()
+    public function when_saving_quietly_the_cached_assets_withEvents_flag_will_be_set_back_to_true()
     {
         Event::fake();
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
-        Facades\Asset::shouldReceive('save')->with($asset);
+        Facades\Asset::partialMock()->shouldReceive('save')->with($asset);
 
         $return = $asset->saveQuietly();
 
@@ -1604,6 +1641,31 @@ class AssetTest extends TestCase
         $this->uploadFileTest();
     }
 
+    /** @test */
+    public function if_saving_event_returns_false_during_upload_the_asset_doesnt_save()
+    {
+        Event::fake([AssetSaved::class, AssetUploaded::class, AssetCreated::class]);
+
+        Event::listen(AssetCreating::class, function ($event) {
+            return false;
+        });
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
+
+        $this->assertFalse($return);
+
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        Event::assertNotDispatched(AssetSaved::class);
+        Event::assertNotDispatched(AssetUploaded::class);
+        Event::assertNotDispatched(AssetCreated::class);
+    }
+
     private function uploadFileTest()
     {
         Event::fake();
@@ -1640,10 +1702,11 @@ class AssetTest extends TestCase
             'path/to',
             'path/to/asset.jpg',
         ], Cache::get('asset-list-contents-test_container')->keys()->all());
-        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
-            return $event->asset = $asset;
-        });
-        Event::assertDispatched(AssetSaved::class);
+
+        Event::assertDispatched(AssetCreating::class, fn ($event) => $event->asset === $asset);
+        Event::assertDispatched(AssetSaved::class, fn ($event) => $event->asset === $asset);
+        Event::assertDispatched(AssetUploaded::class, fn ($event) => $event->asset === $asset);
+        Event::assertDispatched(AssetCreated::class, fn ($event) => $event->asset === $asset);
     }
 
     /** @test */
