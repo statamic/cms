@@ -1,3 +1,5 @@
+@php use Statamic\Facades\Site; @endphp
+
 <div class="card p-0 overflow-hidden h-full">
     <div class="flex justify-between items-center p-4">
         <h2>
@@ -11,7 +13,7 @@
         @can('create', ['Statamic\Contracts\Entries\Entry', $collection])
         <create-entry-button
             button-class="btn-primary"
-            url="{{ $collection->createEntryUrl() }}"
+            url="{{ $collection->createEntryUrl(Site::selected()) }}"
             :blueprints="{{ $blueprints->toJson() }}"
             text="{{ $button }}"></create-entry-button>
         @endcan
