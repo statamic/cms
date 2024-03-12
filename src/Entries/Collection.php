@@ -147,7 +147,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function dated($dated = null)
     {
-        return $this->fluentlyGetOrSet('dated')->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->dated;
+        }
+
+        $this->dated = $dated;
+
+        return $this;
     }
 
     public function orderable()
