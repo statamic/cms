@@ -19,7 +19,6 @@ use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Runtime\Tracing\TraceManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
-use Statamic\View\Antlers\Parser;
 use Statamic\View\Blade\AntlersBladePrecompiler;
 use Statamic\View\Cascade;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
@@ -41,32 +40,14 @@ class ViewServiceProvider extends ServiceProvider
             return new Cascade($app['request'], Site::current());
         });
 
-        $this->registerRuntimeAntlers();
-        $this->registerRegexAntlers();
-
-        $this->app->bind(ParserContract::class, function ($app) {
-            return config('statamic.antlers.version', 'regex') === 'regex'
-                ? $app->make('antlers.regex')
-                : $app->make('antlers.runtime');
-        });
+        $this->registerAntlers();
 
         $this->app->singleton(Engine::class, function ($app) {
             return new Engine($app['files'], $app[ParserContract::class]);
         });
     }
 
-    private function registerRegexAntlers()
-    {
-        $this->app->bind('antlers.regex', function ($app) {
-            return (new Parser)
-                ->callback([Engine::class, 'renderTag'])
-                ->cascade($app[Cascade::class]);
-        });
-
-        $this->app->bind(Parser::class, fn ($app) => $app['antlers.regex']);
-    }
-
-    private function registerRuntimeAntlers()
+    private function registerAntlers()
     {
         GlobalRuntimeState::$environmentId = StringUtilities::uuidv4();
 
@@ -100,7 +81,7 @@ class ViewServiceProvider extends ServiceProvider
             return new PerformanceTracer();
         });
 
-        $this->app->bind('antlers.runtime', function ($app) {
+        $this->app->bind(ParserContract::class, function ($app) {
             /** @var RuntimeParser $parser */
             $parser = $app->make(RuntimeParser::class)->cascade($app[Cascade::class]);
             $runtimeConfig = new RuntimeConfiguration();

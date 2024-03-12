@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
@@ -33,7 +34,7 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
-class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
+class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
 {
     use ContainsSupplementalData, HasAugmentedInstance, Publishable, ResolvesValues, Revisable, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
@@ -269,8 +270,12 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
         return $this->isDefaultLocale();
     }
 
-    public function locale()
+    public function locale($locale = null)
     {
+        if (func_num_args() === 1) {
+            throw new \Exception('The locale cannot be set on a LocalizedTerm.');
+        }
+
         return $this->locale;
     }
 
