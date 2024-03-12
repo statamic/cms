@@ -21,7 +21,7 @@
                         <a href="{{ cp_route('blueprints.create') }}" class="btn-primary rtl:ml-4 ltr:mr-4">{{ __('Create Blueprint') }}</a>
                         @unless($blueprints->isEmpty())
                             <a href="{{ cp_route('blueprints.index') }}" class="font-bold text-blue text-sm hover:text-gray-900">
-                                {{ __('View All') }} <span class="font-normal">({{ $blueprints->count() }})</span> {{ Statamic::cpDirection() === 'ltr' ? '&rarr;' : '&larr;' }}
+                                {{ __('View All') }} <span class="font-normal">({{ $blueprints->count() }})</span> @if (Statamic::cpDirection() === 'ltr') &rarr; @else &larr; @endif
                             </a>
                         @endunless
                     </div>
@@ -38,7 +38,7 @@
                         <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary rtl:ml-4 ltr:mr-4">{{ __('Create Fieldset') }}</a>
                         @unless($fieldsets->isEmpty())
                             <a href="{{ cp_route('fieldsets.index') }}" class="font-bold text-blue text-sm hover:text-gray-900">
-                                {{ __('View All') }} <span class="font-normal">({{ $fieldsets->count() }})</span> {{ Statamic::cpDirection() === 'ltr' ? '&rarr;' : '&larr;' }}
+                                {{ __('View All') }} <span class="font-normal">({{ $fieldsets->count() }})</span> @if (Statamic::cpDirection() === 'ltr') &rarr; @else &larr; @endif
                             </a>
                         @endunless
                     </div>

@@ -20,7 +20,7 @@
                 @cp_svg('icons/light/hammer-wrench')
             </div>
             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue">{{ __('Configure Collection') }} {{ Statamic::cpDirection() === 'ltr' ? '&rarr;' : '&larr;' }}</h3>
+                <h3 class="mb-2 text-blue">{{ __('Configure Collection') }} @if (Statamic::cpDirection() === 'ltr') &rarr; @else &larr; @endif</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
             </div>
         </a>
@@ -34,12 +34,12 @@
                 @cp_svg('icons/light/content-writing')
             </div>
             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue">{{ $collection->createLabel() }} @if (!$multipleBlueprints){{ Statamic::cpDirection() === 'ltr' ? '&rarr;' : '&larr;' }}@endif</h3>
+                <h3 class="mb-2 text-blue">{{ $collection->createLabel() }} @if (!$multipleBlueprints) @if (Statamic::cpDirection() === 'ltr') &rarr; @else &larr; @endif @endif</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_create_entry_description') }}</p>
                 @if ($multipleBlueprints)
                     @foreach ($collection->entryBlueprints() as $blueprint)
                         <a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site, 'blueprint' => $blueprint->handle()]) }}"
-                           class="text-blue text-sm rtl:ml-2 ltr:mr-2">{{ $blueprint->title() }} {{ Statamic::cpDirection() === 'ltr' ? '&rarr;' : '&larr;' }}</a>
+                           class="text-blue text-sm rtl:ml-2 ltr:mr-2">{{ $blueprint->title() }} @if (Statamic::cpDirection() === 'ltr') &rarr; @else &larr; @endif</a>
                     @endforeach
                 @endif
             </div>
@@ -49,7 +49,7 @@
                 @cp_svg('icons/light/blueprint')
             </div>
             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue">{{ __('Configure Blueprints') }} {{ Statamic::cpDirection() === 'ltr' ? '&rarr;' : '&larr;' }}</h3>
+                <h3 class="mb-2 text-blue">{{ __('Configure Blueprints') }} @if (Statamic::cpDirection() === 'ltr') &rarr; @else &larr; @endif</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_blueprints_description') }}</p>
             </div>
         </a>
@@ -58,7 +58,7 @@
                 @cp_svg('icons/light/crane')
             </div>
             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue">{{ __('Scaffold Views') }} {{ Statamic::cpDirection() === 'ltr' ? '&rarr;' : '&larr;' }}</h3>
+                <h3 class="mb-2 text-blue">{{ __('Scaffold Views') }} @if (Statamic::cpDirection() === 'ltr') &rarr; @else &larr; @endif</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_scaffold_description') }}</p>
             </div>
         </a>
