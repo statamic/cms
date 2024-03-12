@@ -41,6 +41,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
     protected $data = [];
     private $absoluteUrl;
     private $absoluteUrlWithoutRedirect;
+    private $blueprint;
 
     public function __construct()
     {
@@ -428,8 +429,12 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
 
     public function blueprint()
     {
+        if ($this->blueprint !== null) {
+            return $this->blueprint;
+        }
+
         if ($this->structure() instanceof Nav) {
-            return $this->structure()->blueprint();
+            return $this->blueprint = $this->structure()->blueprint();
         }
     }
 
