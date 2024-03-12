@@ -1,13 +1,13 @@
 <template>
-    <div class="pt-2 pr-2">
+    <div class="pt-2 rtl:pl-2 ltr:pr-2">
         <div class="flex flex-wrap items-center">
 
-            <button class="pill-tab mr-1" :class="{ 'active': ! activePreset }" @click="viewAll" v-text="__('All')" />
+            <button class="pill-tab rtl:ml-1 ltr:mr-1" :class="{ 'active': ! activePreset }" @click="viewAll" v-text="__('All')" />
 
             <template v-for="(preset, handle) in presets">
-                <button class="pill-tab active mr-1" v-if="handle === activePreset">
+                <button class="pill-tab active rtl:ml-1 ltr:mr-1" v-if="handle === activePreset">
                     {{ preset.display }}
-                    <dropdown-list class="ml-2" placement="bottom-start">
+                    <dropdown-list class="rtl:mr-2 ltr:ml-2" placement="bottom-start">
                         <template v-slot:trigger>
                             <button class="opacity-50 hover:opacity-100">
                                 <svg-icon name="micro/chevron-down-xs" class="w-2 h-2" />
@@ -19,7 +19,7 @@
                         <dropdown-item :text="__('Delete')" class="warning" @click="deletePreset" />
                     </dropdown-list>
                 </button>
-                <button class="pill-tab mr-1" v-else @click="viewPreset(handle)">
+                <button class="pill-tab rtl:ml-1 ltr:mr-1" v-else @click="viewPreset(handle)">
                     {{ preset.display }}
                 </button>
             </template>

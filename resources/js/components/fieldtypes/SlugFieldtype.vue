@@ -17,6 +17,7 @@
                 :id="fieldId"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
+                direction="ltr"
             >
                 <template v-slot:append v-if="config.show_regenerate">
                     <button class="input-group-append items-center flex" @click="sync" v-tooltip="__('Regenerate from: :field', { 'field': config.from })">
