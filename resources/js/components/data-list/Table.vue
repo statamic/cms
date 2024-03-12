@@ -12,13 +12,13 @@
                         'current-column': sharedState.sortColumn === column.field,
                         'sortable-column': column.sortable === true,
                         'cursor-not-allowed': !sortable,
-                        'text-right pr-8': column.numeric,
+                        'rtl:text-left ltr:text-right rtl:pl-8 ltr:pr-8': column.numeric,
                     }"
                     class="group"
                     @click.prevent="changeSortColumn(column.field)"
                 >
                     <span v-text="__(column.label)" />
-                    <svg v-if="column.sortable" :class="[sharedState.sortDirection, {'opacity-100 pointer-events-none': sharedState.sortColumn === column.field}]" height="8" width="8" viewBox="0 0 10 6.5" class="ml-1 opacity-0 group-hover:opacity-100">
+                    <svg v-if="column.sortable" :class="[sharedState.sortDirection, {'opacity-100 pointer-events-none': sharedState.sortColumn === column.field}]" height="8" width="8" viewBox="0 0 10 6.5" class="rtl:mr-1 ltr:ml-1 opacity-0 group-hover:opacity-100">
                         <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor"/>
                     </svg>
                 </th>
@@ -52,7 +52,7 @@
                         @click="checkboxClicked(row, index, $event)"
                     />
                 </th>
-                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'text-right pr-8': column.numeric}">
+                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'rtl:text-left ltr:text-right rtl:pl-8 ltr:pr-8': column.numeric}">
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"
