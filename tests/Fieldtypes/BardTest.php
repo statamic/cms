@@ -1211,6 +1211,20 @@ EOT;
         $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
     }
 
+    /** @test */
+    public function it_filters_away_bad_nodes()
+    {
+        $data = [
+            [],
+            ['type' => 'text', 'text' => 'This is inline text.'],
+            ['text' => 'I have no type'],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
