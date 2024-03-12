@@ -22,7 +22,7 @@ class Nav extends Structure implements Contract
     use ExistsAsFile;
 
     protected $collections;
-    protected $blueprintCache;
+    private $blueprintCache;
 
     public function save()
     {
