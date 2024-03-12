@@ -800,13 +800,6 @@ class CoreModifiers extends Modifier
      */
     public function groupBy($value, $params)
     {
-        if (config('statamic.antlers.version') != 'runtime') {
-            // Workaround for https://github.com/statamic/cms/issues/3614
-            // At the moment this modifier only works properly when using the param syntax.
-            $params = implode(':', $params);
-            $params = explode('|', $params);
-        }
-
         $groupBy = $params[0];
 
         $groupLabels = [];
@@ -1550,7 +1543,7 @@ class CoreModifiers extends Modifier
      */
     public function modifyDate($value, $params)
     {
-        return $this->carbon($value)->modify(Arr::get($params, 0));
+        return $this->carbon($value)->copy()->modify(Arr::get($params, 0));
     }
 
     /**
@@ -2185,18 +2178,16 @@ class CoreModifiers extends Modifier
      */
     public function shuffle($value, array $params)
     {
-        $seed = Arr::get($params, 0);
-
         if (Compare::isQueryBuilder($value)) {
             $value = $value->get();
         }
 
         if (is_array($value)) {
-            return collect($value)->shuffle($seed)->all();
+            return collect($value)->shuffle()->all();
         }
 
         if ($value instanceof Collection) {
-            return $value->shuffle($seed);
+            return $value->shuffle();
         }
 
         return Stringy::shuffle($value);
