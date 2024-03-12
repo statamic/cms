@@ -10,6 +10,7 @@ class AugmentedPage extends AugmentedEntry
     protected $page;
     protected $hasEntry = false;
     private $cachedKeys;
+    private $fieldsCache;
 
     public function __construct($page)
     {
@@ -62,6 +63,10 @@ class AugmentedPage extends AugmentedEntry
 
     protected function blueprintFields()
     {
+        if ($this->fieldsCache) {
+            return $this->fieldsCache;
+        }
+
         $fields = ($pageBlueprint = $this->page->blueprint())
             ? $pageBlueprint->fields()->all()
             : collect();
@@ -71,7 +76,7 @@ class AugmentedPage extends AugmentedEntry
             $fields = $entryFields->merge($fields);
         }
 
-        return $fields;
+        return $this->fieldsCache = $fields;
     }
 
     protected function id()
