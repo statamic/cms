@@ -2,6 +2,8 @@
 
 namespace Statamic\Tags\Concerns;
 
+use Statamic\Support\Str;
+
 trait RendersAttributes
 {
     /**
@@ -14,6 +16,10 @@ trait RendersAttributes
     {
         return collect($attributes)
             ->map(function ($value, $attribute) {
+                if (Str::startsWith($attribute, 'attr:')) {
+                    $attribute = mb_substr($attribute, 5);
+                }
+
                 if ($value === null) {
                     return;
                 }
@@ -29,20 +35,31 @@ trait RendersAttributes
     }
 
     /**
-     * Render HTML attributes from rest of tag params, except for specifically known params.
+     * Render HTML attributes from tag params.
      *
-     * @param  array  $knownTagParams
+     * Parameters that are not prefixed with attr: will be automatically removed.
+     *
      * @return string
      */
-    protected function renderAttributesFromParams($knownTagParams = [])
+    protected function renderAttributesFromParams()
     {
-        $attributes = collect($this->params->all())
-            ->except($knownTagParams)
-            ->mapWithKeys(function ($value, $attribute) {
-                return [preg_replace('/^attr:/', '', $attribute) => $value];
-            })
-            ->all();
+        $params = $this->params->filter(function ($value, $attribute) {
+            return preg_match('/^attr:/', $attribute);
+        })->all();
 
-        return $this->renderAttributes($attributes);
+        return $this->renderAttributes($params);
+    }
+
+    /**
+     * Render HTML attributes and merge attributes from tag params.
+     *
+     * @return string
+     */
+    protected function renderAttributesFromParamsWith(array $attrs)
+    {
+        return collect([
+            $this->renderAttributes($attrs),
+            $this->renderAttributesFromParams(),
+        ])->filter()->implode(' ');
     }
 }

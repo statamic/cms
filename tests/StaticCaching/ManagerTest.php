@@ -21,6 +21,7 @@ class ManagerTest extends TestCase
         $mock = Mockery::mock(Cacher::class)->shouldReceive('flush')->once()->getMock();
         StaticCache::extend('test', fn () => $mock);
 
+        Cache::shouldReceive('store')->andReturnSelf();
         Cache::shouldReceive('get')->with('nocache::urls', [])->once()->andReturn(['/one', '/two']);
         Cache::shouldReceive('get')->with('nocache::session.'.md5('/one'))->once()->andReturn(['regions' => ['r1', 'r2']]);
         Cache::shouldReceive('get')->with('nocache::session.'.md5('/two'))->once()->andReturn(['regions' => ['r3', 'r4']]);

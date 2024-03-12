@@ -9,13 +9,13 @@
         <header v-if="!loading" class="flex items-center sticky top-0 inset-x-0 bg-white shadow px-8 py-2 z-1 h-13">
             <h1 class="flex-1 flex items-center text-xl">
                 {{ __(values.display) || __(config.display) || config.handle }}
-                <small class="badge-pill bg-gray-100 ml-4 border text-xs text-gray-700 font-medium leading-none flex items-center">
-                    <svg-icon class="h-4 w-4 mr-2 inline-block text-gray-700" :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`"></svg-icon>
+                <small class="badge-pill bg-gray-100 rtl:mr-4 ltr:ml-4 border text-xs text-gray-700 font-medium leading-none flex items-center">
+                    <svg-icon class="h-4 w-4 rtl:ml-2 ltr:mr-2 inline-block text-gray-700" :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`"></svg-icon>
                     {{ fieldtype.title }}
                 </small>
             </h1>
             <button
-                class="text-gray-700 hover:text-gray-800 mr-6 text-sm"
+                class="text-gray-700 hover:text-gray-800 rtl:ml-6 ltr:mr-6 text-sm"
                 @click.prevent="close"
                 v-text="__('Cancel')"
             ></button>
@@ -111,10 +111,12 @@ export default {
     ],
 
     props: {
+        id: String,
         config: Object,
         overrides: { type: Array, default: () => [] },
         type: String,
         root: Boolean,
+        fields: Array,
         suggestableConditionFields: Array,
     },
 
@@ -240,8 +242,10 @@ export default {
             this.clearErrors();
 
             this.$axios.post(cp_url('fields/update'), {
+                id: this.id,
                 type: this.type,
-                values: this.values
+                values: this.values,
+                fields: this.fields
             }).then(response => {
                 this.$emit('committed', response.data, this.editedFields);
                 this.close();
