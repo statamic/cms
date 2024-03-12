@@ -39,7 +39,7 @@
                             <button @click="hideBanner" class="rtl:ml-4 ltr:mr-4 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
                             <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Manage Licenses') }}">
-                                {{ __('Manage Licenses') }} @if (Statamic::cpDirection() === 'ltr') &rarr; @else &larr; @endif
+                                {{ __('Manage Licenses') }} @rarr
                             </a>
                             @endcan
                         </div>
@@ -61,7 +61,7 @@
                             <button @click="hideBanner" class="rtl:ml-4 ltr:mr-4 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
                                 <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Manage Licenses') }}">
-                                    {{ __('Manage Licenses') }} @if (Statamic::cpDirection() === 'ltr') &rarr; @else &larr; @endif
+                                    {{ __('Manage Licenses') }} @rarr
                                 </a>
                             @endcan
                         </div>
