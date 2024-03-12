@@ -7,7 +7,7 @@
     </div>
     <div class="flex flex-wrap p-4">
         <a href="https://statamic.dev" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-gray-800">
+            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800">
                 @cp_svg('icons/light/book-pages')
             </div>
             <div class="flex-1">
@@ -17,7 +17,7 @@
         </a>
         @if (!Statamic::pro())
         <a href="https://statamic.dev/licensing" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-gray-800">
+            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800">
                 @cp_svg('icons/light/pro-ribbon')
             </div>
             <div class="flex-1">
@@ -27,7 +27,7 @@
         </a>
         @endif
         <a href="{{ cp_route('collections.create') }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-gray-800">
+            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800">
                 @cp_svg('icons/light/content-writing')
             </div>
             <div class="flex-1">
@@ -36,7 +36,7 @@
             </div>
         </a>
         <a href="{{ cp_route('blueprints.index') }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-gray-800">
+            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800">
                 @cp_svg('icons/light/blueprints')
             </div>
             <div class="flex-1">
@@ -45,7 +45,7 @@
             </div>
         </a>
         <a href="{{ cp_route('navigation.create') }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-gray-800">
+            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800">
                 @cp_svg('icons/light/hierarchy-files')
             </div>
             <div class="flex-1">

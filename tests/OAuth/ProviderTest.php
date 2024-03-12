@@ -21,10 +21,6 @@ class ProviderTest extends TestCase
             'driver' => 'local',
             'root' => $this->tempDir = __DIR__.'/tmp',
         ]]);
-
-        config(['statamic.oauth.providers' => [
-            'test',
-        ]]);
     }
 
     public function tearDown(): void
