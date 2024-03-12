@@ -39,8 +39,8 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
     protected $title;
     protected $depth;
     protected $data = [];
-    protected $absoluteUrl;
-    protected $absoluteUrlWithoutRedirect;
+    private $absoluteUrl;
+    private $absoluteUrlWithoutRedirect;
 
     public function __construct()
     {
