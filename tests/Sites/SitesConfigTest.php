@@ -267,4 +267,80 @@ class SitesConfigTest extends TestCase
 
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
+
+    /** @test */
+    public function it_validates_required_fields_for_site_through_cp_endpoint()
+    {
+        $this
+            ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
+            ->patchJson(cp_route('sites.update'), [])
+            ->assertStatus(422)
+            ->assertJsonCount(4, 'errors')
+            ->assertJson(['errors' => [
+                'name' => ['This field is required.'],
+                'handle' => ['This field is required.'],
+                'url' => ['This field is required.'],
+                'locale' => ['This field is required.'],
+            ]]);
+    }
+
+    /** @test */
+    public function it_validates_required_fields_for_multiple_sites_through_cp_endpoint()
+    {
+        // Multisite requires this config
+        Config::set('statamic.sites.enabled', true);
+
+        $this
+            ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
+            ->patchJson(cp_route('sites.update'), [
+                'sites' => [
+                    [
+                        'handle' => 'english', // this is a required field, so there should be only 3 failures here
+                    ],
+                    [
+                        'direction' => 'rtl', // this is an optional field, so there should be 4 failures here
+                    ],
+                ],
+            ])
+            ->assertStatus(422)
+            ->assertJsonCount(7, 'errors')
+            ->assertJson(['errors' => [
+                'sites.0.name' => ['This field is required.'],
+                'sites.0.url' => ['This field is required.'],
+                'sites.0.locale' => ['This field is required.'],
+                'sites.1.name' => ['This field is required.'],
+                'sites.1.handle' => ['This field is required.'],
+                'sites.1.url' => ['This field is required.'],
+                'sites.1.locale' => ['This field is required.'],
+            ]]);
+    }
+
+    public static function submitsNoSites()
+    {
+        return [
+            'with no sites array' => [[]],
+            'sites array with no elements' => [['sites' => []]],
+            'sites null' => [['sites' => null]],
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider submitsNoSites
+     */
+    public function it_validates_at_least_one_site_is_required_for_multiple_sites_through_cp_endpoint($data)
+    {
+        // Multisite requires this config
+        Config::set('statamic.sites.enabled', true);
+
+        $this
+            ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
+            ->patchJson(cp_route('sites.update'), $data)
+            ->assertStatus(422)
+            ->assertJsonCount(1, 'errors')
+            ->assertJson(['errors' => [
+                'sites' => ['This field is required.'],
+            ]]);
+    }
 }

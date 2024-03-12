@@ -209,6 +209,7 @@ class Sites
                         'mode' => 'stacked',
                         'add_row' => __('Add Site'),
                         'fields' => $siteFields,
+                        'required' => true,
                     ],
                 ],
             ];
