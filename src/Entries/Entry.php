@@ -78,9 +78,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
-    protected $hasDate;
-    protected $hasTime;
-    protected $hasSeconds;
+    private $hasDate;
+    private $hasTime;
+    private $hasSeconds;
 
     public function __construct()
     {
@@ -546,7 +546,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             ->args(func_get_args());
     }
 
-    protected function clearDateTimePropertyCaches()
+    private function clearDateTimePropertyCaches()
     {
         $this->hasDate = null;
         $this->hasTime = null;
