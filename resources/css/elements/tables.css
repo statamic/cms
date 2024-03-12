@@ -17,11 +17,11 @@
 
 .data-list-bulk-actions {
 	@apply bg-white absolute w-full py-2 z-1;
-	padding-left: 56px;
+	padding-left: 56px ; [dir="rtl"] & { padding-right: 56px ; padding-left: 0 ; }
 }
 
 .mode-grid .data-list-bulk-actions {
-	@apply bg-white w-full pt-3 pb-1 z-10 pl-4 static;
+	@apply bg-white w-full pt-3 pb-1 z-10 rtl:pr-4 ltr:pl-4 static;
 }
 
 .mode-grid .rotating-dots-button {
@@ -29,11 +29,11 @@
 }
 
 .data-list-footer {
-    @apply py-3 pr-4 flex items-center border-t;
+    @apply py-3 rtl:pl-4 ltr:pr-4 flex items-center border-t;
 }
 
 .data-table {
-	@apply text-left text-gray-700 outline-none max-w-full w-full;
+	@apply rtl:text-right ltr:text-left text-gray-700 outline-none max-w-full w-full;
 	overflow-x: auto;
 
     thead {
@@ -45,8 +45,8 @@
 
         th {
             @apply font-medium px-4 py-3 whitespace-nowrap;
-            &:first-child { @apply rounded-tl-lg; }
-			&:last-child { @apply rounded-tr-lg; }
+            &:first-child { @apply rtl:rounded-tr-lg ltr:rounded-tl-lg; }
+			&:last-child { @apply rtl:rounded-tl-lg ltr:rounded-tr-lg; }
 			&:hover {
 				@apply text-gray-900;
 			}
@@ -55,7 +55,7 @@
             @apply p-0 w-4;
         }
 		.type-column {
-			text-align: right;
+			@apply ltr:text-right rtl:text-left;
 		}
 	}
 
@@ -70,11 +70,11 @@
 
 			&:first-child {
 				td:first-child, th:first-child {
-				    @apply rounded-tl-md;
+				    @apply rtl:rounded-tr-md ltr:rounded-tl-md;
 				}
 
 				td:last-child, th:last-child {
-				    @apply rounded-tr-md;
+				    @apply rtl:rounded-tl-md ltr:rounded-tr-md;
 				}
 			}
 
@@ -82,11 +82,11 @@
 				@apply border-none;
 
                 td:first-child, th:first-child {
-				    @apply rounded-bl-md;
+				    @apply rtl:rounded-br-md ltr:rounded-bl-md;
 				}
 
 				td:last-child, th:last-child {
-				    @apply rounded-br-md;
+				    @apply rtl:rounded-bl-md ltr:rounded-br-md;
 				}
 			}
 
@@ -95,7 +95,7 @@
             }
 
             th {
-                @apply py-2 pr-4;
+                @apply py-2 rtl:pl-4 ltr:pr-4;
             }
 
             td {
@@ -103,12 +103,12 @@
             }
 
             td.table-drag-handle {
-                @apply w-1 border-r h-full py-2 px-0;
+                @apply w-1 rtl:border-l ltr:border-r h-full py-2 px-0;
             }
 		}
 
         .type-column {
-			text-align: right;
+			@apply ltr:text-right rtl:text-left;
 		}
     }
 
@@ -141,42 +141,42 @@
 /* Sticky Meta Columns */
 .data-table {
     thead th.checkbox-column {
-        @apply p-0 pr-2 sticky z-1 -left-px;
+        @apply p-0 rtl:pl-2 ltr:pr-2 sticky z-1 rtl:-right-px ltr:-left-px;
         width: 45px;
         min-width: 45px;
         &:after {
-            @apply absolute left-0 right-0 top-0 bottom-0 -z-1 ;
+            @apply absolute rtl:right-0 ltr:left-0 rtl:left-0 ltr:right-0 top-0 bottom-0 -z-1 ;
             content: '';
             background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
         }
     }
 
     thead th.actions-column {
-        @apply p-0 pl-2 text-right sticky -right-px;
+        @apply p-0 rtl:pr-2 ltr:pl-2 rtl:text-left ltr:text-right sticky rtl:-left-px ltr:-right-px;
         width: 45px;
         min-width: 45px;
         &:after {
-            @apply absolute left-0 right-0 top-0 bottom-0 -z-1;
+            @apply absolute rtl:right-0 ltr:left-0 rtl:left-0 ltr:right-0 top-0 bottom-0 -z-1;
             content: '';
             background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
         }
     }
 
     tbody th.checkbox-column {
-        @apply px-3 sticky -left-px;
+        @apply px-3 sticky rtl:-right-px ltr:-left-px;
         &:after {
-            @apply absolute left-0 right-0 top-0 bottom-0 -z-1;
+            @apply absolute rtl:right-0 ltr:left-0 rtl:left-0 ltr:right-0 top-0 bottom-0 -z-1;
             content: '';
             background-image: linear-gradient(to right, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
         }
     }
 
     tbody th.actions-column {
-        @apply p-0 pl-2 text-right sticky -right-px;
+        @apply p-0 rtl:pr-2 ltr:pl-2 rtl:text-left ltr:text-right sticky rtl:-left-px ltr:-right-px;
         min-width: 45px;
         width: 45px;
         &:after {
-            @apply absolute left-0 right-0 top-0 bottom-0 -z-1;
+            @apply absolute rtl:right-0 ltr:left-0 rtl:left-0 ltr:right-0 top-0 bottom-0 -z-1;
             content: '';
             background-image: linear-gradient(to left, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
         }
@@ -223,7 +223,7 @@
 }
 
 .data-list-filter-link {
-	@apply border-gray-400 text-gray-600 mr-2 p-3 pb-2;
+	@apply border-gray-400 text-gray-600 rtl:ml-2 ltr:mr-2 p-3 pb-2;
 
 	&:hover {
 		@apply border-b-3 text-gray-700;
@@ -241,7 +241,7 @@
 }
 
 td.table-drag-handle {
-	@apply w-3 border-r h-full p-2;
+	@apply w-3 rtl:border-l ltr:border-r h-full p-2;
     min-width: 16px;
 	cursor: grab;
 	background: theme('colors.gray.200') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
@@ -263,7 +263,7 @@ td.table-drag-handle {
 	text-align: center;
 	height: 22px;
 	width: 22px;
-	float: right;
+	float: right ; [dir="rtl"] & { float: left ; }
 	cursor: pointer;
 
 	&:hover {
@@ -280,8 +280,8 @@ td.table-drag-handle {
 		content: "";
 		position: absolute;
 		bottom: -1px;
-		left: 0;
-		right: 0;
+	 left: 0 ; [dir="rtl"] & { left: auto ; right: 0 ; }
+	 right: 0 ; [dir="rtl"] & { right: auto ; left: 0 ; }
 		height: 2px;
 	}
 
@@ -293,9 +293,9 @@ td.table-drag-handle {
     }
 	.icon {
         position: relative;
-        float: right;
+        float: right ; [dir="rtl"] & { float: left ; }
         top: 6px;
-        right: 5px;
+        right: 5px ; [dir="rtl"] & { right: auto ; left: 5px ; }
 	}
 
 	.icon, .icon:before {
@@ -309,7 +309,7 @@ td.table-drag-handle {
 }
 
 .column-actions {
-	text-align: right;
+	@apply ltr:text-right rtl:text-left;
 	width: 30px;
 }
 
@@ -319,7 +319,7 @@ table.control {
 
 .flush table.control {
     tr th:first-child {
-        padding-left: 30px;
+        padding-left: 30px ; [dir="rtl"] & { padding-right: 30px ; padding-left: 0 ; }
     }
 }
 
@@ -343,7 +343,7 @@ table.control {
 .relationship-index-field {
     min-width: 10vw;
     .relationship-index-field-item {
-        @apply rounded bg-gray-100 border px-1 flex items-center text-2xs mr-1;
+        @apply rounded bg-gray-100 border px-1 flex items-center text-2xs rtl:ml-1 ltr:mr-1;
         a {
             @apply line-clamp-1;
         }
