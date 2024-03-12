@@ -55,7 +55,7 @@
                         />
                     </div>
                     <button ref="existing" class="text-blue hover:text-gray-800 flex items-center mb-2 outline-none" @click.prevent="isSelecting = true">
-                        <svg-icon name="light/hyperlink" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
+                        <svg-icon name="light/hyperlink" class="rtl:ml-1 ltr:mr-1 h-4 w-4 flex items-center"></svg-icon>
                         <span class="hidden @sm:block" v-text="__('Link Existing Item')" />
                         <span class="@sm:hidden" v-text="__('Link')" />
                     </button>
