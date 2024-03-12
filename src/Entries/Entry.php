@@ -78,7 +78,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
-    protected $siteCache;
+    private $siteCache;
 
     public function __construct()
     {
