@@ -9,7 +9,7 @@ class AugmentedPage extends AugmentedEntry
 {
     protected $page;
     protected $hasEntry = false;
-    protected $fieldsCache = null;
+    private $fieldsCache;
 
     public function __construct($page)
     {
