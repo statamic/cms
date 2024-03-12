@@ -43,6 +43,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
     private $absoluteUrlWithoutRedirect;
     private $blueprint;
     private $routeData;
+    private $status;
 
     public function __construct()
     {
@@ -429,7 +430,11 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
 
     public function status()
     {
-        return optional($this->entry())->status();
+        if ($this->status !== null) {
+            return $this->status;
+        }
+
+        return $this->status = optional($this->entry())->status();
     }
 
     public function blueprint()
