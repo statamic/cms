@@ -156,7 +156,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->getter(function ($sortField) {
                 if ($sortField) {
                     return $sortField;
-                } elseif ($this->orderable()) {
+                } elseif ($this->orderable() || $this->hasStructure()) {
                     return 'order';
                 } elseif ($this->dated()) {
                     return 'date';
@@ -617,17 +617,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->fluentlyGetOrSet('pastDateBehavior')
             ->getter(function ($behavior) {
                 return $behavior ?? 'public';
-            })
-            ->args(func_get_args());
-    }
-
-    /** @deprecated */
-    public function revisions($enabled = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('revisions')
-            ->getter(function ($behavior) {
-                return $behavior ?? false;
             })
             ->args(func_get_args());
     }
