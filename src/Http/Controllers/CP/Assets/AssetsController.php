@@ -94,15 +94,4 @@ class AssetsController extends CpController
 
         return $asset->download();
     }
-
-    public function destroy($asset)
-    {
-        $asset = Asset::find(base64_decode($asset));
-
-        // TODO: Auth
-
-        $asset->delete();
-
-        return response('', 204);
-    }
 }

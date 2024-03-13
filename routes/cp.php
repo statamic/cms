@@ -227,7 +227,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('assets/browse/{asset_container}/{path?}/edit', [BrowserController::class, 'edit'])->where('path', '.*')->name('assets.browse.edit');
     Route::get('assets/browse/{asset_container}/{path?}', [BrowserController::class, 'show'])->where('path', '.*')->name('assets.browse.show');
     Route::post('assets-fieldtype', [FieldtypeController::class, 'index']);
-    Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset']);
+    Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset'])->except('destroy');
     Route::get('assets/{encoded_asset}/download', [AssetsController::class, 'download'])->name('assets.download');
     Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');
     Route::get('svgs/{encoded_asset}', [SvgController::class, 'show'])->name('assets.svgs.show');
@@ -275,7 +275,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('users/actions/list', [UserActionController::class, 'bulkActions'])->name('users.actions.bulk');
     Route::get('users/blueprint', [UserBlueprintController::class, 'edit'])->name('users.blueprint.edit');
     Route::patch('users/blueprint', [UserBlueprintController::class, 'update'])->name('users.blueprint.update');
-    Route::resource('users', UsersController::class);
+    Route::resource('users', UsersController::class)->except('destroy');
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
     Route::get('account', AccountController::class)->name('account');
     Route::get('user-groups/blueprint', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.blueprint.edit');
