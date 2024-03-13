@@ -118,19 +118,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function collection($collection = null)
     {
-        return $this
-            ->fluentlyGetOrSet('collection')
-            ->setter(function ($collection) {
-                $this->clearDateTimePropertyCaches();
+        if (func_num_args() === 0) {
+            return $this->collection ? Blink::once("collection-{$this->collection}", function () {
+                return Collection::findByHandle($this->collection);
+            }) : null;
+        }
 
-                return $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
-            })
-            ->getter(function ($collection) {
-                return $collection ? Blink::once("collection-{$collection}", function () use ($collection) {
-                    return Collection::findByHandle($collection);
-                }) : null;
-            })
-            ->args(func_get_args());
+        $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
+        $this->clearDateTimePropertyCaches();
+
+        return $this;
     }
 
     public function blueprint($blueprint = null)
