@@ -10,7 +10,6 @@ trait HasOrigin
      * @var string
      */
     protected $origin;
-    protected $cachedHasOrigin = false;
 
     public function keys()
     {
@@ -68,7 +67,6 @@ trait HasOrigin
         Blink::forget($this->getOriginBlinkKey());
 
         $this->origin = is_object($origin) ? $this->getOriginIdFromObject($origin) : $origin;
-        $this->cachedHasOrigin = $this->origin != null;
 
         return $this;
     }
@@ -87,11 +85,7 @@ trait HasOrigin
 
     public function hasOrigin()
     {
-        if (! $this->cachedHasOrigin && $this->origin) {
-            $this->cachedHasOrigin = true;
-        }
-
-        return $this->cachedHasOrigin;
+        return $this->origin != null;
     }
 
     public function isRoot()
