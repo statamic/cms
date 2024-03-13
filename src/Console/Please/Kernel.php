@@ -2,7 +2,7 @@
 
 namespace Statamic\Console\Please;
 
-use App\Console\Kernel as ConsoleKernel;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Statamic\Console\Please\Application as Please;
 use Statamic\Statamic;
 
