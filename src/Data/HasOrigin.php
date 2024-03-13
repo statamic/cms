@@ -64,7 +64,7 @@ trait HasOrigin
     public function origin($origin = null)
     {
         if (func_num_args() === 0) {
-            if (! $origin) {
+            if (! $this->origin) {
                 return null;
             }
 
@@ -72,7 +72,7 @@ trait HasOrigin
                 return $found;
             }
 
-            return tap($this->getOriginByString($origin), function ($found) {
+            return tap($this->getOriginByString($this->origin), function ($found) {
                 Blink::put($this->getOriginBlinkKey(), $found);
             });
         }
@@ -98,7 +98,7 @@ trait HasOrigin
 
     public function hasOrigin()
     {
-        return $this->origin != null;
+        return $this->origin !== null;
     }
 
     public function isRoot()
