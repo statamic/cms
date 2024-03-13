@@ -226,7 +226,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('assets/browse/{asset_container}/{path?}/edit', [BrowserController::class, 'edit'])->where('path', '.*')->name('assets.browse.edit');
     Route::get('assets/browse/{asset_container}/{path?}', [BrowserController::class, 'show'])->where('path', '.*')->name('assets.browse.show');
     Route::post('assets-fieldtype', [FieldtypeController::class, 'index']);
-    Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset']);
+    Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset'])->except('destroy');
     Route::get('assets/{encoded_asset}/download', [AssetsController::class, 'download'])->name('assets.download');
     Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');
     Route::get('svgs/{encoded_asset}', [SvgController::class, 'show'])->name('assets.svgs.show');
