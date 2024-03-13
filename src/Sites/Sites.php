@@ -228,16 +228,8 @@ class Sites
         return $this->sites
             ->keyBy
             ->handle()
-            ->map(function ($site) {
-                return [
-                    'name' => $site->name(),
-                    'locale' => $site->locale(),
-                    'url' => $site->url(),
-                    'lang' => $site->lang(),
-                    'direction' => $site->direction(),
-                    'attributes' => $site->attributes(),
-                ];
-            })
+            ->map
+            ->rawConfig()
             ->all();
     }
 
