@@ -2,6 +2,7 @@
 
 namespace Statamic\Listeners;
 
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\View\State\StateManager;
 
@@ -11,5 +12,6 @@ class ClearState
     {
         Statamic::clearApiRouteCache();
         StateManager::resetState();
+        URL::clearExternalUrlCache();
     }
 }
