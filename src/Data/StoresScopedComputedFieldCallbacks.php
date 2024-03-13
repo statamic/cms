@@ -24,7 +24,7 @@ trait StoresScopedComputedFieldCallbacks
 
     public function getComputedCallbacks(string $scope): Collection
     {
-        return Blink::once('getComputedCallbacks'.$scope, function () use ($scope) {
+        return Blink::once(__CLASS__.'::getComputedCallbacks'.$scope, function () use ($scope) {
             return collect($this->computedFieldCallbacks)
                 ->filter(fn ($_, $key) => Str::startsWith($key, "{$scope}."))
                 ->keyBy(fn ($_, $key) => Str::after($key, "{$scope}."));
