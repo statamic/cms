@@ -1,8 +1,9 @@
 <?php
 
-namespace Statamic\View\State;
+namespace Statamic\Listeners;
 
 use Statamic\Statamic;
+use Statamic\View\State\StateManager;
 
 class ClearState
 {
