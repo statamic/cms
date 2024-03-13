@@ -15,8 +15,8 @@ use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
+use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
-use Statamic\Translator\TextDirection;
 use Stringy\StaticStringy;
 
 class Statamic
@@ -480,6 +480,6 @@ class Statamic
 
     public static function cpDirection()
     {
-        return TextDirection::getDirection(static::cpLocale());
+        return TextDirection::of(static::cpLocale());
     }
 }
