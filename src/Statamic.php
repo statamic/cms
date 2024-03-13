@@ -35,7 +35,7 @@ class Statamic
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
-    protected static $isApiRouteCache;
+    private static $isApiRouteCache;
 
     public static function version()
     {
