@@ -127,17 +127,15 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function collection($collection = null)
     {
-        return $this
-            ->fluentlyGetOrSet('collection')
-            ->setter(function ($collection) {
-                return $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
-            })
-            ->getter(function ($collection) {
-                return $collection ? Blink::once("collection-{$collection}", function () use ($collection) {
-                    return Collection::findByHandle($collection);
-                }) : null;
-            })
-            ->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->collection ? Blink::once("collection-{$this->collection}", function () {
+                return Collection::findByHandle($this->collection);
+            }) : null;
+        }
+
+        $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
+
+        return $this;
     }
 
     public function blueprint($blueprint = null)
