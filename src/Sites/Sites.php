@@ -22,8 +22,6 @@ class Sites
 
     public function all()
     {
-        // TODO: resolve antlers stuff
-
         return $this->sites;
     }
 
