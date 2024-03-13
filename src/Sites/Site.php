@@ -5,6 +5,7 @@ namespace Statamic\Sites;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 
 class Site implements Augmentable
 {
@@ -17,7 +18,7 @@ class Site implements Augmentable
     public function __construct($handle, $config)
     {
         $this->handle = $handle;
-        $this->config = $config;
+        $this->config = $this->resolveAntlers($config);
     }
 
     public function handle()
@@ -92,13 +93,31 @@ class Site implements Augmentable
 
     public function set($key, $value)
     {
-        $this->config[$key] = $value;
+        $this->config[$key] = $this->resolveAntlersValue($value);
 
         if ($key === 'url') {
             $this->absoluteUrlCache = null;
         }
 
         return $this;
+    }
+
+    public function resolveAntlers($config)
+    {
+        return collect($config)
+            ->map(fn ($value) => $this->resolveAntlersValue($value))
+            ->all();
+    }
+
+    protected function resolveAntlersValue($value)
+    {
+        if (is_array($value)) {
+            return collect($value)
+                ->map(fn ($element) => $this->resolveAntlersValue($element))
+                ->all();
+        }
+
+        return (string) app(RuntimeParser::class)->parse($value, ['config' => config()->all()]);
     }
 
     private function removePath($url)
