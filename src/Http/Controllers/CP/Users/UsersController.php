@@ -308,15 +308,4 @@ class UsersController extends CpController
             'saved' => is_bool($save) ? $save : true,
         ];
     }
-
-    public function destroy($user)
-    {
-        throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        $this->authorize('delete', $user);
-
-        $user->delete();
-
-        return response('', 204);
-    }
 }
