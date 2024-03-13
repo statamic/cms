@@ -13,12 +13,14 @@ class Site implements Augmentable
 
     protected $handle;
     protected $config;
+    protected $rawConfig;
     private $absoluteUrlCache;
 
     public function __construct($handle, $config)
     {
         $this->handle = $handle;
         $this->config = $this->resolveAntlers($config);
+        $this->rawConfig = $config;
     }
 
     public function handle()
@@ -94,6 +96,7 @@ class Site implements Augmentable
     public function set($key, $value)
     {
         $this->config[$key] = $this->resolveAntlersValue($value);
+        $this->rawConfig[$key] = $value;
 
         if ($key === 'url') {
             $this->absoluteUrlCache = null;
@@ -140,6 +143,11 @@ class Site implements Augmentable
             'direction' => $this->direction(),
             'attributes' => $this->attributes(),
         ];
+    }
+
+    public function rawConfig()
+    {
+        return $this->rawConfig;
     }
 
     public function __toString()
