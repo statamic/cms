@@ -64,10 +64,6 @@ trait HasOrigin
     public function origin($origin = null)
     {
         if (func_num_args() === 0) {
-            if (! $origin) {
-                return null;
-            }
-
             if ($found = Blink::get($this->getOriginBlinkKey())) {
                 return $found;
             }
