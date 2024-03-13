@@ -13,6 +13,7 @@ abstract class AbstractAugmented implements Augmented
     protected $data;
     protected $blueprintFields;
     protected $relations = [];
+    protected $isSelecting = false;
 
     public function __construct($data)
     {
@@ -29,38 +30,66 @@ abstract class AbstractAugmented implements Augmented
         return $this->select(array_diff($this->keys(), Arr::wrap($keys)));
     }
 
-    public function select($keys = null)
+    public function select($keys = null, $fields = null)
     {
         $arr = [];
 
+        if (! $fields) {
+            $fields = $this->blueprintFields();
+        }
+
         $keys = $this->filterKeys(Arr::wrap($keys ?: $this->keys()));
 
+        $this->isSelecting = true;
+
         foreach ($keys as $key) {
-            $arr[$key] = $this->get($key);
+            $arr[$key] = (new TransientValue(null, $key, null))->withAugmentationReferences($this, $fields->get($key));
         }
+
+        $this->isSelecting = false;
 
         return (new AugmentedCollection($arr))->withRelations($this->relations);
     }
 
     abstract public function keys();
 
-    public function get($handle): Value
+    public function getAugmentedMethodValue($method)
+    {
+        if ($this->methodExistsOnThisClass($method)) {
+            return $this->$method();
+        }
+
+        return $this->data->$method();
+    }
+
+    protected function adjustFieldtype($handle, $fieldtype)
+    {
+        if ($this->isSelecting || $fieldtype !== null) {
+            return $fieldtype;
+        }
+
+        return $this->getFieldtype($handle);
+    }
+
+    public function get($handle, $fieldtype = null): Value
     {
         $method = Str::camel($handle);
 
         if ($this->methodExistsOnThisClass($method)) {
-            $value = $this->$method();
-
-            return $value instanceof Value
-                ? $value
-                : new Value($value, $method, null, $this->data);
+            $value = $this->wrapInvokable($method, true, $this, $handle, $fieldtype);
+        } elseif (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
+            $value = $this->wrapInvokable($method, false, $this->data, $handle, $fieldtype);
+        } else {
+            $value = $this->wrapDeferredValue($handle, $fieldtype);
         }
 
-        if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
-            return $this->wrapValue($this->data->$method(), $handle);
+        // If someone is calling ->get() directly they probably
+        // don't want to remember to also ->materialize() it.
+        if (! $this->isSelecting) {
+            return $value->materialize();
         }
 
-        return $this->wrapValue($this->getFromData($handle), $handle);
+        return $value;
     }
 
     protected function filterKeys($keys)
@@ -80,7 +109,7 @@ abstract class AbstractAugmented implements Augmented
         return method_exists($this, $method) && ! in_array($method, ['select', 'except']);
     }
 
-    protected function getFromData($handle)
+    public function getFromData($handle)
     {
         $value = method_exists($this->data, 'value') ? $this->data->value($handle) : $this->data->get($handle);
 
@@ -93,19 +122,48 @@ abstract class AbstractAugmented implements Augmented
         return $value;
     }
 
-    protected function wrapValue($value, $handle)
+    protected function wrapDeferredValue($handle, $fieldtype = null)
     {
-        $fields = $this->blueprintFields();
+        $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
+
+        return (new DeferredValue(
+            null,
+            $handle,
+            $fieldtype,
+            $this->data
+        ))->withAugmentedReference($this);
+    }
+
+    protected function wrapInvokable(string $method, bool $proxy, $methodTarget, string $handle, $fieldtype = null)
+    {
+        $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
+
+        return (new InvokableValue(
+            null,
+            $handle,
+            $fieldtype,
+            $this->data
+        ))->setInvokableDetails($method, $proxy, $methodTarget);
+    }
+
+    protected function wrapValue($value, $handle, $fieldtype = null)
+    {
+        $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
 
         return new Value(
             $value,
             $handle,
-            optional($fields->get($handle))->fieldtype(),
+            $fieldtype,
             $this->data
         );
     }
 
-    protected function blueprintFields()
+    protected function getFieldtype($handle)
+    {
+        return optional($this->blueprintFields()->get($handle))->fieldtype();
+    }
+
+    public function blueprintFields()
     {
         if (! isset($this->blueprintFields)) {
             $this->blueprintFields = (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())

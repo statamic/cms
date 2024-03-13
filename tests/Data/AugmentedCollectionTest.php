@@ -40,7 +40,7 @@ class AugmentedCollectionTest extends TestCase
         $value = m::mock(Value::class);
         // $value->shouldNotReceive('toArray');
         $value->shouldReceive('isRelationship')->andReturnFalse();
-        $value->shouldReceive('shallow')->once()->andReturnSelf();
+        $value->shouldReceive('shallow')->once()->andReturn($value);
         $c = new AugmentedCollection([$value]);
         $results = $c->withShallowNesting()->toArray();
 

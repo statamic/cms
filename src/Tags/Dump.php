@@ -2,6 +2,8 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Support\Dumper;
+
 class Dump extends Tags
 {
     /**
@@ -9,7 +11,7 @@ class Dump extends Tags
      */
     public function index()
     {
-        dump($this->context->except(['__env', 'app'])->sortKeys()->all());
+        Dumper::dump($this->context->except(['__env', 'app'])->sortKeys()->all());
     }
 
     /**
@@ -17,6 +19,6 @@ class Dump extends Tags
      */
     public function wildcard($var)
     {
-        dump($this->context->value($var));
+        Dumper::dump($this->context->value($var));
     }
 }

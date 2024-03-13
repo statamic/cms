@@ -141,7 +141,7 @@ class AugmentedTest extends TestCase
             }
         };
 
-        $this->assertSame($valueInstance, $augmented->get('foo'));
+        $this->assertSame($valueInstance, $augmented->get('foo')->materialize());
     }
 
     /** @test */
