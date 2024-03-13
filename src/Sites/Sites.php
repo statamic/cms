@@ -131,7 +131,7 @@ class Sites
 
     public function save()
     {
-        File::put($this->path(), YAML::dump($this->toArray()));
+        File::put($this->path(), YAML::dump($this->config()));
     }
 
     public function blueprint()
@@ -223,7 +223,7 @@ class Sites
         ]);
     }
 
-    public function toArray()
+    public function config()
     {
         return $this->sites
             ->keyBy
@@ -233,9 +233,9 @@ class Sites
             ->all();
     }
 
-    public function toPublishArray()
+    public function publishFormValues()
     {
-        $sites = collect($this->toArray())
+        $sites = collect($this->config())
             ->map(fn ($site, $handle) => array_merge(['handle' => $handle], $site))
             ->values()
             ->all();

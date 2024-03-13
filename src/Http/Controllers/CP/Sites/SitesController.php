@@ -16,7 +16,7 @@ class SitesController extends CpController
 
     public function edit()
     {
-        $data = Site::toPublishArray();
+        $data = Site::publishFormValues();
 
         $blueprint = Site::blueprint();
 

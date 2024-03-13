@@ -106,7 +106,7 @@ class Multisite extends Command
         });
 
         // TODO: Make sure we're doing correct merge behaviour here...
-        $sites = Site::toArray() + $this->newSiteConfigs->all();
+        $sites = Site::config() + $this->newSiteConfigs->all();
 
         Site::setSites($sites)->save();
 
