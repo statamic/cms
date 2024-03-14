@@ -67,4 +67,16 @@ class Application extends ConsoleApplication
             $this->add($command);
         }
     }
+
+    public static function rebindKernel(): void
+    {
+        if (! class_exists('App\Console\Kernel')) {
+            require_once __DIR__.'/AppKernel.php';
+        }
+
+        app()->singleton(
+            \Illuminate\Contracts\Console\Kernel::class,
+            \Statamic\Console\Please\Kernel::class
+        );
+    }
 }

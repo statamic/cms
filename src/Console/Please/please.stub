@@ -12,10 +12,7 @@ require __DIR__.'/vendor/autoload.php';
 $app = require_once __DIR__.'/bootstrap/app.php';
 
 // Rebind the kernel...
-$app->singleton(
-    \Illuminate\Contracts\Console\Kernel::class,
-    \Statamic\Console\Please\Kernel::class
-);
+Statamic\Console\Please\Application::rebindKernel();
 
 // Handle the command...
 $status = $app->handleCommand(new ArgvInput);
