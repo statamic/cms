@@ -79,34 +79,36 @@ class AssetsGeneratePresets extends Command
 
         $steps = (count($container->warmPresets()) + $cpPresets) * count($assets);
 
-        $progress = progress(
-            label: $this->shouldQueue ? 'Queueing...' : 'Generating...',
-            steps: $steps
-        );
+        if ($steps > 0) {
+            $progress = progress(
+                label: $this->shouldQueue ? 'Queueing...' : 'Generating...',
+                steps: $steps
+            );
 
-        $progress->start();
+            $progress->start();
 
-        foreach ($assets as $asset) {
-            foreach ($asset->warmPresets() as $preset) {
-                $counts[$preset] = ($counts[$preset] ?? 0) + 1;
-                $progress->label("Generating $preset for {$asset->basename()}...");
+            foreach ($assets as $asset) {
+                foreach ($asset->warmPresets() as $preset) {
+                    $counts[$preset] = ($counts[$preset] ?? 0) + 1;
+                    $progress->label("Generating $preset for {$asset->basename()}...");
 
-                $dispatchMethod = $this->shouldQueue
-                    ? 'dispatch'
-                    : (method_exists(Dispatcher::class, 'dispatchSync') ? 'dispatchSync' : 'dispatchNow');
+                    $dispatchMethod = $this->shouldQueue
+                        ? 'dispatch'
+                        : (method_exists(Dispatcher::class, 'dispatchSync') ? 'dispatchSync' : 'dispatchNow');
 
-                try {
-                    GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);
-                } catch (\Exception $e) {
-                    Log::debug($e);
-                    $counts['errors'] = ($counts['errors'] ?? 0) + 1;
+                    try {
+                        GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);
+                    } catch (\Exception $e) {
+                        Log::debug($e);
+                        $counts['errors'] = ($counts['errors'] ?? 0) + 1;
+                    }
+
+                    $progress->advance();
                 }
-
-                $progress->advance();
             }
-        }
 
-        $progress->finish();
+            $progress->finish();
+        }
 
         $verb = $this->shouldQueue ? 'queued' : 'generated';
         info(sprintf("<info>[✔]</info> %s images $verb for %s assets.", $steps, count($assets)));
