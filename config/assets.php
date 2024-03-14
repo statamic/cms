@@ -124,7 +124,7 @@ return [
         |
         */
 
-        'append_original_filename' => true,
+        'append_original_filename' => false,
 
     ],
 
