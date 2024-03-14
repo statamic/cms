@@ -19,6 +19,7 @@ use Symfony\Component\VarExporter\VarExporter;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
+use function Laravel\Prompts\spin;
 use function Laravel\Prompts\text;
 
 class Multisite extends Command
@@ -46,7 +47,7 @@ class Multisite extends Command
         $confirmed = confirm("The current site handle is [{$this->siteOne()}], content will be moved into folders with this name. Is this okay?");
 
         if (! $confirmed) {
-            $this->crossLine('Change the site handle in <comment>config/statamic/sites.php</comment> then try this command again.');
+            $this->components->error('Change the site handle in <comment>config/statamic/sites.php</comment> then try this command again.');
 
             return;
         }
@@ -60,7 +61,7 @@ class Multisite extends Command
         } while ($site !== '');
 
         if ($this->sites->count() < 2) {
-            return $this->crossLine('Multisite has not been enabled.');
+            return $this->components->error('Multisite has not been enabled.');
         }
 
         $this->clearStache();
