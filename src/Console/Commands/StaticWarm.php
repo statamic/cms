@@ -116,7 +116,7 @@ class StaticWarm extends Command
 
     public function outputSuccessLine(Response $response, $index): void
     {
-        $this->components->twoColumnDetail($this->getRelativeUri($index), "<info>✓ Cached</info>");
+        $this->components->twoColumnDetail($this->getRelativeUri($index), '<info>✓ Cached</info>');
     }
 
     public function outputFailureLine($exception, $index): void
