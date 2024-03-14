@@ -180,7 +180,7 @@ class MakeUser extends Command
 
         $user->save();
 
-        $this->info('User created successfully.');
+        $this->components->info('User created successfully.');
     }
 
     /**
