@@ -39,8 +39,6 @@ class MakeUserTest extends TestCase
     /** @test */
     public function it_can_make_a_super_user_interactively()
     {
-        $this->markTestSkipped("The test doesn't work now we've switched to Laravel Prompts.");
-
         $this->assertEmpty(User::all());
 
         $this->artisan('statamic:make:user')
@@ -62,8 +60,6 @@ class MakeUserTest extends TestCase
     /** @test */
     public function it_can_make_a_non_super_user_interactively()
     {
-        $this->markTestSkipped("The test doesn't work now we've switched to Laravel Prompts.");
-
         $this->assertEmpty(User::all());
 
         $this->artisan('statamic:make:user')
