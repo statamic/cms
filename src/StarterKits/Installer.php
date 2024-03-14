@@ -7,6 +7,7 @@ use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
+use Laravel\Prompts\Prompt;
 use Statamic\Console\NullConsole;
 use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
@@ -15,6 +16,8 @@ use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
+
+use function Laravel\Prompts\confirm;
 
 final class Installer
 {
@@ -91,6 +94,13 @@ final class Installer
     public function withoutDependencies($withoutDependencies = false)
     {
         $this->withoutDependencies = $withoutDependencies;
+
+        return $this;
+    }
+
+    public function isInteractive($isInteractive = false)
+    {
+        Prompt::interactive($isInteractive);
 
         return $this;
     }
@@ -481,7 +491,7 @@ final class Installer
             return $this;
         }
 
-        if ($this->console->confirm('Create a super user?', false)) {
+        if (confirm('Create a super user?', false)) {
             $this->console->call('make:user', ['--super' => true]);
         }
 

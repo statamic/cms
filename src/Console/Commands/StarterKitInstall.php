@@ -62,7 +62,8 @@ class StarterKitInstall extends Command
             ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
-            ->withUser($cleared && $this->input->isInteractive() && ! $this->option('cli-install'))
+            ->isInteractive($isInteractive = $this->input->isInteractive())
+            ->withUser($cleared && $isInteractive && ! $this->option('cli-install'))
             ->usingSubProcess($this->option('cli-install'))
             ->force($this->option('force'));
 
