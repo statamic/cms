@@ -47,8 +47,7 @@ class UserLoginRequest extends FormRequest
 
         $errorResponse = $this->has('_error_redirect') ? redirect($this->input('_error_redirect')) : back();
 
-        throw (new ValidationException($validator, $errorResponse->withInput()->withErrors(__('Invalid credentials.'))))
-            ->errorBag($this->errorBag);
+        throw (new ValidationException($validator, $errorResponse->withInput()->withErrors(__('Invalid credentials.'), 'user.login')));
     }
 
     public function validateResolved()
