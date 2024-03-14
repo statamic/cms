@@ -35,6 +35,8 @@ class AssetsMeta extends Command
             },
             hint: 'This may take a while if you have a lot of assets.'
         );
+
+        $this->components->info("Generated metadata for {$assets->count()} " . str_plural('asset', $assets->count()) . '.');
     }
 
     /**
