@@ -15,6 +15,7 @@ use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
+use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
 use Stringy\StaticStringy;
 
@@ -35,6 +36,7 @@ class Statamic
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
+    private static $isApiRouteCache;
 
     public static function version()
     {
@@ -211,13 +213,22 @@ class Statamic
         return $route;
     }
 
+    public static function clearApiRouteCache()
+    {
+        self::$isApiRouteCache = null;
+    }
+
     public static function isApiRoute()
     {
-        if (! config('statamic.api.enabled') || ! static::pro()) {
-            return false;
+        if (self::$isApiRouteCache !== null) {
+            return self::$isApiRouteCache;
         }
 
-        return starts_with(request()->path(), config('statamic.api.route'));
+        if (! config('statamic.api.enabled') || ! static::pro()) {
+            return self::$isApiRouteCache = false;
+        }
+
+        return self::$isApiRouteCache = starts_with(request()->path(), config('statamic.api.route'));
     }
 
     public static function apiRoute($route, $params = [])
@@ -460,5 +471,15 @@ class Statamic
 
             return $path;
         });
+    }
+
+    public static function cpLocale(): string
+    {
+        return config('app.locale');
+    }
+
+    public static function cpDirection()
+    {
+        return TextDirection::of(static::cpLocale());
     }
 }

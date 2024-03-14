@@ -78,16 +78,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
 
-      - name: Install Laravel 11
-        uses: nick-invision/retry@v2
-        if: steps.should-run-tests.outputs.result == 'true' && matrix.laravel == '11.*'
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: |
-            composer config minimum-stability dev
-            composer config prefer-stable true
-
       - name: Install dependencies
         uses: nick-invision/retry@v2
         if: steps.should-run-tests.outputs.result == 'true'
