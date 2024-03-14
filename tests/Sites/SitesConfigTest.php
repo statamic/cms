@@ -73,7 +73,6 @@ class SitesConfigTest extends TestCase
         $this->assertSame('/', Site::default()->url());
         $this->assertSame('en_US', Site::default()->locale());
         $this->assertSame('en', Site::default()->lang());
-
     }
 
     /** @test */
@@ -113,6 +112,38 @@ class SitesConfigTest extends TestCase
         $this->assertSame('ar', Site::get('arabic')->lang());
         $this->assertSame('rtl', Site::get('arabic')->direction());
         $this->assertSame(['theme' => 'standard'], Site::get('arabic')->attributes());
+    }
+
+    /** @test */
+    public function it_resolves_antlers_when_resolving_sites()
+    {
+        Config::set('app', [
+            'name' => 'English Resolved',
+            'url' => '/resolved',
+            'faker_locale' => 'xx_XX',
+            'locale' => 'xx',
+        ]);
+
+        Config::set('statamic.some_addon.theme', 'sunset');
+
+        Site::setSites([
+            'default' => [
+                'name' => '{{ config:app:name }}',
+                'url' => '{{ config:app:url }}',
+                'locale' => '{{ config:app:faker_locale }}',
+                'lang' => '{{ config:app:locale }}',
+                'attributes' => [
+                    'theme' => '{{ config:statamic:some_addon:theme }}',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('default', Site::default()->handle());
+        $this->assertSame('English Resolved', Site::default()->name());
+        $this->assertSame('/resolved', Site::default()->url());
+        $this->assertSame('xx_XX', Site::default()->locale());
+        $this->assertSame('xx', Site::default()->lang());
+        $this->assertSame(['theme' => 'sunset'], Site::default()->attributes());
     }
 
     /** @test */
@@ -172,6 +203,84 @@ class SitesConfigTest extends TestCase
                 'direction' => 'rtl',
                 'attributes' => [
                     'theme' => 'standard',
+                ],
+            ],
+        ];
+
+        $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
+    }
+
+    /** @test */
+    public function it_saves_single_site_back_to_yaml_with_unresolved_antlers()
+    {
+        Site::setSites([
+            'default' => [
+                'name' => '{{ config:app:name }}',
+                'url' => '{{ config:app:url }}',
+                'locale' => '{{ config:app:faker_locale }}',
+                'lang' => '{{ config:app:locale }}',
+                'attributes' => [
+                    'theme' => '{{ config:statamic:some_addon:theme }}',
+                ],
+            ],
+        ])->save();
+
+        $expected = [
+            'default' => [
+                'name' => '{{ config:app:name }}',
+                'url' => '{{ config:app:url }}',
+                'locale' => '{{ config:app:faker_locale }}',
+                'lang' => '{{ config:app:locale }}',
+                'attributes' => [
+                    'theme' => '{{ config:statamic:some_addon:theme }}',
+                ],
+            ],
+        ];
+
+        $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
+    }
+
+    /** @test */
+    public function it_saves_multiple_sites_back_to_yaml_with_unresolved_antlers()
+    {
+        Site::setSites([
+            'default' => [
+                'name' => '{{ config:app:name }}',
+                'url' => '{{ config:app:url }}',
+                'locale' => '{{ config:app:faker_locale }}',
+                'lang' => '{{ config:app:locale }}',
+                'attributes' => [
+                    'theme' => '{{ config:statamic:some_addon:theme }}',
+                ],
+            ],
+            'arabic' => [
+                'name' => '{{ config:app:name }}',
+                'url' => '{{ config:app:url }}',
+                'locale' => '{{ config:app:faker_locale }}',
+                'lang' => '{{ config:app:locale }}',
+                'attributes' => [
+                    'theme' => '{{ config:statamic:some_addon:theme }}',
+                ],
+            ],
+        ])->save();
+
+        $expected = [
+            'default' => [
+                'name' => '{{ config:app:name }}',
+                'url' => '{{ config:app:url }}',
+                'locale' => '{{ config:app:faker_locale }}',
+                'lang' => '{{ config:app:locale }}',
+                'attributes' => [
+                    'theme' => '{{ config:statamic:some_addon:theme }}',
+                ],
+            ],
+            'arabic' => [
+                'name' => '{{ config:app:name }}',
+                'url' => '{{ config:app:url }}',
+                'locale' => '{{ config:app:faker_locale }}',
+                'lang' => '{{ config:app:locale }}',
+                'attributes' => [
+                    'theme' => '{{ config:statamic:some_addon:theme }}',
                 ],
             ],
         ];
