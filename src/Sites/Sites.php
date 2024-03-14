@@ -119,8 +119,8 @@ class Sites
         $default = [
             'default' => [
                 'name' => config('app.name'),
-                'locale' => 'en_US',
                 'url' => '/',
+                'locale' => 'en_US',
             ],
         ];
 

@@ -24,13 +24,13 @@ class SitesConfigTest extends TestCase
         File::put($this->yamlPath = base_path('content/sites.yaml'), YAML::dump([
             'english' => [
                 'name' => 'English',
-                'locale' => 'en_US',
                 'url' => '/',
+                'locale' => 'en_US',
             ],
             'french' => [
                 'name' => 'French',
-                'locale' => 'fr_FR',
                 'url' => '/fr/',
+                'locale' => 'fr_FR',
             ],
         ]));
 
@@ -45,15 +45,15 @@ class SitesConfigTest extends TestCase
 
         $this->assertSame('english', Site::default()->handle());
         $this->assertSame('English', Site::default()->name());
+        $this->assertSame('/', Site::default()->url());
         $this->assertSame('en_US', Site::default()->locale());
         $this->assertSame('en', Site::default()->lang());
-        $this->assertSame('/', Site::default()->url());
 
         $this->assertSame('french', Site::get('french')->handle());
         $this->assertSame('French', Site::get('french')->name());
+        $this->assertSame('/fr', Site::get('french')->url());
         $this->assertSame('fr_FR', Site::get('french')->locale());
         $this->assertSame('fr', Site::get('french')->lang());
-        $this->assertSame('/fr', Site::get('french')->url());
     }
 
     /** @test */
@@ -70,9 +70,9 @@ class SitesConfigTest extends TestCase
 
         $this->assertSame('default', Site::default()->handle());
         $this->assertSame(config('app.name'), Site::default()->name());
+        $this->assertSame('/', Site::default()->url());
         $this->assertSame('en_US', Site::default()->locale());
         $this->assertSame('en', Site::default()->lang());
-        $this->assertSame('/', Site::default()->url());
 
     }
 
@@ -82,15 +82,14 @@ class SitesConfigTest extends TestCase
         Site::setSites([
             'default' => [
                 'name' => 'English',
-                'locale' => 'en_US',
                 'url' => '/',
+                'locale' => 'en_US',
+                'lang' => 'slang', // testing custom lang string, because it auto-sets itself off locale
             ],
             'arabic' => [
                 'name' => 'Arabic (Egypt)',
                 'url' => '/ar/',
                 'locale' => 'ar_EG',
-                'lang' => 'arabic', // testing custom lang string, because it auto-sets off locale too
-                'direction' => 'rtl', // by default, `ltr` should be saved
                 'attributes' => [
                     'theme' => 'standard',
                 ],
@@ -101,18 +100,18 @@ class SitesConfigTest extends TestCase
 
         $this->assertSame('default', Site::get('default')->handle());
         $this->assertSame('English', Site::get('default')->name());
-        $this->assertSame('en_US', Site::get('default')->locale());
-        $this->assertSame('en', Site::get('default')->lang());
-        $this->assertSame('ltr', Site::get('default')->direction());
         $this->assertSame('/', Site::get('default')->url());
+        $this->assertSame('en_US', Site::get('default')->locale());
+        $this->assertSame('slang', Site::get('default')->lang());
+        $this->assertSame('ltr', Site::get('default')->direction());
         $this->assertSame([], Site::get('default')->attributes());
 
         $this->assertSame('arabic', Site::get('arabic')->handle());
         $this->assertSame('Arabic (Egypt)', Site::get('arabic')->name());
-        $this->assertSame('ar_EG', Site::get('arabic')->locale());
-        $this->assertSame('arabic', Site::get('arabic')->lang());
-        $this->assertSame('rtl', Site::get('arabic')->direction());
         $this->assertSame('/ar', Site::get('arabic')->url());
+        $this->assertSame('ar_EG', Site::get('arabic')->locale());
+        $this->assertSame('ar', Site::get('arabic')->lang());
+        $this->assertSame('rtl', Site::get('arabic')->direction());
         $this->assertSame(['theme' => 'standard'], Site::get('arabic')->attributes());
     }
 
@@ -122,19 +121,16 @@ class SitesConfigTest extends TestCase
         Site::setSites([
             'default' => [
                 'name' => 'English',
-                'locale' => 'en_US',
                 'url' => '/',
+                'locale' => 'en_US',
             ],
         ])->save();
 
         $expected = [
             'default' => [
                 'name' => 'English',
-                'locale' => 'en_US',
                 'url' => '/',
-                'lang' => 'en',
-                'direction' => 'ltr',
-                'attributes' => [],
+                'locale' => 'en_US',
             ],
         ];
 
@@ -147,14 +143,14 @@ class SitesConfigTest extends TestCase
         Site::setSites([
             'default' => [
                 'name' => 'English',
-                'locale' => 'en_US',
                 'url' => '/',
+                'locale' => 'en_US',
             ],
             'arabic' => [
                 'name' => 'Arabic (Egypt)',
                 'url' => '/ar/',
                 'locale' => 'ar_EG',
-                'lang' => 'arabic', // testing custom lang string, because it auto-sets off locale too
+                'lang' => 'arabic', // testing custom lang string, because it auto-sets itself off locale
                 'direction' => 'rtl', // by default, `ltr` should be saved
                 'attributes' => [
                     'theme' => 'standard',
@@ -165,16 +161,13 @@ class SitesConfigTest extends TestCase
         $expected = [
             'default' => [
                 'name' => 'English',
-                'locale' => 'en_US',
                 'url' => '/',
-                'lang' => 'en',
-                'direction' => 'ltr',
-                'attributes' => [],
+                'locale' => 'en_US',
             ],
             'arabic' => [
                 'name' => 'Arabic (Egypt)',
+                'url' => '/ar/',
                 'locale' => 'ar_EG',
-                'url' => '/ar',
                 'lang' => 'arabic',
                 'direction' => 'rtl',
                 'attributes' => [
@@ -194,19 +187,16 @@ class SitesConfigTest extends TestCase
             ->patchJson(cp_route('sites.update'), [
                 'name' => 'English',
                 'handle' => 'default',
-                'locale' => 'en_US',
                 'url' => '/',
+                'locale' => 'en_US',
             ])
             ->assertSuccessful();
 
         $expected = [
             'default' => [
                 'name' => 'English',
-                'locale' => 'en_US',
                 'url' => '/',
-                'lang' => 'en',
-                'direction' => 'ltr',
-                'attributes' => [],
+                'locale' => 'en_US',
             ],
         ];
 
@@ -224,17 +214,19 @@ class SitesConfigTest extends TestCase
             ->patchJson(cp_route('sites.update'), [
                 'sites' => [
                     [
+                        'id' => 'abcde', // grid fieldtypes submit id, that should get stripped out
                         'name' => 'English',
                         'handle' => 'default',
-                        'locale' => 'en_US',
                         'url' => '/',
+                        'locale' => 'en_US',
+                        'lang' => 'slang', // testing custom lang string, because it auto-sets itself off locale
                     ],
                     [
+                        'id' => 'fghijk', // grid fieldtypes submit id, that should get stripped out
                         'name' => 'Arabic (Egypt)',
                         'handle' => 'arabic',
                         'url' => '/ar/',
                         'locale' => 'ar_EG',
-                        'lang' => 'arabic', // testing custom lang string, because it auto-sets off locale too
                         'direction' => 'rtl', // by default, `ltr` should be saved
                         'attributes' => [
                             'theme' => 'standard',
@@ -247,17 +239,14 @@ class SitesConfigTest extends TestCase
         $expected = [
             'default' => [
                 'name' => 'English',
-                'locale' => 'en_US',
                 'url' => '/',
-                'lang' => 'en',
-                'direction' => 'ltr',
-                'attributes' => [],
+                'locale' => 'en_US',
+                'lang' => 'slang',
             ],
             'arabic' => [
                 'name' => 'Arabic (Egypt)',
+                'url' => '/ar/',
                 'locale' => 'ar_EG',
-                'url' => '/ar',
-                'lang' => 'arabic',
                 'direction' => 'rtl',
                 'attributes' => [
                     'theme' => 'standard',

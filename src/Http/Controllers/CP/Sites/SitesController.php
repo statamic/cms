@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP\Sites;
 use Illuminate\Http\Request;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Support\Arr;
 
 class SitesController extends CpController
 {
@@ -47,13 +46,18 @@ class SitesController extends CpController
             ->values()
             ->all();
 
-        // Normalize form values, since we always want array of sites keyed by handle
-        $values = collect(config('statamic.sites.enabled') ? $values['sites'] : [$values])
+        // Normalize form values to sites config, since we always want array of sites keyed by handle, etc.
+        $sites = collect(config('statamic.sites.enabled') ? $values['sites'] : [$values])
             ->keyBy('handle')
-            ->transform(fn ($site) => Arr::except($site, 'handle'))
+            ->transform(function ($site) {
+                return collect($site)
+                    ->except(['id', 'handle'])
+                    ->filter()
+                    ->all();
+            })
             ->all();
 
-        Site::setSites($values)->save();
+        Site::setSites($sites)->save();
 
         return response('', 204);
     }

@@ -43,8 +43,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         File::put(base_path('content/sites.yaml'), YAML::dump([
             'en' => [
                 'name' => 'English',
-                'locale' => 'en_US',
                 'url' => 'http://localhost/',
+                'locale' => 'en_US',
             ],
         ]));
     }
