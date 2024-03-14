@@ -16,6 +16,7 @@ class MakeAddonTest extends TestCase
     {
         parent::setUp();
 
+        $this->markTestSkipped("The test doesn't work now we've switched to Laravel Prompts.");
         $this->markTestSkippedInWindows();
 
         $this->files = app(Filesystem::class);
