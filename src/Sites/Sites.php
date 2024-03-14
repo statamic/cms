@@ -169,22 +169,14 @@ class Sites
                 'field' => [
                     'type' => 'text',
                     'required' => true,
-                    'width' => 33,
+                    'width' => 50,
                 ],
             ],
             [
                 'handle' => 'lang',
                 'field' => [
                     'type' => 'text',
-                    'width' => 33,
-                ],
-            ],
-            [
-                'handle' => 'direction',
-                'field' => [
-                    'type' => 'select',
-                    'options' => ['ltr', 'rtl'],
-                    'width' => 33,
+                    'width' => 50,
                 ],
             ],
             [
