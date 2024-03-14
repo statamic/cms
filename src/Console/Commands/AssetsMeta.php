@@ -21,6 +21,10 @@ class AssetsMeta extends Command
     {
         $assets = $this->getAssets();
 
+        if ($assets->isEmpty()) {
+            return $this->components->warn("There's no metadata to generate. You don't have any assets.");
+        }
+
         progress(
             label: 'Generating asset metadata...',
             steps: $assets,
