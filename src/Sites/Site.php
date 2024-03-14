@@ -5,6 +5,7 @@ namespace Statamic\Sites;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Support\Str;
+use Statamic\Support\TextDirection;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 
 class Site implements Augmentable
@@ -61,7 +62,7 @@ class Site implements Augmentable
 
     public function direction()
     {
-        return $this->config['direction'] ?? 'ltr';
+        return TextDirection::of($this->lang());
     }
 
     public function attributes()
