@@ -15,6 +15,7 @@ use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
+use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
 use Stringy\StaticStringy;
 
@@ -479,8 +480,6 @@ class Statamic
 
     public static function cpDirection()
     {
-        $rtl = ['ar', 'fa', 'he', 'ps', 'ur'];
-
-        return in_array(static::cpLocale(), $rtl) ? 'rtl' : 'ltr';
+        return TextDirection::of(static::cpLocale());
     }
 }
