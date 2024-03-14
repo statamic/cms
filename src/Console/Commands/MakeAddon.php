@@ -211,7 +211,7 @@ class MakeAddon extends GeneratorCommand
                 } catch (ProcessException $exception) {
                     $this->components->error("An error was encountered while installing your addon's Composer dependencies.");
                     $this->line($exception->getMessage());
-                    // exit(1);
+                    exit(1);
                 }
             },
             "Installing your addon's Composer dependencies..."
@@ -259,7 +259,7 @@ class MakeAddon extends GeneratorCommand
                 } catch (ProcessException $exception) {
                     $this->components->error('An error was encountered while installing your addon.');
                     $this->line($exception->getMessage());
-                    // exit(1);
+                    exit(1);
                 }
             },
             'Installing your addon with Composer...'
