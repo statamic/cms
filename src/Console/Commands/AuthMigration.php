@@ -43,7 +43,7 @@ class AuthMigration extends Command
 
         File::put($to, $contents);
 
-        $this->components->info('Users migration created successfully.');
+        $this->components->info("Migration [$file] created successfully.");
 
         $this->createGroupsTable();
         $this->createRolesTable();
@@ -67,7 +67,7 @@ class AuthMigration extends Command
 
         File::put($to, $contents);
 
-        $this->components->info('Groups migration created successfully.');
+        $this->components->info("Migration [$file] created successfully.");
     }
 
     private function createRolesTable()
@@ -86,6 +86,6 @@ class AuthMigration extends Command
 
         File::put($to, $contents);
 
-        $this->components->info('Roles migration created successfully.');
+        $this->components->info("Migration [$file] created successfully.");
     }
 }
