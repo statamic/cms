@@ -3,7 +3,6 @@
 namespace Tests\Console\Commands;
 
 use Illuminate\Filesystem\Filesystem;
-use Statamic\Console\Commands\MakeUser;
 use Statamic\Facades\User;
 use Tests\TestCase;
 
