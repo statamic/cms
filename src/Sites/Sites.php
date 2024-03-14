@@ -205,13 +205,8 @@ class Sites
             ];
         }
 
-        return Blueprint::make('sites')->setContents([
-            'sections' => [
-                [
-                    'display' => __('Sites'),
-                    'fields' => $siteFields,
-                ],
-            ],
+        return Blueprint::make()->setContents([
+            'fields' => $siteFields,
         ]);
     }
 
