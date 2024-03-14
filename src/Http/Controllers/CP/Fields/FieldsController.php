@@ -68,7 +68,7 @@ class FieldsController extends CpController
             'handle' => [
                 function ($attribute, $value, $fail) use ($request) {
                     $existingFieldWithHandle = collect($request->fields ?? [])
-                        ->when($request->id, fn ($collection) => $collection->reject(fn ($field) => $field['_id'] === $request->id))
+                        ->when($request->has('id'), fn ($collection) => $collection->reject(fn ($field) => $field['_id'] === $request->id))
                         ->flatMap(function (array $field) {
                             if ($field['type'] === 'import') {
                                 return Fieldset::find($field['fieldset'])->fields()->all()->map->handle()->toArray();

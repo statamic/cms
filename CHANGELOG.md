@@ -1,5 +1,16 @@
 # Release Notes
 
+## 4.53.2 (2024-03-13)
+
+### What's improved
+- Persian translations. [#9711](https://github.com/statamic/cms/issues/9711) by @peimn
+
+### What's fixed
+- Fix "A field with a handle of X already exists" error when editing fieldsets. [#9718](https://github.com/statamic/cms/issues/9718) by @duncanmcclean
+- Fix arrow direction in RTL. [#9712](https://github.com/statamic/cms/issues/9712) by @peimn
+
+
+
 ## 4.53.1 (2024-03-12)
 
 ### What's fixed
