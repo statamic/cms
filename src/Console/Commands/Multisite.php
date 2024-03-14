@@ -19,7 +19,6 @@ use Symfony\Component\VarExporter\VarExporter;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
-use function Laravel\Prompts\spin;
 use function Laravel\Prompts\text;
 
 class Multisite extends Command
