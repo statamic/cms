@@ -71,7 +71,7 @@ class Application extends ConsoleApplication
     public static function rebindKernel(): void
     {
         if (! class_exists('App\Console\Kernel')) {
-            require_once __DIR__.'/AppKernel.php';
+            require_once __DIR__.'/app-kernel.php';
         }
 
         app()->singleton(
