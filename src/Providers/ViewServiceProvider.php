@@ -43,6 +43,7 @@ class ViewServiceProvider extends ServiceProvider
 
         $this->registerRuntimeAntlers();
         $this->registerRegexAntlers();
+        $this->registerBladeDirectives();
 
         $this->app->bind(ParserContract::class, function ($app) {
             return config('statamic.antlers.version', 'regex') === 'regex'
@@ -169,6 +170,31 @@ class ViewServiceProvider extends ServiceProvider
                 ->setRuntimeConfiguration($runtimeConfig);
 
             return $parser;
+        });
+    }
+
+    public function registerBladeDirectives()
+    {
+        Blade::directive('tags', function ($expression) {
+            return "<?php
+                foreach (Arr::wrap($expression) as \$__key => \$__value) {
+                    if (is_array(\$__value) && in_array('tag', \$__value)) {
+                        \$__tag = \$__value['tag'];
+                        \$__params = \$__value['params'] ?? [];
+                    } else if (is_array(\$__value) && count(\$__value) == 1) {
+                        \$__tag = array_keys(\$__value)[0];
+                        \$__params = array_values(\$__value)[0];
+                    } else if (is_string(\$__value)) {
+                        \$__tag = \$__value;
+                        \$__params = [];
+                    } else {
+                        continue;
+                    }
+                    \$__varName = is_string(\$__key) ? \$__key : camel_case(str_replace(':', '_', \$__tag));
+                    \${\$__varName} = Statamic::tag(\$__tag)->params(\$__params)->fetch();
+                }
+                unset(\$__tag, \$__params, \$__varName, \$__key, \$__value);
+            ?>";
         });
     }
 
