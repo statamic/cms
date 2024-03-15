@@ -77,15 +77,20 @@ class CorePreferences
             'tr' => 'Turkish',
             'zh_CN' => 'Chinese (China)',
             'zh_TW' => 'Chinese (Taiwan)',
-        ])->when(extension_loaded('intl'), fn ($locales) => $locales->map(function ($label, $locale) use ($current) {
-            $label = Locale::getDisplayName($locale, $current);
-            $native = Locale::getDisplayName($locale, $locale);
+        ])->when(extension_loaded('intl'), fn ($locales) => $locales
+            ->map(fn ($label, $locale) => [
+                'label' => Locale::getDisplayName($locale, $current),
+                'native' => Locale::getDisplayName($locale, $locale),
+            ])
+            ->sortBy('native', SORT_NATURAL | SORT_FLAG_CASE)
+            ->map(function ($item, $locale) use ($current) {
+                ['label' => $label, 'native' => $native] = $item;
 
-            if ($locale !== $current && $label !== $native) {
-                $label .= '<span class="ltr:ml-4 rtl:mr-4 text-gray-600">'.$native.'</span>';
-            }
+                if ($locale !== $current && $label !== $native) {
+                    $label .= '<span class="ltr:ml-4 rtl:mr-4 text-gray-600">'.$native.'</span>';
+                }
 
-            return $label;
-        }))->all();
+                return $label;
+            }))->all();
     }
 }
