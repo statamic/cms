@@ -15,9 +15,8 @@ use Symfony\Component\Process\PhpExecutableFinder;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
-use function Laravel\Prompts\info;
 use function Laravel\Prompts\multiselect;
-use function Laravel\Prompts\warning;
+use function Laravel\Prompts\spin;
 
 class InstallEloquentDriver extends Command
 {
@@ -45,9 +44,12 @@ class InstallEloquentDriver extends Command
     public function handle()
     {
         if (! Composer::isInstalled('statamic/eloquent-driver')) {
-            $this->info('Installing the statamic/eloquent-driver package...');
-            Composer::withoutQueue()->throwOnFailure()->require('statamic/eloquent-driver');
-            $this->checkLine('Installed statamic/eloquent-driver package');
+            spin(
+                callback: fn () => Composer::withoutQueue()->throwOnFailure()->require('statamic/eloquent-driver'),
+                message: 'Installing the statamic/eloquent-driver package...'
+            );
+
+            $this->components->info('Installed statamic/eloquent-driver package');
         }
 
         if (! File::exists(config_path('statamic/eloquent-driver.php'))) {
@@ -61,11 +63,11 @@ class InstallEloquentDriver extends Command
                     ->__toString()
             );
 
-            $this->checkLine('Config file published. You can find it at config/statamic/eloquent-driver.php');
+            $this->components->info('Config file [config/statamic/eloquent-driver.php] published successfully.');
         }
 
         if ($this->availableRepositories()->isEmpty()) {
-            return warning("No repositories left to migrate. You're already using the Eloquent Driver for all repositories.");
+            return $this->components->warn("No repositories left to migrate. You're already using the Eloquent Driver for all repositories.");
         }
 
         $repositories = multiselect(
@@ -134,183 +136,247 @@ class InstallEloquentDriver extends Command
 
     protected function migrateAssets(): void
     {
-        info('Migrating assets...');
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-asset-migrations');
+                $this->runArtisanCommand('migrate');
 
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-asset-migrations');
-        $this->runArtisanCommand('migrate');
+                $this->switchToEloquentDriver('asset_containers');
+                $this->switchToEloquentDriver('assets');
+            },
+            message: 'Migrating assets...'
+        );
 
-        $this->switchToEloquentDriver('asset_containers');
-        $this->switchToEloquentDriver('assets');
-
-        $this->checkLine('Configured assets');
+        $this->components->info('Configured assets');
 
         if (confirm('Would you like to import existing assets?')) {
-            $this->runArtisanCommand('statamic:eloquent:import-assets --force');
-            $this->checkLine('Imported existing assets');
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-assets --force'),
+                message: 'Importing existing assets...'
+            );
+
+            $this->components->info('Imported existing assets');
         }
     }
 
     protected function migrateBlueprints(): void
     {
-        info('Migrating blueprints...');
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-blueprint-migrations');
+                $this->runArtisanCommand('migrate');
 
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-blueprint-migrations');
-        $this->runArtisanCommand('migrate');
+                $this->switchToEloquentDriver('blueprints');
+            },
+            message: 'Migrating blueprints...'
+        );
 
-        $this->switchToEloquentDriver('blueprints');
-
-        $this->checkLine('Configured blueprints');
+        $this->components->info('Configured blueprints');
 
         if (confirm('Would you like to import existing blueprints?')) {
-            $this->runArtisanCommand('statamic:eloquent:import-blueprints');
-            $this->checkLine('Imported existing blueprints');
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-blueprints'),
+                message: 'Importing existing blueprints...'
+            );
+
+            $this->components->info('Imported existing blueprints');
         }
     }
 
     protected function migrateCollections(): void
     {
-        info('Migrating collections...');
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-collection-migrations');
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
 
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-collection-migrations');
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
+                $this->runArtisanCommand('migrate');
 
-        $this->runArtisanCommand('migrate');
+                $this->switchToEloquentDriver('collections');
+                $this->switchToEloquentDriver('collection_trees');
+            },
+            message: 'Migrating collections...'
+        );
 
-        $this->switchToEloquentDriver('collections');
-        $this->switchToEloquentDriver('collection_trees');
-
-        $this->checkLine('Configured collections');
+        $this->components->info('Configured collections');
 
         if (confirm('Would you like to import existing collections?')) {
-            $this->runArtisanCommand('statamic:eloquent:import-collections --force');
-            $this->checkLine('Imported existing collections');
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-collections --force'),
+                message: 'Importing existing collections...'
+            );
+
+            $this->components->info('Imported existing collections');
         }
     }
 
     protected function migrateEntries(): void
     {
-        info('Migrating entries...');
+        $shouldImportEntries = confirm('Would you like to import existing entries?');
 
-        $this->switchToEloquentDriver('entries');
+        spin(
+            callback: function () use ($shouldImportEntries) {
+                $this->switchToEloquentDriver('entries');
 
-        if (confirm('Would you like to import existing entries?')) {
-            File::put(
-                config_path('statamic/eloquent-driver.php'),
-                Str::of(File::get(config_path('statamic/eloquent-driver.php')))
-                    ->replace("'model'  => \Statamic\Eloquent\Entries\EntryModel::class", "'model'  => \Statamic\Eloquent\Entries\UuidEntryModel::class")
-                    ->__toString()
-            );
+                if ($shouldImportEntries) {
+                    File::put(
+                        config_path('statamic/eloquent-driver.php'),
+                        Str::of(File::get(config_path('statamic/eloquent-driver.php')))
+                            ->replace("'model'  => \Statamic\Eloquent\Entries\EntryModel::class", "'model'  => \Statamic\Eloquent\Entries\UuidEntryModel::class")
+                            ->__toString()
+                    );
 
-            $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-entries-table-with-string-ids');
-            $this->runArtisanCommand('migrate');
+                    $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-entries-table-with-string-ids');
+                    $this->runArtisanCommand('migrate');
 
-            $this->runArtisanCommand('statamic:eloquent:import-entries');
+                    $this->runArtisanCommand('statamic:eloquent:import-entries');
 
-            $this->checkLine('Configured & imported existing entries');
+                    return;
+                }
 
-            return;
-        }
+                if (File::exists(base_path('content/collections/pages/home.md'))) {
+                    File::delete(base_path('content/collections/pages/home.md'));
+                }
 
-        if (File::exists(base_path('content/collections/pages/home.md'))) {
-            File::delete(base_path('content/collections/pages/home.md'));
-        }
+                if (File::exists(base_path('content/trees/collections/pages.yaml'))) {
+                    File::put(base_path('content/trees/collections/pages.yaml'), 'tree: {}');
+                }
 
-        if (File::exists(base_path('content/trees/collections/pages.yaml'))) {
-            File::put(base_path('content/trees/collections/pages.yaml'), 'tree: {}');
-        }
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-entries-table');
+                $this->runArtisanCommand('migrate');
+            },
+            message: $shouldImportEntries
+                ? 'Migrating entries...'
+                : 'Migrating and importing entries...'
+        );
 
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-entries-table');
-        $this->runArtisanCommand('migrate');
-
-        $this->checkLine('Configured entries');
+        $this->components->info(
+            $shouldImportEntries
+                ? 'Configured & imported existing entries'
+                : 'Configured entries'
+        );
     }
 
     protected function migrateForms(): void
     {
-        info('Migrating forms...');
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-form-migrations');
+                $this->runArtisanCommand('migrate');
 
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-form-migrations');
-        $this->runArtisanCommand('migrate');
+                $this->switchToEloquentDriver('forms');
+            },
+            message: 'Migrating forms...'
+        );
 
-        $this->switchToEloquentDriver('forms');
-
-        $this->checkLine('Configured forms');
+        $this->components->info('Configured forms');
 
         if (confirm('Would you like to import existing forms?')) {
-            $this->runArtisanCommand('statamic:eloquent:import-forms');
-            $this->checkLine('Imported existing forms');
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-forms'),
+                message: 'Importing existing forms...'
+            );
+
+            $this->components->info('Imported existing forms');
         }
     }
 
     protected function migrateGlobals(): void
     {
-        info('Migrating globals...');
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-global-migrations');
+                $this->runArtisanCommand('migrate');
 
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-global-migrations');
-        $this->runArtisanCommand('migrate');
+                $this->switchToEloquentDriver('global_sets');
+                $this->switchToEloquentDriver('global_set_variables');
+            },
+            message: 'Migrating globals...'
+        );
 
-        $this->switchToEloquentDriver('global_sets');
-        $this->switchToEloquentDriver('global_set_variables');
-
-        $this->checkLine('Configured globals');
+        $this->components->info('Configured globals');
 
         if (confirm('Would you like to import existing globals?')) {
-            $this->runArtisanCommand('statamic:eloquent:import-globals');
-            $this->checkLine('Imported existing globals');
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-globals'),
+                message: 'Importing existing global variables...'
+            );
+
+            $this->components->info('Imported existing globals');
         }
     }
 
     protected function migrateNavs(): void
     {
-        info('Migrating navs...');
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
 
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
+                $this->runArtisanCommand('migrate');
 
-        $this->runArtisanCommand('migrate');
+                $this->switchToEloquentDriver('navigations');
+                $this->switchToEloquentDriver('navigation_trees');
+            },
+            message: 'Migrating navs...'
+        );
 
-        $this->switchToEloquentDriver('navigations');
-        $this->switchToEloquentDriver('navigation_trees');
-
-        $this->checkLine('Configured navs');
+        $this->components->info('Configured navs');
 
         if (confirm('Would you like to import existing navs?')) {
-            $this->runArtisanCommand('statamic:eloquent:import-navs --force');
-            $this->checkLine('Imported existing navs');
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-navs --force'),
+                message: 'Importing existing navs...'
+            );
+
+            $this->components->info('Imported existing navs');
         }
     }
 
     protected function migrateRevisions(): void
     {
-        info('Migrating revisions...');
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-revision-migrations');
+                $this->runArtisanCommand('migrate');
 
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-revision-migrations');
-        $this->runArtisanCommand('migrate');
+                $this->switchToEloquentDriver('revisions');
+            },
+        );
 
-        $this->switchToEloquentDriver('revisions');
-
-        $this->checkLine('Configured revisions');
+        $this->components->info('Configured revisions');
 
         if (confirm('Would you like to import existing revisions?')) {
-            $this->runArtisanCommand('statamic:eloquent:import-revisions');
-            $this->checkLine('Imported existing revisions');
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-revisions'),
+                message: 'Importing existing revisions...'
+            );
+
+            $this->components->info('Imported existing revisions');
         }
     }
 
     protected function migrateTaxonomies(): void
     {
-        info('Migrating taxonomies...');
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-taxonomy-migrations');
+                $this->runArtisanCommand('migrate');
 
-        $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-taxonomy-migrations');
-        $this->runArtisanCommand('migrate');
+                $this->switchToEloquentDriver('taxonomies');
+                $this->switchToEloquentDriver('terms');
+            },
+            message: 'Migrating taxonomies...'
+        );
 
-        $this->switchToEloquentDriver('taxonomies');
-        $this->switchToEloquentDriver('terms');
-
-        $this->checkLine('Configured taxonomies');
+        $this->components->info('Configured taxonomies');
 
         if (confirm('Would you like to import existing taxonomies?')) {
-            $this->runArtisanCommand('statamic:eloquent:import-taxonomies --force');
-            $this->checkLine('Imported existing taxonomies');
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-taxonomies --force'),
+                message: 'Importing existing taxonomies...'
+            );
+
+            $this->components->info('Imported existing taxonomies');
         }
     }
 
