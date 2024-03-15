@@ -14,6 +14,7 @@ class CorePreferences
             'instructions' => __('statamic::messages.preference_locale_instructions'),
             'clearable' => true,
             'options' => [
+                'cs' => 'Czech',
                 'da' => 'Danish',
                 'de' => 'German',
                 'de_CH' => 'German (Switzerland)',
@@ -24,6 +25,7 @@ class CorePreferences
                 'hu' => 'Hungarian',
                 'id' => 'Indonesian',
                 'it' => 'Italian',
+                'ja' => 'Japanese',
                 'ms' => 'Malay',
                 'nb' => 'Norwegian',
                 'nl' => 'Dutch',
