@@ -51,6 +51,26 @@ export default {
                 ? __('Configure Sites')
                 : __('Configure Site');
         },
+
+        initialSiteHandles() {
+            return this.$config.get('multisiteEnabled')
+                ? this.initialValues.sites.map(site => site.handle)
+                : [this.initialValues.handle];
+        },
+
+        currentSiteHandles() {
+            return this.$config.get('multisiteEnabled')
+                ? this.values.sites.map(site => site.handle)
+                : [this.values.handle];
+        },
+
+        initialHandleChanged() {
+            return this.initialSiteHandles.filter(handle => ! this.currentSiteHandles.includes(handle)).length > 0;
+        },
+
+        initialHandleChangedWarning() {
+            return __('Warning! Changing a site handle may break existing site content!');
+        },
     },
 
     methods: {
@@ -61,6 +81,10 @@ export default {
         },
 
         submit() {
+            if (this.initialHandleChanged && ! confirm(this.initialHandleChangedWarning)) {
+                return;
+            }
+
             this.saving = true;
             this.clearErrors();
 
