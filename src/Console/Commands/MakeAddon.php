@@ -74,7 +74,7 @@ class MakeAddon extends GeneratorCommand
         $this->normalizePackage();
 
         if (! $this->option('force') && $this->addonAlreadyExists()) {
-            $this->error('Addon already exists!');
+            $this->components->error('Addon already exists!');
 
             return;
         }
@@ -82,9 +82,13 @@ class MakeAddon extends GeneratorCommand
         try {
             $this
                 ->generateAddonFiles()
-                ->installAddon()
-                ->generateOptional()
-                ->installComposerDependencies();
+                ->generateOptional();
+
+            $this->components->info('Addon files created.');
+
+            $this
+                ->installComposerDependencies()
+                ->installAddon();
         } catch (\Exception $e) {
             $this->components->error($e->getMessage());
 
@@ -141,31 +145,26 @@ class MakeAddon extends GeneratorCommand
      */
     protected function generateAddonFiles()
     {
-        spin(
-            function () {
-                $this->generateComposerJson();
+        $this->generateComposerJson();
 
-                $files = [
-                    'addon/provider.php.stub' => 'src/ServiceProvider.php',
-                    'addon/TestCase.php.stub' => 'tests/TestCase.php',
-                    'addon/ExampleTest.php.stub' => 'tests/ExampleTest.php',
-                    'addon/.gitignore.stub' => '.gitignore',
-                    'addon/README.md.stub' => 'README.md',
-                    'addon/phpunit.xml.stub' => 'phpunit.xml',
-                ];
+        $files = [
+            'addon/provider.php.stub' => 'src/ServiceProvider.php',
+            'addon/TestCase.php.stub' => 'tests/TestCase.php',
+            'addon/ExampleTest.php.stub' => 'tests/ExampleTest.php',
+            'addon/.gitignore.stub' => '.gitignore',
+            'addon/README.md.stub' => 'README.md',
+            'addon/phpunit.xml.stub' => 'phpunit.xml',
+        ];
 
-                $data = [
-                    'name' => $this->addonTitle(),
-                    'package' => $this->package,
-                    'namespace' => $this->addonNamespace(),
-                ];
+        $data = [
+            'name' => $this->addonTitle(),
+            'package' => $this->package,
+            'namespace' => $this->addonNamespace(),
+        ];
 
-                foreach ($files as $stub => $file) {
-                    $this->createFromStub($stub, $this->addonPath($file), $data);
-                }
-            },
-            'Creating addon...'
-        );
+        foreach ($files as $stub => $file) {
+            $this->createFromStub($stub, $this->addonPath($file), $data);
+        }
 
         return $this;
     }
@@ -186,14 +185,9 @@ class MakeAddon extends GeneratorCommand
             return $this;
         }
 
-        $this->output->newLine();
-        $this->line('Generating additional addon components...');
-
         $optional->each(function ($type) {
             $this->runOptionalAddonGenerator($type);
         });
-
-        $this->checkInfo('Additional components created successfully.');
 
         return $this;
     }
@@ -217,6 +211,11 @@ class MakeAddon extends GeneratorCommand
             "Installing your addon's Composer dependencies..."
         );
 
+        $this->components->info('Composer dependencies installed.');
+        $this->components->bulletList([
+            'This allows you to run tests from within the addon directory.',
+        ]);
+
         return $this;
     }
 
@@ -238,7 +237,11 @@ class MakeAddon extends GeneratorCommand
 
         $this->files->put(base_path('composer.json'), $json);
 
-        $this->info("Repository added to your application's composer.json successfully.");
+        $this->components->info("Repository added to your app's composer.json.");
+        $this->components->bulletList([
+            'This allows Composer to reference your addon locally during development.',
+            'When you publish your package, you should remove this from your composer.json file.',
+        ]);
 
         return $this;
     }
@@ -250,20 +253,21 @@ class MakeAddon extends GeneratorCommand
      */
     protected function installAddon()
     {
+        $this->addRepositoryPath();
+
         spin(
             function () {
-                $this->addRepositoryPath();
-
                 try {
                     Composer::withoutQueue()->throwOnFailure()->require($this->package);
                 } catch (ProcessException $exception) {
-                    $this->newLine();
                     $this->line($exception->getMessage());
                     throw new \Exception('An error was encountered while installing your addon.');
                 }
             },
             'Installing your addon with Composer...'
         );
+
+        $this->components->info('Addon installed into your app via Composer.');
 
         return $this;
     }
@@ -290,7 +294,7 @@ class MakeAddon extends GeneratorCommand
             $arguments['--force'] = true;
         }
 
-        $this->call("{$prefix}make:{$type}", $arguments);
+        $this->callSilent("{$prefix}make:{$type}", $arguments);
     }
 
     /**
