@@ -96,9 +96,9 @@ class MakeAddon extends GeneratorCommand
         $this->components->info('Your addon is ready! 🎉');
 
         $this->components->bulletList([
-            "You find your addon in <comment>{$relativePath}</comment>",
+            "You can find your addon in <comment>{$relativePath}</comment>",
             'Learn how to build addons in our docs: <comment>https://statamic.dev/extending/addons</comment>',
-            "When you're ready, setup as a seller to publish your addon on the Marketplace: <comment>https://statamic.com/sell</comment>",
+            "When you're ready, you can publish your addon to the Marketplace: <comment>https://statamic.com/sell</comment>",
         ]);
 
         $this->newLine();
