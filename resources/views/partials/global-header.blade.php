@@ -117,6 +117,7 @@
             <div class="divider"></div>
 
             <dropdown-item :text="__('Profile')" redirect="{{ route('statamic.cp.account') }}"></dropdown-item>
+            <dropdown-item :text="__('Preferences')" redirect="{{ cp_route('preferences.user.edit') }}"></dropdown-item>
             @if (session()->get('statamic_impersonated_by'))
                 <dropdown-item :text="__('Stop Impersonating')" redirect="{{ cp_route('impersonation.stop') }}"></dropdown-item>
             @endif
