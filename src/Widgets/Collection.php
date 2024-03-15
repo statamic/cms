@@ -2,6 +2,7 @@
 
 namespace Statamic\Widgets;
 
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -29,7 +30,8 @@ class Collection extends Widget
 
         [$sortColumn, $sortDirection] = $this->parseSort($collection);
 
-        $blueprint = $collection->entryBlueprint();
+        $blueprint = $collection->entryBlueprint() ?? $collection->entryBlueprints()->first();
+
         $columns = $blueprint
             ->columns()
             ->only($this->config('fields', []))
@@ -48,6 +50,8 @@ class Collection extends Widget
             'sortColumn' => $sortColumn,
             'sortDirection' => $sortDirection,
             'columns' => $columns,
+            'canCreate' => User::current()->can('create', [EntryContract::class, $collection])
+                && ! $collection->entryBlueprints()->reject->hidden()->isEmpty(),
         ]);
     }
 
