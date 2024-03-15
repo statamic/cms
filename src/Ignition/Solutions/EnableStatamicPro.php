@@ -2,7 +2,7 @@
 
 namespace Statamic\Ignition\Solutions;
 
-use Facade\IgnitionContracts\RunnableSolution;
+use Spatie\Ignition\Contracts\RunnableSolution;
 use Statamic\Statamic;
 
 class EnableStatamicPro implements RunnableSolution
