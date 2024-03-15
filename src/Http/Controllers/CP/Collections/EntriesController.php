@@ -54,7 +54,7 @@ class EntriesController extends CpController
         }
 
         return (new Entries($entries))
-            ->blueprint($collection->entryBlueprint())
+            ->blueprint($collection->entryBlueprint() ?? $collection->entryBlueprints()->first())
             ->columnPreferenceKey("collections.{$collection->handle()}.columns")
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
