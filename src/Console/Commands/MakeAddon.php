@@ -3,7 +3,6 @@
 namespace Statamic\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
-use function Laravel\Prompts\spin;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Console\RunsInPlease;
@@ -11,6 +10,8 @@ use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+
+use function Laravel\Prompts\spin;
 
 class MakeAddon extends GeneratorCommand
 {
