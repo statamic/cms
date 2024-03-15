@@ -77,7 +77,7 @@ class CorePreferences
             'tr' => 'Turkish',
             'zh_CN' => 'Chinese (China)',
             'zh_TW' => 'Chinese (Taiwan)',
-        ])->when(extension_loaded('intl'), fn ($locales) => $locales->mapWithKeys(function ($label, $locale) use ($current) {
+        ])->when(extension_loaded('intl'), fn ($locales) => $locales->map(function ($label, $locale) use ($current) {
             $label = Locale::getDisplayName($locale, $current);
             $native = Locale::getDisplayName($locale, $locale);
 
@@ -85,7 +85,7 @@ class CorePreferences
                 $label .= '<span class="ltr:ml-4 rtl:mr-4 text-gray-600">'.$native.'</span>';
             }
 
-            return [$locale => $label];
+            return $label;
         }))->all();
     }
 }
