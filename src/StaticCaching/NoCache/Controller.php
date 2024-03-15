@@ -24,6 +24,10 @@ class Controller
             $url = Str::before($url, '?').'?'.Request::normalizeQueryString(Str::after($url, '?'));
         }
 
+        if (Str::contains($url, '#')) {
+            $url = Str::before($url, '#');
+        }
+
         $session = $session->setUrl($url)->restore();
 
         $replacer = new NoCacheReplacer($session);
