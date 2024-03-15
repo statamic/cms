@@ -36,7 +36,6 @@ class Statamic
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
-    private static $isApiRouteCache;
 
     public static function version()
     {
@@ -213,22 +212,13 @@ class Statamic
         return $route;
     }
 
-    public static function clearApiRouteCache()
-    {
-        self::$isApiRouteCache = null;
-    }
-
     public static function isApiRoute()
     {
-        if (self::$isApiRouteCache !== null) {
-            return self::$isApiRouteCache;
-        }
-
         if (! config('statamic.api.enabled') || ! static::pro()) {
-            return self::$isApiRouteCache = false;
+            return false;
         }
 
-        return self::$isApiRouteCache = starts_with(request()->path(), config('statamic.api.route'));
+        return starts_with(request()->path(), config('statamic.api.route'));
     }
 
     public static function apiRoute($route, $params = [])
