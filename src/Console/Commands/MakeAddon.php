@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
+use function Laravel\Prompts\spin;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Console\RunsInPlease;
@@ -10,8 +11,6 @@ use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-
-use function Laravel\Prompts\spin;
 
 class MakeAddon extends GeneratorCommand
 {
@@ -85,7 +84,7 @@ class MakeAddon extends GeneratorCommand
                 ->generateOptional()
                 ->installComposerDependencies();
         } catch (\Exception $e) {
-            $this->error($e->getMessage());
+            $this->components->error($e->getMessage());
 
             return 1;
         }
@@ -209,9 +208,8 @@ class MakeAddon extends GeneratorCommand
                 try {
                     Composer::withoutQueue()->throwOnFailure()->install($this->addonPath());
                 } catch (ProcessException $exception) {
-                    $this->components->error("An error was encountered while installing your addon's Composer dependencies.");
                     $this->line($exception->getMessage());
-                    exit(1);
+                    throw new \Exception("An error was encountered while installing your addon's Composer dependencies.");
                 }
             },
             "Installing your addon's Composer dependencies..."
@@ -257,9 +255,9 @@ class MakeAddon extends GeneratorCommand
                 try {
                     Composer::withoutQueue()->throwOnFailure()->require($this->package);
                 } catch (ProcessException $exception) {
-                    $this->components->error('An error was encountered while installing your addon.');
+                    $this->newLine();
                     $this->line($exception->getMessage());
-                    exit(1);
+                    throw new \Exception('An error was encountered while installing your addon.');
                 }
             },
             'Installing your addon with Composer...'
