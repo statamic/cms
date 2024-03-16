@@ -20,7 +20,7 @@
                 @cp_svg('icons/light/hammer-wrench')
             </div>
             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue">{{ __('Configure Taxonomy') }} &rarr;</h3>
+                <h3 class="mb-2 text-blue">{{ __('Configure Taxonomy') }} @rarr</h3>
                 <p>{{ __('statamic::messages.taxonomy_next_steps_configure_description') }}</p>
             </div>
         </a>
@@ -29,7 +29,7 @@
                 @cp_svg('icons/light/content-writing')
             </div>
             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue">{{ __('Create Term') }} &rarr;</h3>
+                <h3 class="mb-2 text-blue">{{ __('Create Term') }} @rarr</h3>
                 <p>{{ __('statamic::messages.taxonomy_next_steps_create_term_description') }}</p>
             </div>
         </a>
@@ -38,7 +38,7 @@
                 @cp_svg('icons/light/book-pages')
             </div>
             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                <h3 class="mb-2 text-blue">{{ __('Read the Documentation') }} &rarr;</h3>
+                <h3 class="mb-2 text-blue">{{ __('Read the Documentation') }} @rarr</h3>
                 <p>{{ __('statamic::messages.taxonomy_next_steps_documentation_description') }}</p>
             </div>
         </a>

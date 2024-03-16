@@ -1,6 +1,6 @@
 @php use Statamic\Facades\Site; @endphp
 
-<div class="card p-0 overflow-hidden h-full">
+<div class="card p-0 overflow-hidden h-full flex flex-col">
     <div class="flex justify-between items-center p-4">
         <h2>
             <a class="flex items-center" href="{{ $collection->showUrl() }}">
