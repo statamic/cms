@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'czech' => 'Czech',
+    'danish' => 'Danish',
+    'german' => 'German',
+    'german_ch' => 'German (Switzerland)',
+    'english' => 'English',
+    'spanish' => 'Spanish',
+    'persian' => 'Persian',
+    'french' => 'French',
+    'hungarian' => 'Hungarian',
+    'indonesian' => 'Indonesian',
+    'italian' => 'Italian',
+    'japanese' => 'Japanese',
+    'malay' => 'Malay',
+    'norwegian' => 'Norwegian',
+    'dutch' => 'Dutch',
+    'polish' => 'Polish',
+    'portuguese' => 'Portuguese',
+    'portuguese_br' => 'Portuguese (Brazil)',
+    'russian' => 'Russian',
+    'slovenian' => 'Slovenian',
+    'swedish' => 'Swedish',
+    'turkish' => 'Turkish',
+    'chinese_cn' => 'Chinese (China)',
+    'chinese_tw' => 'Chinese (Taiwan)',
+];

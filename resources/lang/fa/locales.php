@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'czech' => 'چکی',
+    'danish' => 'دانمارکی',
+    'german' => 'آلمانی',
+    'german_ch' => 'آلمانی (سوئیس)',
+    'english' => 'انگلیسی',
+    'spanish' => 'اسپانیایی',
+    'persian' => 'فارسی',
+    'french' => 'فرانسوی',
+    'hungarian' => 'مجارستانی',
+    'indonesian' => 'اندونزیایی',
+    'italian' => 'ایتالیایی',
+    'japanese' => 'ژاپنی',
+    'malay' => 'مالایی',
+    'norwegian' => 'نروژی',
+    'dutch' => 'هلندی',
+    'polish' => 'لهستانی',
+    'portuguese' => 'پرتغالی',
+    'portuguese_br' => 'پرتغالی (برزیل)',
+    'russian' => 'روسی',
+    'slovenian' => 'اسلوونیایی',
+    'swedish' => 'سوئدی',
+    'turkish' => 'ترکی',
+    'chinese_cn' => 'چینی (چین)',
+    'chinese_tw' => 'چینی (تایوان)',
+];
