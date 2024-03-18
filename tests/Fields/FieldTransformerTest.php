@@ -210,7 +210,7 @@ class FieldTransformerTest extends TestCase
                         'instructions' => null,
                         'icon' => null,
                         'fields' => ['import' => 'seo'],
-                    ]]
+                    ]],
                 ]],
                 'instructions' => 'Some instructions',
                 'listable' => true,
@@ -230,7 +230,7 @@ class FieldTransformerTest extends TestCase
                     'sets' => ['set' => [
                         'display' => 'Set',
                         'fields' => ['import' => 'seo'],
-                    ]]
+                    ]],
                 ]],
             ],
         ], $fromVue);
@@ -247,7 +247,7 @@ class FieldTransformerTest extends TestCase
                         'instructions' => null,
                         'icon' => 'date',
                         'fields' => ['import' => 'seo'],
-                    ]]
+                    ]],
                 ]],
                 'instructions' => 'Some instructions',
                 'listable' => true,
@@ -269,7 +269,7 @@ class FieldTransformerTest extends TestCase
                         'display' => 'Set',
                         'icon' => 'date',
                         'fields' => ['import' => 'seo'],
-                    ]]
+                    ]],
                 ]],
             ],
         ], $fromVue);
