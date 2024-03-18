@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Illuminate\Support\Collection;
+use Statamic\Exceptions\FieldsetNotFoundException;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
@@ -50,6 +51,17 @@ class FieldsetRepository
         $this->fieldsets[$handle] = $fieldset;
 
         return $fieldset;
+    }
+
+    public function findOrFail($id): Fieldset
+    {
+        $blueprint = $this->find($id);
+
+        if (! $blueprint) {
+            throw new FieldsetNotFoundException($id);
+        }
+
+        return $blueprint;
     }
 
     private function standardFieldsetPath(string $handle)

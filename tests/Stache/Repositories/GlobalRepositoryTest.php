@@ -3,6 +3,7 @@
 namespace Tests\Stache\Repositories;
 
 use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Exceptions\GlobalSetNotFoundException;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Globals\GlobalCollection;
 use Statamic\Stache\Repositories\GlobalRepository;
@@ -101,5 +102,23 @@ class GlobalRepositoryTest extends TestCase
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->in('en')->data()->all());
         $this->assertFileExists($this->directory.'/new.yaml');
         @unlink($this->directory.'/new.yaml');
+    }
+
+    /** @test */
+    public function test_find_or_fail_gets_global()
+    {
+        $set = $this->repo->findOrFail('contact');
+
+        $this->assertInstanceOf(GlobalSet::class, $set);
+        $this->assertEquals('Contact Details', $set->title());
+    }
+
+    /** @test */
+    public function test_find_or_fail_throws_exception_when_global_does_not_exist()
+    {
+        $this->expectException(GlobalSetNotFoundException::class);
+        $this->expectExceptionMessage('Global Set [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }

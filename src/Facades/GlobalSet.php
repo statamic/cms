@@ -9,6 +9,7 @@ use Statamic\Contracts\Globals\GlobalRepository;
  * @method static \Statamic\Globals\GlobalCollection all()
  * @method static null|\Statamic\Globals\GlobalCollection find($id)
  * @method static null|\Statamic\Globals\GlobalCollection findByHandle($handle)
+ * @method static \Statamic\Globals\GlobalCollection findOrFail($id)
  * @method static void save($global);
  *
  * @see \Statamic\Globals\GlobalCollection

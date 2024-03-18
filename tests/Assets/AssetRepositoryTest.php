@@ -6,6 +6,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\AssetRepository;
+use Statamic\Contracts\Assets\Asset as AssetContract;
+use Statamic\Exceptions\AssetNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -78,5 +80,39 @@ EOT;
         $foundAssetLongUrl = Asset::findByUrl($assetLongUrl->url());
         $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetLongUrl);
         $this->assertEquals('test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
+    }
+
+    /** @test */
+    public function it_finds_assets_using_find_or_fail()
+    {
+        Storage::fake('disk_short', ['url' => 'test']);
+
+        $assetRepository = new AssetRepository;
+
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
+
+        Storage::disk('disk_short')->putFileAs('foo', $file, 'image_in_short.jpg');
+        $realFilePath = Storage::disk('disk_short')->path('foo/image_in_short.jpg');
+        touch($realFilePath, $timestamp = Carbon::now()->subMinutes(3)->timestamp);
+
+        $containerShortUrl = tap(AssetContainer::make('container_short')->disk('disk_short'))->save();
+        $assetShortUrl = $containerShortUrl->makeAsset('foo/image_in_short.jpg');
+        $assetRepository->save($assetShortUrl);
+
+        $asset = $assetRepository->findOrFail($assetShortUrl->id());
+
+        $this->assertInstanceOf(AssetContract::class, $asset);
+        $this->assertEquals($assetShortUrl->id(), $asset->id());
+    }
+
+    /** @test */
+    public function test_find_or_fail_throws_exception_when_asset_does_not_exist()
+    {
+        $assetRepository = new AssetRepository;
+
+        $this->expectException(AssetNotFoundException::class);
+        $this->expectExceptionMessage('Asset [does-not-exist] not found');
+
+        $assetRepository->findOrFail('does-not-exist');
     }
 }

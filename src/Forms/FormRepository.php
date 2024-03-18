@@ -6,6 +6,7 @@ use Closure;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\FormRepository as Contract;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
+use Statamic\Exceptions\FormNotFoundException;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Forms\Exporters\ExporterRepository;
@@ -29,6 +30,17 @@ class FormRepository implements Contract
         }
 
         return $form->hydrate();
+    }
+
+    public function findOrFail($handle): FormContract
+    {
+        $form = $this->find($handle);
+
+        if (! $form) {
+            throw new FormNotFoundException($handle);
+        }
+
+        return $form;
     }
 
     /**

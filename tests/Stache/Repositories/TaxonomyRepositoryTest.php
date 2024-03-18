@@ -3,6 +3,7 @@
 namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Stache\Repositories\TaxonomyRepository;
@@ -124,5 +125,23 @@ class TaxonomyRepositoryTest extends TestCase
         $this->assertEquals($previewTargetsTaxonomy1, $previewTargetsTest->all());
         $this->assertEquals($previewTargetsTaxonomy2, $previewTargetsTest2->all());
         $this->assertNotEquals($previewTargetsTest->all(), $previewTargetsTest2->all());
+    }
+
+    /** @test */
+    public function test_find_or_fail_gets_taxonomy()
+    {
+        $taxonomy = $this->repo->findOrFail('tags');
+
+        $this->assertInstanceOf(Taxonomy::class, $taxonomy);
+        $this->assertEquals('Tags', $taxonomy->title());
+    }
+
+    /** @test */
+    public function test_find_or_fail_throws_exception_when_taxonomy_does_not_exist()
+    {
+        $this->expectException(TaxonomyNotFoundException::class);
+        $this->expectExceptionMessage('Taxonomy [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }

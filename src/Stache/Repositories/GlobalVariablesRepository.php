@@ -4,6 +4,7 @@ namespace Statamic\Stache\Repositories;
 
 use Statamic\Contracts\Globals\GlobalVariablesRepository as RepositoryContract;
 use Statamic\Contracts\Globals\Variables;
+use Statamic\Exceptions\GlobalVariablesNotFoundException;
 use Statamic\Globals\VariablesCollection;
 use Statamic\Stache\Stache;
 use Statamic\Support\Str;
@@ -29,6 +30,17 @@ class GlobalVariablesRepository implements RepositoryContract
     public function find($id): ?Variables
     {
         return $this->store->getItem($id);
+    }
+
+    public function findOrFail($id): Variables
+    {
+        $variables = $this->find($id);
+
+        if (! $variables) {
+            throw new GlobalVariablesNotFoundException($id);
+        }
+
+        return $variables;
     }
 
     public function whereSet($handle): VariablesCollection

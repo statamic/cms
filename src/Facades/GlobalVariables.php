@@ -8,6 +8,7 @@ use Statamic\Contracts\Globals\GlobalVariablesRepository;
 /**
  * @method static \Statamic\Globals\VariablesCollection all()
  * @method static null|\Statamic\Globals\Variables find($id)
+ * @method static \Statamic\Globals\Variables findOrFail($id)
  * @method static \Statamic\Globals\VariablesCollection whereSet($set)
  * @method static void save($variable);
  *

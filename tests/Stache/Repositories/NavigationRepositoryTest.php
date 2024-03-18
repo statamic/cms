@@ -4,6 +4,7 @@ namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Structures\Structure;
+use Statamic\Exceptions\NavigationNotFoundException;
 use Statamic\Stache\Repositories\NavigationRepository;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\CollectionsStore;
@@ -76,5 +77,23 @@ class NavigationRepositoryTest extends TestCase
         $this->assertNotNull($this->repo->findByHandle('new'));
         $this->assertFileExists($this->directory.'/new.yaml');
         @unlink($this->directory.'/new.yaml');
+    }
+
+    /** @test */
+    public function test_find_or_fail_gets_nav()
+    {
+        $nav = $this->repo->findOrFail('footer');
+
+        $this->assertInstanceOf(Structure::class, $nav);
+        $this->assertEquals('Footer', $nav->title());
+    }
+
+    /** @test */
+    public function test_find_or_fail_throws_exception_when_nav_does_not_exist()
+    {
+        $this->expectException(NavigationNotFoundException::class);
+        $this->expectExceptionMessage('Navigation [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }

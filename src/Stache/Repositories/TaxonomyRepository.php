@@ -5,6 +5,7 @@ namespace Statamic\Stache\Repositories;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\TaxonomyRepository as RepositoryContract;
+use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Facades;
 use Statamic\Stache\Stache;
 use Statamic\Support\Str;
@@ -27,6 +28,17 @@ class TaxonomyRepository implements RepositoryContract
     public function find($id): ?Taxonomy
     {
         return $this->findByHandle($id);
+    }
+
+    public function findOrFail($id): Taxonomy
+    {
+        $taxonomy = $this->find($id);
+
+        if (! $taxonomy) {
+            throw new TaxonomyNotFoundException($id);
+        }
+
+        return $taxonomy;
     }
 
     public function handles(): Collection

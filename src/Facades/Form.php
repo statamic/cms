@@ -7,6 +7,7 @@ use Statamic\Contracts\Forms\FormRepository;
 
 /**
  * @method static \Statamic\Contracts\Forms\Form find($handle)
+ * @method static \Statamic\Contracts\Forms\Form findOrFail($handle)
  * @method static \Illuminate\Support\Collection all()
  * @method static \Statamic\Contracts\Forms\Form make($handle = null)
  *

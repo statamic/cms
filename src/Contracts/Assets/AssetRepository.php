@@ -18,6 +18,8 @@ interface AssetRepository
 
     public function findByPath(string $path);
 
+    public function findOrFail(string $asset);
+
     public function make();
 
     public function query();
