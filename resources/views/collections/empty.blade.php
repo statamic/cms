@@ -73,8 +73,9 @@
         </div>
     </div>
 </div>
-@include('statamic::partials.docs-callout', [
-    'topic' => __('Collections'),
-    'url' => 'collection'
-])
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Collections'),
+        'url' => 'collection'
+    ])
 @stop
