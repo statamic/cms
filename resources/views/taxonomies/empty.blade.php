@@ -26,7 +26,7 @@
             </div>
         </a>
         @endcan
-        @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy, $site])
+        @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy, \Statamic\Facades\Site::get($site)])
         <a href="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800">
                 @cp_svg('icons/light/content-writing')

@@ -2,7 +2,6 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class TermPolicy
@@ -48,10 +47,6 @@ class TermPolicy
     public function create($user, $taxonomy, $site = null)
     {
         $user = User::fromUser($user);
-
-        if (is_string($site)) {
-            $site = Site::get($site);
-        }
 
         if ($site && (! $taxonomy->sites()->contains($site->handle()) || ! $this->userCanAccessSite($user, $site))) {
             return false;

@@ -26,7 +26,7 @@
             </div>
         </a>
         @endcan
-        @can('create', ['Statamic\Contracts\Entries\Entry', $collection, $site])
+        @can('create', ['Statamic\Contracts\Entries\Entry', $collection, \Statamic\Facades\Site::get($site)])
         <?php $multipleBlueprints = $collection->entryBlueprints()->count() > 1 ?>
         @if ($multipleBlueprints)<div
         @else<a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}"

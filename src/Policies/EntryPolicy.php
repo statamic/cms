@@ -2,7 +2,6 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class EntryPolicy
@@ -71,10 +70,6 @@ class EntryPolicy
     public function create($user, $collection, $site = null)
     {
         $user = User::fromUser($user);
-
-        if (is_string($site)) {
-            $site = Site::get($site);
-        }
 
         if ($site && (! $collection->sites()->contains($site->handle()) || ! $this->userCanAccessSite($user, $site))) {
             return false;
