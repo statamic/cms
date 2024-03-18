@@ -1,5 +1,82 @@
 # Release Notes
 
+## 4.53.2 (2024-03-13)
+
+### What's improved
+- Persian translations. [#9711](https://github.com/statamic/cms/issues/9711) by @peimn
+
+### What's fixed
+- Fix "A field with a handle of X already exists" error when editing fieldsets. [#9718](https://github.com/statamic/cms/issues/9718) by @duncanmcclean
+- Fix arrow direction in RTL. [#9712](https://github.com/statamic/cms/issues/9712) by @peimn
+
+
+
+## 4.53.1 (2024-03-12)
+
+### What's fixed
+- Fix broken navigation tree. [#9709](https://github.com/statamic/cms/issues/9709) by @duncanmcclean
+
+
+
+## 4.53.0 (2024-03-11)
+
+### What's new
+- Persian translation. [#9707](https://github.com/statamic/cms/issues/9707) by @peimn
+- Japanese translation. [#9683](https://github.com/statamic/cms/issues/9683) by @kusaka-kouki
+- Field based redirects may provide a status. [#9417](https://github.com/statamic/cms/issues/9417) by @ryanmitchell
+- RTL support in the Control Panel. [#9447](https://github.com/statamic/cms/issues/9447) by @peimn
+- Add AssetCreating, AssetCreated and AssetSaving events. [#9378](https://github.com/statamic/cms/issues/9378) by @ryanmitchell
+- Add validation to prevent duplicate field handles. [#9337](https://github.com/statamic/cms/issues/9337) by @duncanmcclean
+- Show blueprint title in tree view. [#9413](https://github.com/statamic/cms/issues/9413) by @mmodler
+- Bard & Replicators: Show set group in UI. [#9670](https://github.com/statamic/cms/issues/9670) by @duncanmcclean
+- Users Listing: Allow for configuring default sort field & direction. [#9671](https://github.com/statamic/cms/issues/9671) by @duncanmcclean
+- E.T. Phone Home. [#8416](https://github.com/statamic/cms/issues/8416) by @jackmcdade
+- Date/time fieldtypes use native time fields. [#9662](https://github.com/statamic/cms/issues/9662) by @aaronbushnell
+
+### What's fixed
+- Fix "Create Entry" button on collection widget in multisite. [#9699](https://github.com/statamic/cms/issues/9699) by @duncanmcclean
+- Ensure submission values take precedence over globals data. [#9698](https://github.com/statamic/cms/issues/9698) by @duncanmcclean
+- Fix preferences when user has role via group. [#8957](https://github.com/statamic/cms/issues/8957) by @duncanmcclean
+- Fix bug in deleting users in the CP controller. [#9677](https://github.com/statamic/cms/issues/9677) by @ryanmitchell
+- Fix Collection::computed docblock. [#9673](https://github.com/statamic/cms/issues/9673) by @ajnsn
+- Prevent localizing entries without edit permission. [#9605](https://github.com/statamic/cms/issues/9605) by @duncanmcclean
+
+
+
+## 4.52.0 (2024-03-04)
+
+### What's new
+- OAuth improvements including support for SAML2 providers. [#9612](https://github.com/statamic/cms/issues/9612) by @duncanmcclean
+
+### What's fixed
+- Fix entries not being "linked" to their localizations corrected. [#9661](https://github.com/statamic/cms/issues/9661) by @ryanmitchell
+- Fix prop type warning in validation builder. [#9665](https://github.com/statamic/cms/issues/9665) by @jasonvarga
+- Only suggest fields in the same replicator set. [#9663](https://github.com/statamic/cms/issues/9663) by @jasonvarga
+- Roll back to initial simple isAjax() check on front end forms. [#9629](https://github.com/statamic/cms/issues/9629) by @ryanmitchell
+- Fix Antlers sections not being yieldable in Blade layouts. [#9614](https://github.com/statamic/cms/issues/9614) by @JohnathonKoster
+- Fix Antlers strict equality inside conditions. [#9621](https://github.com/statamic/cms/issues/9621) by @JohnathonKoster
+- Fix test that fails on February 29th. [#9620](https://github.com/statamic/cms/issues/9620) by @jasonvarga
+- Filter away bad bard nodes during preprocessing. [#9608](https://github.com/statamic/cms/issues/9608) by @SylvesterDamgaard
+- Fix page url value in TreeBuilder. [#9611](https://github.com/statamic/cms/issues/9611) by @0kyn
+
+
+
+## 4.51.0 (2024-02-28)
+
+### What's new
+- Add `isDirty` / `isClean`. [#5502](https://github.com/statamic/cms/issues/5502) by @ryanmitchell
+- Support for validation Rule objects. [#9332](https://github.com/statamic/cms/issues/9332) by @martyf
+
+### What's fixed
+- Use protection scheme from data before using site-wide protection scheme. [#9607](https://github.com/statamic/cms/issues/9607) by @duncanmcclean
+- Fix search dropdown being hidden on Taggable Fieldtype. [#9606](https://github.com/statamic/cms/issues/9606) by @duncanmcclean
+- Tweak SuggestsConditionalFields behaviour when dealing with a fields prefix. [#9592](https://github.com/statamic/cms/issues/9592) by @martyf
+- Only run custom validation errors when not precognitive. [#9599](https://github.com/statamic/cms/issues/9599) by @ryanmitchell
+- Fix docblock of FluentTag param method. [#9601](https://github.com/statamic/cms/issues/9601) by @ajnsn
+- Fix pixel gap on relationship fieldtype items and prevent padding issue. [#9597](https://github.com/statamic/cms/issues/9597) by @robdekort
+
+
+
 ## 4.50.0 (2024-02-26)
 
 ### What's new

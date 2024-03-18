@@ -5,10 +5,13 @@ namespace Tests\Auth;
 use BadMethodCallException;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Mockery;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
+use Statamic\Events\UserSaved;
+use Statamic\Events\UserSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
@@ -511,6 +514,66 @@ trait UserContractTests
     public function additionalToArrayValues()
     {
         return [];
+    }
+
+    /**
+     * @test
+     */
+    public function it_has_a_dirty_state()
+    {
+        $user = $this->makeUser();
+        $user->email('test@test.com');
+        $user->save();
+
+        $this->assertFalse($user->isDirty());
+        $this->assertFalse($user->isDirty('email'));
+        $this->assertFalse($user->isDirty('name'));
+        $this->assertFalse($user->isDirty(['email']));
+        $this->assertFalse($user->isDirty(['name']));
+        $this->assertFalse($user->isDirty(['email', 'name']));
+        $this->assertTrue($user->isClean());
+        $this->assertTrue($user->isClean('email'));
+        $this->assertTrue($user->isClean('name'));
+        $this->assertTrue($user->isClean(['email']));
+        $this->assertTrue($user->isClean(['name']));
+        $this->assertTrue($user->isClean(['email', 'name']));
+
+        $user->email('test@tester.com');
+
+        $this->assertTrue($user->isDirty());
+        $this->assertTrue($user->isDirty('email'));
+        $this->assertFalse($user->isDirty('name'));
+        $this->assertTrue($user->isDirty(['email']));
+        $this->assertFalse($user->isDirty(['name']));
+        $this->assertTrue($user->isDirty(['email', 'name']));
+        $this->assertFalse($user->isClean());
+        $this->assertFalse($user->isClean('email'));
+        $this->assertTrue($user->isClean('name'));
+        $this->assertFalse($user->isClean(['email']));
+        $this->assertTrue($user->isClean(['name']));
+        $this->assertFalse($user->isClean(['email', 'name']));
+    }
+
+    /** @test */
+    public function it_syncs_original_at_the_right_time()
+    {
+        $eventsHandled = 0;
+
+        Event::listen(function (UserSaving $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->user->isDirty());
+        });
+        Event::listen(function (UserSaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->user->isDirty());
+        });
+
+        $user = $this->makeUser();
+        $user->email('test@test.com');
+        $user->save();
+
+        $this->assertFalse($user->isDirty());
+        $this->assertEquals(2, $eventsHandled);
     }
 
     private function createRole($handle)

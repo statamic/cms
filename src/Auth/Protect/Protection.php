@@ -30,12 +30,16 @@ class Protection
 
     public function scheme()
     {
-        if ($default = config('statamic.protect.default')) {
-            return $default;
+        if (
+            $this->data
+            && $this->data instanceof Protectable
+            && $scheme = $this->data->getProtectionScheme()
+        ) {
+            return $scheme;
         }
 
-        if ($this->data && $this->data instanceof Protectable) {
-            return $this->data->getProtectionScheme();
+        if ($default = config('statamic.protect.default')) {
+            return $default;
         }
 
         return null;
