@@ -75,6 +75,7 @@ class CorePreferences
             'sl' => 'Slovenian',
             'sv' => 'Swedish',
             'tr' => 'Turkish',
+            'uk' => 'Ukrainian',
             'zh_CN' => 'Chinese (China)',
             'zh_TW' => 'Chinese (Taiwan)',
         ])->when(extension_loaded('intl'), fn ($locales) => $locales
