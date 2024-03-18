@@ -17,7 +17,7 @@ class Children extends Structure
      */
     public function index()
     {
-        $this->params->put('from', Str::start(Str::after(URL::getCurrent(), Site::current()->url()), '/'));
+        $this->params->put('from', Str::start(Str::after(URL::makeAbsolute(URL::getCurrent()), Site::current()->absoluteUrl()), '/'));
         $this->params->put('max_depth', 1);
 
         $collection = $this->params->get('collection', $this->context->value('collection')?->handle());

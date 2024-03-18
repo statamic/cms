@@ -9,7 +9,7 @@ use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\CollectionTreeDeleted;
 use Statamic\Events\CollectionTreeSaved;
-use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
@@ -31,7 +31,7 @@ class Invalidate implements ShouldQueue
         AssetSaved::class => 'invalidateAsset',
         AssetDeleted::class => 'invalidateAsset',
         EntrySaved::class => 'invalidateEntry',
-        EntryDeleted::class => 'invalidateEntry',
+        EntryDeleting::class => 'invalidateEntry',
         TermSaved::class => 'invalidateTerm',
         TermDeleted::class => 'invalidateTerm',
         GlobalSetSaved::class => 'invalidateGlobalSet',
