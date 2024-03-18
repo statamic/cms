@@ -48,6 +48,42 @@ class FieldTransformer
 
                 return $defaultConfig->has($key) && $defaultConfig->get($key) === $value;
             })
+            ->map(function ($value, $key) {
+                if ($key === 'sets') {
+                    return collect($value)
+                        ->map(function ($setGroup) {
+                            if (! Arr::get($setGroup, 'instructions')) {
+                                unset($setGroup['instructions']);
+                            }
+
+                            if (! Arr::get($setGroup, 'icon')) {
+                                unset($setGroup['icon']);
+                            }
+
+                            if (isset($setGroup['sets'])) {
+                                $setGroup['sets'] = collect($setGroup['sets'])
+                                    ->map(function ($set) {
+                                        if (! Arr::get($set, 'instructions')) {
+                                            unset($set['instructions']);
+                                        }
+
+                                        if (! Arr::get($set, 'icon')) {
+                                            unset($set['icon']);
+                                        }
+
+                                        return $set;
+                                    })
+                                    ->filter()
+                                    ->all();
+                            }
+
+                            return $setGroup;
+                        })
+                        ->all();
+                }
+
+                return $value;
+            })
             ->filter()
             ->sortBy(function ($value, $key) {
                 // Push sets & fields to the end of the config.

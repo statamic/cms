@@ -194,4 +194,84 @@ class FieldTransformerTest extends TestCase
             ],
         ], $fromVue);
     }
+
+    /** @test */
+    public function blank_instructions_and_icon_are_removed_from_set_groups()
+    {
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text', 'handle' => 'test', 'type' => 'inline', 'config' => [
+                'display' => 'Test',
+                'sets' => ['set_group' => [
+                    'display' => 'Set Group',
+                    'instructions' => null,
+                    'icon' => null,
+                    'sets' => ['set' => [
+                        'display' => 'Set',
+                        'instructions' => null,
+                        'icon' => null,
+                        'fields' => ['import' => 'seo'],
+                    ]]
+                ]],
+                'instructions' => 'Some instructions',
+                'listable' => true,
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->assertEquals([
+            'handle' => 'test',
+            'field' => [
+                'display' => 'Test',
+                'instructions' => 'Some instructions',
+                'listable' => true,
+                'foo' => 'bar',
+                'sets' => ['set_group' => [
+                    'display' => 'Set Group',
+                    'sets' => ['set' => [
+                        'display' => 'Set',
+                        'fields' => ['import' => 'seo'],
+                    ]]
+                ]],
+            ],
+        ], $fromVue);
+
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text', 'handle' => 'test', 'type' => 'inline', 'config' => [
+                'display' => 'Test',
+                'sets' => ['set_group' => [
+                    'display' => 'Set Group',
+                    'instructions' => 'This is a set group.',
+                    'icon' => null,
+                    'sets' => ['set' => [
+                        'display' => 'Set',
+                        'instructions' => null,
+                        'icon' => 'date',
+                        'fields' => ['import' => 'seo'],
+                    ]]
+                ]],
+                'instructions' => 'Some instructions',
+                'listable' => true,
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->assertEquals([
+            'handle' => 'test',
+            'field' => [
+                'display' => 'Test',
+                'instructions' => 'Some instructions',
+                'listable' => true,
+                'foo' => 'bar',
+                'sets' => ['set_group' => [
+                    'display' => 'Set Group',
+                    'instructions' => 'This is a set group.',
+                    'sets' => ['set' => [
+                        'display' => 'Set',
+                        'icon' => 'date',
+                        'fields' => ['import' => 'seo'],
+                    ]]
+                ]],
+            ],
+        ], $fromVue);
+    }
 }
