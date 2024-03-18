@@ -3,6 +3,7 @@
 namespace Tests\Auth;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
 use Statamic\Contracts\Auth\Role as RoleContract;
@@ -17,6 +18,10 @@ trait PermissibleContractTests
     /** @test */
     public function it_gets_and_assigns_roles()
     {
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to this test.
+        Event::fake();
+
         $roleA = new class extends Role
         {
             public function handle(?string $handle = null)
@@ -78,6 +83,10 @@ trait PermissibleContractTests
     /** @test */
     public function it_removes_a_role_assignment()
     {
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to this test.
+        Event::fake();
+
         $roleA = new class extends Role
         {
             public function handle(?string $handle = null)
@@ -124,6 +133,10 @@ trait PermissibleContractTests
     /** @test */
     public function it_checks_if_it_has_a_role()
     {
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to this test.
+        Event::fake();
+
         $roleA = new class extends Role
         {
             public function handle(?string $handle = null)
@@ -174,6 +187,7 @@ trait PermissibleContractTests
         $userGroup = (new UserGroup)->handle('usergroup')->assignRole($userGroupRole);
 
         RoleAPI::shouldReceive('find')->with('direct')->andReturn($directRole);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$directRole])); // the stache calls this when getting a user. unrelated to test.
         UserGroupAPI::shouldReceive('find')->with('usergroup')->andReturn($userGroup);
         RoleAPI::shouldReceive('all')->andReturn(collect([$directRole]));     // the stache calls this when getting a user. unrelated to test.
         UserGroupAPI::shouldReceive('all')->andReturn(collect([$userGroup])); // the stache calls this when getting a user. unrelated to test.
@@ -227,6 +241,10 @@ trait PermissibleContractTests
     /** @test */
     public function it_checks_if_it_has_super_permissions_through_roles_and_groups()
     {
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to this test.
+        Event::fake();
+
         $superRole = new class extends Role
         {
             public function handle(?string $handle = null)
@@ -257,6 +275,7 @@ trait PermissibleContractTests
 
         RoleAPI::shouldReceive('find')->with('superrole')->andReturn($superRole);
         RoleAPI::shouldReceive('find')->with('nonsuperrole')->andReturn($nonSuperRole);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$superRole, $nonSuperRole])); // the stache calls this when getting a user. unrelated to test.
         UserGroupAPI::shouldReceive('find')->with('supergroup')->andReturn($superGroup);
         UserGroupAPI::shouldReceive('find')->with('nonsupergroup')->andReturn($nonSuperGroup);
         RoleAPI::shouldReceive('all')->andReturn(collect([$superRole, $nonSuperRole]));        // the stache calls this when getting a user. unrelated to test.
