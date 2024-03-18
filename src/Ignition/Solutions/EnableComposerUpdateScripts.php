@@ -38,7 +38,7 @@ class EnableComposerUpdateScripts implements RunnableSolution
         return 'Configure & Run Update Scripts';
     }
 
-    public function run(array $parameters = [])
+    public function run(array $parameters = []): void
     {
         // Setup null console so we can detect console error output.
         $console = new NullConsole;

@@ -34,7 +34,7 @@ class EnableStatamicPro implements RunnableSolution
         return 'Enable Statamic Pro';
     }
 
-    public function run(array $parameters = [])
+    public function run(array $parameters = []): void
     {
         Statamic::enablePro();
     }
