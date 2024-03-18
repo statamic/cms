@@ -32,7 +32,13 @@
                     v-bind="attributes"
                 >
             </template>
-             <template #no-options>
+            <template #option="option">
+                <template v-if="config.collections?.length > 1 && option.collection">
+                    <span class="text-gray-700 mr-2">{{ option.collection.title }}</span>
+                </template>
+                {{ option.title }}
+            </template>
+            <template #no-options>
                 <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
             </template>
             <template #footer="{ deselect }" v-if="multiple">
