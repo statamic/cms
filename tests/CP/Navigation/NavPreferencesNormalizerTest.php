@@ -257,7 +257,7 @@ class NavPreferencesNormalizerTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider modifiers
+     * @dataProvider modifiersProvider
      **/
     public function it_defaults_action_to_modify_when_modifying_in_original_section($modifier)
     {
@@ -284,7 +284,7 @@ class NavPreferencesNormalizerTest extends TestCase
         ]), 'sections.content.items.content::collections::pages.action'));
     }
 
-    public function modifiers()
+    public static function modifiersProvider()
     {
         return collect(NavPreferencesNormalizer::ALLOWED_NAV_ITEM_MODIFICATIONS)->map(fn ($key) => [$key]);
     }

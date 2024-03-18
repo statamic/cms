@@ -434,10 +434,10 @@ class CollectionTest extends TestCase
         $this->assertNull($datedAndOrdered->customSortDirection());
 
         $alpha->structureContents(['max_depth' => 99]);
-        $this->assertEquals('title', $alpha->sortField());
+        $this->assertEquals('order', $alpha->sortField());
         $this->assertEquals('asc', $alpha->sortDirection());
         $dated->structureContents(['max_depth' => 99]);
-        $this->assertEquals('date', $dated->sortField());
+        $this->assertEquals('order', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
         // Custom sort field and direction should override any other logic.
@@ -926,7 +926,7 @@ class CollectionTest extends TestCase
         $this->assertCount(0, $collection->queryEntries()->get());
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],

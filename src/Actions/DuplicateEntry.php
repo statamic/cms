@@ -5,6 +5,7 @@ namespace Statamic\Actions;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Entry as Entries;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class DuplicateEntry extends Action
@@ -21,7 +22,7 @@ class DuplicateEntry extends Action
 
     public function confirmationText()
     {
-        $hasDescendants = $this->items
+        $hasDescendants = Site::hasMultiple() && $this->items
             ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
             ->unique()
             ->contains(fn ($entry) => $entry->descendants()->count());

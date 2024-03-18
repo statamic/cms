@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class CamelizeTest extends TestCase
 {
-    public function camelFarm(): array
+    public static function camelFarmProvider(): array
     {
         return [
             'it_camelize_underscores' => ['makeEverythingBetter', 'make_everything_better'],
@@ -21,7 +21,7 @@ class CamelizeTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider camelFarm
+     * @dataProvider camelFarmProvider
      */
     public function it_camelizes_underscores($expected, $input): void
     {

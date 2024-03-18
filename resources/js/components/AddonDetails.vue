@@ -2,7 +2,7 @@
     <div>
         <div class="flex items-center mb-6">
             <h1 class="flex-1" v-text="addon.name" />
-            <a :href="addon.url" target="_blank" class="btn mr-4" v-text="__('View on Marketplace')" />
+            <a :href="addon.url" target="_blank" class="btn rtl:ml-4 ltr:mr-4" v-text="__('View on Marketplace')" />
             <button v-if="addon.installed" class="btn" @click="showComposerInstructions" v-text="__('Uninstall')" />
             <button v-else class="btn btn-primary" @click="showComposerInstructions" v-text="__('Install')" />
         </div>
@@ -33,7 +33,7 @@
                 <div class="flex-1 text-lg">
                     <div class="little-heading p-0 mb-2 text-gray-700" v-text="__('Seller')" />
                     <a :href="addon.seller.website" class="relative flex items-center">
-                        <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full w-6 mr-2">
+                        <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full w-6 rtl:ml-2 ltr:mr-2">
                         <span class="font-bold">{{ addon.seller.name }}</span>
                     </a>
                 </div>

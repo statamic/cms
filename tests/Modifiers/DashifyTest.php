@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class DashifyTest extends TestCase
 {
-    public function undashyThings(): array
+    public static function undashyThingsProvider(): array
     {
         return [
             'with_whitespaces' => ['just-because-i-can', 'Just Because I Can'],
@@ -20,7 +20,7 @@ class DashifyTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider undashyThings
+     * @dataProvider undashyThingsProvider
      */
     public function it_returns_a_lowercase_and_trimmed_string_separated_by_dashes($expected, $input): void
     {

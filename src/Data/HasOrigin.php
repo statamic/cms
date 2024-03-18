@@ -10,16 +10,21 @@ trait HasOrigin
      * @var string
      */
     protected $origin;
+    private $cachedKeys;
 
     public function keys()
     {
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
+        }
+
         $originFallbackKeys = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues()->keys() : collect();
 
         $originKeys = $this->hasOrigin() ? $this->origin()->keys() : collect();
 
         $computedKeys = method_exists($this, 'computedKeys') ? $this->computedKeys() : [];
 
-        return collect()
+        return $this->cachedKeys = collect()
             ->merge($originFallbackKeys)
             ->merge($originKeys)
             ->merge($this->data->keys())
@@ -60,9 +65,17 @@ trait HasOrigin
     {
         return $this->fluentlyGetOrSet('origin')
             ->getter(function ($origin) {
-                return $origin
-                    ? Blink::once($this->getOriginBlinkKey(), fn () => $this->getOriginByString($origin))
-                    : null;
+                if (! $origin) {
+                    return null;
+                }
+
+                if ($found = Blink::get($this->getOriginBlinkKey())) {
+                    return $found;
+                }
+
+                return tap($this->getOriginByString($origin), function ($found) {
+                    Blink::put($this->getOriginBlinkKey(), $found);
+                });
             })
             ->setter(function ($origin) {
                 Blink::forget($this->getOriginBlinkKey());

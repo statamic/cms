@@ -109,6 +109,10 @@ export default {
         this.$events.$on('clear-selections', this.clearSelections);
     },
 
+    destroyed() {
+        this.$events.$off('clear-selections', this.clearSelections);
+    },
+
     methods: {
 
         setInitialSortColumn() {
