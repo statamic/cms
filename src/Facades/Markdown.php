@@ -11,6 +11,7 @@ use Statamic\Markdown\Manager;
  * @method static bool hasParser(string $name)
  * @method static void extend(string $name, \Closure $closure)
  * @method static string parse(string $markdown)
+ * @method static \League\CommonMark\CommonMarkConverter converter()
  * @method static \League\CommonMark\Environment\Environment environment()
  * @method static \Statamic\Markdown\Parser addExtension(\Closure $closure)
  * @method static \Statamic\Markdown\Parser addExtensions(\Closure $closure)
