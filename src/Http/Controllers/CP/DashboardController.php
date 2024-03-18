@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Illuminate\Support\Arr;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -37,7 +36,9 @@ class DashboardController extends CpController
                 return is_string($config) ? ['type' => $config] : $config;
             })
             ->filter(function ($config) {
-                $sites = Arr::get($config, 'sites', Site::all()->keys()->all());
+                if (! $sites = $config['sites'] ?? null) {
+                    return true;
+                }
 
                 return in_array(Site::selected()->handle(), $sites);
             })
