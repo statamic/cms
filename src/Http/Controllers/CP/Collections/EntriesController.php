@@ -427,19 +427,6 @@ class EntriesController extends CpController
         };
     }
 
-    public function destroy($entry)
-    {
-        if (! $entry = Entry::find($entry)) {
-            return $this->pageNotFound();
-        }
-
-        $this->authorize('delete', $entry);
-
-        $entry->delete();
-
-        return response('', 204);
-    }
-
     protected function extractFromFields($entry, $blueprint)
     {
         // The values should only be data merged with the origin data.

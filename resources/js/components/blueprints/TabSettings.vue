@@ -16,7 +16,7 @@
                         class="blueprint-tab-field"
                     >
                         <div class="blueprint-tab-field-inner">
-                            <div class="blueprint-drag-handle w-4 border-r"></div>
+                            <div class="blueprint-drag-handle w-4 ltr:border-r rtl:border-l"></div>
 
                             <label class="block">{{ field.display }}</label>
                             <div v-if="field.instructions" class="help-block">{{ field.instructions }}</div>

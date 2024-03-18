@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Field;
+use Statamic\Facades\Fieldset;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\CanManageBlueprints;
 
@@ -50,8 +51,10 @@ class FieldsController extends CpController
     public function update(Request $request)
     {
         $request->validate([
+            'id' => 'nullable',
             'type' => 'required',
             'values' => 'required|array',
+            'fields' => 'sometimes|array',
         ]);
 
         $fieldtype = FieldtypeRepository::find($request->type);
@@ -62,7 +65,27 @@ class FieldsController extends CpController
             ->fields()
             ->addValues($request->values);
 
-        $extraRules = [];
+        $extraRules = [
+            'handle' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    $existingFieldWithHandle = collect($request->fields ?? [])
+                        ->when($request->id, fn ($collection) => $collection->reject(fn ($field) => $field['_id'] === $request->id))
+                        ->flatMap(function (array $field) {
+                            if ($field['type'] === 'import') {
+                                return Fieldset::find($field['fieldset'])->fields()->all()->map->handle()->toArray();
+                            }
+
+                            return [$field['handle']];
+                        })
+                        ->values()
+                        ->contains($request->values['handle']);
+
+                    if ($existingFieldWithHandle) {
+                        $fail(__('statamic::validation.duplicate_field_handle', ['handle' => $value]));
+                    }
+                },
+            ],
+        ];
         $customMessages = [
             'handle.not_in' => __('statamic::validation.reserved'),
         ];
