@@ -5,8 +5,8 @@ namespace Statamic\Http\Controllers\CP\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Statamic\Facades\Blueprint;
-use Statamic\Fields\Field;
 use Statamic\Facades\Fieldset;
+use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\CanManageBlueprints;
 
