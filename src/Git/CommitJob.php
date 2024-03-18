@@ -13,20 +13,10 @@ class CommitJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable;
 
     /**
-     * Commit message.
-     *
-     * @var string|null
-     */
-    public $message;
-
-    /**
      * Create a new job instance.
-     *
-     * @param  string|null  $message
      */
-    public function __construct($message = null)
+    public function __construct(public $message = null, public $committer = null)
     {
-        $this->message = $message;
     }
 
     /**
@@ -34,6 +24,6 @@ class CommitJob implements ShouldQueue
      */
     public function handle()
     {
-        Git::commit($this->message);
+        Git::as($this->committer)->commit($this->message);
     }
 }

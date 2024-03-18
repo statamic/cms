@@ -51,7 +51,7 @@ class CollectionRepository implements RepositoryContract
         });
     }
 
-    public function make(string $handle = null): Collection
+    public function make(?string $handle = null): Collection
     {
         return app(Collection::class)->handle($handle);
     }

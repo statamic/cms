@@ -10,8 +10,10 @@ use Statamic\Auth\UserRepositoryManager;
 use Statamic\Console\RunsInPlease;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Auth\UserRepository as UserRepositoryContract;
+use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Stache\Repositories\UserRepository as FileRepository;
+use Statamic\Stache\Stores\UsersStore;
 
 class ImportUsers extends Command
 {
@@ -60,6 +62,9 @@ class ImportUsers extends Command
 
             return;
         }
+
+        $store = app(UsersStore::class)->directory(config('statamic.stache.stores.users.directory', base_path('users')));
+        Stache::registerStore($store);
 
         app()->bind(UserContract::class, FileUser::class);
         app()->bind(UserRepositoryContract::class, FileRepository::class);

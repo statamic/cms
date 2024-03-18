@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class IsEmailTest extends TestCase
 {
-    public function emails(): array
+    public static function emailsProvider(): array
     {
         return [
             'email' => [true, 'lknope@inpra.org'],
@@ -18,7 +18,7 @@ class IsEmailTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider emails
+     * @dataProvider emailsProvider
      */
     public function it_returns_true_if_the_string_is_a_valid_email_address($expected, $input): void
     {

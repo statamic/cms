@@ -133,6 +133,9 @@ class TaxonomiesController extends CpController
             'collections' => $taxonomy->collections()->map->handle()->all(),
             'sites' => $taxonomy->sites()->all(),
             'preview_targets' => $taxonomy->basePreviewTargets(),
+            'term_template' => $taxonomy->hasCustomTermTemplate() ? $taxonomy->termTemplate() : null,
+            'template' => $taxonomy->hasCustomTemplate() ? $taxonomy->template() : null,
+            'layout' => $taxonomy->layout(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
@@ -162,7 +165,10 @@ class TaxonomiesController extends CpController
 
         $taxonomy
             ->title($values['title'])
-            ->previewTargets($values['preview_targets']);
+            ->previewTargets($values['preview_targets'])
+            ->termTemplate($values['term_template'] ?? null)
+            ->template($values['template'] ?? null)
+            ->layout($values['layout'] ?? null);
 
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);
@@ -245,7 +251,7 @@ class TaxonomiesController extends CpController
                         'type' => 'html',
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <span class="mr-4">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <span class="rtl:ml-4 ltr:mr-4">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
                             '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
@@ -305,6 +311,28 @@ class TaxonomiesController extends CpController
                                 ],
                             ],
                         ],
+                    ],
+                ],
+            ],
+            'templates' => [
+                'display' => __('Templates'),
+                'fields' => [
+                    'template' => [
+                        'display' => __('Template'),
+                        'instructions' => __('statamic::messages.taxonomy_configure_template_instructions'),
+                        'type' => 'template',
+                        'placeholder' => __('System default'),
+                    ],
+                    'term_template' => [
+                        'display' => __('Term Template'),
+                        'instructions' => __('statamic::messages.taxonomy_configure_term_template_instructions'),
+                        'type' => 'template',
+                        'placeholder' => __('System default'),
+                    ],
+                    'layout' => [
+                        'display' => __('Layout'),
+                        'instructions' => __('statamic::messages.taxonomy_configure_layout_instructions'),
+                        'type' => 'template',
                     ],
                 ],
             ],

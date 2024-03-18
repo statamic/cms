@@ -47,6 +47,10 @@ class Antlers
 
     public function identifiers(string $content): array
     {
+        if (config('statamic.antlers.version') !== 'runtime') {
+            throw new \Exception('Antlers identifiers can only be retrieved when using the runtime parser.');
+        }
+
         return (new IdentifierFinder)->getIdentifiers($content);
     }
 }

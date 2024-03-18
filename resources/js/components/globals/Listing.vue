@@ -3,7 +3,7 @@
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table>
                 <template slot="cell-title" slot-scope="{ row: global }">
-                    <a :href="global.edit_url">{{ global.title }}</a>
+                    <a :href="global.edit_url">{{ __(global.title) }}</a>
                 </template>
                 <template slot="cell-handle" slot-scope="{ value: handle }">
                     <span class="font-mono text-2xs">{{ handle }}</span>

@@ -42,7 +42,7 @@ class UsersTest extends TestCase
         }
     }
 
-    public function usersProvider()
+    public static function usersProvider()
     {
         return [
             'all' => [
@@ -105,7 +105,7 @@ class UsersTest extends TestCase
         $this->assertTrue($provider->contains($d));
     }
 
-    public function indexFilterProvider()
+    public static function indexFilterProvider()
     {
         return [
             'class' => [TestSearchableUsersFilter::class],

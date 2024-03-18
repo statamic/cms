@@ -175,7 +175,7 @@ class FieldsetRepository
         $this->hints[$namespace] = $directory;
     }
 
-    protected function getFieldsetsByDirectory(string $directory, string $namespace = null): Collection
+    protected function getFieldsetsByDirectory(string $directory, ?string $namespace = null): Collection
     {
         return File::withAbsolutePaths()
             ->getFilesByTypeRecursively($directory, 'yaml')

@@ -2,6 +2,8 @@
 
 namespace Statamic\Auth;
 
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Auth\Role;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
@@ -505,7 +507,11 @@ class UserTags extends Tags
             return $this->parser ? null : false;
         }
 
-        $roles = Arr::wrap($this->params->explode(['role', 'roles']));
+        $roles = $this->params->get(['role', 'roles']);
+
+        if (! $roles instanceof Collection || ! $roles->every(fn ($role) => $role instanceof Role)) {
+            $roles = Arr::wrap($this->params->explode(['role', 'roles']));
+        }
 
         foreach ($roles as $role) {
             if ($user->hasRole($role)) {
@@ -529,7 +535,11 @@ class UserTags extends Tags
             return $this->parser ? $this->parse() : true;
         }
 
-        $roles = Arr::wrap($this->params->explode(['roles', 'role']));
+        $roles = $this->params->get(['role', 'roles']);
+
+        if (! $roles instanceof Collection || ! $roles->every(fn ($role) => $role instanceof Role)) {
+            $roles = Arr::wrap($this->params->explode(['roles', 'role']));
+        }
 
         $is = false;
 

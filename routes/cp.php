@@ -237,15 +237,17 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('edit', [FieldsController::class, 'edit'])->name('fields.edit');
         Route::post('update', [FieldsController::class, 'update'])->name('fields.update');
         Route::get('field-meta', [MetaController::class, 'show']);
-        Route::resource('fieldsets', FieldsetController::class);
+        Route::resource('fieldsets', FieldsetController::class)->except(['show']);
         Route::get('blueprints', [BlueprintController::class, 'index'])->name('blueprints.index');
+        Route::get('blueprints/{namespace}/{handle}', [BlueprintController::class, 'edit'])->name('blueprints.edit');
+        Route::patch('blueprints/{namespace}/{handle}', [BlueprintController::class, 'update'])->name('blueprints.update');
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
     });
 
     Route::get('updater', [UpdaterController::class, 'index'])->name('updater');
     Route::get('updater/count', [UpdaterController::class, 'count']);
-    Route::get('updater/{product}', [UpdateProductController::class, 'show'])->name('updater.product');
-    Route::get('updater/{product}/changelog', [UpdateProductController::class, 'changelog']);
+    Route::get('updater/{marketplaceProductSlug}', [UpdateProductController::class, 'show'])->name('updater.product');
+    Route::get('updater/{marketplaceProductSlug}/changelog', [UpdateProductController::class, 'changelog']);
 
     Route::group(['prefix' => 'duplicates'], function () {
         Route::get('/', [DuplicatesController::class, 'index'])->name('duplicates');
@@ -298,8 +300,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
-        Route::resource('addons', AddonsApiController::class);
-        Route::resource('templates', TemplatesController::class);
+        Route::resource('addons', AddonsApiController::class)->only('index');
+        Route::resource('templates', TemplatesController::class)->only('index');
     });
 
     Route::group(['prefix' => 'preferences', 'as' => 'preferences.'], function () {

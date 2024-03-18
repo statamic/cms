@@ -17,9 +17,11 @@
                 :step="step"
                 :disabled="disabled"
                 :readonly="isReadOnly"
-                :placeholder="placeholder"
+                :placeholder="__(placeholder)"
+                :autocomplete="autocomplete"
                 :autofocus="focus"
                 :min="min"
+                :dir="direction"
                 @input="$emit('input', $event.target.value)"
                 @keydown="$emit('keydown', $event)"
                 @focus="$emit('focus')"
@@ -31,7 +33,7 @@
                 </div>
             </slot>
         </div>
-        <div class="text-xs ml-2" :class="limitIndicatorColor" v-if="limit">
+        <div class="text-xs rtl:mr-2 ltr:ml-2" :class="limitIndicatorColor" v-if="limit">
             <span v-text="currentLength"></span>/<span v-text="limit"></span>
         </div>
     </div>
@@ -55,8 +57,10 @@ export default {
         prepend: { default: null },
         append: { default: null },
         focus: { type: Boolean },
+        autocomplete: { default: null },
         autoselect: { type: Boolean },
-        min: { type: Number, default: undefined }
+        min: { type: Number, default: undefined },
+        direction: { type: String }
     },
     mounted() {
         if (this.autoselect) {

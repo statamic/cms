@@ -357,6 +357,10 @@ class Entries
                 return;
             }
 
+            if (! is_iterable($values)) {
+                $values = [$values];
+            }
+
             $values = collect($values)->map(function ($term) use ($taxonomy) {
                 if ($term instanceof Term) {
                     return $term->id();
@@ -380,7 +384,7 @@ class Entries
         }
 
         if (! $this->params->bool(['redirects', 'links'], false)) {
-            $query->where('redirect', '=', null);
+            $query->whereNull('redirect');
         }
     }
 
