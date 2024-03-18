@@ -33,7 +33,7 @@
                 >
             </template>
             <template #option="option">
-                <template v-if="config.collections?.length > 1 && option.collection">
+                <template v-if="hasMultipleCollections">
                     <span class="text-gray-700 mr-2">{{ option.collection.title }}</span>
                 </template>
                 {{ option.title }}
@@ -105,6 +105,10 @@ export default {
     },
 
     computed: {
+        hasMultipleCollections(){
+            return this.config.collections?.length > 1 || [...new Set(this.options.map(option => option?.collection?.handle))].length > 1;
+        },
+
         isTaggable() {
             if (data_get(this.config, 'create') === false) return false;
 
