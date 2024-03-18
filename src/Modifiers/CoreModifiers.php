@@ -3,10 +3,11 @@
 namespace Statamic\Modifiers;
 
 use ArrayAccess;
-use Carbon\Carbon;
+use Carbon\CarbonInterface as Carbon;
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -957,6 +958,23 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a hex color to rgb values.
+     *
+     * @return string
+     */
+    public function hexToRgb($value)
+    {
+        // Remove the hash (#) if present
+        $hex = ltrim($value, '#');
+
+        // Parse the hex value into RGB components
+        $rgb = sscanf($hex, '%02x%02x%02x');
+
+        // Return the RGB values as a comma-separated string
+        return implode(', ', $rgb);
+    }
+
+    /**
      * Get the date difference in hours.
      *
      * @param  Carbon  $value
@@ -1005,7 +1023,7 @@ class CoreModifiers extends Modifier
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param $value
+     * @param  $value
      * @return bool
      */
     public function inArray($haystack, $params, $context)
@@ -1492,7 +1510,7 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param $params
+     * @param  $params
      * @return string
      */
     public function md5($value)
@@ -2908,8 +2926,17 @@ class CoreModifiers extends Modifier
             }
         }
 
+        if (Str::contains($url, 'youtube.com/shorts/')) {
+            $url = str_replace('shorts/', 'embed/', $url);
+        }
+
         if (Str::contains($url, 'youtube.com')) {
             $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
+        }
+
+        // This avoids SSL issues when using the non-www version
+        if (Str::contains($url, '//youtube-nocookie.com')) {
+            $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
         }
 
         return $url;
@@ -3008,7 +3035,7 @@ class CoreModifiers extends Modifier
     private function carbon($value)
     {
         if (! $value instanceof Carbon) {
-            $value = (is_numeric($value)) ? Carbon::createFromTimestamp($value) : Carbon::parse($value);
+            $value = (is_numeric($value)) ? Date::createFromTimestamp($value) : Date::parse($value);
         }
 
         return $value;

@@ -13,6 +13,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionSaved;
 use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
@@ -338,22 +339,20 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function ensureEntryBlueprintFields($blueprint)
     {
-        if (! $blueprint->hasField('title')) {
-            $blueprint->ensureFieldPrepended('title', [
-                'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
-                'required' => ! $auto,
-            ]);
-        }
+        $blueprint->ensureFieldPrepended('title', [
+            'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
+            'required' => ! $auto,
+        ]);
 
-        if ($this->requiresSlugs() && ! $blueprint->hasField('slug')) {
+        if ($this->requiresSlugs()) {
             $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true, 'validate' => 'max:200'], 'sidebar');
         }
 
-        if ($this->dated() && ! $blueprint->hasField('date')) {
+        if ($this->dated()) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
         }
 
-        if ($this->hasStructure() && ! $this->orderable() && ! $blueprint->hasField('parent')) {
+        if ($this->hasStructure() && ! $this->orderable()) {
             $blueprint->ensureField('parent', [
                 'type' => 'entries',
                 'collections' => [$this->handle()],
@@ -616,6 +615,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
+    /** @deprecated */
     public function revisions($enabled = null)
     {
         return $this
@@ -680,7 +680,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
-    public function structureContents(array $contents = null)
+    public function structureContents(?array $contents = null)
     {
         return $this
             ->fluentlyGetOrSet('structureContents')
@@ -729,7 +729,18 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function delete()
     {
-        $this->queryEntries()->get()->each->delete();
+        if (CollectionDeleting::dispatch($this) === false) {
+            return false;
+        }
+
+        $this->queryEntries()->get()->each(function ($entry) {
+            $entry->deleteDescendants();
+            $entry->delete();
+        });
+
+        if ($this->hasStructure()) {
+            $this->structure()->trees()->each->delete();
+        }
 
         Facades\Collection::delete($this);
 
@@ -862,15 +873,9 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function augmentedArrayData()
     {
-        $data = [
+        return [
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
-
-        if (! Statamic::isApiRoute() && ! Statamic::isCpRoute()) {
-            $data['mount'] = $this->mount();
-        }
-
-        return $data;
     }
 }

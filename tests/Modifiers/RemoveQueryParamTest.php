@@ -33,7 +33,7 @@ class RemoveQueryParamTest extends TestCase
         $this->assertSame($this->baseUrl, $this->modify($this->baseUrl));
     }
 
-    private function modify(string $url, string $queryParamKey = null)
+    private function modify(string $url, ?string $queryParamKey = null)
     {
         if (is_null($queryParamKey)) {
             return Modify::value($url)->removeQueryParam()->fetch();

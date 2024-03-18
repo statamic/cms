@@ -3,20 +3,18 @@
     <div>
         <div v-for="permission in permissions" :key="permission.value">
             <label
-                class="flex items-center justify-between py-2 pr-4 border-b group hover:bg-gray-100"
-                :style="{ paddingLeft: `${16*depth}px` }"
+                class="flex items-center justify-between py-2 rtl:pl-4 ltr:pr-4 border-b group hover:bg-gray-100"
+                :style="direction === 'ltr' ? { paddingLeft: `${16*depth}px` } : { paddingRight: `${16*depth}px` }"
             >
-                <div class="flex" :class="{ 'text-gray-500': disabled, 'cursor-not-allowed': disabled }">
+                <div class="flex">
                     <div class="leading-normal">
                         <input type="checkbox"
                             v-model="permission.checked"
                             :value="permission.value"
-                            :disabled="disabled"
                             name="permissions[]"
-                            :class="{ 'cursor-not-allowed': disabled }"
                         />
                     </div>
-                    <div class="pl-2">
+                    <div class="rtl:pr-2 ltr:pl-2">
                         {{ permission.label }}
                     </div>
                 </div>
@@ -27,7 +25,6 @@
                 v-if="permission.children.length"
                 :depth="depth+1"
                 :initial-permissions="permission.children"
-                :disabled="!permission.checked"
             />
         </div>
     </div>
@@ -39,7 +36,6 @@ export default {
 
     props: {
         initialPermissions: Array,
-        disabled: Boolean,
         depth: Number
     },
 
@@ -49,14 +45,10 @@ export default {
         }
     },
 
-    watch: {
-
-        disabled(disabled) {
-            if (disabled) {
-                this.permissions.map(permission => permission.checked = false);
-            }
+    computed: {
+        direction() {
+            return this.$config.get('direction', 'rtl');
         }
-
     }
 
 }

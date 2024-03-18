@@ -51,7 +51,7 @@
 
                 <div class="addon-grid my-8" :class="{ 'opacity-50': loading }">
                     <div class="addon-card bg-white text-gray-800 h-full shadow rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
-                        <span class="badge absolute top-0 left-0 mt-2 ml-2" v-if="addon.installed">Installed</span>
+                        <span class="badge absolute top-0 rtl:right-0 ltr:left-0 mt-2 rtl:mr-2 ltr:ml-2" v-if="addon.installed">Installed</span>
                         <div class="h-48 rounded-t bg-cover bg-center" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
                         <div class="px-6 mb-4 relative text-center">
                             <a :href="addon.seller.website" class="relative">

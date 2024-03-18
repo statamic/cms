@@ -74,7 +74,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         ];
 
         foreach ($configs as $config) {
-            $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
+            $app['config']->set("statamic.$config", require (__DIR__."/../config/{$config}.php"));
         }
     }
 
@@ -121,13 +121,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $viewPaths[] = __DIR__.'/__fixtures__/views/';
 
         $app['config']->set('view.paths', $viewPaths);
-    }
-
-    public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
-    {
-        $args = static::normalizeArgsForWindows(func_get_args());
-
-        parent::assertEquals(...$args);
     }
 
     protected function assertEveryItem($items, $callback)
@@ -177,7 +170,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     // This method is unavailable on earlier versions of Laravel.
-    public function partialMock($abstract, \Closure $mock = null)
+    public function partialMock($abstract, ?\Closure $mock = null)
     {
         $mock = \Mockery::mock(...array_filter(func_get_args()))->makePartial();
         $this->app->instance($abstract, $mock);
@@ -221,5 +214,18 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
             return $this;
         });
+    }
+
+    public function __call($name, $arguments)
+    {
+        if ($name == 'assertStringEqualsStringIgnoringLineEndings') {
+            return Assert::assertThat(
+                $arguments[1],
+                new StringEqualsStringIgnoringLineEndings($arguments[0]),
+                $arguments[2] ?? ''
+            );
+        }
+
+        throw new \BadMethodCallException("Method [$name] does not exist.");
     }
 }

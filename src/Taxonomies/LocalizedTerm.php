@@ -372,13 +372,17 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
     public function template($template = null)
     {
         if (func_num_args() === 0) {
-            $defaultTemplate = $this->taxonomyHandle().'.show';
-
-            if ($collection = $this->collection()) {
-                $defaultTemplate = $collection->handle().'.'.$defaultTemplate;
+            if ($template = $this->get('template')) {
+                return $template;
             }
 
-            return $this->get('template', $defaultTemplate);
+            $template = $this->taxonomy()->termTemplate();
+
+            if ($collection = $this->collection()) {
+                $template = $collection->handle().'.'.$template;
+            }
+
+            return $template;
         }
 
         return $this->set('template', $template);
@@ -387,7 +391,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
     public function layout($layout = null)
     {
         if (func_num_args() === 0) {
-            return $this->get('layout', 'layout');
+            return $this->get('layout') ?? $this->taxonomy()->layout();
         }
 
         return $this->set('layout', $layout);
@@ -411,6 +415,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
     //         'entries_count' => $entryQuery->count(),
     //     ])->all();
     // }
+
+    public function saveQuietly()
+    {
+        return $this->term->saveQuietly();
+    }
 
     public function save()
     {

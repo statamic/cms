@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class StatamicGroupsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('GROUPS_TABLE', function (Blueprint $table) {
+            $table->id();
+            $table->string('handle')->unique();
+            $table->string('title');
+            $table->json('data')->nullable();
+            $table->json('roles')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down()
+    {
+        Schema::dropIfExists('GROUPS_TABLE');
+    }
+}

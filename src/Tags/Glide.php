@@ -28,7 +28,7 @@ class Glide extends Tags
      * @param  array  $args
      * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         $tag = explode(':', $this->tag, 2)[1];
 
@@ -132,20 +132,24 @@ class Glide extends Tags
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
         return $items->map(function ($item) {
-            $data = ['url' => $this->generateGlideUrl($item)];
+            try {
+                $data = ['url' => $this->generateGlideUrl($item)];
 
-            if ($this->isValidExtension($item)) {
-                $path = $this->generateImage($item);
-                $attrs = Attributes::from(GlideManager::cacheDisk(), $path);
-                $data = array_merge($data, $attrs);
+                if ($this->isValidExtension($item)) {
+                    $path = $this->generateImage($item);
+                    $attrs = Attributes::from(GlideManager::cacheDisk(), $path);
+                    $data = array_merge($data, $attrs);
+                }
+
+                if ($item instanceof Augmentable) {
+                    $data = array_merge($item->toAugmentedArray(), $data);
+                }
+
+                return $data;
+            } catch (\Exception $e) {
+                \Log::error($e->getMessage());
             }
-
-            if ($item instanceof Augmentable) {
-                $data = array_merge($item->toAugmentedArray(), $data);
-            }
-
-            return $data;
-        })->all();
+        })->filter()->all();
     }
 
     /**

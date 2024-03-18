@@ -15,16 +15,14 @@ class FileUploader extends Uploader
         $this->container = $container ? AssetContainer::find($container) : null;
     }
 
-    public static function container(string $container = null)
+    public static function container(?string $container = null)
     {
         return new static($container);
     }
 
     protected function uploadPath(UploadedFile $file)
     {
-        $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-
-        return now()->timestamp.'/'.$filename.'.'.$file->guessExtension();
+        return now()->timestamp.'/'.$file->getClientOriginalName();
     }
 
     protected function uploadPathPrefix()

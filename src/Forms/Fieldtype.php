@@ -32,6 +32,17 @@ class Fieldtype extends Relationship
                 'default' => 1,
                 'instructions' => __('statamic::fieldtypes.form.config.max_items'),
             ],
+            'mode' => [
+                'display' => __('UI Mode'),
+                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                'type' => 'radio',
+                'default' => 'default',
+                'options' => [
+                    'default' => __('Stack Selector'),
+                    'select' => __('Select Dropdown'),
+                    'typeahead' => __('Typeahead Field'),
+                ],
+            ],
             'query_scopes' => [
                 'display' => __('Query Scopes'),
                 'instructions' => __('statamic::fieldtypes.form.config.query_scopes'),
@@ -57,7 +68,7 @@ class Fieldtype extends Relationship
     {
         if ($form = Facades\Form::find($id)) {
             return [
-                'title' => $form->title(),
+                'title' => __($form->title()),
                 'id' => $form->handle(),
             ];
         }
@@ -85,7 +96,7 @@ class Fieldtype extends Relationship
         $formFields = function ($form) {
             return [
                 'id' => $form->handle(),
-                'title' => $form->title(),
+                'title' => __($form->title()),
                 'submissions' => $form->submissions()->count(),
             ];
         };

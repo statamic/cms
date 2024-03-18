@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Fieldset;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\CanManageBlueprints;
 
@@ -49,8 +50,10 @@ class FieldsController extends CpController
     public function update(Request $request)
     {
         $request->validate([
+            'id' => 'nullable',
             'type' => 'required',
             'values' => 'required|array',
+            'fields' => 'sometimes|array',
         ]);
 
         $fieldtype = FieldtypeRepository::find($request->type);
@@ -61,9 +64,37 @@ class FieldsController extends CpController
             ->fields()
             ->addValues($request->values);
 
-        $fields->validate([], [
+        $extraRules = [
+            'handle' => [
+                function ($attribute, $value, $fail) use ($request) {
+                    $existingFieldWithHandle = collect($request->fields ?? [])
+                        ->when($request->has('id'), fn ($collection) => $collection->reject(fn ($field) => $field['_id'] === $request->id))
+                        ->flatMap(function (array $field) {
+                            if ($field['type'] === 'import') {
+                                return Fieldset::find($field['fieldset'])->fields()->all()->map->handle()->toArray();
+                            }
+
+                            return [$field['handle']];
+                        })
+                        ->values()
+                        ->contains($request->values['handle']);
+
+                    if ($existingFieldWithHandle) {
+                        $fail(__('statamic::validation.duplicate_field_handle', ['handle' => $value]));
+                    }
+                },
+            ],
+        ];
+        $customMessages = [
             'handle.not_in' => __('statamic::validation.reserved'),
-        ]);
+        ];
+
+        if ($request->type === 'date' && $request->values['handle'] === 'date') {
+            $extraRules['mode'] = 'in:single';
+            $customMessages['mode.in'] = __('statamic::validation.date_fieldtype_only_single_mode_allowed');
+        }
+
+        $fields->validate($extraRules, $customMessages);
 
         $values = array_merge($request->values, $fields->process()->values()->all());
 
@@ -99,7 +130,11 @@ class FieldsController extends CpController
                 'type' => 'slug',
                 'from' => 'display',
                 'separator' => '_',
-                'validate' => 'required|regex:/^[a-zA-Z][a-zA-Z0-9_]*$/|not_in:'.implode(',', $reserved),
+                'validate' => [
+                    'required',
+                    'regex:/^[a-zA-Z]([a-zA-Z0-9_]|->)*$/',
+                    'not_in:'.implode(',', $reserved),
+                ],
                 'show_regenerate' => true,
             ],
             'instructions' => [

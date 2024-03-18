@@ -246,7 +246,7 @@ class EntriesController extends CpController
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled() && $entry->published()) {
-            $entry
+            $saved = $entry
                 ->makeWorkingCopy()
                 ->user(User::current())
                 ->save();
@@ -258,22 +258,26 @@ class EntriesController extends CpController
                 $entry->published($request->published);
             }
 
-            $entry->updateLastModified(User::current())->save();
+            $saved = $entry->updateLastModified(User::current())->save();
         }
 
         [$values] = $this->extractFromFields($entry, $blueprint);
 
-        return (new EntryResource($entry->fresh()))
-            ->additional([
-                'data' => [
-                    'values' => $values,
-                ],
-            ]);
+        return [
+            'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
+                'values' => $values,
+            ]),
+            'saved' => $saved,
+        ];
     }
 
     public function create(Request $request, $collection, $site)
     {
         $this->authorize('create', [EntryContract::class, $collection, $site]);
+
+        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, $site)) {
+            return $response;
+        }
 
         $blueprint = $collection->entryBlueprint($request->blueprint);
 
@@ -398,15 +402,18 @@ class EntriesController extends CpController
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled()) {
-            $entry->store([
+            $saved = $entry->store([
                 'message' => $request->message,
                 'user' => User::current(),
             ]);
         } else {
-            $entry->updateLastModified(User::current())->save();
+            $saved = $entry->updateLastModified(User::current())->save();
         }
 
-        return new EntryResource($entry);
+        return [
+            'data' => (new EntryResource($entry))->resolve()['data'],
+            'saved' => $saved,
+        ];
     }
 
     private function resolveSlug($request)
@@ -580,5 +587,12 @@ class EntriesController extends CpController
         return $collection
             ->sites()
             ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
+    }
+
+    protected function ensureCollectionIsAvailableOnSite($collection, $site)
+    {
+        if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
+            return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
+        }
     }
 }

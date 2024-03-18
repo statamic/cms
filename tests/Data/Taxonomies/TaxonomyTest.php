@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Events\TaxonomyCreated;
 use Statamic\Events\TaxonomyCreating;
+use Statamic\Events\TaxonomyDeleted;
+use Statamic\Events\TaxonomyDeleting;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
@@ -101,6 +103,7 @@ class TaxonomyTest extends TestCase
                 ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
 
         $blueprint = $taxonomy->termBlueprint();
         $this->assertNotEquals($default, $blueprint);
@@ -392,6 +395,45 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_the_layout()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to layout
+        $this->assertEquals('layout', $taxonomy->layout());
+
+        // taxonomy level overrides the default
+        $taxonomy->layout('foo');
+        $this->assertEquals('foo', $taxonomy->layout());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_template()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to taxonomy.index
+        $this->assertEquals('tags.index', $taxonomy->template());
+
+        // taxonomy level overrides the default
+        $taxonomy->template('foo');
+        $this->assertEquals('foo', $taxonomy->template());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_term_template()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to taxonomy.show
+        $this->assertEquals('tags.show', $taxonomy->termTemplate());
+
+        // taxonomy level overrides the default
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $taxonomy->termTemplate());
+    }
+
+    /** @test */
     public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
     {
         Site::setConfig([
@@ -423,11 +465,44 @@ class TaxonomyTest extends TestCase
         $this->assertFalse($user->can('view', $taxonomy3));
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],
             'through facade' => [true],
         ];
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Facades\Taxonomy::make('test'))->save();
+
+        $taxonomy->delete();
+
+        Event::assertDispatched(TaxonomyDeleting::class, function ($event) use ($taxonomy) {
+            return $event->taxonomy === $taxonomy;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Taxonomy::spy();
+        Event::fake([TaxonomyDeleted::class]);
+
+        Event::listen(TaxonomyDeleting::class, function () {
+            return false;
+        });
+
+        $taxonomy = new Taxonomy('test');
+
+        $return = $taxonomy->delete();
+
+        $this->assertFalse($return);
+        Facades\Taxonomy::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(TaxonomyDeleted::class);
     }
 }

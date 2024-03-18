@@ -47,6 +47,10 @@ class GlideManager
 
                     $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.Str::of($path)->after('/');
 
+                    if ($extension = ($params['fm'] ?? false)) {
+                        $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
+                    }
+
                     return $cachePath;
                 });
         }

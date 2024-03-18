@@ -13,7 +13,7 @@
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         />
-        <div class="text-right text-xs" :class="limitIndicatorColor" v-if="limit">
+        <div class="rtl:text-left ltr:text-right text-xs" :class="limitIndicatorColor" v-if="limit">
             <span v-text="currentLength"></span>/<span v-text="limit"></span>
         </div>
     </div>
@@ -39,12 +39,16 @@ export default {
     mounted() {
         autosize(this.$refs.textarea);
 
+        if (this.focus) {
+            this.$refs.textarea.focus();
+        }
+
         setTimeout(() => {
             this.updateSize();
         }, 1);
         this.$events.$on('tab-switched', this.updateSize);
     },
-    
+
     beforeDestroy() {
         autosize.destroy(this.$refs.textarea);
     },

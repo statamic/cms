@@ -449,4 +449,36 @@ HTML;
             $this->tag('{{ locales }}you should not see this{{ /locales }}', ['id' => $value])
         );
     }
+
+    /** @test */
+    public function it_prefers_page_id_over_id()
+    {
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('english')
+            ->id('1')
+            ->data(['title' => 'hello'])
+            ->create();
+
+        $this->assertEquals(
+            '<hello>',
+            $this->tag('{{ locales }}<{{ title }}>{{ /locales }}', ['page' => ['id' => '1']])
+        );
+    }
+
+    /** @test */
+    public function it_prefers_id_param_over_page_id()
+    {
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('english')
+            ->id('1')
+            ->data(['title' => 'hello'])
+            ->create();
+
+        $this->assertEquals(
+            '<hello>',
+            $this->tag('{{ locales id="1" }}<{{ title }}>{{ /locales }}', ['page' => ['id' => '7']])
+        );
+    }
 }
