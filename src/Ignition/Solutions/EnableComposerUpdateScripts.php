@@ -13,7 +13,7 @@ class EnableComposerUpdateScripts implements RunnableSolution
 {
     public function getSolutionTitle(): string
     {
-        return 'Your composer.json is not properly configured for Statamic update scripts';
+        return 'Your composer.json is missing configuration';
     }
 
     public function getSolutionDescription(): string
@@ -30,7 +30,7 @@ class EnableComposerUpdateScripts implements RunnableSolution
 
     public function getSolutionActionDescription(): string
     {
-        return 'Statamic can attempt to configure and run update scripts for you.';
+        return 'Your composer.json is not properly configured for Statamic update scripts. Statamic can attempt to configure and run update scripts for you.';
     }
 
     public function getRunButtonText(): string
