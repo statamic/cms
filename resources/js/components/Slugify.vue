@@ -50,7 +50,12 @@ export default {
     methods: {
 
         reset() {
-            if (this.enabled) this.shouldSlugify = true;
+            if (this.enabled) {
+                this.shouldSlugify = true;
+                return this.slugify();
+            }
+
+            return Promise.resolve();
         },
 
         slugify() {
