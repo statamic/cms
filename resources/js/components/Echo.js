@@ -19,7 +19,10 @@ class Echo {
 
     start() {
         let config = {
-            ...Statamic.$config.get('broadcasting.options'),
+            broadcaster: 'pusher',
+            key: Statamic.$config.get('broadcasting.pusher.key'),
+            cluster: Statamic.$config.get('broadcasting.pusher.cluster'),
+            encrypted: Statamic.$config.get('broadcasting.pusher.encrypted'),
             csrfToken: Statamic.$config.get('csrfToken'),
             authEndpoint: Statamic.$config.get('broadcasting.endpoint'),
         };
