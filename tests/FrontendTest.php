@@ -152,10 +152,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_subdirectory_based_site_is_displayed()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -167,10 +167,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_subdirectory_based_site_is_displayed_with_ending_slash()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -182,10 +182,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_domain_site_is_displayed()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -197,10 +197,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_domain_site_is_displayed_with_ending_slash()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -645,10 +645,10 @@ class FrontendTest extends TestCase
     {
         app('translator')->addNamespace('test', __DIR__.'/__fixtures__/lang');
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<p>{{ trans key="test::messages.hello" }}</p>');
@@ -691,10 +691,10 @@ class FrontendTest extends TestCase
         $frLocale = setlocale(LC_TIME, 0);
         setlocale(LC_TIME, $originalLocale);
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en', 'lang' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale, 'lang' => 'fr'],
-        ]]);
+        ]);
 
         (new class extends Tags
         {

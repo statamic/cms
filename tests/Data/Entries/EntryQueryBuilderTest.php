@@ -617,10 +617,10 @@ class EntryQueryBuilderTest extends TestCase
     /** @test */
     public function it_substitutes_entries_by_uri_and_site()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::make('posts')->routes('/posts/{slug}')->sites(['en', 'fr'])->save();
         EntryFactory::id('en-1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->locale('en')->create();

@@ -19,10 +19,10 @@ class AddViewPathsTest extends TestCase
      */
     public function adds_view_paths($isAmpEnabled, $requestUrl, $expectedPaths)
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         view()->getFinder()->setPaths($originalPaths = [
             '/path/to/views',
@@ -54,10 +54,10 @@ class AddViewPathsTest extends TestCase
      */
     public function adds_namespaced_view_paths($requestUrl, $expectedPaths)
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         view()->getFinder()->replaceNamespace('foo', [
             '/path/to/views',

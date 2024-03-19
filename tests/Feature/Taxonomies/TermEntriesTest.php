@@ -99,10 +99,10 @@ class TermEntriesTest extends TestCase
     /** @test */
     public function it_gets_and_counts_entries_for_a_localized_term_across_collections()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['locale' => 'en_US', 'name' => 'English', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'name' => 'French', 'url' => '/fr/'],
-        ]]);
+        ]);
 
         Taxonomy::make('colors')->save();
         tap(Term::make()->taxonomy('colors'), function ($term) {
@@ -163,10 +163,10 @@ class TermEntriesTest extends TestCase
     /** @test */
     public function it_gets_and_counts_entries_for_a_localized_term_for_a_single_collection()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['locale' => 'en_US', 'name' => 'English', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'name' => 'French', 'url' => '/fr/'],
-        ]]);
+        ]);
 
         Taxonomy::make('colors')->save();
         tap(Term::make()->taxonomy('colors'), function ($term) {

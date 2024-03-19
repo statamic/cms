@@ -33,10 +33,10 @@ class GlobalVariablesRepositoryTest extends TestCase
 
     private function setUpMultiSite()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr/'],
-        ]]);
+        ]);
         $stache = (new Stache)->sites(['en', 'fr']);
         $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/globals-multisite';

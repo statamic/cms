@@ -126,11 +126,11 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_reorder_items_within_sections()
     {
-        $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
+        $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Site'];
 
         $this->assertEquals($defaultContentItems, $this->buildDefaultNav()->get('Content')->map->display()->all());
 
-        $reorderedContentItems = ['Globals', 'Taxonomies', 'Collections', 'Navigation', 'Assets'];
+        $reorderedContentItems = ['Globals', 'Taxonomies', 'Collections', 'Navigation', 'Assets', 'Site'];
 
         // Recommended syntax...
         $this->assertEquals($reorderedContentItems, $this->buildNavWithPreferences([
@@ -142,6 +142,7 @@ class NavPreferencesTest extends TestCase
                     'content::collections' => '@inherit',
                     'content::navigation' => '@inherit',
                     'content::assets' => '@inherit',
+                    'content::site' => '@inherit',
                 ],
             ],
         ])->get('Content')->map->display()->all());
@@ -155,6 +156,7 @@ class NavPreferencesTest extends TestCase
                 'content::collections' => '@inherit',
                 'content::navigation' => '@inherit',
                 'content::assets' => '@inherit',
+                'content::site' => '@inherit',
             ],
         ])->get('Content')->map->display()->all());
 
@@ -169,6 +171,7 @@ class NavPreferencesTest extends TestCase
                         'content::collections' => '@inherit',
                         'content::navigation' => '@inherit',
                         'content::assets' => '@inherit',
+                        'content::site' => '@inherit',
                     ],
                 ],
             ],
@@ -210,6 +213,7 @@ class NavPreferencesTest extends TestCase
                     'content::collections' => '@inherit',
                     'content::navigation' => '@inherit',
                     'content::assets' => '@inherit',
+                    'content::site' => '@inherit',
                 ],
             ],
         ])->get('Content')->map->display()->all());
@@ -223,6 +227,7 @@ class NavPreferencesTest extends TestCase
                     'content::collections' => '@inherit',
                     'content::navigation' => '@inherit',
                     'content::assets' => '@inherit',
+                    'content::site' => '@inherit',
                 ],
             ],
         ])->get('Content')->map->display()->all());
@@ -394,7 +399,7 @@ class NavPreferencesTest extends TestCase
             ],
         ]);
         $this->assertNull($nav->get('Content'));
-        $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'], $nav->get('Data')->map->display()->all());
+        $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Site'], $nav->get('Data')->map->display()->all());
         $this->assertNull($nav->get('Users'));
         $this->assertEquals(['Users', 'Groups', 'Permissions'], $nav->get('Pals')->map->display()->all());
     }
@@ -502,7 +507,7 @@ class NavPreferencesTest extends TestCase
                 'content::collections::pages' => '@alias',
             ],
         ]);
-        $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Pages'], $nav->get('Content')->map->display()->all());
+        $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Site', 'Pages'], $nav->get('Content')->map->display()->all());
         $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
         $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
     }
@@ -701,11 +706,11 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_hide_items_from_a_section()
     {
-        $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
+        $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Site'];
 
         $this->assertEquals($defaultContentItems, $this->buildDefaultNav()->get('Content')->map->display()->all());
 
-        $itemsAfterHiding = ['Collections', 'Taxonomies', 'Assets'];
+        $itemsAfterHiding = ['Collections', 'Taxonomies', 'Assets', 'Site'];
 
         // Recommended syntax...
         $this->assertEquals($itemsAfterHiding, $this->buildNavWithPreferences([
@@ -1607,6 +1612,7 @@ class NavPreferencesTest extends TestCase
             'Blueprints' => 'http://localhost/cp/fields/blueprints',
             'Flickr' => 'https://flickr.com',
             'Fieldsets' => 'http://localhost/cp/fields/fieldsets?modified',
+            'Site' => 'http://localhost/cp/sites',
         ], $nav->get('Site')->mapWithKeys(fn ($i) => [$i->display() => $i->url()])->all());
 
         // The `Fields` section was not explicitly defined in config, but `Blueprints` should be gone due to `@move`
@@ -1632,7 +1638,7 @@ class NavPreferencesTest extends TestCase
             ],
         ], true)->get('Content');
 
-        $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globetrotters'], $contentItems->map->display()->all());
+        $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globetrotters', 'Site'], $contentItems->map->display()->all());
 
         $this->assertEquals('@hide', $contentItems->keyBy->display()->get('Navigation')->manipulations()['action']);
         $this->assertEquals('@modify', $contentItems->keyBy->display()->get('Globetrotters')->manipulations()['action']);

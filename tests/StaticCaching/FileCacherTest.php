@@ -228,11 +228,11 @@ class FileCacherTest extends TestCase
     /** @test */
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
-        ]]);
+        ]);
 
         $writer = \Mockery::spy(Writer::class);
         $cache = app(Repository::class);
@@ -266,11 +266,11 @@ class FileCacherTest extends TestCase
     /** @test */
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite_and_a_single_string_value_for_the_path()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
-        ]]);
+        ]);
 
         $writer = \Mockery::spy(Writer::class);
         $cache = app(Repository::class);

@@ -73,6 +73,7 @@ use Statamic\Http\Controllers\CP\Preferences\UserPreferenceController;
 use Statamic\Http\Controllers\CP\SearchController;
 use Statamic\Http\Controllers\CP\SelectSiteController;
 use Statamic\Http\Controllers\CP\SessionTimeoutController;
+use Statamic\Http\Controllers\CP\Sites\SitesController;
 use Statamic\Http\Controllers\CP\StartPageController;
 use Statamic\Http\Controllers\CP\Taxonomies\PublishedTermsController;
 use Statamic\Http\Controllers\CP\Taxonomies\ReorderTaxonomyBlueprintsController;
@@ -231,6 +232,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');
     Route::get('svgs/{encoded_asset}', [SvgController::class, 'show'])->name('assets.svgs.show');
     Route::get('pdfs/{encoded_asset}', [PdfController::class, 'show'])->name('assets.pdfs.show');
+
+    Route::get('sites', [SitesController::class, 'edit'])->name('sites.edit');
+    Route::patch('sites', [SitesController::class, 'update'])->name('sites.update');
 
     Route::group(['prefix' => 'fields'], function () {
         Route::get('/', [FieldsController::class, 'index'])->name('fields.index');

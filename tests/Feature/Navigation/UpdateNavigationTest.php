@@ -49,11 +49,11 @@ class UpdateNavigationTest extends TestCase
     /** @test */
     public function it_updates_a_nav_with_multiple_sites()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
             'de' => ['url' => 'http://localhost/de/', 'locale' => 'de'],
-        ]]);
+        ]);
 
         $nav = $this->createNav();
         $nav->makeTree('de')->save();

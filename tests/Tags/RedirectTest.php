@@ -15,10 +15,10 @@ class RedirectTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr'],
-        ]]);
+        ]);
     }
 
     protected function resolveApplicationConfiguration($app)

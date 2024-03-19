@@ -46,11 +46,11 @@ EOT;
 
         Event::fake();
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => '/en', 'name' => 'English', 'locale' => 'en_US'],
             'french' => ['url' => '/fr', 'name' => 'French', 'locale' => 'fr_FR'],
             'espanol' => ['url' => '/es', 'name' => 'Spanish', 'locale' => 'es_ES'],
-        ]]);
+        ]);
 
         Collection::make('test')
             ->routes('{id}')

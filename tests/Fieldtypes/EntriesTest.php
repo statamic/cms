@@ -28,10 +28,10 @@ class EntriesTest extends TestCase
 
         Carbon::setTestNow(Carbon::parse('2021-01-02'));
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $collection = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->dated(true)->pastDateBehavior('private')->futureDateBehavior('private')->save();
 

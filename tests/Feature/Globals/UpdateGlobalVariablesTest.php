@@ -37,10 +37,10 @@ class UpdateGlobalVariablesTest extends TestCase
     /** @test */
     public function it_denies_access_if_you_dont_have_site_permission()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr/'],
-        ]]);
+        ]);
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->make();

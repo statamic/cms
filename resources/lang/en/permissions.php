@@ -8,6 +8,8 @@ return [
     'group_cp' => 'Control Panel',
     'access_cp' => 'Access the Control Panel',
     'access_cp_desc' => 'Allows access into control panel, but doesn\'t guarantee anything can be done once inside.',
+    'configure_sites' => 'Configure Sites',
+    'configure_sites_desc' => 'Ability to configure sites when multi-site is enabled.',
     'configure_fields' => 'Configure Fields',
     'configure_fields_desc' => 'Ability to edit blueprints, fieldsets, and their fields.',
     'configure_addons' => 'Configure Addons',

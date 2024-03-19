@@ -286,18 +286,26 @@ class SiteTest extends TestCase
     }
 
     /** @test */
-    public function gets_direction()
+    public function it_gets_direction()
     {
-        $site = new Site('ar', ['locale' => 'ar_SA', 'direction' => 'rtl']);
+        $site = new Site('ar', ['locale' => 'ar_SA']);
 
         $this->assertEquals('rtl', $site->direction());
     }
 
     /** @test */
-    public function gets_direction_with_fallback()
+    public function it_gets_direction_with_fallback()
     {
         $site = new Site('en', ['locale' => 'en_US']);
 
         $this->assertEquals('ltr', $site->direction());
+    }
+
+    /** @test */
+    public function it_gets_direction_from_custom_lang()
+    {
+        $site = new Site('reverse_elvish', ['locale' => 'en_US', 'lang' => 'ar']); // ar should be rtl lang
+
+        $this->assertEquals('rtl', $site->direction());
     }
 }

@@ -20,12 +20,9 @@ class UpdateTermReferencesTest extends TestCase
         parent::setUp();
 
         // TODO: Test localized terms?
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-            ],
+        Facades\Site::setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
         ]);
 
         $this->topics = tap(Facades\Taxonomy::make('topics'))->save();

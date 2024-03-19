@@ -21,10 +21,10 @@ class EntriesTest extends TestCase
      */
     public function it_gets_entries($locale, $config, $expected)
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::make('blog')->sites(['en', 'fr'])->save();
         Collection::make('pages')->sites(['en'])->save();

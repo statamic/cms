@@ -17,10 +17,10 @@ class ParentTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
-        ]]);
+        ]);
     }
 
     private function tag($tag, $data = [])

@@ -25,10 +25,10 @@ class UrlBuilderTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
-        ]]);
+        ]);
 
         $entry = tap(\Statamic\Facades\Entry::make()
             ->id('post')

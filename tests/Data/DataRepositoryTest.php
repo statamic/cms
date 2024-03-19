@@ -118,10 +118,10 @@ class DataRepositoryTest extends TestCase
      */
     public function it_finds_by_request_url($requestUrl, $entryId)
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->findByRequestUrlTest($requestUrl, $entryId);
     }
@@ -133,10 +133,10 @@ class DataRepositoryTest extends TestCase
      */
     public function it_finds_by_request_url_with_no_root_site($requestUrl, $entryId)
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'english' => ['url' => 'http://localhost/en/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->findByRequestUrlTest($requestUrl, $entryId);
     }

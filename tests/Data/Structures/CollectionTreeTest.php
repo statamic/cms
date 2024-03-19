@@ -67,10 +67,10 @@ class CollectionTreeTest extends TestCase
     /** @test */
     public function it_gets_the_path_when_using_multisite()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'one' => ['locale' => 'en_US', 'url' => '/one'],
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
-        ]]);
+        ]);
 
         $collection = Collection::make('pages')->structureContents(['root' => true]);
         Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);

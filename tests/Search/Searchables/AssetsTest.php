@@ -21,10 +21,10 @@ class AssetsTest extends TestCase
      */
     public function it_gets_assets($locale, $config, $expected)
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Storage::fake('images');
         Storage::fake('documents');

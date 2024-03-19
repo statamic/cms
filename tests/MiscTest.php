@@ -22,10 +22,10 @@ class MiscTest extends TestCase
      **/
     public function locales_tag_doesnt_ruin_future_tag_pairs($withParameter)
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
             'de' => ['url' => 'http://localhost/de/', 'locale' => 'de', 'name' => 'German'],
-        ]]);
+        ]);
 
         $blueprint = Blueprint::makeFromFields(['related_entries' => ['type' => 'entries']]);
         Blueprint::shouldReceive('in')->with('collections/test')->andReturn(collect([$blueprint]));

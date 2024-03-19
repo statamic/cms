@@ -821,6 +821,7 @@ class NavTransformerTest extends TestCase
                     ['id' => 'content::assets'],
                     ['id' => 'content::collections'],
                     ['id' => 'content::globals'],
+                    ['id' => 'content::site'],
                 ],
             ],
         ]);
@@ -1293,6 +1294,7 @@ class NavTransformerTest extends TestCase
                         ],
                         'content::navigation' => '@inherit',
                         'content::taxonomies' => '@inherit',
+                        'content::assets' => '@inherit',
                     ],
                 ],
                 'custom_section' => [

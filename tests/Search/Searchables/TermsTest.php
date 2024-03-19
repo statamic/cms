@@ -16,10 +16,10 @@ class TermsTest extends TestCase
     /** @test */
     public function it_finds_terms_from_references()
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr/'],
-        ]]);
+        ]);
 
         Taxonomy::make('tags')->sites(['en', 'fr'])->save();
         Term::make('alfa')->taxonomy('tags')->dataForLocale('en', [])->dataForLocale('fr', [])->save();
@@ -48,10 +48,10 @@ class TermsTest extends TestCase
      */
     public function it_gets_terms($locale, $config, $expected)
     {
-        Site::setConfig(['sites' => [
+        Site::setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Taxonomy::make('tags')->sites(['en', 'fr'])->save();
         Taxonomy::make('categories')->sites(['en'])->save();

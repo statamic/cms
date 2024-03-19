@@ -14,9 +14,9 @@ class PolicyTestCase extends TestCase
 
     protected function withSites(array $sites)
     {
-        Site::setConfig(['sites' => collect($sites)->mapWithKeys(fn ($site) => [
+        Site::setSites(collect($sites)->mapWithKeys(fn ($site) => [
             $site => ['locale' => $site, 'url' => '/'],
-        ])]);
+        ]));
     }
 
     protected function userWithPermissions(array $permissions)
