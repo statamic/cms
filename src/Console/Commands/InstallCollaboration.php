@@ -56,7 +56,11 @@ class InstallCollaboration extends Command
 
     protected function enableBroadcasting(): void
     {
-        // TODO: Only attempt to enable broadcasting if it's not already enabled.
+        if (in_array(\Illuminate\Broadcasting\BroadcastServiceProvider::class, array_keys(app()->getLoadedProviders()))) {
+            $this->components->warn('Broadcasting is already enabled.');
+
+            return;
+        }
 
         if (version_compare(app()->version(), '11', '<')) {
             $this->enableBroadcastServiceProvider();
