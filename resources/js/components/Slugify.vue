@@ -22,25 +22,34 @@ export default {
 
     data() {
         return {
-            shouldSlugify: this.enabled
+            slug: null,
+            shouldSlugify: this.enabled && !this.to
         }
     },
 
     watch: {
 
-        from(from) {
-            if (!this.shouldSlugify) return this.to;
-            if (!from) return this.$emit('slugified', '');
-
-            this.slugify();
+        from: {
+            immediate: true,
+            handler() {
+                if (!this.shouldSlugify) {
+                    this.slug = this.to;
+                } else if (!this.from) {
+                    this.slug = '';
+                } else {
+                    this.slugify();
+                }
+            }
         },
 
-    },
+        to(to) {
+            if (to !== this.slug) this.shouldSlugify = false;
+        },
 
-    created() {
-        if (this.to) {
-            this.shouldSlugify = false;
+        slug(slug) {
+            this.$emit('slugified', slug);
         }
+
     },
 
     render() {
@@ -51,8 +60,7 @@ export default {
 
         reset() {
             if (this.enabled) {
-                this.shouldSlugify = true;
-                return this.slugify();
+                return this.slugify().then(() => this.shouldSlugify = true);
             }
 
             return Promise.resolve();
@@ -61,7 +69,7 @@ export default {
         slugify() {
             return new Promise((resolve, reject) => {
                 this.$slugify(this.from, this.separator, this.language).then((slug) => {
-                    this.$emit('slugified', slug);
+                    this.slug = slug;
                     resolve(slug);
                 }).catch((error) => {
                     reject(error);
