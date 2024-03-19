@@ -17,7 +17,7 @@ class Writer
      */
     public function write($path, $content, $lockFor = 0)
     {
-        @mkdir(dirname($path), 0777, true);
+        @mkdir(dirname($path), config('statamic.static_caching.permissions.directory', 0755), true);
 
         // Create the file handle. We use the "c" mode which will avoid writing an
         // empty file if we abort when checking the lock status in the next step.
@@ -31,7 +31,7 @@ class Writer
         }
 
         fwrite($handle, $content);
-        chmod($path, 0777);
+        chmod($path, config('statamic.static_caching.permissions.file', 0644));
 
         // Hold the file lock for a moment to prevent other processes from trying to write the same file.
         sleep($lockFor);
