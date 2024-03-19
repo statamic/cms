@@ -15,19 +15,17 @@ class SlugTest extends TestCase
      *
      * @dataProvider slugProvider
      */
-    public function it_generates_a_slug($text, $glue, $language, $expected)
+    public function it_generates_a_slug($string, $separator, $language, $expected)
     {
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
-            ->post('/cp/slug', [
-                'text' => $text,
-                'glue' => $glue,
+            ->postJson('/cp/slug', [
+                'string' => $string,
+                'separator' => $separator,
                 'language' => $language,
             ])
             ->assertOk()
-            ->assertJson([
-                'slug' => $expected,
-            ]);
+            ->assertContent($expected);
     }
 
     public static function slugProvider()

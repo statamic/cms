@@ -9,16 +9,10 @@ class SlugController extends CpController
 {
     public function __invoke(Request $request)
     {
-        $validated = $request->validate([
-            'text' => ['required'],
-            'glue' => ['required'],
+        return Str::slug(...$request->validate([
+            'string' => ['required'],
+            'separator' => ['required'],
             'language' => ['required'],
-        ]);
-
-        $slug = Str::slug($validated['text'], $validated['glue'], $validated['language']);
-
-        return [
-            'slug' => $slug,
-        ];
+        ]));
     }
 }
