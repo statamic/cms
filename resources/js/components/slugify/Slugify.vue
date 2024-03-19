@@ -22,6 +22,7 @@ export default {
 
     data() {
         return {
+            slugifier: this.$slug.in(this.language).separatedBy(this.separator),
             slug: null,
             shouldSlugify: this.enabled && !this.to
         }
@@ -31,7 +32,7 @@ export default {
 
         from: {
             immediate: true,
-            handler: _.debounce(function() {
+            handler() {
                 if (!this.shouldSlugify) {
                     this.slug = this.to;
                 } else if (!this.from) {
@@ -39,7 +40,7 @@ export default {
                 } else {
                     this.slugify();
                 }
-            }, 500)
+            }
         },
 
         to(to) {
@@ -68,12 +69,10 @@ export default {
 
         slugify() {
             return new Promise((resolve, reject) => {
-                this.$slugify(this.from, this.separator, this.language).then((slug) => {
+                this.slugifier.create(this.from).then(slug => {
                     this.slug = slug;
                     resolve(slug);
-                }).catch((error) => {
-                    reject(error);
-                });
+                }).catch(error => reject(error));
             });
         }
 
