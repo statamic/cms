@@ -5,8 +5,11 @@ namespace Statamic\StarterKits;
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
+use Illuminate\Console\Command;
+use Illuminate\Console\View\Components\Line;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
+use Laravel\Prompts\Prompt;
 use Statamic\Console\NullConsole;
 use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
@@ -15,6 +18,9 @@ use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
+
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\spin;
 
 final class Installer
 {
@@ -51,7 +57,7 @@ final class Installer
      * @param  mixed  $console
      * @return static
      */
-    public static function package(string $package, $console = null, ?LicenseManager $licenseManager = null)
+    public static function package(string $package, ?Command $console = null, ?LicenseManager $licenseManager = null)
     {
         return new self($package, $console, $licenseManager);
     }
@@ -91,6 +97,13 @@ final class Installer
     public function withoutDependencies($withoutDependencies = false)
     {
         $this->withoutDependencies = $withoutDependencies;
+
+        return $this;
+    }
+
+    public function isInteractive($isInteractive = false)
+    {
+        Prompt::interactive($isInteractive);
 
         return $this;
     }
@@ -248,13 +261,16 @@ final class Installer
      */
     protected function requireStarterKit()
     {
-        $this->console->info("Preparing starter kit [{$this->package}]...");
-
-        try {
-            Composer::withoutQueue()->throwOnFailure()->requireDev($this->package);
-        } catch (ProcessException $exception) {
-            $this->rollbackWithError("Error installing starter kit [{$this->package}].", $exception->getMessage());
-        }
+        spin(
+            function () {
+                try {
+                    Composer::withoutQueue()->throwOnFailure()->requireDev($this->package);
+                } catch (ProcessException $exception) {
+                    $this->rollbackWithError("Error installing starter kit [{$this->package}].", $exception->getMessage());
+                }
+            },
+            "Preparing starter kit [{$this->package}]..."
+        );
 
         return $this;
     }
@@ -481,7 +497,7 @@ final class Installer
             return $this;
         }
 
-        if ($this->console->confirm('Create a super user?', false)) {
+        if (confirm('Create a super user?', false)) {
             $this->console->call('make:user', ['--super' => true]);
         }
 
@@ -569,11 +585,14 @@ EOT;
      */
     protected function reticulateSplines()
     {
-        $this->console->info('Reticulating splines...');
-
-        if (config('app.env') !== 'testing') {
-            usleep(500000);
-        }
+        spin(
+            function () {
+                if (config('app.env') !== 'testing') {
+                    usleep(500000);
+                }
+            },
+            'Reticulating splines...'
+        );
 
         return $this;
     }
@@ -589,11 +608,14 @@ EOT;
             return $this;
         }
 
-        $this->console->info('Cleaning up temporary files...');
-
-        if (Composer::isInstalled($this->package)) {
-            Composer::withoutQueue()->throwOnFailure(false)->removeDev($this->package);
-        }
+        spin(
+            function () {
+                if (Composer::isInstalled($this->package)) {
+                    Composer::withoutQueue()->throwOnFailure(false)->removeDev($this->package);
+                }
+            },
+            'Cleaning up temporary files...'
+        );
 
         return $this;
     }
