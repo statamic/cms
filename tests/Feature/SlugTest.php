@@ -30,7 +30,7 @@ class SlugTest extends TestCase
             ]);
     }
 
-    public function slugProvider()
+    public static function slugProvider()
     {
         return [
             'single_word' => ['one', '-', 'en', 'one'],
