@@ -39,6 +39,7 @@ class SlugTest extends TestCase
             'chinese_characters' => ['你好，世界', '-', 'ch', 'ni-hao-shi-jie'],
             'german_characters' => ['Björn Müller', '-', 'de', 'bjoern-mueller'],
             'arabic_characters' => ['صباح الخير', '-', 'ar', 'sbah-alkhyr'],
+            'alternate_separator' => ['one two three', '_', 'en', 'one_two_three'],
         ];
     }
 }
