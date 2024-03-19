@@ -35,7 +35,7 @@ class SlugTest extends TestCase
             'multiple_words' => ['one two three', '-', 'en', 'one-two-three'],
             'apples' => ["Apple's", '-', 'en', 'apples'],
             'smart_quotes' => ['Statamic’s latest feature: “Duplicator”', '-', 'en', 'statamics-latest-feature-duplicator'],
-            'highens_separated_by_spaces' => ['Block - Hero', '-', 'en', 'block-hero'],
+            'hyphens_separated_by_spaces' => ['Block - Hero', '-', 'en', 'block-hero'],
             'chinese_characters' => ['你好，世界', '-', 'ch', 'ni-hao-shi-jie'],
             'german_characters' => ['Björn Müller', '-', 'de', 'bjoern-mueller'],
             'arabic_characters' => ['صباح الخير', '-', 'ar', 'sbah-alkhyr'],
