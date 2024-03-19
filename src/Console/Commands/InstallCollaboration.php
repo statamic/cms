@@ -60,7 +60,7 @@ class InstallCollaboration extends Command
 
         if (version_compare(app()->version(), '11', '<')) {
             $this->enableBroadcastServiceProvider();
-            $this->components->info("Broadcasting enabled successfully.");
+            $this->components->info('Broadcasting enabled successfully.');
 
             return;
         }
@@ -78,7 +78,7 @@ class InstallCollaboration extends Command
             message: 'Enabling broadcasting...'
         );
 
-        $this->components->info("Broadcasting enabled successfully.");
+        $this->components->info('Broadcasting enabled successfully.');
     }
 
     protected function installBroadcastingDriver(): void
