@@ -9,7 +9,7 @@ export default {
             lang = lang ?? site?.lang ?? Statamic.$config.get('lang');
 
             return new Promise((resolve, reject) => {
-                axios.post(cp_url('fieldtypes/slug'), { text, glue, language: lang })
+                axios.post(cp_url('slug'), { text, glue, language: lang })
                     .then(response => resolve(response.data.slug))
                     .catch(error => reject(error));
             });

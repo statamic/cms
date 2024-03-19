@@ -1,14 +1,13 @@
 <?php
 
-namespace Statamic\Http\Controllers\CP\Fieldtypes;
+namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Str;
 
-class SlugFieldtypeController extends CpController
+class SlugController extends CpController
 {
-    public function generate(Request $request)
+    public function __invoke(Request $request)
     {
         $validated = $request->validate([
             'text' => ['required'],

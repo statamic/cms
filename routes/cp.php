@@ -48,7 +48,6 @@ use Statamic\Http\Controllers\CP\Fields\MetaController;
 use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
-use Statamic\Http\Controllers\CP\Fieldtypes\SlugFieldtypeController;
 use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
 use Statamic\Http\Controllers\CP\Forms\FormBlueprintController;
 use Statamic\Http\Controllers\CP\Forms\FormExportController;
@@ -74,6 +73,7 @@ use Statamic\Http\Controllers\CP\Preferences\UserPreferenceController;
 use Statamic\Http\Controllers\CP\SearchController;
 use Statamic\Http\Controllers\CP\SelectSiteController;
 use Statamic\Http\Controllers\CP\SessionTimeoutController;
+use Statamic\Http\Controllers\CP\SlugController;
 use Statamic\Http\Controllers\CP\StartPageController;
 use Statamic\Http\Controllers\CP\Taxonomies\PublishedTermsController;
 use Statamic\Http\Controllers\CP\Taxonomies\ReorderTaxonomyBlueprintsController;
@@ -298,7 +298,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('relationship/filters', [RelationshipFieldtypeController::class, 'filters'])->name('relationship.filters');
         Route::post('markdown', [MarkdownFieldtypeController::class, 'preview'])->name('markdown.preview');
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
-        Route::post('slug', [SlugFieldtypeController::class, 'generate'])->name('slug.generate');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
@@ -338,6 +337,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         });
     });
 
+    Route::post('slug', SlugController::class);
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
     Route::view('/playground', 'statamic::playground')->name('playground');

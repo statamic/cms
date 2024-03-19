@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Fieldtypes;
+namespace Feature;
 
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -19,7 +19,7 @@ class SlugTest extends TestCase
     {
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
-            ->post('/cp/fieldtypes/slug', [
+            ->post('/cp/slug', [
                 'text' => $text,
                 'glue' => $glue,
                 'language' => $language,
