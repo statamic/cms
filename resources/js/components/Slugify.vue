@@ -31,7 +31,7 @@ export default {
 
         from: {
             immediate: true,
-            handler() {
+            handler: _.debounce(function() {
                 if (!this.shouldSlugify) {
                     this.slug = this.to;
                 } else if (!this.from) {
@@ -39,7 +39,7 @@ export default {
                 } else {
                     this.slugify();
                 }
-            }
+            }, 500)
         },
 
         to(to) {
