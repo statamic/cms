@@ -31,15 +31,15 @@ class SlugTest extends TestCase
     public static function slugProvider()
     {
         return [
-            'single_word' => ['one', '-', 'en', 'one'],
-            'multiple_words' => ['one two three', '-', 'en', 'one-two-three'],
+            'single word' => ['one', '-', 'en', 'one'],
+            'multiple words' => ['one two three', '-', 'en', 'one-two-three'],
             'apples' => ["Apple's", '-', 'en', 'apples'],
-            'smart_quotes' => ['Statamic’s latest feature: “Duplicator”', '-', 'en', 'statamics-latest-feature-duplicator'],
-            'hyphens_separated_by_spaces' => ['Block - Hero', '-', 'en', 'block-hero'],
-            'chinese_characters' => ['你好，世界', '-', 'ch', 'ni-hao-shi-jie'],
-            'german_characters' => ['Björn Müller', '-', 'de', 'bjoern-mueller'],
-            'arabic_characters' => ['صباح الخير', '-', 'ar', 'sbah-alkhyr'],
-            'alternate_separator' => ['one two three', '_', 'en', 'one_two_three'],
+            'smart quotes' => ['Statamic’s latest feature: “Duplicator”', '-', 'en', 'statamics-latest-feature-duplicator'],
+            'hyphens separated by spaces' => ['Block - Hero', '-', 'en', 'block-hero'],
+            'chinese characters' => ['你好，世界', '-', 'ch', 'ni-hao-shi-jie'],
+            'german characters' => ['Björn Müller', '-', 'de', 'bjoern-mueller'],
+            'arabic characters' => ['صباح الخير', '-', 'ar', 'sbah-alkhyr'],
+            'alternate separator' => ['one two three', '_', 'en', 'one_two_three'],
         ];
     }
 }
