@@ -5,7 +5,6 @@
     <element-container @resized="containerWidth = $event.width">
     <div class="grid-fieldtype-container" :class="{'grid-fullscreen bg-white': fullScreenMode }">
 
-        <!-- TODO: JACK HELP (the space be here when multisite is `enabled => true` in sites.php) -->
         <template v-if="config.fullscreen || !config.hide_display">
             <header class="bg-gray-200 border-b py-3 rtl:pr-3 ltr:pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
                 <h2 v-text="__(config.display)" />
