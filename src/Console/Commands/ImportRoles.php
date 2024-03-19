@@ -13,9 +13,6 @@ use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\RoleRepository as RoleRepositoryContract;
 use Statamic\Facades\Role;
 
-use function Laravel\Prompts\error;
-use function Laravel\Prompts\progress;
-
 class ImportRoles extends Command
 {
     use RunsInPlease;
@@ -42,7 +39,7 @@ class ImportRoles extends Command
     public function handle()
     {
         if (! config('statamic.users.tables.roles', false)) {
-            error('You do not have eloquent driven roles enabled');
+            $this->error('You do not have eloquent driven roles enabled');
 
             return;
         }
@@ -68,19 +65,16 @@ class ImportRoles extends Command
         Facade::clearResolvedInstance(RoleContract::class);
         Facade::clearResolvedInstance(RoleRepositoryContract::class);
 
-        progress(
-            label: 'Importing roles...',
-            steps: $roles,
-            callback: function ($role) {
-                $eloquentRole = Role::make($role->handle())
-                    ->title($role->title())
-                    ->permissions($role->permissions())
-                    ->preferences($role->preferences());
+        $this->withProgressBar($roles, function ($role) {
+            $eloquentRole = Role::make($role->handle())
+                ->title($role->title())
+                ->permissions($role->permissions())
+                ->preferences($role->preferences());
 
-                $eloquentRole->save();
-            }
-        );
+            $eloquentRole->save();
+        });
 
+        $this->newLine();
         $this->info('Roles imported');
     }
 }

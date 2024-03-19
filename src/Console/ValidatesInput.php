@@ -21,7 +21,7 @@ trait ValidatesInput
             return false;
         }
 
-        $this->components->error($validator->errors()->first());
+        $this->error($validator->errors()->first());
 
         return true;
     }

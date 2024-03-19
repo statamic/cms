@@ -6,8 +6,6 @@ use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\StaticCache;
 
-use function Laravel\Prompts\spin;
-
 class StaticClear extends Command
 {
     use RunsInPlease;
@@ -33,8 +31,8 @@ class StaticClear extends Command
      */
     public function handle()
     {
-        spin(callback: fn () => StaticCache::flush(), message: 'Clearing the static page cache...');
+        StaticCache::flush();
 
-        $this->components->info('Your static page cache is now so very, very empty.');
+        $this->info('Your static page cache is now so very, very empty.');
     }
 }

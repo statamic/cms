@@ -15,10 +15,6 @@ use Statamic\Facades\User;
 use Statamic\Stache\Repositories\UserRepository as FileRepository;
 use Statamic\Stache\Stores\UsersStore;
 
-use function Laravel\Prompts\error;
-use function Laravel\Prompts\info;
-use function Laravel\Prompts\progress;
-
 class ImportUsers extends Command
 {
     use RunsInPlease;
@@ -45,7 +41,7 @@ class ImportUsers extends Command
     public function handle()
     {
         if (config('statamic.users.repository') !== 'eloquent') {
-            error('Your site is not using the eloquent user repository.');
+            $this->error('Your site is not using the eloquent user repository.');
 
             return 0;
         }
@@ -62,7 +58,7 @@ class ImportUsers extends Command
         $model = config("auth.providers.$provider.model");
 
         if (! in_array(HasUuids::class, class_uses_recursive($model))) {
-            error('Please add the HasUuids trait to your '.$model.' model in order to run this importer.');
+            $this->error('Your user model must use the HasUuids trait for this migration to run');
 
             return;
         }
@@ -79,37 +75,34 @@ class ImportUsers extends Command
 
         $eloquentRepository = app(UserRepositoryManager::class)->createEloquentDriver([]);
 
-        progress(
-            label: 'Importing users...',
-            steps: $users,
-            callback: function ($user, $progress) use ($eloquentRepository) {
-                $data = $user->data();
+        $this->withProgressBar($users, function ($user) use ($eloquentRepository) {
+            $data = $user->data();
 
-                $eloquentUser = $eloquentRepository->make()
-                    ->email($user->email())
-                    ->preferences($user->preferences())
-                    ->data($data->except(['groups', 'roles'])->merge(['name' => $user->name()]))
-                    ->id($user->id());
+            $eloquentUser = $eloquentRepository->make()
+                ->email($user->email())
+                ->preferences($user->preferences())
+                ->data($data->except(['groups', 'roles'])->merge(['name' => $user->name()]))
+                ->id($user->id());
 
-                if ($user->isSuper()) {
-                    $eloquentUser->makeSuper();
-                }
-
-                if (count($data->get('groups', [])) > 0) {
-                    $eloquentUser->groups($data->get('groups'));
-                }
-
-                if (count($data->get('roles', [])) > 0) {
-                    $eloquentUser->roles($data->get('roles'));
-                }
-
-                $eloquentUser->saveToDatabase();
-
-                $eloquentUser->model()->forceFill(['password' => $user->password()]);
-                $eloquentUser->model()->saveQuietly();
+            if ($user->isSuper()) {
+                $eloquentUser->makeSuper();
             }
-        );
 
-        info('Users imported');
+            if (count($data->get('groups', [])) > 0) {
+                $eloquentUser->groups($data->get('groups'));
+            }
+
+            if (count($data->get('roles', [])) > 0) {
+                $eloquentUser->roles($data->get('roles'));
+            }
+
+            $eloquentUser->saveToDatabase();
+
+            $eloquentUser->model()->forceFill(['password' => $user->password()]);
+            $eloquentUser->model()->saveQuietly();
+        });
+
+        $this->newLine();
+        $this->info('Users imported');
     }
 }

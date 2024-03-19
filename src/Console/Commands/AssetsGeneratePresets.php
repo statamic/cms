@@ -10,11 +10,6 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Jobs\GeneratePresetImageManipulation;
 use Statamic\Support\Arr;
 
-use function Laravel\Prompts\error;
-use function Laravel\Prompts\info;
-use function Laravel\Prompts\note;
-use function Laravel\Prompts\progress;
-
 class AssetsGeneratePresets extends Command
 {
     use RunsInPlease;
@@ -51,12 +46,12 @@ class AssetsGeneratePresets extends Command
         $this->shouldQueue = $this->option('queue');
 
         if ($this->shouldQueue && config('queue.default') === 'sync') {
-            error('The queue connection is set to "sync". Queueing will be disabled.');
+            $this->error('The queue connection is set to "sync". Queueing will be disabled.');
             $this->shouldQueue = false;
         }
 
         AssetContainer::all()->sortBy('title')->each(function ($container) {
-            note('Generating presets for <comment>'.$container->title().'</comment>...');
+            $this->line('Generating presets for <comment>'.$container->title().'</comment>...');
             $this->generatePresets($container);
             $this->newLine();
         });
@@ -78,40 +73,37 @@ class AssetsGeneratePresets extends Command
         $cpPresets = config('statamic.cp.enabled') ? 1 : 0;
 
         $steps = (count($container->warmPresets()) + $cpPresets) * count($assets);
+        $bar = $this->output->createProgressBar($steps);
 
-        if ($steps > 0) {
-            $progress = progress(
-                label: $this->shouldQueue ? 'Queueing...' : 'Generating...',
-                steps: $steps
-            );
+        foreach ($assets as $asset) {
+            $verb = $this->shouldQueue ? 'Queueing' : 'Generating';
+            $bar->setFormat("[%current%/%max%] $verb %filename% <comment>%preset%</comment>... ");
 
-            $progress->start();
+            foreach ($asset->warmPresets() as $preset) {
+                $counts[$preset] = ($counts[$preset] ?? 0) + 1;
+                $bar->setMessage($preset, 'preset');
+                $bar->setMessage($asset->basename(), 'filename');
+                $bar->display();
 
-            foreach ($assets as $asset) {
-                foreach ($asset->warmPresets() as $preset) {
-                    $counts[$preset] = ($counts[$preset] ?? 0) + 1;
-                    $progress->label("Generating $preset for {$asset->basename()}...");
+                $dispatchMethod = $this->shouldQueue
+                    ? 'dispatch'
+                    : (method_exists(Dispatcher::class, 'dispatchSync') ? 'dispatchSync' : 'dispatchNow');
 
-                    $dispatchMethod = $this->shouldQueue
-                        ? 'dispatch'
-                        : (method_exists(Dispatcher::class, 'dispatchSync') ? 'dispatchSync' : 'dispatchNow');
-
-                    try {
-                        GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);
-                    } catch (\Exception $e) {
-                        Log::debug($e);
-                        $counts['errors'] = ($counts['errors'] ?? 0) + 1;
-                    }
-
-                    $progress->advance();
+                try {
+                    GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);
+                } catch (\Exception $e) {
+                    Log::debug($e);
+                    $counts['errors'] = ($counts['errors'] ?? 0) + 1;
                 }
-            }
 
-            $progress->finish();
+                $bar->advance();
+            }
         }
 
         $verb = $this->shouldQueue ? 'queued' : 'generated';
-        info(sprintf("<info>[✔]</info> %s images $verb for %s assets.", $steps, count($assets)));
+        $bar->setFormat(sprintf("<info>[✔]</info> %s images $verb for %s assets.", $steps, count($assets)));
+        $bar->finish();
+        $this->newLine(2);
 
         if (property_exists($this, 'components')) {
             $errors = Arr::pull($counts, 'errors');

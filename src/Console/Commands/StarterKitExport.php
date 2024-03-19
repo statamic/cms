@@ -9,8 +9,6 @@ use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 
-use function Laravel\Prompts\confirm;
-
 class StarterKitExport extends Command
 {
     use RunsInPlease;
@@ -45,12 +43,12 @@ class StarterKitExport extends Command
         try {
             StarterKitExporter::export($path);
         } catch (StarterKitException $exception) {
-            $this->components->error($exception->getMessage());
+            $this->error($exception->getMessage());
 
             return 1;
         }
 
-        $this->components->info("Starter kit was successfully exported to [$path].");
+        $this->info("Starter kit was successfully exported to [$path].");
     }
 
     /**
@@ -62,7 +60,7 @@ class StarterKitExport extends Command
         $newPath = base_path($config = 'starter-kit.yaml');
 
         if ($this->input->isInteractive()) {
-            if (! confirm("Config [{$config}] does not exist. Would you like to create it now?", true)) {
+            if (! $this->confirm("Config [{$config}] does not exist. Would you like to create it now?", true)) {
                 return;
             }
         }
@@ -95,13 +93,13 @@ class StarterKitExport extends Command
     protected function askToCreateExportPath($path)
     {
         if ($this->input->isInteractive()) {
-            if (! confirm("Path [{$path}] does not exist. Would you like to create it now?", true)) {
+            if (! $this->confirm("Path [{$path}] does not exist. Would you like to create it now?", true)) {
                 return;
             }
         }
 
         File::makeDirectory($path, 0755, true);
 
-        $this->components->info("A new directory has been created at [{$path}].");
+        $this->comment("A new directory has been created at [{$path}].");
     }
 }

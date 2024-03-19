@@ -26,7 +26,8 @@ class SupportZipBlueprint extends Command
             return 1;
         }
 
-        $this->components->info("Zip [{$filename}] created successfully.");
+        $this->info('Zip created successfully.');
+        $this->comment("Your zip file awaits: {$filename}");
     }
 
     protected function createZip($blueprint)
@@ -36,7 +37,7 @@ class SupportZipBlueprint extends Command
         $zip = new ZipArchive();
 
         if ($zip->open($filename, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            $this->components->error("Unable to create zip file: [$filename]");
+            $this->error("Unable to create zip file \"$filename\"");
 
             return false;
         }
@@ -57,7 +58,7 @@ class SupportZipBlueprint extends Command
         $handle = $this->argument('blueprint');
 
         if (! $blueprint = Blueprint::find($handle)) {
-            $this->components->error("Blueprint [$handle] not found.");
+            $this->error("Blueprint \"$handle\" not found");
 
             return null;
         }

@@ -9,10 +9,6 @@ use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\error;
-use function Laravel\Prompts\spin;
-
 class InstallSsg extends Command
 {
     use EnhancesCommands, RunsInPlease;
@@ -39,42 +35,30 @@ class InstallSsg extends Command
     public function handle()
     {
         if (Composer::isInstalled('statamic/ssg')) {
-            return error('The Static Site Generator package is already installed.');
+            return $this->error('The Static Site Generator package is already installed.');
         }
 
-        spin(
-            fn () => Composer::withoutQueue()->throwOnFailure()->require('statamic/ssg'),
-            'Installing the statamic/ssg package...'
-        );
-
+        $this->info('Installing the statamic/ssg package...');
+        Composer::withoutQueue()->throwOnFailure()->require('statamic/ssg');
         $this->checkLine('Installed statamic/ssg package');
 
-        if (confirm('Would you like to publish the config file?')) {
-            spin(
-                function () {
-                    Process::run([
-                        (new PhpExecutableFinder())->find(false) ?: 'php',
-                        defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
-                        'vendor:publish',
-                        '--provider',
-                        'Statamic\\StaticSite\\ServiceProvider',
-                    ]);
-                },
-                message: 'Publishing the config file...'
-            );
+        if ($this->confirm('Would you like to publish the config file?')) {
+            Process::run([
+                (new PhpExecutableFinder())->find(false) ?: 'php',
+                defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+                'vendor:publish',
+                '--provider',
+                'Statamic\\StaticSite\\ServiceProvider',
+            ]);
 
             $this->checkLine('Config file published. You can find it at config/statamic/ssg.php');
         }
 
         if (
             ! Composer::isInstalled('spatie/fork')
-            && confirm('Would you like to install spatie/fork? It allows for running multiple workers at once.')
+            && $this->confirm('Would you like to install spatie/fork? It allows for running multiple workers at once.')
         ) {
-            spin(
-                fn () => Composer::withoutQueue()->throwOnFailure()->require('spatie/fork'),
-                'Installing the spatie/fork package...'
-            );
-
+            Composer::withoutQueue()->throwOnFailure()->require('spatie/fork');
             $this->checkLine('Installed spatie/fork package');
         }
     }

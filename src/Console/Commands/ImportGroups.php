@@ -13,9 +13,6 @@ use Statamic\Contracts\Auth\UserGroup as GroupContract;
 use Statamic\Contracts\Auth\UserGroupRepository as GroupRepositoryContract;
 use Statamic\Facades\UserGroup;
 
-use function Laravel\Prompts\error;
-use function Laravel\Prompts\progress;
-
 class ImportGroups extends Command
 {
     use RunsInPlease;
@@ -42,7 +39,7 @@ class ImportGroups extends Command
     public function handle()
     {
         if (! config('statamic.users.tables.groups', false)) {
-            error('You do not have eloquent driven groups enabled');
+            $this->error('You do not have eloquent driven groups enabled');
 
             return;
         }
@@ -68,20 +65,17 @@ class ImportGroups extends Command
         Facade::clearResolvedInstance(GroupContract::class);
         Facade::clearResolvedInstance(GroupRepositoryContract::class);
 
-        progress(
-            label: 'Importing groups...',
-            steps: $groups,
-            callback: function ($group, $progress) {
-                $eloquentGroup = UserGroup::make()
-                    ->handle($group->handle())
-                    ->title($group->title())
-                    ->roles($group->roles())
-                    ->data($group->data()->except(['title', 'roles']));
+        $this->withProgressBar($groups, function ($group) {
+            $eloquentGroup = UserGroup::make()
+                ->handle($group->handle())
+                ->title($group->title())
+                ->roles($group->roles())
+                ->data($group->data()->except(['title', 'roles']));
 
-                $eloquentGroup->save();
-            }
-        );
+            $eloquentGroup->save();
+        });
 
+        $this->newLine();
         $this->info('Groups imported');
     }
 }

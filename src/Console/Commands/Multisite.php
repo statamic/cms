@@ -17,10 +17,6 @@ use Statamic\Facades\YAML;
 use Statamic\Statamic;
 use Symfony\Component\VarExporter\VarExporter;
 
-use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\info;
-use function Laravel\Prompts\text;
-
 class Multisite extends Command
 {
     use EnhancesCommands, RunsInPlease;
@@ -43,24 +39,23 @@ class Multisite extends Command
 
         $this->validateRunningOfCommand();
 
-        $confirmed = confirm("The current site handle is [{$this->siteOne()}], content will be moved into folders with this name. Is this okay?");
+        $confirmed = $this->confirm("The current site handle is [<comment>{$this->siteOne()}</comment>], content will be moved into folders with this name. Is this okay?");
 
         if (! $confirmed) {
-            $this->components->error('Change the site handle in <comment>config/statamic/sites.php</comment> then try this command again.');
+            $this->crossLine('Change the site handle in <comment>config/statamic/sites.php</comment> then try this command again.');
 
             return;
         }
 
-        info("Please enter the handles of the additional sites. Just press enter when you're done.");
-
+        $this->info("Please enter the handles of the additional sites. Just press enter when you're done.");
         do {
-            if ($site = text('Handle of site #'.($this->sites->count() + 1))) {
+            if ($site = $this->ask('Handle of site #'.($this->sites->count() + 1))) {
                 $this->sites->add($site);
             }
-        } while ($site !== '');
+        } while ($site !== null);
 
         if ($this->sites->count() < 2) {
-            return $this->components->error('Multisite has not been enabled.');
+            return $this->crossLine('Multisite has not been enabled.');
         }
 
         $this->clearStache();

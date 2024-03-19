@@ -7,8 +7,6 @@ use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\YAML;
 
-use function Laravel\Prompts\confirm;
-
 class SiteClear extends Command
 {
     use RunsInPlease;
@@ -76,7 +74,7 @@ class SiteClear extends Command
             return false;
         }
 
-        return ! confirm(label: 'Are you sure you want to remove all the site content and resources?', default: false);
+        return ! $this->confirm('Are you sure you want to remove all the site content and resources?', false);
     }
 
     /**

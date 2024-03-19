@@ -33,6 +33,6 @@ class StacheClear extends Command
     {
         Stache::clear();
 
-        $this->components->info('You have trimmed the Stache. It looks dashing.');
+        $this->info('You have trimmed the Stache. It looks dashing.');
     }
 }
