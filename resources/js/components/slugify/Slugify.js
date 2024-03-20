@@ -6,6 +6,7 @@ export default class Slugify {
     #separator = '-';
     #language;
     #debounced;
+    #controller;
 
     constructor() {
         this.#setInitialLanguage();
@@ -47,8 +48,21 @@ export default class Slugify {
             language: this.#language
         };
 
-        return axios.post(cp_url('slug'), payload)
+        if (this.#controller) this.#controller.abort();
+        this.#controller = new AbortController;
+
+        let aborted = false;
+        return axios.post(cp_url('slug'), payload, { signal: this.#controller.signal })
             .then(response => response.data)
-            .finally(() => this.busy = false);
+            .catch(e => {
+                if (axios.isCancel(e)) {
+                    aborted = true;
+                    return;
+                }
+                throw e;
+            })
+            .finally(() => {
+                if (!aborted) this.busy = false
+            });
     }
 }
