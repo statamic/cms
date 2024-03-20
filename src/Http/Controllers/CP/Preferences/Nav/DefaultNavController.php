@@ -41,6 +41,8 @@ class DefaultNavController extends Controller
 
         Preference::default()->set('nav', $nav)->save();
 
+        Nav::clearCachedUrls();
+
         $this->success(__('Saved'));
 
         return true;
@@ -49,6 +51,8 @@ class DefaultNavController extends Controller
     public function destroy()
     {
         Preference::default()->remove('nav')->save();
+
+        Nav::clearCachedUrls();
 
         return true;
     }

@@ -17,6 +17,7 @@
                 :instructions="__('messages.asset_folders_directory_instructions')"
                 :focus="true"
                 :required="true"
+                :config="{ debounce: false }"
                 v-model="directory"
             />
 

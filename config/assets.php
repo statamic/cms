@@ -114,6 +114,18 @@ return [
 
         'generate_presets_on_upload' => true,
 
+        /*
+        |--------------------------------------------------------------------------
+        | Append Original Filename
+        |--------------------------------------------------------------------------
+        |
+        | Append the original filename to Glide generated URLs.
+        | This helps with Search Engine Optimization.
+        |
+        */
+
+        'append_original_filename' => false,
+
     ],
 
     /*
@@ -197,5 +209,17 @@ return [
     */
 
     'lowercase' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Additional Uploadable Extensions
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will only allow uploads of certain approved file extensions.
+    | If you need to allow more file extensions, you may add them here.
+    |
+    */
+
+    'additional_uploadable_extensions' => [],
 
 ];

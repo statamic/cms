@@ -14,7 +14,7 @@ interface CollectionRepository
 
     public function findByMount($mount): ?Collection;
 
-    public function make(string $handle = null): Collection;
+    public function make(?string $handle = null): Collection;
 
     public function handles(): IlluminateCollection;
 

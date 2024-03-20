@@ -25,6 +25,7 @@ class Statamic
 
     protected static $scripts = [];
     protected static $externalScripts = [];
+    protected static $inlineScripts = [];
     protected static $styles = [];
     protected static $externalStyles = [];
     protected static $vites = [];
@@ -82,6 +83,18 @@ class Statamic
         static::$externalScripts[] = $url;
 
         return new static;
+    }
+
+    public static function inlineScript($html)
+    {
+        static::$inlineScripts[] = $html;
+
+        return new static;
+    }
+
+    public static function availableInlineScripts(Request $request)
+    {
+        return static::$inlineScripts;
     }
 
     public static function availableStyles(Request $request)
@@ -447,5 +460,17 @@ class Statamic
 
             return $path;
         });
+    }
+
+    public static function cpLocale(): string
+    {
+        return config('app.locale');
+    }
+
+    public static function cpDirection()
+    {
+        $rtl = ['ar', 'fa', 'he', 'ps', 'ur'];
+
+        return in_array(static::cpLocale(), $rtl) ? 'rtl' : 'ltr';
     }
 }

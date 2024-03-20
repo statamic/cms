@@ -15,6 +15,9 @@ export default {
             // Remove smart single quotes
             custom["’"] = "";
 
+            // Prevent `Block - Hero` turning into `block_-_hero`
+            custom[" - "] = " ";
+
             return getSlug(text, {
                 separator: glue || '-',
                 lang,

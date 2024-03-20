@@ -36,7 +36,7 @@ class Subscriber extends StatamicSubscriber
             return;
         }
 
-        Git::dispatchCommit(
+        Git::as($event->authenticatedUser)->dispatchCommit(
             $event instanceof ProvidesCommitMessage
                 ? $event->commitMessage()
                 : null

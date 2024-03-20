@@ -12,6 +12,7 @@ class Submissions extends ResourceCollection
 
     public $collects = ListedSubmission::class;
     protected $blueprint;
+    protected $columnPreferenceKey;
     protected $columns;
 
     public function blueprint($blueprint)

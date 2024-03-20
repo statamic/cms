@@ -36,7 +36,7 @@ final class Installer
      *
      * @param  mixed  $console
      */
-    public function __construct(string $package, $console = null, LicenseManager $licenseManager = null)
+    public function __construct(string $package, $console = null, ?LicenseManager $licenseManager = null)
     {
         $this->package = $package;
         $this->licenseManager = $licenseManager;
@@ -51,7 +51,7 @@ final class Installer
      * @param  mixed  $console
      * @return static
      */
-    public static function package(string $package, $console = null, LicenseManager $licenseManager = null)
+    public static function package(string $package, $console = null, ?LicenseManager $licenseManager = null)
     {
         return new self($package, $console, $licenseManager);
     }

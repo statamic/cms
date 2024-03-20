@@ -149,7 +149,8 @@ EOT;
 
         /** @var AntlersNode $firstNode */
         $firstNode = $nodes[0];
-        $this->assertCount(7, $firstNode->runtimeNodes);
+        // The () are added automatically.
+        $this->assertCount(9, $firstNode->runtimeNodes);
 
         // Parse the text that would produce the 7 runtime nodes above.
         $runtimeNodes = $this->getParsedRuntimeNodes("{{ is_small_article || collection:handle == 'vacancies' }}");

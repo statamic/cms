@@ -40,7 +40,7 @@ class UpdaterController extends CpController
     {
         $this->authorize('view updates');
 
-        return UpdatesOverview::count($request->input('clearCache', false));
+        return UpdatesOverview::count();
     }
 
     /**

@@ -20,7 +20,7 @@ class GlideManager
      */
     public function server(array $config = [])
     {
-        return ServerFactory::create(array_merge([
+        $server = ServerFactory::create(array_merge([
             'source' => base_path(), // this gets overridden on the fly by the image generator
             'cache' => $this->cacheDisk()->getDriver(),
             'response' => new LaravelResponseFactory(app('request')),
@@ -29,6 +29,33 @@ class GlideManager
             'presets' => Image::manipulationPresets(),
             'watermarks' => public_path(),
         ], $config));
+
+        if (config('statamic.assets.image_manipulation.append_original_filename', false)) {
+            $server
+                ->setCachePathCallable(function ($path, $params) {
+                    // to avoid having to recreate the getCachePath method from glide server
+                    // we run getCachePath again without this callback function
+                    $customCallable = $this->getCachePathCallable();
+
+                    $this->setCachePathCallable(null);
+                    $cachePath = $this->getCachePath($path, $params);
+                    $this->setCachePathCallable($customCallable);
+
+                    // then we append our original filename to the end
+                    $filename = Str::afterLast($cachePath, '/');
+                    $cachePath = Str::beforeLast($cachePath, '/');
+
+                    $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.Str::of($path)->after('/');
+
+                    if ($extension = ($params['fm'] ?? false)) {
+                        $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
+                    }
+
+                    return $cachePath;
+                });
+        }
+
+        return $server;
     }
 
     public function cacheDisk()

@@ -149,6 +149,16 @@ class GlobalsController extends CpController
 
         $handle = $data['handle'] ?? Str::snake($data['title']);
 
+        if (GlobalSet::find($handle)) {
+            $error = __('A Global Set with that handle already exists.');
+
+            if ($request->wantsJson()) {
+                throw new \Exception($error);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
+
         $global = GlobalSet::make($handle)->title($data['title']);
 
         $global->addLocalization($global->makeLocalization(Site::default()->handle()));

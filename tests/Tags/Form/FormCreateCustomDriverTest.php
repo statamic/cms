@@ -156,6 +156,7 @@ EOT
             'name' => null,
             'email' => null,
             'message' => null,
+            'winnie' => null,
         ];
 
         $this->assertEquals($expected, $initialData);
@@ -179,6 +180,7 @@ EOT
             'name' => 'San Holo',
             'email' => null,
             'message' => null,
+            'winnie' => null,
         ];
 
         $this->assertEquals($expected, $initialData);

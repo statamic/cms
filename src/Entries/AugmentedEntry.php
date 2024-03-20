@@ -79,7 +79,13 @@ class AugmentedEntry extends AbstractAugmented
 
     protected function mount()
     {
-        return $this->data->value('mount') ?? Collection::findByMount($this->data);
+        $mount = $this->data->value('mount') ?? Collection::findByMount($this->data);
+
+        if (! $mount && ($origin = $this->data->origin())) {
+            return Collection::findByMount($origin);
+        }
+
+        return $mount;
     }
 
     public function authors()

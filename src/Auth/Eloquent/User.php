@@ -20,7 +20,7 @@ class User extends BaseUser
     protected $roles;
     protected $groups;
 
-    public function model(Model $model = null)
+    public function model(?Model $model = null)
     {
         if (is_null($model)) {
             return $this->model;
@@ -358,6 +358,17 @@ class User extends BaseUser
             return $this->model()->timestamps = $value;
         }
 
+        if ($key === 'super') {
+            return $this->model()->super = $value;
+        }
+
         return $this->$key = $value;
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'email' => $this->email(),
+        ], $this->model()->attributesToArray());
     }
 }

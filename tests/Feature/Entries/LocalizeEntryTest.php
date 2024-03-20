@@ -34,7 +34,7 @@ class LocalizeEntryTest extends TestCase
     public function it_localizes_an_entry()
     {
         $user = $this->user();
-        $entry = EntryFactory::collection('blog')->slug('test')->create();
+        $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(false))->save())->slug('test')->create();
         $this->assertNull($entry->in('fr'));
 
         $response = $this
@@ -46,6 +46,8 @@ class LocalizeEntryTest extends TestCase
         $this->assertNotNull($localized);
         $this->assertEquals($user, $localized->lastModifiedBy());
         $response->assertJson(['handle' => 'fr', 'url' => $localized->editUrl()]);
+
+        $this->assertCount(0, $entry->in('fr')->revisions());
     }
 
     /** @test */
@@ -59,6 +61,24 @@ class LocalizeEntryTest extends TestCase
             ->localize($entry, ['site' => ''])
             ->assertRedirect('/original')
             ->assertSessionHasErrors('site');
+    }
+
+    /** @test */
+    public function cant_localize_entry_without_edit_permissions()
+    {
+        $user = $this->user();
+        $this->setTestRoles(['test' => ['access cp', 'access en site', 'access fr site', 'view blog entries']]);
+
+        $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(false))->save())->slug('test')->create();
+        $this->assertNull($entry->in('fr'));
+
+        $this
+            ->actingAs($user->fresh())
+            ->localize($entry, ['site' => 'fr'])
+            ->assertRedirect();
+
+        $localized = $entry->fresh()->in('fr');
+        $this->assertNull($localized);
     }
 
     /** @test */
@@ -195,6 +215,28 @@ class LocalizeEntryTest extends TestCase
         ], Collection::findByHandle('pages')->structure()->in('fr')->tree());
     }
 
+    /** @test */
+    public function it_localizes_an_entry_with_revisions()
+    {
+        config(['statamic.revisions.enabled' => true]);
+
+        $user = $this->user();
+        $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(true))->save())->slug('test')->create();
+        $this->assertNull($entry->in('fr'));
+
+        $response = $this
+            ->actingAs($user)
+            ->localize($entry, ['site' => 'fr'])
+            ->assertOk();
+
+        $localized = $entry->fresh()->in('fr');
+        $this->assertNotNull($localized);
+        $this->assertEquals($user, $localized->lastModifiedBy());
+        $response->assertJson(['handle' => 'fr', 'url' => $localized->editUrl()]);
+
+        $this->assertCount(1, $entry->in('fr')->revisions());
+    }
+
     private function localize($entry, $params = [])
     {
         $url = cp_route('collections.entries.localize', [
@@ -208,7 +250,15 @@ class LocalizeEntryTest extends TestCase
 
     private function user()
     {
-        $this->setTestRoles(['test' => ['access cp']]);
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'access en site',
+            'access fr site',
+            'view blog entries',
+            'edit blog entries',
+            'view pages entries',
+            'edit pages entries',
+        ]]);
 
         return User::make()->assignRole('test')->save();
     }

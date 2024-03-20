@@ -61,7 +61,7 @@ class Result implements ContainsQueryableValues, Contract
         return $this->searchable->getSearchReference();
     }
 
-    public function setScore(int $score = null): self
+    public function setScore(?int $score = null): self
     {
         $this->score = $score;
 
