@@ -39,7 +39,7 @@ class UpdatesRun extends Command
         $success = UpdateScriptManager::runUpdatesForSpecificPackageVersion($package, $this->argument('version'), $this);
 
         $success
-            ? $this->info('Update scripts were run successfully!')
-            : $this->comment('There were no update scripts for this version.');
+            ? $this->components->info('Update scripts were run successfully!')
+            : $this->components->warn('There were no update scripts for this version.');
     }
 }

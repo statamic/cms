@@ -44,8 +44,8 @@ class MakeUserTest extends TestCase
         $this->artisan('statamic:make:user')
             ->expectsQuestion('Email', 'jason@ifyoucantescapeit.org')
             ->expectsQuestion('Name', 'Jason')
-            ->expectsQuestion('Password (Your input will be hidden)', 'midnight')
-            ->expectsQuestion('Super user', true)
+            ->expectsQuestion('Password', 'midnight')
+            ->expectsQuestion('Super user?', true)
             ->assertExitCode(0);
 
         $user = User::all()->first();
@@ -65,8 +65,8 @@ class MakeUserTest extends TestCase
         $this->artisan('statamic:make:user')
             ->expectsQuestion('Email', 'jesses.girl@springfield.com')
             ->expectsQuestion('Name', 'Gertrude')
-            ->expectsQuestion('Password (Your input will be hidden)', 'iloverickie')
-            ->expectsQuestion('Super user', false)
+            ->expectsQuestion('Password', 'iloverickie')
+            ->expectsQuestion('Super user?', false)
             ->assertExitCode(0);
 
         $user = User::all()->first();
@@ -82,13 +82,13 @@ class MakeUserTest extends TestCase
         $this->assertEmpty(User::all());
 
         $this->artisan('statamic:make:user', ['email' => 'jason'])
-            ->expectsOutput(trans('validation.email', ['attribute' => 'input']));
+            ->expectsOutputToContain(trans('validation.email', ['attribute' => 'input']));
 
         $this->artisan('statamic:make:user', ['email' => 'jason@keeponrunnin.com'])
-            ->expectsOutput('User created successfully.');
+            ->expectsOutputToContain('User created successfully.');
 
         $this->artisan('statamic:make:user', ['email' => 'jason@keeponrunnin.com'])
-            ->expectsOutput('A user with this email already exists.');
+            ->expectsOutputToContain('A user with this email already exists.');
     }
 
     /** @test */

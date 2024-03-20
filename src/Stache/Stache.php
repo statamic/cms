@@ -10,7 +10,6 @@ use Statamic\Stache\Stores\Store;
 use Statamic\Support\Str;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
-use Wilderborn\Partyline\Facade as Partyline;
 
 class Stache
 {
@@ -82,8 +81,6 @@ class Stache
 
     public function clear()
     {
-        Partyline::comment('Clearing Stache...');
-
         $this->stores()->reverse()->each->clear();
 
         $this->duplicates()->clear();
@@ -100,8 +97,6 @@ class Stache
 
     public function warm()
     {
-        Partyline::comment('Warming Stache...');
-
         $lock = tap($this->lock('stache-warming'))->acquire(true);
 
         $this->startTimer();
