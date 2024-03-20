@@ -88,11 +88,20 @@ class CoreNav
             ->icon('/hierarchy-files')
             ->can('index', NavContract::class)
             ->children(function () {
-                return NavAPI::all()->sortBy->title()->map(function ($nav) {
-                    return Nav::item($nav->title())
-                        ->url($nav->showUrl())
-                        ->can('view', $nav);
-                });
+                return NavAPI::all()->sortBy->title()
+                    ->filter(function ($nav) {
+                        return User::current()->can('configure navs')
+                            || $nav->sites()->contains(Site::selected()->handle());
+                    })
+                    ->map(function ($nav) {
+                        return Nav::item($nav->title())
+                            ->url(
+                                $nav->sites()->contains(Site::selected()->handle())
+                                    ? $nav->showUrl()
+                                    : $nav->editUrl()
+                            )
+                            ->can('view', $nav);
+                    });
             });
 
         Nav::content('Taxonomies')
