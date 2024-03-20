@@ -122,6 +122,10 @@ export function closestVm(el, name) {
     }
 }
 
+export function str_slug(string) {
+    return Statamic.$slug.create(string);
+}
+
 export function snake_case(string) {
     return Statamic.$slug.separatedBy('_').create(string);
 }
