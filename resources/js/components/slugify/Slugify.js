@@ -10,8 +10,11 @@ export default class Slugify {
 
     constructor() {
         this.#setInitialLanguage();
-        this.#debounced = _.debounce(function (resolve) {
-            this.#performRequest().then(slug => resolve(slug));
+
+        this.#debounced = _.debounce(function (resolve, reject) {
+            return this.#performRequest()
+                .then(slug => resolve(slug))
+                .catch(e => reject(e));
         }, 300)
     }
 
@@ -38,7 +41,7 @@ export default class Slugify {
         this.busy = true;
         this.#string = string;
 
-        return new Promise(resolve => this.#debounced(resolve));
+        return new Promise((resolve, reject) => this.#debounced(resolve, reject));
     }
 
     #performRequest() {
