@@ -133,13 +133,18 @@ class CoreNav
             ->icon('/earth')
             ->can('index', GlobalSet::class)
             ->children(function () {
-                return GlobalSetAPI::all()->sortBy->title()->map(function ($globalSet) {
-                    $localized = $globalSet->inSelectedSite();
+                return GlobalSetAPI::all()->sortBy->title()
+                    ->filter(function ($globalSet) {
+                        return User::current()->can('configure globals')
+                            || ! is_null($globalSet->inSelectedSite());
+                    })
+                    ->map(function ($globalSet) {
+                        $localized = $globalSet->inSelectedSite();
 
-                    return Nav::item($globalSet->title())
-                        ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
-                        ->can('view', $globalSet);
-                })->filter();
+                        return Nav::item($globalSet->title())
+                            ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
+                            ->can('view', $globalSet);
+                    })->filter();
             });
 
         return $this;
