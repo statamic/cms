@@ -102,7 +102,7 @@ export default {
 
         savingPresetSlug() {
             return this.$slugify(this.savingPresetName, '_');
-        }
+        },
     },
 
     created() {
