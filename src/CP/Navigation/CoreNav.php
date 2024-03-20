@@ -74,7 +74,11 @@ class CoreNav
                     })
                     ->map(function ($collection) {
                         return Nav::item($collection->title())
-                            ->url($collection->showUrl())
+                            ->url(
+                                $collection->sites()->contains(Site::selected()->handle())
+                                    ? $collection->showUrl()
+                                    : $collection->editUrl()
+                            )
                             ->can('view', $collection);
                     });
             });

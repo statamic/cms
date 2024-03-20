@@ -3,7 +3,8 @@
         <div class="card overflow-hidden p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
                 <template slot="cell-title" slot-scope="{ row: collection }">
-                    <a :href="collection.entries_url">{{ __(collection.title) }}</a>
+                    <a v-if="collection.available_in_selected_site" :href="collection.entries_url">{{ __(collection.title) }}</a>
+                    <a v-else :href="collection.edit_url">{{ __(collection.title) }}</a>
                 </template>
                 <template slot="actions" slot-scope="{ row: collection, index }">
                     <dropdown-list placement="left-start">
