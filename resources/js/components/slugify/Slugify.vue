@@ -22,7 +22,7 @@ export default {
 
     data() {
         return {
-            slugifier: this.$slug.in(this.language).separatedBy(this.separator),
+            slugifier: this.$slug.async().in(this.language).separatedBy(this.separator),
             slug: null,
             shouldSlugify: this.enabled && !this.to
         }

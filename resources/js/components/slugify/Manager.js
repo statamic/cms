@@ -18,6 +18,10 @@ class Manager {
         return this.make().in(language);
     }
 
+    async() {
+        return this.make().async();
+    }
+
 }
 
 export default Manager;

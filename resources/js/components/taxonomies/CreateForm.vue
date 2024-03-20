@@ -47,7 +47,7 @@ export default {
         return {
             title: null,
             handle: null,
-            slug: this.$slug.separatedBy('_'),
+            slug: this.$slug.async().separatedBy('_'),
         }
     },
 
