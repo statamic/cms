@@ -46,10 +46,13 @@ class ProEnable extends Command
             $this->checkInfo('Statamic editions config successfully updated to reference .env var!');
         }
 
-        if (! $this->configReferencingEnv()) {
-            $this->crossLine('Statamic editions config not currently referencing .env var.');
+        if ($this->option('update-config') && ! $this->configReferencingEnv()) {
+            $this->crossLine('Could not reliably update editions config to reference .env var!');
             $this->comment(PHP_EOL.'For this setting to take effect, please modify your [config/statamic/editions.php] as follows:');
             $this->line("'pro' => env('STATAMIC_PRO_ENABLED', false)");
+        } elseif (! $this->configReferencingEnv()) {
+            $this->crossLine('Statamic editions config not currently referencing .env var!');
+            $this->comment('Please re-run this command with the `--update-config` option.');
         }
     }
 
