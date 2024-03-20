@@ -15,7 +15,10 @@
             </div>
             <div class="mb-4">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Handle') }}</label>
-                <input type="text" v-model="handle" class="input-text" tabindex="2">
+                <div class="relative">
+                    <loading-graphic inline text="" v-if="slug.busy" class="absolute top-3 right-3"/>
+                    <input type="text" v-model="handle" class="input-text" tabindex="2">
+                </div>
                 <div class="text-2xs text-gray-600 mt-2 flex items-center">
                     {{ __('messages.globals_configure_handle_instructions') }}
                 </div>
@@ -42,14 +45,15 @@ export default {
     data() {
         return {
             title: null,
-            handle: null
+            handle: null,
+            slug: this.$slug.separatedBy('_'),
         }
     },
 
     watch: {
-        title: _.debounce(function(value) {
-            this.$slugify(value, '_').then(handle => this.handle = handle);
-        }, 500)
+        title(title) {
+            this.slug.create(title).then(slug => this.handle = slug);
+        }
     },
 
     computed: {
