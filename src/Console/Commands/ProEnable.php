@@ -38,21 +38,21 @@ class ProEnable extends Command
             return;
         }
 
-        $this->laravel['config']['statamic.editions.pro'] = true;
-
         $this->checkInfo('Statamic Pro successfully enabled in .env file!');
 
         if ($this->option('update-config') && $this->updateConfig()) {
             $this->checkInfo('Statamic editions config successfully updated to reference .env var!');
         }
 
-        if ($this->option('update-config') && ! $this->configReferencingEnv()) {
+        if ($this->option('update-config') && ! $this->isConfigReferencingEnv()) {
             $this->crossLine('Could not reliably update editions config to reference .env var!');
             $this->comment(PHP_EOL.'For this setting to take effect, please modify your [config/statamic/editions.php] as follows:');
             $this->line("'pro' => env('STATAMIC_PRO_ENABLED', false)");
-        } elseif (! $this->configReferencingEnv()) {
+        } elseif (! $this->isConfigReferencingEnv()) {
             $this->crossLine('Statamic editions config not currently referencing .env var!');
             $this->comment('Please re-run this command with the `--update-config` option.');
+        } else {
+            $this->laravel['config']['statamic.editions.pro'] = true;
         }
     }
 
@@ -141,7 +141,7 @@ class ProEnable extends Command
             return false;
         }
 
-        if ($this->configReferencingEnv()) {
+        if ($this->isConfigReferencingEnv()) {
             return false;
         }
 
@@ -165,10 +165,10 @@ class ProEnable extends Command
      *
      * @return bool
      */
-    protected function configReferencingEnv()
+    protected function isConfigReferencingEnv()
     {
         if (! file_exists($configPath = config_path('statamic/editions.php'))) {
-            return false;
+            return true;
         }
 
         return (bool) preg_match('/[\'"]pro[\'"]\s*=>\s*env\([\'"]STATAMIC_PRO_ENABLED[\'"]/m', file_get_contents($configPath));
