@@ -1,17 +1,28 @@
-import axios from 'axios';
+import getSlug from 'speakingurl';
 
 export default {
     install(Vue, options) {
-        Vue.prototype.$slugify = function(string, separator, lang) {
+        Vue.prototype.$slugify = function(text, glue, lang) {
             const selectedSite = Statamic.$config.get('selectedSite');
             const sites = Statamic.$config.get('sites');
             const site = sites.find(site => site.handle === selectedSite);
             lang = lang ?? site?.lang ?? Statamic.$config.get('lang');
+            const custom = Statamic.$config.get(`charmap.${lang}`) ?? {};
 
-            return new Promise((resolve, reject) => {
-                axios.post(cp_url('slug'), { string, separator, language: lang })
-                    .then(response => resolve(response.data))
-                    .catch(error => reject(error));
+            // Remove apostrophes in all languages
+            custom["'"] = "";
+
+            // Remove smart single quotes
+            custom["’"] = "";
+
+            // Prevent `Block - Hero` turning into `block_-_hero`
+            custom[" - "] = " ";
+
+            return getSlug(text, {
+                separator: glue || '-',
+                lang,
+                custom,
+                symbols: Statamic.$config.get('asciiReplaceExtraSymbols')
             });
         };
     }
