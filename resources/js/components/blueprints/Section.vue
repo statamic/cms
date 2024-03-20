@@ -148,7 +148,7 @@ export default {
 
         'editingSection.display': function(display) {
             if (this.editingSection && this.handleSyncedWithDisplay) {
-                this.editingSection.handle = this.$slugify(display, '_');
+                this.editingSection.handle = snake_case(display);
             }
         }
 
