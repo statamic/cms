@@ -20,6 +20,9 @@ class FakeComposer
     {
         [$package, $branch] = $this->parseRawPackageArg($package);
 
+        Blink::put('composer-require-package', $package);
+        Blink::put('composer-require-branch', $branch);
+
         if (collect($extraParams)->contains('--dry-run')) {
             return;
         }
@@ -31,6 +34,9 @@ class FakeComposer
     public function requireDev($package, $version = null, ...$extraParams)
     {
         [$package, $branch] = $this->parseRawPackageArg($package);
+
+        Blink::put('composer-require-dev-package', $package);
+        Blink::put('composer-require-dev-branch', $branch);
 
         if (collect($extraParams)->contains('--dry-run')) {
             return;
