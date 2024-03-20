@@ -5,6 +5,8 @@
         :from="source"
         :separator="separator"
         :language="language"
+        @slugifying="syncing = true"
+        @slugified="syncing = false"
         v-model="slug"
     >
         <div>
@@ -122,8 +124,7 @@ export default {
         },
 
         sync() {
-            this.syncing = true;
-            this.$refs.slugify.reset().then(() => this.syncing = false);
+            this.$refs.slugify.reset();
         }
     }
 

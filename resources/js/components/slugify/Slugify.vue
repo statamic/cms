@@ -60,15 +60,22 @@ export default {
     methods: {
 
         reset() {
-            if (this.enabled) {
-                return this.slugify().then(() => this.shouldSlugify = true);
-            }
+            if (! this.enabled) return Promise.resolve();
 
-            return Promise.resolve();
+            // If the slug doesn't change, we'll emit the event manually.
+            // The watcher will only emit the event if the slug changes.
+            const initialSlug = this.slug;
+
+            return this.slugify().then(() => {
+                this.shouldSlugify = true;
+                if (this.slug === initialSlug) this.$emit('slugified', this.slug);
+            });
+
         },
 
         slugify() {
             return new Promise((resolve, reject) => {
+                this.$emit('slugifying');
                 this.slugifier.create(this.from).then(slug => {
                     this.slug = slug;
                     resolve(slug);
