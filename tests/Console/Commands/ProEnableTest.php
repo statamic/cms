@@ -32,6 +32,8 @@ ENV;
         $this->defaultEditionsContents = $this->files->get(__DIR__.'/../../../config/editions.php');
 
         $this->files->put($this->envPath, $this->defaultEnvContents);
+
+        $this->files->makeDirectory(dirname($this->editionsPath), 0777, true, true);
         $this->files->put($this->editionsPath, $this->defaultEditionsContents);
     }
 
