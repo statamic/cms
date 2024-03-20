@@ -3,6 +3,7 @@
 namespace Tests\Fakes\Composer;
 
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Facades\Blink;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -17,6 +18,8 @@ class FakeComposer
 
     public function require($package, $version = null, ...$extraParams)
     {
+        [$package, $branch] = $this->parseRawPackageArg($package);
+
         if (collect($extraParams)->contains('--dry-run')) {
             return;
         }
@@ -27,6 +30,8 @@ class FakeComposer
 
     public function requireDev($package, $version = null, ...$extraParams)
     {
+        [$package, $branch] = $this->parseRawPackageArg($package);
+
         if (collect($extraParams)->contains('--dry-run')) {
             return;
         }
@@ -129,6 +134,17 @@ class FakeComposer
         if ($this->files->exists($path = base_path("vendor/{$package}"))) {
             $this->files->deleteDirectory($path);
         }
+    }
+
+    protected function parseRawPackageArg(string $package): array
+    {
+        $parts = explode(':', $package);
+
+        if (count($parts) === 1) {
+            $parts[] = null;
+        }
+
+        return $parts;
     }
 
     public function __call($method, $args)
