@@ -7,7 +7,7 @@ import Reveal from './Reveal';
 import Components from './Components';
 import FieldConditions from './FieldConditions';
 import Callbacks from './Callbacks';
-import Slugify from './slugs/Manager.js';
+import Slugs from './slugs/Manager.js';
 const echo = new Echo;
 const bard = new Bard;
 const keys = new Keys;
@@ -16,7 +16,7 @@ const reveal = new Reveal;
 const components = new Components;
 const conditions = new FieldConditions;
 const callbacks = new Callbacks;
-const slugify = new Slugify;
+const slug = new Slugs;
 
 export default new Vue({
     data() {
@@ -66,7 +66,7 @@ export default new Vue({
         },
 
         $slug() {
-            return slugify;
+            return slug;
         },
 
         user() {
