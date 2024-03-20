@@ -121,3 +121,7 @@ export function closestVm(el, name) {
         vm = vm.$parent;
     }
 }
+
+export function snake_case(string) {
+    return Statamic.$slug.separatedBy('_').create(string);
+}
