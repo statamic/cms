@@ -38,8 +38,15 @@ export default class Slugify {
     }
 
     create(string) {
-        this.busy = true;
+        if (! string) {
+            this.#controller.abort();
+            this.#debounced.cancel();
+            this.busy = false;
+            return Promise.resolve('');
+        }
+
         this.#string = string;
+        this.busy = true;
 
         return new Promise((resolve, reject) => this.#debounced(resolve, reject));
     }
