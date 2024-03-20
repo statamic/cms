@@ -17,7 +17,8 @@ class ProEnable extends Command
      * @var string
      */
     protected $signature = 'statamic:pro:enable
-        { --force : Force the operation to run when in production }';
+        { --force : Force the operation to run when in production }
+        { --update-config : Also update editions config to reference .env var }';
 
     /**
      * The console command description.
@@ -41,8 +42,12 @@ class ProEnable extends Command
 
         $this->checkInfo('Statamic Pro successfully enabled in .env file!');
 
-        if ($this->configNotReferencingEnv()) {
-            $this->crossLine('Statamic editions config not currently referencing .env file.');
+        if ($this->option('update-config') && $this->updateConfig()) {
+            $this->checkInfo('Statamic editions config successfully updated to reference .env var!');
+        }
+
+        if (! $this->configReferencingEnv()) {
+            $this->crossLine('Statamic editions config not currently referencing .env var.');
             $this->comment(PHP_EOL.'For this setting to take effect, please modify your [config/statamic/editions.php] as follows:');
             $this->line("'pro' => env('STATAMIC_PRO_ENABLED', false)");
         }
@@ -123,16 +128,46 @@ class ProEnable extends Command
     }
 
     /**
-     * Check whether the editions config is referencing the .env var.
+     * Update editions config to reference the .env var.
      *
      * @return bool
      */
-    protected function configNotReferencingEnv()
+    protected function updateConfig()
     {
         if (! file_exists($configPath = config_path('statamic/editions.php'))) {
             return false;
         }
 
-        return ! preg_match('/[\'"]pro[\'"]\s*=>\s*env\([\'"]STATAMIC_PRO_ENABLED[\'"]/m', file_get_contents($configPath));
+        if ($this->configReferencingEnv()) {
+            return false;
+        }
+
+        $contents = file_get_contents($configPath);
+
+        if (str_contains($contents, "'pro' => false,")) {
+            $contents = str_replace("'pro' => false,", "'pro' => env('STATAMIC_PRO_ENABLED', false),", $contents);
+        } elseif (str_contains($contents, "'pro' => true,")) {
+            $contents = str_replace("'pro' => true,", "'pro' => env('STATAMIC_PRO_ENABLED', false),", $contents);
+        } else {
+            return false;
+        }
+
+        file_put_contents($configPath, $contents);
+
+        return true;
+    }
+
+    /**
+     * Check whether the editions config is referencing the .env var.
+     *
+     * @return bool
+     */
+    protected function configReferencingEnv()
+    {
+        if (! file_exists($configPath = config_path('statamic/editions.php'))) {
+            return false;
+        }
+
+        return (bool) preg_match('/[\'"]pro[\'"]\s*=>\s*env\([\'"]STATAMIC_PRO_ENABLED[\'"]/m', file_get_contents($configPath));
     }
 }
