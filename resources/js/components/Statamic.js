@@ -7,7 +7,7 @@ import Reveal from './Reveal';
 import Components from './Components';
 import FieldConditions from './FieldConditions';
 import Callbacks from './Callbacks';
-import Slugify from './slugify/Manager.js';
+import Slugify from './slugs/Manager.js';
 const echo = new Echo;
 const bard = new Bard;
 const keys = new Keys;

@@ -1,9 +1,9 @@
-import Slugify from './Slugify';
+import Slug from './Slug';
 
 class Manager {
 
     make() {
-        return new Slugify;
+        return new Slug;
     }
 
     create(string) {

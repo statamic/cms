@@ -1,7 +1,7 @@
 import axios from 'axios';
 import speakingUrl from 'speakingurl';
 
-export default class Slugify {
+export default class Slug {
     busy = false;
     #string;
     #separator = '-';
