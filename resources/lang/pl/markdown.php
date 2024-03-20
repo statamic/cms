@@ -12,7 +12,7 @@ return [
 </code></pre>
 
 <h3>Pogrubienie i pochylenie</h3>
-<pre class="language-markdown"><code>Możesz __pochylić__ tekst, **pogrubiać** go, lub **__pogrubiać i pochylać jednocześnie__**.</code></pre>
+<pre class="language-markdown"><code>Możesz *pochylić* tekst, **pogrubiać** go, lub _**pogrubiać i pochylać jednocześnie**_.</code></pre>
 
 <h3>Linki</h3>
 <pre class="language-markdown"><code>To jest [przykładowy link](http://example.com).</code></pre>
