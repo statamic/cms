@@ -70,7 +70,7 @@ class CoreNav
                 return CollectionAPI::all()->sortBy->title()
                     ->filter(function ($collection) {
                         return User::current()->can('configure collections')
-                        || $collection->sites()->contains(Site::selected()->handle());
+                            || $collection->sites()->contains(Site::selected()->handle());
                     })
                     ->map(function ($collection) {
                         return Nav::item($collection->title())
