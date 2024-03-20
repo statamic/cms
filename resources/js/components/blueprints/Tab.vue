@@ -150,9 +150,9 @@ export default {
             this.display = this.tab.display;
         },
 
-        async fieldUpdated(handle, value) {
+        fieldUpdated(handle, value) {
             if (handle === 'display' && this.handleSyncedWithDisplay) {
-                await this.$slugify(value, '_').then(handle => this.handle = handle)
+                this.handle = this.$slugify(value, '_');
             }
 
             if (handle === 'handle') {

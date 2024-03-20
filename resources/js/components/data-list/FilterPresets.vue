@@ -80,13 +80,7 @@ export default {
             showRenameModal: false,
             showDeleteModal: false,
             savingPresetName: null,
-            savingPresetSlug: null,
-        }
-    },
-
-    watch: {
-        savingPresetName: async function (value) {
-            await this.$slugify(value, '_').then(handle => this.savingPresetSlug = handle);
+            test: 'hello!'
         }
     },
 
@@ -105,6 +99,10 @@ export default {
 
             return payload;
         },
+
+        savingPresetSlug() {
+            return this.$slugify(this.savingPresetName, '_');
+        }
     },
 
     created() {

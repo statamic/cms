@@ -133,7 +133,6 @@ export default {
             saving: false,
             deleting: false,
             savingPresetName: null,
-            savingPresetHandle: null,
             presets: [],
         }
     },
@@ -146,10 +145,6 @@ export default {
             handler(preset) {
                 this.savingPresetName = preset.display || null;
             }
-        },
-
-        savingPresetName: async function(value) {
-            await this.$slugify(value, '_').then(handle => this.savingPresetHandle = handle);
         }
     },
 
@@ -210,6 +205,10 @@ export default {
 
         canSave() {
             return this.savesPresets && this.isDirty && this.preferencesPrefix;
+        },
+
+        savingPresetHandle() {
+            return this.$slugify(this.savingPresetName, '_');
         },
 
         isUpdatingPreset() {
