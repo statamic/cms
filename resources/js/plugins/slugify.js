@@ -1,5 +1,3 @@
-import getSlug from 'speakingurl';
-
 export default {
     install(Vue, options) {
         Vue.prototype.$slugify = function(text, glue, lang) {
