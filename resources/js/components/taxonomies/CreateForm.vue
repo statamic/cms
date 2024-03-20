@@ -59,7 +59,7 @@ export default {
 
     computed: {
         canSubmit() {
-            return Boolean(this.title && this.handle);
+            return Boolean(this.title && this.handle && !this.slug.busy);
         },
     },
 
