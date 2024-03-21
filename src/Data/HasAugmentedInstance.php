@@ -41,7 +41,7 @@ trait HasAugmentedInstance
 
     public function augmented()
     {
-        return $this->runHooks('augmented', $augmented = $this->newAugmentedInstance());
+        return $this->runHooks('augmented', $this->newAugmentedInstance());
     }
 
     abstract public function newAugmentedInstance(): Augmented;
