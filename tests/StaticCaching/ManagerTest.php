@@ -3,7 +3,6 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Support\Facades\Cache;
-use InvalidArgumentException;
 use Mockery;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
