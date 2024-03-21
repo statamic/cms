@@ -3,8 +3,7 @@
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
                 <template slot="cell-title" slot-scope="{ row: structure }">
-                    <a v-if="structure.available_in_selected_site" :href="structure.show_url" class="flex items-center" v-text="__(structure.title)" />
-                    <a v-else :href="structure.edit_url" class="flex items-center" v-text="__(structure.title)" />
+                    <a :href="structure.available_in_selected_site ? structure.show_url : structure.edit_url" class="flex items-center" v-text="__(structure.title)" />
                 </template>
                 <template slot="actions" slot-scope="{ row: structure, index }">
                     <dropdown-list>
