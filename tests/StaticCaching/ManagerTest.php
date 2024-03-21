@@ -17,6 +17,10 @@ class ManagerTest extends TestCase
         config([
             'statamic.static_caching.strategy' => 'test',
             'statamic.static_caching.strategies.test.driver' => 'test',
+            'cache.stores.static_cache' => [
+                'driver' => 'file',
+                'path' => storage_path('statamic/static-urls-cache'),
+            ],
         ]);
 
         $mock = Mockery::mock(Cacher::class)->shouldReceive('flush')->once()->getMock();
@@ -39,7 +43,6 @@ class ManagerTest extends TestCase
         $mock = Mockery::mock(Cacher::class)->shouldReceive('flush')->once()->getMock();
         StaticCache::extend('test', fn () => $mock);
 
-        Cache::shouldReceive('store')->with('static_cache')->andThrow(InvalidArgumentException::class);
         Cache::shouldReceive('store')->andReturnSelf();
         Cache::shouldReceive('get')->with('nocache::urls', [])->once()->andReturn(['/one', '/two']);
         Cache::shouldReceive('get')->with('nocache::session.'.md5('/one'))->once()->andReturn(['regions' => ['r1', 'r2']]);
