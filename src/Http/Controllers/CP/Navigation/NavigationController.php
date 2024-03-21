@@ -17,23 +17,20 @@ class NavigationController extends CpController
     {
         $this->authorize('index', NavContract::class, __('You are not authorized to view navs.'));
 
-        $navs = Nav::all()
-            ->filter(function ($nav) {
-                return User::current()->can('configure navs')
-                    || ($nav->sites()->contains(Site::selected()->handle()) && User::current()->can('view', $nav));
-            })
-            ->map(function ($structure) {
-                return [
-                    'id' => $structure->handle(),
-                    'title' => $structure->title(),
-                    'show_url' => $structure->showUrl(),
-                    'edit_url' => $structure->editUrl(),
-                    'delete_url' => $structure->deleteUrl(),
-                    'deleteable' => User::current()->can('delete', $structure),
-                    'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
-                ];
-            })
-            ->values();
+        $navs = Nav::all()->filter(function ($nav) {
+            return User::current()->can('configure navs')
+                || ($nav->sites()->contains(Site::selected()->handle()) && User::current()->can('view', $nav));
+        })->map(function ($structure) {
+            return [
+                'id' => $structure->handle(),
+                'title' => $structure->title(),
+                'show_url' => $structure->showUrl(),
+                'edit_url' => $structure->editUrl(),
+                'delete_url' => $structure->deleteUrl(),
+                'deleteable' => User::current()->can('delete', $structure),
+                'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
+            ];
+        })->values();
 
         return view('statamic::navigation.index', compact('navs'));
     }

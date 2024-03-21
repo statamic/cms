@@ -23,30 +23,27 @@ class CollectionsController extends CpController
     {
         $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
 
-        $collections = Collection::all()
-            ->filter(function ($collection) {
-                return User::current()->can('configure collections')
-                    || User::current()->can('view', $collection)
-                    && $collection->sites()->contains(Site::selected()->handle());
-            })
-            ->map(function ($collection) {
-                return [
-                    'id' => $collection->handle(),
-                    'title' => $collection->title(),
-                    'entries' => $collection->queryEntries()->where('site', Site::selected())->count(),
-                    'edit_url' => $collection->editUrl(),
-                    'delete_url' => $collection->deleteUrl(),
-                    'entries_url' => cp_route('collections.show', $collection->handle()),
-                    'url' => $collection->absoluteUrl(Site::selected()->handle()),
-                    'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
-                    'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
-                    'deleteable' => User::current()->can('delete', $collection),
-                    'editable' => User::current()->can('edit', $collection),
-                    'blueprint_editable' => User::current()->can('configure fields'),
-                    'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
-                ];
-            })
-            ->values();
+        $collections = Collection::all()->filter(function ($collection) {
+            return User::current()->can('configure collections')
+                || User::current()->can('view', $collection)
+                && $collection->sites()->contains(Site::selected()->handle());
+        })->map(function ($collection) {
+            return [
+                'id' => $collection->handle(),
+                'title' => $collection->title(),
+                'entries' => $collection->queryEntries()->where('site', Site::selected())->count(),
+                'edit_url' => $collection->editUrl(),
+                'delete_url' => $collection->deleteUrl(),
+                'entries_url' => cp_route('collections.show', $collection->handle()),
+                'url' => $collection->absoluteUrl(Site::selected()->handle()),
+                'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
+                'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
+                'deleteable' => User::current()->can('delete', $collection),
+                'editable' => User::current()->can('edit', $collection),
+                'blueprint_editable' => User::current()->can('configure fields'),
+                'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
+            ];
+        })->values();
 
         return view('statamic::collections.index', [
             'collections' => $collections,
