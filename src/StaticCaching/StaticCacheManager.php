@@ -43,7 +43,7 @@ class StaticCacheManager extends Manager
         return Cache::store($this->hasCustomStore() ? 'static_cache' : null);
     }
 
-    public function hasCustomStore(): bool
+    private function hasCustomStore(): bool
     {
         return config()->has('cache.stores.static_cache');
     }
