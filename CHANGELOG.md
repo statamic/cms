@@ -1,5 +1,39 @@
 # Release Notes
 
+## 4.54.0 (2024-03-21)
+
+### What's new
+- Collections etc are hidden when unavailable to currently selected site in the CP. [#9583](https://github.com/statamic/cms/issues/9583) by @pdipatrizio
+- Add ability to install starter kit from specific branch. [#9766](https://github.com/statamic/cms/issues/9766) by @jesseleite
+- Widgets can be restricted to specific sites. [#9600](https://github.com/statamic/cms/issues/9600) by @aerni
+- Add Ukrainian translations. [#9750](https://github.com/statamic/cms/issues/9750) by @osbre
+- Add direct link to preferences. [#9740](https://github.com/statamic/cms/issues/9740) by @jasonvarga
+
+### What's improved
+- Polish translations. [#9771](https://github.com/statamic/cms/issues/9771) by @PaperTurtle
+- French translations. [#9736](https://github.com/statamic/cms/issues/9736) by @ebeauchamps
+- Russian translations. [#9722](https://github.com/statamic/cms/issues/9722) by @dragomano
+- Improve locale preference selector. [#9739](https://github.com/statamic/cms/issues/9739) by @jasonvarga
+- Throw more helpful exception when invalid values are passed to `whereCollection`/`whereTaxonomy` methods. [#9751](https://github.com/statamic/cms/issues/9751) by @duncanmcclean
+
+### What's fixed
+- Fix 403 views not using error template. [#9768](https://github.com/statamic/cms/issues/9768) by @edalzell
+- Fix field locking user avatar size. [#9761](https://github.com/statamic/cms/issues/9761) by @duncanmcclean
+- Fix markdown and code fieldtype read-only modes. [#9764](https://github.com/statamic/cms/issues/9764) by @duncanmcclean
+- Fix blueprint error when creating user. [#9276](https://github.com/statamic/cms/issues/9276) by @duncanmcclean
+- Allow slashes in comb search queries. [#9754](https://github.com/statamic/cms/issues/9754) by @ryanmitchell
+- Add entry and term empty view permission checks. [#9377](https://github.com/statamic/cms/issues/9377) by @jacksleight
+- Ensure changes to "Parent" get saved when using revisions. [#9079](https://github.com/statamic/cms/issues/9079) by @duncanmcclean
+- Replace Mix paths with Vite paths in `starter-kit.yaml` stub. [#9741](https://github.com/statamic/cms/issues/9741) by @duncanmcclean
+- Fix `{{ nocache }}` tag when URL contains URL fragment. [#9742](https://github.com/statamic/cms/issues/9742) by @duncanmcclean
+- Add missing DocBlocks to the `Markdown` facade. [#9746](https://github.com/statamic/cms/issues/9746) by @osbre
+- Add missing config items. [#9734](https://github.com/statamic/cms/issues/9734) by @jasonvarga
+- Fix stacked grid margin-top styling. [#9733](https://github.com/statamic/cms/issues/9733) by @jesseleite
+- Ensure pagination is always displayed at the bottom of collection widget. [#9726](https://github.com/statamic/cms/issues/9726) by @duncanmcclean
+- Bump follow-redirects from 1.15.4 to 1.15.6 [#9748](https://github.com/statamic/cms/issues/9748) by @dependabot
+
+
+
 ## 4.53.2 (2024-03-13)
 
 ### What's improved
