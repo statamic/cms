@@ -3,6 +3,7 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Support\Facades\Cache;
+use InvalidArgumentException;
 use Mockery;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
@@ -21,6 +22,24 @@ class ManagerTest extends TestCase
         $mock = Mockery::mock(Cacher::class)->shouldReceive('flush')->once()->getMock();
         StaticCache::extend('test', fn () => $mock);
 
+        Cache::shouldReceive('store')->andReturnSelf();
+        Cache::shouldReceive('flush')->once();
+
+        StaticCache::flush();
+    }
+
+    /** @test */
+    public function it_flushes_without_static_cache_store()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'test',
+            'statamic.static_caching.strategies.test.driver' => 'test',
+        ]);
+
+        $mock = Mockery::mock(Cacher::class)->shouldReceive('flush')->once()->getMock();
+        StaticCache::extend('test', fn () => $mock);
+
+        Cache::shouldReceive('store')->with('static_cache')->andThrow(InvalidArgumentException::class);
         Cache::shouldReceive('store')->andReturnSelf();
         Cache::shouldReceive('get')->with('nocache::urls', [])->once()->andReturn(['/one', '/two']);
         Cache::shouldReceive('get')->with('nocache::session.'.md5('/one'))->once()->andReturn(['regions' => ['r1', 'r2']]);
