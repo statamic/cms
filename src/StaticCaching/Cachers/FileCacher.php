@@ -206,7 +206,7 @@ class FileCacher extends AbstractCacher
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            url: window.location.href,
+            url: window.location.href.split('#')[0],
             sections: Object.keys(map)
         })
     })

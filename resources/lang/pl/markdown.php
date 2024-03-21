@@ -3,7 +3,7 @@
 return [
 
     'cheatsheet' => '
-<p>Markdown to język znaczników przeznaczony do formatowania tekstu. Pozwala na tworzenie tekstu za pomocą czytelnej i prostej składni, który zostanie później przekonwertowany do HTML.</p>
+<p>Markdown jest składnią znaczników do formatowania tekstu w sieci, umożliwiającą pisanie w łatwej do odczytania i zapisania formie tekstowej, która jest konwertowana na prawidłowo zbudowany HTML.</p>
 
 <h3>Nagłówki</h3>
 <pre class="language-markdown"><code># To jest h1
@@ -12,21 +12,21 @@ return [
 </code></pre>
 
 <h3>Pogrubienie i pochylenie</h3>
-<pre class="language-markdown"><code>Możesz tworzyć *wyróżniony*, **pogrubiony**, lub _**wyróżniony i pogrubiony jednocześnie**_ tekst.</code></pre>
+<pre class="language-markdown"><code>Możesz *pochylić* tekst, **pogrubiać** go, lub _**pogrubiać i pochylać jednocześnie**_.</code></pre>
 
 <h3>Linki</h3>
 <pre class="language-markdown"><code>To jest [przykładowy link](http://example.com).</code></pre>
 
 <h3>Kod</h3>
 <p>
-Zawrzyj swój kod w 3 apostrofy (<code>```</code>)
+Umieść swój kod pomiędzy trzema apostrofami (<code>```</code>), na linii przed i po kodzie.
 </p>
 
 <pre class="language-markdown"><code>```
 to: jest składnia yaml
 ```</code></pre>
 
-<p>Możesz równierz napisać kod w jednej linijce za pomocą <code>`</code> pojedynczych apostrofów.
+<p>Możesz również umieścić kod inline, otaczając go pojedynczymi apostrofami (<code>`</code>).
 
 <h3>Cytaty</h3>
 
@@ -37,12 +37,12 @@ to: jest składnia yaml
 <h3>Obrazy</h3>
 <pre class="language-markdown"><code>![tekst alternatywny](http://example.com/image.jpg)</code></pre>
 
-<h3>Listy nienumerowana</h3>
+<h3>Listy nienumerowane</h3>
 <pre class="language-markdown"><code>- Bekon
 - Stek
 - Piwo</code></pre>
 
-<h3>Listy numerowana</h3>
+<h3>Listy numerowane</h3>
 <pre class="language-markdown"><code>1. Najedz się
 2. Napij się
 3. Bądź wesoły</code></pre>
