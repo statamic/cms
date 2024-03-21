@@ -37,6 +37,10 @@ return [
             'driver' => 'file',
             'path' => public_path('static'),
             'lock_hold_length' => 0,
+            'permissions' => [
+                'directory' => 0755,
+                'file' => 0644,
+            ],
         ],
 
     ],
@@ -124,20 +128,4 @@ return [
     */
 
     'warm_queue' => null,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Permissions
-    |--------------------------------------------------------------------------
-    |
-    | If you are using full static caching you can specify the permissions
-    | applied to directories and files created
-    |
-    */
-
-    'permissions' => [
-        'directory' => 0755,
-        'file' => 0644,
-    ],
-
 ];
