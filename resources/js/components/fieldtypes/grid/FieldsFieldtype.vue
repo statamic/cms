@@ -4,7 +4,7 @@
         :fields="fields"
         :editing-field="editingField"
         :can-define-localizable="false"
-        :suggestable-condition-fields="suggestableConditionFields"
+        :suggestable-condition-fields="suggestableConditionFields(this)"
         @field-created="fieldCreated"
         @field-updated="fieldUpdated"
         @field-linked="fieldLinked"
