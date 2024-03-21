@@ -67,13 +67,21 @@ class StaticCacheManager extends Manager
     {
         $this->driver()->flush();
 
-        collect($this->cacheStore()->get('nocache::urls', []))->each(function ($url) {
-            $session = $this->cacheStore()->get($sessionKey = 'nocache::session.'.md5($url));
-            collect($session['regions'] ?? [])->each(fn ($region) => $this->cacheStore()->forget('nocache::region.'.$region));
-            $this->cacheStore()->forget($sessionKey);
-        });
+        try {
+            $store = Cache::store('static_cache');
 
-        $this->cacheStore()->forget('nocache::urls');
+            $store->flush();
+        } catch (InvalidArgumentException $e) {
+            $store = Cache::store();
+
+            collect($this->cacheStore()->get('nocache::urls', []))->each(function ($url) {
+                $session = $this->cacheStore()->get($sessionKey = 'nocache::session.'.md5($url));
+                collect($session['regions'] ?? [])->each(fn ($region) => $this->cacheStore()->forget('nocache::region.'.$region));
+                $this->cacheStore()->forget($sessionKey);
+            });
+
+            $this->cacheStore()->forget('nocache::urls');
+        }
     }
 
     public function nocacheJs(string $js)
