@@ -168,12 +168,12 @@ class FileCacher extends AbstractCacher
         $query = Arr::get($urlParts, 'query', '');
 
         if ($this->config('ignore_query_strings')) {
-            $whitelistedQueryParams = collect($this->config('whitelisted_query_parameters', []))
+            $allowedQueryParams = collect($this->config('allowed_query_parameters', []))
                 ->map(fn ($param) => Str::ensureRight($param, '='))
                 ->all();
 
-            $query = collect(explode('&', $query))->filter(function ($param) use ($whitelistedQueryParams) {
-                return Str::startsWith($param, $whitelistedQueryParams);
+            $query = collect(explode('&', $query))->filter(function ($param) use ($allowedQueryParams) {
+                return Str::startsWith($param, $allowedQueryParams);
             })->implode('&');
         }
 

@@ -57,7 +57,7 @@ class StaticCacheManager extends Manager
         return array_merge($config, [
             'exclude' => $this->app['config']['statamic.static_caching.exclude'] ?? [],
             'ignore_query_strings' => $this->app['config']['statamic.static_caching.ignore_query_strings'] ?? false,
-            'whitelisted_query_parameters' => $this->app['config']['statamic.static_caching.whitelisted_query_parameters'] ?? [],
+            'allowed_query_parameters' => $this->app['config']['statamic.static_caching.allowed_query_parameters'] ?? [],
             'locale' => Site::current()->handle(),
         ]);
     }

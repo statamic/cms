@@ -60,7 +60,7 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_a_url_with_query_strings_disabled_and_whitelisted_query_params()
     {
-        $cacher = $this->cacher(['ignore_query_strings' => true, 'whitelisted_query_parameters' => ['page']]);
+        $cacher = $this->cacher(['ignore_query_strings' => true, 'allowed_query_parameters' => ['page']]);
 
         $request = Request::create('http://example.com/test', 'GET', [
             'page' => 5,

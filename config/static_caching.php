@@ -102,7 +102,7 @@ return [
 
     'ignore_query_strings' => false,
 
-    'whitelisted_query_parameters' => [
+    'allowed_query_parameters' => [
         'page',
     ],
 
