@@ -156,6 +156,7 @@ return [
 
     'handle' => 'Handles must use lowercase letters with snake_case separators.',
     'slug' => 'Slugs must use lowercase letters with slug-case separators.',
+    'slug' => 'Slugs must contain only letters and numbers with dashes or underscores as separators.',
     'unique_entry_value' => 'This value has already been taken.',
     'unique_term_value' => 'This value has already been taken.',
     'unique_user_value' => 'This value has already been taken.',

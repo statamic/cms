@@ -18,6 +18,7 @@ class SlugTest extends TestCase
         $this->assertPasses('foo-bar');
         $this->assertPasses('foo-bar-baz');
         $this->assertPasses('foo-bar-baz-qux');
+        $this->assertPasses('1-foo-bar234-baz-qux-5');
 
         $this->assertFails('foo_bar');
         $this->assertFails('-foo');
@@ -26,10 +27,6 @@ class SlugTest extends TestCase
         $this->assertFails('foo-bar-');
         $this->assertFails('foo--bar');
         $this->assertFails('foo---bar');
-        $this->assertFails('1foo');
-        $this->assertFails('foo2');
-        $this->assertFails('foo-3bar');
-        $this->assertFails('foo-4-bar');
         $this->assertFails('*foo');
         $this->assertFails('foo#');
         $this->assertFails('foo-!bar');
@@ -39,6 +36,6 @@ class SlugTest extends TestCase
     /** @test */
     public function it_outputs_helpful_validation_error()
     {
-        $this->assertValidationErrorOutput('Slugs must use lowercase letters with slug-case separators.', '-bad-input');
+        $this->assertValidationErrorOutput('Slugs must contain only letters and numbers with dashes or underscores as separators.', '-bad-input');
     }
 }

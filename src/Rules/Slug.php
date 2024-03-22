@@ -12,7 +12,7 @@ class Slug implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! preg_match('/^[a-z]+(?:-{0,1}[a-z])*$/', $value)) {
+        if (! preg_match('/^[a-zA-Z0-9]+(?:-{0,1}[a-zA-Z0-9])*$/', $value)) {
             $fail('statamic::validation.slug')->translate();
         }
     }
