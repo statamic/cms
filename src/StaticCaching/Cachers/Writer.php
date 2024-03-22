@@ -14,7 +14,6 @@ class Writer
 
     /**
      * @param  array  $permissions  An array of file and directory umask permissions
-     * @return self
      */
     public function __construct(array $permissions = [])
     {
