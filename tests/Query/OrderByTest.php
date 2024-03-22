@@ -20,7 +20,7 @@ class OrderByTest extends TestCase
         $this->assertEquals($dir, $orderby->direction);
     }
 
-    public function parseProvider()
+    public static function parseProvider()
     {
         return [
             ['foo', 'foo', 'asc'],

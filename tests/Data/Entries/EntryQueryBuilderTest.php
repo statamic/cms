@@ -722,7 +722,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals($expected, Entry::query()->where('title', 'like', $like)->get()->map->title->all());
     }
 
-    public function likeProvider()
+    public static function likeProvider()
     {
         return collect([
             'foo' => ['foo'],

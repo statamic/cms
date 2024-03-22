@@ -4,6 +4,7 @@ namespace Tests\Stache\Repositories;
 
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\EntryCollection;
+use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Stache\Repositories\EntryRepository;
@@ -136,6 +137,24 @@ class EntryRepositoryTest extends TestCase
         $this->assertNull($this->repo->find('unknown'));
     }
 
+    /** @test */
+    public function test_find_or_fail_gets_entry()
+    {
+        $entry = $this->repo->findOrFail('alphabetical-bravo');
+
+        $this->assertInstanceOf(Entry::class, $entry);
+        $this->assertEquals('Bravo', $entry->get('title'));
+    }
+
+    /** @test */
+    public function test_find_or_fail_throws_exception_when_entry_does_not_exist()
+    {
+        $this->expectException(EntryNotFoundException::class);
+        $this->expectExceptionMessage('Entry [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
+    }
+
     /**
      * @test
      *
@@ -153,7 +172,7 @@ class EntryRepositoryTest extends TestCase
         }
     }
 
-    public function entryByUriProvider()
+    public static function entryByUriProvider()
     {
         return [
             'case sensitive' => ['/alphabetical/bravo', 'Bravo'],

@@ -88,7 +88,7 @@ class UrlTest extends TestCase
         $this->assertSame($isAncestor, URL::isAncestorOf($child, $parent));
     }
 
-    public function ancestorProvider()
+    public static function ancestorProvider()
     {
         return [
             'homepage to homepage' => ['/', '/', false],
@@ -144,7 +144,7 @@ class UrlTest extends TestCase
         $this->assertSame($expected, URL::makeAbsolute($url));
     }
 
-    public function absoluteProvider()
+    public static function absoluteProvider()
     {
         return [
             ['http://example.com', 'http://example.com'],
@@ -177,7 +177,7 @@ class UrlTest extends TestCase
         $this->assertSame($expected, URL::makeRelative($url));
     }
 
-    public function relativeProvider()
+    public static function relativeProvider()
     {
         return [
             ['http://example.com', '/'],

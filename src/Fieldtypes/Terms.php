@@ -22,7 +22,6 @@ use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Taxonomies\LocalizedTerm;
 
 class Terms extends Relationship
 {
@@ -112,7 +111,7 @@ class Terms extends Relationship
         // entry, but could also be something else, like another taxonomy term.
         $parent = $this->field->parent();
 
-        $site = $parent && ($parent instanceof Localization || $parent instanceof LocalizedTerm)
+        $site = $parent && $parent instanceof Localization
             ? $parent->locale()
             : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
 

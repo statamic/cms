@@ -22,7 +22,7 @@ class ParentTags extends Tags
      * @param  array  $args
      * @return mixed
      */
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         $var_name = Stringy::removeLeft($this->tag, 'parent:');
 

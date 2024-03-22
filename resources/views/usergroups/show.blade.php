@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', Statamic::crumb($group->title(), 'User Group'))
 @section('wrapper_class', 'max-w-full')
@@ -11,7 +13,7 @@
         ])
         <div class="flex items-center">
             <h1 class="flex-1">{{ __($group->title()) }}</h1>
-            <dropdown-list class="mr-2">
+            <dropdown-list class="rtl:ml-2 ltr:mr-2">
                 @can('edit', $group)
                     <dropdown-item :text="__('Edit User Group')" redirect="{{ $group->editUrl() }}"></dropdown-item>
                 @endcan

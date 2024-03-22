@@ -372,7 +372,7 @@ GQL;
             ]);
     }
 
-    public function userPasswordFilterProvider()
+    public static function userPasswordFilterProvider()
     {
         return [
             'password' => ['password', '{ password: "abc" }'],
