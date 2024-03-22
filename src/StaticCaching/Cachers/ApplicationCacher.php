@@ -8,6 +8,7 @@ use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\UrlInvalidated;
+use Statamic\StaticCaching\Page;
 
 class ApplicationCacher extends AbstractCacher
 {
@@ -42,27 +43,29 @@ class ApplicationCacher extends AbstractCacher
         // Keep track of the URL and key the response content is about to be stored within.
         $this->cacheUrl($key, ...$this->getPathAndDomain($url));
 
-        $responseKey = $this->normalizeKey('responses:'.$key);
-        $headersKey = $this->normalizeKey('headers:'.$key);
+        $key = $this->normalizeKey('responses:'.$key);
         $value = $this->normalizeContent($content);
 
         if ($value instanceof JsonResponse) {
             $value = $value->getContent();
         }
 
-        if ($expiration = $this->getDefaultExpiration()) {
-            $this->cache->put($responseKey, $value, now()->addMinutes($expiration));
-        } else {
-            $this->cache->forever($responseKey, $value);
-        }
-
-        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($headersKey, $expiration) {
+        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($key, $value) {
             $headers = collect($event->response->headers->all())
                 ->reject(fn ($value, $key) => in_array($key, ['date', 'x-powered-by', 'cache-control', 'expires', 'set-cookie']))
                 ->mapWithKeys(fn ($value, $key) => [$key => Arr::first($value)])
                 ->all();
 
-            $this->cache->put($headersKey, $headers, $expiration);
+            $value = [
+                'response' => $value,
+                'headers' => $headers,
+            ];
+
+            if ($expiration = $this->getDefaultExpiration()) {
+                $this->cache->put($key, $value, now()->addMinutes($expiration));
+            } else {
+                $this->cache->forever($key, $value);
+            }
         });
     }
 
@@ -85,16 +88,7 @@ class ApplicationCacher extends AbstractCacher
     {
         $cachedPage = $this->cached ?? $this->getFromCache($request);
 
-        return $cachedPage;
-    }
-
-    public function getCachedHeaders(Request $request)
-    {
-        $url = $this->getUrl($request);
-
-        $key = $this->makeHash($url);
-
-        return $this->cache->get($this->normalizeKey('headers:'.$key)) ?? [];
+        return new Page($cachedPage['response'], $cachedPage['headers']);;
     }
 
     private function getFromCache(Request $request)

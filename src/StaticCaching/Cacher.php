@@ -29,13 +29,6 @@ interface Cacher
     public function getCachedPage(Request $request);
 
     /**
-     * Get a cached page's headers.
-     *
-     * @return array
-     */
-    public function getCachedHeaders(Request $request);
-
-    /**
      * Flush out the entire static cache.
      *
      * @return void

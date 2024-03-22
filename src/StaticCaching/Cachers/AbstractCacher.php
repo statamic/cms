@@ -274,11 +274,6 @@ abstract class AbstractCacher implements Cacher
         return $this->getCachedPage($request) !== null;
     }
 
-    public function getCachedHeaders(Request $request)
-    {
-        return [];
-    }
-
     protected function getPathAndDomain($url)
     {
         $parsed = parse_url($url);
