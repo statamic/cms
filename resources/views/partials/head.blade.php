@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width">
 <meta name="robots" content="noindex,nofollow">
 
-<title>@yield('title', $title ?? __('Here')) ‹ {{ Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic' }}</title>
+<title>@yield('title', $title ?? __('Here')) {{ Statamic::cpDirection() === 'ltr' ? '‹' : '›' }} {{ Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic' }}</title>
 
 @if (Statamic::pro() && config('statamic.cp.custom_favicon_url'))
     @include('statamic::partials.favicon', ['favicon_url' => config('statamic.cp.custom_favicon_url')])

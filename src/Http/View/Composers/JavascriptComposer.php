@@ -41,7 +41,8 @@ class JavascriptComposer
             'toasts' => Toast::toArray(),
             'translationLocale' => app('translator')->locale(),
             'translations' => $this->translations(),
-            'locale' => config('app.locale'),
+            'locale' => Statamic::cpLocale(),
+            'direction' => Statamic::cpDirection(),
             'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
             'charmap' => ASCII::charsArray($replaceSymbols),
         ];

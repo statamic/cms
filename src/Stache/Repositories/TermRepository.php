@@ -4,6 +4,7 @@ namespace Statamic\Stache\Repositories;
 
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
+use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
@@ -32,11 +33,19 @@ class TermRepository implements RepositoryContract
 
     public function whereTaxonomy(string $handle): TermCollection
     {
+        if (! Taxonomy::find($handle)) {
+            throw new TaxonomyNotFoundException($handle);
+        }
+
         return $this->query()->where('taxonomy', $handle)->get();
     }
 
     public function whereInTaxonomy(array $handles): TermCollection
     {
+        collect($handles)
+            ->reject(fn ($taxonomy) => Taxonomy::find($taxonomy))
+            ->each(fn ($taxonomy) => throw new TaxonomyNotFoundException($taxonomy));
+
         return $this->query()->whereIn('taxonomy', $handles)->get();
     }
 
