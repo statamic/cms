@@ -28,8 +28,8 @@ class Multisite extends Command
 
     public function handle()
     {
-        if (! $this->checkForAndEnablePro()) {
-            return $this->crossLine('Multisite has not been enabled.');
+        if (! $this->ensureProIsEnabled()) {
+            return;
         }
 
         Stache::disableUpdatingIndexes();
@@ -206,22 +206,21 @@ class Multisite extends Command
         return File::isDirectory("content/navigation/{$this->siteOne()}");
     }
 
-    protected function checkForAndEnablePro()
+    protected function ensureProIsEnabled()
     {
         if (Statamic::pro()) {
             return true;
         }
 
-        if (! $this->confirm('Statamic Pro is required for multiple sites. Would you like to enable it?', true)) {
+        if (! $this->confirm('Statamic Pro is required for multiple sites. Enable pro and continue?', true)) {
             return false;
         }
 
-        try {
-            Statamic::enablePro();
-            $this->checkLine('Statamic Pro has been enabled.');
-        } catch (\Exception $e) {
-            $this->error('Could not automatically enable Pro.');
-            $this->line('You can enable it manually in <comment>config/statamic/editions.php</comment>');
+        Statamic::enablePro();
+
+        if (! Statamic::pro()) {
+            $this->error('Could not reliably enable pro, please modify your [config/statamic/editions.php] as follows:');
+            $this->line("'pro' => env('STATAMIC_PRO_ENABLED', false)");
 
             return false;
         }
