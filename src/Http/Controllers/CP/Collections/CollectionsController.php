@@ -13,6 +13,7 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Str;
@@ -187,7 +188,7 @@ class CollectionsController extends CpController
 
         $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
+            'handle' => ['nullable', new Handle],
         ]);
 
         $handle = $request->handle ?? Str::snake($request->title);
