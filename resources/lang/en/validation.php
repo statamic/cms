@@ -154,6 +154,8 @@ return [
     |
     */
 
+    'handle' => 'Handles must contain only lowercase letters and numbers with underscores as separators.',
+    'slug' => 'Slugs must contain only letters and numbers with dashes or underscores as separators.',
     'code_fieldtype_rulers' => 'This is invalid.',
     'date_fieldtype_date_required' => 'Date is required.',
     'date_fieldtype_end_date_invalid' => 'Not a valid end date.',
@@ -164,7 +166,6 @@ return [
     'date_fieldtype_time_required' => 'Time is required.',
     'duplicate_field_handle' => 'A field with a handle of :handle already exists.',
     'duplicate_uri' => 'Duplicate URI :value',
-    'handle' => 'Handles must contain only lowercase letters and numbers with underscores as separators.',
     'one_site_without_origin' => 'At least one site must not have an origin.',
     'options_require_keys' => 'All options must have keys.',
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',
@@ -172,13 +173,12 @@ return [
     'parent_causes_root_children' => 'This would cause the root page to have children.',
     'reserved' => 'This is a reserved word.',
     'reserved_field_handle' => 'Field with a handle of :handle is a reserved word.',
-    'slug' => 'Slugs must contain only letters and numbers with dashes or underscores as separators.',
-    'time' => 'Not a valid time.',
     'unique_entry_value' => 'This value has already been taken.',
     'unique_form_handle' => 'This value has already been taken.',
     'unique_term_value' => 'This value has already been taken.',
-    'unique_uri' => 'This URI has already been taken.',
     'unique_user_value' => 'This value has already been taken.',
+    'unique_uri' => 'This URI has already been taken.',
+    'time' => 'Not a valid time.',
 
     /*
     |--------------------------------------------------------------------------
