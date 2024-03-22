@@ -7,12 +7,16 @@ use Statamic\Facades\Folder;
 
 class Writer
 {
-    private $permissions = [
+    private array $permissions = [
         'file' => 0644,
         'directory' => 0755,
     ];
 
-    public function __construct($permissions = [])
+    /**
+     * @param  array  $permissions  An array of file and directory umask permissions
+     * @return self
+     */
+    public function __construct(array $permissions = [])
     {
         $this->permissions = array_merge($this->permissions, $permissions);
     }
