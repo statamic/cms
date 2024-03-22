@@ -9,6 +9,7 @@ use Statamic\Entries\EntryCollection;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Facades\Collection;
+use Statamic\Rules\Slug;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
 use Statamic\Support\Arr;
@@ -128,7 +129,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => $collection->autoGeneratesTitles() ? '' : 'required',
-            'slug' => 'alpha_dash',
+            'slug' => [new Slug],
         ];
     }
 
@@ -136,7 +137,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => $collection->autoGeneratesTitles() ? '' : 'required',
-            'slug' => 'alpha_dash',
+            'slug' => [new Slug],
         ];
     }
 
