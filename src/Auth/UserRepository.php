@@ -8,7 +8,7 @@ use Statamic\Data\StoresComputedFieldCallbacks;
 use Statamic\Events\UserBlueprintFound;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
-use Statamic\OAuth\Provider;
+use Statamic\Facades\OAuth;
 use Statamic\Statamic;
 
 abstract class UserRepository implements RepositoryContract
@@ -64,6 +64,7 @@ abstract class UserRepository implements RepositoryContract
 
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
             'name' => ['type' => 'text', 'display' => __('Name'), 'listable' => true],
+            'email' => ['type' => 'text', 'input_type' => 'email', 'display' => __('Email Address'), 'listable' => true],
         ])->setHandle('user');
 
         $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => __('Email Address'), 'listable' => true]);
@@ -86,7 +87,7 @@ abstract class UserRepository implements RepositoryContract
     public function findByOAuthId(string $provider, string $id): ?User
     {
         return $this->find(
-            (new Provider($provider))->getUserId($id)
+            OAuth::provider($provider)->getUserId($id)
         );
     }
 }

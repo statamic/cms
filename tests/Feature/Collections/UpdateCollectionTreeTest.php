@@ -63,7 +63,7 @@ class UpdateCollectionTreeTest extends TestCase
         ], $collection->structure()->in('en')->tree());
     }
 
-    public function collectionTreeDataProvider()
+    public static function collectionTreeDataProvider()
     {
         return [
             'arbitrary handle' => ['pages'],

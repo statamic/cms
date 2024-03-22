@@ -20,15 +20,15 @@
             </div>
             <div class="flex items-center text-sm justify-center mb-4">
                 <div class="flex items-center mx-4">
-                    <div class="mr-1">X</div>
+                    <div class="rtl:ml-1 ltr:mr-1">X</div>
                     <div class="value">{{ x }}<sup>%</sup></div>
                 </div>
                 <div class="flex items-center mx-4">
-                    <div class="mr-1">Y</div>
+                    <div class="rtl:ml-1 ltr:mr-1">Y</div>
                     <div class="value">{{ y }}<sup>%</sup></div>
                 </div>
                 <div class="flex items-center mx-4">
-                    <div class="mr-1">Z</div>
+                    <div class="rtl:ml-1 ltr:mr-1">Z</div>
                     <div class="value">{{ z }}</div>
                 </div>
             </div>

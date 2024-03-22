@@ -6,6 +6,10 @@ use Mockery;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
+use Statamic\Fields\Value;
+use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Link;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Routing\ResolveRedirect;
 use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
@@ -209,5 +213,59 @@ class ResolveRedirectTest extends TestCase
         $resolve->shouldReceive('resolve')->once()->with('foo', 'bar', false)->andReturn('hello');
 
         $this->assertEquals('hello', $resolve('foo', 'bar'));
+    }
+
+    /** @test */
+    public function it_can_resolve_a_group_field_with_url()
+    {
+        // When using the "Link" blueprint, the `redirect` field would be a `group` type
+        // contain `url` and `code` subfields. The `url` subfield is a `link` type.
+        // When resolving the redirect, the augmented value of the group field
+        // will be passed in which is a `Values` object.
+
+        $resolver = new ResolveRedirect;
+
+        $fieldtype = Mockery::mock(Link::class)->makePartial()->shouldReceive('augment')->andReturn(new ArrayableLink('/test'))->getMock();
+
+        $value = new Values([
+            'url' => new Value('/test', 'url', $fieldtype),
+            'code' => '', // irrelevant for this test
+        ]);
+
+        $this->assertEquals('/test', $resolver($value));
+        $this->assertEquals('/test', $resolver->item($value));
+    }
+
+    /** @test */
+    public function it_can_resolve_a_group_field_with_entry()
+    {
+        // Same as above, but in this case, an entry was selected in the nested link field.
+
+        $resolver = new ResolveRedirect;
+
+        $entry = Mockery::mock(Entry::class)->shouldReceive('url')->once()->andReturn('/the-entry')->getMock();
+
+        $fieldtype = Mockery::mock(Link::class)->makePartial()->shouldReceive('augment')->andReturn(new ArrayableLink($entry))->getMock();
+
+        $value = new Values([
+            'url' => new Value('entry::123', 'url', $fieldtype),
+            'code' => '', // irrelevant for this test
+        ]);
+
+        $this->assertEquals('/the-entry', $resolver($value));
+        $this->assertEquals($entry, $resolver->item($value));
+    }
+
+    /** @test */
+    public function it_can_resolve_arrays_with_url_and_code()
+    {
+        // Same as above, but without a blueprint field.
+        // Maybe a user put an array directly in their data.
+
+        $resolver = new ResolveRedirect;
+
+        $arr = ['url' => '/test', 'code' => 301];
+        $this->assertEquals('/test', $resolver($arr));
+        $this->assertEquals('/test', $resolver->item($arr));
     }
 }

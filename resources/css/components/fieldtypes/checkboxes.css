@@ -8,6 +8,6 @@
     }
 
     .option + label {
-        @apply ml-2;
+        @apply rtl:mr-2 ltr:ml-2;
     }
 }

@@ -8,10 +8,11 @@ use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Antlers;
 use Statamic\Support\Arr;
+use Statamic\Support\Traits\Hookable;
 
 abstract class Tags
 {
-    use HasAliases, HasHandle, Macroable, RegistersItself;
+    use HasAliases, HasHandle, Hookable, Macroable, RegistersItself;
 
     protected static $binding = 'tags';
 
@@ -92,6 +93,8 @@ abstract class Tags
         $this->setParameters($properties['params']);
         $this->tag = array_get($properties, 'tag');
         $this->method = array_get($properties, 'tag_method');
+
+        $this->runHooks('init');
     }
 
     public function setParser($parser)
@@ -137,7 +140,7 @@ abstract class Tags
         if (static::hasMacro($method)) {
             $macro = static::$macros[$method];
 
-            if ($macro instanceof Closure) {
+            if ($macro instanceof \Closure) {
                 $macro = $macro->bindTo($this, static::class);
             }
 

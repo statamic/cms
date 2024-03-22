@@ -18,7 +18,7 @@ class YamlTest extends TestCase
         $this->assertSame($expected, $this->fieldtype()->process($value));
     }
 
-    public function processProvider()
+    public static function processProvider()
     {
         return [
             'string' => ['alfa', 'alfa'],

@@ -32,7 +32,7 @@ class RoleNavController extends Controller
             : Nav::buildWithoutPreferences(true);
 
         return $this->navBuilder($nav, [
-            'title' => $role->title(),
+            'title' => __($role->title()),
             'updateUrl' => cp_route('preferences.nav.role.update', $role->handle()),
             'destroyUrl' => cp_route('preferences.nav.role.destroy', $role->handle()),
         ]);

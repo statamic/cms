@@ -226,7 +226,7 @@ class PageTest extends TestCase
         $this->assertFalse($page->hasCustomUrl());
     }
 
-    public function stripExtensionFromParentUriProvider()
+    public static function stripExtensionFromParentUriProvider()
     {
         return [
             'html' => ['html'],

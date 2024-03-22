@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Route;
 use Statamic\Auth\Protect\Protectors\Password\Controller as PasswordProtectController;
 use Statamic\Facades\OAuth;
@@ -9,6 +10,7 @@ use Statamic\Http\Controllers\ForgotPasswordController;
 use Statamic\Http\Controllers\FormController;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\Http\Controllers\OAuthController;
+use Statamic\Http\Controllers\PhoneHomeController;
 use Statamic\Http\Controllers\ResetPasswordController;
 use Statamic\Http\Controllers\UserController;
 use Statamic\Http\Middleware\AuthGuard;
@@ -51,9 +53,17 @@ Route::name('statamic.')->group(function () {
 
     if (OAuth::enabled()) {
         Route::get(config('statamic.oauth.routes.login'), [OAuthController::class, 'redirectToProvider'])->name('oauth.login');
-        Route::get(config('statamic.oauth.routes.callback'), [OAuthController::class, 'handleProviderCallback'])->name('oauth.callback');
+        Route::match(['get', 'post'], config('statamic.oauth.routes.callback'), [OAuthController::class, 'handleProviderCallback'])
+            ->withoutMiddleware('App\Http\Middleware\VerifyCsrfToken')
+            ->name('oauth.callback');
     }
 });
+
+if (config('statamic.system.phone_home_route_enabled', true)) {
+    Route::get('et/phone/home/{token}', PhoneHomeController::class)
+        ->name('statamic.phone-home')
+        ->middleware(ThrottleRequests::class.':1');
+}
 
 if (config('statamic.routes.enabled')) {
     Statamic::additionalWebRoutes();
