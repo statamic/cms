@@ -18,6 +18,9 @@ class HandleTest extends TestCase
         $this->assertPasses('foo_bar');
         $this->assertPasses('foo_bar_baz');
         $this->assertPasses('foo_bar_baz_qux');
+        $this->assertPasses('foo1');
+        $this->assertPasses('foo123');
+        $this->assertPasses('foo123_20bar');
 
         $this->assertFails('foo-bar');
         $this->assertFails('_foo');
@@ -27,9 +30,6 @@ class HandleTest extends TestCase
         $this->assertFails('foo__bar');
         $this->assertFails('foo___bar');
         $this->assertFails('1foo');
-        $this->assertFails('foo2');
-        $this->assertFails('foo_3bar');
-        $this->assertFails('foo_4_bar');
         $this->assertFails('*foo');
         $this->assertFails('foo#');
         $this->assertFails('foo_!bar');
@@ -39,6 +39,6 @@ class HandleTest extends TestCase
     /** @test */
     public function it_outputs_helpful_validation_error()
     {
-        $this->assertValidationErrorOutput('Handles must use lowercase letters with snake_case separators.', '_bad_input');
+        $this->assertValidationErrorOutput('Handles must contain only lowercase letters and numbers with underscores as separators.', '_bad_input');
     }
 }
