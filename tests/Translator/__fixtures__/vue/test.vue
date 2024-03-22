@@ -32,6 +32,7 @@
         {{ trans_choice(`vue template trans_choice backtick quote :param`, 2, { param: 'test' }) }}
 
         {{ __('vue template with/slash') }}
+        {{ __('vue template with bracket(s)') }}
     </div>
 
 </template>
@@ -66,6 +67,7 @@ export default {
             trans_choice(`vue script trans_choice backtick quote :param`, 2, { param: 'test' }),
 
             __('vue script with/slash'),
+            __('vue script with bracket(s)'),
         ];
     }
 

@@ -103,6 +103,7 @@ class TaxonomyTest extends TestCase
                 ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
 
         $blueprint = $taxonomy->termBlueprint();
         $this->assertNotEquals($default, $blueprint);
@@ -464,7 +465,7 @@ class TaxonomyTest extends TestCase
         $this->assertFalse($user->can('view', $taxonomy3));
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],

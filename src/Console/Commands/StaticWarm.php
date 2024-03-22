@@ -190,6 +190,10 @@ class StaticWarm extends Command
                 return null;
             }
 
+            if ($entry->isRedirect()) {
+                return null;
+            }
+
             return $entry->absoluteUrl();
         })->filter();
 

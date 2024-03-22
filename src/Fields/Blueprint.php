@@ -22,6 +22,7 @@ use Statamic\Events\BlueprintSaving;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
+use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -113,9 +114,15 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function path()
     {
+        $namespace = str_replace('.', '/', (string) $this->namespace());
+
+        if ($this->isNamespaced()) {
+            $namespace = 'vendor/'.$namespace;
+        }
+
         return Path::tidy(vsprintf('%s/%s/%s.yaml', [
             Facades\Blueprint::directory(),
-            str_replace('.', '/', (string) $this->namespace()),
+            $namespace,
             $this->handle(),
         ]));
     }
@@ -392,7 +399,17 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function title()
     {
-        return array_get($this->contents, 'title', Str::humanize($this->handle));
+        return array_get($this->contents, 'title', Str::humanize(Str::of($this->handle)->after('::')->afterLast('.')));
+    }
+
+    public function isNamespaced(): bool
+    {
+        return Facades\Blueprint::getAdditionalNamespaces()->has($this->namespace);
+    }
+
+    public function isDeletable()
+    {
+        return ! $this->isNamespaced();
     }
 
     public function toPublishArray()
@@ -675,5 +692,10 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     public function toQueryableValue()
     {
         return $this->handle();
+    }
+
+    public function writeFile($path = null)
+    {
+        File::put($path ?? $this->buildPath(), $this->fileContents());
     }
 }

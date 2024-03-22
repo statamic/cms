@@ -527,4 +527,76 @@ class GridTest extends TestCase
         $this->assertNull((new Grid)->toQueryableValue([]));
         $this->assertEquals([['foo' => 'bar']], (new Grid)->toQueryableValue([['foo' => 'bar']]));
     }
+
+    /**
+     * @test
+     */
+    public function it_generates_field_path_prefix()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public static function handle()
+            {
+                return 'custom';
+            }
+
+            public function preProcess($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function process($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function preload()
+            {
+                return ['fieldPathPrefix' => $this->field()->fieldPathPrefix()];
+            }
+
+            public function augment($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+        };
+
+        $fieldtype::register();
+
+        $field = (new Field('test', [
+            'type' => 'grid',
+            'fields' => [
+                ['handle' => 'words', 'field' => ['type' => 'custom']],
+            ],
+        ]))->setValue([
+            [
+                '_id' => 'set-id-1',
+                'type' => 'one',
+                'words' => 'test',
+            ],
+            [
+                '_id' => 'set-id-2',
+                'type' => 'one',
+                'words' => 'test',
+            ],
+        ]);
+
+        $value = $field->augment()->value()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = $field->preProcess()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = $field->process()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = $field->fieldtype()->preload();
+        $this->assertEquals('test.0.words', $value['existing']['set-id-1']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.1.words', $value['existing']['set-id-2']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.-1.words', $value['new']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.-1.words', $value['defaults']['words']);
+    }
 }

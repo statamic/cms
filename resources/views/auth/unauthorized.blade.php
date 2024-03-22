@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::outside')
 @section('title', __('Unauthorized'))
 

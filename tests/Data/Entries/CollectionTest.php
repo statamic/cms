@@ -366,6 +366,7 @@ class CollectionTest extends TestCase
                 ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
 
         $blueprint = $collection->entryBlueprint();
         $this->assertNotEquals($default, $blueprint);
@@ -925,7 +926,7 @@ class CollectionTest extends TestCase
         $this->assertCount(0, $collection->queryEntries()->get());
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],
