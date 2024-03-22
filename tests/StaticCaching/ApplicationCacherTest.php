@@ -17,7 +17,7 @@ class ApplicationCacherTest extends TestCase
     {
         $key = 'static-cache:responses:'.md5('http://example.com/test?foo=bar');
         $cache = $this->mock(Repository::class);
-        $cache->shouldReceive('get')->with($key)->times(2)->andReturn(null, 'html content');
+        $cache->shouldReceive('get')->with($key)->times(2)->andReturn(null, ['response' => 'html content', 'headers' => []]);
         $cache->shouldNotReceive('has');
 
         $cacher = new ApplicationCacher($cache, []);
@@ -32,12 +32,16 @@ class ApplicationCacherTest extends TestCase
     {
         $key = 'static-cache:responses:'.md5('http://example.com/test?foo=bar');
         $cache = $this->mock(Repository::class);
-        $cache->shouldReceive('get')->with($key)->once()->andReturn('html content');
+        $cache->shouldReceive('get')->with($key)->once()->andReturn(['response' => 'html content', 'headers' => [
+            'Content-Type' => 'application/html',
+        ]]);
 
         $cacher = new ApplicationCacher($cache, []);
         $request = Request::create('http://example.com/test', 'GET', ['foo' => 'bar']);
 
-        $this->assertEquals('html content', $cacher->getCachedPage($request));
+        $cachedPage = $cacher->getCachedPage($request);
+        $this->assertEquals('html content', $cachedPage->response);
+        $this->assertEquals('application/html', $cachedPage->headers['Content-Type']);
     }
 
     /** @test */
@@ -45,27 +49,19 @@ class ApplicationCacherTest extends TestCase
     {
         $key = 'static-cache:responses:'.md5('http://example.com/test?foo=bar');
         $cache = $this->mock(Repository::class);
-        $cache->shouldReceive('get')->with($key)->once()->andReturn('html content');
+        $cache->shouldReceive('get')->with($key)->once()->andReturn(['response' => 'html content', 'headers' => [
+            'Content-Type' => 'application/html',
+        ]]);
         $cache->shouldNotReceive('has');
 
         $cacher = new ApplicationCacher($cache, []);
         $request = Request::create('http://example.com/test', 'GET', ['foo' => 'bar']);
 
         $this->assertTrue($cacher->hasCachedPage($request));
-        $this->assertEquals('html content', $cacher->getCachedPage($request));
-    }
 
-    /** @test */
-    public function gets_cached_headers()
-    {
-        $key = 'static-cache:headers:'.md5('http://example.com/sitemap.xml');
-        $cache = $this->mock(Repository::class);
-        $cache->shouldReceive('get')->with($key)->once()->andReturn(['Content-Type' => 'application/xml']);
-
-        $cacher = new ApplicationCacher($cache, []);
-        $request = Request::create('http://example.com/sitemap.xml', 'GET');
-
-        $this->assertEquals(['Content-Type' => 'application/xml'], $cacher->getCachedHeaders($request));
+        $cachedPage = $cacher->getCachedPage($request);
+        $this->assertEquals('html content', $cachedPage->response);
+        $this->assertEquals('application/html', $cachedPage->headers['Content-Type']);
     }
 
     /** @test */
