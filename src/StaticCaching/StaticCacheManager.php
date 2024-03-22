@@ -30,7 +30,7 @@ class StaticCacheManager extends Manager
 
     public function createFileDriver(array $config)
     {
-        return new FileCacher(new Writer, $this->cacheStore(), $config);
+        return new FileCacher(new Writer($config['permissions'] ?? []), $this->cacheStore(), $config);
     }
 
     public function createApplicationDriver(array $config)
