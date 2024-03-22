@@ -154,6 +154,8 @@ return [
     |
     */
 
+    'handle' => 'Handles must contain only lowercase letters and numbers with underscores as separators.',
+    'slug' => 'Slugs must contain only letters and numbers with dashes or underscores as separators.',
     'code_fieldtype_rulers' => 'This is invalid.',
     'date_fieldtype_date_required' => 'Date is required.',
     'date_fieldtype_end_date_invalid' => 'Not a valid end date.',

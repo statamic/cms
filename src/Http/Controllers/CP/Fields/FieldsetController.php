@@ -8,6 +8,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -115,7 +116,7 @@ class FieldsetController extends CpController
     {
         $request->validate([
             'title' => 'required',
-            'handle' => 'required|alpha_dash',
+            'handle' => ['required', new Handle],
         ]);
 
         if (Facades\Fieldset::find($request->handle)) {
