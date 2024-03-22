@@ -428,7 +428,7 @@ EOT;
     /** @test */
     public function ternary_condition_inside_parameter()
     {
-        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
+        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\TestTags::class;
 
         $this->assertEquals('yes', $this->renderString(
             "{{ test variable='{{ good ? 'yes' : 'fail' }}' }}",
@@ -646,7 +646,8 @@ EOT;
     public function tags_with_curlies_in_params_gets_parsed()
     {
         // the variables are inside Test@index
-        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
+        // $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\TestTags::class;
+        \Tests\Fixtures\Addon\Tags\TestTags::register();
 
         $template = "{{ test variable='{string}' }}";
 
@@ -729,7 +730,7 @@ EOT;
     /** @test */
     public function empty_values_are_not_overridden_by_previous_iteration_with_parsing()
     {
-        $this->app['statamic.tags']['test'] = \Tests\Antlers\Fixtures\Addon\Tags\Test::class;
+        $this->app['statamic.tags']['test'] = \Tests\Antlers\Fixtures\Addon\Tags\TestTags::class;
 
         // Variable name was changed from "loop" to "loopvar" compared to the original test to avoid a
         // headache since the base test class is going to be loading all of the core Statamic Tags.
@@ -2437,7 +2438,7 @@ EOT;
         ]));
     }
 
-    public function objectInConditionProvider()
+    public static function objectInConditionProvider()
     {
         return [
             'with __toString' => [new class()

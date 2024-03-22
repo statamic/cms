@@ -476,6 +476,15 @@ class PathDataManager
         }
     }
 
+    private function collapseValues(bool $isFinal)
+    {
+        if (! $isFinal && $this->reducedVar instanceof Values) {
+            $this->lockData();
+            $this->reducedVar = self::reduce($this->reducedVar, true, $this->shouldDoValueIntercept);
+            $this->unlockData();
+        }
+    }
+
     private function collapseQueryBuilder($builder)
     {
         $this->reducedVar = $builder->get();
@@ -616,6 +625,8 @@ class PathDataManager
                             $this->unlockData();
                         }
 
+                        $this->collapseValues($pathItem->isFinal);
+
                         continue;
                     } else {
                         if ($this->cascade != null) {
@@ -659,6 +670,8 @@ class PathDataManager
                 }
 
                 $this->reduceVar($pathItem, $data);
+
+                $this->collapseValues($pathItem->isFinal);
 
                 if ($pathItem->isFinal && $this->reducedVar instanceof Builder && ! $wasBuilderGoingIntoLast) {
                     $this->encounteredBuilderOnFinalPart = true;
