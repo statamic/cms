@@ -20,12 +20,14 @@ use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
 {
     use EnhancesCommands;
+    use Hookable;
     use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
@@ -163,7 +165,7 @@ class StaticWarm extends Command
             ->merge($this->taxonomyUris())
             ->merge($this->termUris())
             ->merge($this->customRouteUris())
-            ->merge($this->extraRouteUris())
+            ->merge($this->additionalUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
                 return $cacher->isExcluded($uri);
@@ -281,26 +283,14 @@ class StaticWarm extends Command
         return $routes;
     }
 
-    protected function extraRouteUris(): Collection
+    protected function additionalUris(): Collection
     {
-        $handler = config('statamic.static_caching.warm_extra_routes_generator', false);
+        $this->line('[ ] Additional...');
 
-        if (! $handler || ! class_exists($handler)) {
-            return collect();
-        }
+        $uris = $this->runHooks('additional', collect());
 
-        $this->line('[ ] Extra routes...');
+        $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Additional");
 
-        $routes = (new $handler)->handle();
-
-        $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Extra routes");
-
-        if (! $routes instanceof Collection) {
-            return collect();
-        }
-
-        return $routes->map(function ($route) {
-            return URL::tidy(Str::start($route, config('app.url').'/'));
-        });
+        return $uris->map(fn ($uri) => URL::makeAbsolute($uri));
     }
 }

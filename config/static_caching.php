@@ -129,16 +129,4 @@ return [
 
     'warm_queue' => null,
 
-    /*
-    |--------------------------------------------------------------------------
-    | Warm Extra Routes Generator
-    |--------------------------------------------------------------------------
-    |
-    | Here you can specify a class that will provide a collection of extra uris
-    | that the static:warm command will visit, beyond those it autogenerates
-    |
-    */
-
-    'warm_extra_routes_generator' => null,
-
 ];
