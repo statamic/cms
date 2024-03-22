@@ -5,6 +5,7 @@ namespace Statamic;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Laravel\Nova\Nova;
@@ -49,17 +50,7 @@ class Statamic
 
     public static function enablePro()
     {
-        $path = config_path('statamic/editions.php');
-
-        $contents = File::get($path);
-
-        if (! Str::contains($contents, "'pro' => false,")) {
-            throw new \Exception('Could not reliably update the config file.');
-        }
-
-        $contents = str_replace("'pro' => false,", "'pro' => true,", $contents);
-
-        File::put($path, $contents);
+        Artisan::call('statamic:pro:enable', ['--update-config' => true]);
     }
 
     public static function availableScripts(Request $request)

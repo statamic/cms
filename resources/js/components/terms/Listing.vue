@@ -127,6 +127,7 @@ export default {
             listingKey: 'terms',
             preferencesPrefix: `taxonomies.${this.taxonomy}`,
             requestUrl: cp_url(`taxonomies/${this.taxonomy}/terms`),
+            pushQuery: true,
         }
     },
 
