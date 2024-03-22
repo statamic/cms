@@ -164,6 +164,7 @@ return [
     'date_fieldtype_time_required' => 'Time is required.',
     'duplicate_field_handle' => 'A field with a handle of :handle already exists.',
     'duplicate_uri' => 'Duplicate URI :value',
+    'email_available' => 'A user with this email already exists.',
     'one_site_without_origin' => 'At least one site must not have an origin.',
     'options_require_keys' => 'All options must have keys.',
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',
