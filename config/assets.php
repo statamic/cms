@@ -126,6 +126,18 @@ return [
 
         'append_original_filename' => false,
 
+        /*
+        |--------------------------------------------------------------------------
+        | Prepend used Parameters
+        |--------------------------------------------------------------------------
+        |
+        | Prepend the used parameters to Glide generated URLs.
+        | This helps identifying which parameters were used, for
+        | example on external S3 urls.
+        |
+        */
+
+        'prepend_used_parameters' => false,
     ],
 
     /*

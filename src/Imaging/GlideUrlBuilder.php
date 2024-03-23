@@ -6,6 +6,7 @@ use Exception;
 use League\Glide\Urls\UrlBuilderFactory;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class GlideUrlBuilder extends ImageUrlBuilder
@@ -39,7 +40,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
                 $path = 'http/'.base64_encode($item);
 
                 if (! $filename) {
-                    $filename = $this->optionallySetFilename(Str::afterLast($item, '/'));
+                    $filename = $this->optionallySetFilename(Str::afterLast($item, '/'), $params);
                 }
 
                 break;
@@ -47,7 +48,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
                 $path = 'asset/'.base64_encode($this->item->containerId().'/'.$this->item->path());
 
                 if (! $filename) {
-                    $filename = $this->optionallySetFilename(Str::afterLast($this->item->path(), '/'));
+                    $filename = $this->optionallySetFilename(Str::afterLast($this->item->path(), '/'), $params);
                 }
 
                 break;
@@ -76,16 +77,30 @@ class GlideUrlBuilder extends ImageUrlBuilder
     }
 
     /**
-     * Should the filename be set based on the config setting
+     * Should the filename (and optional parameters) be set based on the config setting
      *
      * @return bool|string
      */
-    private function optionallySetFilename(string $filename)
+    private function optionallySetFilename(string $filename, array $params = [])
     {
-        if (! config('statamic.assets.image_manipulation.append_original_filename', false)) {
+        if (! config('statamic.assets.image_manipulation.append_original_filename', false) &&
+            ! config('statamic.assets.image_manipulation.prepend_used_parameters', false)) {
             return false;
         }
 
-        return $filename;
+        $parts = [];
+
+        if (config('statamic.assets.image_manipulation.prepend_used_parameters', false)) {
+            $flatParams = Arr::join(Arr::map(Arr::dot($params), function (string $value, string $key) {
+                return $key . $value;
+            }), '-');
+            $parts[] = Str::slug($flatParams);
+        }
+
+        if (config('statamic.assets.image_manipulation.append_original_filename', false)) {
+            $parts[] = $filename;
+        }
+
+        return Arr::join($parts, '-');
     }
 }

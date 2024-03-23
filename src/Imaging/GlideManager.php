@@ -8,6 +8,7 @@ use League\Glide\ServerFactory;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class GlideManager
@@ -30,7 +31,8 @@ class GlideManager
             'watermarks' => public_path(),
         ], $config));
 
-        if (config('statamic.assets.image_manipulation.append_original_filename', false)) {
+        if (config('statamic.assets.image_manipulation.append_original_filename', false) ||
+            config('statamic.assets.image_manipulation.prepend_used_parameters', false)) {
             $server
                 ->setCachePathCallable(function ($path, $params) {
                     // to avoid having to recreate the getCachePath method from glide server
@@ -45,12 +47,23 @@ class GlideManager
                     $filename = Str::afterLast($cachePath, '/');
                     $cachePath = Str::beforeLast($cachePath, '/');
 
-                    $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.Str::of($path)->after('/');
+                    if( config('statamic.assets.image_manipulation.prepend_used_parameters', false)) {
+                        $flatParams = Arr::join(Arr::map(Arr::dot($params), function (string $value, string $key) {
+                            return $key . $value;
+                        }), '-');
 
-                    if ($extension = ($params['fm'] ?? false)) {
-                        $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
+                        if( !empty($flatParams)) {
+                            $filename = Str::slug($flatParams) . '-' . $filename;
+                        }
                     }
 
+                    if( config('statamic.assets.image_manipulation.append_original_filename', false)) {
+                        $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.Str::of($path)->after('/');
+
+                        if ($extension = ($params['fm'] ?? false)) {
+                            $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
+                        }
+                    }
                     return $cachePath;
                 });
         }
@@ -142,7 +155,8 @@ class GlideManager
         $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
 
         // Delete generated glide cache for asset.
-        if (config('statamic.assets.image_manipulation.append_original_filename', false)) {
+        if (config('statamic.assets.image_manipulation.append_original_filename', false) ||
+            config('statamic.assets.image_manipulation.prepend_used_parameters', false)) {
             // Make sure to use the default cache path when clearing the cache
             tap($this->server(), function ($server) use ($pathPrefix, $asset) {
                 $customCallable = $server->getCachePathCallable();
