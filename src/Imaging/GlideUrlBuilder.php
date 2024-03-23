@@ -92,7 +92,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
 
         if (config('statamic.assets.image_manipulation.prepend_used_parameters', false)) {
             $flatParams = Arr::join(Arr::map(Arr::dot($params), function (string $value, string $key) {
-                return $key . $value;
+                return $key.$value;
             }), '-');
             $parts[] = Str::slug($flatParams);
         }

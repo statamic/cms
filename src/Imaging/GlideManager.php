@@ -47,23 +47,24 @@ class GlideManager
                     $filename = Str::afterLast($cachePath, '/');
                     $cachePath = Str::beforeLast($cachePath, '/');
 
-                    if( config('statamic.assets.image_manipulation.prepend_used_parameters', false)) {
+                    if (config('statamic.assets.image_manipulation.prepend_used_parameters', false)) {
                         $flatParams = Arr::join(Arr::map(Arr::dot($params), function (string $value, string $key) {
-                            return $key . $value;
+                            return $key.$value;
                         }), '-');
 
-                        if( !empty($flatParams)) {
-                            $filename = Str::slug($flatParams) . '-' . $filename;
+                        if (! empty($flatParams)) {
+                            $filename = Str::slug($flatParams).'-'.$filename;
                         }
                     }
 
-                    if( config('statamic.assets.image_manipulation.append_original_filename', false)) {
+                    if (config('statamic.assets.image_manipulation.append_original_filename', false)) {
                         $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.Str::of($path)->after('/');
 
                         if ($extension = ($params['fm'] ?? false)) {
                             $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
                         }
                     }
+
                     return $cachePath;
                 });
         }
