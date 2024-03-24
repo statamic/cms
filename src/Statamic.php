@@ -212,7 +212,7 @@ class Statamic
     public static function isApiRoute()
     {
         if (self::$isApiRouteCache !== null) {
-            return self::$isApiRouteCache;
+            // return self::$isApiRouteCache;
         }
 
         if (! config('statamic.api.enabled') || ! static::pro()) {
