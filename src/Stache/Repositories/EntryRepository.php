@@ -6,7 +6,9 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\EntryNotFoundException;
+use Statamic\Facades\Collection;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
 use Statamic\Support\Arr;
@@ -31,11 +33,19 @@ class EntryRepository implements RepositoryContract
 
     public function whereCollection(string $handle): EntryCollection
     {
+        if (! Collection::find($handle)) {
+            throw new CollectionNotFoundException($handle);
+        }
+
         return $this->query()->where('collection', $handle)->get();
     }
 
     public function whereInCollection(array $handles): EntryCollection
     {
+        collect($handles)
+            ->reject(fn ($collection) => Collection::find($collection))
+            ->each(fn ($collection) => throw new CollectionNotFoundException($collection));
+
         return $this->query()->whereIn('collection', $handles)->get();
     }
 
