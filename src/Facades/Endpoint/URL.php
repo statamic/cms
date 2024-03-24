@@ -14,7 +14,7 @@ use Statamic\Support\Str;
  */
 class URL
 {
-    protected static $externalUriCache = [];
+    private static $externalUriCache = [];
 
     /**
      * Removes occurrences of "//" in a $path (except when part of a protocol)

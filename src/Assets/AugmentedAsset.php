@@ -8,7 +8,7 @@ use Statamic\Support\Str;
 
 class AugmentedAsset extends AbstractAugmented
 {
-    protected $cachedKeys = null;
+    private $cachedKeys;
 
     public function keys()
     {

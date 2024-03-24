@@ -8,14 +8,13 @@ use Statamic\Facades\Site;
 class Comparator
 {
     protected $locale;
-    protected static $hasCheckedCollator = false;
-    protected static $canUseCollator = false;
+    private static bool $canUseCollator;
 
     public function __construct()
     {
         $this->locale = Site::current()->locale();
 
-        if (! self::$hasCheckedCollator) {
+        if (! isset(self::$canUseCollator)) {
             self::$canUseCollator = class_exists(Collator::class);
         }
     }

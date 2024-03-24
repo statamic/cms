@@ -5,6 +5,7 @@ namespace Statamic;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Laravel\Nova\Nova;
@@ -15,6 +16,7 @@ use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
+use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
 use Stringy\StaticStringy;
 
@@ -49,17 +51,7 @@ class Statamic
 
     public static function enablePro()
     {
-        $path = config_path('statamic/editions.php');
-
-        $contents = File::get($path);
-
-        if (! Str::contains($contents, "'pro' => false,")) {
-            throw new \Exception('Could not reliably update the config file.');
-        }
-
-        $contents = str_replace("'pro' => false,", "'pro' => true,", $contents);
-
-        File::put($path, $contents);
+        Artisan::call('statamic:pro:enable', ['--update-config' => true]);
     }
 
     public static function availableScripts(Request $request)
@@ -470,5 +462,15 @@ class Statamic
 
             return $path;
         });
+    }
+
+    public static function cpLocale(): string
+    {
+        return config('app.locale');
+    }
+
+    public static function cpDirection()
+    {
+        return TextDirection::of(static::cpLocale());
     }
 }

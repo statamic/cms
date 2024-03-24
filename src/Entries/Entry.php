@@ -81,10 +81,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     protected $layout;
     protected $augmentationReferenceKey;
     protected $computedCallbackCache;
-    protected $siteCache;
     protected $hasDate;
     protected $hasTime;
     protected $hasSeconds;
+    private $siteCache;
 
     public function __construct()
     {

@@ -22,7 +22,7 @@ class Nav extends Structure implements Contract
     use ExistsAsFile;
 
     protected $collections;
-    protected $blueprintCache;
+    private $blueprintCache;
 
     public function save()
     {
@@ -133,7 +133,7 @@ class Nav extends Structure implements Contract
         $blueprint = Blueprint::find('navigation.'.$this->handle())
             ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('navigation');
 
-        Blink::put($blink, $blueprint);
+        Blink::put($blink, $this->blueprintCache = $blueprint);
 
         NavBlueprintFound::dispatch($blueprint, $this);
 

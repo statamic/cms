@@ -38,7 +38,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     protected $handle;
     protected $routes = [];
-    protected $cachedRoutes = null;
+    private $cachedRoutes = null;
     protected $mount;
     protected $title;
     protected $template;
@@ -102,6 +102,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             })->afterSetter(function () {
                 $this->cachedRoutes = null;
             })
+            ->afterSetter(fn () => $this->cachedRoutes = null)
             ->args(func_get_args());
     }
 
@@ -169,7 +170,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->getter(function ($sortField) {
                 if ($sortField) {
                     return $sortField;
-                } elseif ($this->orderable()) {
+                } elseif ($this->orderable() || $this->hasStructure()) {
                     return 'order';
                 } elseif ($this->dated()) {
                     return 'date';
@@ -408,9 +409,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
                 return collect($sites);
             })
-            ->afterSetter(function () {
-                $this->cachedRoutes = null;
-            })
+            ->afterSetter(fn () => $this->cachedRoutes = null)
             ->args(func_get_args());
     }
 
@@ -494,6 +493,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function updateEntryOrder($ids = null)
     {
         Facades\Collection::updateEntryOrder($this, $ids);
+
+        return $this;
+    }
+
+    public function updateEntryParent($ids = null)
+    {
+        Facades\Collection::updateEntryParent($this, $ids);
 
         return $this;
     }

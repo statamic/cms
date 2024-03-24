@@ -8,7 +8,7 @@ use Statamic\Statamic;
 
 class AugmentedTerm extends AbstractAugmented
 {
-    protected $cachedKeys = null;
+    private $cachedKeys;
 
     public function keys()
     {

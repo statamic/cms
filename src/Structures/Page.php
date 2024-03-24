@@ -42,13 +42,13 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     protected $data = [];
     protected $augmentationReferenceKey;
     protected $setAugmentationReferenceKey = false;
-    protected $absoluteUrl;
-    protected $absoluteUrlWithoutRedirect;
-    protected $blueprint;
-    protected $routeData;
-    protected $structure;
-    protected $status;
-    protected $entry;
+    private $absoluteUrl;
+    private $absoluteUrlWithoutRedirect;
+    private $blueprint;
+    private $entry;
+    private $routeData;
+    private $status;
+    private $structure;
 
     public function __construct()
     {

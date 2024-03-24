@@ -11,7 +11,7 @@ use Statamic\Support\Str;
 
 class AugmentedUser extends AbstractAugmented
 {
-    protected $cachedKeys = null;
+    private $cachedKeys;
 
     public function keys()
     {
