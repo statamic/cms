@@ -12,8 +12,6 @@ trait HasOrigin
     protected $origin;
     private $cachedKeys;
 
-    protected $cachedKeys = null;
-
     public function keys()
     {
         if ($this->cachedKeys) {
