@@ -98,7 +98,7 @@ trait HasOrigin
 
     public function hasOrigin()
     {
-        return $this->origin !== null;
+        return $this->origin() !== null;
     }
 
     public function isRoot()
