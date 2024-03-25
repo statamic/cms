@@ -137,6 +137,6 @@ class Nav extends Structure implements Contract
 
         NavBlueprintFound::dispatch($blueprint, $this);
 
-        return $blueprint;
+        return $this->blueprintCache = $blueprint;
     }
 }

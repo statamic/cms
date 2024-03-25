@@ -105,6 +105,13 @@ EOL;
     /** @test */
     public function it_saves_to_disk()
     {
+        Facades\Stache::shouldReceive('flushIndexValues')
+            ->zeroOrMoreTimes();
+        Facades\Stache::shouldReceive('setShouldUseIndexValues')
+            ->zeroOrMoreTimes();
+        Facades\Stache::shouldReceive('withoutIndexedValues')
+            ->zeroOrMoreTimes();
+
         Facades\Stache::shouldReceive('store')
             ->with('asset-containers')
             ->andReturn($this->store);

@@ -279,6 +279,30 @@ class Str
         return IlluminateStr::reverse(StaticStringy::safeTruncate(IlluminateStr::reverse($string), $length, $substring));
     }
 
+    public static function removeRight($string, $cap)
+    {
+        if (str_ends_with($string, $cap)) {
+            return mb_substr($string, 0, mb_strlen($string) - mb_strlen($cap));
+        }
+
+        return $string;
+    }
+
+    public static function collapseWhitespace($string)
+    {
+        return trim(\mb_ereg_replace('[[:space:]]+', '', $string, 'msr'));
+    }
+
+    public static function ensureLeft($string, $start)
+    {
+        return IlluminateStr::start($string, $start);
+    }
+
+    public static function ensureRight($string, $cap)
+    {
+        return IlluminateStr::finish($string, $cap);
+    }
+
     /**
      * Implicitly defer all other method calls to either \Stringy\StaticStringy or \Illuminate\Support\Str.
      *
@@ -289,13 +313,13 @@ class Str
     public static function __callStatic($method, $args)
     {
         $deferToStringy = [
-            'append', 'at', 'camelize', 'chars', 'collapseWhitespace', 'containsAny', 'count', 'countSubstr',
-            'dasherize', 'delimit', 'endsWithAny', 'ensureLeft', 'ensureRight', 'first', 'getEncoding', 'getIterator',
+            'append', 'at', 'camelize', 'chars', 'containsAny', 'count', 'countSubstr',
+            'dasherize', 'delimit', 'endsWithAny', 'first', 'getEncoding', 'getIterator',
             'hasLowerCase', 'hasUpperCase', 'htmlDecode', 'htmlEncode', 'humanize', 'indexOf', 'indexOfLast', 'insert',
             'isAlpha', 'isAlphanumeric', 'isBase64', 'isBlank', 'isHexadecimal', 'isLowerCase', 'isSerialized',
             'isUpperCase', 'last', 'lines', 'longestCommonPrefix', 'longestCommonSubstring', 'longestCommonSuffix',
             'lowerCaseFirst', 'offsetExists', 'offsetGet', 'offsetSet', 'offsetUnset', 'pad', 'prepend', 'regexReplace',
-            'removeLeft', 'removeRight', 'safeTruncate', 'shuffle', 'slice', 'slugify', 'split', 'startsWithAny',
+            'removeLeft', 'safeTruncate', 'shuffle', 'slice', 'slugify', 'split', 'startsWithAny',
             'stripWhitespace', 'surround', 'swapCase', 'tidy', 'titleize', 'toAscii', 'toBoolean', 'toLowerCase',
             'toSpaces', 'toTabs', 'toTitleCase', 'toUpperCase', 'trim', 'trimLeft', 'trimRight', 'truncate',
             'underscored', 'upperCamelize', 'upperCaseFirst',

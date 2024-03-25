@@ -13,6 +13,7 @@ use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Data\BulkAugmentable;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\Entries\EntryRepository;
@@ -26,6 +27,7 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasDirtyState;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
+use Statamic\Data\ReceivesIndexValues;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
@@ -43,7 +45,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -53,9 +54,9 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
+class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
-    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, ReceivesIndexValues, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
     use HasDirtyState;
     use HasOrigin {
@@ -78,6 +79,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
+    protected $augmentationReferenceKey;
+    protected $computedCallbackCache;
+    protected $hasDate;
+    protected $hasTime;
+    protected $hasSeconds;
     private $siteCache;
 
     public function __construct()
@@ -89,6 +95,17 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     public function id($id = null)
     {
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
+    }
+
+    public function getAugmentationReferenceKey(): ?string
+    {
+        if ($this->augmentationReferenceKey) {
+            return $this->augmentationReferenceKey;
+        }
+
+        $dataPart = implode('|', $this->data->keys()->sort()->all());
+
+        return $this->augmentationReferenceKey = 'Entry::'.$this->blueprint()->namespace().'::'.$dataPart;
     }
 
     public function locale($locale = null)
@@ -128,6 +145,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             }) : null;
         }
 
+        $this->computedCallbackCache = null;
+        $this->clearDateTimePropertyCaches();
         $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
 
         return $this;
@@ -163,6 +182,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                 return $blueprint;
             })
             ->setter(function ($blueprint) use ($key) {
+                $this->clearDateTimePropertyCaches();
+
                 Blink::forget($key);
 
                 return $blueprint instanceof \Statamic\Fields\Blueprint ? $blueprint->handle() : $blueprint;
@@ -335,6 +356,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function save()
     {
+        $this->flushIndexedValues();
+
         $isNew = is_null(Facades\Entry::find($this->id()));
 
         $withEvents = $this->withEvents;
@@ -544,27 +567,58 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             ->args(func_get_args());
     }
 
+    public function receivesIndexValues()
+    {
+        return ['uri'];
+    }
+
+    public function getDependantIndexes()
+    {
+        return [
+            'entries' => ['uri'],
+        ];
+    }
+
+    protected function clearDateTimePropertyCaches()
+    {
+        $this->hasDate = null;
+        $this->hasTime = null;
+        $this->hasSeconds = null;
+    }
+
     public function hasDate()
     {
-        return $this->collection()->dated();
+        if ($this->hasDate !== null) {
+            return $this->hasDate;
+        }
+
+        return $this->hasDate = $this->collection()->dated();
     }
 
     public function hasTime()
     {
-        if (! $this->hasDate()) {
-            return false;
+        if ($this->hasTime !== null) {
+            return $this->hasTime;
         }
 
-        return $this->blueprint()->field('date')->fieldtype()->timeEnabled();
+        if (! $this->hasDate()) {
+            return $this->hasTime = false;
+        }
+
+        return $this->hasTime = $this->blueprint()->field('date')->fieldtype()->timeEnabled();
     }
 
     public function hasSeconds()
     {
-        if (! $this->hasTime()) {
-            return false;
+        if ($this->hasSeconds !== null) {
+            return $this->hasSeconds;
         }
 
-        return $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
+        if (! $this->hasTime()) {
+            return $this->hasSeconds = false;
+        }
+
+        return $this->hasSeconds = $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
     }
 
     public function sites()
@@ -859,6 +913,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function uri()
     {
+        $indexedUri = $this->getIndexedValue('uri');
+
+        if ($indexedUri !== null) {
+            return $indexedUri;
+        }
+
         if (! $this->route()) {
             return null;
         }
@@ -1019,6 +1079,22 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     protected function getComputedCallbacks()
     {
-        return Facades\Collection::getComputedCallbacks($this->collection);
+        if ($this->computedCallbackCache) {
+            return $this->computedCallbackCache;
+        }
+
+        return $this->computedCallbackCache = Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function __serialize(): array
+    {
+        return Arr::except(get_object_vars($this), ['computedCallbackCache']);
+    }
+
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
     }
 }

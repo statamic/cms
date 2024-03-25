@@ -15,7 +15,7 @@ use Tests\TestCase;
 class HasAugmentedDataTest extends TestCase
 {
     /** @test */
-    public function it_makes_an_augmented_instance()
+    public function aaa_it_makes_an_augmented_instance()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')->andReturn($fieldtype = new class extends Fieldtype
         {
@@ -56,7 +56,7 @@ class HasAugmentedDataTest extends TestCase
             $this->assertEquals('FOO', $value->raw());
             $this->assertEquals('foo', $value->handle());
             $this->assertEquals($thing, $value->augmentable());
-            $this->assertEquals($fieldtype, $value->fieldtype());
+            $this->assertEquals($fieldtype, $value->fieldtype()->withoutField());
         });
 
         $this->assertEquals('BAR', $thing->augmentedValue('bar'));
@@ -66,14 +66,29 @@ class HasAugmentedDataTest extends TestCase
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
         ];
-        $this->assertEquals($expectedArr, $thing->augmented()->all()->all());
-        $this->assertEquals($expectedArr, $thing->toAugmentedArray());
+
+        $result = $thing->augmented()->all();
+        $result['foo']->fieldtype()->withoutField();
+
+        $this->assertEquals($expectedArr, $result->all());
+        $result = $thing->toAugmentedArray();
+        $result['foo']->fieldtype()->withoutField();
+
+        $this->assertEquals($expectedArr, $result);
 
         $expectedSelectArr = [
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
         ];
-        $this->assertEquals($expectedSelectArr, $thing->augmented()->select(['foo', 'bar'])->all());
-        $this->assertEquals($expectedSelectArr, $thing->toAugmentedArray(['foo', 'bar']));
+
+        $result = $thing->augmented()->select(['foo', 'bar']);
+        $result['foo']->fieldtype()->withoutField();
+
+        $this->assertEquals($expectedSelectArr, $result->all());
+
+        $result = $thing->toAugmentedArray(['foo', 'bar']);
+        $result['foo']->fieldtype()->withoutField();
+
+        $this->assertEquals($expectedSelectArr, $result);
     }
 }

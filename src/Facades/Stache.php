@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string generateId()
  * @method static self clear()
  * @method static void refresh()
- * @method static void warm()
+ * @method static void warm($stores = [])
  * @method static self instance()
  * @method static mixed fileCount()
  * @method static mixed|null fileSize()
@@ -24,6 +24,12 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed|null buildDate()
  * @method static self disableUpdatingIndexes()
  * @method static bool shouldUpdateIndexes()
+ * @method static bool shouldUseIndexValues()
+ * @method static self setShouldUseIndexValues($allowed = true)
+ * @method static self withoutIndexedValues(callable $callback)
+ * @method static void flushIndexValues($index)
+ * @method static void updateDependantIndexes($store, $handle)
+ * @method static void itemUsingIndexValues($index, $item)
  *
  * @see \Statamic\Stache\Stache
  */

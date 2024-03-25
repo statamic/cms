@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Query;
 
+use Illuminate\Support\Str;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
@@ -14,6 +15,8 @@ abstract class Builder extends BaseBuilder
     public function __construct(Store $store)
     {
         $this->store = $store;
+        $this->loggerEnabled = config('statamic.stache.query_logging.enabled', false);
+        $this->logRealValues = config('statamic.stache.query_logging.dump_values', false);
     }
 
     public function count()
@@ -21,21 +24,56 @@ abstract class Builder extends BaseBuilder
         return $this->getFilteredAndLimitedKeys()->count();
     }
 
-    public function get($columns = ['*'])
+    protected function resolveKeys()
     {
         $keys = $this->getFilteredKeys();
 
         $keys = $this->orderKeys($keys);
 
-        $keys = $this->limitKeys($keys);
+        return $this->limitKeys($keys);
+    }
 
-        $items = $this->getItems($keys);
+    public function pluck($column, $key = null)
+    {
+        $keys = $this->resolveKeys();
+
+        return $this->store->getFromIndex(
+            $this->getKeysForIndexQuery($keys),
+            $column,
+            $key
+        );
+    }
+
+    protected function getKeysForIndexQuery($keys)
+    {
+        return $keys->map(function ($key) {
+            $queryKey = Str::after($key, '::');
+
+            if (! Str::contains($queryKey, '-') && is_numeric($queryKey)) {
+                return intval($queryKey);
+            }
+
+            return $queryKey;
+        });
+    }
+
+    public function get($columns = ['*'])
+    {
+        $startTime = hrtime(true);
+
+        $items = $this->getItems($this->resolveKeys());
 
         $items->each(fn ($item) => $item
             ->selectedQueryColumns($this->columns ?? $columns)
             ->selectedQueryRelations($this->with));
 
-        return $this->collect($items)->values();
+        $values = $this->collect($items)->values();
+
+        $endTime = hrtime(true);
+
+        $this->emitQueryEvent($startTime, $endTime);
+
+        return $values;
     }
 
     abstract protected function getFilteredKeys();
