@@ -28,7 +28,7 @@ class DeleteTemporaryAttachments implements ShouldQueue
                 $files = collect(Arr::wrap($this->submission->get($field->handle(), [])));
 
                 $files->each(function ($path) {
-                    Storage::disk('local')->delete('statamic/file-uploads/' . $path);
+                    Storage::disk('local')->delete('statamic/file-uploads/'.$path);
                 });
 
                 $this->submission->set($field->handle(), null)->saveQuietly();
