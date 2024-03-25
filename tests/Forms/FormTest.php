@@ -26,6 +26,8 @@ class FormTest extends TestCase
     /** @test */
     public function it_saves_a_form()
     {
+        $this->assertTrue(false);
+
         Event::fake();
 
         $blueprint = (new Blueprint)->setHandle('post')->save();
