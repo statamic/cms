@@ -39,6 +39,7 @@ class SendEmails
 
                 return new $class($this->submission, $this->site, $config);
             })
+            // TODO: only dispatch this job when the form blueprint contains a Files field.
             ->when(true, function ($jobs) {
                 $jobs->push(new DeleteTemporaryAttachments($this->submission));
             });

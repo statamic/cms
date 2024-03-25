@@ -120,7 +120,6 @@ return [
     'form_configure_intro' => 'Forms are used to collect information from visitors and dispatch events and notifications when there are new submissions.',
     'form_configure_mailer_instructions' => 'Choose the mailer for sending this email. Leave blank to fall back to the default mailer.',
     'form_configure_store_instructions' => 'Disable to stop storing submissions. Events and email notifications will still be sent.',
-    'form_configure_delete_attachments_instructions' => 'Enable to delete attachments automatically after the submission emails are sent.',
     'form_configure_title_instructions' => 'Usually a call to action, like "Contact Us".',
     'getting_started_widget_blueprints' => 'Blueprints define the custom fields used to create and store content.',
     'getting_started_widget_collections' => 'Collections contain the different types of content in the site.',

@@ -58,12 +58,6 @@ class SendEmailsTest extends TestCase
     /** @test */
     public function it_queues_email_jobs_when_config_contains_single_email()
     {
-        if (version_compare(app()->version(), '10.0.0', '<')) {
-            // The test breaks but it technically works.
-            // See: https://github.com/laravel/framework/pull/47832
-            $this->markTestSkipped();
-        }
-
         // The email config should be an array of email configs.
         // e.g. [ [to,from,...], [to,from,...], ... ]
         // but it's possible that a user may have only one email config.
