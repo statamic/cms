@@ -625,6 +625,33 @@ class QueryBuilderTest extends TestCase
 
         $this->assertEquals(['b', 'c', 'd'], $query->offset(1)->get()->map->reference->all());
     }
+
+    /** @test */
+    public function values_can_be_plucked()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo'],
+            ['reference' => 'b', 'title' => 'Gandalf'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+        ]);
+
+        $query = (new FakeQueryBuilder($items))->withoutData();
+
+        $this->assertEquals([
+            'a' => 'Frodo',
+            'b' => 'Gandalf',
+            'c' => 'Frodo\'s Precious',
+            'd' => 'Smeagol\'s Precious',
+        ], $query->pluck('title', 'reference')->all());
+
+        $this->assertEquals([
+            'Frodo',
+            'Gandalf',
+            'Frodo\'s Precious',
+            'Smeagol\'s Precious',
+        ], $query->pluck('title')->all());
+    }
 }
 
 class FakeQueryBuilder extends QueryBuilder

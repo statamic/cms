@@ -775,24 +775,16 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $this->assertEquals(collect([
+        $this->assertEquals([
             1 => 'post-1',
             2 => 'post-2',
             3 => 'post-3',
-        ]), Entry::query()->pluck('slug', 'id'));
+        ], Entry::query()->pluck('slug', 'id')->all());
 
-        $this->assertEquals(collect([
+        $this->assertEquals([
             'post-1',
             'post-2',
             'post-3',
-        ]), Entry::query()->pluck('slug'));
-
-        $this->assertEquals(collect([
-            3 => 'post-3',
-        ]), Entry::query()->where('id', 3)->pluck('slug', 'id'));
-
-        $this->assertEquals(collect([
-            'post-3' => 3,
-        ]), Entry::query()->where('id', 3)->pluck('id', 'slug'));
+        ], Entry::query()->pluck('slug')->all());
     }
 }

@@ -600,4 +600,24 @@ class AssetQueryBuilderTest extends TestCase
             'f.jpg',
         ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
     }
+
+    /** @test */
+    public function values_can_be_plucked()
+    {
+        Asset::find('test::a.jpg')->data(['text' => 'Text 1'])->save();
+        Asset::find('test::b.txt')->data(['text' => 'Text 2'])->save();
+        Asset::find('test::c.txt')->data(['text' => 'Text 3'])->save();
+
+        $this->assertEquals([
+            'a.jpg' => 'Text 1',
+            'b.txt' => 'Text 2',
+            'c.txt' => 'Text 3',
+        ], $this->container->queryAssets()->whereNotNull('text')->pluck('text', 'path')->all());
+
+        $this->assertEquals([
+            'Text 1',
+            'Text 2',
+            'Text 3',
+        ], $this->container->queryAssets()->whereNotNull('text')->pluck('text')->all());
+    }
 }
