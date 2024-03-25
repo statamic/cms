@@ -13,6 +13,7 @@ use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
+use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\NoLock;
@@ -77,7 +78,10 @@ class Cache
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
             $cachedPage = $this->cacher->getCachedPage($request);
-            $response = $cachedPage?->toResponse($request) ?? response($cachedPage);
+
+            $response = $cachedPage instanceof Page
+                ? $cachedPage->toResponse($request)
+                : response($cachedPage);
 
             $this->makeReplacements($response);
 
