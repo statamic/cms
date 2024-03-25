@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
+use Statamic\Assets\FileUploader;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
@@ -126,7 +127,19 @@ class Submission implements Augmentable, SubmissionContract
     public function uploadFiles($uploadedFiles)
     {
         return collect($uploadedFiles)->map(function ($files, $handle) {
-            return AssetsUploader::field($this->fields()->get($handle))->upload($files);
+            $field = $this->fields()->get($handle);
+
+            if ($field['type'] === 'files') {
+                $paths = collect(Arr::wrap($files))->map(function ($file) {
+                    return FileUploader::container()->upload($file);
+                });
+
+                return $field['max_files'] === 1
+                    ? $paths->first()
+                    : $paths->all();
+            }
+
+            return AssetsUploader::field($field)->upload($files);
         })->all();
     }
 

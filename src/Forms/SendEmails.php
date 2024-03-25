@@ -39,7 +39,7 @@ class SendEmails
 
                 return new $class($this->submission, $this->site, $config);
             })
-            ->when($this->submission->form()->deleteAttachments(), function ($jobs) {
+            ->when(true, function ($jobs) {
                 $jobs->push(new DeleteTemporaryAttachments($this->submission));
             });
     }

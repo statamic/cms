@@ -112,7 +112,7 @@ class Email extends Mailable
 
         $this->getRenderableFieldData(Arr::except($this->submissionData, ['id', 'date', 'form']))
             ->filter(function ($field) {
-                return $field['fieldtype'] === 'assets';
+                return $field['fieldtype'] === 'assets' || $field['fieldtype'] === 'files';
             })
             ->each(function ($field) {
                 $value = $field['value']->value();
@@ -122,7 +122,9 @@ class Email extends Mailable
                     : $value->get();
 
                 foreach ($value as $file) {
-                    $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
+                    $field['fieldtype'] === 'files'
+                        ? $this->attachFromStorageDisk('local', 'statamic/file-uploads/'.$file)
+                        : $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
                 }
             });
 
