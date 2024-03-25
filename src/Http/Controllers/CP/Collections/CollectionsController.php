@@ -13,6 +13,7 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Str;
@@ -24,7 +25,9 @@ class CollectionsController extends CpController
         $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
 
         $collections = Collection::all()->filter(function ($collection) {
-            return User::current()->can('view', $collection);
+            return User::current()->can('configure collections')
+                || User::current()->can('view', $collection)
+                && $collection->sites()->contains(Site::selected()->handle());
         })->map(function ($collection) {
             return [
                 'id' => $collection->handle(),
@@ -39,6 +42,7 @@ class CollectionsController extends CpController
                 'deleteable' => User::current()->can('delete', $collection),
                 'editable' => User::current()->can('edit', $collection),
                 'blueprint_editable' => User::current()->can('configure fields'),
+                'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
             ];
         })->values();
 
@@ -187,7 +191,7 @@ class CollectionsController extends CpController
 
         $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
+            'handle' => ['nullable', new Handle],
         ]);
 
         $handle = $request->handle ?? Str::snake($request->title);
@@ -288,7 +292,16 @@ class CollectionsController extends CpController
                 'title' => __('Link'),
                 'fields' => [
                     ['handle' => 'title', 'field' => ['type' => 'text']],
-                    ['handle' => 'redirect', 'field' => ['type' => 'link', 'required' => true]],
+                    [
+                        'handle' => 'redirect',
+                        'field' => [
+                            'type' => 'group', 'required' => true, 'width' => '100',
+                            'fields' => [
+                                ['handle' => 'url', 'field' => ['type' => 'link', 'required' => true, 'width' => '100', 'display' => __('Location')]],
+                                ['handle' => 'status', 'field' => ['type' => 'radio', 'inline' => 'true', 'required' => true, 'options' => [301 => __('301 (Permanent)'), 302 => __('302 (Temporary)')], 'width' => '100', 'display' => __('HTTP Status'), 'default' => 302]],
+                            ],
+                        ],
+                    ],
                 ],
             ])
             ->save();
@@ -410,7 +423,7 @@ class CollectionsController extends CpController
                         'type' => 'html',
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <span class="mr-4">'.$collection->entryBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <span class="rtl:ml-4 ltr:mr-4">'.$collection->entryBlueprints()->map->title()->join(', ').'</span>'.
                             '   <a href="'.cp_route('collections.blueprints.index', $collection).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
@@ -534,6 +547,7 @@ class CollectionsController extends CpController
                                 'field' => [
                                     'display' => __('Format'),
                                     'type' => 'text',
+                                    'dir' => 'ltr',
                                 ],
                             ],
                             [
