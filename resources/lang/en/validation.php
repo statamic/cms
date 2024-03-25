@@ -157,7 +157,7 @@ return [
     'handle' => 'Must contain only lowercase letters and numbers with underscores as separators.',
     'slug' => 'Must contain only letters and numbers with dashes or underscores as separators.',
     'code_fieldtype_rulers' => 'This is invalid.',
-    'composer_package' => 'Please enter a valid composer package name (eg. hasselhoff/kung-fury).',
+    'composer_package' => 'Must be a valid composer package name (eg. hasselhoff/kung-fury).',
     'date_fieldtype_date_required' => 'Date is required.',
     'date_fieldtype_end_date_invalid' => 'Not a valid end date.',
     'date_fieldtype_end_date_required' => 'End date is required.',
