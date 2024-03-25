@@ -92,6 +92,11 @@ class CollectionRepository implements RepositoryContract
         $this->store->updateEntryOrder($collection, $ids);
     }
 
+    public function updateEntryParent(Collection $collection, $ids = null)
+    {
+        $this->store->updateEntryParent($collection, $ids);
+    }
+
     public function whereStructured(): IlluminateCollection
     {
         return $this->all()->filter->hasStructure();
