@@ -26,6 +26,7 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasDirtyState;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
+use Statamic\Data\ReceivesIndexValues;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
@@ -43,7 +44,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -55,7 +55,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
-    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, ReceivesIndexValues, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
     use HasDirtyState;
     use HasOrigin {
@@ -335,6 +335,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function save()
     {
+        $this->flushIndexedValues();
+
         $isNew = is_null(Facades\Entry::find($this->id()));
 
         $withEvents = $this->withEvents;
@@ -542,6 +544,18 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                 return Carbon::createFromFormat('Y-m-d-His', $date);
             })
             ->args(func_get_args());
+    }
+
+    public function receivesIndexValues()
+    {
+        return ['uri'];
+    }
+
+    public function getDependantIndexes()
+    {
+        return [
+            'entries' => ['uri'],
+        ];
     }
 
     public function hasDate()
@@ -859,6 +873,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function uri()
     {
+        $indexedUri = $this->getIndexedValue('uri');
+
+        if ($indexedUri !== null) {
+            return $indexedUri;
+        }
+
         if (! $this->route()) {
             return null;
         }
