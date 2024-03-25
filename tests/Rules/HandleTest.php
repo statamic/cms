@@ -39,6 +39,6 @@ class HandleTest extends TestCase
     /** @test */
     public function it_outputs_helpful_validation_error()
     {
-        $this->assertValidationErrorOutput('Handles must contain only lowercase letters and numbers with underscores as separators.', '_bad_input');
+        $this->assertValidationErrorOutput(trans('statamic::validation.handle'), '_bad_input');
     }
 }
