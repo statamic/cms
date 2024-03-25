@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 
 class Page implements Responsable
 {
@@ -10,8 +11,8 @@ class Page implements Responsable
     {
     }
 
-    public function toResponse($request)
+    public function toResponse($request = null)
     {
-        return response($this->response, 200, $this->headers);
+        return new Response($this->response, 200, $this->headers);
     }
 }
