@@ -313,7 +313,7 @@ export default [
     // },
     {
         label: 'Unique Entry Value',
-        value: 'unique_entry_value:{collection},{id},{site}',
+        value: 'new \\Statamic\\Rules\\UniqueEntryValue({collection}, {id}, {site})',
     },
     {
         label: 'URL',
