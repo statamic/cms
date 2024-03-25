@@ -24,7 +24,7 @@ interface Cacher
     /**
      * Get a cached page.
      *
-     * @return string|Page
+     * @return Page
      */
     public function getCachedPage(Request $request);
 

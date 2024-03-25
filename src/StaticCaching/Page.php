@@ -7,7 +7,7 @@ use Illuminate\Http\Response;
 
 class Page implements Responsable
 {
-    public function __construct(public string|Response $content, public array $headers)
+    public function __construct(public string $content, public array $headers)
     {
     }
 

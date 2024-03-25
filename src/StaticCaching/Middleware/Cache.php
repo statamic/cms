@@ -78,10 +78,7 @@ class Cache
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
             $cachedPage = $this->cacher->getCachedPage($request);
-
-            $response = $cachedPage instanceof Page
-                ? $cachedPage->toResponse($request)
-                : response($cachedPage);
+            $response = $cachedPage->toResponse($request);
 
             $this->makeReplacements($response);
 
