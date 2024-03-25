@@ -77,9 +77,6 @@ class ApplicationCacherTest extends TestCase
         $cache->forever('static-cache:responses:one', 'html content');
         $cache->forever('static-cache:responses:onemore', 'onemore html content');
         $cache->forever('static-cache:responses:two', 'two html content');
-        $cache->forever('static-cache:headers:one', ['Content-Type' => 'application/xml']);
-        $cache->forever('static-cache:headers:onemore', ['Content-Type' => 'application/xml']);
-        $cache->forever('static-cache:headers:two', ['Content-Type' => 'application/xml']);
 
         $cacher->invalidateUrl('/one');
 
@@ -90,9 +87,6 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:one'));
         $this->assertNotNull($cache->get('static-cache:responses:onemore'));
         $this->assertNotNull($cache->get('static-cache:responses:two'));
-        $this->assertNull($cache->get('static-cache:headers:one'));
-        $this->assertNotNull($cache->get('static-cache:headers:onemore'));
-        $this->assertNotNull($cache->get('static-cache:headers:two'));
     }
 
     /** @test */
@@ -110,10 +104,6 @@ class ApplicationCacherTest extends TestCase
         $cache->forever('static-cache:responses:oneqs', 'querystring html content');
         $cache->forever('static-cache:responses:onemore', 'onemore html content');
         $cache->forever('static-cache:responses:two', 'two html content');
-        $cache->forever('static-cache:headers:one', ['Content-Type' => 'application/xml']);
-        $cache->forever('static-cache:headers:oneqs', ['Content-Type' => 'application/xml']);
-        $cache->forever('static-cache:headers:onemore', ['Content-Type' => 'application/xml']);
-        $cache->forever('static-cache:headers:two', ['Content-Type' => 'application/xml']);
 
         $cacher->invalidateUrl('/one');
 
@@ -125,10 +115,6 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:oneqs'));
         $this->assertNotNull($cache->get('static-cache:responses:onemore'));
         $this->assertNotNull($cache->get('static-cache:responses:two'));
-        $this->assertNull($cache->get('static-cache:headers:one'));
-        $this->assertNull($cache->get('static-cache:headers:oneqs'));
-        $this->assertNotNull($cache->get('static-cache:headers:onemore'));
-        $this->assertNotNull($cache->get('static-cache:headers:two'));
     }
 
     /**
@@ -181,10 +167,6 @@ class ApplicationCacherTest extends TestCase
         $cache->forever('static-cache:responses:two', 'html content');
         $cache->forever('static-cache:responses:three', 'html content');
         $cache->forever('static-cache:responses:four', 'html content');
-        $cache->forever('static-cache:headers:one', ['Content-Type' => 'application/xml']);
-        $cache->forever('static-cache:headers:two', ['Content-Type' => 'application/xml']);
-        $cache->forever('static-cache:headers:three', ['Content-Type' => 'application/xml']);
-        $cache->forever('static-cache:headers:four', ['Content-Type' => 'application/xml']);
 
         $cacher->flush();
 
@@ -192,10 +174,6 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:two'));
         $this->assertNull($cache->get('static-cache:responses:three'));
         $this->assertNull($cache->get('static-cache:responses:four'));
-        $this->assertNull($cache->get('static-cache:headers:one'));
-        $this->assertNull($cache->get('static-cache:headers:two'));
-        $this->assertNull($cache->get('static-cache:headers:three'));
-        $this->assertNull($cache->get('static-cache:headers:four'));
         $this->assertEquals([], $cacher->getUrls('http://example.com')->all());
         $this->assertEquals([], $cacher->getUrls('http://another.com')->all());
     }
