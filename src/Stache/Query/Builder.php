@@ -22,7 +22,7 @@ abstract class Builder extends BaseBuilder
         return $this->getFilteredAndLimitedKeys()->count();
     }
 
-    protected function resolveKeys()
+    private function resolveKeys()
     {
         $keys = $this->getFilteredKeys();
 
@@ -42,7 +42,7 @@ abstract class Builder extends BaseBuilder
         );
     }
 
-    protected function getKeysForIndexQuery($keys)
+    private function getKeysForIndexQuery($keys)
     {
         return $keys->map(function ($key) {
             $queryKey = Str::after($key, '::');
