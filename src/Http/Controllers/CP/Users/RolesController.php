@@ -9,6 +9,7 @@ use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RequireStatamicPro;
+use Statamic\Rules\Handle;
 
 class RolesController extends CpController
 {
@@ -61,7 +62,7 @@ class RolesController extends CpController
 
         $request->validate([
             'title' => 'required',
-            'handle' => 'alpha_dash',
+            'handle' => [new Handle],
             'super' => 'boolean',
             'permissions' => 'array',
         ]);
@@ -120,7 +121,7 @@ class RolesController extends CpController
 
         $request->validate([
             'title' => 'required',
-            'handle' => 'alpha_dash',
+            'handle' => [new Handle],
             'super' => 'boolean',
             'permissions' => 'array',
         ]);
