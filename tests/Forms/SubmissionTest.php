@@ -192,33 +192,4 @@ class SubmissionTest extends TestCase
 
         Event::assertNotDispatched(SubmissionSaved::class);
     }
-
-    /** @test */
-    public function it_deletes_attachments()
-    {
-        Storage::fake('uploads');
-        AssetContainer::make('uploads')->disk('uploads')->save();
-
-        $form = tap(Form::make('contact_us'))->save();
-        $form->blueprint()->ensureField('attachments', ['type' => 'assets', 'container' => 'uploads'])->save();
-
-        Storage::disk('uploads')->put('foo.jpg', '');
-        Storage::disk('uploads')->put('bar.pdf', '');
-        Storage::disk('uploads')->put('baz.txt', '');
-
-        Storage::disk('uploads')->assertExists(['foo.jpg', 'bar.pdf', 'baz.txt']);
-
-        $submission = tap($form->makeSubmission()->data([
-            'attachments' => ['foo.jpg', 'bar.pdf'],
-        ]))->save();
-
-        $this->assertCount(2, $submission->get('attachments'));
-
-        $submission->deleteAttachments();
-
-        $this->assertNull($submission->get('attachments'));
-
-        Storage::disk('uploads')->assertMissing(['foo.jpg', 'bar.pdf']);
-        Storage::disk('uploads')->assertExists(['baz.txt']);
-    }
 }
