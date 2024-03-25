@@ -2,7 +2,6 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Arr;
