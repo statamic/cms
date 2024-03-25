@@ -7,6 +7,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Fields\Field;
 use Statamic\Sites\Site;
 
 class SendEmails
@@ -39,8 +40,7 @@ class SendEmails
 
                 return new $class($this->submission, $this->site, $config);
             })
-            // TODO: only dispatch this job when the form blueprint contains a Files field.
-            ->when(true, function ($jobs) {
+            ->when($this->shouldDeleteTemporaryAttachments(), function ($jobs) {
                 $jobs->push(new DeleteTemporaryAttachments($this->submission));
             });
     }
@@ -52,5 +52,15 @@ class SendEmails
         $config = isset($config['to']) ? [$config] : $config;
 
         return collect($config);
+    }
+
+    protected function shouldDeleteTemporaryAttachments(): bool
+    {
+        $fields = $this->submission->form()->blueprint()->fields()->all();
+
+        return $fields
+            ->filter(fn (Field $field) => $field->fieldtype()->handle() === 'files')
+            ->filter()
+            ->count() > 0;
     }
 }
