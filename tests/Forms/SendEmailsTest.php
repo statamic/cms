@@ -90,13 +90,13 @@ class SendEmailsTest extends TestCase
     {
         Bus::fake();
 
-        // TODO: add a Files field to the form blueprint to trigger this behaviour.
-
         $form = tap(FacadesForm::make('test')->email([
             'from' => 'first@sender.com',
             'to' => 'first@recipient.com',
             'foo' => 'bar',
         ]))->save();
+
+        $form->blueprint()->ensureField('attachments', ['type' => 'files'])->save();
 
         (new SendEmails(
             $submission = $form->makeSubmission(),
