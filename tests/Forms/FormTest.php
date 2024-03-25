@@ -26,7 +26,7 @@ class FormTest extends TestCase
     /** @test */
     public function it_saves_a_form()
     {
-        $this->assertTrue(false);
+        $this->assertFalse(true);
 
         Event::fake();
 
