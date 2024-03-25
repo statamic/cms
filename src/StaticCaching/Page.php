@@ -7,12 +7,12 @@ use Illuminate\Http\Response;
 
 class Page implements Responsable
 {
-    public function __construct(public $response, public $headers)
+    public function __construct(public string|Response $content, public array $headers)
     {
     }
 
-    public function toResponse($request = null)
+    public function toResponse($request): Response
     {
-        return new Response($this->response, 200, $this->headers);
+        return new Response($this->content, 200, $this->headers);
     }
 }

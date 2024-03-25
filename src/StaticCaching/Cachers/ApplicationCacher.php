@@ -46,26 +46,20 @@ class ApplicationCacher extends AbstractCacher
         $key = $this->normalizeKey('responses:'.$key);
         $value = $this->normalizeContent($content);
 
-        if ($value instanceof JsonResponse) {
-            $value = $value->getContent();
-        }
-
         Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($key, $value) {
             $headers = collect($event->response->headers->all())
                 ->reject(fn ($value, $key) => in_array($key, ['date', 'x-powered-by', 'cache-control', 'expires', 'set-cookie']))
                 ->mapWithKeys(fn ($value, $key) => [$key => Arr::first($value)])
                 ->all();
 
-            $value = [
-                'response' => $value,
+            $cacheValue = [
+                'content' => $value,
                 'headers' => $headers,
             ];
 
-            if ($expiration = $this->getDefaultExpiration()) {
-                $this->cache->put($key, $value, now()->addMinutes($expiration));
-            } else {
-                $this->cache->forever($key, $value);
-            }
+            $this->getDefaultExpiration()
+                ? $this->cache->put($key, $cacheValue, now()->addMinutes($this->getDefaultExpiration()))
+                : $this->cache->forever($key, $cacheValue);
         });
     }
 
@@ -88,7 +82,7 @@ class ApplicationCacher extends AbstractCacher
     {
         $cachedPage = $this->cached ?? $this->getFromCache($request);
 
-        return new Page($cachedPage['response'], $cachedPage['headers']);
+        return new Page($cachedPage['content'], $cachedPage['headers']);
     }
 
     private function getFromCache(Request $request)
