@@ -7,9 +7,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class ComposerPackage implements ValidationRule
 {
-    /**
-     * Run the validation rule.
-     */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! preg_match("/^[^\/\s]+\/[^\/\s]+$/", $value)) {

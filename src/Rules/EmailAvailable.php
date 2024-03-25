@@ -8,9 +8,6 @@ use Statamic\Facades\User;
 
 class EmailAvailable implements ValidationRule
 {
-    /**
-     * Run the validation rule.
-     */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (User::query()->where('email', trim($value))->count() !== 0) {
