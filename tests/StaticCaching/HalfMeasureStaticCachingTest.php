@@ -69,8 +69,6 @@ class HalfMeasureStaticCachingTest extends TestCase
     /** @test */
     public function it_includes_custom_headers_in_cached_response()
     {
-        // The sitemap route is defined in the `getEnvironmentSetUp` method.
-
         $this
             ->get('/sitemap')
             ->assertOk()
