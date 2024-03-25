@@ -20,6 +20,7 @@ class Field implements Arrayable
     protected $value;
     protected $parent;
     protected $parentField;
+    protected $parentIndex;
     protected $validationContext;
     protected ?Form $form = null;
 
@@ -33,7 +34,7 @@ class Field implements Arrayable
     {
         return (new static($this->handle, $this->config))
             ->setParent($this->parent)
-            ->setParentField($this->parentField)
+            ->setParentField($this->parentField, $this->parentIndex)
             ->setValue($this->value);
     }
 
@@ -58,6 +59,24 @@ class Field implements Arrayable
         return $path;
     }
 
+    public function fieldPathKeys()
+    {
+        $path = $this->parentField ? $this->parentField->fieldPathKeys() : [];
+
+        if (isset($this->parentIndex)) {
+            $path[] = $this->parentIndex;
+        }
+
+        $path[] = $this->handle();
+
+        return $path;
+    }
+
+    public function fieldPathPrefix()
+    {
+        return implode('.', $this->fieldPathKeys());
+    }
+
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;
@@ -68,6 +87,11 @@ class Field implements Arrayable
     public function prefix()
     {
         return $this->prefix;
+    }
+
+    public function parentIndex()
+    {
+        return $this->parentIndex;
     }
 
     public function type()
@@ -166,7 +190,7 @@ class Field implements Arrayable
     {
         $display = Lang::has($key = 'validation.attributes.'.$this->handle())
             ? Lang::get($key)
-            : $this->display();
+            : __($this->display());
 
         return array_merge(
             [$this->handle() => $display],
@@ -277,9 +301,10 @@ class Field implements Arrayable
         return $this->parent;
     }
 
-    public function setParentField($field)
+    public function setParentField($field, $index = null)
     {
         $this->parentField = $field;
+        $this->parentIndex = $index;
 
         return $this;
     }
@@ -422,5 +447,105 @@ class Field implements Arrayable
     public function form(): ?Form
     {
         return $this->form;
+    }
+
+    public static function commonFieldOptions(): Fields
+    {
+        $reserved = [
+            'content_type',
+            'elseif',
+            'endif',
+            'endunless',
+            'if',
+            'length',
+            'reference',
+            'resource',
+            'status',
+            'unless',
+            'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
+            'views',
+        ];
+
+        $fields = collect([
+            'display' => [
+                'display' => __('Display Label'),
+                'instructions' => __('statamic::messages.fields_display_instructions'),
+                'type' => 'field_display',
+            ],
+            'handle' => [
+                'display' => __('Handle'),
+                'instructions' => __('statamic::messages.fields_handle_instructions'),
+                'type' => 'slug',
+                'from' => 'display',
+                'separator' => '_',
+                'validate' => [
+                    'required',
+                    'regex:/^[a-zA-Z]([a-zA-Z0-9_]|->)*$/',
+                    'not_in:'.implode(',', $reserved),
+                ],
+                'show_regenerate' => true,
+            ],
+            'instructions' => [
+                'display' => __('Instructions'),
+                'instructions' => __('statamic::messages.fields_instructions_instructions'),
+                'type' => 'textarea',
+            ],
+            'instructions_position' => [
+                'display' => __('Instructions Position'),
+                'instructions' => __('statamic::messages.fields_instructions_position_instructions'),
+                'type' => 'select',
+                'options' => [
+                    'above' => __('Above'),
+                    'below' => __('Below'),
+                ],
+                'default' => 'above',
+                'if' => [
+                    'instructions' => 'not null',
+                ],
+            ],
+            'listable' => [
+                'display' => __('Listable'),
+                'instructions' => __('statamic::messages.fields_listable_instructions'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'options' => [
+                    'hidden' => __('Hidden by default'),
+                    'true' => __('Shown by default'),
+                    'false' => __('Not listable'),
+                ],
+                'default' => 'hidden',
+                'unless' => [
+                    'type' => 'section',
+                ],
+            ],
+            'visibility' => [
+                'display' => __('Visibility'),
+                'instructions' => __('statamic::messages.fields_visibility_instructions'),
+                'options' => [
+                    'visible' => __('Visible'),
+                    'read_only' => __('Read Only'),
+                    'computed' => __('Computed'),
+                    'hidden' => __('Hidden'),
+                ],
+                'default' => 'visible',
+                'type' => 'select',
+            ],
+            'replicator_preview' => [
+                'display' => __('Preview'),
+                'instructions' => __('statamic::messages.fields_replicator_preview_instructions'),
+                'type' => 'toggle',
+                'validate' => 'boolean',
+                'default' => true,
+            ],
+            'duplicate' => [
+                'display' => __('Duplicate'),
+                'instructions' => __('statamic::messages.fields_duplicate_instructions'),
+                'type' => 'toggle',
+                'validate' => 'boolean',
+                'default' => true,
+            ],
+        ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
+
+        return new Fields($fields);
     }
 }

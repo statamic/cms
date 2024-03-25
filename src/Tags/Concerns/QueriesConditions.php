@@ -45,6 +45,8 @@ trait QueriesConditions
     {
         $regexOperator = $value ? 'regexp' : 'not regexp';
 
+        $field = str_replace('.', '->', $field);
+
         switch ($condition) {
             case 'is':
             case 'equals':

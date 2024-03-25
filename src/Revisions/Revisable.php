@@ -71,10 +71,26 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
+        $parent = $item->get('parent');
+
+        $item->remove('parent');
+
         $item
             ->published(true)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
+
+        if ($item->collection()->hasStructure() && $parent) {
+            $tree = $item->collection()->structure()->in($item->locale());
+
+            if (optional($tree->find($parent))->isRoot()) {
+                $parent = null;
+            }
+
+            $tree
+                ->move($this->id(), $parent)
+                ->save();
+        }
 
         $item
             ->makeRevision()
@@ -111,16 +127,20 @@ trait Revisable
 
     public function store($options = [])
     {
-        $this
+        $return = $this
             ->published(false)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
 
-        $this
-            ->makeRevision()
-            ->user($user)
-            ->message($options['message'] ?? false)
-            ->save();
+        if ($this->revisionsEnabled()) {
+            $return = $this
+                ->makeRevision()
+                ->user($user)
+                ->message($options['message'] ?? false)
+                ->save();
+        }
+
+        return $return;
     }
 
     public function createRevision($options = [])
@@ -135,7 +155,7 @@ trait Revisable
 
     public function revisionsEnabled()
     {
-        return config('statamic.revisions.enabled') || ! Statamic::pro();
+        return config('statamic.revisions.enabled') && Statamic::pro();
     }
 
     abstract protected function revisionKey();

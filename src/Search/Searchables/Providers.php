@@ -30,7 +30,7 @@ class Providers
         });
     }
 
-    public function make(string $key, Index $index = null, array $keys = null)
+    public function make(string $key, ?Index $index = null, ?array $keys = null)
     {
         if (! $provider = $this->providers()->get($key)) {
             throw new \Exception('Unknown searchable ['.$key.']');

@@ -11,7 +11,7 @@
                         <div class="field-inner">
                             <label class="publish-field-label" for="field_behavior">
                                 <span v-text="__('Localizations')" />
-                                <i class="required ml-1">*</i>
+                                <i class="required rtl:mr-1 ltr:ml-1">*</i>
                             </label>
                             <div class="help-block -mt-2"><p v-html="instructions" /></div>
                         </div>
@@ -31,7 +31,7 @@
                 <button class="text-gray hover:text-gray-900"
                     @click="$emit('cancel')"
                     v-text="__('Cancel')" />
-                <button class="btn ml-4 btn-danger"
+                <button class="btn rtl:mr-4 ltr:ml-4 btn-danger"
                     @click="confirm"
                     v-text="__('Confirm')" />
             </div>

@@ -8,9 +8,15 @@ use Statamic\Statamic;
 
 class AugmentedTerm extends AbstractAugmented
 {
+    private $cachedKeys;
+
     public function keys()
     {
-        return $this->data->values()->keys()
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
+        }
+
+        return $this->cachedKeys = $this->data->values()->keys()
             ->merge($this->data->supplements()->keys())
             ->merge($this->commonKeys())
             ->merge($this->blueprintFields()->keys())
@@ -33,6 +39,7 @@ class AugmentedTerm extends AbstractAugmented
             'taxonomy',
             'edit_url',
             'locale',
+            'collection',
             'updated_at',
             'updated_by',
         ];

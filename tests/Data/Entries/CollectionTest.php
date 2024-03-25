@@ -3,7 +3,6 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
@@ -11,6 +10,8 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\Collection;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionCreating;
+use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionSaved;
 use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
@@ -365,6 +366,7 @@ class CollectionTest extends TestCase
                 ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
 
         $blueprint = $collection->entryBlueprint();
         $this->assertNotEquals($default, $blueprint);
@@ -432,10 +434,10 @@ class CollectionTest extends TestCase
         $this->assertNull($datedAndOrdered->customSortDirection());
 
         $alpha->structureContents(['max_depth' => 99]);
-        $this->assertEquals('title', $alpha->sortField());
+        $this->assertEquals('order', $alpha->sortField());
         $this->assertEquals('asc', $alpha->sortDirection());
         $dated->structureContents(['max_depth' => 99]);
-        $this->assertEquals('date', $dated->sortField());
+        $this->assertEquals('order', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
         // Custom sort field and direction should override any other logic.
@@ -723,15 +725,13 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_augments()
     {
-        $mountedEntry = EntryFactory::collection('pages')->id('blog')->slug('blog')->data(['title' => 'Blog'])->create();
-
-        $collection = (new Collection)->mount('blog')->handle('test');
+        $collection = (new Collection)->handle('test');
 
         $this->assertInstanceof(Augmentable::class, $collection);
-        $this->assertCount(3, $augmentedArray = $collection->toAugmentedArray());
-        $this->assertEquals('Test', $augmentedArray['title']);
-        $this->assertEquals('test', $augmentedArray['handle']);
-        $this->assertEquals($mountedEntry, $augmentedArray['mount']->value());
+        $this->assertEquals([
+            'title' => 'Test',
+            'handle' => 'test',
+        ], $collection->toAugmentedArray());
     }
 
     /** @test */
@@ -926,7 +926,7 @@ class CollectionTest extends TestCase
         $this->assertCount(0, $collection->queryEntries()->get());
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],
@@ -964,5 +964,38 @@ class CollectionTest extends TestCase
         $this->assertTrue($user->can('view', $collection1));
         $this->assertTrue($user->can('view', $collection2));
         $this->assertFalse($user->can('view', $collection3));
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $collection = Facades\Collection::make('test')->save();
+
+        $collection->delete();
+
+        Event::assertDispatched(CollectionDeleting::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Collection::spy();
+        Event::fake([CollectionDeleted::class]);
+
+        Event::listen(CollectionDeleting::class, function () {
+            return false;
+        });
+
+        $collection = new Collection('test');
+
+        $return = $collection->delete();
+
+        $this->assertFalse($return);
+        Facades\Collection::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(CollectionDeleted::class);
     }
 }

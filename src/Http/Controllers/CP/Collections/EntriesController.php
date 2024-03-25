@@ -201,8 +201,6 @@ class EntriesController extends CpController
 
         $values = $fields->process()->values();
 
-        $parent = $values->pull('parent');
-
         if ($explicitBlueprint = $values->pull('blueprint')) {
             $entry->blueprint($explicitBlueprint);
         }
@@ -225,24 +223,30 @@ class EntriesController extends CpController
             $tree = $entry->structure()->in($entry->locale());
         }
 
+        $parent = $values->get('parent');
+
         if ($structure && ! $collection->orderable()) {
             $this->validateParent($entry, $tree, $parent);
 
-            $entry->afterSave(function ($entry) use ($parent, $tree) {
-                if ($parent && optional($tree->find($parent))->isRoot()) {
-                    $parent = null;
-                }
+            if (! $entry->revisionsEnabled()) {
+                $entry->afterSave(function ($entry) use ($parent, $tree) {
+                    if ($parent && optional($tree->find($parent))->isRoot()) {
+                        $parent = null;
+                    }
 
-                $tree
-                    ->move($entry->id(), $parent)
-                    ->save();
-            });
+                    $tree
+                        ->move($entry->id(), $parent)
+                        ->save();
+                });
+
+                $values->forget('parent');
+            }
         }
 
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled() && $entry->published()) {
-            $entry
+            $saved = $entry
                 ->makeWorkingCopy()
                 ->user(User::current())
                 ->save();
@@ -254,22 +258,26 @@ class EntriesController extends CpController
                 $entry->published($request->published);
             }
 
-            $entry->updateLastModified(User::current())->save();
+            $saved = $entry->updateLastModified(User::current())->save();
         }
 
         [$values] = $this->extractFromFields($entry, $blueprint);
 
-        return (new EntryResource($entry->fresh()))
-            ->additional([
-                'data' => [
-                    'values' => $values,
-                ],
-            ]);
+        return [
+            'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
+                'values' => $values,
+            ]),
+            'saved' => $saved,
+        ];
     }
 
     public function create(Request $request, $collection, $site)
     {
         $this->authorize('create', [EntryContract::class, $collection, $site]);
+
+        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, $site)) {
+            return $response;
+        }
 
         $blueprint = $collection->entryBlueprint($request->blueprint);
 
@@ -394,15 +402,18 @@ class EntriesController extends CpController
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled()) {
-            $entry->store([
+            $saved = $entry->store([
                 'message' => $request->message,
                 'user' => User::current(),
             ]);
         } else {
-            $entry->updateLastModified(User::current())->save();
+            $saved = $entry->updateLastModified(User::current())->save();
         }
 
-        return new EntryResource($entry);
+        return [
+            'data' => (new EntryResource($entry))->resolve()['data'],
+            'saved' => $saved,
+        ];
     }
 
     private function resolveSlug($request)
@@ -420,19 +431,6 @@ class EntriesController extends CpController
         };
     }
 
-    public function destroy($entry)
-    {
-        if (! $entry = Entry::find($entry)) {
-            return $this->pageNotFound();
-        }
-
-        $this->authorize('delete', $entry);
-
-        $entry->delete();
-
-        return response('', 204);
-    }
-
     protected function extractFromFields($entry, $blueprint)
     {
         // The values should only be data merged with the origin data.
@@ -447,6 +445,10 @@ class EntriesController extends CpController
 
         if ($entry->hasStructure()) {
             $values['parent'] = array_filter([optional($entry->parent())->id()]);
+
+            if ($entry->revisionsEnabled() && $entry->has('parent')) {
+                $values['parent'] = [$entry->get('parent')];
+            }
         }
 
         if ($entry->collection()->dated()) {
@@ -572,5 +574,12 @@ class EntriesController extends CpController
         return $collection
             ->sites()
             ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
+    }
+
+    protected function ensureCollectionIsAvailableOnSite($collection, $site)
+    {
+        if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
+            return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
+        }
     }
 }

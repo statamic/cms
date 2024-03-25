@@ -76,7 +76,7 @@ class TermsTest extends TestCase
         }
     }
 
-    public function termsProvider()
+    public static function termsProvider()
     {
         return [
             'all' => [
@@ -217,7 +217,7 @@ class TermsTest extends TestCase
         $this->assertTrue($provider->contains($d->in('en')));
     }
 
-    public function indexFilterProvider()
+    public static function indexFilterProvider()
     {
         return [
             'class' => [TestSearchableTermsFilter::class],

@@ -80,7 +80,8 @@ class MakeAddon extends GeneratorCommand
             $this
                 ->generateAddonFiles()
                 ->installAddon()
-                ->generateOptional();
+                ->generateOptional()
+                ->installComposerDependencies();
         } catch (\Exception $e) {
             $this->error($e->getMessage());
 
@@ -137,8 +138,11 @@ class MakeAddon extends GeneratorCommand
 
         $files = [
             'addon/provider.php.stub' => 'src/ServiceProvider.php',
+            'addon/TestCase.php.stub' => 'tests/TestCase.php',
+            'addon/ExampleTest.php.stub' => 'tests/ExampleTest.php',
             'addon/.gitignore.stub' => '.gitignore',
             'addon/README.md.stub' => 'README.md',
+            'addon/phpunit.xml.stub' => 'phpunit.xml',
         ];
 
         $data = [
@@ -150,6 +154,7 @@ class MakeAddon extends GeneratorCommand
         foreach ($files as $stub => $file) {
             $this->createFromStub($stub, $this->addonPath($file), $data);
         }
+
         $this->checkInfo('Addon boilerplate created successfully.');
 
         return $this;
@@ -179,6 +184,30 @@ class MakeAddon extends GeneratorCommand
         });
 
         $this->checkInfo('Additional components created successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Installs the addon's composer dependencies.
+     *
+     * @return $this
+     */
+    protected function installComposerDependencies()
+    {
+        $this->output->newLine();
+
+        $this->line("Installing your addon's Composer dependencies. This may take a moment...");
+
+        try {
+            Composer::withoutQueue()->throwOnFailure()->install($this->addonPath());
+        } catch (ProcessException $exception) {
+            $this->line($exception->getMessage());
+            $this->output->newLine();
+            throw new \Exception("An error was encountered while installing your addon's Composer dependencies!");
+        }
+
+        $this->checkInfo('Composer dependencies installed successfully.');
 
         return $this;
     }

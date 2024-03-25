@@ -8,6 +8,7 @@ use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\NavBlueprintFound;
 use Statamic\Events\NavDeleted;
+use Statamic\Events\NavDeleting;
 use Statamic\Events\NavSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -21,6 +22,7 @@ class Nav extends Structure implements Contract
     use ExistsAsFile;
 
     protected $collections;
+    private $blueprintCache;
 
     public function save()
     {
@@ -33,6 +35,10 @@ class Nav extends Structure implements Contract
 
     public function delete()
     {
+        if (NavDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\Nav::delete($this);
 
         NavDeleted::dispatch($this);
@@ -116,14 +122,18 @@ class Nav extends Structure implements Contract
 
     public function blueprint()
     {
+        if ($this->blueprintCache) {
+            return $this->blueprintCache;
+        }
+
         if (Blink::has($blink = 'nav-blueprint-'.$this->handle())) {
-            return Blink::get($blink);
+            return $this->blueprintCache = Blink::get($blink);
         }
 
         $blueprint = Blueprint::find('navigation.'.$this->handle())
             ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('navigation');
 
-        Blink::put($blink, $blueprint);
+        Blink::put($blink, $this->blueprintCache = $blueprint);
 
         NavBlueprintFound::dispatch($blueprint, $this);
 

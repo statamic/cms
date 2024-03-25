@@ -155,7 +155,7 @@ class RoutesTest extends TestCase
             ->assertDontSee('The layout');
     }
 
-    public function undefinedLayoutRouteProvider()
+    public static function undefinedLayoutRouteProvider()
     {
         return [
             'null' => ['route-with-null-layout'],

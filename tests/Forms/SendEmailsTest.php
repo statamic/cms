@@ -136,7 +136,7 @@ class SendEmailsTest extends TestCase
         Bus::assertNothingDispatched();
     }
 
-    public function noEmailsProvider()
+    public static function noEmailsProvider()
     {
         return [
             'null' => [null],

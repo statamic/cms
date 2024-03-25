@@ -18,7 +18,8 @@ class NavigationController extends CpController
         $this->authorize('index', NavContract::class, __('You are not authorized to view navs.'));
 
         $navs = Nav::all()->filter(function ($nav) {
-            return User::current()->can('view', $nav);
+            return User::current()->can('configure navs')
+                || ($nav->sites()->contains(Site::selected()->handle()) && User::current()->can('view', $nav));
         })->map(function ($structure) {
             return [
                 'id' => $structure->handle(),
@@ -27,6 +28,7 @@ class NavigationController extends CpController
                 'edit_url' => $structure->editUrl(),
                 'delete_url' => $structure->deleteUrl(),
                 'deleteable' => User::current()->can('delete', $structure),
+                'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
             ];
         })->values();
 
@@ -68,7 +70,11 @@ class NavigationController extends CpController
         $site = $request->site ?? Site::selected()->handle();
 
         if (! $nav->existsIn($site)) {
-            return redirect($nav->trees()->first()->showUrl());
+            if ($nav->trees()->isNotEmpty()) {
+                return redirect($nav->trees()->first()->showUrl());
+            }
+
+            $nav->makeTree($site)->save();
         }
 
         $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));

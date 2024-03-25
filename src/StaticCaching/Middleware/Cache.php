@@ -116,7 +116,7 @@ class Cache
             return false;
         }
 
-        if ($request->isLivePreview()) {
+        if ($request->statamicToken()) {
             return false;
         }
 
@@ -141,7 +141,7 @@ class Cache
             return false;
         }
 
-        if ($request->isLivePreview()) {
+        if ($request->statamicToken()) {
             return false;
         }
 

@@ -8,6 +8,7 @@ use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Traits\Localizable;
 use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
@@ -22,6 +23,7 @@ use Statamic\Data\ContainsComputedData;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
@@ -34,6 +36,7 @@ use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
@@ -52,8 +55,9 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
-    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
+    use HasDirtyState;
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -74,6 +78,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
+    private $siteCache;
 
     public function __construct()
     {
@@ -91,6 +96,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return $this
             ->fluentlyGetOrSet('locale')
             ->setter(function ($locale) {
+                $this->siteCache = null;
+
                 return $locale instanceof \Statamic\Sites\Site ? $locale->handle() : $locale;
             })
             ->getter(function ($locale) {
@@ -101,7 +108,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function site()
     {
-        return Site::get($this->locale());
+        if ($this->siteCache) {
+            return $this->siteCache;
+        }
+
+        return $this->siteCache = Site::get($this->locale());
     }
 
     public function authors()
@@ -111,17 +122,15 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function collection($collection = null)
     {
-        return $this
-            ->fluentlyGetOrSet('collection')
-            ->setter(function ($collection) {
-                return $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
-            })
-            ->getter(function ($collection) {
-                return $collection ? Blink::once("collection-{$collection}", function () use ($collection) {
-                    return Collection::findByHandle($collection);
-                }) : null;
-            })
-            ->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->collection ? Blink::once("collection-{$this->collection}", function () {
+                return Collection::findByHandle($this->collection);
+            }) : null;
+        }
+
+        $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
+
+        return $this;
     }
 
     public function blueprint($blueprint = null)
@@ -142,6 +151,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                 }
 
                 $blueprint = $this->collection()->entryBlueprint($blueprint, $this);
+
+                if (! $blueprint) {
+                    throw new BlueprintNotFoundException($this->value('blueprint'), 'collections/'.$this->collection()->handle());
+                }
 
                 Blink::put($key, $blueprint);
 
@@ -167,6 +180,19 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return new AugmentedEntry($this);
     }
 
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'collection' => $this->collectionHandle(),
+            'locale' => $this->locale(),
+            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
+            'slug' => $this->slug(),
+            'date' => optional($this->date())->format('Y-m-d-Hi'),
+            'published' => $this->published(),
+            'path' => $this->initialPath() ?? $this->path(),
+        ], $this->data()->except(['updated_at'])->toArray());
+    }
+
     public function delete()
     {
         if (EntryDeleting::dispatch($this) === false) {
@@ -185,7 +211,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                     if (optional($parent)->isRoot()) {
                         $parent = null;
                     }
-                    $this->page()->pages()->all()->each(function ($child) use ($tree, $parent) {
+                    $this->page()?->pages()->all()->each(function ($child) use ($tree, $parent) {
                         $tree->move($child->id(), optional($parent)->id());
                     });
                     $tree->remove($this);
@@ -378,6 +404,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         $stack->pop();
 
+        $this->syncOriginal();
+
         return true;
     }
 
@@ -499,7 +527,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                     return null;
                 }
 
-                if ($date instanceof \Carbon\Carbon) {
+                if ($date instanceof \Carbon\CarbonInterface) {
                     return $date;
                 }
 
@@ -921,7 +949,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        $title = (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+        $title = $this->withLocale($this->site()->locale(), fn () => (string) Antlers::parse($format, $this->augmented()->except('slug')->all()));
 
         return trim($title);
     }
@@ -947,6 +975,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         return (string) Antlers::parse($format, array_merge($this->routeData(), [
             'site' => $this->site(),
+            'uri' => $this->uri(),
+            'url' => $this->url(),
             'permalink' => $this->absoluteUrl(),
             'locale' => $this->locale(),
         ]));
