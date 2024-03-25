@@ -162,7 +162,7 @@ class InstallCollaboration extends Command
     }
 
     /**
-     * Add the Reverb variables to the environment file.
+     * Add the Pusher variables to the environment file.
      */
     protected function addPusherEnvironmentVariables(): void
     {
@@ -180,7 +180,7 @@ class InstallCollaboration extends Command
             'PUSHER_PORT' => 'PUSHER_PORT=443',
             'PUSHER_SCHEME' => 'PUSHER_SCHEME=https',
             'PUSHER_APP_CLUSTER' => 'PUSHER_APP_CLUSTER=mt1',
-            'REVERB_NEW_LINE' => null,
+            'PUSHER_NEW_LINE' => null,
             'VITE_PUSHER_APP_KEY' => 'VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"',
             'VITE_PUSHER_HOST' => 'VITE_PUSHER_HOST="${PUSHER_HOST}"',
             'VITE_PUSHER_PORT' => 'VITE_PUSHER_PORT="${PUSHER_PORT}"',
