@@ -28,6 +28,6 @@ class ComposerPackageTest extends TestCase
     /** @test */
     public function it_outputs_helpful_validation_error()
     {
-        $this->assertValidationErrorOutput('Please enter a valid composer package name (eg. hasselhoff/kung-fury).', 'not-a-package');
+        $this->assertValidationErrorOutput(trans('statamic::validation.composer_package'), 'not-a-package');
     }
 }

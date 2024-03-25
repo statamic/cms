@@ -39,6 +39,6 @@ class EmailAvailableTest extends TestCase
     /** @test */
     public function it_outputs_helpful_validation_error()
     {
-        $this->assertValidationErrorOutput('A user with this email already exists.', 'frodo@lotr.com');
+        $this->assertValidationErrorOutput(trans('statamic::validation.email_available'), 'frodo@lotr.com');
     }
 }
