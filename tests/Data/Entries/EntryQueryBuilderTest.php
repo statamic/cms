@@ -772,7 +772,7 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     /** @test */
-    public function pluck_can_be_used_to_retrieve_values_from_index()
+    public function values_can_be_plucked()
     {
         $this->createDummyCollectionAndEntries();
 
@@ -791,6 +791,12 @@ class EntryQueryBuilderTest extends TestCase
             2 => 'post-2',
             3 => 'post-3',
         ]), Entry::query()->pluck('slug', 'id'));
+
+        $this->assertEquals(collect([
+            'post-1',
+            'post-2',
+            'post-3',
+        ]), Entry::query()->pluck('slug'));
 
         $this->assertEquals(collect([
             3 => 'post-3',
