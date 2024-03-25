@@ -30,30 +30,28 @@ class GlideManager
             'watermarks' => public_path(),
         ], $config));
 
-        if (config('statamic.assets.image_manipulation.append_original_filename', false)) {
-            $server
-                ->setCachePathCallable(function ($path, $params) {
-                    // to avoid having to recreate the getCachePath method from glide server
-                    // we run getCachePath again without this callback function
-                    $customCallable = $this->getCachePathCallable();
+        $server
+            ->setCachePathCallable(function ($path, $params) {
+                // to avoid having to recreate the getCachePath method from glide server
+                // we run getCachePath again without this callback function
+                $customCallable = $this->getCachePathCallable();
 
-                    $this->setCachePathCallable(null);
-                    $cachePath = $this->getCachePath($path, $params);
-                    $this->setCachePathCallable($customCallable);
+                $this->setCachePathCallable(null);
+                $cachePath = $this->getCachePath($path, $params);
+                $this->setCachePathCallable($customCallable);
 
-                    // then we append our original filename to the end
-                    $filename = Str::afterLast($cachePath, '/');
-                    $cachePath = Str::beforeLast($cachePath, '/');
+                // then we append our original filename to the end
+                $filename = Str::afterLast($cachePath, '/');
+                $cachePath = Str::beforeLast($cachePath, '/');
 
-                    $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.Str::of($path)->after('/');
+                $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.Str::of($path)->after('/');
 
-                    if ($extension = ($params['fm'] ?? false)) {
-                        $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
-                    }
+                if ($extension = ($params['fm'] ?? false)) {
+                    $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
+                }
 
-                    return $cachePath;
-                });
-        }
+                return $cachePath;
+            });
 
         return $server;
     }

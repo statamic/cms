@@ -39,7 +39,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
                 $path = 'http/'.base64_encode($item);
 
                 if (! $filename) {
-                    $filename = $this->optionallySetFilename(Str::afterLast($item, '/'));
+                    $filename = Str::afterLast($item, '/');
                 }
 
                 break;
@@ -47,7 +47,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
                 $path = 'asset/'.base64_encode($this->item->containerId().'/'.$this->item->path());
 
                 if (! $filename) {
-                    $filename = $this->optionallySetFilename(Str::afterLast($this->item->path(), '/'));
+                    $filename = Str::afterLast($this->item->path(), '/');
                 }
 
                 break;
@@ -73,19 +73,5 @@ class GlideUrlBuilder extends ImageUrlBuilder
         }
 
         return URL::prependSiteRoot($builder->getUrl($path, $params));
-    }
-
-    /**
-     * Should the filename be set based on the config setting
-     *
-     * @return bool|string
-     */
-    private function optionallySetFilename(string $filename)
-    {
-        if (! config('statamic.assets.image_manipulation.append_original_filename', false)) {
-            return false;
-        }
-
-        return $filename;
     }
 }

@@ -4,7 +4,6 @@ namespace Tests\Imaging;
 
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
-use Statamic\Facades\Config;
 use Statamic\Imaging\GlideUrlBuilder;
 use Tests\TestCase;
 
@@ -44,7 +43,7 @@ class GlideUrlBuilderTest extends TestCase
     public function testExternal()
     {
         $this->assertEquals(
-            '/img/http/'.base64_encode('http://example.com').'?w=100',
+            '/img/http/'.base64_encode('http://example.com').'/example.com?w=100',
             $this->builder->build('http://example.com', ['w' => '100'])
         );
     }
@@ -58,7 +57,7 @@ class GlideUrlBuilderTest extends TestCase
         $encoded = base64_encode('main/img/foo.jpg');
 
         $this->assertEquals(
-            "/img/asset/$encoded?w=100",
+            "/img/asset/$encoded/foo.jpg?w=100",
             $this->builder->build($asset, ['w' => '100'])
         );
     }
@@ -83,8 +82,6 @@ class GlideUrlBuilderTest extends TestCase
 
     public function testConfigAddsFilename()
     {
-        Config::set('statamic.assets.image_manipulation.append_original_filename', true);
-
         $asset = new Asset;
         $asset->container((new AssetContainer)->handle('main'));
         $asset->path('img/foo.jpg');
