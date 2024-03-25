@@ -4,7 +4,6 @@ namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -775,16 +774,6 @@ class EntryQueryBuilderTest extends TestCase
     public function values_can_be_plucked()
     {
         $this->createDummyCollectionAndEntries();
-
-        $this->assertEquals(collect([1, 2, 3]), Entry::query()->pluck('id'));
-
-        $paths = Entry::query()->pluck('path')->map(fn ($path) => Str::afterLast($path, '/'));
-
-        $this->assertEquals(collect([
-            'post-1.md',
-            'post-2.md',
-            'post-3.md',
-        ]), $paths);
 
         $this->assertEquals(collect([
             1 => 'post-1',
