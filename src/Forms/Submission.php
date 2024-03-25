@@ -143,39 +143,6 @@ class Submission implements Augmentable, SubmissionContract
         })->all();
     }
 
-    public function deleteAttachments(): void
-    {
-        $this->blueprint()->fields()->all()
-            ->filter(fn (Field $field) => $field->type() === 'assets')
-            ->each(function (Field $field) {
-                $assets = Arr::wrap($this->get($field->handle(), []));
-                $assetContainer = $this->resolveAssetContainerForField($field);
-
-                collect($assets)->each(function ($path) use ($assetContainer) {
-                    $assetContainer->asset($path)?->delete();
-                });
-
-                $this->set($field->handle(), null)->saveQuietly();
-            });
-    }
-
-    protected function resolveAssetContainerForField(Field $field): AssetContainerContract
-    {
-        if ($configured = $field->get('container')) {
-            if ($container = AssetContainer::find($configured)) {
-                return $container;
-            }
-
-            throw new AssetContainerNotFoundException($configured);
-        }
-
-        if (($containers = AssetContainer::all())->count() === 1) {
-            return $containers->first();
-        }
-
-        throw new UndefinedContainerException;
-    }
-
     public function afterSave($callback)
     {
         $this->afterSaveCallbacks[] = $callback;
