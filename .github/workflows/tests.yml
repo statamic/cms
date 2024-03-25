@@ -140,7 +140,7 @@ jobs:
     name: Slack Notification
     runs-on: ubuntu-20.04
     needs: [php-tests, js-tests]
-    if: github.event.pull_request.draft == false
+    if: always() && github.event.pull_request.draft == false
     steps:
       - uses: technote-space/workflow-conclusion-action@v1
       - name: Send Slack notification
