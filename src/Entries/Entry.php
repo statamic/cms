@@ -1016,4 +1016,14 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     {
         return Facades\Collection::getComputedCallbacks($this->collection);
     }
+
+    public function __sleep()
+    {
+        if ($this->slug instanceof Closure) {
+            $slug = $this->slug;
+            $this->slug = $slug($this);
+        }
+
+        return array_keys(get_object_vars($this));
+    }
 }
