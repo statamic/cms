@@ -372,9 +372,9 @@ export default {
             if (!this.mounted) return;
 
             let jsonValue = JSON.stringify(json);
-            let oldJonValue = JSON.stringify(oldJson);
+            let oldJsonValue = JSON.stringify(oldJson);
                         
-            if (jsonValue === oldJonValue) return;
+            if (jsonValue === oldJsonValue) return;
 
             // Prosemirror's JSON will include spaces between tags.
             // For example (this is not the actual json)...
