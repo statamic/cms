@@ -15,6 +15,7 @@
 
 <div class="card p-4 content">
     <div class="flex flex-wrap">
+        @can('edit', $collection)
         <a href="{{ cp_route('collections.edit', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800">
                 @cp_svg('icons/light/hammer-wrench')
@@ -24,6 +25,8 @@
                 <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
             </div>
         </a>
+        @endcan
+        @can('create', ['Statamic\Contracts\Entries\Entry', $collection, \Statamic\Facades\Site::get($site)])
         <?php $multipleBlueprints = $collection->entryBlueprints()->count() > 1 ?>
         @if ($multipleBlueprints)<div
         @else<a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}"
@@ -44,6 +47,8 @@
                 @endif
             </div>
         @if ($multipleBlueprints)</div>@else</a>@endif
+        @endcan
+        @can('configure fields')
         <a href="{{ cp_route('collections.blueprints.index', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800">
                 @cp_svg('icons/light/blueprint')
@@ -53,6 +58,8 @@
                 <p>{{ __('statamic::messages.collection_next_steps_blueprints_description') }}</p>
             </div>
         </a>
+        @endcan
+        @can('store', 'Statamic\Contracts\Entries\Collection')
         <a href="{{ cp_route('collections.scaffold', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800">
                 @cp_svg('icons/light/crane')
@@ -62,6 +69,10 @@
                 <p>{{ __('statamic::messages.collection_next_steps_scaffold_description') }}</p>
             </div>
         </a>
+        @endcan
+        <div class="hidden first:flex justify-center items-center p-8 w-full">
+            @cp_svg($svg ?? 'empty/content')
+        </div>
     </div>
 </div>
 

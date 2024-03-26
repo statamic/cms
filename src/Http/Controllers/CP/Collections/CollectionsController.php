@@ -24,7 +24,9 @@ class CollectionsController extends CpController
         $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
 
         $collections = Collection::all()->filter(function ($collection) {
-            return User::current()->can('view', $collection);
+            return User::current()->can('configure collections')
+                || User::current()->can('view', $collection)
+                && $collection->sites()->contains(Site::selected()->handle());
         })->map(function ($collection) {
             return [
                 'id' => $collection->handle(),
@@ -39,6 +41,7 @@ class CollectionsController extends CpController
                 'deleteable' => User::current()->can('delete', $collection),
                 'editable' => User::current()->can('edit', $collection),
                 'blueprint_editable' => User::current()->can('configure fields'),
+                'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
             ];
         })->values();
 
