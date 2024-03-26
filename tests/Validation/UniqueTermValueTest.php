@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Validator;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Rules\UniqueTermValue;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -21,12 +22,12 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value']
+            ['slug' => new UniqueTermValue]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'baz'],
-            ['slug' => 'unique_term_value']
+            ['slug' => new UniqueTermValue]
         )->passes());
     }
 
@@ -41,12 +42,12 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value:taxonomy-one']
+            ['slug' => new UniqueTermValue('taxonomy-one')]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'bar'],
-            ['slug' => 'unique_term_value:taxonomy-one']
+            ['slug' => new UniqueTermValue('taxonomy-one')]
         )->passes());
     }
 
@@ -60,12 +61,12 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value:taxonomy-one,'.$term->id()]
+            ['slug' => new UniqueTermValue('taxonomy-one', $term->id())]
         )->passes());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value:taxonomy-one,456']
+            ['slug' => new UniqueTermValue('taxonomy-one', 456)]
         )->fails());
     }
 
@@ -84,12 +85,12 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value:taxonomy-one,null,site-one']
+            ['slug' => new UniqueTermValue('taxonomy-one', null, 'site-one')]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value:taxonomy-one,null,site-two']
+            ['slug' => new UniqueTermValue('taxonomy-one', null, 'site-two')]
         )->passes());
     }
 }
