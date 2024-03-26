@@ -137,7 +137,7 @@ class Email extends Mailable
         $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']));
 
         if (array_has($this->config, 'attachments')) {
-            $fields = $fields->reject(fn ($field) => $field['fieldtype'] === 'assets');
+            $fields = $fields->reject(fn ($field) => $field['fieldtype'] === 'assets' || $field['fieldtype'] === 'files');
         }
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
