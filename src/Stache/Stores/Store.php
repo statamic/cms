@@ -27,6 +27,59 @@ abstract class Store
     protected $shouldCacheFileItems = false;
     protected $modified;
     protected $keys;
+    protected $identifiedBy = 'id';
+
+    protected function resolveFromIndex($keys, $column)
+    {
+        return $this->resolveIndex($column)
+            ->load()
+            ->items()
+            ->where(function ($value, $key) use (&$keys) {
+                return $keys->has($key);
+            });
+    }
+
+    private function isValidKey($value)
+    {
+        if (is_string($value) || is_int($value)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getFromIndex($keys, $column, $key = null)
+    {
+        // This is for performance. There's no need to resolve anything
+        // else if we're looking for the keys. We have them already.
+        if ($column === $this->identifiedBy && $key === null) {
+            return $keys;
+        }
+
+        $keys = $keys->flip();
+        $values = $this->resolveFromIndex($keys, $column);
+
+        if ($key === null) {
+            return $values->values();
+        }
+
+        $keyValues = $this->resolveFromIndex($keys, $key);
+        $newValues = [];
+
+        foreach ($keys->keys() as $keyValue) {
+            $newKeyValue = $keyValues[$keyValue] ?? null;
+
+            if (! $this->isValidKey($newKeyValue)) {
+                continue;
+            }
+
+            $newValue = $values[$keyValue] ?? null;
+
+            $newValues[$newKeyValue] = $newValue;
+        }
+
+        return collect($newValues);
+    }
 
     public function directory($directory = null)
     {

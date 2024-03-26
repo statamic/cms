@@ -30,6 +30,11 @@ abstract class IteratorBuilder extends Builder
         return $this->limitItems($items)->values();
     }
 
+    public function pluck($column, $key = null)
+    {
+        return $this->get()->pluck($column, $key);
+    }
+
     protected function getFilteredItems()
     {
         $items = $this->getBaseItems();

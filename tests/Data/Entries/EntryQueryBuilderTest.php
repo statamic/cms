@@ -769,4 +769,22 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Support\LazyCollection::class, $entries);
         $this->assertCount(3, $entries);
     }
+
+    /** @test */
+    public function values_can_be_plucked()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertEquals([
+            1 => 'post-1',
+            2 => 'post-2',
+            3 => 'post-3',
+        ], Entry::query()->pluck('slug', 'id')->all());
+
+        $this->assertEquals([
+            'post-1',
+            'post-2',
+            'post-3',
+        ], Entry::query()->pluck('slug')->all());
+    }
 }
