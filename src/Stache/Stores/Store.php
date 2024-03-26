@@ -50,6 +50,8 @@ abstract class Store
 
     public function getFromIndex($keys, $column, $key = null)
     {
+        // This is for performance. There's no need to resolve anything
+        // else if we're looking for the keys. We have them already.
         if ($column === $this->identifiedBy && $key === null) {
             return $keys;
         }
