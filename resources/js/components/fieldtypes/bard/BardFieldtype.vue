@@ -368,12 +368,13 @@ export default {
 
     watch: {
 
-        json(json) {
+        json(json, oldJson) {
             if (!this.mounted) return;
 
             let jsonValue = JSON.stringify(json);
-
-            if (jsonValue === this.value) return;
+            let oldJonValue = JSON.stringify(oldJson);
+                        
+            if (jsonValue === oldJonValue) return;
 
             // Prosemirror's JSON will include spaces between tags.
             // For example (this is not the actual json)...
