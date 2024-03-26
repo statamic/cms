@@ -37,6 +37,10 @@
             @confirm="savePreset(savingPresetSlug)"
         >
             <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset(savingPresetSlug)" />
+
+            <div v-if="Object.keys(presets).includes(savingPresetSlug)">
+                <small class="help-block text-red-500 mt-2 mb-0">A view already exists with this name. Creating this view will overwrite the existing view with this name.</small>
+            </div>
         </confirmation-modal>
 
         <confirmation-modal
@@ -47,6 +51,10 @@
             @confirm="savePreset(savingPresetSlug)"
         >
             <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset()" />
+
+            <div v-if="Object.keys(presets).filter(preset => preset !== activePreset).includes(savingPresetSlug)">
+                <small class="help-block text-red-500 mt-2 mb-0">A view already exists with this name. Creating this view will overwrite the existing view with this name.</small>
+            </div>
         </confirmation-modal>
 
         <confirmation-modal
