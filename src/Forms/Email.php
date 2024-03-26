@@ -112,7 +112,7 @@ class Email extends Mailable
 
         $this->getRenderableFieldData(Arr::except($this->submissionData, ['id', 'date', 'form']))
             ->filter(function ($field) {
-                return $field['fieldtype'] === 'assets';
+                return $field['fieldtype'] === 'assets' || $field['fieldtype'] === 'files';
             })
             ->each(function ($field) {
                 $value = $field['value']->value();
@@ -122,7 +122,9 @@ class Email extends Mailable
                     : $value->get();
 
                 foreach ($value as $file) {
-                    $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
+                    $field['fieldtype'] === 'files'
+                        ? $this->attachFromStorageDisk('local', 'statamic/file-uploads/'.$file)
+                        : $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
                 }
             });
 
@@ -132,10 +134,15 @@ class Email extends Mailable
     protected function addData()
     {
         $augmented = $this->submission->toAugmentedArray();
+        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']));
+
+        if (array_has($this->config, 'attachments')) {
+            $fields = $fields->reject(fn ($field) => $field['fieldtype'] === 'assets' || $field['fieldtype'] === 'files');
+        }
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
             'config' => config()->all(),
-            'fields' => $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form'])),
+            'fields' => $fields,
             'site_url' => Config::getSiteUrl(),
             'date' => now(),
             'now' => now(),
