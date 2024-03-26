@@ -10,11 +10,9 @@ use Statamic\Support\Arr;
 
 class DateFieldtype implements ValidationRule
 {
-    private $fieldtype;
-
-    public function __construct($fieldtype)
+    public function __construct(private $fieldtype)
     {
-        $this->fieldtype = $fieldtype;
+        //
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
