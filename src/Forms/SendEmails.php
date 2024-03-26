@@ -56,9 +56,7 @@ class SendEmails
 
     protected function shouldDeleteTemporaryAttachments(): bool
     {
-        $fields = $this->submission->form()->blueprint()->fields()->all();
-
-        return $fields
+        return $this->submission->form()->blueprint()->fields()->all()
             ->filter(fn (Field $field) => $field->fieldtype()->handle() === 'files')
             ->filter()
             ->count() > 0;
