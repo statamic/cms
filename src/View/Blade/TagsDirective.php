@@ -2,16 +2,14 @@
 
 namespace Statamic\View\Blade;
 
-use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Statamic\Statamic;
 
 class TagsDirective
 {
     public static function handle($tags): array
     {
-        $variables = [];
-
-        foreach (Arr::wrap($tags) as $key => $value) {
+        return Collection::wrap($tags)->mapWithKeys(function ($value, $key) {
             if (is_array($value) && count($value) > 0) {
                 $tag = array_keys($value)[0];
                 $params = array_values($value)[0];
@@ -20,10 +18,9 @@ class TagsDirective
                 $params = [];
             }
 
-            $varName = is_string($key) ? $key : camel_case(str_replace(':', '_', $tag));
-            $variables[$varName] = Statamic::tag($tag)->params($params)->fetch();
-        }
+            $var = is_string($key) ? $key : camel_case(str_replace(':', '_', $tag));
 
-        return $variables;
+            return [$var => Statamic::tag($tag)->params($params)->fetch()];
+        })->all();
     }
 }
