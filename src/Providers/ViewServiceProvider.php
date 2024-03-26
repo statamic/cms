@@ -176,7 +176,7 @@ class ViewServiceProvider extends ServiceProvider
     public function registerBladeDirectives()
     {
         Blade::directive('tags', function ($expression) {
-            return "<?php extract(\Statamic\View\Blade\BladeTagsDirective::handle($expression)) ?>";
+            return "<?php extract(\Statamic\View\Blade\TagsDirective::handle($expression)) ?>";
         });
     }
 
