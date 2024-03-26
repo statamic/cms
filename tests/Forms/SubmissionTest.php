@@ -10,13 +10,10 @@ use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class SubmissionTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
-
     /** @test */
     public function the_id_is_generated_the_first_time_but_can_be_overridden()
     {
