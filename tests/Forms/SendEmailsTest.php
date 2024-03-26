@@ -90,7 +90,7 @@ class SendEmailsTest extends TestCase
     {
         Bus::fake();
 
-        $form = tap(FacadesForm::make('test')->email([
+        $form = tap(FacadesForm::make('attachments_test')->email([
             'from' => 'first@sender.com',
             'to' => 'first@recipient.com',
             'foo' => 'bar',
