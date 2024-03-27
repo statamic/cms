@@ -2,15 +2,21 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
+use Statamic\Data\DataCollection;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Config;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
+use Statamic\Query\ItemQueryBuilder;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Str;
 
 class FormSubmissionsController extends CpController
 {
-    public function index($form)
+    use QueriesFilters;
+
+    public function index(FilteredRequest $request, $form)
     {
         $this->authorize('view', $form);
 
@@ -18,7 +24,14 @@ class FormSubmissionsController extends CpController
             return ['data' => [], 'meta' => ['columns' => []]];
         }
 
-        $submissions = $form->submissions()->values();
+        $query = (new ItemQueryBuilder())
+            ->withItems(new DataCollection($form->submissions()->values()));
+
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'form' => $form->handle(),
+        ]);
+
+        $submissions = $query->get();
 
         // Search submissions.
         if ($search = $this->request->search) {
@@ -40,7 +53,10 @@ class FormSubmissionsController extends CpController
 
         return (new Submissions($paginator))
             ->blueprint($form->blueprint())
-            ->columnPreferenceKey("forms.{$form->handle()}.columns");
+            ->columnPreferenceKey("forms.{$form->handle()}.columns")
+            ->additional(['meta' => [
+                'activeFilterBadges' => $activeFilterBadges,
+            ]]);
     }
 
     private function searchSubmissions($submissions)

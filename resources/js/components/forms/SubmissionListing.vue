@@ -5,8 +5,6 @@
             <loading-graphic />
         </div>
 
-        <slot name="no-results" v-if="!loading && !searchQuery && items.length === 0" />
-
         <data-list
             v-else-if="!initializing"
             :columns="columns"
@@ -18,10 +16,44 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card overflow-hidden p-0 relative">
-                    <div class="flex flex-wrap items-center justify-between p-2 text-sm border-b">
-                        <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
-                        <data-list-column-picker class="rtl:mr-2 ltr:ml-2" :preferences-key="preferencesKey('columns')" />
+                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
+                        <data-list-filter-presets
+                            ref="presets"
+                            :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
+                            :active-filters="activeFilters"
+                            :has-active-filters="hasActiveFilters"
+                            :preferences-prefix="preferencesPrefix"
+                            :search-query="searchQuery"
+                            @selected="selectPreset"
+                            @reset="filtersReset"
+                        />
+
+                        <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+
+                        <div class="flex space-x-2 mt-2">
+                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
+                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
+                            <data-list-column-picker :preferences-key="preferencesKey('columns')" />
+                        </div>
                     </div>
+
+                    <data-list-filters
+                        ref="filters"
+                        :filters="filters"
+                        :active-preset="activePreset"
+                        :active-preset-payload="activePresetPayload"
+                        :active-filters="activeFilters"
+                        :active-filter-badges="activeFilterBadges"
+                        :active-count="activeFilterCount"
+                        :search-query="searchQuery"
+                        :is-searching="true"
+                        :saves-presets="true"
+                        :preferences-prefix="preferencesPrefix"
+                        @changed="filterChanged"
+                        @saved="$refs.presets.setPreset($event)"
+                        @deleted="$refs.presets.refreshPresets()"
+                    />
 
                     <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
 
