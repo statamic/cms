@@ -11,6 +11,11 @@ class UpdateStructuredEntryChildUris
         $entry = $event->entry;
         $collection = $entry->collection();
 
+        // If the slug hasn't changed, nothing needs to happen.
+        if ($entry->isClean('slug')) {
+            return;
+        }
+
         // If it's orderable (single depth structure), there are no children to update.
         if ($collection->orderable()) {
             return;
