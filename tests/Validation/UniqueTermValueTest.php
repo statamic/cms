@@ -42,12 +42,12 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => new UniqueTermValue('taxonomy-one')]
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one')]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'bar'],
-            ['slug' => new UniqueTermValue('taxonomy-one')]
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one')]
         )->passes());
     }
 
@@ -61,12 +61,12 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => new UniqueTermValue('taxonomy-one', $term->id())]
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one', except: $term->id())]
         )->passes());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => new UniqueTermValue('taxonomy-one', 456)]
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one', except: 456)]
         )->fails());
     }
 
@@ -85,12 +85,12 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => new UniqueTermValue('taxonomy-one', null, 'site-one')]
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one', site: 'site-one')]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => new UniqueTermValue('taxonomy-one', null, 'site-two')]
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one', site: 'site-two')]
         )->passes());
     }
 }

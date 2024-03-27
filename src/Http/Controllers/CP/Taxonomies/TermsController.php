@@ -171,7 +171,7 @@ class TermsController extends CpController
             'slug' => [
                 'required',
                 new Slug,
-                new UniqueTermValue($taxonomy->handle(), $term->id(), $site->handle()),
+                new UniqueTermValue(taxonomy: $taxonomy->handle(), except: $term->id(), site: $site->handle()),
             ],
         ]);
 
@@ -271,7 +271,7 @@ class TermsController extends CpController
 
         $fields->validate([
             'title' => 'required',
-            'slug' => ['required', new UniqueTermValue($taxonomy->handle(), null, $site->handle())],
+            'slug' => ['required', new UniqueTermValue(taxonomy: $taxonomy->handle(), site: $site->handle())],
         ]);
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);

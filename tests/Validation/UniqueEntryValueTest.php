@@ -35,12 +35,12 @@ class UniqueEntryValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => new UniqueEntryValue('collection-one')]
+            ['slug' => new UniqueEntryValue(collection: 'collection-one')]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'bar'],
-            ['slug' => new UniqueEntryValue('collection-one')]
+            ['slug' => new UniqueEntryValue(collection: 'collection-one')]
         )->passes());
     }
 
@@ -51,12 +51,12 @@ class UniqueEntryValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => new UniqueEntryValue('collection-one', 123)]
+            ['slug' => new UniqueEntryValue(collection: 'collection-one', except: 123)]
         )->passes());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => new UniqueEntryValue('collection-one', 456)]
+            ['slug' => new UniqueEntryValue(collection: 'collection-one', except: 456)]
         )->fails());
     }
 
@@ -72,12 +72,12 @@ class UniqueEntryValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => new UniqueEntryValue('collection-one', null, 'site-one')]
+            ['slug' => new UniqueEntryValue(collection: 'collection-one', site: 'site-one')]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => new UniqueEntryValue('collection-one', null, 'site-two')]
+            ['slug' => new UniqueEntryValue(collection: 'collection-one', site: 'site-two')]
         )->passes());
     }
 }
