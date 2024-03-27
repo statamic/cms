@@ -251,6 +251,16 @@ EOT;
         $this->repo->delete($fieldset);
     }
 
+    /** @test */
+    public function it_resets_a_namespaced_fieldset()
+    {
+        File::shouldReceive('delete')->once();
+
+        $fieldset = (new Fieldset)->setHandle('foo::test');
+
+        $this->repo->reset($fieldset);
+    }
+
     /** @test  */
     public function it_gets_a_namespaced_fieldset()
     {

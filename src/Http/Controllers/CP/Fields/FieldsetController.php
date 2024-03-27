@@ -29,11 +29,13 @@ class FieldsetController extends CpController
                         'id' => $fieldset->handle(),
                         'delete_url' => $fieldset->deleteUrl(),
                         'edit_url' => $fieldset->editUrl(),
+                        'reset_url' => $fieldset->resetUrl(),
                         'fields' => $fieldset->fields()->all()->count(),
                         'imported_by' => collect($fieldset->importedBy())->flatten(1)->mapToGroups(function ($item) {
                             return [$this->group($item) => ['handle' => $item->handle(), 'title' => $item->title()]];
                         }),
                         'is_deletable' => $fieldset->isDeletable(),
+                        'is_resetable' => $fieldset->isResetable(),
                         'title' => $fieldset->title(),
                     ],
                 ];
@@ -147,6 +149,17 @@ class FieldsetController extends CpController
         $this->authorize('delete', $fieldset);
 
         $fieldset->delete();
+
+        return response('');
+    }
+
+    public function reset($fieldset)
+    {
+        $fieldset = Facades\Fieldset::find($fieldset);
+
+        $this->authorize('delete', $fieldset);
+
+        $fieldset->reset();
 
         return response('');
     }

@@ -6,12 +6,14 @@ use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetDeleting;
+use Statamic\Events\FieldsetReset;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
+use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
 use Statamic\Facades\Taxonomy;
@@ -116,6 +118,11 @@ class Fieldset
         return cp_route('fieldsets.destroy', $this->handle());
     }
 
+    public function resetUrl()
+    {
+        return cp_route('fieldsets.reset', $this->handle());
+    }
+
     public function importedBy(): array
     {
         $blueprints = collect([
@@ -183,6 +190,12 @@ class Fieldset
         return ! $this->isNamespaced();
     }
 
+    public function isResetable()
+    {
+        return $this->isNamespaced()
+            && File::exists(FieldsetRepository::overriddenNamespacedFieldsetPath($this->handle));
+    }
+
     public function afterSave($callback)
     {
         $this->afterSaveCallbacks[] = $callback;
@@ -243,6 +256,15 @@ class Fieldset
         FieldsetRepository::delete($this);
 
         FieldsetDeleted::dispatch($this);
+
+        return true;
+    }
+
+    public function reset()
+    {
+        FieldsetRepository::reset($this);
+
+        FieldsetReset::dispatch($this);
 
         return true;
     }
