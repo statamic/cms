@@ -131,4 +131,21 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
         });
     }
+
+    protected function getBlueprintsForRelations()
+    {
+        $collections = empty($this->collections)
+            ? Facades\Collection::all()
+            : $this->collections;
+
+        return collect($collections)->flatMap(function ($collection) {
+            if (is_string($collection)) {
+                $collection = Facades\Collection::find($collection);
+            }
+
+            return $collection ? $collection->entryBlueprints() : false;
+        })
+            ->filter()
+            ->unique();
+    }
 }

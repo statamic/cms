@@ -15,6 +15,8 @@ use Statamic\Facades\Pattern;
 
 abstract class Builder implements Contract
 {
+    use Traits\QueriesRelationships;
+
     protected $columns;
     protected $limit;
     protected $offset = 0;
