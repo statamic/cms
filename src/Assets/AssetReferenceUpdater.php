@@ -56,7 +56,12 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                     && $this->getConfiguredAssetsFieldContainer($field) === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
-                $field->get('max_files') === 1
+                $data = $this->item->data()->all();
+                $dottedKey = $dottedPrefix.$field->handle();
+
+                $value = Arr::get($data, $dottedKey);
+
+                is_string($value)
                     ? $this->updateStringValue($field, $dottedPrefix)
                     : $this->updateArrayValue($field, $dottedPrefix);
             });
