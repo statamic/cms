@@ -176,14 +176,28 @@ class Submission implements Augmentable, SubmissionContract
         }
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     /**
      * Delete this submission.
      */
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         File::delete($this->getPath());
 
-        SubmissionDeleted::dispatch($this);
+        if ($withEvents) {
+            SubmissionDeleted::dispatch($this);
+        }
+
+        return true;
     }
 
     /**

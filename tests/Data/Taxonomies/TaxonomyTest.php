@@ -505,4 +505,19 @@ class TaxonomyTest extends TestCase
         Facades\Taxonomy::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(TaxonomyDeleted::class);
     }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Facades\Taxonomy::make('test'))->save();
+
+        $return = $taxonomy->deleteQuietly();
+
+        Event::assertNotDispatched(TaxonomyDeleting::class);
+        Event::assertNotDispatched(TaxonomyDeleted::class);
+
+        $this->assertTrue($return);
+    }
 }

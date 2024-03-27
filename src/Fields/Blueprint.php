@@ -474,15 +474,27 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (BlueprintDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && BlueprintDeleting::dispatch($this) === false) {
             return false;
         }
 
         BlueprintRepository::delete($this);
 
-        BlueprintDeleted::dispatch($this);
+        if ($withEvents) {
+            BlueprintDeleted::dispatch($this);
+        }
 
         return true;
     }

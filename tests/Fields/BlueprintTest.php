@@ -1454,4 +1454,19 @@ class BlueprintTest extends TestCase
         Facades\Blueprint::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(BlueprintDeleted::class);
     }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $blueprint = (new Blueprint)->setHandle('test');
+
+        $return = $blueprint->deleteQuietly();
+
+        Event::assertNotDispatched(BlueprintDeleting::class);
+        Event::assertNotDispatched(BlueprintDeleted::class);
+
+        $this->assertTrue($return);
+    }
 }

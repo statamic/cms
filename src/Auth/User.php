@@ -199,15 +199,27 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (UserDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && UserDeleting::dispatch($this) === false) {
             return false;
         }
 
         Facades\User::delete($this);
 
-        UserDeleted::dispatch($this);
+        if ($withEvents) {
+            UserDeleted::dispatch($this);
+        }
 
         return $this;
     }

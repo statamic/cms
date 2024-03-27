@@ -1966,6 +1966,21 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $entry = EntryFactory::collection('test')->create();
+
+        $return = $entry->deleteQuietly();
+
+        Event::assertNotDispatched(EntryDeleting::class);
+        Event::assertNotDispatched(EntryDeleted::class);
+
+        $this->assertTrue($return);
+    }
+
+    /** @test */
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         Facades\Entry::spy();
