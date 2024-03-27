@@ -12,9 +12,12 @@ use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
+use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
 {
+    use AppliesScopes;
+
     protected $columns;
     protected $limit;
     protected $offset = 0;
@@ -34,6 +37,13 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+
+    public function __call($method, $args)
+    {
+        $this->applyScope($method, $args);
+
+        return $this;
+    }
 
     public function select($columns = ['*'])
     {
