@@ -97,6 +97,39 @@ class GlideUrlBuilderTest extends TestCase
         );
     }
 
+    public function testConfigAddsParams()
+    {
+        Config::set('statamic.assets.image_manipulation.prepend_used_parameters', true);
+
+        $asset = new Asset;
+        $asset->container((new AssetContainer)->handle('main'));
+        $asset->path('img/foo.jpg');
+
+        $encoded = base64_encode('main/img/foo.jpg');
+
+        $this->assertEquals(
+            "/img/asset/$encoded/w100-h50?w=100&h=50",
+            $this->builder->build($asset, ['w' => '100', 'h' => '50'])
+        );
+    }
+
+    public function testConfigAddsFilenameAndParams()
+    {
+        Config::set('statamic.assets.image_manipulation.append_original_filename', true);
+        Config::set('statamic.assets.image_manipulation.prepend_used_parameters', true);
+
+        $asset = new Asset;
+        $asset->container((new AssetContainer)->handle('main'));
+        $asset->path('img/foo.jpg');
+
+        $encoded = base64_encode('main/img/foo.jpg');
+
+        $this->assertEquals(
+            "/img/asset/$encoded/w100-h50-foo.jpg?w=100&h=50",
+            $this->builder->build($asset, ['w' => '100', 'h' => '50'])
+        );
+    }
+
     public function testMarkWithAsset()
     {
         $asset = new Asset;
