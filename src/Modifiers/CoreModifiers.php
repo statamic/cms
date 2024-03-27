@@ -156,6 +156,48 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Returns an attribute ($params[0]) with its value when the given $value variable is not empty.
+     *
+     * @param  string  $value
+     * @param  array  $params
+     * @return string
+     */
+    public function attribute($value, $params)
+    {
+        if (! $name = Arr::get($params, 0)) {
+            throw new \Exception('Attribute modifier requires the attribute name: {{ value | attribute:attribute-name }}');
+        }
+
+        if (\is_array($value)) {
+            if (empty($value)) {
+                return '';
+            }
+
+            $value = \json_encode($value);
+        }
+
+        if (\is_bool($value)) {
+            return $value ? ' '.$name : '';
+        }
+
+        if (\is_object($value)) {
+            if (! method_exists($value, '__toString')) {
+                return '';
+            }
+
+            $value = $value->__toString();
+        }
+
+        $value = trim($value);
+
+        if ($value === '') {
+            return '';
+        }
+
+        return sprintf(' %s="%s"', $name, Html::entities($value));
+    }
+
+    /**
      * Returns a focal point as a background-position CSS value.
      *
      * @return string
