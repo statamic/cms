@@ -12,6 +12,15 @@ class UseClassBasedStatamicUniqueRulesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk, RunsUpdateScripts;
 
+    public function tearDown(): void
+    {
+        foreach (static::examplePaths() as $path) {
+            File::delete($path[0]);
+        }
+
+        parent::tearDown();
+    }
+
     /** @test */
     public function it_is_registered()
     {
