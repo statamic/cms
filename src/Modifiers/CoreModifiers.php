@@ -168,9 +168,13 @@ class CoreModifiers extends Modifier
             throw new \Exception('Attribute modifier requires the attribute name: {{ value | attribute:attribute-name }}');
         }
 
+        if (\is_bool($value)) {
+            return $value ? ' '.$name : '';
+        }
+
         $value = trim($value);
 
-        if (empty($value)) {
+        if ($value === '') {
             return '';
         }
 

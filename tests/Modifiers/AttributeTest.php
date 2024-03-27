@@ -13,6 +13,10 @@ class AttributeTest extends TestCase
         ],
         'link_target' => '_blank',
         'link_rel' => ' ',
+        'bool_true' => true,
+        'bool_false' => false,
+        'integer' => -1,
+        'array' => [],
     ];
 
     private function tag($tag, $data = [])
@@ -47,10 +51,49 @@ EOT;
     }
 
     /** @test */
+    public function it_returns_the_attribute_when_value_is_an_integer()
+    {
+        $template = <<<'EOT'
+{{ integer | attribute:tabIndex }}
+EOT;
+
+        $this->assertSame(
+            ' tabIndex="-1"',
+            $this->tag($template, $this->data)
+        );
+    }
+
+    /** @test */
     public function it_returns_an_empty_string_when_value_is_empty()
     {
         $template = <<<'EOT'
 {{ link_rel | attribute:rel }}
+EOT;
+
+        $this->assertSame(
+            '',
+            $this->tag($template, $this->data)
+        );
+    }
+
+    /** @test */
+    public function it_returns_the_attribute_alone_when_value_is_bool_true()
+    {
+        $template = <<<'EOT'
+{{ bool_true | attribute:required }}
+EOT;
+
+        $this->assertSame(
+            ' required',
+            $this->tag($template, $this->data)
+        );
+    }
+
+    /** @test */
+    public function it_returns_an_empty_string_when_value_is_bool_false()
+    {
+        $template = <<<'EOT'
+{{ bool_false | attribute:required }}
 EOT;
 
         $this->assertSame(
