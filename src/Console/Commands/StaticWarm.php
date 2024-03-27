@@ -73,13 +73,6 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $client = new Client([
-            'verify' => $this->shouldVerifySsl(),
-            'auth' => $this->option('user') && $this->option('password')
-                ? [$this->option('user'), $this->option('password')]
-                : null,
-        ]);
-
         $this->output->newLine();
         $this->line('Compiling URLs...');
 
@@ -97,7 +90,7 @@ class StaticWarm extends Command
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
 
-            $pool = new Pool($client, $requests, [
+            $pool = new Pool($this->client(), $requests, [
                 'concurrency' => $this->concurrency(),
                 'fulfilled' => [$this, 'outputSuccessLine'],
                 'rejected' => [$this, 'outputFailureLine'],
@@ -109,6 +102,37 @@ class StaticWarm extends Command
         }
     }
 
+    private function warmPaginatedPages(string $url, int $currentPage, int $totalPages, string $pageName): void
+    {
+        $urls = collect(range($currentPage, $totalPages))->map(function ($page) use ($url, $pageName) {
+            return "{$url}?{$pageName}={$page}";
+        });
+
+        $requests = $urls->map(fn (string $url) => new Request('GET', $url))->all();
+
+        $pool = new Pool($this->client(), $requests, [
+            'concurrency' => $this->concurrency(),
+            'fulfilled' => function (Response $response, $index) use ($urls) {
+                $this->checkLine($this->getRelativeUri($urls->get($index)));
+            },
+            'rejected' => [$this, 'outputFailureLine'],
+        ]);
+
+        $promise = $pool->promise();
+
+        $promise->wait();
+    }
+
+    private function client(): Client
+    {
+        return new Client([
+            'verify' => $this->shouldVerifySsl(),
+            'auth' => $this->option('user') && $this->option('password')
+                ? [$this->option('user'), $this->option('password')]
+                : null,
+        ]);
+    }
+
     private function concurrency(): int
     {
         $strategy = config('statamic.static_caching.strategy');
@@ -118,12 +142,18 @@ class StaticWarm extends Command
 
     public function outputSuccessLine(Response $response, $index): void
     {
-        $this->checkLine($this->getRelativeUri($index));
+        $this->checkLine($this->getRelativeUri($this->uris()->get($index)));
+
+        if ($response->hasHeader('X-Statamic-Pagination')) {
+            [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
+
+            $this->warmPaginatedPages($this->uris()->get($index), $currentPage, $totalPages, $pageName);
+        }
     }
 
     public function outputFailureLine($exception, $index): void
     {
-        $uri = $this->getRelativeUri($index);
+        $uri = $this->getRelativeUri($this->uris()->get($index));
 
         if ($exception instanceof RequestException && $exception->hasResponse()) {
             $response = $exception->getResponse();
@@ -140,9 +170,9 @@ class StaticWarm extends Command
         $this->crossLine("$uri → <fg=cyan>$message</fg=cyan>");
     }
 
-    private function getRelativeUri(int $index): string
+    private function getRelativeUri(string $uri): string
     {
-        return Str::start(Str::after($this->uris()->get($index), config('app.url')), '/');
+        return Str::start(Str::after($uri, config('app.url')), '/');
     }
 
     private function requests()
