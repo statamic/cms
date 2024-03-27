@@ -172,11 +172,14 @@ EOT;
 
 }
 
-class AttributeTestStringable {
-    function __toString() {
+class AttributeTestStringable
+{
+    function __toString()
+    {
         return 'Test';
     }
 }
 
-class AttributeTestNotStringable {
+class AttributeTestNotStringable
+{
 }
