@@ -174,7 +174,7 @@ EOT;
 
 class AttributeTestStringable
 {
-    function __toString()
+    public function __toString()
     {
         return 'Test';
     }
