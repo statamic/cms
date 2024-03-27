@@ -106,6 +106,8 @@ EOT;
     /** @test */
     public function it_only_adds_appropriate_fields_of_context_to_session()
     {
+        $this->get('/');
+
         $expectedFields = [
             'foo', // By adding @auto it will be picked up from the template.
             'baz', // Explicitly selected
@@ -132,6 +134,8 @@ EOT;
     /** @test */
     public function it_only_adds_explicitly_defined_fields_of_context_to_session()
     {
+        $this->get('/');
+
         // We will not add `bar` to the session because it is not explicitly defined.
         // We will not add `nope` to the session because it is not in the context.
         $expectedFields = ['foo', 'baz'];

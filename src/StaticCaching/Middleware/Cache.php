@@ -162,4 +162,9 @@ class Cache
 
         return $locks->createLock($key, 30);
     }
+
+    public static function isBeingUsedOnCurrentRoute()
+    {
+        return in_array(static::class, app('router')->gatherRouteMiddleware(request()->route()));
+    }
 }
