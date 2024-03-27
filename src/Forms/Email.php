@@ -111,9 +111,7 @@ class Email extends Mailable
         }
 
         $this->getRenderableFieldData(Arr::except($this->submissionData, ['id', 'date', 'form']))
-            ->filter(function ($field) {
-                return $field['fieldtype'] === 'assets' || $field['fieldtype'] === 'files';
-            })
+            ->filter(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']))
             ->each(function ($field) {
                 $value = $field['value']->value();
 
