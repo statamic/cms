@@ -1,5 +1,30 @@
 # Release Notes
 
+## 4.55.0 (2024-03-27)
+
+### What's new
+- Add tags blade directive. [#9732](https://github.com/statamic/cms/issues/9732) by @Jade-GG
+- Ability to provide additional urls for `static:warm`. [#9303](https://github.com/statamic/cms/issues/9303) by @ryanmitchell
+- Enable configuration of full measure static cache permissions. [#9755](https://github.com/statamic/cms/issues/9755) by @ryanmitchell
+- Listing page state gets added to URLs to become shareable. [#9408](https://github.com/statamic/cms/issues/9408) by @jacksleight
+- Add `augmented` hooks. [#9625](https://github.com/statamic/cms/issues/9625) by @ryanmitchell
+
+### What's improved
+- French and English translations. [#9774](https://github.com/statamic/cms/issues/9774) by @ebeauchamps
+
+### What's fixed
+- Fix Revealer state issues when closing Live Preview. [#9797](https://github.com/statamic/cms/issues/9797) by @jesseleite
+- Fix Bard IME input in Safari. [#9788](https://github.com/statamic/cms/issues/9788) by @jacksleight
+- Fix Glide cache not clearing on image reupload if `append_original_filename` is enabled. [#9610](https://github.com/statamic/cms/issues/9610) by @daun
+- Update entry parent index on collection tree save. [#9443](https://github.com/statamic/cms/issues/9443) by @jacksleight
+- Support chunk on query builders in Antlers. [#9157](https://github.com/statamic/cms/issues/9157) by @ryanmitchell
+- Fix return type of `AssetContainer:all()`. [#9777](https://github.com/statamic/cms/issues/9777) by @daun
+- Avoid using a pipeline if there are no Hooks registered. [#9772](https://github.com/statamic/cms/issues/9772) by @jasonvarga
+- Enable pro fix and improvements. [#9763](https://github.com/statamic/cms/issues/9763) by @jesseleite
+- Flush entire `static_cache` cache store when running `static:clear`. [#9770](https://github.com/statamic/cms/issues/9770) by @duncanmcclean
+
+
+
 ## 4.54.0 (2024-03-21)
 
 ### What's new
