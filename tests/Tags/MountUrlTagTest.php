@@ -13,9 +13,10 @@ class MountUrlTagTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
-    public function it_gets_collection_mount()
+    public function setUp(): void
     {
+        parent::setUp();
+
         Site::setConfig(['sites' => [
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
@@ -25,16 +26,35 @@ class MountUrlTagTest extends TestCase
             'english' => 'pages/{slug}',
             'french' => 'le-pages/{slug}',
         ])->save();
+
         $mountEn = EntryFactory::collection('pages')->slug('blog')->locale('english')->id('blog-en')->create();
         $mountFr = EntryFactory::collection('pages')->slug('le-blog')->locale('french')->origin('blog-en')->id('blog-fr')->create();
-        Collection::make('blog')->routes('{mount}/{slug}')->mount($mountEn->id())->save();
 
+        Collection::make('blog')->routes('{mount}/{slug}')->mount($mountEn->id())->save();
+    }
+
+    /** @test */
+    public function it_gets_collection_mount()
+    {
         $this->assertParseEquals('/pages/blog', '{{ mount_url:blog }}');
         $this->assertParseEquals('/pages/blog', '{{ mount_url handle="blog" }}');
 
         Site::setCurrent('french');
         $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount_url:blog }}');
         $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount_url handle="blog" }}');
+    }
+
+    /** @test */
+    public function it_can_link_to_selected_site()
+    {
+        $this->assertParseEquals('/pages/blog', '{{ mount_url:blog }}');
+        $this->assertParseEquals('/pages/blog', '{{ mount_url:blog site="english" }}');
+        $this->assertParseEquals('http://localhost/fr/le-pages/le-blog', '{{ mount_url:blog site="french" }}');
+
+        Site::setCurrent('french');
+        $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount_url:blog }}');
+        $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount_url:blog site="french" }}');
+        $this->assertParseEquals('http://localhost/pages/blog', '{{ mount_url:blog site="english" }}');
     }
 
     private function assertParseEquals($expected, $template, $context = [])
