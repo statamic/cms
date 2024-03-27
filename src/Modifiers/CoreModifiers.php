@@ -162,7 +162,7 @@ class CoreModifiers extends Modifier
      * @param  array  $params
      * @return string
      */
-    public function attribute(string $value, array $params)
+    public function attribute($value, $params)
     {
         if (! $name = Arr::get($params, 0)) {
             throw new \Exception('Attribute modifier requires the attribute name: {{ value | attribute:attribute-name }}');

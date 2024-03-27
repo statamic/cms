@@ -23,7 +23,7 @@ class AttributeTest extends TestCase
     /** @test */
     public function it_returns_the_attribute_when_view_value_is_not_empty()
     {
-        $template = <<<EOT
+        $template = <<<'EOT'
 {{ view:class_list | attribute:class }}
 EOT;
 
@@ -36,7 +36,7 @@ EOT;
     /** @test */
     public function it_returns_the_attribute_when_scoped_value_is_not_empty()
     {
-        $template = <<<EOT
+        $template = <<<'EOT'
 {{ link_target | attribute:target }}
 EOT;
 
@@ -48,7 +48,7 @@ EOT;
     /** @test */
     public function it_returns_an_empty_string_when_value_is_empty()
     {
-        $template = <<<EOT
+        $template = <<<'EOT'
 {{ link_rel | attribute:rel }}
 EOT;
 
