@@ -268,6 +268,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return Facades\Entry::query()->where('collection', $this->handle());
     }
 
+    public function hasVisibleEntryBlueprint()
+    {
+        return $this->entryBlueprints()->reject->hidden()->isNotEmpty();
+    }
+
     public function entryBlueprints()
     {
         $blink = 'collection-entry-blueprints-'.$this->handle();

@@ -100,8 +100,7 @@ class CollectionsController extends CpController
             'createUrls' => $collection->sites()
                 ->mapWithKeys(fn ($site) => [$site => cp_route('collections.entries.create', [$collection->handle(), $site])])
                 ->all(),
-            'canCreate' => User::current()->can('create', [EntryContract::class, $collection])
-                && ! $collection->entryBlueprints()->reject->hidden()->isEmpty(),
+            'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
         ];
 
         if ($collection->queryEntries()->count() === 0) {

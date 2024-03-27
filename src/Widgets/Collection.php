@@ -49,8 +49,7 @@ class Collection extends Widget
             'sortColumn' => $sortColumn,
             'sortDirection' => $sortDirection,
             'columns' => $columns,
-            'canCreate' => User::current()->can('create', [EntryContract::class, $collection])
-                && ! $collection->entryBlueprints()->reject->hidden()->isEmpty(),
+            'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
         ]);
     }
 
