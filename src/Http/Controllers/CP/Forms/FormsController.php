@@ -141,13 +141,13 @@ class FormsController extends CpController
     {
         $this->authorize('edit', $form);
 
-        $values = [
+        $values = array_merge($form->data()->all(), [
             'handle' => $form->handle(),
             'title' => __($form->title()),
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
             'email' => $form->email(),
-        ];
+        ]);
 
         $fields = ($blueprint = $this->editFormBlueprint($form))
             ->fields()
@@ -172,11 +172,14 @@ class FormsController extends CpController
 
         $values = $fields->process()->values()->all();
 
+        $data = collect($values)->except(['title', 'honeypot', 'store', 'email']);
+
         $form
             ->title($values['title'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
-            ->email($values['email']);
+            ->email($values['email'])
+            ->merge($data);
 
         $form->save();
 
@@ -192,7 +195,7 @@ class FormsController extends CpController
 
     protected function editFormBlueprint($form)
     {
-        return Blueprint::makeFromTabs([
+        $fields = [
             'name' => [
                 'display' => __('Name'),
                 'fields' => [
@@ -339,6 +342,24 @@ class FormsController extends CpController
             ],
 
             // metrics
-        ]);
+            // ...
+
+        ];
+
+        foreach (Form::getConfigFor($form->handle()) as $handle => $config) {
+            $merged = false;
+            foreach ($fields as $fieldHandle => $fieldConfig) {
+                if ($fieldConfig['display'] == $config['display']) {
+                    $fields[$fieldHandle]['fields'] += $config['fields'];
+                    $merged = true;
+                }
+            }
+
+            if (! $merged) {
+                $fields[] = $config;
+            }
+        }
+
+        return Blueprint::makeFromTabs($fields);
     }
 }

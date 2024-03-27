@@ -9,9 +9,12 @@ use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Forms\Exporters\ExporterRepository;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FormRepository implements Contract
 {
+    private $configs = [];
     private $redirects = [];
 
     /**
@@ -68,6 +71,37 @@ class FormRepository implements Contract
         }
 
         return $form;
+    }
+
+    public function appendConfigFields($handles, string $display, array $fields)
+    {
+        $this->configs[] = [
+            'display' => $display,
+            'handles' => Arr::wrap($handles),
+            'fields' => $fields,
+        ];
+    }
+
+    public function getConfigFor($handle)
+    {
+        $reserved = ['title', 'honeypot', 'store', 'email'];
+
+        return collect($this->configs)
+            ->filter(function ($config) use ($handle) {
+                return in_array('*', $config['handles']) || in_array($handle, $config['handles']);
+            })
+            ->flatMap(function ($config) use ($reserved) {
+
+                return [
+                    Str::slugify($config['display']) => [
+                        'display' => $config['display'],
+                        'fields' => collect($config['fields'])
+                            ->filter(fn ($field, $index) => ! in_array($field['handle'] ?? $index, $reserved))
+                            ->all(),
+                    ],
+                ];
+            })
+            ->all();
     }
 
     public function redirect(string $form, Closure $callback)
