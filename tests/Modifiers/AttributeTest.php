@@ -45,6 +45,7 @@ EOT;
             $this->tag($template, $this->data)
         );
     }
+    
     /** @test */
     public function it_returns_an_empty_string_when_value_is_empty()
     {
