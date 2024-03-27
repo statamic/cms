@@ -461,4 +461,22 @@ EOT
 
         config()->set('statamic.users.registration_form_honeypot_field', null);
     }
+
+    /** @test */
+    public function it_handles_precognitive_requests()
+    {
+        if (! method_exists($this, 'withPrecognition')) {
+            $this->markTestSkipped();
+
+            return;
+        }
+
+        $response = $this
+            ->withPrecognition()
+            ->post('/!/auth/register', [
+                'password_confirmation' => 'no',
+            ]);
+
+        $response->assertSuccessfulPrecognition();
+    }
 }
