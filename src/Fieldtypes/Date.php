@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Carbon\Exceptions\InvalidFormatException;
+use DateTimeZone;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Exceptions\ValidationException;
@@ -348,9 +349,9 @@ class Date extends Fieldtype
     private function parseSaved($value)
     {
         try {
-            return Carbon::createFromFormat($this->saveFormat(), $value);
+            return Carbon::createFromFormat($this->saveFormat(), $value)->tz($this->timezone());
         } catch (InvalidFormatException|InvalidArgumentException $e) {
-            return Carbon::parse($value);
+            return Carbon::parse($value)->tz($this->timezone());
         }
     }
 
@@ -417,5 +418,10 @@ class Date extends Fieldtype
             'start' => Carbon::createFromFormat(self::DEFAULT_DATE_FORMAT, $value['start'])->startOfDay(),
             'end' => Carbon::createFromFormat(self::DEFAULT_DATE_FORMAT, $value['end'])->startOfDay(),
         ];
+    }
+
+    private function timezone()
+    {
+        return new DateTimeZone(config('app.timezone'));
     }
 }
