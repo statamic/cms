@@ -122,6 +122,10 @@ trait QueriesConditions
                 return $this->queryIsBeforeCondition($query, $field, $value);
             case 'is_numberwang':
                 return $this->queryIsNumberwangCondition($query, $field, $regexOperator);
+            case 'includes':
+                return $this->queryIncludesCondition($query, $field, $value);
+            case 'doesnt_include':
+                return $this->queryDoesntIncludeCondition($query, $field, $value);
         }
     }
 
@@ -298,6 +302,24 @@ trait QueriesConditions
     protected function queryIsNumberwangCondition($query, $field, $regexOperator)
     {
         return $query->where($field, $regexOperator, "^(1|22|7|9|1002|2\.3|15|109876567|31)$");
+    }
+
+    protected function queryIncludesCondition($query, $field, $value)
+    {
+        if (is_string($value)) {
+            $value = $this->getPipedValues($value);
+        }
+
+        return $query->whereJsonContains($field, $value);
+    }
+
+    protected function queryDoesntIncludeCondition($query, $field, $value)
+    {
+        if (is_string($value)) {
+            $value = $this->getPipedValues($value);
+        }
+
+        return $query->whereJsonDoesntContain($field, $value);
     }
 
     /**
