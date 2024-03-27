@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Site;
+use Statamic\Jobs\StaticRecacheJob;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
@@ -138,6 +139,13 @@ abstract class AbstractCacher implements Cacher
     {
         $url = $request->getUri();
 
+        if ($recache = $request->input('__recache')) {
+            $url = str_replace('__recache='.$recache, '', $url);
+            if (substr($url, -1, 1) == '?') {
+                $url = substr($url, 0, -1);
+            }
+        }
+
         if ($this->config('ignore_query_strings')) {
             $url = explode('?', $url)[0];
         }
@@ -244,6 +252,63 @@ abstract class AbstractCacher implements Cacher
             } else {
                 $this->invalidateUrl(...$this->getPathAndDomain($url));
             }
+        });
+    }
+
+    /**
+     * Recache multiple URLs.
+     *
+     * @param  array  $urls
+     * @return void
+     */
+    public function recacheUrls($urls)
+    {
+        collect($urls)
+            ->map(fn ($url) => is_array($url) ? $url : [$url, null])
+            ->each(function ($parts) {
+                [$path, $domain] = $parts;
+
+                if (Str::contains($path, '*')) {
+                    $this->recacheWildcardUrl($path, $domain);
+
+                    return;
+                }
+
+                $this->recacheUrl($path, $domain);
+            });
+    }
+
+    /**
+     * Recache an individual URLs.
+     *
+     * @param  string  $path
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function recacheUrl($path, $domain = null)
+    {
+        StaticRecacheJob::dispatch($path, $domain);
+    }
+
+    /**
+     * Recache a wildcard URL.
+     *
+     * @param  string  $wildcard
+     * @param  string|null  $domain
+     */
+    protected function recacheWildcardUrl($wildcard, $domain = null)
+    {
+        // Remove the asterisk
+        $wildcard = substr($wildcard, 0, -1);
+
+        if (! $domain) {
+            [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
+        }
+
+        $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
+            return Str::startsWith($url, $wildcard);
+        })->each(function ($url) use ($domain) {
+            $this->recacheUrl($url, $domain);
         });
     }
 

@@ -5,6 +5,7 @@ namespace Statamic\StaticCaching\Middleware;
 use Closure;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
 use Statamic\Statamic;
@@ -120,6 +121,10 @@ class Cache
             return false;
         }
 
+        if ($this->hasValidRecacheToken($request)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -146,6 +151,20 @@ class Cache
         }
 
         return true;
+    }
+
+    private function hasValidRecacheToken($request)
+    {
+        if (! $token = $request->input('__recache')) {
+            return false;
+        }
+
+        $url = str_replace('__recache='.$token, '', $request->getUri());
+        if (substr($url, -1, 1) == '?') {
+            $url = substr($url, 0, -1);
+        }
+
+        return Hash::check($url, $token);
     }
 
     private function createLock($request)
