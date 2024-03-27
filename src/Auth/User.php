@@ -21,6 +21,7 @@ use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsComputedData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\UserCreated;
@@ -39,7 +40,7 @@ use Statamic\Support\Str;
 
 abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {
-    use Authorizable, CanResetPassword, ContainsComputedData, HasAugmentedInstance, HasAvatar, Notifiable, ResolvesValues, Searchable, TracksQueriedColumns, TracksQueriedRelations;
+    use Authorizable, CanResetPassword, ContainsComputedData, HasAugmentedInstance, HasAvatar, HasDirtyState, Notifiable, ResolvesValues, Searchable, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
@@ -192,6 +193,8 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
             UserSaved::dispatch($this);
         }
+
+        $this->syncOriginal();
 
         return $this;
     }

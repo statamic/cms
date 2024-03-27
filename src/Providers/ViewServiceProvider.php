@@ -43,6 +43,7 @@ class ViewServiceProvider extends ServiceProvider
 
         $this->registerRuntimeAntlers();
         $this->registerRegexAntlers();
+        $this->registerBladeDirectives();
 
         $this->app->bind(ParserContract::class, function ($app) {
             return config('statamic.antlers.version', 'regex') === 'regex'
@@ -169,6 +170,13 @@ class ViewServiceProvider extends ServiceProvider
                 ->setRuntimeConfiguration($runtimeConfig);
 
             return $parser;
+        });
+    }
+
+    public function registerBladeDirectives()
+    {
+        Blade::directive('tags', function ($expression) {
+            return "<?php extract(\Statamic\View\Blade\TagsDirective::handle($expression)) ?>";
         });
     }
 

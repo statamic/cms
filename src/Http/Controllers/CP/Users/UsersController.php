@@ -68,9 +68,19 @@ class UsersController extends CpController
             'blueprints' => ['user'],
         ]);
 
-        $users = $query
-            ->orderBy(request('sort', 'email'), request('order', 'asc'))
-            ->paginate(request('perPage'));
+        $sortField = request('sort');
+        $sortDirection = request('order', 'asc');
+
+        if (! $sortField && ! request('search')) {
+            $sortField = config('statamic.user.sort_field', 'email');
+            $sortDirection = config('statamic.user.sort_direction', 'asc');
+        }
+
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $users = $query->paginate(request('perPage'));
 
         if ($users->getCollection()->first() instanceof Result) {
             $users->setCollection($users->getCollection()->map->getSearchable());
@@ -126,7 +136,7 @@ class UsersController extends CpController
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
         $additional = $fields->all()
-            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups']))
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
             ->keys();
 
         $viewData = [
@@ -271,7 +281,7 @@ class UsersController extends CpController
             ->withReplacements(['id' => $user->id()])
             ->validate();
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles', 'super']);
 
         foreach ($values as $key => $value) {
             $user->set($key, $value);
@@ -302,10 +312,6 @@ class UsersController extends CpController
     public function destroy($user)
     {
         throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (! $user = User::find($user)) {
-            return $this->pageNotFound();
-        }
 
         $this->authorize('delete', $user);
 

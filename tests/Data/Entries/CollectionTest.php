@@ -926,7 +926,7 @@ class CollectionTest extends TestCase
         $this->assertCount(0, $collection->queryEntries()->get());
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],

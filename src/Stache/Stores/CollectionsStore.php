@@ -12,8 +12,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionsStore extends BasicStore
 {
-    protected $traverseRecursively = false;
-
     public function key()
     {
         return 'collections';
@@ -96,6 +94,15 @@ class CollectionsStore extends BasicStore
         $index = Stache::store('entries')
             ->store($collection->handle())
             ->index('order');
+
+        $this->updateEntriesWithinIndex($index, $ids);
+    }
+
+    public function updateEntryParent($collection, $ids = null)
+    {
+        $index = Stache::store('entries')
+            ->store($collection->handle())
+            ->index('parent');
 
         $this->updateEntriesWithinIndex($index, $ids);
     }

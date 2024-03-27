@@ -55,7 +55,7 @@ class AssetsTest extends TestCase
         }
     }
 
-    public function assetsProvider()
+    public static function assetsProvider()
     {
         return [
             'all' => [
@@ -155,7 +155,7 @@ class AssetsTest extends TestCase
         $this->assertTrue($provider->contains($d));
     }
 
-    public function indexFilterProvider()
+    public static function indexFilterProvider()
     {
         return [
             'class' => [TestSearchableAssetsFilter::class],
