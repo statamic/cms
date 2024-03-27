@@ -168,12 +168,16 @@ class CoreModifiers extends Modifier
             throw new \Exception('Attribute modifier requires the attribute name: {{ value | attribute:attribute-name }}');
         }
 
-        if (\is_bool($value)) {
-            return $value ? ' '.$name : '';
+        if (\is_array($value)) {
+            if (empty($value)) {
+                return '';
+            }
+
+            $value = \json_encode($value);
         }
 
-        if (\is_array($value)) {
-            return '';
+        if (\is_bool($value)) {
+            return $value ? ' '.$name : '';
         }
 
         if (\is_object($value)) {

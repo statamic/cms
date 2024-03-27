@@ -18,7 +18,8 @@ class AttributeTest extends TestCase
         'bool_false' => false,
         'integer' => -1,
         'float' => 1.5,
-        'array' => ['array' => 'will not be handle'],
+        'array' => ['array' => ['will' => ['be handled' => 'as json']]],
+        'array_empty' => [],
     ];
 
     private function tag($tag, $data = [])
@@ -131,10 +132,23 @@ EOT;
     }
 
     /** @test */
-    public function it_returns_an_empty_string_when_value_is_an_array()
+    public function it_returns_an_json_string_when_value_is_an_array()
     {
         $template = <<<'EOT'
-{{ array | attribute:required }}
+{{ array | attribute:x-data }}
+EOT;
+
+        $this->assertSame(
+            ' x-data="{&quot;array&quot;:{&quot;will&quot;:{&quot;be handled&quot;:&quot;as json&quot;}}}"',
+            $this->tag($template, $this->data)
+        );
+    }
+
+    /** @test */
+    public function it_returns_an_empty_string_when_value_is_an_empty_array()
+    {
+        $template = <<<'EOT'
+{{ array_empty | attribute:x-data }}
 EOT;
 
         $this->assertSame(
