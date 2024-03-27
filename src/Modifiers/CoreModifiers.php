@@ -172,6 +172,18 @@ class CoreModifiers extends Modifier
             return $value ? ' '.$name : '';
         }
 
+        if (\is_array($value)) {
+            return '';
+        }
+
+        if (\is_object($value)) {
+            if (! method_exists($value, '__toString')) {
+                return '';
+            }
+
+            $value = $value->__toString();
+        }
+
         $value = trim($value);
 
         if ($value === '') {
