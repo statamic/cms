@@ -31,7 +31,6 @@ class Collection extends Widget
         [$sortColumn, $sortDirection] = $this->parseSort($collection);
 
         $blueprint = $collection->entryBlueprint();
-
         $columns = $blueprint
             ->columns()
             ->only($this->config('fields', []))
