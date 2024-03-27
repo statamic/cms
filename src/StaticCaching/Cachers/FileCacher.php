@@ -163,7 +163,7 @@ class FileCacher extends AbstractCacher
     public function getFilePath($url, $site = null)
     {
         $urlParts = parse_url($url);
-        $pathParts = pathinfo($urlParts['path']);
+        $pathParts = pathinfo($urlParts['path'] ?? $url);
         $slug = $pathParts['basename'];
         $query = $this->config('ignore_query_strings') ? '' : Arr::get($urlParts, 'query', '');
 
