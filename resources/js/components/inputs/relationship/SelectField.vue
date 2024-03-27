@@ -32,7 +32,13 @@
                     v-bind="attributes"
                 >
             </template>
-             <template #no-options>
+            <template #option="option">
+                <template v-if="hasMultipleCollections">
+                    <span class="text-gray-700 mr-2">{{ option.collection.title }}</span>
+                </template>
+                {{ option.title }}
+            </template>
+            <template #no-options>
                 <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
             </template>
             <template #footer="{ deselect }" v-if="multiple">
@@ -99,6 +105,10 @@ export default {
     },
 
     computed: {
+        hasMultipleCollections(){
+            return this.config.collections?.length > 1 || [...new Set(this.options.map(option => option?.collection?.handle))].length > 1;
+        },
+
         isTaggable() {
             if (data_get(this.config, 'create') === false) return false;
 
