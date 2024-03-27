@@ -1,25 +1,24 @@
 <?php
 
-namespace Statamic\Validation;
+namespace Statamic\Rules;
 
+use Closure;
 use DateTime;
-use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class TimeFieldtype implements InvokableRule
+class TimeFieldtype implements ValidationRule
 {
-    protected $fieldtype;
-
-    public function __construct($fieldtype)
+    public function __construct(private $fieldtype)
     {
-        $this->fieldtype = $fieldtype;
+        //
     }
 
-    public function __invoke($attribute, $value, $fail)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $format = $this->fieldtype->config('seconds_enabled') ? 'H:i:s' : 'H:i';
 
         if (! $this->matchesFormat($value, $format)) {
-            return $fail('statamic::validation.time')->translate();
+            $fail('statamic::validation.time')->translate();
         }
     }
 

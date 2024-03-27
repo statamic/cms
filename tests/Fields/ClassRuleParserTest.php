@@ -66,6 +66,18 @@ class ClassRuleParserTest extends TestCase
                 'new App\MyRule(a: "foo:bar")',
                 ['App\MyRule', ['a' => 'foo:bar']],
             ],
+            'null argument' => [
+                'new App\MyRule(null)',
+                ['App\MyRule', [null]],
+            ],
+            'true boolean argument' => [
+                'new App\MyRule(true)',
+                ['App\MyRule', [true]],
+            ],
+            'false boolean argument' => [
+                'new App\MyRule(false)',
+                ['App\MyRule', [false]],
+            ],
         ];
     }
 }

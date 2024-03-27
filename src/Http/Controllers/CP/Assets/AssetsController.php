@@ -11,7 +11,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
-use Statamic\Validation\AllowedFile;
+use Statamic\Rules\AllowedFile;
 
 class AssetsController extends CpController
 {

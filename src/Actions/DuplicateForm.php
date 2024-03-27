@@ -5,6 +5,7 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Form as Forms;
 use Statamic\Rules\Handle;
+use Statamic\Rules\UniqueFormHandle;
 use Statamic\Statamic;
 
 class DuplicateForm extends Action
@@ -31,7 +32,7 @@ class DuplicateForm extends Action
                 'type' => 'slug',
                 'instructions' => __('statamic::messages.form_configure_handle_instructions'),
                 'separator' => '_',
-                'validate' => ['required', new Handle, 'unique_form_handle'],
+                'validate' => ['required', new Handle, new UniqueFormHandle],
             ],
         ];
     }

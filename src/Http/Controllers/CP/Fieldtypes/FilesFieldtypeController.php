@@ -5,7 +5,7 @@ namespace Statamic\Http\Controllers\CP\Fieldtypes;
 use Illuminate\Http\Request;
 use Statamic\Assets\FileUploader as Uploader;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Validation\AllowedFile;
+use Statamic\Rules\AllowedFile;
 
 class FilesFieldtypeController extends CpController
 {

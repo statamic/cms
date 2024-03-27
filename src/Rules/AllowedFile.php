@@ -1,13 +1,14 @@
 <?php
 
-namespace Statamic\Validation;
+namespace Statamic\Rules;
 
-use Illuminate\Contracts\Validation\InvokableRule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Http\UploadedFile;
 
-class AllowedFile implements InvokableRule
+class AllowedFile implements ValidationRule
 {
-    private array $extensions = [
+    const EXTENSIONS = [
         '7z',
         'aiff',
         'asc',
@@ -108,16 +109,16 @@ class AllowedFile implements InvokableRule
         'zip',
     ];
 
-    public function __invoke($attribute, $value, $fail): void
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! $this->isAllowed($value)) {
-            $fail(__('validation.uploaded'));
+        if (! $this->isAllowedExtension($value)) {
+            $fail('statamic::validation.uploaded')->translate();
         }
     }
 
-    private function isAllowed(UploadedFile $file): bool
+    private function isAllowedExtension(UploadedFile $file): bool
     {
-        $extensions = array_merge($this->extensions, config('statamic.assets.additional_uploadable_extensions', []));
+        $extensions = array_merge(static::EXTENSIONS, config('statamic.assets.additional_uploadable_extensions', []));
 
         return in_array(trim(strtolower($file->getClientOriginalExtension())), $extensions);
     }
