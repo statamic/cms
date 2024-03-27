@@ -148,6 +148,13 @@ final class Addon
     protected $editions = [];
 
     /**
+     * Cache of folders.
+     *
+     * @var array|null
+     */
+    protected $folderCache = [];
+
+    /**
      * @param  string  $id
      */
     public function __construct($id)
@@ -177,6 +184,7 @@ final class Addon
         $keys = [
             'id', 'slug', 'editions', 'marketplaceId', 'marketplaceSlug', 'marketplaceUrl', 'marketplaceSellerSlug', 'name', 'namespace',
             'autoload', 'provider', 'description', 'package', 'version', 'latestVersion', 'url', 'developer', 'developerUrl', 'isCommercial',
+            'folderCache',
         ];
 
         foreach (Arr::only($package, $keys) as $key => $value) {
@@ -456,6 +464,17 @@ final class Addon
         }
 
         $this->editions = $editions;
+
+        return $this;
+    }
+
+    public function folderCache($folderCache = null)
+    {
+        if (func_num_args() === 0) {
+            return collect($this->folderCache);
+        }
+
+        $this->folderCache = $folderCache;
 
         return $this;
     }
