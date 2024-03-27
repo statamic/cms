@@ -74,7 +74,7 @@ class CollectionsController extends CpController
                 ];
             })->values();
 
-        $blueprint = $collection->entryBlueprint() ?? $collection->entryBlueprints()->first();
+        $blueprint = $collection->entryBlueprint();
 
         $columns = $blueprint
             ->columns()

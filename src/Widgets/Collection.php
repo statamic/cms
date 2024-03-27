@@ -30,7 +30,7 @@ class Collection extends Widget
 
         [$sortColumn, $sortDirection] = $this->parseSort($collection);
 
-        $blueprint = $collection->entryBlueprint() ?? $collection->entryBlueprints()->first();
+        $blueprint = $collection->entryBlueprint();
 
         $columns = $blueprint
             ->columns()

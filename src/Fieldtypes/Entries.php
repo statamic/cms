@@ -150,8 +150,7 @@ class Entries extends Relationship
 
     protected function getBlueprint($request = null)
     {
-        return $this->getFirstCollectionFromRequest($request)->entryBlueprint()
-            ?? $this->getFirstCollectionFromRequest($request)->entryBlueprints()->first();
+        return $this->getFirstCollectionFromRequest($request)->entryBlueprint();
     }
 
     protected function getFirstCollectionFromRequest($request)
