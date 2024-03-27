@@ -354,6 +354,24 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_first_entry_blueprint_when_they_are_all_hidden()
+    {
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'apple' => $blueprintOne = (new Blueprint)->setHandle('apple')->setHidden(true),
+            'berry' => $blueprintTwo = (new Blueprint)->setHandle('berry')->setHidden(true),
+            'cherry' => $blueprintThree = (new Blueprint)->setHandle('cherry')->setHidden(true),
+        ]));
+
+        $blueprints = $collection->entryBlueprints();
+
+        $this->assertCount(3, $blueprints);
+        $this->assertEquals($blueprintOne, $collection->entryBlueprint());
+        $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+    }
+
+    /** @test */
     public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_singular_collection()
     {
         $collection = (new Collection)->handle('articles');
