@@ -30,6 +30,7 @@ import './bootstrap/components';
 import './bootstrap/fieldtypes';
 import './bootstrap/directives';
 import './bootstrap/tooltips';
+import './bootstrap/alpine';
 
 import axios from 'axios';
 import PortalVue from "portal-vue";
@@ -58,8 +59,6 @@ Statamic.booting(Statamic => {
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
 });
-
-Alpine.start()
 
 Vue.prototype.$axios = axios;
 Vue.prototype.$events = new Vue();
