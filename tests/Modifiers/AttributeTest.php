@@ -168,8 +168,6 @@ EOT;
             $this->tag($template, ['object' => new AttributeTestStringable()])
         );
     }
-
-
 }
 
 class AttributeTestStringable
