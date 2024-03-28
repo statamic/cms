@@ -4,7 +4,6 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Route;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\FakesContent;
@@ -30,12 +29,6 @@ class HalfMeasureStaticCachingTest extends TestCase
         $app['config']->set('statamic.static_caching.replacers', array_merge($app['config']->get('statamic.static_caching.replacers'), [
             'test' => TestReplacer::class,
         ]));
-
-        $app->booted(function () {
-            Route::get('/sitemap', function () {
-                return response('<title>Sitemap</title>')->withHeaders(['Content-Type' => 'application/xml']);
-            });
-        });
     }
 
     /** @test */
@@ -48,38 +41,30 @@ class HalfMeasureStaticCachingTest extends TestCase
             'with' => [
                 'title' => 'The About Page',
                 'content' => 'This is the about page.',
+                'headers' => [
+                    'foo' => 'bar',
+                    'alfa' => ['bravo', 'charlie'],
+                ],
             ],
         ]);
 
-        $this
+        $response = $this
             ->get('/about')
             ->assertOk()
             ->assertSee('<h1>The About Page</h1> <p>This is the about page.</p>', false);
+        $this->assertEquals(['bar'], $response->headers->all('foo'));
+        $this->assertEquals(['bravo', 'charlie'], $response->headers->all('alfa'));
 
         $page
             ->set('content', 'Updated content')
             ->saveQuietly(); // Save quietly to prevent the invalidator from clearing the statically cached page.
 
-        $this
+        $response = $this
             ->get('/about')
             ->assertOk()
             ->assertSee('<h1>The About Page</h1> <p>This is the about page.</p>', false);
-    }
-
-    /** @test */
-    public function it_includes_custom_headers_in_cached_response()
-    {
-        $this
-            ->get('/sitemap')
-            ->assertOk()
-            ->assertHeader('Content-Type', 'application/xml')
-            ->assertSee('<title>Sitemap</title>', false);
-
-        $this
-            ->get('/sitemap')
-            ->assertOk()
-            ->assertHeader('Content-Type', 'application/xml')
-            ->assertSee('<title>Sitemap</title>', false);
+        $this->assertEquals(['bar'], $response->headers->all('foo'));
+        $this->assertEquals(['bravo', 'charlie'], $response->headers->all('alfa'));
     }
 
     /** @test */
