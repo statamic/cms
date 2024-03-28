@@ -44,15 +44,7 @@ abstract class Builder extends BaseBuilder
 
     private function getKeysForIndexQuery($keys)
     {
-        return $keys->map(function ($key) {
-            $queryKey = Str::after($key, '::');
-
-            if (! Str::contains($queryKey, '-') && is_numeric($queryKey)) {
-                return intval($queryKey);
-            }
-
-            return $queryKey;
-        });
+        return $keys->map(fn ($key) => Str::after($key, '::'));
     }
 
     public function get($columns = ['*'])

@@ -34,18 +34,7 @@ abstract class Store
         return $this->resolveIndex($column)
             ->load()
             ->items()
-            ->where(function ($value, $key) use (&$keys) {
-                return $keys->has($key);
-            });
-    }
-
-    private function isValidKey($value)
-    {
-        if (is_string($value) || is_int($value)) {
-            return true;
-        }
-
-        return false;
+            ->where(fn ($value, $key) => $keys->has($key));
     }
 
     public function getFromIndex($keys, $column, $key = null)
@@ -68,10 +57,6 @@ abstract class Store
 
         foreach ($keys->keys() as $keyValue) {
             $newKeyValue = $keyValues[$keyValue] ?? null;
-
-            if (! $this->isValidKey($newKeyValue)) {
-                continue;
-            }
 
             $newValue = $values[$keyValue] ?? null;
 

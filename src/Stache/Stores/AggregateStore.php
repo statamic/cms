@@ -18,9 +18,7 @@ abstract class AggregateStore extends Store
     {
         return $this->stores()->mapWithKeys(function ($store) use ($column) {
             return $store->resolveIndex($column)->load()->items();
-        })->where(function ($value, $key) use (&$keys) {
-            return $keys->has($key);
-        });
+        })->where(fn ($value, $key) => $keys->has($key));
     }
 
     public function store($key)
