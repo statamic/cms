@@ -111,31 +111,53 @@ class Email extends Mailable
         }
 
         $this->getRenderableFieldData(Arr::except($this->submissionData, ['id', 'date', 'form']))
-            ->filter(function ($field) {
-                return $field['fieldtype'] === 'assets';
-            })
+            ->filter(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']))
             ->each(function ($field) {
-                $value = $field['value']->value();
-
-                $value = array_get($field, 'config.max_files') === 1
-                    ? collect([$value])->filter()
-                    : $value->get();
-
-                foreach ($value as $file) {
-                    $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
-                }
+                $field['value'] = $field['value']->value();
+                $field['fieldtype'] === 'assets' ? $this->attachAssets($field) : $this->attachFiles($field);
             });
 
         return $this;
     }
 
+    private function attachAssets($field)
+    {
+        $value = $field['value'];
+
+        $value = array_get($field, 'config.max_files') === 1
+            ? collect([$value])->filter()
+            : $value->get();
+
+        foreach ($value as $asset) {
+            $this->attachFromStorageDisk($asset->container()->diskHandle(), $asset->path());
+        }
+    }
+
+    private function attachFiles($field)
+    {
+        $value = $field['value'];
+
+        $value = array_get($field, 'config.max_files') === 1
+            ? collect([$value])->filter()
+            : $value;
+
+        foreach ($value as $file) {
+            $this->attachFromStorageDisk('local', 'statamic/file-uploads/'.$file);
+        }
+    }
+
     protected function addData()
     {
         $augmented = $this->submission->toAugmentedArray();
+        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']));
+
+        if (array_has($this->config, 'attachments')) {
+            $fields = $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
+        }
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
             'config' => config()->all(),
-            'fields' => $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form'])),
+            'fields' => $fields,
             'site_url' => Config::getSiteUrl(),
             'date' => now(),
             'now' => now(),
