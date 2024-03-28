@@ -3,7 +3,9 @@
 namespace Statamic\Notifications;
 
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Arr;
 use Statamic\Auth\Passwords\PasswordReset as PasswordResetManager;
+use Statamic\Support\Str;
 
 class ActivateAccount extends PasswordReset
 {
@@ -49,7 +51,11 @@ class ActivateAccount extends PasswordReset
         return (new MailMessage)
             ->subject(static::$subject ?? __('statamic::messages.activate_account_notification_subject'))
             ->greeting(static::$greeting)
-            ->line(static::$body ?? __('statamic::messages.activate_account_notification_body'))
+            ->when(true, function ($mailMessage) {
+                collect(explode("\n", static::$body ?? __('statamic::messages.activate_account_notification_body')))
+                    ->filter()
+                    ->each(fn ($line) => $mailMessage->line($line));
+            })
             ->action(__('Activate Account'), PasswordResetManager::url($this->token, PasswordResetManager::BROKER_ACTIVATIONS));
     }
 
