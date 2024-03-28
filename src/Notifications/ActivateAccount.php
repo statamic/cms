@@ -3,9 +3,7 @@
 namespace Statamic\Notifications;
 
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Arr;
 use Statamic\Auth\Passwords\PasswordReset as PasswordResetManager;
-use Statamic\Support\Str;
 
 class ActivateAccount extends PasswordReset
 {
