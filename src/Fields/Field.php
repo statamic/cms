@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\GraphQL;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -480,7 +481,7 @@ class Field implements Arrayable
                 'separator' => '_',
                 'validate' => [
                     'required',
-                    'regex:/^[a-zA-Z]([a-zA-Z0-9_]|->)*$/',
+                    new Handle,
                     'not_in:'.implode(',', $reserved),
                 ],
                 'show_regenerate' => true,

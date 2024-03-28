@@ -14,7 +14,7 @@
         "composer/composer": "^2.2.22",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9.21",
-        "laravel/framework": "^10.13.0 || ^11.0",
+        "laravel/framework": "^10.33 || ^11.0",
         "laravel/helpers": "^1.1",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",

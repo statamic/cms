@@ -147,6 +147,18 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_resolves_the_slug_when_serializing()
+    {
+        $entry = new Entry;
+        $entry->slug(fn () => 'the-slug');
+
+        // This would throw an exception if the slug remained an unresolved closure.
+        $serialized = serialize($entry);
+
+        $this->assertEquals('the-slug', unserialize($serialized)->slug());
+    }
+
+    /** @test */
     public function it_sets_gets_and_removes_data_values()
     {
         $collection = tap(Collection::make('test'))->save();
