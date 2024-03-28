@@ -16,9 +16,9 @@ abstract class AggregateStore extends Store
 
     protected function resolveFromIndex($keys, $column)
     {
-        return $this->stores()->mapWithKeys(function ($store) use ($column) {
-            return $store->resolveIndex($column)->load()->items();
-        })->where(fn ($value, $key) => $keys->has($key));
+        return $this->stores()
+            ->mapWithKeys(fn ($store) => $store->resolveIndex($column)->load()->items())
+            ->where(fn ($value, $key) => $keys->has($key));
     }
 
     public function store($key)
