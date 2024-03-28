@@ -185,7 +185,7 @@ class ValidatorTest extends TestCase
         $field = Mockery::mock(Field::class);
         $field->shouldReceive('setValidationContext')->with([])->andReturnSelf();
         $field->shouldReceive('rules')->andReturn([
-            'one' => ['new Tests\\Fields\\FakeRule({string}, {zero}, {num}, {true}, {false}, {null})'],
+            'one' => ['new \\Tests\\Fields\\FakeRule({string}, {zero}, {num}, {true}, {false}, {null})'],
         ]);
 
         $fields = Mockery::mock(Fields::class);
@@ -494,8 +494,14 @@ class ValidatorTest extends TestCase
 
 class FakeRule
 {
-    public function __construct(public $string, public $zero, public $num, public $true, public $false, public $null)
-    {
+    public function __construct(
+        public $string,
+        public $zero,
+        public $num,
+        public $true,
+        public $false,
+        public $null
+    ) {
         //
     }
 }
