@@ -4,13 +4,14 @@ namespace Statamic\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Facades\Form;
 
-class ComposerPackage implements ValidationRule
+class UniqueFormHandle implements ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! preg_match("/^[^\/\s]+\/[^\/\s]+$/", $value)) {
-            $fail('statamic::validation.composer_package')->translate();
+        if (Form::find($value)) {
+            $fail('statamic::validation.unique_form_handle')->translate();
         }
     }
 }

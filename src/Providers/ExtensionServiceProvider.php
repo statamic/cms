@@ -230,6 +230,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddDefaultPreferencesToGitConfig::class,
         Updates\AddConfigureFormFieldsPermission::class,
         Updates\AddSitePermissions::class,
+        Updates\UseClassBasedStatamicUniqueRules::class,
         Updates\MigrateSitesConfigToYaml::class,
     ];
 

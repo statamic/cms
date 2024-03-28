@@ -36,6 +36,6 @@ class SlugTest extends TestCase
     /** @test */
     public function it_outputs_helpful_validation_error()
     {
-        $this->assertValidationErrorOutput('Slugs must contain only letters and numbers with dashes or underscores as separators.', '-bad-input');
+        $this->assertValidationErrorOutput(trans('statamic::validation.slug'), '-bad-input');
     }
 }

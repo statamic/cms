@@ -3,8 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
-use LogicException;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Blueprint;
@@ -77,10 +77,6 @@ class CollectionsController extends CpController
 
         $blueprint = $collection->entryBlueprint();
 
-        if (! $blueprint) {
-            throw new LogicException("The {$collection->handle()} collection does not have any visible blueprints. At least one must not be hidden.");
-        }
-
         $columns = $blueprint
             ->columns()
             ->put('status', Column::make('status')
@@ -105,6 +101,7 @@ class CollectionsController extends CpController
             'createUrls' => $collection->sites()
                 ->mapWithKeys(fn ($site) => [$site => cp_route('collections.entries.create', [$collection->handle(), $site])])
                 ->all(),
+            'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
         ];
 
         if ($collection->queryEntries()->count() === 0) {

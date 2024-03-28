@@ -34,6 +34,12 @@ class ClassRuleParser
                     return [$key => (string) Str::of($arg)->trim('"')->replace('\\"', '"')];
                 } elseif (Str::startsWith($arg, "'") && Str::endsWith($arg, "'")) {
                     return [$key => (string) Str::of($arg)->trim("'")->replace("\\'", "'")];
+                } elseif ($arg === 'null') {
+                    return [$key => null];
+                } elseif ($arg === 'true') {
+                    return [$key => true];
+                } elseif ($arg === 'false') {
+                    return [$key => false];
                 }
 
                 return [$key => $arg];

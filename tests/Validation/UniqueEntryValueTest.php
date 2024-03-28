@@ -2,6 +2,7 @@
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Validator;
+use Statamic\Rules\UniqueEntryValue;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -17,12 +18,12 @@ class UniqueEntryValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_entry_value']
+            ['slug' => new UniqueEntryValue]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'baz'],
-            ['slug' => 'unique_entry_value']
+            ['slug' => new UniqueEntryValue]
         )->passes());
     }
 
@@ -34,12 +35,12 @@ class UniqueEntryValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_entry_value:collection-one']
+            ['slug' => new UniqueEntryValue(collection: 'collection-one')]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'bar'],
-            ['slug' => 'unique_entry_value:collection-one']
+            ['slug' => new UniqueEntryValue(collection: 'collection-one')]
         )->passes());
     }
 
@@ -50,12 +51,12 @@ class UniqueEntryValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_entry_value:collection-one,123']
+            ['slug' => new UniqueEntryValue(collection: 'collection-one', except: 123)]
         )->passes());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_entry_value:collection-one,456']
+            ['slug' => new UniqueEntryValue(collection: 'collection-one', except: 456)]
         )->fails());
     }
 
@@ -71,12 +72,12 @@ class UniqueEntryValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_entry_value:collection-one,null,site-one']
+            ['slug' => new UniqueEntryValue(collection: 'collection-one', site: 'site-one')]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_entry_value:collection-one,null,site-two']
+            ['slug' => new UniqueEntryValue(collection: 'collection-one', site: 'site-two')]
         )->passes());
     }
 }
