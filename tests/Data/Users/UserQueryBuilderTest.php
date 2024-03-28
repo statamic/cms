@@ -384,4 +384,16 @@ class UserQueryBuilderTest extends TestCase
             'Frodo',
         ], User::query()->pluck('name')->all());
     }
+
+    /** @test */
+    public function only_queried_values_are_returned_by_pluck()
+    {
+        User::make()->id(1)->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
+        User::make()->id(2)->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+        User::make()->id(3)->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
+
+        $this->assertSame([
+            'Smeagol',
+        ], User::query()->where('id', 2)->pluck('name')->all());
+    }
 }

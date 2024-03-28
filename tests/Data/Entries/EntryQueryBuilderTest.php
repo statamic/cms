@@ -790,7 +790,7 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     /** @test */
-    public function only_queried_values_are_returned()
+    public function only_queried_values_are_returned_by_pluck()
     {
         $this->createDummyCollectionAndEntries();
 
