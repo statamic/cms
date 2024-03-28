@@ -38,7 +38,7 @@
         >
             <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset(savingPresetSlug)" />
 
-            <div v-if="Object.keys(presets).includes(savingPresetSlug)">
+            <div v-if="presets && Object.keys(presets).includes(savingPresetSlug)">
                 <small class="help-block text-red-500 mt-2 mb-0" v-text="__('messages.filters_view_already_exists')"></small>
             </div>
         </confirmation-modal>
