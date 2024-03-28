@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
+use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
-use Statamic\Validation\AllowedFile;
 
 class FrontendFormRequest extends FormRequest
 {
