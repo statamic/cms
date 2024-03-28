@@ -8,7 +8,7 @@ use Illuminate\Http\UploadedFile;
 
 class AllowedFile implements ValidationRule
 {
-    const EXTENSIONS = [
+    private const EXTENSIONS = [
         '7z',
         'aiff',
         'asc',
