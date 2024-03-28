@@ -4,7 +4,6 @@ namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Page;
@@ -48,7 +47,6 @@ class ApplicationCacher extends AbstractCacher
         Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($key, $value) {
             $headers = collect($event->response->headers->all())
                 ->reject(fn ($value, $key) => in_array($key, ['date', 'x-powered-by', 'cache-control', 'expires', 'set-cookie']))
-                ->mapWithKeys(fn ($value, $key) => [$key => Arr::first($value)])
                 ->all();
 
             $cacheValue = [
