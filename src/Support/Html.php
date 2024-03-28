@@ -92,7 +92,7 @@ class Html
      */
     public static function entities($value)
     {
-        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
+        return htmlentities($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
     }
 
     /**
@@ -349,7 +349,7 @@ class Html
             return Arr::sanitize($value, $antlers);
         }
 
-        $value = self::entities($value);
+        $value = htmlspecialchars($value);
 
         if ($antlers) {
             $value = str_replace(['{', '}'], ['&lbrace;', '&rbrace;'], $value);
