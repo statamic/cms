@@ -57,6 +57,7 @@ class HalfMeasureStaticCachingTest extends TestCase
 
         $page
             ->set('content', 'Updated content')
+            ->set('headers', ['foo' => 'updated', 'alfa' => ['updated1', 'updated2']])
             ->saveQuietly(); // Save quietly to prevent the invalidator from clearing the statically cached page.
 
         $response = $this
