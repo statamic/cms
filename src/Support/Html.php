@@ -92,7 +92,7 @@ class Html
      */
     public static function entities($value)
     {
-        return htmlentities($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
+        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
     }
 
     /**
