@@ -4,6 +4,7 @@ namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -786,5 +787,21 @@ class EntryQueryBuilderTest extends TestCase
             'post-2',
             'post-3',
         ], Entry::query()->pluck('slug')->all());
+    }
+
+    /** @test */
+    public function only_queried_values_are_returned()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $paths = Entry::query()->where('id', '3')
+            ->pluck('path')
+            ->map(fn ($path) => Str::afterLast($path, '/'))
+            ->all();
+
+        // We should only get the paths from the index that matched filtered keys.
+        $this->assertSame([
+            'post-3.md',
+        ], $paths);
     }
 }
