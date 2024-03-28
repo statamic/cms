@@ -516,7 +516,7 @@ class EntriesController extends CpController
         if (! $parent || ! $entry->page()->isRoot()) {
             // If a parent is selected, validate that it doesn't exceed the max depth of the structure.
             if ($parent && $entry->page()->depth() > $entry->collection()->structure()->maxDepth()) {
-                throw ValidationException::withMessages(['parent' => "Page exceeds max depth of {$entry->collection()->structure()->maxDepth()}."]);
+                throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_exceeds_max_depth')]);
             }
 
             return;
