@@ -62,39 +62,7 @@ class Multisite extends Command
             return false;
         }
 
-        if ($this->commandMayHaveBeenRan()) {
-            $this->error('Command may have already been run. Did you update your [content/sites.yaml] file?');
-
-            return false;
-        }
-
         return true;
-    }
-
-    private function commandMayHaveBeenRan(): bool
-    {
-        return $this->collectionsHaveBeenMoved()
-            || $this->globalsHaveBeenMoved()
-            || $this->navsHaveBeenMoved();
-    }
-
-    private function collectionsHaveBeenMoved(): bool
-    {
-        if (! $collection = Collection::all()->first()) {
-            return false;
-        }
-
-        return File::isDirectory("content/collections/{$collection->handle()}/{$this->siteHandle}");
-    }
-
-    private function globalsHaveBeenMoved(): bool
-    {
-        return File::isDirectory("content/globals/{$this->siteHandle}");
-    }
-
-    private function navsHaveBeenMoved(): bool
-    {
-        return File::isDirectory("content/navigation/{$this->siteHandle}");
     }
 
     private function confirmSiteHandle(): bool
