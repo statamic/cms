@@ -3,9 +3,11 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
+use Statamic\Console\ValidatesInput;
 use Statamic\Facades\Collection;
 use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
@@ -18,195 +20,38 @@ use Statamic\Statamic;
 
 class Multisite extends Command
 {
-    use EnhancesCommands, RunsInPlease;
+    use ConfirmableTrait, EnhancesCommands, RunsInPlease, ValidatesInput;
 
-    protected $name = 'statamic:multisite';
+    protected $signature = 'statamic:multisite';
+
     protected $description = 'Converts from a single to multisite installation';
 
-    protected $sites;
-    protected $newSiteConfigs;
+    private $siteHandle;
 
     public function handle()
     {
-        if (! $this->ensureProIsEnabled()) {
+        $okayToConvert = $this->confirmToProceed()
+            && $this->ensureProIsEnabled()
+            && $this->ensureMultisiteIsEnabled()
+            && $this->ensureFreshRun()
+            && $this->confirmSiteHandle();
+
+        if (! $okayToConvert) {
             return;
         }
 
-        Stache::disableUpdatingIndexes();
-
-        $this->sites = collect(Site::default()->handle());
-
-        $this->validateRunningOfCommand();
-
-        $confirmed = $this->confirm("The current site handle is [<comment>{$this->siteOne()}</comment>], content will be moved into folders with this name. Is this okay?");
-
-        if (! $confirmed) {
-            $this->crossLine('Change the site handle in <comment>config/statamic/sites.php</comment> then try this command again.');
-
-            return;
-        }
-
-        $this->info("Please enter the handles of the additional sites. Just press enter when you're done.");
-        do {
-            if ($site = $this->ask('Handle of site #'.($this->sites->count() + 1))) {
-                $this->sites->add($site);
-            }
-        } while ($site !== null);
-
-        if ($this->sites->count() < 2) {
-            return $this->crossLine('Multisite has not been enabled.');
-        }
-
-        $this->clearStache();
-
-        $config = $this->updateSiteConfig();
-
-        $this->comment('Converting...');
-
-        Collection::all()->each(function ($collection) {
-            $this->moveCollectionContent($collection);
-            $this->moveCollectionTrees($collection);
-            $this->updateCollection($collection);
-            $this->checkLine("Collection [<comment>{$collection->handle()}</comment>] updated.");
-        });
-
-        GlobalSet::all()->each(function ($set) {
-            $this->moveGlobalSet($set);
-            $this->checkLine("Global [<comment>{$set->handle()}</comment>] updated.");
-        });
-
-        Nav::all()->each(function ($nav) {
-            $this->moveNav($nav);
-            $this->checkLine("Nav [<comment>{$nav->handle()}</comment>] updated.");
-        });
-
-        $this->addPermissions();
-
-        Cache::clear();
-        $this->checkLine('Cache cleared.');
-
-        $this->checkInfo('Done!');
+        $this
+            ->updateSite()
+            ->clearStache()
+            ->convertCollections()
+            ->convertGlobalSets()
+            ->convertNavs()
+            ->addPermissions()
+            ->clearCache()
+            ->checkInfo('Successfully converted from single to multisite installation!');
     }
 
-    protected function clearStache()
-    {
-        Stache::clear();
-        $this->checkLine('Stache cleared.');
-        $this->line('');
-    }
-
-    protected function updateSiteConfig()
-    {
-        $this->newSiteConfigs = $this->newSites()->mapWithKeys(function ($site) {
-            return [$site => [
-                'name' => $site,
-                'locale' => 'en_US',
-                'url' => "/{$site}/",
-            ]];
-        });
-
-        // TODO: Make sure we're doing correct merge behaviour here...
-        $sites = Site::config() + $this->newSiteConfigs->all();
-
-        Site::setSites($sites)->save();
-
-        Stache::sites(Site::all()->map->handle());
-
-        return $sites;
-    }
-
-    protected function moveCollectionContent($collection)
-    {
-        $handle = $collection->handle();
-        $base = "content/collections/{$handle}";
-
-        File::makeDirectory("{$base}/{$this->siteOne()}");
-
-        File::getFiles($base)->each(function ($file) use ($base) {
-            $filename = pathinfo($file, PATHINFO_BASENAME);
-            File::move($file, "{$base}/{$this->siteOne()}/{$filename}");
-        });
-    }
-
-    protected function updateCollection($collection)
-    {
-        $collection
-            ->sites($this->sites->all())
-            ->save();
-    }
-
-    protected function moveCollectionTrees($collection)
-    {
-        if (! $collection->structure()) {
-            return;
-        }
-
-        $collection->structure()->trees()->each->save();
-    }
-
-    protected function moveGlobalSet($set)
-    {
-        $yaml = YAML::file($set->path())->parse();
-        $data = $yaml['data'] ?? [];
-
-        $set->addLocalization($origin = $set->makeLocalization($this->siteOne())->data($data));
-
-        $this->newSites()->each(function ($site) use ($set, $origin) {
-            $set->addLocalization($set->makeLocalization($site)->origin($origin));
-        });
-
-        $set->save();
-    }
-
-    protected function moveNav($nav)
-    {
-        $default = $nav->trees()->first();
-
-        $default->save();
-
-        $this->sites->each(function ($site) use ($nav, $default) {
-            $nav->makeTree($site, $default->tree())->save();
-        });
-    }
-
-    protected function validateRunningOfCommand()
-    {
-        if (Site::hasMultiple()) {
-            exit($this->error('Already configured for multi-site.'));
-        }
-
-        if ($this->commandMayHaveBeenRan()) {
-            exit($this->error('Command may have already been run. Did you update your config/statamic/sites.php file?'));
-        }
-    }
-
-    protected function commandMayHaveBeenRan()
-    {
-        return $this->collectionsHaveBeenMoved()
-            || $this->globalsHaveBeenMoved()
-            || $this->navsHaveBeenMoved();
-    }
-
-    protected function collectionsHaveBeenMoved()
-    {
-        if (! $collection = Collection::all()->first()) {
-            return false;
-        }
-
-        return File::isDirectory("content/collections/{$collection->handle()}/{$this->siteOne()}");
-    }
-
-    protected function globalsHaveBeenMoved()
-    {
-        return File::isDirectory("content/globals/{$this->siteOne()}");
-    }
-
-    protected function navsHaveBeenMoved()
-    {
-        return File::isDirectory("content/navigation/{$this->siteOne()}");
-    }
-
-    protected function ensureProIsEnabled()
+    private function ensureProIsEnabled(): bool
     {
         if (Statamic::pro()) {
             return true;
@@ -228,22 +73,196 @@ class Multisite extends Command
         return true;
     }
 
-    protected function siteOne()
+    private function ensureMultisiteIsEnabled(): bool
     {
-        return $this->sites->first();
+        // TODO
+
+        return true;
     }
 
-    protected function newSites()
+    private function ensureFreshRun(): bool
     {
-        return $this->sites->slice(1);
+        if (Site::hasMultiple()) {
+            $this->error('Already configured for multi-site.');
+
+            return false;
+        }
+
+        if ($this->commandMayHaveBeenRan()) {
+            $this->error('Command may have already been run. Did you update your [content/sites.yaml] file?');
+
+            return false;
+        }
+
+        return true;
     }
 
-    protected function addPermissions()
+    private function commandMayHaveBeenRan(): bool
+    {
+        return $this->collectionsHaveBeenMoved()
+            || $this->globalsHaveBeenMoved()
+            || $this->navsHaveBeenMoved();
+    }
+
+    private function collectionsHaveBeenMoved(): bool
+    {
+        if (! $collection = Collection::all()->first()) {
+            return false;
+        }
+
+        return File::isDirectory("content/collections/{$collection->handle()}/{$this->siteHandle}");
+    }
+
+    private function globalsHaveBeenMoved(): bool
+    {
+        return File::isDirectory("content/globals/{$this->siteHandle}");
+    }
+
+    private function navsHaveBeenMoved(): bool
+    {
+        return File::isDirectory("content/navigation/{$this->siteHandle}");
+    }
+
+    private function confirmSiteHandle(): bool
+    {
+        $handle = $this->siteHandle ?? Site::default()->handle();
+
+        if (! $this->confirm("Content will be moved into site folders by the name [<comment>{$handle}</comment>]. Is this okay?", true)) {
+            $this
+                ->promptForNewSiteHandle()
+                ->confirmSiteHandle();
+        }
+
+        return true;
+    }
+
+    private function promptForNewSiteHandle(): self
+    {
+        $this->siteHandle = $this->ask('Please enter a new site handle');
+
+        if ($this->validationFails($this->siteHandle, ['required', 'alpha_dash'])) {
+            return $this->promptForNewSiteHandle();
+        }
+
+        return $this;
+    }
+
+    private function updateSite(): self
+    {
+        // TODO
+
+        return $this;
+    }
+
+    private function clearStache(): self
+    {
+        Stache::disableUpdatingIndexes();
+        Stache::clear();
+
+        $this->checkLine('Stache cleared.');
+
+        return $this;
+    }
+
+    private function convertCollections(): self
+    {
+        Collection::all()->each(function ($collection) {
+            $this->moveCollectionContent($collection);
+            $this->moveCollectionTrees($collection);
+            $this->updateCollection($collection);
+            $this->checkLine("Collection [<comment>{$collection->handle()}</comment>] updated.");
+        });
+
+        return $this;
+    }
+
+    private function moveCollectionContent($collection): void
+    {
+        $handle = $collection->handle();
+
+        $base = "content/collections/{$handle}";
+
+        File::makeDirectory("{$base}/{$this->siteHandle}");
+
+        File::getFiles($base)->each(function ($file) use ($base) {
+            $filename = pathinfo($file, PATHINFO_BASENAME);
+            File::move($file, "{$base}/{$this->siteHandle}/{$filename}");
+        });
+    }
+
+    private function updateCollection($collection): void
+    {
+        $collection
+            ->sites([$this->siteHandle])
+            ->save();
+    }
+
+    private function moveCollectionTrees($collection): void
+    {
+        if (! $collection->structure()) {
+            return;
+        }
+
+        $collection->structure()->trees()->each->save();
+    }
+
+    private function convertGlobalSets(): self
+    {
+        GlobalSet::all()->each(function ($set) {
+            $this->moveGlobalSet($set);
+            $this->checkLine("Global [<comment>{$set->handle()}</comment>] updated.");
+        });
+
+        return $this;
+    }
+
+    private function moveGlobalSet($set): void
+    {
+        $yaml = YAML::file($set->path())->parse();
+
+        $data = $yaml['data'] ?? [];
+
+        $set->addLocalization($set->makeLocalization($this->siteHandle)->data($data));
+
+        $set->save();
+    }
+
+    private function convertNavs(): self
+    {
+        Nav::all()->each(function ($nav) {
+            $this->moveNav($nav);
+            $this->checkLine("Nav [<comment>{$nav->handle()}</comment>] updated.");
+        });
+
+        return $this;
+    }
+
+    private function moveNav($nav): void
+    {
+        $default = $nav->trees()->first();
+
+        $default->save();
+
+        $nav->makeTree($this->siteHandle, $default->tree())->save();
+    }
+
+    private function addPermissions(): self
     {
         Role::all()->each(function ($role) {
-            Site::all()->each(fn ($site) => $role->addPermission("access {$site->handle()} site"));
+            $role->addPermission("access {$this->siteHandle} site");
             $role->save();
             $this->checkLine("Site permissions added to [<comment>{$role->handle()}</comment>] role.");
         });
+
+        return $this;
+    }
+
+    private function clearCache(): self
+    {
+        Cache::clear();
+
+        $this->checkLine('Cache cleared.');
+
+        return $this;
     }
 }
