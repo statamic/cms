@@ -16,6 +16,7 @@ use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
+use Statamic\Rules\Handle;
 use Statamic\Statamic;
 
 class Multisite extends Command
@@ -157,7 +158,7 @@ class Multisite extends Command
     {
         $this->siteHandle = $this->ask('Please enter a new site handle');
 
-        if ($this->validationFails($this->siteHandle, ['required', 'alpha_dash'])) {
+        if ($this->validationFails($this->siteHandle, ['required', new Handle])) {
             return $this->promptForNewSiteHandle();
         }
 
