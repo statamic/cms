@@ -34,7 +34,7 @@ class BroadcastServiceProvider extends ServiceProvider
     protected function enabled()
     {
         return in_array(
-            \App\Providers\BroadcastServiceProvider::class,
+            \Illuminate\Broadcasting\BroadcastServiceProvider::class,
             array_keys($this->app->getLoadedProviders())
         );
     }

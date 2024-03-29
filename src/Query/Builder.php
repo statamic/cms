@@ -573,6 +573,8 @@ abstract class Builder implements Contract
 
     abstract public function get($columns = ['*']);
 
+    abstract public function pluck($column, $key = null);
+
     public function when($value, $callback, $default = null)
     {
         if ($value) {

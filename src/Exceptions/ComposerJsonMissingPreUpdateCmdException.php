@@ -3,8 +3,8 @@
 namespace Statamic\Exceptions;
 
 use Exception;
-use Facade\IgnitionContracts\ProvidesSolution;
-use Facade\IgnitionContracts\Solution;
+use Spatie\Ignition\Contracts\ProvidesSolution;
+use Spatie\Ignition\Contracts\Solution;
 use Statamic\Ignition\Solutions\EnableComposerUpdateScripts;
 
 class ComposerJsonMissingPreUpdateCmdException extends Exception implements ProvidesSolution

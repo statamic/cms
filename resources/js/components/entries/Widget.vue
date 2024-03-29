@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="h-full">
         <div v-if="initializing" class="loading">
             <loading-graphic />
         </div>
@@ -11,6 +11,7 @@
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
+            class="h-full flex flex-col justify-between"
         >
             <div slot-scope="{ }">
                 <data-list-table :loading="loading">

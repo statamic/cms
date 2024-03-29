@@ -23,7 +23,7 @@ abstract class Builder extends BaseBuilder
         return $this->getFilteredAndLimitedKeys()->count();
     }
 
-    public function get($columns = ['*'])
+    private function resolveKeys()
     {
         $startTime = hrtime(true);
 
@@ -31,9 +31,17 @@ abstract class Builder extends BaseBuilder
 
         $keys = $this->orderKeys($keys);
 
-        $keys = $this->limitKeys($keys);
+        return $this->limitKeys($keys);
+    }
 
-        $items = $this->getItems($keys);
+    public function pluck($column, $key = null)
+    {
+        return $this->store->getItemValues($this->resolveKeys(), $column, $key);
+    }
+
+    public function get($columns = ['*'])
+    {
+        $items = $this->getItems($this->resolveKeys());
 
         $items->each(fn ($item) => $item
             ->selectedQueryColumns($this->columns ?? $columns)
