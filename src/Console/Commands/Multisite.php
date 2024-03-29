@@ -48,7 +48,7 @@ class Multisite extends Command
             ->convertNavs()
             ->addPermissions()
             ->clearCache()
-            ->checkInfo('Successfully converted from single to multisite installation!');
+            ->checkInfo(PHP_EOL.'Successfully converted from single to multisite installation!');
     }
 
     private function ensureProIsEnabled(): bool
@@ -69,6 +69,8 @@ class Multisite extends Command
 
             return false;
         }
+
+        $this->checkLine('Statamic Pro enabled.');
 
         return true;
     }
