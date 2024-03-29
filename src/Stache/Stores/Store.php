@@ -29,15 +29,18 @@ abstract class Store
     protected $keys;
     protected $identifiedBy = 'id';
 
-    protected function resolveFromIndex($keys, $column)
+    protected function getIndexedValues($name, $only)
     {
-        return $this->resolveIndex($column)
+        // The keys are provided as an array of IDs. It's faster to do has() than contains() so we'll flip them.
+        $only = $only->flip();
+
+        return $this->resolveIndex($name)
             ->load()
             ->items()
-            ->where(fn ($value, $key) => $keys->has($key));
+            ->where(fn ($value, $key) => $only->has($key));
     }
 
-    public function getFromIndex($keys, $column, $key = null)
+    public function getItemValues($keys, $column, $key = null)
     {
         // This is for performance. There's no need to resolve anything
         // else if we're looking for the keys. We have them already.
@@ -45,17 +48,16 @@ abstract class Store
             return $keys;
         }
 
-        $keys = $keys->flip();
-        $values = $this->resolveFromIndex($keys, $column);
+        $values = $this->getIndexedValues($column, $keys);
 
         if ($key === null) {
             return $values->values();
         }
 
-        $keyValues = $this->resolveFromIndex($keys, $key);
+        $keyValues = $this->getIndexedValues($key, $keys);
         $newValues = [];
 
-        foreach ($keys->keys() as $keyValue) {
+        foreach ($keys as $keyValue) {
             $newKeyValue = $keyValues[$keyValue] ?? null;
 
             $newValue = $values[$keyValue] ?? null;

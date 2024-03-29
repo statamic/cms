@@ -14,11 +14,15 @@ abstract class AggregateStore extends Store
         $this->stores = collect();
     }
 
-    protected function resolveFromIndex($keys, $column)
+    protected function getIndexedValues($name, $only)
     {
+        // The keys are provided as an array of IDs. It's faster to do has() than contains() so we'll flip them.
+        $only = $only->flip();
+
+        // Return a map of the requested keys to the corresponding indexed values.
         return $this->stores()
-            ->mapWithKeys(fn ($store) => $store->resolveIndex($column)->load()->items())
-            ->where(fn ($value, $key) => $keys->has($key));
+            ->mapWithKeys(fn ($store) => $store->resolveIndex($name)->load()->items())
+            ->where(fn ($value, $key) => $only->has($key));
     }
 
     public function store($key)

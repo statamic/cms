@@ -33,18 +33,11 @@ abstract class Builder extends BaseBuilder
 
     public function pluck($column, $key = null)
     {
-        $keys = $this->resolveKeys();
+        $keys = $this
+            ->resolveKeys()
+            ->map(fn ($key) => Str::after($key, '::'));
 
-        return $this->store->getFromIndex(
-            $this->getKeysForIndexQuery($keys),
-            $column,
-            $key
-        );
-    }
-
-    private function getKeysForIndexQuery($keys)
-    {
-        return $keys->map(fn ($key) => Str::after($key, '::'));
+        return $this->store->getItemValues($keys, $column, $key);
     }
 
     public function get($columns = ['*'])
