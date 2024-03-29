@@ -8,8 +8,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 abstract class BasicStore extends Store
 {
-    protected $identifiedBy = 'id';
-
     public function getItemFilter(SplFileInfo $file)
     {
         return $file->getExtension() === 'yaml';
@@ -48,7 +46,7 @@ abstract class BasicStore extends Store
     {
         // This is for performance. There's no need to resolve anything
         // else if we're looking for the keys. We have them already.
-        if ($valueIndex === $this->identifiedBy && $keyIndex === null) {
+        if ($valueIndex === 'id' && $keyIndex === null) {
             return $keys;
         }
 
