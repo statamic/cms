@@ -41,7 +41,7 @@ class Multisite extends Command
         }
 
         $this
-            ->updateSite()
+            ->updateSiteConfig()
             ->clearStache()
             ->convertCollections()
             ->convertGlobalSets()
@@ -147,9 +147,13 @@ class Multisite extends Command
         return $this;
     }
 
-    private function updateSite(): self
+    private function updateSiteConfig(): self
     {
-        // TODO
+        $siteConfig = collect(Site::config())->first();
+
+        Site::setSites([$this->siteHandle => $siteConfig])->save();
+
+        $this->checkLine('Site config updated.');
 
         return $this;
     }
