@@ -42,7 +42,7 @@ abstract class BasicStore extends Store
         return $item;
     }
 
-    public function getItemValues($keys, $valueIndex, $keyIndex = null)
+    public function getItemValues($keys, $valueIndex, $keyIndex)
     {
         // This is for performance. There's no need to resolve anything
         // else if we're looking for the keys. We have them already.

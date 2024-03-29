@@ -65,7 +65,7 @@ abstract class AggregateStore extends Store
         return $this->store($store)->getItem($id);
     }
 
-    public function getItemValues($keys, $valueIndex, $keyIndex = null)
+    public function getItemValues($keys, $valueIndex, $keyIndex)
     {
         return $keys
             ->map(function ($key) {
