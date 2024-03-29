@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Query;
 
-use Illuminate\Support\Str;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
@@ -33,11 +32,7 @@ abstract class Builder extends BaseBuilder
 
     public function pluck($column, $key = null)
     {
-        $keys = $this
-            ->resolveKeys()
-            ->map(fn ($key) => Str::after($key, '::'));
-
-        return $this->store->getItemValues($keys, $column, $key);
+        return $this->store->getItemValues($this->resolveKeys(), $column, $key);
     }
 
     public function get($columns = ['*'])

@@ -19,9 +19,9 @@ class EntryQueryBuilderTest extends TestCase
     {
         Collection::make('posts')->save();
 
-        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'author' => 'John Doe'])->create();
-        $entry = EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'author' => 'John Doe'])->create();
-        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'author' => 'John Doe'])->create();
+        EntryFactory::id('id-1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'author' => 'John Doe'])->create();
+        $entry = EntryFactory::id('id-2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'author' => 'John Doe'])->create();
+        EntryFactory::id('id-3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'author' => 'John Doe'])->create();
 
         return $entry;
     }
@@ -774,25 +774,33 @@ class EntryQueryBuilderTest extends TestCase
     public function values_can_be_plucked()
     {
         $this->createDummyCollectionAndEntries();
-        Entry::find('2')->set('type', 'b')->save();
-        Entry::find('3')->set('type', 'b')->save();
+        Entry::find('id-2')->set('type', 'b')->save();
+        Entry::find('id-3')->set('type', 'b')->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['title' => 'Thing 1', 'type' => 'a'])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['title' => 'Thing 2', 'type' => 'b'])->create();
 
         $this->assertEquals([
-            1 => 'post-1',
-            2 => 'post-2',
-            3 => 'post-3',
+            'id-1' => 'post-1',
+            'id-2' => 'post-2',
+            'id-3' => 'post-3',
+            'id-4' => 'thing-1',
+            'id-5' => 'thing-2',
         ], Entry::query()->pluck('slug', 'id')->all());
 
         $this->assertEquals([
             'post-1',
             'post-2',
             'post-3',
+            'thing-1',
+            'thing-2',
         ], Entry::query()->pluck('slug')->all());
 
         // Assert only queried values are plucked.
         $this->assertSame([
             'post-2',
             'post-3',
+            'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
     }
 }

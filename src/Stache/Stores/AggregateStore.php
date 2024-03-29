@@ -14,17 +14,6 @@ abstract class AggregateStore extends Store
         $this->stores = collect();
     }
 
-    protected function getIndexedValues($name, $only)
-    {
-        // The keys are provided as an array of IDs. It's faster to do has() than contains() so we'll flip them.
-        $only = $only->flip();
-
-        // Return a map of the requested keys to the corresponding indexed values.
-        return $this->stores()
-            ->mapWithKeys(fn ($store) => $store->resolveIndex($name)->load()->items())
-            ->where(fn ($value, $key) => $only->has($key));
-    }
-
     public function store($key)
     {
         if (! $this->stores->has($key)) {
@@ -74,6 +63,18 @@ abstract class AggregateStore extends Store
         [$store, $id] = explode('::', $key, 2);
 
         return $this->store($store)->getItem($id);
+    }
+
+    public function getItemValues($keys, $valueIndex, $keyIndex = null)
+    {
+        return $keys
+            ->map(function ($key) {
+                [$store, $key] = explode('::', $key, 2);
+
+                return compact('store', 'key');
+            })
+            ->groupBy('store')
+            ->flatMap(fn ($items, $store) => $this->store($store)->getItemValues($items->map->key, $valueIndex, $keyIndex));
     }
 
     public function clear()

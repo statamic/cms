@@ -27,37 +27,6 @@ abstract class Store
     protected $shouldCacheFileItems = false;
     protected $modified;
     protected $keys;
-    protected $identifiedBy = 'id';
-
-    protected function getIndexedValues($name, $only)
-    {
-        // The keys are provided as an array of IDs. It's faster to do has() than contains() so we'll flip them.
-        $only = $only->flip();
-
-        return $this->resolveIndex($name)
-            ->load()
-            ->items()
-            ->where(fn ($value, $key) => $only->has($key));
-    }
-
-    public function getItemValues($keys, $valueIndex, $keyIndex = null)
-    {
-        // This is for performance. There's no need to resolve anything
-        // else if we're looking for the keys. We have them already.
-        if ($valueIndex === $this->identifiedBy && $keyIndex === null) {
-            return $keys;
-        }
-
-        $values = $this->getIndexedValues($valueIndex, $keys);
-
-        if ($keyIndex === null) {
-            return $values->values();
-        }
-
-        $keyValues = $this->getIndexedValues($keyIndex, $keys);
-
-        return $keys->mapWithKeys(fn ($key) => [$keyValues[$key] => $values[$key]]);
-    }
 
     public function directory($directory = null)
     {
@@ -120,6 +89,8 @@ abstract class Store
     }
 
     abstract public function getItem($key);
+
+    abstract public function getItemValues($keys, $valueIndex, $keyIndex = null);
 
     public function indexUsage()
     {
