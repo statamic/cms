@@ -1543,7 +1543,7 @@ class CoreModifiers extends Modifier
      */
     public function modifyDate($value, $params)
     {
-        return $this->carbon($value)->modify(Arr::get($params, 0));
+        return $this->carbon($value)->copy()->modify(Arr::get($params, 0));
     }
 
     /**

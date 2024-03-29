@@ -91,6 +91,10 @@ class TreeBuilder
                 'entry' => $page->reference(),
                 'title' => $page->hasCustomTitle() ? $page->title() : null,
                 'entry_title' => $referenceExists ? $page->entry()->value('title') : null,
+                'entry_blueprint' => $referenceExists ? [
+                    'handle' => $page->entry()->blueprint()->handle(),
+                    'title' => $page->entry()->blueprint()->title(),
+                ] : null,
                 'url' => $referenceExists ? $page->url() : null,
                 'edit_url' => $page->editUrl(),
                 'can_delete' => $referenceExists ? User::current()->can('delete', $page->entry()) : true,

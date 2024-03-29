@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Query;
 
-use Illuminate\Support\Str;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
@@ -22,7 +21,7 @@ abstract class Builder extends BaseBuilder
         return $this->getFilteredAndLimitedKeys()->count();
     }
 
-    protected function resolveKeys()
+    private function resolveKeys()
     {
         $keys = $this->getFilteredKeys();
 
@@ -33,26 +32,7 @@ abstract class Builder extends BaseBuilder
 
     public function pluck($column, $key = null)
     {
-        $keys = $this->resolveKeys();
-
-        return $this->store->getFromIndex(
-            $this->getKeysForIndexQuery($keys),
-            $column,
-            $key
-        );
-    }
-
-    protected function getKeysForIndexQuery($keys)
-    {
-        return $keys->map(function ($key) {
-            $queryKey = Str::after($key, '::');
-
-            if (! Str::contains($queryKey, '-') && is_numeric($queryKey)) {
-                return intval($queryKey);
-            }
-
-            return $queryKey;
-        });
+        return $this->store->getItemValues($this->resolveKeys(), $column, $key);
     }
 
     public function get($columns = ['*'])

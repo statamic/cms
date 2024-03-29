@@ -14,6 +14,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 
 class TaxonomiesController extends CpController
@@ -99,7 +100,7 @@ class TaxonomiesController extends CpController
 
         $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
+            'handle' => ['nullable', new Handle],
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
@@ -251,7 +252,7 @@ class TaxonomiesController extends CpController
                         'type' => 'html',
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <span class="mr-4">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <span class="rtl:ml-4 ltr:mr-4">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
                             '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
