@@ -46,13 +46,13 @@ abstract class BasicStore extends Store
     {
         // This is for performance. There's no need to resolve anything
         // else if we're looking for the keys. We have them already.
-        if ($valueIndex === 'id' && $keyIndex === null) {
+        if ($valueIndex === 'id' && ! $keyIndex) {
             return $keys;
         }
 
         $values = $this->getIndexedValues($valueIndex, $keys);
 
-        if ($keyIndex === null) {
+        if (! $keyIndex) {
             return $values->values();
         }
 
