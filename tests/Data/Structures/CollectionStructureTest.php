@@ -7,7 +7,6 @@ use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Entry;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
@@ -18,7 +17,6 @@ class CollectionStructureTest extends StructureTestCase
 {
     private $collection;
     private $entryQueryBuilder;
-    private $queryBuilderGetReturnValue;
     private $queryBuilderPluckReturnValue;
 
     public function setUp(): void
@@ -28,9 +26,7 @@ class CollectionStructureTest extends StructureTestCase
         $this->entryQueryBuilder = $this->mock(EntryQueryBuilder::class);
         $this->entryQueryBuilder->shouldReceive('where')->with('site', 'en')->andReturnSelf();
         $this->entryQueryBuilder->shouldReceive('where')->with('site', 'fr')->andReturnSelf();
-        $this->entryQueryBuilder->shouldReceive('get')->andReturnUsing(function () {
-            return $this->queryBuilderGetReturnValue();
-        });
+        $this->entryQueryBuilder->shouldReceive('get')->never();
         $this->entryQueryBuilder->shouldReceive('pluck')->andReturnUsing(function () {
             return $this->queryBuilderPluckReturnValue();
         });
@@ -44,11 +40,6 @@ class CollectionStructureTest extends StructureTestCase
     public function structure($handle = null)
     {
         return (new CollectionStructure)->handle($handle);
-    }
-
-    public function queryBuilderGetReturnValue()
-    {
-        return $this->queryBuilderGetReturnValue ?? collect();
     }
 
     public function queryBuilderPluckReturnValue()
@@ -88,10 +79,6 @@ class CollectionStructureTest extends StructureTestCase
         $structure = $this->structure()->handle('test');
         $this->collection->shouldReceive('structure')->andReturn($structure);
         $this->collection->shouldReceive('handle')->andReturn('test');
-
-        $this->queryBuilderGetReturnValue = collect([
-            Entry::make()->id('1'),
-        ]);
 
         $this->queryBuilderPluckReturnValue = collect([
             1,
@@ -269,11 +256,6 @@ class CollectionStructureTest extends StructureTestCase
     {
         Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
 
-        $this->queryBuilderGetReturnValue = collect([
-            Entry::make()->id('123'),
-            Entry::make()->id('456'),
-        ]);
-
         $this->queryBuilderPluckReturnValue = collect([
             123,
             456,
@@ -286,11 +268,6 @@ class CollectionStructureTest extends StructureTestCase
     public function only_entries_belonging_to_the_associated_collection_may_be_in_the_tree()
     {
         Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
-
-        $this->queryBuilderGetReturnValue = collect([
-            Entry::make()->id('1'),
-            Entry::make()->id('2'),
-        ]);
 
         $this->queryBuilderPluckReturnValue = collect([
             1,
@@ -322,14 +299,6 @@ class CollectionStructureTest extends StructureTestCase
     public function entries_not_explicitly_in_the_tree_should_be_appended_to_the_end_of_the_tree()
     {
         Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
-
-        $this->queryBuilderGetReturnValue = collect([
-            Entry::make()->id('1'),
-            Entry::make()->id('2'),
-            Entry::make()->id('3'),
-            Entry::make()->id('4'),
-            Entry::make()->id('5'),
-        ]);
 
         $this->queryBuilderPluckReturnValue = collect([
             1,
