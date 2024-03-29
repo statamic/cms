@@ -7,7 +7,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Query\StacheQueryDumper;
 
-trait LogsStacheQueries
+trait LogsQueries
 {
     protected $loggerEnabled = false;
     protected $logRealValues = false;
