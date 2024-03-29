@@ -604,20 +604,30 @@ class AssetQueryBuilderTest extends TestCase
     /** @test */
     public function values_can_be_plucked()
     {
-        Asset::find('test::a.jpg')->data(['text' => 'Text 1'])->save();
-        Asset::find('test::b.txt')->data(['text' => 'Text 2'])->save();
-        Asset::find('test::c.txt')->data(['text' => 'Text 3'])->save();
+        $this->assertEquals([
+            'test::a.jpg' => 'a.jpg',
+            'test::b.txt' => 'b.txt',
+            'test::c.txt' => 'c.txt',
+            'test::d.jpg' => 'd.jpg',
+            'test::e.jpg' => 'e.jpg',
+            'test::f.jpg' => 'f.jpg',
+        ], $this->container->queryAssets()->pluck('path', 'id')->all());
 
         $this->assertEquals([
-            'a.jpg' => 'Text 1',
-            'b.txt' => 'Text 2',
-            'c.txt' => 'Text 3',
-        ], $this->container->queryAssets()->whereNotNull('text')->pluck('text', 'path')->all());
+            'a.jpg',
+            'b.txt',
+            'c.txt',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], $this->container->queryAssets()->pluck('path')->all());
 
-        $this->assertEquals([
-            'Text 1',
-            'Text 2',
-            'Text 3',
-        ], $this->container->queryAssets()->whereNotNull('text')->pluck('text')->all());
+        // Assert only queried values are plucked.
+        $this->assertSame([
+            'a.jpg',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], $this->container->queryAssets()->where('extension', 'jpg')->pluck('path')->all());
     }
 }

@@ -630,10 +630,10 @@ class QueryBuilderTest extends TestCase
     public function values_can_be_plucked()
     {
         $items = collect([
-            ['reference' => 'a', 'title' => 'Frodo'],
-            ['reference' => 'b', 'title' => 'Gandalf'],
-            ['reference' => 'c', 'title' => 'Frodo\'s Precious'],
-            ['reference' => 'd', 'title' => 'Smeagol\'s Precious'],
+            ['reference' => 'a', 'title' => 'Frodo', 'type' => 'a'],
+            ['reference' => 'b', 'title' => 'Gandalf', 'type' => 'a'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious', 'type' => 'b'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious', 'type' => 'b'],
         ]);
 
         $query = (new FakeQueryBuilder($items))->withoutData();
@@ -651,6 +651,12 @@ class QueryBuilderTest extends TestCase
             'Frodo\'s Precious',
             'Smeagol\'s Precious',
         ], $query->pluck('title')->all());
+
+        // Assert only queried values are plucked.
+        $this->assertSame([
+            'Frodo\'s Precious',
+            'Smeagol\'s Precious',
+        ], $query->where('type', 'b')->pluck('title')->all());
     }
 }
 

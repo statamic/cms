@@ -4,7 +4,6 @@ namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -775,6 +774,8 @@ class EntryQueryBuilderTest extends TestCase
     public function values_can_be_plucked()
     {
         $this->createDummyCollectionAndEntries();
+        Entry::find('2')->set('type', 'b')->save();
+        Entry::find('3')->set('type', 'b')->save();
 
         $this->assertEquals([
             1 => 'post-1',
@@ -787,21 +788,11 @@ class EntryQueryBuilderTest extends TestCase
             'post-2',
             'post-3',
         ], Entry::query()->pluck('slug')->all());
-    }
 
-    /** @test */
-    public function only_queried_values_are_returned_by_pluck()
-    {
-        $this->createDummyCollectionAndEntries();
-
-        $paths = Entry::query()->where('id', '3')
-            ->pluck('path')
-            ->map(fn ($path) => Str::afterLast($path, '/'))
-            ->all();
-
-        // We should only get the paths from the index that matched filtered keys.
+        // Assert only queried values are plucked.
         $this->assertSame([
-            'post-3.md',
-        ], $paths);
+            'post-2',
+            'post-3',
+        ], Entry::query()->where('type', 'b')->pluck('slug')->all());
     }
 }

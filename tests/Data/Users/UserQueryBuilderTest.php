@@ -368,9 +368,9 @@ class UserQueryBuilderTest extends TestCase
     /** @test */
     public function values_can_be_plucked()
     {
-        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
-        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
-        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'type' => 'a'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol', 'type' => 'b'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo', 'type' => 'b'])->save();
 
         $this->assertEquals([
             'gandalf@precious.com' => 'Gandalf',
@@ -383,17 +383,11 @@ class UserQueryBuilderTest extends TestCase
             'Smeagol',
             'Frodo',
         ], User::query()->pluck('name')->all());
-    }
 
-    /** @test */
-    public function only_queried_values_are_returned_by_pluck()
-    {
-        User::make()->id(1)->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
-        User::make()->id(2)->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
-        User::make()->id(3)->email('frodo@precious.com')->data(['name' => 'Frodo'])->save();
-
+        // Assert only queried values are plucked.
         $this->assertSame([
             'Smeagol',
-        ], User::query()->where('id', 2)->pluck('name')->all());
+            'Frodo',
+        ], User::query()->where('type', 'b')->pluck('name')->all());
     }
 }
