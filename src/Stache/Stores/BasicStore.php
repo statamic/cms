@@ -61,15 +61,16 @@ abstract class BasicStore extends Store
         return $keys->mapWithKeys(fn ($key) => [$keyValues[$key] => $values[$key]]);
     }
 
-    protected function getIndexedValues($name, $only)
+    private function getIndexedValues($name, $only)
     {
-        // The keys are provided as an array of IDs. It's faster to do has() than contains() so we'll flip them.
+        // We don't want *all* the values in the index. We only want the requested keys. They are
+        // provided as an array of IDs. It's faster to do has() than contains() so we'll flip them.
         $only = $only->flip();
 
         return $this->resolveIndex($name)
             ->load()
             ->items()
-            ->where(fn ($value, $key) => $only->has($key));
+            ->filter(fn ($value, $key) => $only->has($key));
     }
 
     protected function getCachedItem($key)
