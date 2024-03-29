@@ -18,6 +18,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Rules\Handle;
 use Statamic\Statamic;
+use Wilderborn\Partyline\Facade as Partyline;
 
 class Multisite extends Command
 {
@@ -32,16 +33,17 @@ class Multisite extends Command
     public function handle()
     {
         $okayToConvert = $this->confirmToProceed()
+            && $this->isFreshRun()
+            && $this->confirmSiteHandle()
             && $this->ensureProIsEnabled()
-            && $this->ensureMultisiteIsEnabled()
-            && $this->ensureFreshRun()
-            && $this->confirmSiteHandle();
+            && $this->ensureMultisiteIsEnabled();
 
         if (! $okayToConvert) {
             return;
         }
 
         $this
+            ->disablePartyline()
             ->updateSiteConfig()
             ->clearStache()
             ->convertCollections()
@@ -49,56 +51,10 @@ class Multisite extends Command
             ->convertNavs()
             ->addPermissions()
             ->clearCache()
-            ->checkInfo(PHP_EOL.'Successfully converted from single to multisite installation!');
+            ->checkInfo('Successfully converted from single to multisite installation!');
     }
 
-    private function ensureProIsEnabled(): bool
-    {
-        if (Statamic::pro()) {
-            return true;
-        }
-
-        if (! $this->confirm('Statamic Pro is required for multiple sites. Enable pro and continue?', true)) {
-            return false;
-        }
-
-        Statamic::enablePro();
-
-        if (! Statamic::pro()) {
-            $this->error('Could not reliably enable pro, please modify your [config/statamic/editions.php] as follows:');
-            $this->line("'pro' => env('STATAMIC_PRO_ENABLED', false)");
-
-            return false;
-        }
-
-        $this->checkLine('Statamic Pro enabled.');
-
-        return true;
-    }
-
-    private function ensureMultisiteIsEnabled(): bool
-    {
-        $contents = File::get($configPath = config_path('statamic/sites.php'));
-
-        if (str_contains($contents, "'enabled' => true,")) {
-            return true;
-        } elseif (str_contains($contents, "'enabled' => false,")) {
-            $contents = str_replace("'enabled' => false,", "'enabled' => true,", $contents);
-        } else {
-            $this->error('Could not reliably enable multisite, please modify your [config/statamic/sites.php] as follows:');
-            $this->line("'enabled' => true,");
-
-            return false;
-        }
-
-        File::put($configPath, $contents);
-
-        $this->checkLine('Multisite enabled.');
-
-        return true;
-    }
-
-    private function ensureFreshRun(): bool
+    private function isFreshRun(): bool
     {
         if (Site::hasMultiple()) {
             $this->error('Already configured for multi-site.');
@@ -161,6 +117,67 @@ class Multisite extends Command
         if ($this->validationFails($this->siteHandle, ['required', new Handle])) {
             return $this->promptForNewSiteHandle();
         }
+
+        return $this;
+    }
+
+    private function ensureProIsEnabled(): bool
+    {
+        if (Statamic::pro()) {
+            return true;
+        }
+
+        if (! $this->confirm('Statamic Pro is required for multiple sites. Enable pro and continue?', true)) {
+            return false;
+        }
+
+        Statamic::enablePro();
+
+        if (! Statamic::pro()) {
+            $this->error('Could not reliably enable pro, please modify your [config/statamic/editions.php] as follows:');
+            $this->line("'pro' => env('STATAMIC_PRO_ENABLED', false)");
+
+            return false;
+        }
+
+        $this->checkLine('Statamic Pro enabled.');
+
+        return true;
+    }
+
+    private function ensureMultisiteIsEnabled(): bool
+    {
+        $contents = File::get($configPath = config_path('statamic/sites.php'));
+
+        if (str_contains($contents, "'enabled' => true,")) {
+            return true;
+        } elseif (str_contains($contents, "'enabled' => false,")) {
+            $contents = str_replace("'enabled' => false,", "'enabled' => true,", $contents);
+        } else {
+            $this->error('Could not reliably enable multisite, please modify your [config/statamic/sites.php] as follows:');
+            $this->line("'enabled' => true,");
+
+            return false;
+        }
+
+        File::put($configPath, $contents);
+
+        $this->checkLine('Multisite enabled.');
+
+        return true;
+    }
+
+    private function disablePartyline(): self
+    {
+        $dummyClass = new class
+        {
+            public function __call($method, $args)
+            {
+                //
+            }
+        };
+
+        Partyline::swap($dummyClass);
 
         return $this;
     }
