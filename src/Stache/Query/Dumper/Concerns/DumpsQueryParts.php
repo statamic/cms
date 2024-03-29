@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Stache\Query\Concerns;
+namespace Statamic\Stache\Query\Dumper\Concerns;
 
 trait DumpsQueryParts
 {

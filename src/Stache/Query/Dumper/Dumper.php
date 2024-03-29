@@ -1,12 +1,12 @@
 <?php
 
-namespace Statamic\Stache\Query;
+namespace Statamic\Stache\Query\Dumper;
 
-use Statamic\Stache\Query\Concerns\DumpsQueryParts;
-use Statamic\Stache\Query\Concerns\DumpsQueryValues;
-use Statamic\Stache\Query\Concerns\DumpsWheres;
+use Statamic\Stache\Query\Dumper\Concerns\DumpsQueryParts;
+use Statamic\Stache\Query\Dumper\Concerns\DumpsQueryValues;
+use Statamic\Stache\Query\Dumper\Concerns\DumpsWheres;
 
-class StacheQueryDumper
+class Dumper
 {
     use DumpsQueryParts, DumpsQueryValues, DumpsWheres;
 

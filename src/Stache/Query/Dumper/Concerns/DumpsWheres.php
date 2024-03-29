@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Stache\Query\Concerns;
+namespace Statamic\Stache\Query\Dumper\Concerns;
 
 use Illuminate\Support\Str;
 use Statamic\Stache\Query\Builder;

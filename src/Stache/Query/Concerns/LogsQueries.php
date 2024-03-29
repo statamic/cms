@@ -4,8 +4,8 @@ namespace Statamic\Stache\Query\Concerns;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
+use Statamic\Stache\Query\Dumper\Dumper;
 use Statamic\Stache\Query\EntryQueryBuilder;
-use Statamic\Stache\Query\StacheQueryDumper;
 
 trait LogsQueries
 {
@@ -22,7 +22,7 @@ trait LogsQueries
             }
         }
 
-        return (new StacheQueryDumper(
+        return (new Dumper(
             $this->store,
             $this->wheres,
             $this->columns,
