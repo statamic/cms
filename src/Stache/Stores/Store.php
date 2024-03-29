@@ -40,32 +40,23 @@ abstract class Store
             ->where(fn ($value, $key) => $only->has($key));
     }
 
-    public function getItemValues($keys, $column, $key = null)
+    public function getItemValues($keys, $valueIndex, $keyIndex = null)
     {
         // This is for performance. There's no need to resolve anything
         // else if we're looking for the keys. We have them already.
-        if ($column === $this->identifiedBy && $key === null) {
+        if ($valueIndex === $this->identifiedBy && $keyIndex === null) {
             return $keys;
         }
 
-        $values = $this->getIndexedValues($column, $keys);
+        $values = $this->getIndexedValues($valueIndex, $keys);
 
-        if ($key === null) {
+        if ($keyIndex === null) {
             return $values->values();
         }
 
-        $keyValues = $this->getIndexedValues($key, $keys);
-        $newValues = [];
+        $keyValues = $this->getIndexedValues($keyIndex, $keys);
 
-        foreach ($keys as $keyValue) {
-            $newKeyValue = $keyValues[$keyValue] ?? null;
-
-            $newValue = $values[$keyValue] ?? null;
-
-            $newValues[$newKeyValue] = $newValue;
-        }
-
-        return collect($newValues);
+        return $keys->mapWithKeys(fn ($key) => [$keyValues[$key] => $values[$key]]);
     }
 
     public function directory($directory = null)
