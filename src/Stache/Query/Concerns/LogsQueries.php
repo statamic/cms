@@ -9,7 +9,6 @@ use Statamic\Stache\Query\EntryQueryBuilder;
 
 trait LogsQueries
 {
-    protected $loggerEnabled = false;
     protected $logRealValues = false;
 
     public function dumpStacheQuery()
@@ -37,7 +36,7 @@ trait LogsQueries
 
     protected function emitQueryEvent($startTime, $endTime): void
     {
-        if (! $this->loggerEnabled) {
+        if (! config('statamic.stache.query_logging.enabled', false)) {
             return;
         }
 
