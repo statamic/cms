@@ -1088,6 +1088,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function __serialize(): array
     {
+        if ($this->slug instanceof Closure) {
+            $slug = $this->slug;
+            $this->slug = $slug($this);
+        }
+
         return Arr::except(get_object_vars($this), ['computedCallbackCache']);
     }
 
@@ -1096,15 +1101,5 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
-    }
-
-    public function __sleep()
-    {
-        if ($this->slug instanceof Closure) {
-            $slug = $this->slug;
-            $this->slug = $slug($this);
-        }
-
-        return array_keys(get_object_vars($this));
     }
 }
