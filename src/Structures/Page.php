@@ -443,7 +443,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
             return $this->routeData;
         }
 
-        return $this->routeData = $this->entry()->routeData();
+        return $this->routeData = $this->entry()?->routeData() ?? [];
     }
 
     public function published()
