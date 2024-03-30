@@ -50,11 +50,6 @@ class CollectionStructureTest extends StructureTestCase
         return $this->queryBuilderPluckReturnValue ?? collect();
     }
 
-    public function queryBuilderPluckReturnValue()
-    {
-        return $this->queryBuilderPluckReturnValue ?? collect();
-    }
-
     /** @test */
     public function it_gets_and_sets_the_handle()
     {
