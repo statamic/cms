@@ -11,6 +11,7 @@ use Statamic\Stache\Stores\Store;
 use Statamic\Support\Str;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
+use WeakMap;
 use Wilderborn\Partyline\Facade as Partyline;
 
 class Stache
@@ -77,10 +78,10 @@ class Stache
         $this->registerDependantIndexes($item);
 
         if (! array_key_exists($index, $this->indexReferences)) {
-            $this->indexReferences[$index] = [];
+            $this->indexReferences[$index] = new WeakMap();
         }
 
-        $this->indexReferences[$index][] = $item;
+        $this->indexReferences[$index][$item] = 1;
     }
 
     public function flushIndexValues($index)
@@ -89,7 +90,7 @@ class Stache
             return;
         }
 
-        foreach ($this->indexReferences[$index] as $item) {
+        foreach ($this->indexReferences[$index] as $item => $value) {
             if (! method_exists($item, 'flushIndexedValue')) {
                 continue;
             }
