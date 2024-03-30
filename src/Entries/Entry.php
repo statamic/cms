@@ -1097,4 +1097,14 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             $this->{$key} = $value;
         }
     }
+
+    public function __sleep()
+    {
+        if ($this->slug instanceof Closure) {
+            $slug = $this->slug;
+            $this->slug = $slug($this);
+        }
+
+        return array_keys(get_object_vars($this));
+    }
 }

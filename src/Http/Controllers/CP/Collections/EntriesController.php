@@ -501,6 +501,11 @@ class EntriesController extends CpController
         // If the entry being edited is not the root, then we don't have anything to worry about.
         // If the parent is the root, that's fine, and is handled during the tree update later.
         if (! $parent || ! $entry->page()->isRoot()) {
+            // If a parent is selected, validate that it doesn't exceed the max depth of the structure.
+            if ($parent && Entry::find($parent)->page()->depth() >= $entry->collection()->structure()->maxDepth()) {
+                throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_exceeds_max_depth')]);
+            }
+
             return;
         }
 
