@@ -11,14 +11,14 @@
 }
 
 .replicator-set-header {
-    @apply bg-gray-300 border-b rounded-t pr-3 flex select-none;
+    @apply bg-gray-300 border-b rounded-t rtl:pl-3 ltr:pr-3 flex select-none;
 
     &.collapsed {
         @apply rounded border-b-0;
     }
 
     .sortable-handle {
-        @apply w-4 border-r rounded-tl p-2;
+        @apply w-4 rtl:border-l ltr:border-r rtl:rounded-tr ltr:rounded-tl p-2;
         cursor: grab;
         background: transparent url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
         background-size: 7px 17px;

@@ -120,7 +120,7 @@ return [
     'unique_term_value' => 'Dieser Wert wurde bereits vergeben.',
     'unique_user_value' => 'Dieser Wert wurde bereits vergeben.',
     'unique_form_handle' => 'Dieser Wert wurde bereits vergeben.',
-    'duplicate_field_handle' => 'Feld mit dem Handle :handle kann nicht mehr als einmal verwendet werden.',
+    'duplicate_field_handle' => 'Ein Feld mit einem Handle :handle gibt es bereits.',
     'one_site_without_origin' => 'Mindestens eine Website darf keine Quelle enthalten.',
     'origin_cannot_be_disabled' => 'Kann keine deaktivierte Quelle auswählen.',
     'unique_uri' => 'Diese URI ist bereits vergeben.',

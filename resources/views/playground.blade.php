@@ -26,14 +26,14 @@
         </div>
         <div class="mb-4 flex">
             <input type="text" class="input-text" placeholder="v3 style">
-            <select class="ml-2" name="" id="">
+            <select class="rtl:mr-2 ltr:ml-2" name="" id="">
                 <option value="">Oh hai Mark</option>
             </select>
         </div>
         <div class="mb-4 flex">
             <input type="text" class="input-text" placeholder="v3 style">
-            <button class="btn ml-2">Default Button</button>
-            <button class="btn-primary ml-2">Primary Button</button>
+            <button class="btn rtl:mr-2 ltr:ml-2">Default Button</button>
+            <button class="btn-primary rtl:mr-2 ltr:ml-2">Primary Button</button>
         </div>
         <div class="mb-4">
             <textarea name="" class="input-text" placeholder="v3 style"></textarea>
@@ -69,14 +69,14 @@
     <div class="shadow bg-white p-8 rounded-lg mb-16">
         <h6 class="mb-4">Flavors</h6>
         <div class="mb-8 flex">
-            <button class="mr-4 btn">Default Button</button>
-            <button class="mr-4 btn-primary">Primary Button</button>
-            <button class="mr-4 btn-danger">Danger Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn">Default Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-primary">Primary Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-danger">Danger Button</button>
             <button class="btn-flat">Flat Button</button>
         </div>
         <h6 class="mb-4">With Dropdowns</h6>
         <div class="mb-8 flex">
-            <div class="btn-group mr-4">
+            <div class="btn-group rtl:ml-4 ltr:mr-4">
                 <button class="btn">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -90,7 +90,7 @@
                     </li>
                 </dropdown-list>
             </div>
-            <div class="btn-group mr-4">
+            <div class="btn-group rtl:ml-4 ltr:mr-4">
                 <button class="btn-primary">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -104,7 +104,7 @@
                     </li>
                 </dropdown-list>
             </div>
-            <div class="btn-group mr-4">
+            <div class="btn-group rtl:ml-4 ltr:mr-4">
                 <button class="btn-danger">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -118,7 +118,7 @@
                     </li>
                 </dropdown-list>
             </div>
-            <div class="btn-group mr-4">
+            <div class="btn-group rtl:ml-4 ltr:mr-4">
                 <button class="btn-flat">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -135,25 +135,25 @@
         </div>
         <h6 class="mb-4">Disabled States</h6>
         <div class="mb-8 flex">
-            <button disabled class="mr-4 btn disabled">Default Button</button>
-            <button disabled class="mr-4 btn-primary disabled">Primary Button</button>
-            <button disabled class="mr-4 btn-danger disabled">Danger Button</button>
+            <button disabled class="rtl:ml-4 ltr:mr-4 btn disabled">Default Button</button>
+            <button disabled class="rtl:ml-4 ltr:mr-4 btn-primary disabled">Primary Button</button>
+            <button disabled class="rtl:ml-4 ltr:mr-4 btn-danger disabled">Danger Button</button>
             <button disabled class="btn-flat disabled">Flat Button</button>
         </div>
 
         <h6 class="mb-4">Large</h6>
         <div class="mb-8 flex">
-            <button class="mr-4 btn btn-lg">Default Button</button>
-            <button class="mr-4 btn-primary btn-lg">Primary Button</button>
-            <button class="mr-4 btn-danger btn-lg">Danger Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn btn-lg">Default Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-primary btn-lg">Primary Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-danger btn-lg">Danger Button</button>
             <button class="btn-flat btn-lg">Flat Button</button>
         </div>
 
         <h6 class="mb-4">Small</h6>
         <div class="flex">
-            <button class="mr-4 btn btn-xs">Default Button</button>
-            <button class="mr-4 btn-primary btn-xs">Primary Button</button>
-            <button class="mr-4 btn-danger btn-xs">Danger Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn btn-xs">Default Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-primary btn-xs">Primary Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-danger btn-xs">Danger Button</button>
             <button class="btn-flat btn-xs">Flat Button</button>
         </div>
     </div>
@@ -236,7 +236,7 @@
                 </div>
                 <div class="text-4xl mb-4">89</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/light/performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 rtl:ml-2 ltr:mr-2">@cp_svg('icons/light/performance-increase')</span>
                     <span class="leading-none text-sm">8.54% Increase</span>
                 </div>
             </div>
@@ -251,7 +251,7 @@
                 </div>
                 <div class="text-4xl mb-4">35</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/light/performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 rtl:ml-2 ltr:mr-2">@cp_svg('icons/light/performance-increase')</span>
                     <span class="leading-none text-sm">2.15% Increase</span>
                 </div>
             </div>
@@ -266,7 +266,7 @@
                 </div>
                 <div class="text-4xl mb-4 text-gray-400">251</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/light/performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 rtl:ml-2 ltr:mr-2">@cp_svg('icons/light/performance-increase')</span>
                     <span class="leading-none text-gray-400 text-sm">8.54% Increase</span>
                 </div>
             </div>

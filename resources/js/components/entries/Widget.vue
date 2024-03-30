@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="h-full">
         <div v-if="initializing" class="loading">
             <loading-graphic />
         </div>
@@ -11,12 +11,13 @@
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
+            class="h-full flex flex-col justify-between"
         >
             <div slot-scope="{ }">
                 <data-list-table :loading="loading">
                     <template slot="cell-title" slot-scope="{ row: entry }">
                         <div class="flex items-center">
-                            <div class="little-dot mr-2" :class="[entry.published ? 'bg-green-600' : 'bg-gray-400']" />
+                            <div class="little-dot rtl:ml-2 ltr:mr-2" :class="[entry.published ? 'bg-green-600' : 'bg-gray-400']" />
                             <a :href="entry.edit_url">{{ entry.title }}</a>
                         </div>
                     </template>
