@@ -14,7 +14,6 @@ abstract class Builder extends BaseBuilder
     public function __construct(Store $store)
     {
         $this->store = $store;
-        $this->logRealValues = config('statamic.stache.query_logging.dump_values', false);
     }
 
     public function count()

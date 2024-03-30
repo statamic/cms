@@ -2,16 +2,14 @@
 
 namespace Statamic\Stache\Query\Concerns;
 
-use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
 use Statamic\Stache\Query\Dumper\Dumper;
 use Statamic\Stache\Query\EntryQueryBuilder;
 
 trait LogsQueries
 {
-    protected $logRealValues = false;
-
-    public function dumpStacheQuery()
+    public function dumpStacheQuery($bindings)
     {
         $extraFrom = '';
 
@@ -27,9 +25,9 @@ trait LogsQueries
             $this->columns,
             $this->orderBys,
             $this->limit,
-            $this->offset
+            $this->offset,
+            $bindings,
         ))
-            ->setDumpActualValues($this->logRealValues)
             ->setExtraFromStatement($extraFrom)
             ->dump();
     }
@@ -40,11 +38,18 @@ trait LogsQueries
             return;
         }
 
+        $bindings = collect();
+
+        $connection = DB::connectUsing('stache', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
         event(new QueryExecuted(
-            $this->dumpStacheQuery(),
-            [],
+            $this->dumpStacheQuery($bindings),
+            $bindings->all(),
             ($endTime - $startTime) / 1000000,
-            new Connection(fn () => null, 'Stache')
+            $connection
         ));
     }
 }

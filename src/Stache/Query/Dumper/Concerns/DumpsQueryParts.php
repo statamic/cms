@@ -2,8 +2,19 @@
 
 namespace Statamic\Stache\Query\Dumper\Concerns;
 
+use Statamic\Stache\Stores\Store;
+use Statamic\Support\Str;
+
 trait DumpsQueryParts
 {
+    protected function dumpTableNameFromStore(Store $store): string
+    {
+        return Str::of(class_basename($store))
+            ->before('Store')
+            ->lower()
+            ->toString();
+    }
+
     protected function dumpColumns(): string
     {
         $columns = '*';

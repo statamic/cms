@@ -17,10 +17,11 @@ class Dumper
     protected $offset;
     protected $store;
     protected $extraFrom = '';
-    protected $dumpActualValues = false;
+
+    private $bindings;
 
     public function __construct(
-        $store, $wheres, $columns, $orderBys, $limit, $offset
+        $store, $wheres, $columns, $orderBys, $limit, $offset, $bindings
     ) {
         $this->store = $store;
         $this->wheres = $wheres;
@@ -28,6 +29,7 @@ class Dumper
         $this->orderBys = $orderBys;
         $this->limit = $limit;
         $this->offset = $offset;
+        $this->bindings = $bindings;
     }
 
     public function setExtraFromStatement($extraFrom): self
@@ -37,16 +39,9 @@ class Dumper
         return $this;
     }
 
-    public function setDumpActualValues($dumpValues): self
-    {
-        $this->dumpActualValues = $dumpValues;
-
-        return $this;
-    }
-
     public function dump(): string
     {
-        $query = 'SELECT '.$this->dumpColumns()."\n".'FROM '.get_class($this->store);
+        $query = 'SELECT '.$this->dumpColumns()."\n".'FROM '.$this->dumpTableNameFromStore($this->store);
 
         if ($this->extraFrom) {
             $query .= '{'.$this->extraFrom.'}';
