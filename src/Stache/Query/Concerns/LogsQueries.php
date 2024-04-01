@@ -9,6 +9,8 @@ use Statamic\Stache\Query\EntryQueryBuilder;
 
 trait LogsQueries
 {
+    private static $connection;
+
     public function dumpStacheQuery($bindings)
     {
         $extraFrom = '';
@@ -40,7 +42,7 @@ trait LogsQueries
 
         $bindings = collect();
 
-        $connection = DB::connectUsing('stache', [
+        static::$connection ??= DB::connectUsing('stache', [
             'driver' => 'sqlite',
             'database' => ':memory:',
         ]);
@@ -49,7 +51,7 @@ trait LogsQueries
             $this->dumpStacheQuery($bindings),
             $bindings->all(),
             ($endTime - $startTime) / 1000000,
-            $connection
+            static::$connection
         ));
     }
 }
