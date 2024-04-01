@@ -81,4 +81,9 @@ abstract class QueryBuilder extends BaseQueryBuilder
     {
         return new DataCollection($items);
     }
+
+    public function getTableNameForFakeQuery()
+    {
+        return 'search_'.$this->index->name();
+    }
 }
