@@ -8,7 +8,7 @@ use Statamic\Support\Str;
 
 trait DumpsQueryParts
 {
-    public function getTableName(Builder $class): string
+    protected function getTableName(Builder $class): string
     {
         if (method_exists($class, 'getTableNameForFakeQuery')) {
             return $class->getTableNameForFakeQuery();

@@ -12,12 +12,12 @@ class Dumper
 {
     use DumpsQueryParts, DumpsQueryValues, DumpsWheres;
 
-    protected $wheres = [];
-    protected $columns = [];
-    protected $orderBys = [];
-    protected $limit;
-    protected $offset;
-    protected $table;
+    private $wheres = [];
+    private $columns = [];
+    private $orderBys = [];
+    private $limit;
+    private $offset;
+    private $table;
     private Collection $bindings;
 
     public function __construct(private $query)
