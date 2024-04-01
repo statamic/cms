@@ -4,9 +4,12 @@ namespace Statamic\Query\Dumper;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Query\Dumper\Concerns\DumpsQueryParts;
 use Statamic\Query\Dumper\Concerns\DumpsQueryValues;
 use Statamic\Query\Dumper\Concerns\DumpsWheres;
+use Statamic\Stache\Query\Builder as StacheQueryBuilder;
+use Statamic\Support\Str;
 
 class Dumper
 {
@@ -68,5 +71,22 @@ class Dumper
         $query .= $this->dumpOrderBys();
 
         return $query;
+    }
+
+    private function getTableName(Builder $class): string
+    {
+        if (method_exists($class, 'getTableNameForFakeQuery')) {
+            return $class->getTableNameForFakeQuery();
+        }
+
+        if ($class instanceof StacheQueryBuilder) {
+            return Str::of(class_basename($class))
+                ->before('QueryBuilder')
+                ->lower()
+                ->plural()
+                ->toString();
+        }
+
+        return get_class($class);
     }
 }
