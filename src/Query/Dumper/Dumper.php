@@ -16,36 +16,22 @@ class Dumper
     protected $limit;
     protected $offset;
     protected $table;
-    protected $extraFrom = '';
-
-    private $bindings;
 
     public function __construct(
-        $table, $wheres, $columns, $orderBys, $limit, $offset, $bindings
+        private $query, private $bindings
     ) {
-        $this->table = $table;
-        $this->wheres = $wheres;
-        $this->columns = $columns;
-        $this->orderBys = $orderBys;
-        $this->limit = $limit;
-        $this->offset = $offset;
-        $this->bindings = $bindings;
-    }
-
-    public function setExtraFromStatement($extraFrom): self
-    {
-        $this->extraFrom = $extraFrom;
-
-        return $this;
+        $data = $query->prepareForFakeQuery();
+        $this->table = $this->getTableName($query);
+        $this->wheres = $data['wheres'];
+        $this->columns = $data['columns'];
+        $this->orderBys = $data['orderBys'];
+        $this->limit = $data['limit'];
+        $this->offset = $data['offset'];
     }
 
     public function dump(): string
     {
         $query = 'select '.$this->dumpColumns()."\n".'from '.$this->table;
-
-        if ($this->extraFrom) {
-            $query .= '{'.$this->extraFrom.'}';
-        }
 
         $query .= $this->dumpWheres();
         $query .= $this->dumpLimits();
