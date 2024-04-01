@@ -18,16 +18,16 @@ class EventServiceProvider extends ServiceProvider
         ],
         \Statamic\Events\CollectionTreeSaved::class => [
             \Statamic\Entries\UpdateStructuredEntryUris::class,
-            \Statamic\Entries\UpdateStructuredEntryOrder::class,
+            \Statamic\Entries\UpdateStructuredEntryOrderAndParent::class,
         ],
         \Statamic\Events\EntryBlueprintFound::class => [
             \Statamic\Entries\AddSiteColumnToBlueprint::class,
         ],
         \Statamic\Events\ResponseCreated::class => [
-            \Statamic\View\State\ClearState::class,
+            \Statamic\Listeners\ClearState::class,
         ],
         \Illuminate\Foundation\Http\Events\RequestHandled::class => [
-            \Statamic\View\State\ClearState::class,
+            \Statamic\Listeners\ClearState::class,
         ],
     ];
 
