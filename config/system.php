@@ -176,6 +176,6 @@ return [
     |
     */
 
-    'fake_sql_queries' => false,
+    'fake_sql_queries' => config('app.debug'),
 
 ];
