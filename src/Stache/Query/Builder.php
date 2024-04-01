@@ -32,7 +32,11 @@ abstract class Builder extends BaseBuilder
 
     public function pluck($column, $key = null)
     {
-        return $this->store->getItemValues($this->resolveKeys(), $column, $key);
+        return $this->onceWithColumns(array_filter([$column, $key]), function () use ($column, $key) {
+            return $this->withFakeQueryLogging(function () use ($column, $key) {
+                return $this->store->getItemValues($this->resolveKeys(), $column, $key);
+            });
+        });
     }
 
     public function get($columns = ['*'])
