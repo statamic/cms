@@ -165,4 +165,17 @@ return [
 
     'row_id_handle' => 'id',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Fake SQL Queries
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, Statamic's query builders will emit events that appear
+    | the same way as any other query. This can be useful for debugging.
+    | The generated SQL statements are approximations and not exact.
+    |
+    */
+
+    'fake_sql_queries' => false,
+
 ];

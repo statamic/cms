@@ -36,7 +36,7 @@ trait LogsQueries
 
     protected function emitQueryEvent($startTime, $endTime): void
     {
-        if (! config('statamic.stache.query_logging.enabled', false)) {
+        if (! config('statamic.system.fake_sql_queries', false)) {
             return;
         }
 
