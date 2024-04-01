@@ -27,13 +27,7 @@ trait DumpsQueryParts
 
     protected function dumpColumns(): string
     {
-        $columns = '*';
-
-        if ($this->columns != null) {
-            $columns = implode(', ', $this->columns);
-        }
-
-        return $columns;
+        return implode(', ', $this->columns);
     }
 
     protected function dumpLimits(): string

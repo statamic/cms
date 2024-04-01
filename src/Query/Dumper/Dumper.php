@@ -12,12 +12,12 @@ class Dumper
 {
     use DumpsQueryParts, DumpsQueryValues, DumpsWheres;
 
-    private $wheres = [];
-    private $columns = [];
-    private $orderBys = [];
-    private $limit;
-    private $offset;
-    private $table;
+    private array $wheres;
+    private array $columns;
+    private array $orderBys;
+    private ?int $limit;
+    private ?int $offset;
+    private string $table;
     private Collection $bindings;
 
     public function __construct(private $query)
@@ -25,7 +25,7 @@ class Dumper
         $data = $query->prepareForFakeQuery();
         $this->table = $this->getTableName($query);
         $this->wheres = $data['wheres'];
-        $this->columns = $data['columns'];
+        $this->columns = $data['columns'] ?? ['*'];
         $this->orderBys = $data['orderBys'];
         $this->limit = $data['limit'];
         $this->offset = $data['offset'];
