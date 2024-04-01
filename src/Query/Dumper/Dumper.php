@@ -33,7 +33,10 @@ class Dumper
     {
         $query = 'select '.$this->dumpColumns()."\n".'from '.$this->table;
 
-        $query .= "\n where ".$this->dumpWheres();
+        if (! empty($this->wheres)) {
+            $query .= "\n where ".$this->dumpWheres();
+        }
+
         $query .= $this->dumpLimits();
         $query .= $this->dumpOrderBys();
 
