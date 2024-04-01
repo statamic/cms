@@ -14,11 +14,11 @@ trait FakesQueries
             return $callback();
         }
 
-        $startTime = hrtime(true);
+        $startTime = microtime(true);
 
         $value = $callback();
 
-        $time = (hrtime(true) - $startTime) / 1000000;
+        $time = round((microtime(true) - $startTime) * 1000, 2);
 
         $bindings = collect();
 
