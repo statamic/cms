@@ -356,12 +356,12 @@ class Date extends Fieldtype
 
     public function timeEnabled()
     {
-        return $this->config('time_enabled');
+        return (bool) $this->config('time_enabled');
     }
 
     public function secondsEnabled()
     {
-        return $this->config('time_seconds_enabled');
+        return (bool) $this->config('time_seconds_enabled');
     }
 
     public function preProcessValidatable($value)
