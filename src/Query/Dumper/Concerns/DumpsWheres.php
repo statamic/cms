@@ -9,7 +9,7 @@ trait DumpsWheres
 {
     protected function dumpBasic($where): string
     {
-        return $where['column'].' '.strtoupper($where['operator']).' '.$this->dumpQueryValue($where['value'] ?? null);
+        return $where['column'].' '.$where['operator'].' '.$this->dumpQueryValue($where['value'] ?? null);
     }
 
     protected function dumpArrayWhere($keyword, $where): string
@@ -24,22 +24,22 @@ trait DumpsWheres
 
     protected function dumpIn($where): string
     {
-        return $this->dumpArrayWhere('IN', $where);
+        return $this->dumpArrayWhere('in', $where);
     }
 
     protected function dumpNotIn($where): string
     {
-        return $this->dumpArrayWhere('NOT IN', $where);
+        return $this->dumpArrayWhere('not in', $where);
     }
 
     protected function dumpNull($where): string
     {
-        return $where['column'].' IS NULL';
+        return $where['column'].' is null';
     }
 
     protected function dumpNotNull($where): string
     {
-        return $where['column'].' IS NOT NULL';
+        return $where['column'].' is not null';
     }
 
     protected function dumpDatePartMethod($datePart, $where): string
@@ -73,7 +73,7 @@ trait DumpsWheres
         $valueTwo = $this->dumpQueryValue($where['values'][1] ?? null);
         $column = $where['column'];
 
-        return $column.' BETWEEN '.$valueOne.' AND '.$valueTwo;
+        return $column.' between '.$valueOne.' and '.$valueTwo;
     }
 
     protected function dumpNotBetween($where): string
@@ -82,7 +82,7 @@ trait DumpsWheres
         $valueTwo = $this->dumpQueryValue($where['values'][1] ?? null);
         $column = $where['column'];
 
-        return $column.' NOT BETWEEN '.$valueOne.' AND '.$valueTwo;
+        return $column.' not between '.$valueOne.' and '.$valueTwo;
     }
 
     protected function dumpColumn($where): string
@@ -124,7 +124,7 @@ trait DumpsWheres
         $dumpedWhere = '';
 
         if (! $isFirst) {
-            $dumpedWhere = strtoupper($where['boolean']).' ';
+            $dumpedWhere = $where['boolean'].' ';
         }
 
         $type = $where['type'];
@@ -157,6 +157,6 @@ trait DumpsWheres
             $parts[] = $this->dumpWhere($i === 0, $this->wheres[$i]);
         }
 
-        return "\n".'WHERE '.implode(' ', $parts);
+        return "\n".'where '.implode(' ', $parts);
     }
 }

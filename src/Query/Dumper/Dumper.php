@@ -41,7 +41,7 @@ class Dumper
 
     public function dump(): string
     {
-        $query = 'SELECT '.$this->dumpColumns()."\n".'FROM '.$this->table;
+        $query = 'select '.$this->dumpColumns()."\n".'from '.$this->table;
 
         if ($this->extraFrom) {
             $query .= '{'.$this->extraFrom.'}';
