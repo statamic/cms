@@ -4,7 +4,6 @@ namespace Statamic\Query\Dumper\Concerns;
 
 use Illuminate\Support\Str;
 use Statamic\Query\Dumper\Dumper;
-use Statamic\Stache\Query\Builder;
 
 trait DumpsWheres
 {
@@ -94,10 +93,6 @@ trait DumpsWheres
     protected function dumpNested($where): string
     {
         $query = $where['query'] ?? null;
-
-        if (! $query instanceof Builder) {
-            return '';
-        }
 
         return '('.(new Dumper($query, $this->bindings))->dumpWheres().')';
     }
