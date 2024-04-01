@@ -37,15 +37,15 @@ abstract class Builder extends BaseBuilder
 
     public function get($columns = ['*'])
     {
-        return $this->withFakeQueryLogging(function () use ($columns) {
+        return $this->onceWithColumns($columns, fn () => $this->withFakeQueryLogging(function () {
             $items = $this->getItems($this->resolveKeys());
 
             $items->each(fn ($item) => $item
-                ->selectedQueryColumns($this->columns ?? $columns)
+                ->selectedQueryColumns($this->columns)
                 ->selectedQueryRelations($this->with));
 
             return $this->collect($items)->values();
-        });
+        }));
     }
 
     abstract protected function getFilteredKeys();
