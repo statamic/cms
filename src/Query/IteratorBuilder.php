@@ -2,12 +2,8 @@
 
 namespace Statamic\Query;
 
-use Statamic\Query\Concerns\FakesQueries;
-
 abstract class IteratorBuilder extends Builder
 {
-    use FakesQueries;
-
     protected $randomize = false;
 
     public function count()
@@ -22,18 +18,16 @@ abstract class IteratorBuilder extends Builder
 
     public function get($columns = ['*'])
     {
-        return $this->withFakeQueryLogging(function () {
-            $items = $this->getFilteredItems();
+        $items = $this->getFilteredItems();
 
-            if ($this->randomize) {
-                $items = $items->shuffle();
-            } elseif ($orderBys = $this->orderBys) {
-                $sort = collect($orderBys)->map->toString()->implode('|');
-                $items = $items->multisort($sort)->values();
-            }
+        if ($this->randomize) {
+            $items = $items->shuffle();
+        } elseif ($orderBys = $this->orderBys) {
+            $sort = collect($orderBys)->map->toString()->implode('|');
+            $items = $items->multisort($sort)->values();
+        }
 
-            return $this->limitItems($items)->values();
-        });
+        return $this->limitItems($items)->values();
     }
 
     public function pluck($column, $key = null)
