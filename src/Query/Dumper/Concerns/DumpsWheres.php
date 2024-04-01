@@ -99,7 +99,7 @@ trait DumpsWheres
             return '';
         }
 
-        return '('.(new Dumper($query, $this->bindings))->dump().')';
+        return '('.(new Dumper($query, $this->bindings))->dumpWheres().')';
     }
 
     protected function dumpDate($where)
@@ -158,6 +158,6 @@ trait DumpsWheres
             $parts[] = $this->dumpWhere($i === 0, $this->wheres[$i]);
         }
 
-        return "\n".'where '.implode(' ', $parts);
+        return implode(' ', $parts);
     }
 }
