@@ -42,7 +42,7 @@ trait DumpsQueryParts
             return '';
         }
 
-        $limit = "\n".'limit '.$this->limit;
+        $limit = ' limit '.$this->limit;
 
         if ($this->offset) {
             $limit .= ' offset '.$this->offset;
@@ -67,6 +67,6 @@ trait DumpsQueryParts
             $orders[] = $orderBy->sort.' '.$orderBy->direction;
         }
 
-        return "\n".'order by '.implode(', ', $orders);
+        return ' order by '.implode(', ', $orders);
     }
 }

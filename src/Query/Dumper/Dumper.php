@@ -31,10 +31,10 @@ class Dumper
 
     public function dump(): string
     {
-        $query = 'select '.$this->dumpColumns()."\n".'from '.$this->table;
+        $query = 'select '.$this->dumpColumns().' from '.$this->table;
 
         if (! empty($this->wheres)) {
-            $query .= "\n where ".$this->dumpWheres();
+            $query .= ' where '.$this->dumpWheres();
         }
 
         $query .= $this->dumpLimits();
