@@ -98,7 +98,7 @@ trait DumpsWheres
             return '';
         }
 
-        return '('.$query->dumpStacheQuery($this->bindings).')';
+        return '('.$query->dumpFakeQuery($this->bindings).')';
     }
 
     protected function dumpDate($where)

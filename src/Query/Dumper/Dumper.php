@@ -15,15 +15,15 @@ class Dumper
     protected $orderBys = [];
     protected $limit;
     protected $offset;
-    protected $store;
+    protected $table;
     protected $extraFrom = '';
 
     private $bindings;
 
     public function __construct(
-        $store, $wheres, $columns, $orderBys, $limit, $offset, $bindings
+        $table, $wheres, $columns, $orderBys, $limit, $offset, $bindings
     ) {
-        $this->store = $store;
+        $this->table = $table;
         $this->wheres = $wheres;
         $this->columns = $columns;
         $this->orderBys = $orderBys;
@@ -41,7 +41,7 @@ class Dumper
 
     public function dump(): string
     {
-        $query = 'SELECT '.$this->dumpColumns()."\n".'FROM '.$this->dumpTableNameFromStore($this->store);
+        $query = 'SELECT '.$this->dumpColumns()."\n".'FROM '.$this->table;
 
         if ($this->extraFrom) {
             $query .= '{'.$this->extraFrom.'}';

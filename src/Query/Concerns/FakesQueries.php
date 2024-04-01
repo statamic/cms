@@ -7,11 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Statamic\Query\Dumper\Dumper;
 use Statamic\Stache\Query\EntryQueryBuilder;
 
-trait LogsQueries
+trait FakesQueries
 {
-    private static $connection;
-
-    public function dumpStacheQuery($bindings)
+    public function dumpFakeQuery($bindings): string
     {
         $extraFrom = '';
 
@@ -22,7 +20,7 @@ trait LogsQueries
         }
 
         return (new Dumper(
-            $this->store,
+            Dumper::getTableName($this),
             $this->wheres,
             $this->columns,
             $this->orderBys,
@@ -34,24 +32,34 @@ trait LogsQueries
             ->dump();
     }
 
-    protected function emitQueryEvent($startTime, $endTime): void
+    protected function withFakeQueryLogging(\Closure $callback)
     {
         if (! config('statamic.system.fake_sql_queries', false)) {
-            return;
+            return $callback();
         }
+
+        $startTime = hrtime(true);
+
+        $value = $callback();
+
+        $time = (hrtime(true) - $startTime) / 1000000;
 
         $bindings = collect();
 
-        static::$connection ??= DB::connectUsing('stache', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
+        if (! app()->bound($key = 'fake-query-connection')) {
+            app()->instance($key, DB::connectUsing('fake', [
+                'driver' => 'sqlite',
+                'database' => ':memory:',
+            ]));
+        }
 
         event(new QueryExecuted(
-            $this->dumpStacheQuery($bindings),
+            $this->dumpFakeQuery($bindings),
             $bindings->all(),
-            ($endTime - $startTime) / 1000000,
-            static::$connection
+            $time,
+            app($key)
         ));
+
+        return $value;
     }
 }

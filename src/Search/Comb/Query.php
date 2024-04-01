@@ -10,4 +10,9 @@ class Query extends QueryBuilder
     {
         return $this->index->lookup($this->query);
     }
+
+    public function getTableNameForFakeQuery()
+    {
+        return 'search_'.$this->index->name();
+    }
 }

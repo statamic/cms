@@ -37,21 +37,15 @@ abstract class Builder extends BaseBuilder
 
     public function get($columns = ['*'])
     {
-        $startTime = hrtime(true);
+        return $this->withFakeQueryLogging(function () use ($columns) {
+            $items = $this->getItems($this->resolveKeys());
 
-        $items = $this->getItems($this->resolveKeys());
+            $items->each(fn ($item) => $item
+                ->selectedQueryColumns($this->columns ?? $columns)
+                ->selectedQueryRelations($this->with));
 
-        $items->each(fn ($item) => $item
-            ->selectedQueryColumns($this->columns ?? $columns)
-            ->selectedQueryRelations($this->with));
-
-        $values = $this->collect($items)->values();
-
-        $endTime = hrtime(true);
-
-        $this->emitQueryEvent($startTime, $endTime);
-
-        return $values;
+            return $this->collect($items)->values();
+        });
     }
 
     abstract protected function getFilteredKeys();

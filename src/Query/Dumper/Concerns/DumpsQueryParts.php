@@ -2,17 +2,27 @@
 
 namespace Statamic\Query\Dumper\Concerns;
 
-use Statamic\Stache\Stores\Store;
+use Statamic\Contracts\Query\Builder;
+use Statamic\Stache\Query\Builder as StacheQueryBuilder;
 use Statamic\Support\Str;
 
 trait DumpsQueryParts
 {
-    protected function dumpTableNameFromStore(Store $store): string
+    public static function getTableName(Builder $class)
     {
-        return Str::of(class_basename($store))
-            ->before('Store')
-            ->lower()
-            ->toString();
+        if (method_exists($class, 'getTableNameForFakeQuery')) {
+            return $class->getTableNameForFakeQuery();
+        }
+
+        if ($class instanceof StacheQueryBuilder) {
+            return Str::of(class_basename($class))
+                ->before('QueryBuilder')
+                ->lower()
+                ->plural()
+                ->toString();
+        }
+
+        return get_class($class);
     }
 
     protected function dumpColumns(): string
