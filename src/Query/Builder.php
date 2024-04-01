@@ -12,7 +12,7 @@ use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
-use Statamic\Stache\Query\Concerns\LogsQueries;
+use Statamic\Query\Concerns\LogsQueries;
 
 abstract class Builder implements Contract
 {

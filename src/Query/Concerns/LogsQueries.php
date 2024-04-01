@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Stache\Query\Concerns;
+namespace Statamic\Query\Concerns;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
-use Statamic\Stache\Query\Dumper\Dumper;
+use Statamic\Query\Dumper\Dumper;
 use Statamic\Stache\Query\EntryQueryBuilder;
 
 trait LogsQueries
