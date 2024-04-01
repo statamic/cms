@@ -1028,7 +1028,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return $this->computedCallbackCache = Facades\Collection::getComputedCallbacks($this->collection);
     }
 
-    public function __serialize(): array
+    public function __sleep()
     {
         if ($this->slug instanceof Closure) {
             $slug = $this->slug;
@@ -1036,12 +1036,5 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         }
 
         return Arr::except(get_object_vars($this), ['computedCallbackCache']);
-    }
-
-    public function __unserialize(array $data): void
-    {
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
     }
 }
