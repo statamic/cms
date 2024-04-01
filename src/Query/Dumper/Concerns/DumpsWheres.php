@@ -94,7 +94,9 @@ trait DumpsWheres
     {
         $query = $where['query'] ?? null;
 
-        return '('.(new Dumper($query, $this->bindings))->dumpWheres().')';
+        $sql = (new Dumper($query))->withBindings($this->bindings)->dumpWheres();
+
+        return "($sql)";
     }
 
     protected function dumpDate($where)

@@ -3,7 +3,6 @@
 namespace Statamic\Query\Concerns;
 
 use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Support\Facades\DB;
 use Statamic\Query\Dumper\Dumper;
 
 trait FakesQueries
@@ -20,20 +19,11 @@ trait FakesQueries
 
         $time = round((microtime(true) - $startTime) * 1000, 2);
 
-        $bindings = collect();
-
-        if (! app()->bound($key = 'fake-query-connection')) {
-            app()->instance($key, DB::connectUsing('fake', [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-            ]));
-        }
-
         event(new QueryExecuted(
-            (new Dumper($this, $bindings))->dump(),
-            $bindings->all(),
+            ($sql = new Dumper($this))->dump(),
+            $sql->bindings()->all(),
             $time,
-            app($key)
+            $sql->connection()
         ));
 
         return $value;

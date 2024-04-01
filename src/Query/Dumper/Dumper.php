@@ -2,6 +2,8 @@
 
 namespace Statamic\Query\Dumper;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Statamic\Query\Dumper\Concerns\DumpsQueryParts;
 use Statamic\Query\Dumper\Concerns\DumpsQueryValues;
 use Statamic\Query\Dumper\Concerns\DumpsWheres;
@@ -16,10 +18,10 @@ class Dumper
     protected $limit;
     protected $offset;
     protected $table;
+    private Collection $bindings;
 
-    public function __construct(
-        private $query, private $bindings
-    ) {
+    public function __construct(private $query)
+    {
         $data = $query->prepareForFakeQuery();
         $this->table = $this->getTableName($query);
         $this->wheres = $data['wheres'];
@@ -27,6 +29,31 @@ class Dumper
         $this->orderBys = $data['orderBys'];
         $this->limit = $data['limit'];
         $this->offset = $data['offset'];
+        $this->bindings = collect();
+    }
+
+    public function bindings(): Collection
+    {
+        return $this->bindings;
+    }
+
+    public function withBindings(Collection $bindings): self
+    {
+        $this->bindings = $bindings;
+
+        return $this;
+    }
+
+    public function connection()
+    {
+        if (! app()->bound($key = 'fake-query-connection')) {
+            app()->instance($key, DB::connectUsing('fake', [
+                'driver' => 'sqlite',
+                'database' => ':memory:',
+            ]));
+        }
+
+        return app($key);
     }
 
     public function dump(): string
