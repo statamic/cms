@@ -1240,7 +1240,7 @@ EOT;
             ['text' => 'I have no type'],
         ];
 
-        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+        $expected = [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'This is inline text.']]]];
 
         $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
     }
