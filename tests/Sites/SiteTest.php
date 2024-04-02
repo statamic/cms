@@ -288,9 +288,13 @@ class SiteTest extends TestCase
     /** @test */
     public function it_gets_direction()
     {
-        $site = new Site('ar', ['locale' => 'ar_SA']);
+        $this->assertEquals('ltr', (new Site('irrelevant', ['locale' => 'en']))->direction());
+        $this->assertEquals('ltr', (new Site('irrelevant', ['locale' => 'en_US']))->direction());
+        $this->assertEquals('ltr', (new Site('irrelevant', ['locale' => 'en_IRRELEVANT']))->direction());
 
-        $this->assertEquals('rtl', $site->direction());
+        $this->assertEquals('rtl', (new Site('irrelevant', ['locale' => 'ar']))->direction());
+        $this->assertEquals('rtl', (new Site('irrelevant', ['locale' => 'ar_SA']))->direction());
+        $this->assertEquals('rtl', (new Site('irrelevant', ['locale' => 'ar_IRRELEVANT']))->direction());
     }
 
     /** @test */
