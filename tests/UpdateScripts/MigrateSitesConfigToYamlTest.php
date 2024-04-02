@@ -216,8 +216,7 @@ CONFIG);
     {
         $this->runUpdateScript(MigrateSitesConfigToYaml::class);
 
-        $this->assertFileExists(config_path('statamic/sites.php'));
-        $this->assertFileDoesNotExist(config_path('statamic/sites.php.tmp'));
+        $this->assertFileDoesNotExist(config_path('statamic/sites.php'));
         $this->assertNull(config('statamic.sites.sites'));
 
         $this->assertFileExists(base_path('content/sites.yaml'));
@@ -227,7 +226,7 @@ CONFIG);
     {
         $boolean = $boolean === true ? 'true' : 'false';
 
-        $this->assertStringContainsString("'enabled' => $boolean", File::get(config_path('statamic/sites.php')));
+        $this->assertStringContainsString("'multisite' => $boolean", File::get(config_path('statamic/system.php')));
     }
 
     private function assertSitesYamlHas($sites)
