@@ -3,6 +3,7 @@
 namespace Statamic\Http\Middleware\CP;
 
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
+use Illuminate\Support\Str;
 
 class TrimStrings extends TransformsRequest
 {
@@ -57,6 +58,13 @@ class TrimStrings extends TransformsRequest
             return $value;
         }
 
-        return preg_replace('~^[\s\x{FEFF}\x{200B}]+|[\s\x{FEFF}\x{200B}]+$~u', '', $value) ?? trim($value);
+        // This is copied from Str::trim() which was only added to Laravel in 11.2.0.
+        // See https://github.com/laravel/framework/pull/50822
+        // Once our min requirement goes beyond that, we can remove this guard.
+        if (! method_exists(Str::class, 'trim')) {
+            return preg_replace('~^[\s\x{FEFF}\x{200B}]+|[\s\x{FEFF}\x{200B}]+$~u', '', $value) ?? trim($value);
+        }
+
+        return Str::trim($value);
     }
 }
