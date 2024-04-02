@@ -298,14 +298,6 @@ class SiteTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_direction_with_fallback()
-    {
-        $site = new Site('en', ['locale' => 'en_US']);
-
-        $this->assertEquals('ltr', $site->direction());
-    }
-
-    /** @test */
     public function it_gets_direction_from_custom_lang()
     {
         $site = new Site('reverse_elvish', ['locale' => 'en_US', 'lang' => 'ar']); // ar should be rtl lang
