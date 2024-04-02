@@ -152,7 +152,7 @@ export default {
 
         fieldUpdated(handle, value) {
             if (handle === 'display' && this.handleSyncedWithDisplay) {
-                this.handle = this.$slugify(value, '_');
+                this.handle = snake_case(value);
             }
 
             if (handle === 'handle') {

@@ -73,6 +73,7 @@ use Statamic\Http\Controllers\CP\Preferences\UserPreferenceController;
 use Statamic\Http\Controllers\CP\SearchController;
 use Statamic\Http\Controllers\CP\SelectSiteController;
 use Statamic\Http\Controllers\CP\SessionTimeoutController;
+use Statamic\Http\Controllers\CP\SlugController;
 use Statamic\Http\Controllers\CP\StartPageController;
 use Statamic\Http\Controllers\CP\Taxonomies\PublishedTermsController;
 use Statamic\Http\Controllers\CP\Taxonomies\ReorderTaxonomyBlueprintsController;
@@ -336,6 +337,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         });
     });
 
+    Route::post('slug', SlugController::class);
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
     Route::view('/playground', 'statamic::playground')->name('playground');
