@@ -48,10 +48,10 @@
              <div class="pb-10" v-if="canCreateSupers">
                 <div class="flex items-center">
                     <toggle-input v-model="user.super" />
-                    <label class="font-bold ml-2">{{ __('Super Admin') }}</label>
+                    <label class="font-bold rtl:mr-2 ltr:ml-2">{{ __('Super Admin') }}</label>
                 </div>
                 <div class="text-2xs text-gray-600 mt-2 flex items-center">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 rtl:ml-1 ltr:mr-1 flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_super_admin_instructions') }}
                 </div>
             </div>
@@ -103,7 +103,7 @@
             <!-- Send Email? -->
             <div class="max-w-md mx-auto px-4 mb-6 flex items-center">
                 <toggle-input v-model="invitation.send" />
-                <label class="font-bold ml-2">{{ __('Send Email Invitation') }}</label>
+                <label class="font-bold rtl:mr-2 ltr:ml-2">{{ __('Send Email Invitation') }}</label>
             </div>
 
             <div class="max-w-lg mx-auto bg-gray-100 py-10 mb-20 border rounded-lg " v-if="invitation.send">
@@ -154,13 +154,13 @@
         <div class="border-t p-4">
             <div class="max-w-md mx-auto flex items-center justify-center">
                 <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="! completed && ! onFirstStep">
-                    &larr; {{ __('Previous')}}
+                    <span v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span> {{ __('Previous')}}
                 </button>
                 <button tabindex="4" class="btn mx-4 w-32" @click="nextStep" v-if="onUserInfoStep">
-                    {{ __('Next')}} &rarr;
+                    {{ __('Next')}} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                 </button>
                 <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="nextStep" v-if="!onUserInfoStep && ! completed && ! onLastStep">
-                    {{ __('Next')}} &rarr;
+                    {{ __('Next')}} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                 </button>
                 <button tabindex="4" class="btn-primary mx-4" @click="submit" v-if="! completed && onLastStep">
                     {{ finishButtonText }}
@@ -255,7 +255,10 @@ export default {
         },
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
-        }
+        },
+        direction() {
+            return this.$config.get('direction', 'rtl');
+        },
     },
 
     methods: {

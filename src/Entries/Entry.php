@@ -23,6 +23,7 @@ use Statamic\Data\ContainsComputedData;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
@@ -56,6 +57,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 {
     use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
+    use HasDirtyState;
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -76,6 +78,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
+    private $computedCallbackCache;
+    private $siteCache;
 
     public function __construct()
     {
@@ -93,6 +97,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return $this
             ->fluentlyGetOrSet('locale')
             ->setter(function ($locale) {
+                $this->siteCache = null;
+
                 return $locale instanceof \Statamic\Sites\Site ? $locale->handle() : $locale;
             })
             ->getter(function ($locale) {
@@ -103,7 +109,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function site()
     {
-        return Site::get($this->locale());
+        if ($this->siteCache) {
+            return $this->siteCache;
+        }
+
+        return $this->siteCache = Site::get($this->locale());
     }
 
     public function authors()
@@ -113,17 +123,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function collection($collection = null)
     {
-        return $this
-            ->fluentlyGetOrSet('collection')
-            ->setter(function ($collection) {
-                return $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
-            })
-            ->getter(function ($collection) {
-                return $collection ? Blink::once("collection-{$collection}", function () use ($collection) {
-                    return Collection::findByHandle($collection);
-                }) : null;
-            })
-            ->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->collection ? Blink::once("collection-{$this->collection}", function () {
+                return Collection::findByHandle($this->collection);
+            }) : null;
+        }
+
+        $this->computedCallbackCache = null;
+        $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
+
+        return $this;
     }
 
     public function blueprint($blueprint = null)
@@ -171,6 +180,19 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedEntry($this);
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'collection' => $this->collectionHandle(),
+            'locale' => $this->locale(),
+            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
+            'slug' => $this->slug(),
+            'date' => optional($this->date())->format('Y-m-d-Hi'),
+            'published' => $this->published(),
+            'path' => $this->initialPath() ?? $this->path(),
+        ], $this->data()->except(['updated_at'])->toArray());
     }
 
     public function delete()
@@ -383,6 +405,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         }
 
         $stack->pop();
+
+        $this->syncOriginal();
 
         return true;
     }
@@ -997,6 +1021,20 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     protected function getComputedCallbacks()
     {
-        return Facades\Collection::getComputedCallbacks($this->collection);
+        if ($this->computedCallbackCache) {
+            return $this->computedCallbackCache;
+        }
+
+        return $this->computedCallbackCache = Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function __sleep()
+    {
+        if ($this->slug instanceof Closure) {
+            $slug = $this->slug;
+            $this->slug = $slug($this);
+        }
+
+        return array_keys(Arr::except(get_object_vars($this), ['computedCallbackCache']));
     }
 }
