@@ -150,4 +150,22 @@ class HtmlTest extends TestCase
     {
         $this->assertEquals('', Html::sanitize(null));
     }
+
+    /** @test */
+    public function it_sanitizes_with_double_encoding_by_default()
+    {
+        $this->assertEquals(
+            'Foobar &amp;amp; Baz &lt; website &gt;',
+            Html::sanitize('Foobar &amp; Baz < website >')
+        );
+    }
+
+    /** @test */
+    public function it_can_sanitize_without_double_encoding()
+    {
+        $this->assertEquals(
+            'Foobar &amp; Baz &lt; website &gt;',
+            Html::sanitize('Foobar &amp; Baz < website >', doubleEncode: false)
+        );
+    }
 }
