@@ -20,6 +20,11 @@ class Sites
         $this->setSites($sites);
     }
 
+    public function multiEnabled(): bool
+    {
+        return (bool) config('statamic.system.multisite', false);
+    }
+
     public function all()
     {
         return $this->sites;
