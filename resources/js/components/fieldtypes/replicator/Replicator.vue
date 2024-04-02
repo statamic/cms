@@ -98,6 +98,7 @@
             :groups="groupConfigs"
             :sets="setConfigs"
             :index="value.length"
+            :label="config.button_label"
             @added="addSet" />
 
     </section>
