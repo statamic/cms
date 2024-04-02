@@ -3,12 +3,9 @@
 namespace Statamic\Support;
 
 use Closure;
-use Statamic\Support\Traits\InvadesProperties;
 
 class FluentGetterSetter
 {
-    use InvadesProperties;
-
     protected $object;
     protected $property;
     protected $getter;
@@ -131,5 +128,15 @@ class FluentGetterSetter
         if ($afterSetter = $this->afterSetter) {
             $afterSetter($value);
         }
+    }
+
+    private function invade($object, $property)
+    {
+        return (fn () => $this->{$property})->call($object);
+    }
+
+    private function invadeSetter($object, $property, $value)
+    {
+        (fn () => $this->{$property} = $value)->call($object);
     }
 }
