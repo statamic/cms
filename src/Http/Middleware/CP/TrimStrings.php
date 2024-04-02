@@ -24,7 +24,7 @@ class TrimStrings extends TransformsRequest
      */
     protected function cleanArray(array $data, $keyPrefix = '')
     {
-        if ($this->isTextNode($data, $keyPrefix)) {
+        if ($this->isTextNode($data)) {
             $this->except[] = $keyPrefix.'text';
         }
 
@@ -32,11 +32,9 @@ class TrimStrings extends TransformsRequest
     }
 
     /**
-     * Check if the data is a text node.
-     *
-     * @return array
+     * Check if the data is a Bard (ProseMirror) text node.
      */
-    protected function isTextNode(array $data, $keyPrefix = '')
+    private function isTextNode(array $data): bool
     {
         return
             array_key_exists('text', $data) &&
