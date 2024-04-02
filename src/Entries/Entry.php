@@ -553,7 +553,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return ['uri'];
     }
 
-    public function getDependantIndexes()
+    public function getDependentIndexes()
     {
         return [
             'entries' => ['uri'],

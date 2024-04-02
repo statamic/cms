@@ -25,45 +25,45 @@ class Stache
     protected $duplicates;
     protected $indexedValuesAllowed = true;
     protected $indexReferences = [];
-    protected $dependantIndexClasses = [];
-    protected $dependantIndexes = [];
+    protected $dependentIndexClasses = [];
+    protected $dependentIndexes = [];
 
     public function __construct()
     {
         $this->stores = collect();
     }
 
-    protected function registerDependantIndexes($item)
+    protected function registerDependentIndexes($item)
     {
         $class = get_class($item);
 
-        if (array_key_exists($class, $this->dependantIndexClasses)) {
+        if (array_key_exists($class, $this->dependentIndexClasses)) {
             return;
         }
 
         // Prevent registering the same class multiple times.
-        $this->dependantIndexClasses[$class] = true;
+        $this->dependentIndexClasses[$class] = true;
 
-        $dependencies = $item->getDependantIndexes();
+        $dependencies = $item->getDependentIndexes();
 
         foreach ($dependencies as $store => $indexNames) {
-            if (! array_key_exists($store, $this->dependantIndexes)) {
-                $this->dependantIndexes[$store] = [];
+            if (! array_key_exists($store, $this->dependentIndexes)) {
+                $this->dependentIndexes[$store] = [];
             }
 
-            $this->dependantIndexes[$store] = array_merge($this->dependantIndexes[$store], $indexNames);
+            $this->dependentIndexes[$store] = array_merge($this->dependentIndexes[$store], $indexNames);
         }
     }
 
-    public function updateDependantIndexes($store, $handle)
+    public function updateDependentIndexes($store, $handle)
     {
-        if (! array_key_exists($store, $this->dependantIndexes)) {
+        if (! array_key_exists($store, $this->dependentIndexes)) {
             return;
         }
 
         $this->withoutIndexedValues(function () use ($store, $handle) {
             $storeInstance = $this->store($store);
-            foreach ($this->dependantIndexes[$store] as $index) {
+            foreach ($this->dependentIndexes[$store] as $index) {
                 if ($storeInstance instanceof AggregateStore) {
                     $storeInstance->store($handle)->index($index)->update();
                 } else {
@@ -75,7 +75,7 @@ class Stache
 
     public function itemUsingIndexValues($index, $item)
     {
-        $this->registerDependantIndexes($item);
+        $this->registerDependentIndexes($item);
 
         if (! array_key_exists($index, $this->indexReferences)) {
             $this->indexReferences[$index] = new WeakMap();

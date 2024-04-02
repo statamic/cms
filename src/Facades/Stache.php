@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static self setShouldUseIndexValues($allowed = true)
  * @method static self withoutIndexedValues(callable $callback)
  * @method static void flushIndexValues($index)
- * @method static void updateDependantIndexes($store, $handle)
+ * @method static void updateDependentIndexes($store, $handle)
  * @method static void itemUsingIndexValues($index, $item)
  *
  * @see \Statamic\Stache\Stache

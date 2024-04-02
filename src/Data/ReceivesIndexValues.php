@@ -15,7 +15,7 @@ trait ReceivesIndexValues
      */
     abstract public function receivesIndexValues();
 
-    abstract public function getDependantIndexes();
+    abstract public function getDependentIndexes();
 
     /**
      * Sets a value on the instance from a Stache index.

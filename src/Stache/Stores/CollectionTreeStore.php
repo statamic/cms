@@ -47,6 +47,6 @@ class CollectionTreeStore extends NavTreeStore
         // Ensures indexes are updated. An example
         // where this is important is changing
         // parent/child tree relationships.
-        Stache::updateDependantIndexes('entries', $item->handle());
+        Stache::updateDependentIndexes('entries', $item->handle());
     }
 }
