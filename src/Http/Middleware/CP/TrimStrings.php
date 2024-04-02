@@ -13,7 +13,9 @@ class TrimStrings extends TransformsRequest
      * @var array<int, string>
      */
     protected $except = [
-        //
+        'current_password',
+        'password',
+        'password_confirmation',
     ];
 
     /**
