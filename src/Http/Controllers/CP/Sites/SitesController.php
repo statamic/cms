@@ -47,7 +47,7 @@ class SitesController extends CpController
             ->all();
 
         // Normalize form values to sites config, since we always want array of sites keyed by handle, etc.
-        $sites = collect(config('statamic.sites.enabled') ? $values['sites'] : [$values])
+        $sites = collect(Site::multiEnabled() ? $values['sites'] : [$values])
             ->keyBy('handle')
             ->transform(function ($site) {
                 return collect($site)

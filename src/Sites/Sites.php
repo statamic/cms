@@ -193,7 +193,7 @@ class Sites
         ];
 
         // If multisite, nest fields in a grid
-        if (config('statamic.sites.enabled')) {
+        if ($this->multiEnabled()) {
             $siteFields = [
                 [
                     'handle' => 'sites',
@@ -232,7 +232,7 @@ class Sites
             ->values()
             ->all();
 
-        if (! config('statamic.sites.enabled')) {
+        if (! $this->multiEnabled()) {
             return $sites[0];
         }
 
