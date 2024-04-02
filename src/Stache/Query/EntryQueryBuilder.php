@@ -5,6 +5,7 @@ namespace Statamic\Stache\Query;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
+use Statamic\Support\Arr;
 
 class EntryQueryBuilder extends Builder implements QueryBuilder
 {
@@ -130,5 +131,21 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return collect($collections)->flatMap(function ($collection) use ($column) {
             return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
         });
+    }
+
+    public function prepareForFakeQuery(): array
+    {
+        $data = parent::prepareForFakeQuery();
+
+        if (! empty($this->collections)) {
+            $data['wheres'] = Arr::prepend($data['wheres'], [
+                'type' => 'In',
+                'column' => 'collection',
+                'values' => $this->collections,
+                'boolean' => 'and',
+            ]);
+        }
+
+        return $data;
     }
 }

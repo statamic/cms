@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -75,7 +76,8 @@ class Cache
     private function attemptToGetCachedResponse($request)
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            $response = response($this->cacher->getCachedPage($request));
+            $cachedPage = $this->cacher->getCachedPage($request);
+            $response = $cachedPage->toResponse($request);
 
             $this->makeReplacements($response);
 
