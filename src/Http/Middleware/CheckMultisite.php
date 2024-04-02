@@ -11,13 +11,11 @@ class CheckMultisite
 {
     public function handle($request, Closure $next)
     {
-        if (Statamic::pro() || $request->is('_ignition*')) {
+        if (Statamic::pro() || ! Site::multiEnabled() || $request->is('_ignition*')) {
             return $next($request);
         }
 
-        $sites = Site::all();
-
-        throw_if($sites->count() > 1, new StatamicProRequiredException('Statamic Pro is required to use multiple sites.'));
+        throw_if(Site::hasMultiple(), new StatamicProRequiredException('Statamic Pro is required to use multiple sites.'));
 
         return $next($request);
     }
