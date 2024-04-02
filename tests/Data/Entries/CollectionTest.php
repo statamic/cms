@@ -329,6 +329,8 @@ class CollectionTest extends TestCase
         $this->assertEquals($blueprintOne, $collection->entryBlueprint('one'));
         $this->assertEquals($blueprintTwo, $collection->entryBlueprint('two'));
         $this->assertNull($collection->entryBlueprint('three'));
+
+        $this->assertTrue($collection->hasVisibleEntryBlueprint());
     }
 
     /** @test */
@@ -351,6 +353,27 @@ class CollectionTest extends TestCase
 
         // But assert that it can still get a specific blueprint for editing the blueprint, etc.
         $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+
+        $this->assertTrue($collection->hasVisibleEntryBlueprint());
+    }
+
+    /** @test */
+    public function it_gets_first_entry_blueprint_when_they_are_all_hidden()
+    {
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'apple' => $blueprintOne = (new Blueprint)->setHandle('apple')->setHidden(true),
+            'berry' => $blueprintTwo = (new Blueprint)->setHandle('berry')->setHidden(true),
+            'cherry' => $blueprintThree = (new Blueprint)->setHandle('cherry')->setHidden(true),
+        ]));
+
+        $blueprints = $collection->entryBlueprints();
+
+        $this->assertCount(3, $blueprints);
+        $this->assertEquals($blueprintOne, $collection->entryBlueprint());
+        $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+        $this->assertFalse($collection->hasVisibleEntryBlueprint());
     }
 
     /** @test */
@@ -926,7 +949,7 @@ class CollectionTest extends TestCase
         $this->assertCount(0, $collection->queryEntries()->get());
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],

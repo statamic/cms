@@ -531,7 +531,7 @@ class TaxonomyTest extends TestCase
         $this->assertFalse($user->can('view', $taxonomy3));
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],

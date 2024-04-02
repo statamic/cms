@@ -23,7 +23,7 @@
             <button
                 v-if="showFilename"
                 @click="editOrOpen"
-                class="flex items-center flex-1 ml-3 text-xs text-left truncate w-full"
+                class="flex items-center flex-1 rtl:mr-3 ltr:ml-3 text-xs rtl:text-right ltr:text-left truncate w-full"
                 :aria-label="__('Edit Asset')"
             >
                 {{ asset.basename }}
@@ -39,7 +39,7 @@
                 {{ asset.values.alt ? "✅" : __("Set Alt") }}
             </button>
         </td>
-        <td class="p-0 w-8 text-right align-middle" v-if="!readOnly">
+        <td class="p-0 w-8 rtl:text-left ltr:text-right align-middle" v-if="!readOnly">
             <button
                 class="flex items-center p-1 w-6 h-8 text-lg antialiased text-gray-600 hover:text-gray-900"
                 @click="remove"

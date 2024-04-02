@@ -260,7 +260,10 @@ class Fields
             $field->setConfig(array_merge($field->config(), $overrides));
         }
 
-        return $field->setParent($this->parent)->setHandle($config['handle']);
+        return $field
+            ->setParent($this->parent)
+            ->setParentField($this->parentField, $this->parentIndex)
+            ->setHandle($config['handle']);
     }
 
     private function getImportedFields(array $config): array
@@ -291,7 +294,11 @@ class Fields
             }
 
             return $fields;
-        })->each->setParent($this->parent)->all();
+        })->each(function ($field) {
+            $field
+                ->setParent($this->parent)
+                ->setParentField($this->parentField, $this->parentIndex);
+        })->all();
     }
 
     public function meta()

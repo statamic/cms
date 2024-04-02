@@ -262,7 +262,7 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($expectedWarm, $container->warmPresets());
     }
 
-    public function warmPresetProvider()
+    public static function warmPresetProvider()
     {
         return [
             'no source, no presets' => [null, null, true, ['small', 'medium', 'large', 'max']],

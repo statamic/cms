@@ -95,7 +95,7 @@ class AddViewPathsTest extends TestCase
         app()->instance('request', $request);
     }
 
-    public function viewPathProvider()
+    public static function viewPathProvider()
     {
         return [
             'amp enabled, amp request' => [true, '/amp/fr/test', [
@@ -125,7 +125,7 @@ class AddViewPathsTest extends TestCase
         ];
     }
 
-    public function namespacedViewPathProvider()
+    public static function namespacedViewPathProvider()
     {
         return [
             'default site' => [

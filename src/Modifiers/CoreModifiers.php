@@ -958,6 +958,23 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts a hex color to rgb values.
+     *
+     * @return string
+     */
+    public function hexToRgb($value)
+    {
+        // Remove the hash (#) if present
+        $hex = ltrim($value, '#');
+
+        // Parse the hex value into RGB components
+        $rgb = sscanf($hex, '%02x%02x%02x');
+
+        // Return the RGB values as a comma-separated string
+        return implode(', ', $rgb);
+    }
+
+    /**
      * Get the date difference in hours.
      *
      * @param  Carbon  $value

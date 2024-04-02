@@ -817,7 +817,7 @@ class FrontendTest extends TestCase
         }
     }
 
-    public function redirectProvider()
+    public static function redirectProvider()
     {
         return [
             'valid redirect' => [
@@ -844,7 +844,7 @@ class FrontendTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider redirectProviderNoBlueprint
+     * @dataProvider redirectProviderNoBlueprintProvider
      */
     public function redirect_is_followed_when_no_field_is_present_in_blueprint(
         $dataValue,
@@ -881,7 +881,7 @@ class FrontendTest extends TestCase
         }
     }
 
-    public function redirectProviderNoBlueprint()
+    public static function redirectProviderNoBlueprintProvider()
     {
         return [
             'valid redirect' => [
@@ -908,6 +908,58 @@ class FrontendTest extends TestCase
                 null,                  // and not redirect
             ],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function redirect_http_status_is_applied_when_present_in_blueprint()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'redirect' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'url', 'field' => ['type' => 'link']],
+                    ['handle' => 'status', 'field' => ['type' => 'radio', 'options' => [301, 302]]],
+                ],
+            ]]);
+        Blueprint::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
+
+        tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
+                ],
+            ],
+        ]))->save();
+
+        $response = $this->get('/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
+    }
+
+    /**
+     * @test
+     */
+    public function redirect_http_status_is_applied_when_missing_from_blueprint()
+    {
+        tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
+                ],
+            ],
+        ]))->save();
+
+        $response = $this->get('/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
     }
 
     /** @test */
