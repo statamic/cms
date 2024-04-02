@@ -5,6 +5,7 @@ namespace Statamic\Assets;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetRepository as Contract;
 use Statamic\Contracts\Assets\QueryBuilder;
+use Statamic\Exceptions\AssetNotFoundException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -58,6 +59,17 @@ class AssetRepository implements Contract
         $path = str_after($url, $containerUrl);
 
         return $container->asset($path);
+    }
+
+    public function findOrFail(string $id): Asset
+    {
+        $asset = $this->find($id);
+
+        if (! $asset) {
+            throw new AssetNotFoundException($id);
+        }
+
+        return $asset;
     }
 
     protected function resolveContainerFromUrl($url)
