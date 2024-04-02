@@ -27,7 +27,7 @@ class SitesTest extends TestCase
     {
         parent::setUp();
 
-        $this->sites = new Sites([
+        $this->sites = (new Sites)->setSites([
             'en' => ['url' => 'http://test.com/'],
             'fr' => ['url' => 'http://fr.test.com/'],
             'de' => ['url' => 'http://test.com/de/'],
@@ -177,7 +177,7 @@ class SitesTest extends TestCase
     /** @test */
     public function gets_site_from_url_when_using_relative_urls()
     {
-        $sites = new Sites([
+        $sites = (new Sites)->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr/'],
         ]);

@@ -15,9 +15,9 @@ class Sites
     protected $current;
     protected ?Closure $currentUrlCallback = null;
 
-    public function __construct($sites = null)
+    public function __construct()
     {
-        $this->setSites($sites);
+        $this->setSites();
     }
 
     public function multiEnabled(): bool
@@ -96,7 +96,7 @@ class Sites
         session()->put('statamic.cp.selected-site', $site);
     }
 
-    public function setSites($sites)
+    public function setSites($sites = null)
     {
         $sites ??= $this->getSavedSites();
 
