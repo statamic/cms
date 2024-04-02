@@ -3,6 +3,8 @@
 namespace Tests\Yaml;
 
 use Exception;
+use Illuminate\Support\Facades\Facade;
+use Mockery;
 use Statamic\Facades\YAML;
 use Statamic\Yaml\ParseException;
 use Statamic\Yaml\Yaml as StatamicYaml;
@@ -14,8 +16,6 @@ class YamlTest extends TestCase
     /** @test */
     public function it_dumps_yaml()
     {
-        $this->markTestSkipped(); // TODO: Figure this out
-
         $array = [
             'foo' => 'bar',
             'two_words' => 'two words',
@@ -23,7 +23,7 @@ class YamlTest extends TestCase
             'array' => ['one', 'two'],
         ];
 
-        $symfonyYaml = $this->mock(SymfonyYaml::class)
+        $symfonyYaml = Mockery::mock(SymfonyYaml::class)
             ->shouldReceive('dump')
             ->with($array, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
             ->once()
@@ -31,6 +31,7 @@ class YamlTest extends TestCase
             ->getMock();
 
         $this->app->instance(StatamicYaml::class, new StatamicYaml($symfonyYaml));
+        Facade::clearResolvedInstance(StatamicYaml::class);
 
         $this->assertEquals('some properly dumped yaml from symfony', YAML::dump($array));
     }
@@ -161,8 +162,6 @@ EOT;
      **/
     public function it_dumps_front_matter_properly_when_symfony_yaml_dumper_doesnt_end_with_a_line_break()
     {
-        $this->markTestSkipped(); // TODO: Figure this out
-
         $array = [
             'foo' => 'bar',
             'baz' => "first line\nsecond line", // the multiline string *must* be last for this bug
@@ -171,7 +170,7 @@ EOT;
         // We mock symfony because the multiline character is different depending on the version installed.
         // It will be | on early versions. It will be |- on later versions.
         // The |- character means trim trailing newlines, and is the default when dumping multiline strings.
-        $symfonyYaml = $this->mock(SymfonyYaml::class)
+        $symfonyYaml = Mockery::mock(SymfonyYaml::class)
             ->shouldReceive('dump')
             ->with($array, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
             ->once()
@@ -179,6 +178,7 @@ EOT;
             ->getMock();
 
         $this->app->instance(StatamicYaml::class, new StatamicYaml($symfonyYaml));
+        Facade::clearResolvedInstance(StatamicYaml::class);
 
         // Without the bug fix, the --- would come immediately after the "second line". Like this:
         // baz: |-
