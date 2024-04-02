@@ -143,12 +143,12 @@ class Replicator extends Fieldtype
             ->addValues($data)
             ->validator()
             ->withContext([
-                'prefix' => $this->field->validationContext('prefix') . $this->setRuleFieldPrefix($index) . '.',
+                'prefix' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index).'.',
             ])
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
-            return [$this->setRuleFieldPrefix($index) . '.' . $handle => $rules];
+            return [$this->setRuleFieldPrefix($index).'.'.$handle => $rules];
         })->all();
     }
 
@@ -171,7 +171,7 @@ class Replicator extends Fieldtype
         $attributes = $this->fields($handle, $index)->addValues($data)->validator()->attributes();
 
         return collect($attributes)->mapWithKeys(function ($attribute, $handle) use ($index) {
-            return [$this->setRuleFieldPrefix($index) . '.' . $handle => $attribute];
+            return [$this->setRuleFieldPrefix($index).'.'.$handle => $attribute];
         })->all();
     }
 
@@ -190,7 +190,7 @@ class Replicator extends Fieldtype
         return collect($values)->reject(function ($set, $key) {
             return array_get($set, 'enabled', true) === false;
         })->map(function ($set, $index) use ($shallow) {
-            if (!Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields")) {
+            if (! Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields")) {
                 return $set;
             }
 
@@ -240,7 +240,7 @@ class Replicator extends Fieldtype
         // If the first set doesn't have a nested "set" key, it would be the legacy format.
         // We'll put it in a "main" group so it's compatible with the new format.
         // This also happens in the "sets" fieldtype.
-        if (!Arr::has($sets->first(), 'sets')) {
+        if (! Arr::has($sets->first(), 'sets')) {
             $sets = collect([
                 'main' => [
                     'sets' => $sets->all(),
@@ -285,14 +285,14 @@ class Replicator extends Fieldtype
 
     protected function gqlSetTypeName($set)
     {
-        return 'Set_' . collect($this->field->handlePath())->map(function ($part) {
+        return 'Set_'.collect($this->field->handlePath())->map(function ($part) {
             return Str::studly($part);
-        })->join('_') . '_' . Str::studly($set);
+        })->join('_').'_'.Str::studly($set);
     }
 
     protected function gqlSetsTypeName()
     {
-        return 'Sets_' . collect($this->field->handlePath())->map(function ($part) {
+        return 'Sets_'.collect($this->field->handlePath())->map(function ($part) {
             return Str::studly($part);
         })->join('_');
     }
