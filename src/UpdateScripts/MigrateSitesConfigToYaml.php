@@ -32,7 +32,8 @@ class MigrateSitesConfigToYaml extends UpdateScript
 
         $this
             ->saveMigratedSitesToYaml($sites)
-            ->copyNewSitesConfig($configPath);
+            ->ensureMultisiteConfigEnabled($sites)
+            ->removeOldSitesConfigFile();
 
         $this->console->success('Successfully migrated [config/statamic/sites.php] to [content/sites.yaml]!');
     }
@@ -95,16 +96,28 @@ class MigrateSitesConfigToYaml extends UpdateScript
         return $this;
     }
 
-    private function copyNewSitesConfig($configPath)
+    private function ensureMultisiteConfigEnabled($sites)
     {
-        $newConfig = File::get(__DIR__.'/../../config/sites.php');
-
-        // If more than one site is configured, automatically enable multisite
-        if (Site::all()->count() > 1) {
-            $newConfig = str_replace("'enabled' => false", "'enabled' => true", $newConfig);
+        if (count($sites) <= 1) {
+            return $this;
         }
 
-        File::put($configPath, $newConfig);
+        if (! File::exists($configPath = config_path('statamic/system.php'))) {
+            File::copy(__DIR__.'/../../config/system.php', $configPath);
+        }
+
+        $config = File::get($configPath);
+
+        $config = str_replace("'multisite' => false", "'multisite' => true", $config);
+
+        File::put($configPath, $config);
+
+        return $this;
+    }
+
+    private function removeOldSitesConfigFile()
+    {
+        File::delete(config_path('statamic/sites.php'));
 
         return $this;
     }
