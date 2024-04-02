@@ -21,6 +21,13 @@ class MigrateSitesConfigToYamlTest extends TestCase
         File::delete(base_path('content/sites.yaml'));
     }
 
+    public function tearDown(): void
+    {
+        File::copy(__DIR__.'/../../config/system.php', config_path('statamic/system.php'));
+
+        parent::tearDown();
+    }
+
     /** @test */
     public function it_is_registered()
     {
