@@ -36,11 +36,10 @@ class TrimStrings extends TransformsRequest
      */
     private function isTextNode(array $data): bool
     {
-        return
-            array_key_exists('text', $data) &&
-            array_key_exists('type', $data) &&
-            is_string($data['text']) &&
-            $data['type'] === 'text';
+        return array_key_exists('text', $data)
+            && array_key_exists('type', $data)
+            && is_string($data['text'])
+            && $data['type'] === 'text';
     }
 
     /**
