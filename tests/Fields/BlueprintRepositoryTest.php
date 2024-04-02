@@ -315,6 +315,7 @@ tabs:
       - one
       - two
 EOT;
+
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturnTrue();
         File::shouldReceive('get')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturn($contents);
 

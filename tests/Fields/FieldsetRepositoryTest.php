@@ -40,6 +40,7 @@ fields:
       type: text
       display: Second Field
 EOT;
+
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturn($contents);
 
