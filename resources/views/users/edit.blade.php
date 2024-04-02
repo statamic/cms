@@ -17,6 +17,8 @@
         :can-edit-password="{{ Statamic\Support\Str::bool($canEditPassword) }}"
         :can-edit-blueprint="{{ Statamic\Support\Str::bool($user->can('configure fields')) }}"
         :requires-current-password="{{ Statamic\Support\Str::bool($requiresCurrentPassword) }}"
+        :can-delete="{{ Statamic\Support\Str::bool($canDelete) }}"
+        delete-redirect="{{ $deleteRedirect }}"
     ></user-publish-form>
 
 @endsection

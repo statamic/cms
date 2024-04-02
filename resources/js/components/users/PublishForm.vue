@@ -8,6 +8,14 @@
                 <h1 class="flex-1" v-text="title" />
                     <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint">
                         <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                        <dropdown-item v-if="canDelete" :text="__('Delete User')" class="warning" @click="$refs.deleter.confirm()">
+                            <resource-deleter
+                                ref="deleter"
+                                :resource-title="values.name"
+                                :route="actions.delete"
+                                :redirect="deleteRedirect"
+                            ></resource-deleter>
+                        </dropdown-item>
                     </dropdown-list>
 
                     <change-password
@@ -78,6 +86,8 @@ export default {
         canEditPassword: Boolean,
         canEditBlueprint: Boolean,
         requiresCurrentPassword: Boolean,
+        canDelete: Boolean,
+        deleteRedirect: String,
     },
 
     data() {

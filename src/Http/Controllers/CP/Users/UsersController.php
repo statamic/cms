@@ -255,9 +255,12 @@ class UsersController extends CpController
                 'save' => $user->updateUrl(),
                 'password' => cp_route('users.password.update', $user->id()),
                 'editBlueprint' => cp_route('users.blueprint.edit'),
+                'delete' => cp_route('users.destroy', $user->id()),
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $request->user()->id === $user->id(),
+            'canDelete' => User::fromUser($request->user())->can('delete', $user) && $request->user()->id !== $user->id(),
+            'deleteRedirect' => cp_route('users.index'),
         ];
 
         if ($request->wantsJson()) {
