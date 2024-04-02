@@ -45,13 +45,13 @@ class GlobalRepository implements RepositoryContract
 
     public function findOrFail($id): GlobalSet
     {
-        $set = $this->find($id);
+        $global = $this->find($id);
 
-        if (! $set) {
+        if (! $global) {
             throw new GlobalSetNotFoundException($id);
         }
 
-        return $set;
+        return $global;
     }
 
     public function save($global)
