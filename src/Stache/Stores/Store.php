@@ -90,6 +90,8 @@ abstract class Store
 
     abstract public function getItem($key);
 
+    abstract public function getItemValues($keys, $valueIndex, $keyIndex);
+
     public function indexUsage()
     {
         $key = $this->indexUsageCacheKey();

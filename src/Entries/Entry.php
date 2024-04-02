@@ -78,6 +78,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
+    private $computedCallbackCache;
     private $siteCache;
 
     public function __construct()
@@ -128,6 +129,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             }) : null;
         }
 
+        $this->computedCallbackCache = null;
         $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
 
         return $this;
@@ -1019,6 +1021,20 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     protected function getComputedCallbacks()
     {
-        return Facades\Collection::getComputedCallbacks($this->collection);
+        if ($this->computedCallbackCache) {
+            return $this->computedCallbackCache;
+        }
+
+        return $this->computedCallbackCache = Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function __sleep()
+    {
+        if ($this->slug instanceof Closure) {
+            $slug = $this->slug;
+            $this->slug = $slug($this);
+        }
+
+        return array_keys(Arr::except(get_object_vars($this), ['computedCallbackCache']));
     }
 }
