@@ -20,12 +20,14 @@ use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
 {
     use EnhancesCommands;
+    use Hookable;
     use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
@@ -163,6 +165,7 @@ class StaticWarm extends Command
             ->merge($this->taxonomyUris())
             ->merge($this->termUris())
             ->merge($this->customRouteUris())
+            ->merge($this->additionalUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
                 return $cacher->isExcluded($uri);
@@ -278,5 +281,16 @@ class StaticWarm extends Command
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Custom routes");
 
         return $routes;
+    }
+
+    protected function additionalUris(): Collection
+    {
+        $this->line('[ ] Additional...');
+
+        $uris = $this->runHooks('additional', collect());
+
+        $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Additional");
+
+        return $uris->map(fn ($uri) => URL::makeAbsolute($uri));
     }
 }

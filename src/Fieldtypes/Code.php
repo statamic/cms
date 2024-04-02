@@ -6,6 +6,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\CodeType;
+use Statamic\Rules\CodeFieldtypeRulers;
 
 class Code extends Fieldtype
 {
@@ -110,7 +111,7 @@ class Code extends Fieldtype
                         'key_header' => __('Columns'),
                         'value_header' => __('Line Style (dashed or solid)'),
                         'add_button' => __('Add Ruler'),
-                        'validate' => 'code_fieldtype_rulers',
+                        'validate' => [new CodeFieldtypeRulers],
                     ],
                 ],
             ],

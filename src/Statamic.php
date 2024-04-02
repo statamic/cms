@@ -5,6 +5,7 @@ namespace Statamic;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Laravel\Nova\Nova;
@@ -36,7 +37,6 @@ class Statamic
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
-    private static $isApiRouteCache;
 
     public static function version()
     {
@@ -50,17 +50,7 @@ class Statamic
 
     public static function enablePro()
     {
-        $path = config_path('statamic/editions.php');
-
-        $contents = File::get($path);
-
-        if (! Str::contains($contents, "'pro' => false,")) {
-            throw new \Exception('Could not reliably update the config file.');
-        }
-
-        $contents = str_replace("'pro' => false,", "'pro' => true,", $contents);
-
-        File::put($path, $contents);
+        Artisan::call('statamic:pro:enable', ['--update-config' => true]);
     }
 
     public static function availableScripts(Request $request)
@@ -213,22 +203,13 @@ class Statamic
         return $route;
     }
 
-    public static function clearApiRouteCache()
-    {
-        self::$isApiRouteCache = null;
-    }
-
     public static function isApiRoute()
     {
-        if (self::$isApiRouteCache !== null) {
-            return self::$isApiRouteCache;
-        }
-
         if (! config('statamic.api.enabled') || ! static::pro()) {
-            return self::$isApiRouteCache = false;
+            return false;
         }
 
-        return self::$isApiRouteCache = starts_with(request()->path(), config('statamic.api.route'));
+        return starts_with(request()->path(), config('statamic.api.route'));
     }
 
     public static function apiRoute($route, $params = [])
