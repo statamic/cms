@@ -10,7 +10,7 @@
     }
 
     .item-inner {
-        @apply w-full flex items-center px-2;
+        @apply w-full flex items-center p-2;
     }
 
     &.invalid {
