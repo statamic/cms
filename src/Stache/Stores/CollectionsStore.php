@@ -98,6 +98,15 @@ class CollectionsStore extends BasicStore
         $this->updateEntriesWithinIndex($index, $ids);
     }
 
+    public function updateEntryParent($collection, $ids = null)
+    {
+        $index = Stache::store('entries')
+            ->store($collection->handle())
+            ->index('parent');
+
+        $this->updateEntriesWithinIndex($index, $ids);
+    }
+
     private function updateEntriesWithinIndex($index, $ids)
     {
         if (empty($ids)) {

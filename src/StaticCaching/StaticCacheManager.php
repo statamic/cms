@@ -4,7 +4,6 @@ namespace Statamic\StaticCaching;
 
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
-use InvalidArgumentException;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
@@ -31,7 +30,7 @@ class StaticCacheManager extends Manager
 
     public function createFileDriver(array $config)
     {
-        return new FileCacher(new Writer, $this->cacheStore(), $config);
+        return new FileCacher(new Writer($config['permissions'] ?? []), $this->cacheStore(), $config);
     }
 
     public function createApplicationDriver(array $config)
@@ -41,13 +40,12 @@ class StaticCacheManager extends Manager
 
     public function cacheStore()
     {
-        try {
-            $store = Cache::store('static_cache');
-        } catch (InvalidArgumentException $e) {
-            $store = Cache::store();
-        }
+        return Cache::store($this->hasCustomStore() ? 'static_cache' : null);
+    }
 
-        return $store;
+    private function hasCustomStore(): bool
+    {
+        return config()->has('cache.stores.static_cache');
     }
 
     protected function getConfig($name)
@@ -66,6 +64,12 @@ class StaticCacheManager extends Manager
     public function flush()
     {
         $this->driver()->flush();
+
+        if ($this->hasCustomStore()) {
+            $this->cacheStore()->flush();
+
+            return;
+        }
 
         collect($this->cacheStore()->get('nocache::urls', []))->each(function ($url) {
             $session = $this->cacheStore()->get($sessionKey = 'nocache::session.'.md5($url));

@@ -4,6 +4,7 @@ namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Entries\Collection;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Stache\Repositories\CollectionRepository;
 use Statamic\Stache\Stache;
@@ -115,5 +116,23 @@ class CollectionRepositoryTest extends TestCase
         $this->assertEquals($previewTargetsCollection1, $previewTargetsTest->all());
         $this->assertEquals($previewTargetsCollection2, $previewTargetsTest2->all());
         $this->assertNotEquals($previewTargetsTest->all(), $previewTargetsTest2->all());
+    }
+
+    /** @test */
+    public function test_find_or_fail_gets_collection()
+    {
+        $collection = $this->repo->findOrFail('blog');
+
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertEquals('Blog', $collection->title());
+    }
+
+    /** @test */
+    public function test_find_or_fail_throws_exception_when_collection_does_not_exist()
+    {
+        $this->expectException(CollectionNotFoundException::class);
+        $this->expectExceptionMessage('Collection [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }

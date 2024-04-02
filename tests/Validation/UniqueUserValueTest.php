@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Validator;
 use Statamic\Facades\User;
+use Statamic\Rules\UniqueUserValue;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -16,12 +17,12 @@ class UniqueUserValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['email' => 'foo@bar.com'],
-            ['email' => 'unique_user_value']
+            ['email' => new UniqueUserValue]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'bar@bar.com'],
-            ['slug' => 'unique_user_value']
+            ['slug' => new UniqueUserValue]
         )->passes());
     }
 
@@ -32,7 +33,7 @@ class UniqueUserValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['email' => 'foo@bar.com'],
-            ['email' => 'unique_user_value:123']
+            ['email' => new UniqueUserValue(except: 123)]
         )->passes());
     }
 
@@ -43,7 +44,7 @@ class UniqueUserValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['baz' => 'foo@bar.com'],
-            ['baz' => 'unique_user_value:null,email']
+            ['baz' => new UniqueUserValue(column: 'email')]
         )->fails());
     }
 }
