@@ -41,7 +41,7 @@ class CoreNavTest extends TestCase
     /** @test */
     public function it_builds_plural_sites_item_when_multisite_is_enabled()
     {
-        Facades\Config::set('statamic.sites.enabled', true);
+        Facades\Config::set('statamic.system.multisite', true);
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
 

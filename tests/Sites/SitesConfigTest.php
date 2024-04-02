@@ -316,7 +316,7 @@ class SitesConfigTest extends TestCase
     public function it_saves_multiple_sites_through_cp_endpoint()
     {
         // Multisite requires this config
-        Config::set('statamic.sites.enabled', true);
+        Config::set('statamic.system.multisite', true);
 
         $this
             ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
@@ -386,7 +386,7 @@ class SitesConfigTest extends TestCase
     public function it_validates_required_fields_for_multiple_sites_through_cp_endpoint()
     {
         // Multisite requires this config
-        Config::set('statamic.sites.enabled', true);
+        Config::set('statamic.system.multisite', true);
 
         $this
             ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
@@ -430,7 +430,7 @@ class SitesConfigTest extends TestCase
     public function it_validates_at_least_one_site_is_required_for_multiple_sites_through_cp_endpoint($data)
     {
         // Multisite requires this config
-        Config::set('statamic.sites.enabled', true);
+        Config::set('statamic.system.multisite', true);
 
         $this
             ->actingAs(tap(User::make()->email('chew@bacca.com')->makeSuper())->save())
