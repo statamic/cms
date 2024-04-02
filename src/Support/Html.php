@@ -341,7 +341,7 @@ class Html
      *
      * @param  string|array  $value  The value to sanitize
      * @param  bool  $antlers  Whether Antlers (curly braces) should be escaped.
-     * @param bool $doubleEncode Whether existing HTML entities should be double-encoded.
+     * @param  bool  $doubleEncode  Whether existing HTML entities should be double-encoded.
      * @return string
      */
     public static function sanitize($value, $antlers = true, $doubleEncode = true)
