@@ -803,4 +803,42 @@ class EntryQueryBuilderTest extends TestCase
             'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
     }
+
+    /** @test */
+    public function entries_can_be_found_or_created_or_updated()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        // Create new entry
+        $entry = Entry::query()
+            ->where('collection', 'posts')
+            ->firstOrCreate(
+                ['id' => 'id-1'],
+                ['title' => 'Post 1'],
+            );
+        $this->assertEquals('Post 1', $entry->title);
+
+        // Get the first entry if it already exists
+        $entry = Entry::query()
+            ->where('collection', 'posts')
+            ->firstOrCreate(
+                ['id' => 'id-1'],
+                ['title' => 'Post 2'],
+            );
+        $this->assertEquals('Post 1', $entry->title);
+
+        // Create new entry
+        $entry = Entry::query()->updateOrCreate(
+            ['id' => 'id-2'],
+            ['title' => 'Post 2'],
+        );
+        $this->assertEquals('Post 2', $entry->title);
+
+        // Only update the entry if it already exists
+        $entry = Entry::query()->updateOrCreate(
+            ['id' => 'id-1'],
+            ['title' => 'Post 1 - Updated'],
+        );
+        $this->assertEquals('Post 1 - Updated', $entry->title);
+    }
 }

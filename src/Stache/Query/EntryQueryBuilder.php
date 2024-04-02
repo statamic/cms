@@ -5,6 +5,7 @@ namespace Statamic\Stache\Query;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
+use Statamic\Facades\Entry;
 use Statamic\Support\Arr;
 
 class EntryQueryBuilder extends Builder implements QueryBuilder
@@ -147,5 +148,41 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         return $data;
+    }
+
+    public function firstOrCreate(array $attributes = [], array $values = [])
+    {
+        if (!is_null($instance = (clone $this)->where($attributes)->first())) {
+            return $instance;
+        }
+
+        return $this->createOrFirst($attributes, $values);
+    }
+
+    public function createOrFirst(array $attributes = [], array $values = [])
+    {
+        try {
+            $entry = Entry::make();
+            if (!isset($attributes['collection']) && empty($this->collections)) {
+                return null;
+            }
+
+            $entry->collection($attributes['collection'] ?? $this->collections[0] ?? null);
+
+            $entry->data($attributes)->merge($values);
+            $entry->save();
+            return $entry;
+        } catch (\Exception $e) {
+            return $this->where($attributes)->first();
+        }
+    }
+
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
+            if (!$instance->wasRecentlyCreated) {
+                $instance->merge($values)->save();
+            }
+        });
     }
 }
