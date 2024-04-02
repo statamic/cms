@@ -4,8 +4,8 @@ namespace Statamic\Stache\Repositories;
 
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
-use Statamic\Exceptions\TermNotFoundException;
 use Statamic\Exceptions\TaxonomyNotFoundException;
+use Statamic\Exceptions\TermNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
