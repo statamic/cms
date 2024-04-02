@@ -379,7 +379,7 @@ class Comb
      */
     private function preformat($raw_query)
     {
-        return trim(mb_ereg_replace("[^\w\d\-\.:+\s@&’'‘]", '', $raw_query));
+        return trim(mb_ereg_replace("[^\w\d\-\.:+\s\\\/@&’'‘]", '', $raw_query));
     }
 
     /**

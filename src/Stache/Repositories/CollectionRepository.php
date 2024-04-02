@@ -6,6 +6,7 @@ use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
 use Statamic\Data\StoresScopedComputedFieldCallbacks;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Stache\Stache;
 
@@ -51,6 +52,17 @@ class CollectionRepository implements RepositoryContract
         });
     }
 
+    public function findOrFail($id): Collection
+    {
+        $collection = $this->find($id);
+
+        if (! $collection) {
+            throw new CollectionNotFoundException($id);
+        }
+
+        return $collection;
+    }
+
     public function make(?string $handle = null): Collection
     {
         return app(Collection::class)->handle($handle);
@@ -90,6 +102,11 @@ class CollectionRepository implements RepositoryContract
     public function updateEntryOrder(Collection $collection, $ids = null)
     {
         $this->store->updateEntryOrder($collection, $ids);
+    }
+
+    public function updateEntryParent(Collection $collection, $ids = null)
+    {
+        $this->store->updateEntryParent($collection, $ids);
     }
 
     public function whereStructured(): IlluminateCollection

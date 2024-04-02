@@ -364,4 +364,30 @@ class UserQueryBuilderTest extends TestCase
         $this->assertCount(2, $users);
         $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
     }
+
+    /** @test */
+    public function values_can_be_plucked()
+    {
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'type' => 'a'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol', 'type' => 'b'])->save();
+        User::make()->email('frodo@precious.com')->data(['name' => 'Frodo', 'type' => 'b'])->save();
+
+        $this->assertEquals([
+            'gandalf@precious.com' => 'Gandalf',
+            'smeagol@precious.com' => 'Smeagol',
+            'frodo@precious.com' => 'Frodo',
+        ], User::query()->pluck('name', 'email')->all());
+
+        $this->assertEquals([
+            'Gandalf',
+            'Smeagol',
+            'Frodo',
+        ], User::query()->pluck('name')->all());
+
+        // Assert only queried values are plucked.
+        $this->assertSame([
+            'Smeagol',
+            'Frodo',
+        ], User::query()->where('type', 'b')->pluck('name')->all());
+    }
 }

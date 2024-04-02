@@ -37,6 +37,10 @@ class CpServiceProvider extends ServiceProvider
             return "<?php echo Statamic::svg({$expression}) ?>";
         });
 
+        Blade::directive('rarr', function ($expression) {
+            return "<?php echo Statamic::cpDirection() === 'ltr' ? '&rarr;' : '&larr;' ?>";
+        });
+
         Sets::setIconsDirectory();
 
         $this->registerMiddlewareGroups();

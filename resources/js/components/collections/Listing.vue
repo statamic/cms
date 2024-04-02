@@ -3,7 +3,7 @@
         <div class="card overflow-hidden p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
                 <template slot="cell-title" slot-scope="{ row: collection }">
-                    <a :href="collection.entries_url">{{ __(collection.title) }}</a>
+                    <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url">{{ __(collection.title) }}</a>
                 </template>
                 <template slot="actions" slot-scope="{ row: collection, index }">
                     <dropdown-list placement="left-start">

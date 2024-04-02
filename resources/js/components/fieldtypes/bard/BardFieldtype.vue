@@ -180,7 +180,8 @@ export default {
             showAddSetButton: false,
             provide: {
                 bard: this.makeBardProvide(),
-                storeName: this.storeName
+                storeName: this.storeName,
+                bardSets: this.config.sets
             }
         }
     },
@@ -362,8 +363,10 @@ export default {
 
     watch: {
 
-        json(json) {
+        json(json, oldJson) {
             if (!this.mounted) return;
+                        
+            if (json === oldJson) return;
 
             this.updateDebounced(json);
         },
