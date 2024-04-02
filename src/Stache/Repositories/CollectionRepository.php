@@ -35,15 +35,6 @@ class CollectionRepository implements RepositoryContract
         return $this->findByHandle($id);
     }
 
-    protected function mountedCollections(): IlluminateCollection
-    {
-        return Blink::once('mounted-collections', function () {
-            return $this->all()->keyBy(function ($collection) {
-                return $collection->mount()?->id();
-            })->filter();
-        });
-    }
-
     public function findByHandle($handle): ?Collection
     {
         return $this->store->getItem($handle);
@@ -56,6 +47,15 @@ class CollectionRepository implements RepositoryContract
         }
 
         return $this->mountedCollections()->get($mount->id());
+    }
+
+    private function mountedCollections(): IlluminateCollection
+    {
+        return Blink::once('mounted-collections', function () {
+            return $this->all()->keyBy(function ($collection) {
+                return $collection->mount()?->id();
+            })->filter();
+        });
     }
 
     public function make(?string $handle = null): Collection
