@@ -20,13 +20,13 @@ class FormRepositoryTest extends TestCase
         $this->app->instance(Stache::class, $stache);
 
         $this->repo = new FormRepository($stache);
-
-        $this->repo->make('test_form')->title('Test')->save();
     }
 
     /** @test */
     public function test_find_or_fail_gets_form()
     {
+        $this->repo->make('test_form')->title('Test')->save();
+
         $form = $this->repo->findOrFail('test_form');
 
         $this->assertInstanceOf(Form::class, $form);
