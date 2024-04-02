@@ -103,7 +103,7 @@ class FluentGetterSetter
      */
     protected function runGetterLogic()
     {
-        $value = $this->invade($this->object, $this->property);
+        $value = $this->getProperty($this->object, $this->property);
 
         if ($getter = $this->getter) {
             $value = $getter($value);
@@ -123,19 +123,19 @@ class FluentGetterSetter
             $value = $setter($value);
         }
 
-        $this->invadeSetter($this->object, $this->property, $value);
+        $this->setProperty($this->object, $this->property, $value);
 
         if ($afterSetter = $this->afterSetter) {
             $afterSetter($value);
         }
     }
 
-    private function invade($object, $property)
+    private function getProperty($object, $property)
     {
         return (fn () => $this->{$property})->call($object);
     }
 
-    private function invadeSetter($object, $property, $value)
+    private function setProperty($object, $property, $value)
     {
         (fn () => $this->{$property} = $value)->call($object);
     }
