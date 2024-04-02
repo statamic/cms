@@ -24,10 +24,10 @@ class EventServiceProvider extends ServiceProvider
             \Statamic\Entries\AddSiteColumnToBlueprint::class,
         ],
         \Statamic\Events\ResponseCreated::class => [
-            \Statamic\View\State\ClearState::class,
+            \Statamic\Listeners\ClearState::class,
         ],
         \Illuminate\Foundation\Http\Events\RequestHandled::class => [
-            \Statamic\View\State\ClearState::class,
+            \Statamic\Listeners\ClearState::class,
         ],
     ];
 
