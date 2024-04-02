@@ -46,16 +46,11 @@ class CollectionRepository implements RepositoryContract
             return null;
         }
 
-        return $this->mountedCollections()->get($mount->id());
-    }
-
-    private function mountedCollections(): IlluminateCollection
-    {
         return Blink::once('mounted-collections', fn () => $this
             ->all()
             ->keyBy(fn ($collection) => $collection->mount()?->id())
             ->filter()
-        );
+        )->get($mount->id());
     }
 
     public function make(?string $handle = null): Collection
