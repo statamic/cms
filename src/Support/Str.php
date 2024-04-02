@@ -288,11 +288,6 @@ class Str
         return $string;
     }
 
-    public static function collapseWhitespace($string)
-    {
-        return trim(\mb_ereg_replace('[[:space:]]+', ' ', $string, 'msr'));
-    }
-
     public static function ensureLeft($string, $start)
     {
         return IlluminateStr::start($string, $start);
@@ -313,7 +308,7 @@ class Str
     public static function __callStatic($method, $args)
     {
         $deferToStringy = [
-            'append', 'at', 'camelize', 'chars', 'containsAny', 'count', 'countSubstr',
+            'append', 'at', 'camelize', 'chars', 'collapseWhitespace', 'containsAny', 'count', 'countSubstr',
             'dasherize', 'delimit', 'endsWithAny', 'first', 'getEncoding', 'getIterator',
             'hasLowerCase', 'hasUpperCase', 'htmlDecode', 'htmlEncode', 'humanize', 'indexOf', 'indexOfLast', 'insert',
             'isAlpha', 'isAlphanumeric', 'isBase64', 'isBlank', 'isHexadecimal', 'isLowerCase', 'isSerialized',
