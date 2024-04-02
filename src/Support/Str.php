@@ -290,7 +290,7 @@ class Str
 
     public static function collapseWhitespace($string)
     {
-        return trim(\mb_ereg_replace('[[:space:]]+', '', $string, 'msr'));
+        return trim(\mb_ereg_replace('[[:space:]]+', ' ', $string, 'msr'));
     }
 
     public static function ensureLeft($string, $start)
