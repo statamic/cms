@@ -1395,7 +1395,7 @@ class CoreModifiers extends Modifier
     public function link($value, $params)
     {
         $attributes = $this->buildAttributesFromParameters($params);
-        $title = array_pull($attributes, 'title', null);
+        $title = Arr::pull($attributes, 'title', null);
 
         return Html::link($value, $title, $attributes);
     }
