@@ -47,11 +47,11 @@ class User extends BaseUser
 
         $this->traitData($data);
 
-        if (array_has($data, 'password')) {
+        if (Arr::has($data, 'password')) {
             $this->remove('password')->password($data['password']);
         }
 
-        if (array_has($data, 'password_hash')) {
+        if (Arr::has($data, 'password_hash')) {
             $this->remove('password_hash')->passwordHash($data['password_hash']);
         }
 

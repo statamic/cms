@@ -151,7 +151,7 @@ class Email extends Mailable
         $augmented = $this->submission->toAugmentedArray();
         $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']));
 
-        if (array_has($this->config, 'attachments')) {
+        if (Arr::has($this->config, 'attachments')) {
             $fields = $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
         }
 
