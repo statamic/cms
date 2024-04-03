@@ -28,7 +28,7 @@ class TaxonomyTermsStore extends ChildStore
 
     public function getItemFilter(SplFileInfo $file)
     {
-        $dir = str_finish($this->directory(), '/');
+        $dir = Str::finish($this->directory(), '/');
         $relative = $file->getPathname();
 
         if (substr($relative, 0, strlen($dir)) == $dir) {

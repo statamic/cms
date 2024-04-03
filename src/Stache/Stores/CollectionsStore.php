@@ -26,7 +26,7 @@ class CollectionsStore extends BasicStore
 
     public function getItemFilter(SplFileInfo $file)
     {
-        $dir = str_finish($this->directory, '/');
+        $dir = Str::finish($this->directory, '/');
         $relative = Str::after(Path::tidy($file->getPathname()), $dir);
 
         return $file->getExtension() === 'yaml' && substr_count($relative, '/') === 0;

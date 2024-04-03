@@ -444,10 +444,10 @@ class Statamic
                 $version = str_random();
 
                 // Add the file extension if not provided.
-                $path = str_finish($path, ".{$extension}");
+                $path = Str::finish($path, ".{$extension}");
 
                 // Add the version to the path.
-                $path = str_finish($path, "?v={$version}");
+                $path = Str::finish($path, "?v={$version}");
             }
 
             return $path;
