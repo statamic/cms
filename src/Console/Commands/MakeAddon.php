@@ -8,6 +8,7 @@ use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
+use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -102,8 +103,8 @@ class MakeAddon extends GeneratorCommand
     {
         $parts = explode('/', $this->package);
 
-        $this->vendorSlug = str_slug(snake_case($parts[0]));
-        $this->nameSlug = str_slug(snake_case($parts[1]));
+        $this->vendorSlug = str_slug(Str::snake($parts[0]));
+        $this->nameSlug = str_slug(Str::snake($parts[1]));
         $this->package = "{$this->vendorSlug}/{$this->nameSlug}";
     }
 

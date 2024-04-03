@@ -273,7 +273,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     public function __get($attribute)
     {
-        $words = explode('_', snake_case($attribute));
+        $words = explode('_', Str::snake($attribute));
 
         // If trying to access `type` attribute, allow dynamic string manipulation like `typeLowerPlural`.
         if ($words[0] === 'type') {
