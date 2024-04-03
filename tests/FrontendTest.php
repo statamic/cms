@@ -970,7 +970,7 @@ class FrontendTest extends TestCase
     {
         Site::setConfig(['sites' => [
             'en' => ['url' => '/', 'locale' => 'en'],
-            'fr' => ['url' => "/fr/", 'locale' => 'fr'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
         ]]);
 
         $blueprint = Blueprint::makeFromFields([
