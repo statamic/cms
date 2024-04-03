@@ -399,7 +399,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function title()
     {
-        return array_get($this->contents, 'title', Str::humanize(Str::of($this->handle)->after('::')->afterLast('.')));
+        return Arr::get($this->contents, 'title', Str::humanize(Str::of($this->handle)->after('::')->afterLast('.')));
     }
 
     public function isNamespaced(): bool

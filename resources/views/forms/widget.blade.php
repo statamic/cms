@@ -1,4 +1,5 @@
 @php use function Statamic\trans as __; @endphp
+@php use Statamic\Support\Arr; @endphp
 
 <div class="card p-0 overflow-hidden">
     <div class="flex justify-between items-center p-4">
@@ -19,7 +20,7 @@
                 @foreach($submissions as $submission)
                     <tr>
                         @foreach($fields as $key => $field)
-                        <td><a href="{{ cp_route('forms.submissions.show', [$form->handle(), $submission['id']]) }}">{{ array_get($submission, $field) }}</a></td>
+                        <td><a href="{{ cp_route('forms.submissions.show', [$form->handle(), $submission['id']]) }}">{{ Arr::get($submission, $field) }}</a></td>
                         @endforeach
                         <td class="rtl:text-left ltr:text-right">
                             {{ ($submission['date']->diffInDays() <= 14) ? $submission['date']->diffForHumans() : $submission['date']->format($format) }}

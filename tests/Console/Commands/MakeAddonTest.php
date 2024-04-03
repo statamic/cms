@@ -56,10 +56,10 @@ class MakeAddonTest extends TestCase
     public function it_cannot_make_addon_with_invalid_composer_package_name()
     {
         $this->artisan('statamic:make:addon', ['addon' => 'deaths-tar-vulnerability'])
-            ->expectsOutput('Please enter a valid composer package name (eg. hasselhoff/kung-fury).');
+            ->expectsOutput(trans('statamic::validation.composer_package'));
 
         $this->artisan('statamic:make:addon', ['addon' => 'some/path/deaths-tar-vulnerability'])
-            ->expectsOutput('Please enter a valid composer package name (eg. hasselhoff/kung-fury).');
+            ->expectsOutput(trans('statamic::validation.composer_package'));
 
         $this->assertFileDoesNotExist(base_path('addons/erso/deaths-tar-vulnerability'));
     }

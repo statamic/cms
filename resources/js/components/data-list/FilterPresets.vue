@@ -101,7 +101,7 @@ export default {
         },
 
         savingPresetSlug() {
-            return this.$slugify(this.savingPresetName, '_');
+            return snake_case(this.savingPresetName);
         },
     },
 

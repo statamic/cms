@@ -589,14 +589,14 @@ class FieldsTest extends TestCase
                 ['type' => 'replicator_set', 'two' => 'foo'],
                 ['type' => 'replicator_set', 'griddy_in_reppy' => [
                     ['one' => 'foo'],
-                    ['bardo_in_griddy_in_reppy' => json_encode($bardValues = [
+                    ['bardo_in_griddy_in_reppy' => $bardValues = [
                         ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'two' => 'foo']]],
                         ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'foo']]],
-                        ['type' => 'set', 'attrs' => ['type' => 'bard_set', 'values' => ['type' => 'bard_set', 'bardo_in_bardo_in_griddy_in_reppy' => json_encode($doubleNestedBardValues = [
+                        ['type' => 'set', 'attrs' => ['type' => 'bard_set', 'values' => ['type' => 'bard_set', 'bardo_in_bardo_in_griddy_in_reppy' => $doubleNestedBardValues = [
                             ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'two' => 'foo']]],
                             ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'foo']]],
-                        ])]]],
-                    ])],
+                        ]]]],
+                    ]],
                 ]],
             ],
         ];

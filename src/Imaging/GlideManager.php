@@ -142,7 +142,17 @@ class GlideManager
         $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
 
         // Delete generated glide cache for asset.
-        $this->server()->deleteCache($pathPrefix.'/'.$asset->path());
+        if (config('statamic.assets.image_manipulation.append_original_filename', false)) {
+            // Make sure to use the default cache path when clearing the cache
+            tap($this->server(), function ($server) use ($pathPrefix, $asset) {
+                $customCallable = $server->getCachePathCallable();
+                $server->setCachePathCallable(null);
+                $server->deleteCache($pathPrefix.'/'.$asset->path());
+                $server->setCachePathCallable($customCallable);
+            });
+        } else {
+            $this->server()->deleteCache($pathPrefix.'/'.$asset->path());
+        }
 
         // Use manifest to clear each manipulation key from cache store.
         collect($this->cacheStore()->get($manifestKey, []))->each(function ($manipulationKey) {
