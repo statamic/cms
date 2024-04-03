@@ -57,13 +57,6 @@ abstract class Fieldtype implements Arrayable
         return $this;
     }
 
-    public function withoutField()
-    {
-        $this->field = null;
-
-        return $this;
-    }
-
     public function field(): ?Field
     {
         return $this->field;
