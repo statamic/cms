@@ -15,10 +15,13 @@ use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
+use Statamic\Facades\Asset;
 use Statamic\Facades\File;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
+use Statamic\Forms\Uploaders\FilesUploader;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Submission implements Augmentable, SubmissionContract
@@ -123,7 +126,11 @@ class Submission implements Augmentable, SubmissionContract
     public function uploadFiles($uploadedFiles)
     {
         return collect($uploadedFiles)->map(function ($files, $handle) {
-            return AssetsUploader::field($this->fields()->get($handle))->upload($files);
+            $field = $this->fields()->get($handle);
+
+            return $field['type'] === 'files'
+                ? FilesUploader::field($field)->upload($files)
+                : AssetsUploader::field($field)->upload($files);
         })->all();
     }
 

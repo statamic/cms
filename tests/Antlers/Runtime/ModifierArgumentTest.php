@@ -5,7 +5,7 @@ namespace Tests\Antlers\Runtime;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Entries\EntryCollection;
 use Tests\Antlers\Fixtures\Addon\Modifiers\VarTestModifier;
-use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
+use Tests\Antlers\Fixtures\Addon\Tags\VarTestTags as VarTest;
 use Tests\Antlers\ParserTestCase;
 use Tests\PreventSavingStacheItemsToDisk;
 

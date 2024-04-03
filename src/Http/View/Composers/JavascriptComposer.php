@@ -34,14 +34,15 @@ class JavascriptComposer
         return [
             'csrfToken' => csrf_token(),
             'cpUrl' => cp_route('index'),
-            'cpRoot' => str_start(config('statamic.cp.route'), '/'),
+            'cpRoot' => Str::start(config('statamic.cp.route'), '/'),
             'urlPath' => Str::after(request()->getRequestUri(), config('statamic.cp.route').'/'),
             'resourceUrl' => Statamic::cpAssetUrl(),
             'flash' => Statamic::flash(),
             'toasts' => Toast::toArray(),
             'translationLocale' => app('translator')->locale(),
             'translations' => $this->translations(),
-            'locale' => config('app.locale'),
+            'locale' => Statamic::cpLocale(),
+            'direction' => Statamic::cpDirection(),
             'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
             'charmap' => ASCII::charsArray($replaceSymbols),
         ];

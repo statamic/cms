@@ -4,6 +4,7 @@ namespace Statamic\Sites;
 
 use Closure;
 use Statamic\Facades\User;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Sites
@@ -94,7 +95,7 @@ class Sites
         if (is_null($value)) {
             $this->config = $key;
         } else {
-            array_set($this->config, $key, $value);
+            Arr::set($this->config, $key, $value);
         }
 
         $this->sites = $this->toSites($this->config['sites']);

@@ -13,24 +13,22 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.0, 8.1, 8.2, 8.3]
-        laravel: [9.*, 10.*]
+        php: [8.1, 8.2, 8.3]
+        laravel: [10.*, 11.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
           - os: windows-latest
-            php: 8.1
-            laravel: 9.*
+            php: 8.3
+            laravel: 10.*
             stability: prefer-stable
           - os: windows-latest
-            php: 8.1
-            laravel: 10.*
+            php: 8.3
+            laravel: 11.*
             stability: prefer-stable
         exclude:
-          - php: 8.0
-            laravel: 10.*
-          - php: 8.3
-            laravel: 9.*
+          - php: 8.1
+            laravel: 11.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -40,7 +38,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v42
         with:
           files: |
             config
@@ -58,7 +56,9 @@ jobs:
       - name: Determine whether tests should run
         id: should-run-tests
         if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
-        run: echo "result=true" >> $GITHUB_OUTPUT
+        run: |
+          echo "result=true" >> $GITHUB_OUTPUT
+          echo "result=true" >> $env:GITHUB_OUTPUT
 
       - name: Update apt sources
         if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
@@ -108,16 +108,19 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v42
         with:
           files: |
             **.{js,vue,ts}
             package.json
+            .github/workflows/tests.yml
 
       - name: Determine whether tests should run
         id: should-run-tests
         if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
-        run: echo "result=true" >> $GITHUB_OUTPUT
+        run: |
+          echo "result=true" >> $GITHUB_OUTPUT
+          echo "result=true" >> $env:GITHUB_OUTPUT
 
       - name: Install required npm version
         if: steps.should-run-tests.outputs.result == 'true'
@@ -135,7 +138,7 @@ jobs:
     name: Slack Notification
     runs-on: ubuntu-20.04
     needs: [php-tests, js-tests]
-    if: always()
+    if: always() && github.event_name == 'schedule'
     steps:
       - uses: technote-space/workflow-conclusion-action@v1
       - name: Send Slack notification

@@ -24,6 +24,9 @@ class BroadcastServiceProvider extends ServiceProvider
                 'key' => config('broadcasting.connections.pusher.key'),
                 'cluster' => config('broadcasting.connections.pusher.options.cluster'),
                 'encrypted' => config('broadcasting.connections.pusher.options.encrypted'),
+                'scheme' => config('broadcasting.connections.pusher.options.scheme'),
+                'host' => config('broadcasting.connections.pusher.options.host'),
+                'port' => config('broadcasting.connections.pusher.options.port'),
             ],
         ];
     }
@@ -31,7 +34,7 @@ class BroadcastServiceProvider extends ServiceProvider
     protected function enabled()
     {
         return in_array(
-            \App\Providers\BroadcastServiceProvider::class,
+            \Illuminate\Broadcasting\BroadcastServiceProvider::class,
             array_keys($this->app->getLoadedProviders())
         );
     }

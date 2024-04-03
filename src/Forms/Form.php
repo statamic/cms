@@ -364,7 +364,7 @@ class Form implements Arrayable, Augmentable, FormContract
     public function hasFiles()
     {
         return $this->fields()->filter(function ($field) {
-            return $field->fieldtype()->handle() === 'assets';
+            return in_array($field->fieldtype()->handle(), ['assets', 'files']);
         })->isNotEmpty();
     }
 

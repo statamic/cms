@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class StrPadTest extends TestCase
 {
-    public function paddington(): array
+    public static function padProvider(): array
     {
         return [
             'pads_4_default' => ['test', 'test', [4]],
@@ -21,7 +21,7 @@ class StrPadTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider paddington
+     * @dataProvider padProvider
      */
     public function it_pads_a_string(string $expected, string $input, array $params): void
     {

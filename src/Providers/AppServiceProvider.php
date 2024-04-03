@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
@@ -10,6 +11,7 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Preference;
+use Statamic\Facades\Site;
 use Statamic\Facades\Token;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
@@ -90,6 +92,8 @@ class AppServiceProvider extends ServiceProvider
             return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
+        TrimStrings::skipWhen(fn (Request $request) => $request->is(config('statamic.cp.route').'/*'));
+
         $this->addAboutCommandInfo();
     }
 
@@ -135,7 +139,7 @@ class AppServiceProvider extends ServiceProvider
                 ->setRepository('user', \Statamic\Contracts\Auth\UserRepository::class);
         });
 
-        $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function () {
+        $this->app->singleton(\Statamic\Fields\BlueprintRepository::class, function () {
             return (new \Statamic\Fields\BlueprintRepository)
                 ->setDirectory(resource_path('blueprints'))
                 ->setFallback('default', function () {
@@ -189,14 +193,29 @@ class AppServiceProvider extends ServiceProvider
 
         AboutCommand::add('Statamic', [
             'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
-            'Antlers' => config('statamic.antlers.version'),
             'Addons' => $addons->count(),
             'Stache Watcher' => config('statamic.stache.watcher') ? 'Enabled' : 'Disabled',
             'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',
+            'Sites' => fn () => $this->sitesAboutCommandInfo(),
         ]);
 
         foreach ($addons as $addon) {
             AboutCommand::add('Statamic Addons', $addon->package(), $addon->version());
         }
+    }
+
+    private function sitesAboutCommandInfo()
+    {
+        if (($sites = Site::all())->count() === 1) {
+            return 1;
+        }
+
+        // If there are 5 or fewer sites, list all their names.
+        // If there are more than 5, list the first 3 and append "and n more".
+        $summary = $sites->count() <= 5
+            ? $sites->map->name()->join(', ')
+            : $sites->take(3)->map->name()->join(', ').', and '.($sites->count() - 3).' more';
+
+        return $sites->count().' ('.$summary.')';
     }
 }

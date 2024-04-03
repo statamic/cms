@@ -82,7 +82,7 @@ class CoreModifiersTest extends ParserTestCase
         ];
     }
 
-    protected function result($text)
+    protected function resultOf($text)
     {
         return $this->renderString($text, $this->data, true);
     }
@@ -90,81 +90,81 @@ class CoreModifiersTest extends ParserTestCase
     public function test_starts_with_accepts_special_characters()
     {
         // Issue: https://github.com/statamic/cms/issues/5128
-        $this->assertSame('yes', $this->result('{{ if test_currency_symbol|starts_with:£ }}yes{{else}}no{{/if}}'));
-        $this->assertSame('yes', $this->result('{{ if test_currency_symbol|starts_with("£") }}yes{{else}}no{{/if}}'));
-        $this->assertSame('no', $this->result('{{ if remove_left_var|starts_with:£ }}yes{{else}}no{{/if}}'));
+        $this->assertSame('yes', $this->resultOf('{{ if test_currency_symbol|starts_with:£ }}yes{{else}}no{{/if}}'));
+        $this->assertSame('yes', $this->resultOf('{{ if test_currency_symbol|starts_with("£") }}yes{{else}}no{{/if}}'));
+        $this->assertSame('no', $this->resultOf('{{ if remove_left_var|starts_with:£ }}yes{{else}}no{{/if}}'));
     }
 
     public function test_math_add()
     {
-        $this->assertSame('10', $this->result('{{ value | add: 5 }}'));
+        $this->assertSame('10', $this->resultOf('{{ value | add: 5 }}'));
     }
 
     public function test_query_param()
     {
-        $this->assertSame('https://www.google.com/search?q=test', $this->result('{{ base_url|add_query_param:q:test }}'));
-        $this->assertSame('https://www.google.com/search?q=test', $this->result('{{ base_url|add_query_param:{"q"}:{"test"} }}'));
+        $this->assertSame('https://www.google.com/search?q=test', $this->resultOf('{{ base_url|add_query_param:q:test }}'));
+        $this->assertSame('https://www.google.com/search?q=test', $this->resultOf('{{ base_url|add_query_param:{"q"}:{"test"} }}'));
     }
 
     public function test_ampersand_list()
     {
-        $this->assertSame('one, two, and three', $this->result('{{ list |ampersand_list:and:true }}'));
-        $this->assertSame('one, two, and three', $this->result('{{ list |ampersand_list:{"and"}:{"true"} }}'));
+        $this->assertSame('one, two, and three', $this->resultOf('{{ list |ampersand_list:and:true }}'));
+        $this->assertSame('one, two, and three', $this->resultOf('{{ list |ampersand_list:{"and"}:{"true"} }}'));
     }
 
     public function test_ascii()
     {
-        $this->assertSame('u', $this->result('{{ "ü" |ascii }}'));
+        $this->assertSame('u', $this->resultOf('{{ "ü" |ascii }}'));
     }
 
     public function test_at()
     {
-        $this->assertSame('e', $this->result('{{ "Test"|at:1 }}'));
-        $this->assertSame('e', $this->result('{{ "Test"|at:{1+0} }}'));
+        $this->assertSame('e', $this->resultOf('{{ "Test"|at:1 }}'));
+        $this->assertSame('e', $this->resultOf('{{ "Test"|at:{1+0} }}'));
     }
 
     public function test_background_position()
     {
-        $this->assertSame('50% 30%', $this->result('{{ focus | background_position }}'));
+        $this->assertSame('50% 30%', $this->resultOf('{{ focus | background_position }}'));
     }
 
     public function test_backspace()
     {
-        $this->assertSame('te', $this->result('{{ "test" | backspace: 2 }}'));
-        $this->assertSame('te', $this->result('{{ "test" | backspace:2 }}'));
-        $this->assertSame('te', $this->result('{{ "test" | backspace: {(2-2)+2} }}'));
+        $this->assertSame('te', $this->resultOf('{{ "test" | backspace: 2 }}'));
+        $this->assertSame('te', $this->resultOf('{{ "test" | backspace:2 }}'));
+        $this->assertSame('te', $this->resultOf('{{ "test" | backspace: {(2-2)+2} }}'));
     }
 
     public function test_camelize()
     {
-        $this->assertSame('testPhrase', $this->result('{{ phrase | camelize }}'));
+        $this->assertSame('testPhrase', $this->resultOf('{{ phrase | camelize }}'));
     }
 
     public function test_cdata()
     {
-        $this->assertSame('<![CDATA[test phrase]]>', $this->result('{{ phrase | cdata }}'));
+        $this->assertSame('<![CDATA[test phrase]]>', $this->resultOf('{{ phrase | cdata }}'));
     }
 
     public function test_ceil()
     {
-        $this->assertSame('5', $this->result('{{ 4.3 | ceil }}'));
+        $this->assertSame('5', $this->resultOf('{{ 4.3 | ceil }}'));
     }
 
     public function test_chunk()
     {
-        $this->assertSame('onetwothree', $this->result('{{ chunks chunk="3" }}{{ chunk }}{{ name }}{{ /chunk }}{{ /chunks }}'));
-        $this->assertSame('onetwothree', $this->result('{{ chunks chunk="{2 + 1}" }}{{ chunk }}{{ name }}{{ /chunk }}{{ /chunks }}'));
-        $this->assertSame('onetwothree', $this->result('{{ chunks :chunk="chunkSize" }}{{ chunk }}{{ name }}{{ /chunk }}{{ /chunks }}'));
+        $this->assertSame('onetwothree', $this->resultOf('{{ chunks chunk="3" }}{{ chunk }}{{ name }}{{ /chunk }}{{ /chunks }}'));
+        $this->assertSame('onetwothree', $this->resultOf('{{ chunks chunk="{2 + 1}" }}{{ chunk }}{{ name }}{{ /chunk }}{{ /chunks }}'));
+        $this->assertSame('onetwothree', $this->resultOf('{{ chunks :chunk="chunkSize" }}{{ chunk }}{{ name }}{{ /chunk }}{{ /chunks }}'));
     }
 
     public function test_collapse()
     {
-        $this->assertSame('onetwothree', $this->result('{{ collapse | collapse }}{{ value }}{{ /collapse }}'));
+        $this->assertSame('onetwothree', $this->resultOf('{{ collapse | collapse }}{{ value }}{{ /collapse }}'));
     }
 
     public function test_collapse_whitespace()
     {
-        $this->assertSame('te st', $this->result('{{ "te    st" | collapse_whitespace }}'));
+        $this->assertSame('te st', $this->resultOf('{{ "te    st" | collapse_whitespace }}'));
     }
 
     public function test_contains()
@@ -173,7 +173,7 @@ class CoreModifiersTest extends ParserTestCase
 {{ if list|contains:one }}yep{{ else }}no{{/if}}
 EOT;
 
-        $this->assertSame('yep', $this->result($template));
+        $this->assertSame('yep', $this->resultOf($template));
     }
 
     public function test_contains_all()
@@ -182,7 +182,7 @@ EOT;
 {{ if list|contains:one:two:three }}yep{{ else }}no{{/if}}
 EOT;
 
-        $this->assertSame('yep', $this->result($template));
+        $this->assertSame('yep', $this->resultOf($template));
     }
 
     public function test_contains_any()
@@ -191,35 +191,35 @@ EOT;
 {{ if list|contains:one:three }}yep{{ else }}no{{/if}}
 EOT;
 
-        $this->assertSame('yep', $this->result($template));
+        $this->assertSame('yep', $this->resultOf($template));
     }
 
     public function test_count()
     {
-        $this->assertSame('3', $this->result('{{ list | count }}'));
+        $this->assertSame('3', $this->resultOf('{{ list | count }}'));
     }
 
     public function test_count_substring()
     {
-        $this->assertSame('2', $this->result('{{ count_substr count_substring="est" }}'));
-        $this->assertSame('2', $this->result('{{ count_substr :count_substring="count_substr_var_ref" }}'));
-        $this->assertSame('2', $this->result('{{ count_substr count_substring="{"est"}" }}'));
+        $this->assertSame('2', $this->resultOf('{{ count_substr count_substring="est" }}'));
+        $this->assertSame('2', $this->resultOf('{{ count_substr :count_substring="count_substr_var_ref" }}'));
+        $this->assertSame('2', $this->resultOf('{{ count_substr count_substring="{"est"}" }}'));
     }
 
     public function test_dashify()
     {
-        $this->assertSame('test-phrase', $this->result('{{ phrase |dashify }}'));
+        $this->assertSame('test-phrase', $this->resultOf('{{ phrase |dashify }}'));
     }
 
     public function test_wrap()
     {
-        $this->assertSame('<h1 class="fast furious">As the World Turns</h1>', $this->result('{{ title | wrap:h1.fast.furious }}'));
-        $this->assertSame('<h1 class="fast furious">As the World Turns</h1>', $this->result('{{ title | wrap:{"h1.fast.furious"} }}'));
+        $this->assertSame('<h1 class="fast furious">As the World Turns</h1>', $this->resultOf('{{ title | wrap:h1.fast.furious }}'));
+        $this->assertSame('<h1 class="fast furious">As the World Turns</h1>', $this->resultOf('{{ title | wrap:{"h1.fast.furious"} }}'));
     }
 
     public function test_word_count()
     {
-        $this->assertSame('8', $this->result('{{  "There are probably seven words in this sentence."|word_count }}'));
+        $this->assertSame('8', $this->resultOf('{{  "There are probably seven words in this sentence."|word_count }}'));
     }
 
     public function test_where()
@@ -228,70 +228,70 @@ EOT;
 {{ games where="feeling|love" }}{{ title}}{{ /games }}
 EOT;
 
-        $this->assertSame('DominionNetrunner', $this->result($template));
+        $this->assertSame('DominionNetrunner', $this->resultOf($template));
 
         $template = <<<'EOT'
 {{ games where="{"feeling"}|{"love"}" }}{{ title}}{{ /games }}
 EOT;
 
-        $this->assertSame('DominionNetrunner', $this->result($template));
+        $this->assertSame('DominionNetrunner', $this->resultOf($template));
     }
 
     public function test_unique()
     {
-        $this->assertSame('zebra, hippo, hyena, giraffe', $this->result('{{ checklist | unique | list }}'));
+        $this->assertSame('zebra, hippo, hyena, giraffe', $this->resultOf('{{ checklist | unique | list }}'));
     }
 
     public function test_underscored()
     {
-        $this->assertSame('test_phrase', $this->result('{{ phrase |underscored }}'));
+        $this->assertSame('test_phrase', $this->resultOf('{{ phrase |underscored }}'));
     }
 
     public function test_sort()
     {
-        $this->assertSame('AltruisticAlphaBlatheringBravoZealousZebra', $this->result('{{ complex sort="last_name" }}{{ first_name }}{{ last_name }}{{ /complex }}'));
+        $this->assertSame('AltruisticAlphaBlatheringBravoZealousZebra', $this->resultOf('{{ complex sort="last_name" }}{{ first_name }}{{ last_name }}{{ /complex }}'));
 
-        $this->assertSame('ZealousZebraBlatheringBravoAltruisticAlpha', $this->result('{{ complex sort="last_name|desc" }}{{ first_name }}{{ last_name }}{{ /complex }}'));
+        $this->assertSame('ZealousZebraBlatheringBravoAltruisticAlpha', $this->resultOf('{{ complex sort="last_name|desc" }}{{ first_name }}{{ last_name }}{{ /complex }}'));
     }
 
     public function test_repeat()
     {
-        $this->assertSame('testtesttest', $this->result('{{ "test" | repeat:3 }}'));
+        $this->assertSame('testtesttest', $this->resultOf('{{ "test" | repeat:3 }}'));
     }
 
     public function test_remove_right()
     {
-        $this->assertSame('https://laravel.com', $this->result('{{ "https://laravel.com/" |remove_right:/ }}'));
+        $this->assertSame('https://laravel.com', $this->resultOf('{{ "https://laravel.com/" |remove_right:/ }}'));
     }
 
     public function test_remove_left()
     {
-        $this->assertSame('laravel.com/', $this->result('{{ "https://laravel.com/" |remove_left:"https://" }}'));
-        $this->assertSame('laravel.com/', $this->result('{{ "https://laravel.com/" |remove_left:{remove_left_var} }}'));
+        $this->assertSame('laravel.com/', $this->resultOf('{{ "https://laravel.com/" |remove_left:"https://" }}'));
+        $this->assertSame('laravel.com/', $this->resultOf('{{ "https://laravel.com/" |remove_left:{remove_left_var} }}'));
     }
 
     public function test_lclast()
     {
-        $this->assertSame('tEST', $this->result('{{ "TEST" | lcfirst }}'));
+        $this->assertSame('tEST', $this->resultOf('{{ "TEST" | lcfirst }}'));
     }
 
     public function test_is_numeric()
     {
-        $this->assertSame('yep', $this->result('{{ if "123456"|is_numeric }}yep{{ /if}}'));
+        $this->assertSame('yep', $this->resultOf('{{ if "123456"|is_numeric }}yep{{ /if}}'));
     }
 
     public function test_shorthand_syntax_accepts_space_inside_strings()
     {
-        $this->assertSame('test', $this->result('{{ phrase | explode:" " | first }}'));
-        $this->assertSame('test', $this->result('{{ phrase | explode: " " | first }}'));
-        $this->assertSame('test', $this->result("{{ phrase | explode: ' ' | first }}"));
-        $this->assertSame('test', $this->result("{{ phrase | explode:' ' | first }}"));
+        $this->assertSame('test', $this->resultOf('{{ phrase | explode:" " | first }}'));
+        $this->assertSame('test', $this->resultOf('{{ phrase | explode: " " | first }}'));
+        $this->assertSame('test', $this->resultOf("{{ phrase | explode: ' ' | first }}"));
+        $this->assertSame('test', $this->resultOf("{{ phrase | explode:' ' | first }}"));
     }
 
     public function test_shorthand_syntax_accepts_strings_with_leading_whitespace()
     {
-        $this->assertSame('test', $this->result('{{ phrase | explode:                   " " | first }}'));
-        $this->assertSame('test', $this->result("{{ phrase | explode:                   ' ' | first }}"));
+        $this->assertSame('test', $this->resultOf('{{ phrase | explode:                   " " | first }}'));
+        $this->assertSame('test', $this->resultOf("{{ phrase | explode:                   ' ' | first }}"));
     }
 
     public function test_shorthand_syntax_can_handle_string_escape_sequences()
