@@ -73,7 +73,7 @@ class UniqueTermValueTest extends TestCase
     /** @test */
     public function it_passes_when_theres_a_duplicate_term_value_in_a_different_site()
     {
-        \Statamic\$this->setSites([
+        $this->setSites([
             'site-one' => ['url' => '/'],
             'site-two' => ['url' => '/'],
         ]);

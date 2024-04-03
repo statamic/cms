@@ -63,7 +63,7 @@ class UniqueEntryValueTest extends TestCase
     /** @test */
     public function it_passes_when_theres_a_duplicate_entry_value_in_a_different_site()
     {
-        \Statamic\$this->setSites([
+        $this->setSites([
             'site-one' => ['url' => '/', 'locale' => 'en_US'],
             'site-two' => ['url' => '/', 'locale' => 'fr_FR'],
         ]);
