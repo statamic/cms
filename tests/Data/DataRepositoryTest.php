@@ -7,7 +7,6 @@ use Mockery;
 use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Data\DataRepository;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -118,7 +117,7 @@ class DataRepositoryTest extends TestCase
      */
     public function it_finds_by_request_url($requestUrl, $entryId)
     {
-        Site::setSites([
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);
@@ -133,7 +132,7 @@ class DataRepositoryTest extends TestCase
      */
     public function it_finds_by_request_url_with_no_root_site($requestUrl, $entryId)
     {
-        Site::setSites([
+        $this->setSites([
             'english' => ['url' => 'http://localhost/en/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);

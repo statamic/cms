@@ -34,7 +34,7 @@ class GlobalVariablesRepositoryTest extends TestCase
 
     private function setUpMultiSite()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr/'],
         ]);

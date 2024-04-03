@@ -13,7 +13,7 @@ class IndexManagerTest extends TestCase
     /** @test */
     public function it_gets_indexes()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr/'],
             'de' => ['url' => '/de/'],

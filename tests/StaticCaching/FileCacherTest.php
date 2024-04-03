@@ -5,7 +5,6 @@ namespace Tests\StaticCaching;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\UrlInvalidated;
-use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
@@ -228,7 +227,7 @@ class FileCacherTest extends TestCase
     /** @test */
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
@@ -266,7 +265,7 @@ class FileCacherTest extends TestCase
     /** @test */
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite_and_a_single_string_value_for_the_path()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],

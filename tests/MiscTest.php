@@ -4,7 +4,6 @@ namespace Tests;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
 use Statamic\View\View;
 
@@ -22,7 +21,7 @@ class MiscTest extends TestCase
      **/
     public function locales_tag_doesnt_ruin_future_tag_pairs($withParameter)
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
             'de' => ['url' => 'http://localhost/de/', 'locale' => 'de', 'name' => 'German'],
         ]);

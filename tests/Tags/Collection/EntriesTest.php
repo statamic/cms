@@ -41,7 +41,7 @@ class EntriesTest extends TestCase
         app('statamic.scopes')[PostType::handle()] = PostType::class;
         app('statamic.scopes')[PostAnimal::handle()] = PostAnimal::class;
 
-        Site::setSites([
+        $this->setSites([
             'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
         ]);

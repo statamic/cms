@@ -27,7 +27,7 @@ class TermsTest extends TestCase
     {
         parent::setUp();
 
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);

@@ -8,7 +8,6 @@ use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -37,7 +36,7 @@ class UpdateGlobalVariablesTest extends TestCase
     /** @test */
     public function it_denies_access_if_you_dont_have_site_permission()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr/'],
         ]);

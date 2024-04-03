@@ -234,7 +234,7 @@ class EmailTest extends TestCase
     /** @test */
     public function the_sites_locale_gets_used_on_the_mailable()
     {
-        Site::setSites([
+        $this->setSites([
             'one' => ['locale' => 'en_US', 'url' => '/one'],
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
             'three' => ['locale' => 'de_CH', 'lang' => 'de_CH', 'url' => '/three'],

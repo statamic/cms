@@ -4,7 +4,6 @@ namespace Tests\Feature\Collections;
 
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Site;
 use Statamic\Facades\Structure;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -57,7 +56,7 @@ class DeleteCollectionTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/fr', 'locale' => 'fr_FR'],
         ]);
@@ -105,7 +104,7 @@ class DeleteCollectionTest extends TestCase
     /** @test */
     public function it_deletes_tree_files_in_a_multisite()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/fr', 'locale' => 'fr_FR'],
         ]);

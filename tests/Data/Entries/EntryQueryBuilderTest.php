@@ -617,7 +617,7 @@ class EntryQueryBuilderTest extends TestCase
     /** @test */
     public function it_substitutes_entries_by_uri_and_site()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);

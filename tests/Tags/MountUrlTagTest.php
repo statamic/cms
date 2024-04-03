@@ -16,7 +16,7 @@ class MountUrlTagTest extends TestCase
     /** @test */
     public function it_gets_collection_mount()
     {
-        Site::setSites([
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);

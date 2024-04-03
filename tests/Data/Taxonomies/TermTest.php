@@ -269,7 +269,7 @@ class TermTest extends TestCase
     /** @test */
     public function it_gets_preview_targets()
     {
-        Facades\Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],

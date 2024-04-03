@@ -28,7 +28,7 @@ class EntriesTest extends TestCase
 
         Carbon::setTestNow(Carbon::parse('2021-01-02'));
 
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);

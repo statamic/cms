@@ -56,7 +56,7 @@ class CoreNavTest extends TestCase
     /** @test */
     public function it_doesnt_build_collection_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Facades\Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
@@ -94,7 +94,7 @@ class CoreNavTest extends TestCase
     /** @test */
     public function it_doesnt_build_navigation_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Facades\Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
@@ -140,7 +140,7 @@ class CoreNavTest extends TestCase
     /** @test */
     public function it_doesnt_build_taxonomy_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Facades\Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
@@ -178,7 +178,7 @@ class CoreNavTest extends TestCase
     /** @test */
     public function it_doesnt_build_globals_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Facades\Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],

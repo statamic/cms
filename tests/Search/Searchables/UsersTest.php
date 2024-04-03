@@ -2,7 +2,6 @@
 
 namespace Tests\Search\Searchables;
 
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Search\Searchables\Users;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -19,7 +18,7 @@ class UsersTest extends TestCase
      */
     public function it_gets_users($locale, $config, $expected)
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
         ]);

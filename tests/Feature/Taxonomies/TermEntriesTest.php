@@ -4,7 +4,6 @@ namespace Tests\Feature\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -99,7 +98,7 @@ class TermEntriesTest extends TestCase
     /** @test */
     public function it_gets_and_counts_entries_for_a_localized_term_across_collections()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'name' => 'English', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'name' => 'French', 'url' => '/fr/'],
         ]);
@@ -163,7 +162,7 @@ class TermEntriesTest extends TestCase
     /** @test */
     public function it_gets_and_counts_entries_for_a_localized_term_for_a_single_collection()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'name' => 'English', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'name' => 'French', 'url' => '/fr/'],
         ]);

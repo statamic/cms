@@ -5,7 +5,6 @@ namespace Tests\Tags;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Parse;
-use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -17,7 +16,7 @@ class ParentTest extends TestCase
     {
         parent::setUp();
 
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
         ]);

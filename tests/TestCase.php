@@ -5,7 +5,9 @@ namespace Tests;
 use Illuminate\Testing\Assert as IlluminateAssert;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
+use Statamic\Facades\Config;
 use Statamic\Facades\File;
+use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
@@ -47,6 +49,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
                 'locale' => 'en_US',
             ],
         ]));
+    }
+
+    protected function setSites($sites)
+    {
+        Config::set('statamic.system.multisite', count($sites) > 1);
+
+        Site::setSites($sites);
     }
 
     public function tearDown(): void

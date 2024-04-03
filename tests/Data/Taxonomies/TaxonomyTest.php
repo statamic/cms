@@ -433,7 +433,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
             'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],

@@ -4,7 +4,6 @@ namespace Tests\Data\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Tests\FakesViews;
@@ -24,7 +23,7 @@ class ViewsTest extends TestCase
     {
         parent::setUp();
 
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
         ]);

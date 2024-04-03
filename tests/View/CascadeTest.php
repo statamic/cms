@@ -494,7 +494,7 @@ class CascadeTest extends TestCase
     {
         config(['app.url' => 'http://test.com']);
         url()->forceRootUrl(config('app.url'));
-        Site::setSites($this->siteConfig = [
+        $this->setSites($this->siteConfig = [
             'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
             'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],

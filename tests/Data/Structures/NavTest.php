@@ -56,7 +56,7 @@ class NavTest extends StructureTestCase
     /** @test */
     public function trees_exist_if_they_exist_as_files()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
             'de' => ['url' => '/de/', 'locale' => 'de'],
@@ -158,7 +158,7 @@ class NavTest extends StructureTestCase
     /** @test */
     public function it_gets_available_sites_from_trees()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
             'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
@@ -175,7 +175,7 @@ class NavTest extends StructureTestCase
     /** @test */
     public function it_cannot_view_navs_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
             'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],

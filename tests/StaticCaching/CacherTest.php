@@ -6,7 +6,6 @@ use Illuminate\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Mockery;
-use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Tests\TestCase;
 
@@ -76,7 +75,7 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_the_base_url_when_sites_have_absolute_urls()
     {
-        Site::setSites([
+        $this->setSites([
             'default' => ['url' => 'http://example.com'],
             'uk' => ['url' => 'http://example.co.uk'],
         ]);
@@ -89,7 +88,7 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_the_base_url_when_sites_have_absolute_urls_with_trailing_slashes()
     {
-        Site::setSites([
+        $this->setSites([
             'default' => ['url' => 'http://example.com/'],
             'uk' => ['url' => 'http://example.co.uk/'],
         ]);
@@ -102,7 +101,7 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_the_base_url_when_sites_have_relative_urls()
     {
-        Site::setSites([
+        $this->setSites([
             'default' => ['url' => '/default'],
             'uk' => ['url' => '/uk'],
         ]);
@@ -117,7 +116,7 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_the_base_url_when_sites_have_relative_urls_with_trailing_slashes()
     {
-        Site::setSites([
+        $this->setSites([
             'default' => ['url' => '/default/'],
             'uk' => ['url' => '/uk/'],
         ]);
@@ -132,7 +131,7 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_the_base_url_when_site_is_just_a_slash()
     {
-        Site::setSites([
+        $this->setSites([
             'default' => ['url' => '/'],
             'uk' => ['url' => '/uk/'],
         ]);
@@ -265,7 +264,7 @@ class CacherTest extends TestCase
     {
         $cache = app(Repository::class);
 
-        Site::setSites([
+        $this->setSites([
             'default' => ['url' => 'http://example.com'],
             'uk' => ['url' => 'http://example.co.uk'],
         ]);

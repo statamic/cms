@@ -2,7 +2,6 @@
 
 namespace Tests\Search\Searchables;
 
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Search\Searchables\Terms;
@@ -16,7 +15,7 @@ class TermsTest extends TestCase
     /** @test */
     public function it_finds_terms_from_references()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr/'],
         ]);
@@ -48,7 +47,7 @@ class TermsTest extends TestCase
      */
     public function it_gets_terms($locale, $config, $expected)
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
         ]);

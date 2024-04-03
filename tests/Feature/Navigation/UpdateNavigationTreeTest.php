@@ -7,7 +7,6 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Structures\BranchIdGenerator;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Tests\FakesRoles;
@@ -162,7 +161,7 @@ class UpdateNavigationTreeTest extends TestCase
     /** @test */
     public function it_denies_access_if_you_dont_have_site_permission()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr'],
         ]);
@@ -181,7 +180,7 @@ class UpdateNavigationTreeTest extends TestCase
     public function it_updates_a_specific_sites_tree()
     {
         $this->withoutExceptionHandling();
-        Site::setSites([
+        $this->setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr'],
         ]);

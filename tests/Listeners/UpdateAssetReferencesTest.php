@@ -30,7 +30,7 @@ class UpdateAssetReferencesTest extends TestCase
             'root' => __DIR__.'/tmp',
         ]]);
 
-        Facades\Site::setSites([
+        $this->setSites([
             'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
         ]);

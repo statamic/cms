@@ -16,7 +16,7 @@ class SelectSiteTest extends TestCase
     {
         parent::setUp();
 
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
         ]);

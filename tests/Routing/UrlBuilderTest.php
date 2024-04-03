@@ -3,7 +3,6 @@
 namespace Tests\Routing;
 
 use Statamic\Contracts\Routing\UrlBuilder;
-use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -25,7 +24,7 @@ class UrlBuilderTest extends TestCase
     {
         parent::setUp();
 
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
         ]);

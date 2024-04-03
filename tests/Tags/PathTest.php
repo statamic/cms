@@ -13,7 +13,7 @@ class PathTest extends TestCase
     {
         parent::setUp();
 
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr'],
         ]);

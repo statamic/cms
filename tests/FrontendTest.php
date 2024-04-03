@@ -13,7 +13,6 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -152,7 +151,7 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_subdirectory_based_site_is_displayed()
     {
-        Site::setSites([
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);
@@ -167,7 +166,7 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_subdirectory_based_site_is_displayed_with_ending_slash()
     {
-        Site::setSites([
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);
@@ -182,7 +181,7 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_domain_site_is_displayed()
     {
-        Site::setSites([
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
         ]);
@@ -197,7 +196,7 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_domain_site_is_displayed_with_ending_slash()
     {
-        Site::setSites([
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
         ]);
@@ -645,7 +644,7 @@ class FrontendTest extends TestCase
     {
         app('translator')->addNamespace('test', __DIR__.'/__fixtures__/lang');
 
-        Site::setSites([
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);
@@ -691,7 +690,7 @@ class FrontendTest extends TestCase
         $frLocale = setlocale(LC_TIME, 0);
         setlocale(LC_TIME, $originalLocale);
 
-        Site::setSites([
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en', 'lang' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale, 'lang' => 'fr'],
         ]);

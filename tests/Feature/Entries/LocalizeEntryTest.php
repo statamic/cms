@@ -4,7 +4,6 @@ namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -24,7 +23,7 @@ class LocalizeEntryTest extends TestCase
         config(['cache.default' => 'file']);
         \Illuminate\Support\Facades\Cache::clear();
 
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);

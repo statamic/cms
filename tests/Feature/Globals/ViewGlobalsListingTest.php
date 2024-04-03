@@ -43,7 +43,7 @@ class ViewGlobalsListingTest extends TestCase
     /** @test */
     public function it_uses_the_configure_url_if_it_doesnt_exist_in_the_selected_site_but_you_have_permission()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr', 'name' => 'French'],
         ]);
@@ -75,7 +75,7 @@ class ViewGlobalsListingTest extends TestCase
     /** @test */
     public function it_filters_out_globals_if_it_doesnt_exist_in_the_selected_site_and_you_dont_have_permission_to_configure()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr', 'name' => 'French'],
         ]);
@@ -110,7 +110,7 @@ class ViewGlobalsListingTest extends TestCase
     /** @test */
     public function it_filters_out_globals_in_sites_you_dont_have_permission_to_access()
     {
-        Site::setSites([
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr', 'name' => 'French'],
         ]);

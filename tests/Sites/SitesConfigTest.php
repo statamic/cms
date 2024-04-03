@@ -78,7 +78,7 @@ class SitesConfigTest extends TestCase
     /** @test */
     public function it_sets_sites_at_runtime()
     {
-        Site::setSites([
+        $this->setSites([
             'default' => [
                 'name' => 'English',
                 'url' => '/',
@@ -126,7 +126,7 @@ class SitesConfigTest extends TestCase
 
         Config::set('statamic.some_addon.theme', 'sunset');
 
-        Site::setSites([
+        $this->setSites([
             'default' => [
                 'name' => '{{ config:app:name }}',
                 'url' => '{{ config:app:url }}',
@@ -149,7 +149,7 @@ class SitesConfigTest extends TestCase
     /** @test */
     public function it_saves_single_site_back_to_yaml_in_normalized_sites_array()
     {
-        Site::setSites([
+        $this->setSites([
             'default' => [
                 'name' => 'English',
                 'url' => '/',
@@ -171,7 +171,7 @@ class SitesConfigTest extends TestCase
     /** @test */
     public function it_saves_multiple_sites_back_to_yaml()
     {
-        Site::setSites([
+        $this->setSites([
             'default' => [
                 'name' => 'English',
                 'url' => '/',
@@ -213,7 +213,7 @@ class SitesConfigTest extends TestCase
     /** @test */
     public function it_saves_single_site_back_to_yaml_with_unresolved_antlers()
     {
-        Site::setSites([
+        $this->setSites([
             'default' => [
                 'name' => '{{ config:app:name }}',
                 'url' => '{{ config:app:url }}',
@@ -243,7 +243,7 @@ class SitesConfigTest extends TestCase
     /** @test */
     public function it_saves_multiple_sites_back_to_yaml_with_unresolved_antlers()
     {
-        Site::setSites([
+        $this->setSites([
             'default' => [
                 'name' => '{{ config:app:name }}',
                 'url' => '{{ config:app:url }}',
