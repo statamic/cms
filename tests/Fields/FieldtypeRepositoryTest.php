@@ -21,36 +21,36 @@ class FieldtypeRepositoryTest extends TestCase
     /** @test */
     public function it_gets_a_fieldtype()
     {
-        TestFieldtype::register();
+        FooFieldtype::register();
 
         $found = $this->repo->find('test');
-        $this->assertInstanceOf(TestFieldtype::class, $found);
+        $this->assertInstanceOf(FooFieldtype::class, $found);
 
         // Find it again and assert that it's a different instance each time.
         $second = $this->repo->find('test');
-        $this->assertInstanceOf(TestFieldtype::class, $second);
+        $this->assertInstanceOf(FooFieldtype::class, $second);
         $this->assertNotSame($found, $second);
     }
 
     /** @test */
     public function it_caches_and_clones_existing_instances()
     {
-        TestFieldtype::register();
+        FooFieldtype::register();
 
         $found = $this->repo->find('test');
-        $this->assertInstanceOf(TestFieldtype::class, $found);
+        $this->assertInstanceOf(FooFieldtype::class, $found);
 
         // Re-register another fieldtype that uses the same handle.
         // In reality this wouldn't happen, but we do it for this test to ensure the caching works.
-        AnotherFieldtype::register();
+        BarFieldtype::register();
 
         // Assert that it was registered. If you were to manually resolve it
         // out of the container you'd get the overridden fieldtype.
-        $this->assertEquals(AnotherFieldtype::class, app('statamic.fieldtypes')->get('test'));
+        $this->assertEquals(BarFieldtype::class, app('statamic.fieldtypes')->get('test'));
 
         // Find it again through the repo to assert that it's a different instance each time.
         $second = $this->repo->find('test');
-        $this->assertInstanceOf(TestFieldtype::class, $second);
+        $this->assertInstanceOf(FooFieldtype::class, $second);
         $this->assertNotSame($found, $second);
     }
 
@@ -63,12 +63,12 @@ class FieldtypeRepositoryTest extends TestCase
     }
 }
 
-class TestFieldtype extends Fieldtype
+class FooFieldtype extends Fieldtype
 {
     protected static $handle = 'test';
 }
 
-class AnotherFieldtype extends Fieldtype
+class BarFieldtype extends Fieldtype
 {
     protected static $handle = 'test';
 }
