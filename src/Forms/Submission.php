@@ -21,7 +21,6 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
-use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Submission implements Augmentable, SubmissionContract
