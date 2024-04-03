@@ -45,6 +45,7 @@ class OutpostTest extends TestCase
             'statamic_version' => '3.0.0-testing',
             'statamic_pro' => true,
             'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version(),
             'packages' => [
                 'foo/bar' => ['version' => '1.2.3', 'edition' => null],
                 'baz/qux' => ['version' => '4.5.6', 'edition' => 'example'],
