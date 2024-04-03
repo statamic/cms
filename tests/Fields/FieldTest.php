@@ -58,11 +58,20 @@ class FieldTest extends TestCase
 
         FieldtypeRepository::shouldReceive('find')
             ->with('the_fieldtype')
-            ->andReturn($fieldtype);
+            ->andReturnUsing(fn () => clone $fieldtype);
 
         $field = new Field('test', ['type' => 'the_fieldtype']);
 
-        $this->assertEquals($fieldtype, $field->fieldtype());
+        // The fieldtype from the repository should not have the field attached.
+        $this->assertNull($fieldtype->field());
+
+        // The fieldtype from the field should be an instance of that
+        // fieldtype class, and should have the field attached.
+        $this->assertInstanceOf(get_class($fieldtype), $field->fieldtype());
+        $this->assertEquals($field, $field->fieldtype()->field());
+
+        // Double check that the fieldtype from the repository still doesn't somehow have the field attached.
+        $this->assertNull(FieldtypeRepository::find('the_fieldtype')->field());
     }
 
     /** @test */
