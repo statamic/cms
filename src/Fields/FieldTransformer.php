@@ -103,7 +103,7 @@ class FieldTransformer
 
     private static function referenceTabField(array $submitted)
     {
-        $config = Arr::removeNullValues(array_only($submitted['config'], $submitted['config_overrides']));
+        $config = Arr::removeNullValues(Arr::only($submitted['config'], $submitted['config_overrides']));
 
         return array_filter([
             'handle' => $submitted['handle'],
