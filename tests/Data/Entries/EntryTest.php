@@ -64,6 +64,10 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_site()
     {
+        $this->setSites([
+            'en' => ['locale' => 'en_US'],
+        ]);
+
         $entry = (new Entry)->locale('en');
 
         $site = $entry->site();
@@ -1994,6 +1998,12 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
+        $this->setSites([
+            'en' => [],
+            'fr' => [],
+            'de' => [],
+        ]);
+
         $entry = EntryFactory::collection('test')->locale('en')->id('1')->create();
         $localization = EntryFactory::collection('test')->locale('fr')->id('2')->origin('1')->create();
         $deeperLocalization = EntryFactory::collection('test')->locale('de')->id('3')->origin('2')->create();
@@ -2014,6 +2024,12 @@ class EntryTest extends TestCase
     public function it_detaches_localizations()
     {
         Event::fake();
+
+        $this->setSites([
+            'en' => [],
+            'fr' => [],
+            'fr_ca' => [],
+        ]);
 
         $english = EntryFactory::collection('test')->locale('en')->id('en')->data([
             'title' => 'English',
