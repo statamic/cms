@@ -97,7 +97,7 @@ class Field implements Arrayable
 
     public function type()
     {
-        return array_get($this->config, 'type', 'text');
+        return Arr::get($this->config, 'type', 'text');
     }
 
     public function fieldtype()
@@ -107,12 +107,12 @@ class Field implements Arrayable
 
     public function display()
     {
-        return array_get($this->config, 'display', __(Str::slugToTitle($this->handle)));
+        return Arr::get($this->config, 'display', __(Str::slugToTitle($this->handle)));
     }
 
     public function instructions()
     {
-        return array_get($this->config, 'instructions');
+        return Arr::get($this->config, 'instructions');
     }
 
     public function visibility()
@@ -395,7 +395,7 @@ class Field implements Arrayable
 
     public function get(string $key, $fallback = null)
     {
-        return array_get($this->config, $key, $fallback);
+        return Arr::get($this->config, $key, $fallback);
     }
 
     private function preProcessedConfig()

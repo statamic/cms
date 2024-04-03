@@ -8,6 +8,7 @@ use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RequireStatamicPro;
+use Statamic\Support\Str;
 
 class UserGroupsController extends CpController
 {
@@ -171,7 +172,7 @@ class UserGroupsController extends CpController
 
         $values = $fields->process()->values()->except(['title', 'handle', 'roles']);
 
-        $handle = $request->handle ?: snake_case($request->title);
+        $handle = $request->handle ?: Str::snake($request->title);
 
         if (UserGroup::find($handle)) {
             $error = __('A User Group with that handle already exists.');

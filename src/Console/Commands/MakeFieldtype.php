@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Archetype\Facades\PHPFile;
 use PhpParser\BuilderFactory;
 use Statamic\Console\RunsInPlease;
+use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class MakeFieldtype extends GeneratorCommand
@@ -97,7 +98,7 @@ class MakeFieldtype extends GeneratorCommand
         $component = $this->files->get($this->getStub('fieldtype.vue.stub'));
 
         $component = str_replace('DummyName', $name, $component);
-        $component = str_replace('dummy_name', snake_case($name), $component);
+        $component = str_replace('dummy_name', Str::snake($name), $component);
 
         return $component;
     }

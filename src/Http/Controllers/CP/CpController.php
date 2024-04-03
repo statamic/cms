@@ -10,6 +10,7 @@ use Statamic\Facades\Folder;
 use Statamic\Facades\YAML;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 /**
@@ -58,7 +59,7 @@ class CpController extends Controller
             // Get the name if one exists in a meta file
             if (File::disk('themes')->exists($folder.'/meta.yaml')) {
                 $meta = YAML::parse(File::disk('themes')->get($folder.'/meta.yaml'));
-                $name = array_get($meta, 'name', $folder);
+                $name = Arr::get($meta, 'name', $folder);
             }
 
             $themes[] = compact('folder', 'name');

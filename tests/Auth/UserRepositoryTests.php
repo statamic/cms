@@ -2,6 +2,7 @@
 
 namespace Tests\Auth;
 
+use Statamic\Exceptions\UserNotFoundException;
 use Statamic\Facades\User;
 
 trait UserRepositoryTests
@@ -71,6 +72,22 @@ trait UserRepositoryTests
 
         User::make()->email('foo@bar.com')->data(['name' => 'foo', 'password' => 'foo'])->save();
         $this->assertInstanceOf($this->fakeUserClass(), User::findByEmail('foo@bar.com'));
+    }
+
+    /** @test */
+    public function find_or_fail_gets_user()
+    {
+        User::make()->id(123)->email('foo@bar.com')->data(['name' => 'foo', 'password' => 'foo'])->save();
+        $this->assertInstanceOf($this->userClass(), User::findOrFail(123));
+    }
+
+    /** @test */
+    public function find_or_fail_throws_exception_when_user_does_not_exist()
+    {
+        $this->expectException(UserNotFoundException::class);
+        $this->expectExceptionMessage('User [does-not-exist] not found');
+
+        User::findOrFail('does-not-exist');
     }
 
     /** @test */

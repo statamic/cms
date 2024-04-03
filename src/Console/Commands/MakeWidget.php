@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Archetype\Facades\PHPFile;
 use PhpParser\BuilderFactory;
 use Statamic\Console\RunsInPlease;
+use Statamic\Support\Str;
 
 class MakeWidget extends GeneratorCommand
 {
@@ -70,7 +71,7 @@ class MakeWidget extends GeneratorCommand
             'name' => $this->getNameInput(),
         ];
 
-        $filename = str_slug(snake_case($this->getNameInput()));
+        $filename = Str::slug(Str::snake($this->getNameInput()));
 
         $this->createFromStub(
             'widget.blade.php.stub',
@@ -107,7 +108,7 @@ class MakeWidget extends GeneratorCommand
     {
         $class = parent::buildClass($name);
 
-        $name = str_slug(snake_case($this->getNameInput()));
+        $name = Str::slug(Str::snake($this->getNameInput()));
         $viewPath = 'widgets.'.$name;
 
         if ($this->argument('addon')) {

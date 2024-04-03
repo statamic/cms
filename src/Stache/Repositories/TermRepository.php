@@ -5,6 +5,7 @@ namespace Statamic\Stache\Repositories;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 use Statamic\Exceptions\TaxonomyNotFoundException;
+use Statamic\Exceptions\TermNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
@@ -98,6 +99,17 @@ class TermRepository implements RepositoryContract
         }
 
         return $term->collection($collection);
+    }
+
+    public function findOrFail($id): Term
+    {
+        $term = $this->find($id);
+
+        if (! $term) {
+            throw new TermNotFoundException($id);
+        }
+
+        return $term;
     }
 
     public function save($term)

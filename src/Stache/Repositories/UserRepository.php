@@ -8,6 +8,7 @@ use Statamic\Auth\File\UserGroupRepository;
 use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
 use Statamic\Contracts\Auth\User;
+use Statamic\Exceptions\UserNotFoundException;
 use Statamic\Stache\Query\UserQueryBuilder;
 use Statamic\Stache\Stache;
 
@@ -39,6 +40,17 @@ class UserRepository extends BaseRepository
     public function findByEmail(string $email): ?User
     {
         return $this->query()->where('email', $email)->first();
+    }
+
+    public function findOrFail($id): User
+    {
+        $user = $this->find($id);
+
+        if (! $user) {
+            throw new UserNotFoundException($id);
+        }
+
+        return $user;
     }
 
     public function query()

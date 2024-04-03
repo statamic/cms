@@ -12,6 +12,7 @@ use Statamic\OAuth\Provider;
  * @method static null|\Statamic\Contracts\Auth\User find($id)
  * @method static null|\Statamic\Contracts\Auth\User findByEmail(string $email)
  * @method static null|\Statamic\Contracts\Auth\User findByOAuthId(Provider $provider, string $id)
+ * @method static \Statamic\Contracts\Auth\User findOrFail($id)
  * @method static null|\Statamic\Contracts\Auth\User current()
  * @method static null|\Statamic\Contracts\Auth\User fromUser($user)
  * @method static void save(User $user);
