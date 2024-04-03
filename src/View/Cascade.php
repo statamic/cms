@@ -71,7 +71,7 @@ class Cascade
 
     public function set($key, $value)
     {
-        array_set($this->data, $key, $value);
+        Arr::set($this->data, $key, $value);
     }
 
     public function data($data)

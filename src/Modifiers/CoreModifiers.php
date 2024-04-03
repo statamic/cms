@@ -1787,7 +1787,7 @@ class CoreModifiers extends Modifier
             $value = $value->all();
         }
 
-        return array_random($value);
+        return Arr::random($value);
     }
 
     /**
