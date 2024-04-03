@@ -51,13 +51,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         ]));
     }
 
-    protected function setSites($sites)
-    {
-        Config::set('statamic.system.multisite', count($sites) > 1);
-
-        Site::setSites($sites);
-    }
-
     public function tearDown(): void
     {
         $uses = array_flip(class_uses_recursive(static::class));
@@ -134,6 +127,20 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $viewPaths[] = __DIR__.'/__fixtures__/views/';
 
         $app['config']->set('view.paths', $viewPaths);
+    }
+
+    protected function setSites($sites)
+    {
+        Site::setSites($sites);
+
+        Config::set('statamic.system.multisite', Site::hasMultiple());
+    }
+
+    protected function setSiteValue($site, $key, $value)
+    {
+        Site::setSiteValue($site, $key, $value);
+
+        Config::set('statamic.system.multisite', Site::hasMultiple());
     }
 
     protected function assertEveryItem($items, $callback)

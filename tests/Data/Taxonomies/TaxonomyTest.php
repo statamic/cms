@@ -155,7 +155,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_gets_the_url_when_the_site_is_using_a_subdirectory()
     {
-        Site::setSiteValue('en', 'url', '/subdirectory/');
+        $this->setSiteValue('en', 'url', '/subdirectory/');
 
         $taxonomy = (new Taxonomy)->handle('tags');
 

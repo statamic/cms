@@ -26,7 +26,7 @@ class PathTest extends TestCase
 
     private function setSiteUrl($url)
     {
-        Site::setSiteValue('en', 'url', $url);
+        $this->setSiteValue('en', 'url', $url);
     }
 
     /** @test */
