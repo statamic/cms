@@ -103,7 +103,7 @@ class FieldTransformer
 
     private static function referenceTabField(array $submitted)
     {
-        $config = Arr::removeNullValues(array_only($submitted['config'], $submitted['config_overrides']));
+        $config = Arr::removeNullValues(Arr::only($submitted['config'], $submitted['config_overrides']));
 
         return array_filter([
             'handle' => $submitted['handle'],
@@ -125,11 +125,11 @@ class FieldTransformer
 
     private static function referenceFieldToVue($field): array
     {
-        $fieldsetField = array_get(static::fieldsetFields(), $field['field'], []);
+        $fieldsetField = Arr::get(static::fieldsetFields(), $field['field'], []);
 
         $mergedConfig = array_merge(
-            $fieldsetFieldConfig = array_get($fieldsetField, 'config', []),
-            $config = array_get($field, 'config', [])
+            $fieldsetFieldConfig = Arr::get($fieldsetField, 'config', []),
+            $config = Arr::get($field, 'config', [])
         );
 
         $mergedConfig['width'] = $mergedConfig['width'] ?? 100;

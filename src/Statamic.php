@@ -209,7 +209,7 @@ class Statamic
             return false;
         }
 
-        return starts_with(request()->path(), config('statamic.api.route'));
+        return Str::startsWith(request()->path(), config('statamic.api.route'));
     }
 
     public static function apiRoute($route, $params = [])
@@ -441,13 +441,13 @@ class Statamic
             // In case a file without any version will be passed,
             // a random version number will be created.
             if (! Str::contains($path, '?v=')) {
-                $version = str_random();
+                $version = Str::random();
 
                 // Add the file extension if not provided.
-                $path = str_finish($path, ".{$extension}");
+                $path = Str::finish($path, ".{$extension}");
 
                 // Add the version to the path.
-                $path = str_finish($path, "?v={$version}");
+                $path = Str::finish($path, "?v={$version}");
             }
 
             return $path;

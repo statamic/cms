@@ -336,7 +336,7 @@ class Bard extends Replicator
     {
         $row['attrs']['values'] = parent::processRow($row['attrs']['values'], $index);
 
-        if (array_get($row, 'attrs.enabled', true) === true) {
+        if (Arr::get($row, 'attrs.enabled', true) === true) {
             unset($row['attrs']['enabled']);
         }
 

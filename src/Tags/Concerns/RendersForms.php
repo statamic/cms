@@ -4,6 +4,7 @@ namespace Statamic\Tags\Concerns;
 
 use Closure;
 use Illuminate\Support\MessageBag;
+use Statamic\Support\Str;
 
 trait RendersForms
 {
@@ -126,7 +127,7 @@ trait RendersForms
     {
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
-        $missing = str_random();
+        $missing = Str::random();
         $old = old($field->handle(), $missing);
         $default = $field->value() ?? $field->defaultValue();
         $value = $old === $missing ? $default : $old;

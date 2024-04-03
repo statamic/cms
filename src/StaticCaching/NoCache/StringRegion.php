@@ -2,6 +2,8 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
+use Statamic\Support\Str;
+
 class StringRegion extends Region
 {
     protected $content;
@@ -13,7 +15,7 @@ class StringRegion extends Region
         $this->content = $content;
         $this->context = $this->filterContext($context);
         $this->extension = $extension;
-        $this->key = sha1($content.str_random());
+        $this->key = sha1($content.Str::random());
     }
 
     public function key(): string
