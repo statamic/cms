@@ -38,6 +38,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     protected $handle;
     protected $routes = [];
+    private $cachedRoutes = null;
     protected $mount;
     protected $title;
     protected $template;
@@ -75,7 +76,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function handle($handle = null)
     {
-        return $this->fluentlyGetOrSet('handle')->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->handle;
+        }
+
+        $this->handle = $handle;
+
+        return $this;
     }
 
     public function routes($routes = null)
@@ -83,12 +90,17 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this
             ->fluentlyGetOrSet('routes')
             ->getter(function ($routes) {
-                return $this->sites()->mapWithKeys(function ($site) use ($routes) {
+                if ($this->cachedRoutes !== null) {
+                    return $this->cachedRoutes;
+                }
+
+                return $this->cachedRoutes = $this->sites()->mapWithKeys(function ($site) use ($routes) {
                     $siteRoute = is_string($routes) ? $routes : ($routes[$site] ?? null);
 
                     return [$site => $siteRoute];
                 });
             })
+            ->afterSetter(fn () => $this->cachedRoutes = null)
             ->args(func_get_args());
     }
 
@@ -135,7 +147,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function dated($dated = null)
     {
-        return $this->fluentlyGetOrSet('dated')->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->dated;
+        }
+
+        $this->dated = $dated;
+
+        return $this;
     }
 
     public function orderable()
@@ -150,7 +168,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->getter(function ($sortField) {
                 if ($sortField) {
                     return $sortField;
-                } elseif ($this->orderable()) {
+                } elseif ($this->orderable() || $this->hasStructure()) {
                     return 'order';
                 } elseif ($this->dated()) {
                     return 'date';
@@ -268,6 +286,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return Facades\Entry::query()->where('collection', $this->handle());
     }
 
+    public function hasVisibleEntryBlueprint()
+    {
+        return $this->entryBlueprints()->reject->hidden()->isNotEmpty();
+    }
+
     public function entryBlueprints()
     {
         $blink = 'collection-entry-blueprints-'.$this->handle();
@@ -316,7 +339,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         return Blink::once($blink, function () use ($blueprint) {
             if (is_null($blueprint)) {
-                return $this->entryBlueprints()->reject->hidden()->first();
+                return $this->entryBlueprints()->reject->hidden()->first() ?? $this->entryBlueprints()->first();
             }
 
             return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
@@ -389,6 +412,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
                 return collect($sites);
             })
+            ->afterSetter(fn () => $this->cachedRoutes = null)
             ->args(func_get_args());
     }
 
@@ -450,6 +474,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         Facades\Collection::save($this);
 
         Blink::forget('collection-handles');
+        Blink::forget('mounted-collections');
         Blink::flushStartingWith("collection-{$this->id()}");
 
         if ($isNew) {
@@ -471,6 +496,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function updateEntryOrder($ids = null)
     {
         Facades\Collection::updateEntryOrder($this, $ids);
+
+        return $this;
+    }
+
+    public function updateEntryParent($ids = null)
+    {
+        Facades\Collection::updateEntryParent($this, $ids);
 
         return $this;
     }
@@ -734,6 +766,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         Facades\Collection::delete($this);
 
         CollectionDeleted::dispatch($this);
+
+        Blink::forget('mounted-collections');
 
         return true;
     }
