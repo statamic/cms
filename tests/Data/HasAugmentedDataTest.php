@@ -66,7 +66,6 @@ class HasAugmentedDataTest extends TestCase
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
         ];
-
         $this->assertEquals($expectedArr, $thing->augmented()->all()->all());
         $this->assertEquals($expectedArr, $thing->toAugmentedArray());
 
@@ -74,7 +73,6 @@ class HasAugmentedDataTest extends TestCase
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
         ];
-
         $this->assertEquals($expectedSelectArr, $thing->augmented()->select(['foo', 'bar'])->all());
         $this->assertEquals($expectedSelectArr, $thing->toAugmentedArray(['foo', 'bar']));
     }

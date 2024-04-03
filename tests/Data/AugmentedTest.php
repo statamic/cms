@@ -280,7 +280,6 @@ class AugmentedTest extends TestCase
         };
 
         $result = $augmented->all();
-
         $this->assertInstanceOf(AugmentedCollection::class, $result);
         $this->assertEquals([
             'foo' => $foo = new Value('bar', 'foo', $fieldtype, $this->blueprintThing),
@@ -291,7 +290,6 @@ class AugmentedTest extends TestCase
         ], $result->all());
 
         $result = $augmented->select(['foo', 'hello']);
-
         $this->assertInstanceOf(AugmentedCollection::class, $result);
         $this->assertEveryItemIsInstanceOf(Value::class, $result);
         $this->assertEquals([
@@ -304,7 +302,6 @@ class AugmentedTest extends TestCase
         ], $augmented->select('foo')->all());
 
         $result = $augmented->except(['slug', 'hello']);
-
         $this->assertInstanceOf(AugmentedCollection::class, $result);
         $this->assertEquals([
             'foo' => $foo,
