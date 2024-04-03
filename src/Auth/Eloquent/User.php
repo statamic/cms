@@ -45,7 +45,7 @@ class User extends BaseUser
                 'groups' => $this->groups()->map->handle()->values()->all(),
             ]);
 
-            return collect(array_except($data, ['id', 'email']));
+            return collect(Arr::except($data, ['id', 'email']));
         }
 
         foreach ($data as $key => $value) {
