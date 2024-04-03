@@ -151,7 +151,7 @@ class CacheTagTest extends TestCase
 
 {{ cache }}
     {{ section:header }}The Header{{ /section:header }}
-
+    
     Cached content.
 {{ /cache }}
 EOT;
@@ -159,8 +159,8 @@ EOT;
 The Header
 
 
-
-
+    
+    
     Cached content.
 EXP;
         $original = Event::getFacadeRoot();
@@ -192,7 +192,7 @@ EXP;
 
 {{ cache }}
     {{ push:test }}Hello{{ /push:test }}{{ push:test }}, universe.{{ /push:test }}
-
+    
     Cached content.
 {{ /cache }}
 
@@ -202,8 +202,8 @@ EOT;
 The Beginning.Hello, universe.The End.
 
 
-
-
+    
+    
     Cached content.
 EXP;
         $original = Event::getFacadeRoot();
