@@ -116,6 +116,21 @@ class EntryRepository implements RepositoryContract
         return app(Entry::class);
     }
 
+    public function firstOrCreate(array $attributes, array $values = [])
+    {
+        return $this->query()->firstOrCreate($attributes, $values);
+    }
+
+    public function createOrFirst(array $attributes, array $values = [])
+    {
+        return $this->query()->createOrFirst($attributes, $values);
+    }
+
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        return $this->query()->updateOrCreate($attributes, $values);
+    }
+
     public function taxonomize($entry)
     {
         $entry->collection()->taxonomies()->each(function ($taxonomy) use ($entry) {

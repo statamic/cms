@@ -18,6 +18,12 @@ interface EntryRepository
 
     public function make();
 
+    public function firstOrCreate(array $attributes, array $values = []);
+
+    public function createOrFirst(array $attributes, array $values = []);
+
+    public function updateOrCreate(array $attributes, array $values = []);
+
     public function query();
 
     public function save($entry);

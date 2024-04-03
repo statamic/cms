@@ -828,15 +828,15 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals('Post 1', $entry->title);
 
         // Create new entry
-        $entry = Entry::query()->updateOrCreate(
-            ['id' => 'id-2'],
+        $entry = Entry::updateOrCreate(
+            ['id' => 'id-2', 'collection' => 'posts'],
             ['title' => 'Post 2'],
         );
         $this->assertEquals('Post 2', $entry->title);
 
         // Only update the entry if it already exists
-        $entry = Entry::query()->updateOrCreate(
-            ['id' => 'id-1'],
+        $entry = Entry::updateOrCreate(
+            ['id' => 'id-1', 'collection' => 'posts'],
             ['title' => 'Post 1 - Updated'],
         );
         $this->assertEquals('Post 1 - Updated', $entry->title);
