@@ -4,6 +4,7 @@ namespace Statamic\Extensions\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use Illuminate\Translation\Translator as BaseTranslator;
 use Statamic\Statamic;
 
@@ -45,7 +46,7 @@ class Translator extends BaseTranslator
         $translations->put('*', $this->loader->load($this->locale, '*', '*'));
 
         // The Javascript side is expecting one flattened object.
-        return array_dot($translations);
+        return Arr::dot($translations);
     }
 
     protected function getTranslations($path, $namespace)
