@@ -209,7 +209,7 @@ class Statamic
             return false;
         }
 
-        return starts_with(request()->path(), config('statamic.api.route'));
+        return Str::startsWith(request()->path(), config('statamic.api.route'));
     }
 
     public static function apiRoute($route, $params = [])

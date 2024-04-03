@@ -126,7 +126,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     {
         // If explicitly setting addon path from an external command like `make:addon`,
         // use explicit path and allow external command to handle path output.
-        if (starts_with($addon, '/') && $this->files->exists($addon)) {
+        if (Str::startsWith($addon, '/') && $this->files->exists($addon)) {
             return $addon;
         }
 

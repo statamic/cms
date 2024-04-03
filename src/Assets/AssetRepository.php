@@ -48,11 +48,11 @@ class AssetRepository implements Contract
         $siteUrl = rtrim(Site::current()->absoluteUrl(), '/');
         $containerUrl = $container->url();
 
-        if (starts_with($containerUrl, '/')) {
+        if (Str::startsWith($containerUrl, '/')) {
             $containerUrl = $siteUrl.$containerUrl;
         }
 
-        if (starts_with($containerUrl, $siteUrl)) {
+        if (Str::startsWith($containerUrl, $siteUrl)) {
             $url = $siteUrl.$url;
         }
 
@@ -77,8 +77,8 @@ class AssetRepository implements Contract
         return AssetContainer::all()->sortByDesc(function ($container) {
             return strlen($container->url());
         })->first(function ($container, $id) use ($url) {
-            return starts_with($url, $container->url())
-                || starts_with(URL::makeAbsolute($url), $container->url());
+            return Str::startsWith($url, $container->url())
+                || Str::startsWith(URL::makeAbsolute($url), $container->url());
         });
     }
 
