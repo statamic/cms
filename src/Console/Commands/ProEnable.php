@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
+use Statamic\Support\Str;
 
 class ProEnable extends Command
 {
@@ -147,9 +148,9 @@ class ProEnable extends Command
 
         $contents = file_get_contents($configPath);
 
-        if (str_contains($contents, "'pro' => false,")) {
+        if (Str::contains($contents, "'pro' => false,")) {
             $contents = str_replace("'pro' => false,", "'pro' => env('STATAMIC_PRO_ENABLED', false),", $contents);
-        } elseif (str_contains($contents, "'pro' => true,")) {
+        } elseif (Str::contains($contents, "'pro' => true,")) {
             $contents = str_replace("'pro' => true,", "'pro' => env('STATAMIC_PRO_ENABLED', false),", $contents);
         } else {
             return false;
