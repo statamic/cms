@@ -8,7 +8,7 @@
                 <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
                     <label class="text-xs whitespace-nowrap rtl:ml-2 ltr:mr-2 cursor-pointer">
-                        <template v-if="replicatorSets.length > 1">
+                        <template v-if="setGroup">
                             {{ setGroup.display }}
                             <svg-icon name="micro/chevron-right" class="w-4" />
                         </template>
@@ -157,6 +157,8 @@ export default {
         },
 
         setGroup() {
+            if (this.replicatorSets.length < 1) return null;
+
             return this.replicatorSets.find((group) => {
                 return group.sets.filter((set) => set.handle === this.config.handle).length > 0;
             });
