@@ -56,7 +56,7 @@ class HasAugmentedDataTest extends TestCase
             $this->assertEquals('FOO', $value->raw());
             $this->assertEquals('foo', $value->handle());
             $this->assertEquals($thing, $value->augmentable());
-            $this->assertEquals($fieldtype, $value->fieldtype()->withoutField());
+            $this->assertEquals($fieldtype, $value->fieldtype());
         });
 
         $this->assertEquals('BAR', $thing->augmentedValue('bar'));
@@ -67,28 +67,15 @@ class HasAugmentedDataTest extends TestCase
             'bar' => 'BAR',
         ];
 
-        $result = $thing->augmented()->all();
-        $result['foo']->fieldtype()->withoutField();
-
-        $this->assertEquals($expectedArr, $result->all());
-        $result = $thing->toAugmentedArray();
-        $result['foo']->fieldtype()->withoutField();
-
-        $this->assertEquals($expectedArr, $result);
+        $this->assertEquals($expectedArr, $thing->augmented()->all()->all());
+        $this->assertEquals($expectedArr, $thing->toAugmentedArray());
 
         $expectedSelectArr = [
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
         ];
 
-        $result = $thing->augmented()->select(['foo', 'bar']);
-        $result['foo']->fieldtype()->withoutField();
-
-        $this->assertEquals($expectedSelectArr, $result->all());
-
-        $result = $thing->toAugmentedArray(['foo', 'bar']);
-        $result['foo']->fieldtype()->withoutField();
-
-        $this->assertEquals($expectedSelectArr, $result);
+        $this->assertEquals($expectedSelectArr, $thing->augmented()->select(['foo', 'bar'])->all());
+        $this->assertEquals($expectedSelectArr, $thing->toAugmentedArray(['foo', 'bar']));
     }
 }

@@ -174,7 +174,7 @@ class AugmentedTest extends TestCase
             $this->assertEquals('bar', $value->raw());
             $this->assertEquals('AUGMENTED BAR', $value->value());
             $this->assertEquals('foo', $value->handle());
-            $this->assertEquals($fieldtype, $value->fieldtype()->withoutField());
+            $this->assertEquals($fieldtype, $value->fieldtype());
             $this->assertEquals($this->blueprintThing, $value->augmentable());
         });
 
@@ -183,7 +183,7 @@ class AugmentedTest extends TestCase
             $this->assertEquals('the-thing', $value->raw());
             $this->assertEquals('AUGMENTED THE-THING', $value->value());
             $this->assertEquals('slug', $value->handle());
-            $this->assertEquals($fieldtype, $value->fieldtype()->withoutField());
+            $this->assertEquals($fieldtype, $value->fieldtype());
             $this->assertEquals($this->blueprintThing, $value->augmentable());
         });
 
@@ -280,8 +280,6 @@ class AugmentedTest extends TestCase
         };
 
         $result = $augmented->all();
-        $result['foo']->fieldtype()->withoutField();
-        $result['slug']->fieldtype()->withoutField();
 
         $this->assertInstanceOf(AugmentedCollection::class, $result);
         $this->assertEquals([
@@ -293,7 +291,6 @@ class AugmentedTest extends TestCase
         ], $result->all());
 
         $result = $augmented->select(['foo', 'hello']);
-        $result['foo']->fieldtype()->withoutField();
 
         $this->assertInstanceOf(AugmentedCollection::class, $result);
         $this->assertEveryItemIsInstanceOf(Value::class, $result);
@@ -302,15 +299,11 @@ class AugmentedTest extends TestCase
             'hello' => $hello,
         ], $result->all());
 
-        $result = $augmented->select('foo');
-        $result['foo']->fieldtype()->withoutField();
-
         $this->assertEquals([
             'foo' => $foo,
-        ], $result->all());
+        ], $augmented->select('foo')->all());
 
         $result = $augmented->except(['slug', 'hello']);
-        $result['foo']->fieldtype()->withoutField();
 
         $this->assertInstanceOf(AugmentedCollection::class, $result);
         $this->assertEquals([
@@ -319,16 +312,12 @@ class AugmentedTest extends TestCase
             'supplemented' => $supplemented,
         ], $result->all());
 
-        $result = $augmented->except('hello');
-        $result['foo']->fieldtype()->withoutField();
-        $result['slug']->fieldtype()->withoutField();
-
         $this->assertEquals([
             'foo' => $foo,
             'slug' => $slug,
             'the_slug' => $theSlug,
             'supplemented' => $supplemented,
-        ], $result->all());
+        ], $augmented->except('hello')->all());
     }
 
     /** @test */
