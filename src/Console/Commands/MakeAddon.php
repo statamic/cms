@@ -333,7 +333,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function addonTitle()
     {
-        return str_replace('-', ' ', title_case($this->nameSlug));
+        return str_replace('-', ' ', Str::title($this->nameSlug));
     }
 
     /**
