@@ -8,7 +8,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
-use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
@@ -103,9 +102,7 @@ class Field implements Arrayable
 
     public function fieldtype()
     {
-        return (clone Blink::once('fieldtype'.$this->type(), function () {
-            return FieldtypeRepository::find($this->type());
-        }))->setField($this);
+        return FieldtypeRepository::find($this->type())->setField($this);
     }
 
     public function display()
