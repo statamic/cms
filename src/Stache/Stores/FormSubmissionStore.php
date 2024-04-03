@@ -8,6 +8,7 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Value;
+use Statamic\Support\Str;
 use Statamic\Yaml\ParseException;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -26,8 +27,8 @@ class FormSubmissionStore extends ChildStore
 
     public function getItemFilter(SplFileInfo $file)
     {
-        $dir = str_finish($this->directory(), '/');
-        $relative = str_after(Path::tidy($file->getPathname()), $dir);
+        $dir = Str::finish($this->directory(), '/');
+        $relative = Str::after(Path::tidy($file->getPathname()), $dir);
 
         return $file->getExtension() === 'yaml' && substr_count($relative, '/') === 0;
     }
@@ -44,7 +45,7 @@ class FormSubmissionStore extends ChildStore
         }
 
         $form = pathinfo($path, PATHINFO_DIRNAME);
-        $form = str_after($form, $this->parent->directory());
+        $form = Str::after($form, $this->parent->directory());
 
         $form = Form::find($form);
 
