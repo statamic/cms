@@ -7,6 +7,7 @@ use Statamic\Exceptions\FieldsetNotFoundException;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class FieldsetRepository
@@ -29,7 +30,7 @@ class FieldsetRepository
 
     public function find(string $handle): ?Fieldset
     {
-        if ($cached = array_get($this->fieldsets, $handle)) {
+        if ($cached = Arr::get($this->fieldsets, $handle)) {
             return $cached;
         }
 
@@ -193,8 +194,8 @@ class FieldsetRepository
             ->getFilesByTypeRecursively($directory, 'yaml')
             ->reject(fn ($path) => Str::startsWith($path, $directory.'/vendor/'))
             ->map(function ($file) use ($directory, $namespace) {
-                $basename = str_after($file, str_finish($directory, '/'));
-                $handle = str_before($basename, '.yaml');
+                $basename = Str::after($file, Str::finish($directory, '/'));
+                $handle = Str::before($basename, '.yaml');
                 $handle = str_replace('/', '.', $handle);
 
                 if ($namespace) {

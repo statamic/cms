@@ -10,7 +10,7 @@ class ClassRuleParser
     {
         $rule = Str::substr($rule, 4);
 
-        if (! str_contains($rule, '(')) {
+        if (! Str::contains($rule, '(')) {
             return [$rule, []];
         }
 
@@ -29,7 +29,7 @@ class ClassRuleParser
                 }
 
                 if (is_numeric($arg)) {
-                    return [$key => str_contains($arg, '.') ? (float) $arg : (int) $arg];
+                    return [$key => Str::contains($arg, '.') ? (float) $arg : (int) $arg];
                 } elseif (Str::startsWith($arg, '"') && Str::endsWith($arg, '"')) {
                     return [$key => (string) Str::of($arg)->trim('"')->replace('\\"', '"')];
                 } elseif (Str::startsWith($arg, "'") && Str::endsWith($arg, "'")) {

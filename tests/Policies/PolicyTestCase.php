@@ -3,6 +3,7 @@
 namespace Tests\Policies;
 
 use Statamic\Facades\User;
+use Statamic\Support\Str;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -20,7 +21,7 @@ class PolicyTestCase extends TestCase
 
     protected function userWithPermissions(array $permissions)
     {
-        $role = str_random();
+        $role = Str::random();
 
         $this->setTestRole($role, $permissions);
 

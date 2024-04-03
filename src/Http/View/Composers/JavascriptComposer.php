@@ -34,7 +34,7 @@ class JavascriptComposer
         return [
             'csrfToken' => csrf_token(),
             'cpUrl' => cp_route('index'),
-            'cpRoot' => str_start(config('statamic.cp.route'), '/'),
+            'cpRoot' => Str::start(config('statamic.cp.route'), '/'),
             'urlPath' => Str::after(request()->getRequestUri(), config('statamic.cp.route').'/'),
             'resourceUrl' => Statamic::cpAssetUrl(),
             'flash' => Statamic::flash(),
