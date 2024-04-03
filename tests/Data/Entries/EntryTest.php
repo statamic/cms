@@ -1999,9 +1999,9 @@ class EntryTest extends TestCase
         Event::fake();
 
         $this->setSites([
-            'en' => [],
-            'fr' => [],
-            'de' => [],
+            'en' => ['locale' => 'en'],
+            'fr' => ['locale' => 'fr'],
+            'de' => ['locale' => 'de'],
         ]);
 
         $entry = EntryFactory::collection('test')->locale('en')->id('1')->create();
@@ -2026,9 +2026,9 @@ class EntryTest extends TestCase
         Event::fake();
 
         $this->setSites([
-            'en' => [],
-            'fr' => [],
-            'fr_ca' => [],
+            'en' => ['locale' => 'en'],
+            'fr' => ['locale' => 'fr'],
+            'fr_ca' => ['locale' => 'fr_ca'],
         ]);
 
         $english = EntryFactory::collection('test')->locale('en')->id('en')->data([
