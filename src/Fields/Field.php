@@ -24,6 +24,7 @@ class Field implements Arrayable
     protected $parentIndex;
     protected $validationContext;
     protected ?Form $form = null;
+    private $fieldtype;
 
     public function __construct($handle, array $config)
     {
@@ -102,7 +103,7 @@ class Field implements Arrayable
 
     public function fieldtype()
     {
-        return FieldtypeRepository::find($this->type())->setField($this);
+        return $this->fieldtype ??= FieldtypeRepository::find($this->type())->setField($this);
     }
 
     public function display()
