@@ -103,8 +103,8 @@ class MakeAddon extends GeneratorCommand
     {
         $parts = explode('/', $this->package);
 
-        $this->vendorSlug = str_slug(Str::snake($parts[0]));
-        $this->nameSlug = str_slug(Str::snake($parts[1]));
+        $this->vendorSlug = Str::slug(Str::snake($parts[0]));
+        $this->nameSlug = Str::slug(Str::snake($parts[1]));
         $this->package = "{$this->vendorSlug}/{$this->nameSlug}";
     }
 

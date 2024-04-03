@@ -71,7 +71,7 @@ class MakeWidget extends GeneratorCommand
             'name' => $this->getNameInput(),
         ];
 
-        $filename = str_slug(Str::snake($this->getNameInput()));
+        $filename = Str::slug(Str::snake($this->getNameInput()));
 
         $this->createFromStub(
             'widget.blade.php.stub',
@@ -108,7 +108,7 @@ class MakeWidget extends GeneratorCommand
     {
         $class = parent::buildClass($name);
 
-        $name = str_slug(Str::snake($this->getNameInput()));
+        $name = Str::slug(Str::snake($this->getNameInput()));
         $viewPath = 'widgets.'.$name;
 
         if ($this->argument('addon')) {
