@@ -16,6 +16,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Preferences\HasPreferencesInProperty;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 /**
@@ -314,7 +315,7 @@ class User extends BaseUser
     {
         $yaml = YAML::file($this->metaPath())->parse();
 
-        return array_get($yaml, $key, $default);
+        return Arr::get($yaml, $key, $default);
     }
 
     /**

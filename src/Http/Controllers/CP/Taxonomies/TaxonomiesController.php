@@ -16,6 +16,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
+use Statamic\Support\Arr;
 
 class TaxonomiesController extends CpController
 {
@@ -171,7 +172,7 @@ class TaxonomiesController extends CpController
             ->template($values['template'] ?? null)
             ->layout($values['layout'] ?? null);
 
-        if ($sites = array_get($values, 'sites')) {
+        if ($sites = Arr::get($values, 'sites')) {
             $taxonomy->sites($sites);
         }
 

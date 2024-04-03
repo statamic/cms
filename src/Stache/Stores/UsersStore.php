@@ -8,6 +8,7 @@ use Statamic\Facades\UserGroup;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Users\Group;
 use Statamic\Stache\Indexes\Users\Role;
+use Statamic\Support\Arr;
 
 class UsersStore extends BasicStore
 {
@@ -51,7 +52,7 @@ class UsersStore extends BasicStore
             ->preferences(array_pull($data, 'preferences', []))
             ->data($data);
 
-        if (array_get($data, 'password') || isset($idGenerated)) {
+        if (Arr::get($data, 'password') || isset($idGenerated)) {
             $user->writeFile();
         }
 

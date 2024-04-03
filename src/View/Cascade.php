@@ -66,7 +66,7 @@ class Cascade
 
     public function get($key)
     {
-        return array_get($this->data, $key);
+        return Arr::get($this->data, $key);
     }
 
     public function set($key, $value)
