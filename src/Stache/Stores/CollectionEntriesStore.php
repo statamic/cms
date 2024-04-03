@@ -114,7 +114,7 @@ class CollectionEntriesStore extends ChildStore
 
         // Support entries within subdirectories at any level.
         if (Str::contains($collection, '/')) {
-            $collection = str_before($collection, '/');
+            $collection = Str::before($collection, '/');
         }
 
         return [$collection, $site];

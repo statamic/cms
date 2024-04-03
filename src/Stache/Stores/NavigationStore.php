@@ -27,7 +27,7 @@ class NavigationStore extends BasicStore
     public function makeItemFromFile($path, $contents)
     {
         $relative = Str::after($path, $this->directory);
-        $handle = str_before($relative, '.yaml');
+        $handle = Str::before($relative, '.yaml');
 
         $data = YAML::file($path)->parse($contents);
 

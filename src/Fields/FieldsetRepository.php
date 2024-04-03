@@ -195,7 +195,7 @@ class FieldsetRepository
             ->reject(fn ($path) => Str::startsWith($path, $directory.'/vendor/'))
             ->map(function ($file) use ($directory, $namespace) {
                 $basename = Str::after($file, str_finish($directory, '/'));
-                $handle = str_before($basename, '.yaml');
+                $handle = Str::before($basename, '.yaml');
                 $handle = str_replace('/', '.', $handle);
 
                 if ($namespace) {
