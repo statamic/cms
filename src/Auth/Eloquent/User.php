@@ -117,7 +117,7 @@ class User extends BaseUser
 
     public function assignRole($role)
     {
-        $roles = collect(array_wrap($role))->map(function ($role) {
+        $roles = collect(Arr::wrap($role))->map(function ($role) {
             return is_string($role) ? Role::find($role) : $role;
         })->filter();
 
@@ -132,7 +132,7 @@ class User extends BaseUser
 
     public function removeRole($role)
     {
-        $roles = collect(array_wrap($role))->map(function ($role) {
+        $roles = collect(Arr::wrap($role))->map(function ($role) {
             return is_string($role) ? Role::find($role) : $role;
         })->filter();
 
@@ -183,7 +183,7 @@ class User extends BaseUser
 
     public function addToGroup($group)
     {
-        $groups = collect(array_wrap($group))->map(function ($group) {
+        $groups = collect(Arr::wrap($group))->map(function ($group) {
             return is_string($group) ? UserGroup::find($group) : $group;
         })->filter();
 
@@ -198,7 +198,7 @@ class User extends BaseUser
 
     public function removeFromGroup($group)
     {
-        $groups = collect(array_wrap($group))->map(function ($group) {
+        $groups = collect(Arr::wrap($group))->map(function ($group) {
             return is_string($group) ? UserGroup::find($group) : $group;
         })->filter();
 
