@@ -15,7 +15,7 @@ use Tests\TestCase;
 class HasAugmentedDataTest extends TestCase
 {
     /** @test */
-    public function aaa_it_makes_an_augmented_instance()
+    public function it_makes_an_augmented_instance()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')->andReturn($fieldtype = new class extends Fieldtype
         {
