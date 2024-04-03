@@ -12,6 +12,7 @@ use Statamic\Auth\File\UserGroup;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades;
+use Statamic\Support\Str;
 use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
