@@ -194,7 +194,7 @@ class FieldsetRepository
             ->getFilesByTypeRecursively($directory, 'yaml')
             ->reject(fn ($path) => Str::startsWith($path, $directory.'/vendor/'))
             ->map(function ($file) use ($directory, $namespace) {
-                $basename = str_after($file, str_finish($directory, '/'));
+                $basename = Str::after($file, str_finish($directory, '/'));
                 $handle = str_before($basename, '.yaml');
                 $handle = str_replace('/', '.', $handle);
 

@@ -7,6 +7,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class GlobalVariablesStore extends BasicStore
@@ -22,7 +23,7 @@ class GlobalVariablesStore extends BasicStore
             return false;
         }
 
-        $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
+        $filename = Str::after(Path::tidy($file->getPathName()), $this->directory);
 
         if (! Site::hasMultiple()) {
             return substr_count($filename, '/') === 0;
@@ -33,7 +34,7 @@ class GlobalVariablesStore extends BasicStore
 
     public function makeItemFromFile($path, $contents)
     {
-        $relative = str_after($path, $this->directory);
+        $relative = Str::after($path, $this->directory);
         $handle = str_before($relative, '.yaml');
 
         $data = YAML::file($path)->parse($contents);

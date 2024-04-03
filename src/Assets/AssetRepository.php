@@ -56,7 +56,7 @@ class AssetRepository implements Contract
             $url = $siteUrl.$url;
         }
 
-        $path = str_after($url, $containerUrl);
+        $path = Str::after($url, $containerUrl);
 
         return $container->asset($path);
     }

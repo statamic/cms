@@ -9,6 +9,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionsStore extends BasicStore
@@ -26,7 +27,7 @@ class CollectionsStore extends BasicStore
     public function getItemFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory, '/');
-        $relative = str_after(Path::tidy($file->getPathname()), $dir);
+        $relative = Str::after(Path::tidy($file->getPathname()), $dir);
 
         return $file->getExtension() === 'yaml' && substr_count($relative, '/') === 0;
     }

@@ -106,7 +106,7 @@ class CollectionEntriesStore extends ChildStore
     {
         $site = Site::default()->handle();
         $collection = pathinfo($path, PATHINFO_DIRNAME);
-        $collection = str_after($collection, $this->parent->directory());
+        $collection = Str::after($collection, $this->parent->directory());
 
         if (Site::hasMultiple()) {
             [$collection, $site] = explode('/', $collection);

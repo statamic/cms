@@ -45,7 +45,7 @@ class TaxonomyTermsStore extends ChildStore
     public function makeItemFromFile($path, $contents)
     {
         $taxonomy = pathinfo($path, PATHINFO_DIRNAME);
-        $taxonomy = str_after($taxonomy, $this->parent->directory());
+        $taxonomy = Str::after($taxonomy, $this->parent->directory());
 
         $data = YAML::file($path)->parse($contents);
 
