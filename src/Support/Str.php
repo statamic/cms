@@ -92,7 +92,7 @@ class Str
         $string = $language ? static::ascii($string, $language) : $string;
 
         // Statamic is a-OK with underscores in slugs.
-        $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
+        $string = str_replace('_', $placeholder = strtolower(Str::random(16)), $string);
 
         $slug = IlluminateStr::slug($string, $separator, $language, $dictionary);
 

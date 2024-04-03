@@ -441,7 +441,7 @@ class Statamic
             // In case a file without any version will be passed,
             // a random version number will be created.
             if (! Str::contains($path, '?v=')) {
-                $version = str_random();
+                $version = Str::random();
 
                 // Add the file extension if not provided.
                 $path = Str::finish($path, ".{$extension}");
