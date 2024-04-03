@@ -4,6 +4,7 @@ namespace Statamic\View\Blade;
 
 use Illuminate\Support\Collection;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 class TagsDirective
 {
@@ -18,7 +19,7 @@ class TagsDirective
                 $params = [];
             }
 
-            $var = is_string($key) ? $key : camel_case(str_replace(':', '_', $tag));
+            $var = is_string($key) ? $key : Str::camel(str_replace(':', '_', $tag));
 
             return [$var => Statamic::tag($tag)->params($params)->fetch()];
         })->all();
