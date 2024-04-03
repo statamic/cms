@@ -42,21 +42,15 @@ class GlobalVariablesRepository implements RepositoryContract
         return $variables;
     }
 
-    private function getIdsForSet($handle)
-    {
-        return $this->store
-            ->index('handle')
-            ->items()
-            ->where(function ($value) use ($handle) {
-                return $value == $handle;
-            })->keys()->all();
-    }
-
     public function whereSet($handle): VariablesCollection
     {
-        return new VariablesCollection(
-            $this->store->getItems($this->getIdsForSet($handle))
-        );
+        $keys = $this->store
+            ->index('handle')
+            ->items()
+            ->filter(fn ($value) => $value == $handle)
+            ->keys();
+
+        return VariablesCollection::make($this->store->getItems($keys));
     }
 
     public function save($variable)
