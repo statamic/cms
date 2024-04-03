@@ -269,7 +269,7 @@ class MakeAddon extends GeneratorCommand
     {
         $prefix = $this->runningInPlease ? '' : 'statamic:';
 
-        $name = studly_case($this->nameSlug);
+        $name = Str::studly($this->nameSlug);
 
         // Prevent conflicts when also creating a scope, since they're in the same directory.
         if ($type === 'filter') {
@@ -323,7 +323,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function addonNamespace()
     {
-        return studly_case($this->vendorSlug).'\\'.studly_case($this->nameSlug);
+        return Str::studly($this->vendorSlug).'\\'.Str::studly($this->nameSlug);
     }
 
     /**

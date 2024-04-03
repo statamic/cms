@@ -59,7 +59,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     protected function getNameInput()
     {
-        return studly_case(parent::getNameInput());
+        return Str::studly(parent::getNameInput());
     }
 
     /**
