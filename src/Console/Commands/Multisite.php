@@ -68,7 +68,6 @@ class Multisite extends Command
     private function confirmSiteHandle(): bool
     {
         $this->siteHandle ??= Site::default()->handle();
-        ray($this->siteHandle)->green();
 
         if (! $this->confirm("Content will be moved into site folders by the name [<comment>{$this->siteHandle}</comment>]. Is this okay?", true)) {
             $this
