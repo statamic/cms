@@ -156,7 +156,7 @@ class AppServiceProvider extends ServiceProvider
 
         collect([
             'entries' => fn () => Facades\Entry::query(),
-            'formsubmissions' => fn () => Facades\FormSubmission::query(),
+            'form-submissions' => fn () => Facades\FormSubmission::query(),
             'terms' => fn () => Facades\Term::query(),
             'assets' => fn () => Facades\Asset::query(),
             'users' => fn () => Facades\User::query(),
