@@ -21,8 +21,9 @@
         <div
             class="grid-stacked"
             :class="{
-                'mt-12': !grid.fullScreenMode && hideDisplay,
-                'mt-6': !grid.fullScreenMode && !hideDisplay,
+                'mt-0': !allowFullscreen && hideDisplay,
+                'mt-4': !hideDisplay,
+                'mt-10': allowFullscreen,
             }"
             slot-scope="{}"
         >

@@ -190,7 +190,11 @@ export default {
 
         mode(mode) {
             if (mode === 'preview') this.updateMarkdownPreview();
-        }
+        },
+
+        readOnly(readOnly) {
+            this.codemirror.setOption('readOnly', readOnly ? 'nocursor' : false);
+        },
 
     },
 

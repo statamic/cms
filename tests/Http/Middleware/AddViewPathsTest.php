@@ -5,6 +5,7 @@ namespace Tests\Http\Middleware;
 use Illuminate\Http\Request;
 use Statamic\Facades\Site;
 use Statamic\Http\Middleware\AddViewPaths;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,14 +72,14 @@ class AddViewPathsTest extends TestCase
         $handled = false;
 
         (new AddViewPaths())->handle($request, function () use ($expectedPaths, &$handled) {
-            $this->assertEquals($expectedPaths, array_get(view()->getFinder()->getHints(), 'foo'));
+            $this->assertEquals($expectedPaths, Arr::get(view()->getFinder()->getHints(), 'foo'));
             $handled = true;
 
             return new Response;
         });
 
         $this->assertTrue($handled);
-        $this->assertEquals($originalHints, array_get(view()->getFinder()->getHints(), 'foo'));
+        $this->assertEquals($originalHints, Arr::get(view()->getFinder()->getHints(), 'foo'));
     }
 
     private function setCurrentSiteBasedOnUrl($requestUrl)

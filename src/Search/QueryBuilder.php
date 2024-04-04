@@ -4,12 +4,15 @@ namespace Statamic\Search;
 
 use Statamic\Contracts\Search\Result;
 use Statamic\Data\DataCollection;
+use Statamic\Query\Concerns\FakesQueries;
 use Statamic\Query\IteratorBuilder as BaseQueryBuilder;
 use Statamic\Search\Searchables\Providers;
 use Statamic\Support\Str;
 
 abstract class QueryBuilder extends BaseQueryBuilder
 {
+    use FakesQueries;
+
     protected $query;
     protected $index;
     protected $withData = true;
@@ -38,6 +41,11 @@ abstract class QueryBuilder extends BaseQueryBuilder
         $this->withData = false;
 
         return $this;
+    }
+
+    public function get($columns = ['*'])
+    {
+        return $this->withFakeQueryLogging(fn () => parent::get($columns));
     }
 
     public function getBaseItems()
@@ -72,5 +80,10 @@ abstract class QueryBuilder extends BaseQueryBuilder
     protected function collect($items = [])
     {
         return new DataCollection($items);
+    }
+
+    public function getTableNameForFakeQuery()
+    {
+        return 'search_'.$this->index->name();
     }
 }

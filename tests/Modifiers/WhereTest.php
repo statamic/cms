@@ -3,6 +3,7 @@
 namespace Tests\Modifiers;
 
 use Statamic\Modifiers\Modify;
+use Statamic\Support\Arr;
 use Tests\TestCase;
 
 /**
@@ -20,7 +21,7 @@ class WhereTest extends TestCase
         ];
         $expected = ['Dominion', 'Netrunner'];
         $modified = $this->modify($games, ['feeling', 'love']);
-        $this->assertEquals($expected, array_pluck($modified, 'title'));
+        $this->assertEquals($expected, Arr::pluck($modified, 'title'));
     }
 
     /** @test */
@@ -36,7 +37,7 @@ class WhereTest extends TestCase
         ];
         $expected = ['Dominion', 'Netrunner'];
         $modified = $this->modify($games, ['feeling:love']);
-        $this->assertEquals($expected, array_pluck($modified, 'title'));
+        $this->assertEquals($expected, Arr::pluck($modified, 'title'));
     }
 
     private function modify($value, array $params)

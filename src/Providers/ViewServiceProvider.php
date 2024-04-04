@@ -41,6 +41,7 @@ class ViewServiceProvider extends ServiceProvider
         });
 
         $this->registerAntlers();
+        $this->registerBladeDirectives();
 
         $this->app->singleton(Engine::class, function ($app) {
             return new Engine($app['files'], $app[ParserContract::class]);
@@ -150,6 +151,13 @@ class ViewServiceProvider extends ServiceProvider
                 ->setRuntimeConfiguration($runtimeConfig);
 
             return $parser;
+        });
+    }
+
+    public function registerBladeDirectives()
+    {
+        Blade::directive('tags', function ($expression) {
+            return "<?php extract(\Statamic\View\Blade\TagsDirective::handle($expression)) ?>";
         });
     }
 

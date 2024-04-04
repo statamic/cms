@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 use Statamic\Facades\OAuth;
+use Statamic\Support\Arr;
 
 class OAuthController
 {
@@ -39,12 +40,12 @@ class OAuthController
 
         $previous = session('_previous.url');
 
-        if (! $query = array_get(parse_url($previous), 'query')) {
+        if (! $query = Arr::get(parse_url($previous), 'query')) {
             return $default;
         }
 
         parse_str($query, $query);
 
-        return array_get($query, 'redirect', $default);
+        return Arr::get($query, 'redirect', $default);
     }
 }
