@@ -237,7 +237,46 @@ CONFIG);
     {
         $boolean = $boolean === true ? 'true' : 'false';
 
-        $this->assertStringContainsString("'multisite' => $boolean", File::get(config_path('statamic/system.php')));
+        $this->assertStringContainsString(<<<"CONFIG"
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | License Key
+    |--------------------------------------------------------------------------
+    |
+    | The license key for the corresponding domain from your Statamic account.
+    | Without a key entered, your app will considered to be in Trial Mode.
+    |
+    | https://statamic.dev/licensing#trial-mode
+    |
+    */
+
+    'license_key' => env('STATAMIC_LICENSE_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Enable Multi-site
+    |--------------------------------------------------------------------------
+    |
+    | Whether Statamic's multi-site functionality should be enabled. It is
+    | assumed Statamic Pro is also enabled. To get started, you can run
+    | the `php please multisite` command to update your content file
+    | structure, after which you can manage your sites in the CP.
+    |
+    | https://statamic.dev/multi-site
+    |
+    */
+
+    'multisite' => {$boolean},
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Addons Paths
+    |--------------------------------------------------------------------------
+CONFIG, File::get(config_path('statamic/system.php')));
     }
 
     private function assertSitesYamlHas($sites)
