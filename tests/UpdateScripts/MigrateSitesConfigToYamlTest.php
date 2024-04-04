@@ -223,6 +223,63 @@ CONFIG);
         ]);
     }
 
+    /** @test */
+    public function it_can_append_multisite_config_to_bottom_if_the_nicer_str_replace_fails()
+    {
+        // For example, maybe they removed their comment blocks from their system.php config for some reason...
+        File::put(config_path('statamic/system.php'), <<<'CONFIG'
+<?php
+
+return [
+
+    'license_key' => env('STATAMIC_LICENSE_KEY'),
+
+];
+CONFIG);
+
+        File::put(config_path('statamic/sites.php'), <<<'CONFIG'
+<?php
+
+return [
+    'sites' => [
+        'english' => [
+            'name' => 'English',
+            'locale' => 'en_US',
+            'url' => '/',
+        ],
+    ],
+];
+CONFIG);
+
+        $this->migrateSitesConfig();
+
+        $this->assertStringContainsString(<<<'CONFIG'
+<?php
+
+return [
+
+    'license_key' => env('STATAMIC_LICENSE_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Enable Multi-site
+    |--------------------------------------------------------------------------
+    |
+    | Whether Statamic's multi-site functionality should be enabled. It is
+    | assumed Statamic Pro is also enabled. To get started, you can run
+    | the `php please multisite` command to update your content file
+    | structure, after which you can manage your sites in the CP.
+    |
+    | https://statamic.dev/multi-site
+    |
+    */
+
+    'multisite' => false,
+
+];
+CONFIG, File::get(config_path('statamic/system.php')));
+    }
+
     private function migrateSitesConfig()
     {
         $this->runUpdateScript(MigrateSitesConfigToYaml::class);

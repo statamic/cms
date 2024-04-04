@@ -107,6 +107,7 @@ class MigrateSitesConfigToYaml extends UpdateScript
 
         $config = File::get($configPath = config_path('statamic/system.php'));
 
+        // Insert new `multisite` config...
         $config = str_replace(<<<'SEARCH'
     /*
     |--------------------------------------------------------------------------
@@ -134,6 +135,29 @@ SEARCH, <<<'REPLACE'
     | Default Addons Paths
     |--------------------------------------------------------------------------
 REPLACE, $config);
+
+        // And if the above insertion didn't work, just append to bottom of config...
+        if (! str_contains($config, 'multisite')) {
+            $config = str_replace('];', <<<'REPLACE'
+    /*
+    |--------------------------------------------------------------------------
+    | Enable Multi-site
+    |--------------------------------------------------------------------------
+    |
+    | Whether Statamic's multi-site functionality should be enabled. It is
+    | assumed Statamic Pro is also enabled. To get started, you can run
+    | the `php please multisite` command to update your content file
+    | structure, after which you can manage your sites in the CP.
+    |
+    | https://statamic.dev/multi-site
+    |
+    */
+
+    'multisite' => false,
+
+];
+REPLACE, $config);
+        }
 
         File::put($configPath, $config);
 
