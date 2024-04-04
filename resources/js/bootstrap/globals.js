@@ -1,6 +1,7 @@
 import { marked } from 'marked';
 import { translate, translateChoice } from '../translations/translator';
 import uid from 'uniqid';
+import PreviewHtml from '../components/fieldtypes/replicator/PreviewHtml';
 
 export function cp_url(url) {
     url = Statamic.$config.get('cpUrl') + '/' + url;
@@ -86,6 +87,15 @@ export function utf8btoa(stringToEncode) {
     return btoa(utf8String);
 }
 
+export function utf8atob(stringToDecode) {
+    // Decode from base64 to UTF-8 byte representation
+    const utf8String = atob(stringToDecode);
+
+    // Convert the UTF-8 byte representation back to a regular string
+    return decodeURIComponent(utf8String.split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+}
+
 export function uniqid() {
     return uid();
 }
@@ -102,4 +112,21 @@ export function escapeHtml(string) {
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
+}
+
+export function replicatorPreviewHtml(html) {
+    return new PreviewHtml(html);
+}
+
+export function closestVm(el, name) {
+    let parent = el;
+    while (parent) {
+        if (parent.__vue__) break;
+        parent = parent.parentElement;
+    }
+    let vm = parent.__vue__;
+    while (vm !== vm.$root) {
+        if (!name || name === vm.$options.name) return vm;
+        vm = vm.$parent;
+    }
 }

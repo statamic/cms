@@ -504,6 +504,10 @@ class EntriesTest extends TestCase
         $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy' => 'tags::rad|tags::meh|categories::news']));
         $this->assertEquals([1], $this->getEntryIds(['taxonomy::all' => 'tags::rad|categories::news'])); // modifier still expected to be 3rd segment
         $this->assertEquals([1], $this->getEntryIds(['taxonomy' => 'tags::rad|tags::meh', 'taxonomy:categories' => 'news'])); // mix and match
+
+        // Ensure it works when passing terms (eg from a term fieldtype)
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy:tags:in' => Term::query()->whereIn('slug', ['rad', 'meh'])->get()]));
+        $this->assertEquals([1, 3], $this->getEntryIds(['taxonomy:tags:in' => Term::find('tags::rad')]));
     }
 
     /** @test */
@@ -552,6 +556,19 @@ class EntriesTest extends TestCase
         ]));
 
         $this->assertEquals([3], $this->getEntries(['taxonomy:tags:all' => $builder])->map->slug()->all());
+    }
+
+    /** @test */
+    public function it_chunks_entries()
+    {
+        $this->makeEntry('1')->save();
+        $this->makeEntry('2')->save();
+        $this->makeEntry('3')->save();
+
+        $entries = $this->getEntries(['chunk' => 2]);
+
+        $this->assertEquals([1, 2], $entries->first()->map->slug()->all());
+        $this->assertEquals([3], $entries->last()->map->slug()->all());
     }
 }
 

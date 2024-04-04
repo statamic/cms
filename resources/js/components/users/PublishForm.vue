@@ -6,14 +6,15 @@
             <breadcrumb :url="cp_url('users')" :title="__('Users')" />
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
-                    <dropdown-list class="mr-4" v-if="canEditBlueprint">
+                    <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint">
                         <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
                     </dropdown-list>
 
                     <change-password
                         v-if="canEditPassword"
                         :save-url="actions.password"
-                        class="mr-4"
+                        :requires-current-password="requiresCurrentPassword"
+                        class="rtl:ml-4 ltr:mr-4"
                     />
 
                     <button
@@ -75,7 +76,8 @@ export default {
         actions: Object,
         method: String,
         canEditPassword: Boolean,
-        canEditBlueprint: Boolean
+        canEditBlueprint: Boolean,
+        requiresCurrentPassword: Boolean,
     },
 
     data() {
@@ -109,6 +111,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, this.visibleValues).then(response => {
                 this.title = response.data.title;
+                if (!response.data.saved) {
+                    return this.$toast.error(`Couldn't save user`)
+                }
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
@@ -118,6 +123,7 @@ export default {
                     this.error = message;
                     this.errors = errors;
                     this.$toast.error(message);
+                    this.$reveal.invalid();
                 } else {
                     this.$toast.error(__('Something went wrong'));
                 }

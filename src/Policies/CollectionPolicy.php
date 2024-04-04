@@ -7,7 +7,9 @@ use Statamic\Facades\User;
 
 class CollectionPolicy
 {
-    public function before($user, $ability)
+    use Concerns\HasMultisitePolicy;
+
+    public function before($user)
     {
         $user = User::fromUser($user);
 
@@ -43,7 +45,8 @@ class CollectionPolicy
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission("view {$collection->handle()} entries");
+        return $user->hasPermission("view {$collection->handle()} entries")
+            && $this->userCanAccessAnySite($user, $collection->sites());
     }
 
     public function edit($user, $collection)

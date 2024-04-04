@@ -2,6 +2,8 @@
 
 namespace Statamic\Auth\Protect\Protectors;
 
+use Statamic\Exceptions\ForbiddenHttpException;
+
 class Authenticated extends Protector
 {
     public function protect()
@@ -15,7 +17,7 @@ class Authenticated extends Protector
         }
 
         if (! $this->getLoginUrl()) {
-            abort(403);
+            throw new ForbiddenHttpException();
         }
 
         abort(redirect($this->getLoginUrl()));

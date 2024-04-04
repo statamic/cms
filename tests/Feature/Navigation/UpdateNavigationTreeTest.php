@@ -6,8 +6,8 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Structures\BranchIdGenerator;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Tests\FakesRoles;
@@ -51,7 +51,8 @@ class UpdateNavigationTreeTest extends TestCase
         BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
         BranchIdGenerator::shouldReceive('generate')->times(3)->andReturn('newly-generated-id1', 'newly-generated-id2', 'newly-generated-id3');
 
-        $user = tap(User::make()->makeSuper())->save();
+        $this->setTestRoles(['test' => ['access cp', 'edit test nav']]);
+        $user = tap(User::make()->assignRole('test'))->save();
         $nav = tap(Nav::make('test'))->save();
         $nav->makeTree('en', [
             ['id' => 'id1', 'title' => 'URL', 'url' => 'http://example.com', 'children' => [
@@ -65,7 +66,7 @@ class UpdateNavigationTreeTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->update($nav, [
+            ->update($nav, 'en', [
                 'pages' => [
                     ['id' => 'id1', 'children' => []],
                     ['id' => 'id3', 'children' => []],
@@ -147,33 +148,92 @@ class UpdateNavigationTreeTest extends TestCase
     /** @test */
     public function it_denies_access_if_you_dont_have_permission_to_reorder()
     {
-        $this->markTestIncomplete();
-
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(User::make()->assignRole('test'))->save();
-        $collection = tap(Collection::make('test')->structureContents(['tree' => []]))->save();
+        $nav = tap(Nav::make('test'))->save();
+        $nav->makeTree('en', [])->save();
 
         $this
             ->actingAs($user)
-            ->update($collection, ['site' => 'en', 'pages' => []])
+            ->update($nav, 'en', ['site' => 'en', 'pages' => [], 'data' => []])
             ->assertForbidden();
     }
 
-    public function update($nav, $payload = [])
+    /** @test */
+    public function it_denies_access_if_you_dont_have_site_permission()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr'],
+        ]]);
+        $this->setTestRoles(['test' => ['access cp', 'edit test nav']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $nav = tap(Nav::make('test'))->save();
+        $nav->makeTree('en', [])->save();
+
+        $this
+            ->actingAs($user)
+            ->update($nav, 'en', ['site' => 'en', 'pages' => [], 'data' => []])
+            ->assertForbidden();
+    }
+
+    /** @test */
+    public function it_updates_a_specific_sites_tree()
+    {
+        $this->withoutExceptionHandling();
+        Site::setConfig(['sites' => [
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr'],
+        ]]);
+        $this->setTestRoles(['test' => ['access cp', 'edit test nav', 'access fr site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $nav = tap(Nav::make('test'))->save();
+        $nav->makeTree('fr', [
+            ['id' => 'id1', 'title' => 'One'],
+            ['id' => 'id2', 'title' => 'two'],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->update($nav, 'fr', [
+                'pages' => [
+                    ['id' => 'id2', 'children' => []],
+                    ['id' => 'id1', 'children' => []],
+                ],
+                'data' => [
+                    'id1' => [
+                        'values' => [
+                            'title' => 'Updated One',
+                            'url' => 'http://updated-one.com',
+                        ],
+                        'localizedFields' => ['title', 'url'],
+                    ],
+                    'id2' => [
+                        'values' => [
+                            'title' => 'Updated Two',
+                            'url' => 'http://updated-two.com',
+                        ],
+                        'localizedFields' => ['title', 'url'],
+                    ],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            ['id' => 'id2', 'title' => 'Updated Two', 'url' => 'http://updated-two.com'],
+            ['id' => 'id1', 'title' => 'Updated One', 'url' => 'http://updated-one.com'],
+        ], $nav->in('fr')->tree());
+    }
+
+    public function update($nav, $site = 'en', $payload = [])
     {
         $validParams = [
-            'site' => 'en',
+            'site' => $site,
         ];
 
         return $this->patchJson(
             cp_route('navigation.tree.update', $nav->handle()),
             array_merge($validParams, $payload)
         );
-    }
-
-    /** @test */
-    public function it_updates_a_specific_sites_tree()
-    {
-        $this->markTestIncomplete();
     }
 }

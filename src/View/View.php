@@ -2,6 +2,7 @@
 
 namespace Statamic\View;
 
+use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Statamic\Facades\Cascade;
 use Statamic\Support\Arr;
@@ -89,19 +90,30 @@ class View
 
         if ($this->shouldUseLayout()) {
             GlobalRuntimeState::$containsLayout = true;
-
             $contents = view($this->templateViewName(), $cascade);
 
             if (Str::endsWith($this->layoutViewPath(), Engine::EXTENSIONS)) {
                 $contents = $contents->withoutExtractions();
             }
 
+            GlobalRuntimeState::$shareVariablesTemplateTrigger = $contents->getPath();
+
             $contents = $contents->render();
             GlobalRuntimeState::$containsLayout = false;
+            GlobalRuntimeState::$shareVariablesTemplateTrigger = '';
 
-            $contents = view($this->layoutViewName(), array_merge($cascade, [
+            $factory = app('view');
+
+            // Put the sections back. The ->render() will have flushed the sections.
+            Cascade::sections()->each(function ($content, $section) use ($factory) {
+                $factory->startSection($section, new HtmlString((string) $content));
+            });
+
+            $contents = view($this->layoutViewName(), array_merge($cascade, GlobalRuntimeState::$layoutVariables, [
                 'template_content' => $contents,
             ]));
+
+            GlobalRuntimeState::$layoutVariables = [];
         } else {
             $contents = view($this->templateViewName(), $cascade);
         }

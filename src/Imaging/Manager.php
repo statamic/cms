@@ -79,11 +79,18 @@ class Manager
      */
     public function cpManipulationPresets()
     {
-        return [
-            'cp_thumbnail_small_landscape' => ['w' => '400', 'h' => '400', 'fit' => 'contain'],
-            'cp_thumbnail_small_portrait' => ['h' => '400', 'fit' => 'contain'],
-            'cp_thumbnail_small_square' => ['w' => '400', 'h' => '400'],
-        ];
+        $presets = array_merge(
+            ['small' => 400],
+            config('statamic.cp.thumbnail_presets', [])
+        );
+
+        return collect($presets)
+            ->flatMap(fn ($size, $name) => [
+                "cp_thumbnail_{$name}_landscape" => ['w' => $size, 'h' => $size, 'fit' => 'contain'],
+                "cp_thumbnail_{$name}_portrait" => ['h' => $size, 'fit' => 'contain'],
+                "cp_thumbnail_{$name}_square" => ['w' => $size, 'h' => $size],
+            ])
+            ->all();
     }
 
     /**

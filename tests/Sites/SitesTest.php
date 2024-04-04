@@ -3,12 +3,17 @@
 namespace Tests\Sites;
 
 use Illuminate\Support\Collection;
+use Statamic\Facades\Role;
+use Statamic\Facades\User;
 use Statamic\Sites\Site;
 use Statamic\Sites\Sites;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class SitesTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     private $sites;
 
     protected function resolveApplicationConfiguration($app)
@@ -42,6 +47,29 @@ class SitesTest extends TestCase
             $this->assertEquals('en', $sites->values()->get(0)->handle());
             $this->assertEquals('fr', $sites->values()->get(1)->handle());
             $this->assertEquals('de', $sites->values()->get(2)->handle());
+        });
+    }
+
+    /** @test */
+    public function gets_authorized_sites()
+    {
+        Role::make('test')
+            ->permissions([
+                'access en site',
+                'access de site',
+            ])
+            ->save();
+
+        $this->actingAs(tap(User::make()->assignRole('test'))->save());
+
+        \Statamic\Facades\Site::shouldReceive('hasMultiple')->andReturnTrue();
+
+        tap($this->sites->authorized(), function ($sites) {
+            $this->assertInstanceOf(Collection::class, $sites);
+            $this->assertEquals(2, $sites->count());
+            $this->assertInstanceOf(Site::class, $sites->first());
+            $this->assertEquals('en', $sites->values()->get(0)->handle());
+            $this->assertEquals('de', $sites->values()->get(1)->handle());
         });
     }
 

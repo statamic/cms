@@ -6,6 +6,9 @@ use Carbon\CarbonInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Cache\NoLock;
+use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
@@ -18,6 +21,7 @@ class Outpost
     const ENDPOINT = 'https://outpost.statamic.com/v3/query';
     const REQUEST_TIMEOUT = 5;
     const CACHE_KEY = 'statamic.outpost.response';
+    const LOCK_KEY = 'statamic.outpost.lock';
 
     private $response;
     private $client;
@@ -40,16 +44,24 @@ class Outpost
 
     private function request()
     {
-        if ($this->hasCachedResponse()) {
-            return $this->getCachedResponse();
-        }
+        $lock = $this->lock(static::LOCK_KEY, 10);
 
         try {
+            $lock->block(static::REQUEST_TIMEOUT);
+
+            if ($this->hasCachedResponse()) {
+                return $this->getCachedResponse();
+            }
+
             return $this->performAndCacheRequest();
         } catch (ConnectException $e) {
             return $this->cacheAndReturnErrorResponse($e);
         } catch (RequestException $e) {
             return $this->handleRequestException($e);
+        } catch (LockTimeoutException $e) {
+            return $this->cacheAndReturnErrorResponse($e);
+        } finally {
+            $lock->release();
         }
     }
 
@@ -79,6 +91,7 @@ class Outpost
             'statamic_version' => Statamic::version(),
             'statamic_pro' => Statamic::pro(),
             'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version(),
             'packages' => $this->packagePayload(),
         ];
     }
@@ -181,5 +194,12 @@ class Outpost
         }
 
         return $this->store = $store;
+    }
+
+    private function lock(string $key, int $seconds)
+    {
+        return $this->cache()->getStore() instanceof LockProvider
+            ? $this->cache()->lock($key, $seconds)
+            : new NoLock($key, $seconds);
     }
 }

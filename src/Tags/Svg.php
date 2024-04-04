@@ -5,6 +5,7 @@ namespace Statamic\Tags;
 use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
+use Statamic\Fieldtypes\Icon;
 use Statamic\Support\Str;
 use Stringy\StaticStringy;
 
@@ -28,6 +29,7 @@ class Svg extends Tags
             resource_path(),
             public_path('svg'),
             public_path(),
+            statamic_path('resources/svg/icons/'.Icon::DEFAULT_FOLDER),
         ];
 
         $svg = null;
@@ -40,6 +42,10 @@ class Svg extends Tags
                 );
                 break;
             }
+        }
+
+        if (! $svg && Str::startsWith(mb_strtolower(trim($name)), '<svg')) {
+            $svg = $this->params->get('src');
         }
 
         $attributes = $this->renderAttributesFromParams(['src', 'title', 'desc']);

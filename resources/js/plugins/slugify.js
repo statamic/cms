@@ -12,6 +12,12 @@ export default {
             // Remove apostrophes in all languages
             custom["'"] = "";
 
+            // Remove smart single quotes
+            custom["’"] = "";
+
+            // Prevent `Block - Hero` turning into `block_-_hero`
+            custom[" - "] = " ";
+
             return getSlug(text, {
                 separator: glue || '-',
                 lang,

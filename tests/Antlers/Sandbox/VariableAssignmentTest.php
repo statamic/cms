@@ -161,6 +161,42 @@ EOT;
         $this->assertSame('6', trim($this->renderString($template, [], true)));
     }
 
+    public function test_assignments_are_processed_when_tags_contain_parameters_that_conflict_with_modifier_names()
+    {
+        EntryFactory::collection('blog')->id('1')->create();
+        EntryFactory::collection('blog')->id('2')->create();
+        EntryFactory::collection('blog')->id('3')->create();
+        EntryFactory::collection('blog')->id('4')->create();
+
+        $template = <<<'EOT'
+{{ $theCount = 0; }}
+
+{{ collection:blog limit="4" }}
+{{ $theCount += 1; }}
+
+Count: {{ $theCount }}
+{{ /collection:blog }}
+EOT;
+
+        $expected = <<<'EXP'
+Count: 1
+
+
+
+Count: 2
+
+
+
+Count: 3
+
+
+
+Count: 4
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
+
     public function test_assignments_are_traced_from_nested_arrays_and_tags()
     {
         $data = [

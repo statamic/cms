@@ -19,6 +19,7 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Events\AssetContainerCreated;
+use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
@@ -261,7 +262,7 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($expectedWarm, $container->warmPresets());
     }
 
-    public function warmPresetProvider()
+    public static function warmPresetProvider()
     {
         return [
             'no source, no presets' => [null, null, true, ['small', 'medium', 'large', 'max']],
@@ -285,6 +286,10 @@ class AssetContainerTest extends TestCase
         $return = $container->save();
 
         $this->assertEquals($container, $return);
+
+        Event::assertDispatched(AssetContainerCreating::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
 
         Event::assertDispatched(AssetContainerSaving::class, function ($event) use ($container) {
             return $event->container === $container;
@@ -330,8 +335,28 @@ class AssetContainerTest extends TestCase
 
         $this->assertEquals($container, $return);
 
+        Event::assertNotDispatched(AssetContainerCreating::class);
         Event::assertNotDispatched(AssetContainerSaving::class);
         Event::assertNotDispatched(AssetContainerSaved::class);
+        Event::assertNotDispatched(AssetContainerCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_asset_container_doesnt_save()
+    {
+        Event::fake([AssetContainerCreated::class]);
+        Facades\AssetContainer::spy();
+
+        Event::listen(AssetContainerCreating::class, function () {
+            return false;
+        });
+
+        $container = new AssetContainer;
+
+        $return = $container->save();
+
+        $this->assertFalse($return);
+
         Event::assertNotDispatched(AssetContainerCreated::class);
     }
 
@@ -824,6 +849,20 @@ class AssetContainerTest extends TestCase
     /**
      * @test
      *
+     * @see https://github.com/statamic/cms/issues/8825
+     * @see https://github.com/statamic/cms/pull/8826
+     **/
+    public function it_doesnt_get_kebab_case_folder_assets_when_querying_snake_case_folder()
+    {
+        tap($this->containerWithDisk('snake-kebab')->assets('foo_bar', true), function ($assets) {
+            $this->assertCount(1, $assets);
+            $this->assertEquals('foo_bar/alfa.txt', $assets->first()->path());
+        });
+    }
+
+    /**
+     * @test
+     *
      * @see https://github.com/statamic/cms/issues/5405
      * @see https://github.com/statamic/cms/pull/5433
      **/
@@ -954,11 +993,11 @@ class AssetContainerTest extends TestCase
             });
     }
 
-    private function containerWithDisk()
+    private function containerWithDisk($fixture = 'container')
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__.'/__fixtures__/container',
+            'root' => __DIR__.'/__fixtures__/'.$fixture,
         ]]);
 
         $container = (new AssetContainer)->handle('test')->disk('test');

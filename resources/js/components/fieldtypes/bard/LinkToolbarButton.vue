@@ -13,7 +13,7 @@
         </template>
         <template #default>
             <link-toolbar
-                class="w-80"
+                class="w-84"
                 ref="toolbar"
                 v-if="showingToolbar"
                 :link-attrs="linkAttrs"
@@ -71,8 +71,17 @@ export default {
             this.close();
             this.editor.view.dom.focus();
         }
+    },
 
+    created() {
+        this.bard.$on('link-toggle', () => {
+            this.toggleLinkToolbar();
+            this.$refs.popover.toggle();
+        });
+    },
+
+    beforeDestroy() {
+        this.bard.$off('link-toggle');
     }
-
 }
 </script>

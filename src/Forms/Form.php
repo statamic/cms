@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -10,7 +11,9 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormCreated;
+use Statamic\Events\FormCreating;
 use Statamic\Events\FormDeleted;
+use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
 use Statamic\Facades\Blueprint;
@@ -19,9 +22,11 @@ use Statamic\Facades\Folder;
 use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
+use Statamic\Forms\Exporters\Exporter;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Yaml\ParseException;
 
 class Form implements Arrayable, Augmentable, FormContract
 {
@@ -173,6 +178,10 @@ class Form implements Arrayable, Augmentable, FormContract
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && FormCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (FormSaving::dispatch($this) === false) {
                 return false;
             }
@@ -214,6 +223,10 @@ class Form implements Arrayable, Augmentable, FormContract
      */
     public function delete()
     {
+        if (FormDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->submissions()->each->delete();
 
         File::delete($this->path());
@@ -285,9 +298,16 @@ class Form implements Arrayable, Augmentable, FormContract
         $path = config('statamic.forms.submissions').'/'.$this->handle();
 
         return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
+            try {
+                $data = YAML::parse(File::get($file));
+            } catch (ParseException $e) {
+                $data = [];
+                Log::warning('Could not parse form submission file: '.$file);
+            }
+
             return $this->makeSubmission()
                 ->id(pathinfo($file)['filename'])
-                ->data(YAML::parse(File::get($file)));
+                ->data($data);
         });
     }
 
@@ -388,5 +408,18 @@ class Form implements Arrayable, Augmentable, FormContract
     public function actionUrl()
     {
         return route('statamic.forms.submit', $this->handle());
+    }
+
+    public function exporters()
+    {
+        return FormFacade::exporters()
+            ->all()
+            ->filter->allowedOnForm($this)
+            ->each->setForm($this);
+    }
+
+    public function exporter(string $handle): ?Exporter
+    {
+        return $this->exporters()->get($handle);
     }
 }

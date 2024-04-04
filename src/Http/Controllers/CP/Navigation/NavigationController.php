@@ -18,7 +18,8 @@ class NavigationController extends CpController
         $this->authorize('index', NavContract::class, __('You are not authorized to view navs.'));
 
         $navs = Nav::all()->filter(function ($nav) {
-            return User::current()->can('view', $nav);
+            return User::current()->can('configure navs')
+                || ($nav->sites()->contains(Site::selected()->handle()) && User::current()->can('view', $nav));
         })->map(function ($structure) {
             return [
                 'id' => $structure->handle(),
@@ -27,6 +28,7 @@ class NavigationController extends CpController
                 'edit_url' => $structure->editUrl(),
                 'delete_url' => $structure->deleteUrl(),
                 'deleteable' => User::current()->can('delete', $structure),
+                'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
             ];
         })->values();
 
@@ -65,20 +67,24 @@ class NavigationController extends CpController
     {
         abort_if(! $nav = Nav::find($nav), 404);
 
-        $this->authorize('view', $nav, __('You are not authorized to view navs.'));
-
         $site = $request->site ?? Site::selected()->handle();
 
         if (! $nav->existsIn($site)) {
-            return redirect($nav->trees()->first()->showUrl());
+            if ($nav->trees()->isNotEmpty()) {
+                return redirect($nav->trees()->first()->showUrl());
+            }
+
+            $nav->makeTree($site)->save();
         }
+
+        $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
 
         return view('statamic::navigation.show', [
             'site' => $site,
             'nav' => $nav,
             'expectsRoot' => $nav->expectsRoot(),
             'collections' => $nav->collections()->map->handle()->all(),
-            'sites' => $nav->trees()->map(function ($tree) {
+            'sites' => $this->getAuthorizedTreesForNav($nav)->map(function ($tree) {
                 return [
                     'handle' => $tree->locale(),
                     'name' => $tree->site()->name(),
@@ -87,6 +93,13 @@ class NavigationController extends CpController
             })->values()->all(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
         ]);
+    }
+
+    private function getAuthorizedTreesForNav($nav)
+    {
+        return $nav
+            ->trees()
+            ->filter(fn ($tree) => User::current()->can('view', Site::get($tree->locale())));
     }
 
     public function update(Request $request, $nav)
@@ -142,6 +155,16 @@ class NavigationController extends CpController
             'title' => 'required',
             'handle' => 'required|alpha_dash',
         ]);
+
+        if (Nav::find($values['handle'])) {
+            $error = __('A navigation with that handle already exists.');
+
+            if ($request->wantsJson()) {
+                throw new \Exception($error);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
 
         $structure = Nav::make()
             ->title($values['title'])

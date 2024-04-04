@@ -21,10 +21,13 @@ use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsComputedData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\UserCreated;
+use Statamic\Events\UserCreating;
 use Statamic\Events\UserDeleted;
+use Statamic\Events\UserDeleting;
 use Statamic\Events\UserSaved;
 use Statamic\Events\UserSaving;
 use Statamic\Facades;
@@ -37,7 +40,7 @@ use Statamic\Support\Str;
 
 abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {
-    use Authorizable, CanResetPassword, ContainsComputedData, HasAugmentedInstance, HasAvatar, Notifiable, ResolvesValues, Searchable, TracksQueriedColumns, TracksQueriedRelations;
+    use Authorizable, CanResetPassword, ContainsComputedData, HasAugmentedInstance, HasAvatar, HasDirtyState, Notifiable, ResolvesValues, Searchable, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
@@ -168,6 +171,10 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && UserCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (UserSaving::dispatch($this) === false) {
                 return false;
             }
@@ -187,11 +194,17 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
             UserSaved::dispatch($this);
         }
 
+        $this->syncOriginal();
+
         return $this;
     }
 
     public function delete()
     {
+        if (UserDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\User::delete($this);
 
         UserDeleted::dispatch($this);
@@ -233,12 +246,20 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     {
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_RESETS);
 
+        if (is_array($broker)) {
+            $broker = $broker['cp'];
+        }
+
         return Password::broker($broker)->createToken($this);
     }
 
     public function generateActivateAccountToken()
     {
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
+
+        if (is_array($broker)) {
+            $broker = $broker['cp'];
+        }
 
         return Password::broker($broker)->createToken($this);
     }

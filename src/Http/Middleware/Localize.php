@@ -4,6 +4,7 @@ namespace Statamic\Http\Middleware;
 
 use Carbon\Carbon;
 use Closure;
+use Illuminate\Support\Facades\Date;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
 
@@ -32,7 +33,7 @@ class Localize
         $format = (new \ReflectionClass(Carbon::class))->getProperty('toStringFormat');
         $format->setAccessible(true);
         $originalToStringFormat = $format->getValue();
-        Carbon::setToStringFormat(Statamic::dateFormat());
+        Date::setToStringFormat(Statamic::dateFormat());
 
         $response = $next($request);
 
@@ -40,7 +41,7 @@ class Localize
         // not within the scope of the request to be the "defaults".
         setlocale(LC_TIME, $originalLocale);
         app()->setLocale($originalAppLocale);
-        Carbon::setToStringFormat($originalToStringFormat);
+        Date::setToStringFormat($originalToStringFormat);
 
         return $response;
     }

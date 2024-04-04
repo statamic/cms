@@ -8,6 +8,7 @@ use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\SubmissionCreated;
+use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
@@ -33,6 +34,8 @@ class Submission implements Augmentable, SubmissionContract
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+
+    protected ?string $redirect = null;
 
     public function __construct()
     {
@@ -149,6 +152,10 @@ class Submission implements Augmentable, SubmissionContract
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && SubmissionCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (SubmissionSaving::dispatch($this) === false) {
                 return false;
             }

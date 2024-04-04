@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
+use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\GraphQL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -19,7 +20,9 @@ class Field implements Arrayable
     protected $value;
     protected $parent;
     protected $parentField;
+    protected $parentIndex;
     protected $validationContext;
+    protected ?Form $form = null;
 
     public function __construct($handle, array $config)
     {
@@ -31,7 +34,7 @@ class Field implements Arrayable
     {
         return (new static($this->handle, $this->config))
             ->setParent($this->parent)
-            ->setParentField($this->parentField)
+            ->setParentField($this->parentField, $this->parentIndex)
             ->setValue($this->value);
     }
 
@@ -56,6 +59,24 @@ class Field implements Arrayable
         return $path;
     }
 
+    public function fieldPathKeys()
+    {
+        $path = $this->parentField ? $this->parentField->fieldPathKeys() : [];
+
+        if (isset($this->parentIndex)) {
+            $path[] = $this->parentIndex;
+        }
+
+        $path[] = $this->handle();
+
+        return $path;
+    }
+
+    public function fieldPathPrefix()
+    {
+        return implode('.', $this->fieldPathKeys());
+    }
+
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;
@@ -66,6 +87,11 @@ class Field implements Arrayable
     public function prefix()
     {
         return $this->prefix;
+    }
+
+    public function parentIndex()
+    {
+        return $this->parentIndex;
     }
 
     public function type()
@@ -164,7 +190,7 @@ class Field implements Arrayable
     {
         $display = Lang::has($key = 'validation.attributes.'.$this->handle())
             ? Lang::get($key)
-            : $this->display();
+            : __($this->display());
 
         return array_merge(
             [$this->handle() => $display],
@@ -275,9 +301,10 @@ class Field implements Arrayable
         return $this->parent;
     }
 
-    public function setParentField($field)
+    public function setParentField($field, $index = null)
     {
         $this->parentField = $field;
+        $this->parentIndex = $index;
 
         return $this;
     }
@@ -408,5 +435,17 @@ class Field implements Arrayable
     public function isRelationship(): bool
     {
         return $this->fieldtype()->isRelationship();
+    }
+
+    public function setForm(Form $form)
+    {
+        $this->form = $form;
+
+        return $this;
+    }
+
+    public function form(): ?Form
+    {
+        return $this->form;
     }
 }

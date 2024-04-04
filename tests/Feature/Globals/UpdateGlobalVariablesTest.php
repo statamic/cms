@@ -8,6 +8,7 @@ use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -19,16 +20,36 @@ class UpdateGlobalVariablesTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    public function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_edit_permission()
     {
-        $this->setTestRoles(['test' => ['access cp']]);
+        $this->setTestRoles(['test' => ['access cp', 'access en site']]);
         $user = User::make()->assignRole('test')->save();
         $global = GlobalFactory::handle('test')->create();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->patch($global->in('en')->editUrl())
+            ->patch($global->in('en')->updateUrl())
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+    }
+
+    /** @test */
+    public function it_denies_access_if_you_dont_have_site_permission()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]]);
+        $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->make();
+        $global->addLocalization($global->makeLocalization('fr'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->patch($global->in('fr')->updateUrl(), ['foo' => 'baz'])
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }

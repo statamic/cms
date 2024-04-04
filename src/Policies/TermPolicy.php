@@ -6,7 +6,9 @@ use Statamic\Facades\User;
 
 class TermPolicy
 {
-    public function before($user, $ability)
+    use Concerns\HasMultisitePolicy;
+
+    public function before($user)
     {
         $user = User::fromUser($user);
 
@@ -42,16 +44,20 @@ class TermPolicy
         return $this->edit($user, $term);
     }
 
-    public function create($user, $taxonomy)
+    public function create($user, $taxonomy, $site = null)
     {
         $user = User::fromUser($user);
+
+        if ($site && (! $taxonomy->sites()->contains($site->handle()) || ! $this->userCanAccessSite($user, $site))) {
+            return false;
+        }
 
         return $user->hasPermission("create {$taxonomy->handle()} terms");
     }
 
-    public function store($user, $taxonomy)
+    public function store($user, $taxonomy, $site = null)
     {
-        return $this->create($user, $taxonomy);
+        return $this->create($user, $taxonomy, $site);
     }
 
     public function delete($user, $term)

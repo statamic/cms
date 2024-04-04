@@ -24,7 +24,7 @@ class Role extends BaseRole
         $this->permissions = collect();
     }
 
-    public function title(string $title = null)
+    public function title(?string $title = null)
     {
         if (func_num_args() === 0) {
             return $this->title;
@@ -40,7 +40,7 @@ class Role extends BaseRole
         return $this->handle();
     }
 
-    public function handle(string $handle = null)
+    public function handle(?string $handle = null)
     {
         if (func_num_args() === 0) {
             return $this->handle;
@@ -68,6 +68,8 @@ class Role extends BaseRole
 
         $this->permissions = collect($permissions);
 
+        app(PermissionCache::class)->clear();
+
         return $this;
     }
 
@@ -88,6 +90,8 @@ class Role extends BaseRole
         $this->permissions = $this->permissions
             ->diff(Arr::wrap($permission))
             ->values();
+
+        app(PermissionCache::class)->clear();
 
         return $this;
     }

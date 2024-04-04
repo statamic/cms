@@ -2,7 +2,7 @@
     <div class="flex items-center">
 
         <!-- Link type selector -->
-        <div class="w-40 mr-4">
+        <div class="w-28 rtl:ml-4 ltr:mr-4">
             <v-select
                 v-model="option"
                 append-to-body
@@ -119,7 +119,9 @@ export default {
             this.update(url);
         },
 
-        meta(meta) {
+        meta(meta, oldMeta) {
+            if (JSON.stringify(meta) === JSON.stringify(oldMeta)) return;
+
             this.metaChanging = true;
             this.urlValue = meta.initialUrl;
             this.option = meta.initialOption;

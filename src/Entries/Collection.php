@@ -11,8 +11,11 @@ use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\CollectionCreated;
+use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionSaved;
+use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -265,6 +268,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return Facades\Entry::query()->where('collection', $this->handle());
     }
 
+    public function hasVisibleEntryBlueprint()
+    {
+        return $this->entryBlueprints()->reject->hidden()->isNotEmpty();
+    }
+
     public function entryBlueprints()
     {
         $blink = 'collection-entry-blueprints-'.$this->handle();
@@ -313,7 +321,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         return Blink::once($blink, function () use ($blueprint) {
             if (is_null($blueprint)) {
-                return $this->entryBlueprints()->reject->hidden()->first();
+                return $this->entryBlueprints()->reject->hidden()->first() ?? $this->entryBlueprints()->first();
             }
 
             return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
@@ -342,7 +350,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         ]);
 
         if ($this->requiresSlugs()) {
-            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
+            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true, 'validate' => 'max:200'], 'sidebar');
         }
 
         if ($this->dated()) {
@@ -360,6 +368,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         }
 
         foreach ($this->taxonomies() as $taxonomy) {
+            if ($blueprint->hasField($taxonomy->handle())) {
+                continue;
+            }
+
             $blueprint->ensureField($taxonomy->handle(), [
                 'type' => 'terms',
                 'taxonomies' => [$taxonomy->handle()],
@@ -432,6 +444,14 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
 
+        if ($isNew && CollectionCreating::dispatch($this) === false) {
+            return false;
+        }
+
+        if (CollectionSaving::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\Collection::save($this);
 
         Blink::forget('collection-handles');
@@ -456,6 +476,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function updateEntryOrder($ids = null)
     {
         Facades\Collection::updateEntryOrder($this, $ids);
+
+        return $this;
+    }
+
+    public function updateEntryParent($ids = null)
+    {
+        Facades\Collection::updateEntryParent($this, $ids);
 
         return $this;
     }
@@ -600,6 +627,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
+    /** @deprecated */
     public function revisions($enabled = null)
     {
         return $this
@@ -664,7 +692,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
-    public function structureContents(array $contents = null)
+    public function structureContents(?array $contents = null)
     {
         return $this
             ->fluentlyGetOrSet('structureContents')
@@ -713,7 +741,18 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function delete()
     {
-        $this->queryEntries()->get()->each->delete();
+        if (CollectionDeleting::dispatch($this) === false) {
+            return false;
+        }
+
+        $this->queryEntries()->get()->each(function ($entry) {
+            $entry->deleteDescendants();
+            $entry->delete();
+        });
+
+        if ($this->hasStructure()) {
+            $this->structure()->trees()->each->delete();
+        }
 
         Facades\Collection::delete($this);
 

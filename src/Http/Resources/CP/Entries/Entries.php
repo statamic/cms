@@ -12,6 +12,7 @@ class Entries extends ResourceCollection
 
     public $collects = ListedEntry::class;
     protected $blueprint;
+    protected $columns;
     protected $columnPreferenceKey;
 
     public function blueprint($blueprint)
@@ -36,6 +37,7 @@ class Entries extends ResourceCollection
             ->listable(true)
             ->visible(true)
             ->defaultVisibility(true)
+            ->defaultOrder($columns->count() + 1)
             ->sortable(false);
 
         $columns->put('status', $status);

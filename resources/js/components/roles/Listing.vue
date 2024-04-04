@@ -3,7 +3,7 @@
         <div class="card p-0" slot-scope="{ }">
             <data-list-table>
                 <template slot="cell-title" slot-scope="{ row: role, index }">
-                    <a :href="role.edit_url">{{ role.title }}</a>
+                    <a :href="role.edit_url">{{ __(role.title) }}</a>
                 </template>
                 <template slot="cell-handle" slot-scope="{ value: handle }">
                     <span class="font-mono text-xs">{{ handle }}</span>

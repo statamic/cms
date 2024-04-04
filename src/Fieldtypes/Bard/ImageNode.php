@@ -62,11 +62,11 @@ class ImageNode extends Node
 
     protected function getUrl($id)
     {
-        return optional(Asset::find($id))->url();
+        return Asset::find($id)?->url();
     }
 
     protected function getAlt($id)
     {
-        return optional(Asset::find($id))->data()->get('alt');
+        return Asset::find($id)?->data()->get('alt');
     }
 }

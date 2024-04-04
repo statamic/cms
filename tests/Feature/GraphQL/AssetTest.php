@@ -4,6 +4,7 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -397,5 +398,59 @@ GQL;
             ->assertJson(['errors' => [[
                 'message' => 'Cannot query field "one" on type "AssetInterface". Did you mean to use an inline fragment on "Asset_Test"?',
             ]]]);
+    }
+
+    /** @test */
+    public function it_resolves_query_builders()
+    {
+        config(['app.debug' => true]);
+        BlueprintRepository::partialMock();
+
+        $blueprint = Blueprint::makeFromFields([])->setHandle('test');
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
+        EntryFactory::collection('test')->id('bravo')->data(['title' => 'Bravo'])->create();
+        EntryFactory::collection('test')->id('charlie')->data(['title' => 'Charlie'])->create();
+
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']])->setHandle('tags');
+        BlueprintRepository::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+
+        Storage::fake('test', ['url' => '/assets']);
+        Storage::disk('test')->put('a.txt', '');
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $container->makeAsset('a.txt')->data(['entries_field' => ['bravo', 'charlie']])->save();
+
+        $query = <<<'GQL'
+{
+    asset(id: "test::a.txt") {
+        path
+        ... on Asset_Test {
+            entries_field {
+                id
+                title
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'asset' => [
+                    'path' => 'a.txt',
+                    'entries_field' => [
+                        [
+                            'id' => 'bravo',
+                            'title' => 'Bravo',
+                        ],
+                        [
+                            'id' => 'charlie',
+                            'title' => 'Charlie',
+                        ],
+                    ],
+                ],
+            ]]);
     }
 }

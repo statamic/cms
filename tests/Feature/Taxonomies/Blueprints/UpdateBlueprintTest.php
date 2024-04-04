@@ -153,6 +153,7 @@ class UpdateBlueprintTest extends TestCase
                                     'field' => [
                                         'type' => 'slug',
                                         'required' => true,
+                                        'validate' => 'max:200',
                                     ],
                                 ],
                             ],
@@ -340,6 +341,7 @@ class UpdateBlueprintTest extends TestCase
                                     'field' => [
                                         'type' => 'slug',
                                         'required' => true,
+                                        'validate' => 'max:200',
                                     ],
                                 ],
                             ],

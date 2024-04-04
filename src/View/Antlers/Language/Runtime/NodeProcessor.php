@@ -1753,7 +1753,10 @@ class NodeProcessor
                                 GlobalRuntimeState::$activeTracerCount += 1;
                                 GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
 
-                                if ($node->hasModifierParameters()) {
+                                // Only revert to parseLoop behavior if the tag contains
+                                // parameters that are likely to dramatically change
+                                // the scope or overall output of the tag result
+                                if ($node->hasScopeAdjustingParameters) {
                                     $tagAssocOutput = $output;
                                     $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
                                     $tagCallbackResult = null;

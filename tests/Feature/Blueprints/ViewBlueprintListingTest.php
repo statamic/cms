@@ -39,6 +39,24 @@ class ViewBlueprintListingTest extends TestCase
             ->assertRedirect('/cp/original');
     }
 
+    /** @test */
+    public function it_lets_you_edit_a_custom_namespace_blueprint()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
+
+        $namespace = 'foo';
+        $handle = 'bar';
+
+        Facades\Blueprint::addNamespace($namespace, 'resources/content/'.$namespace);
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('blueprints.edit', [$namespace, $handle]))
+            ->assertOk()
+            ->assertViewIs('statamic::blueprints.edit');
+    }
+
     private function createBlueprint($handle)
     {
         return tap(new Blueprint)->setHandle($handle);

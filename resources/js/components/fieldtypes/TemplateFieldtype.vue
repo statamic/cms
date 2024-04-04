@@ -7,7 +7,7 @@
             append-to-body
             :calculate-position="positionOptions"
             :clearable="config.clearable"
-            :placeholder="config.placeholder"
+            :placeholder="__(config.placeholder)"
             :disabled="isReadOnly"
             :options="options"
             :reduce="selection => selection.value"
@@ -16,7 +16,7 @@
             :multiple="false"
             :value="value">
             <template #no-options>
-                <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No templates to choose from.')" />
+                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No templates to choose from.')" />
             </template>
         </v-select>
     </div>
