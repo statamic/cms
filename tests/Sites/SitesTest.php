@@ -59,7 +59,7 @@ class SitesTest extends TestCase
 
         $this->actingAs(tap(User::make()->assignRole('test'))->save());
 
-        \Statamic\Facades\Site::shouldReceive('hasMultiple')->andReturnTrue();
+        \Statamic\Facades\Site::shouldReceive('multiEnabled')->andReturnTrue();
 
         tap($this->sites->authorized(), function ($sites) {
             $this->assertInstanceOf(Collection::class, $sites);
