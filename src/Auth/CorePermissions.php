@@ -71,7 +71,7 @@ class CorePermissions
 
     protected function registerSites()
     {
-        if (! Site::hasMultiple()) {
+        if (! Site::multiEnabled()) {
             return;
         }
 

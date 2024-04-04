@@ -204,7 +204,7 @@ class CollectionsController extends CpController
             ->pastDateBehavior('public')
             ->futureDateBehavior('private');
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $collection->sites([Site::selected()->handle()]);
         }
 
@@ -475,7 +475,7 @@ class CollectionsController extends CpController
             ];
         }
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $fields['sites'] = [
                 'display' => __('Sites'),
                 'fields' => [
@@ -585,7 +585,7 @@ class CollectionsController extends CpController
 
     protected function ensureCollectionIsAvailableOnSite($collection, $site)
     {
-        if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
+        if (Site::multiEnabled() && ! $collection->sites()->contains($site->handle())) {
             return redirect(cp_route('collections.index'))->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
     }

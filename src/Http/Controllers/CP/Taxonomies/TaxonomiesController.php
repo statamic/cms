@@ -113,7 +113,7 @@ class TaxonomiesController extends CpController
 
         $taxonomy = Taxonomy::make($handle)->title($request->title);
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $taxonomy->sites([Site::default()->handle()]);
         }
 
@@ -268,7 +268,7 @@ class TaxonomiesController extends CpController
             ],
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $fields['sites'] = [
                 'display' => __('Sites'),
                 'fields' => [

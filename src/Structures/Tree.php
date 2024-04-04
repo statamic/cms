@@ -215,7 +215,7 @@ abstract class Tree implements Contract, Localization
     {
         $params = [];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $params['site'] = $this->locale();
         }
 
