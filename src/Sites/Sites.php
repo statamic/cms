@@ -96,7 +96,7 @@ class Sites
         session()->put('statamic.cp.selected-site', $site);
     }
 
-    public function setSites($sites = null)
+    public function setSites($sites = null): self
     {
         $sites ??= $this->getSavedSites();
 
@@ -105,16 +105,18 @@ class Sites
         return $this;
     }
 
-    public function setSiteValue($site, $key, $value)
+    public function setSiteValue(string $site, string $key, $value): self
     {
         if (! $this->sites->has($site)) {
             throw new \Exception("Could not find site [{$site}]");
         }
 
         $this->sites->get($site)?->set($key, $value);
+
+        return $this;
     }
 
-    public function path()
+    public function path(): string
     {
         return base_path('content/sites.yaml');
     }
@@ -215,7 +217,7 @@ class Sites
         ]);
     }
 
-    public function config()
+    public function config(): array
     {
         return $this->sites
             ->keyBy
@@ -225,7 +227,7 @@ class Sites
             ->all();
     }
 
-    public function publishFormValues()
+    public function publishFormValues(): array
     {
         $sites = collect($this->config())
             ->map(fn ($site, $handle) => array_merge(['handle' => $handle], $site))
