@@ -105,7 +105,7 @@ class Multisite extends Command
 
     private function promptForSiteHandle(): bool
     {
-        $this->siteHandle = $this->ask('Please enter a new site handle', Site::default()->handle());
+        $this->siteHandle = $this->ask('Please enter a site handle (default site content will be moved into this directory)', Site::default()->handle());
 
         if ($this->validationFails($this->siteHandle, ['required', new Handle])) {
             return $this->promptForSiteHandle();
