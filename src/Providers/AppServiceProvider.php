@@ -155,10 +155,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         collect([
-            'assets' => fn () => Facades\Asset::query(),
             'entries' => fn () => Facades\Entry::query(),
             'formsubmissions' => fn () => Facades\FormSubmission::query(),
             'terms' => fn () => Facades\Term::query(),
+            'assets' => fn () => Facades\Asset::query(),
             'users' => fn () => Facades\User::query(),
         ])->each(function ($binding, $alias) {
             app()->bind('statamic.queries.'.$alias, $binding);
