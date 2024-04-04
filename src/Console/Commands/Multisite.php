@@ -35,7 +35,7 @@ class Multisite extends Command
     {
         $okayToConvert = $this->confirmToProceed()
             && $this->isFreshRun()
-            && $this->confirmSiteHandle()
+            && $this->promptForSiteHandle()
             && $this->ensureProIsEnabled()
             && $this->ensureMultisiteIsEnabled();
 
@@ -100,28 +100,15 @@ class Multisite extends Command
         return File::isDirectory("content/navigation/{$this->siteHandle}");
     }
 
-    private function confirmSiteHandle(): bool
+    private function promptForSiteHandle(): bool
     {
-        $this->siteHandle ??= Site::default()->handle();
+        $this->siteHandle = $this->ask('Please enter a new site handle', Site::default()->handle());
 
-        if (! $this->confirm("Content will be moved into site folders by the name [<comment>{$this->siteHandle}</comment>]. Is this okay?", true)) {
-            $this
-                ->promptForNewSiteHandle()
-                ->confirmSiteHandle();
+        if ($this->validationFails($this->siteHandle, ['required', new Handle])) {
+            return $this->promptForSiteHandle();
         }
 
         return true;
-    }
-
-    private function promptForNewSiteHandle(): self
-    {
-        $this->siteHandle = $this->ask('Please enter a new site handle');
-
-        if ($this->validationFails($this->siteHandle, ['required', new Handle])) {
-            return $this->promptForNewSiteHandle();
-        }
-
-        return $this;
     }
 
     private function ensureProIsEnabled(): bool
