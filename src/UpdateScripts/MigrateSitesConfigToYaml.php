@@ -32,6 +32,7 @@ class MigrateSitesConfigToYaml extends UpdateScript
 
         $this
             ->saveMigratedSitesToYaml($sites)
+            ->migrateSystemConfig()
             ->ensureMultisiteConfigEnabled($sites)
             ->removeOldSitesConfigFile();
 
@@ -96,17 +97,56 @@ class MigrateSitesConfigToYaml extends UpdateScript
         return $this;
     }
 
+    private function migrateSystemConfig()
+    {
+        if (! File::exists($configPath = config_path('statamic/system.php'))) {
+            File::copy(__DIR__.'/../../config/system.php', $configPath);
+
+            return $this;
+        }
+
+        $config = File::get($configPath = config_path('statamic/system.php'));
+
+        $config = str_replace(<<<'SEARCH'
+    /*
+    |--------------------------------------------------------------------------
+    | Default Addons Paths
+    |--------------------------------------------------------------------------
+SEARCH, <<<'REPLACE'
+    /*
+    |--------------------------------------------------------------------------
+    | Enable Multi-site
+    |--------------------------------------------------------------------------
+    |
+    | Whether Statamic's multi-site functionality should be enabled. It is
+    | assumed Statamic Pro is also enabled. To get started, you can run
+    | the `php please multisite` command to update your content file
+    | structure, after which you can manage your sites in the CP.
+    |
+    | https://statamic.dev/multi-site
+    |
+    */
+
+    'multisite' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Addons Paths
+    |--------------------------------------------------------------------------
+REPLACE, $config);
+
+        File::put($configPath, $config);
+
+        return $this;
+    }
+
     private function ensureMultisiteConfigEnabled($sites)
     {
         if (count($sites) <= 1) {
             return $this;
         }
 
-        if (! File::exists($configPath = config_path('statamic/system.php'))) {
-            File::copy(__DIR__.'/../../config/system.php', $configPath);
-        }
-
-        $config = File::get($configPath);
+        $config = File::get($configPath = config_path('statamic/system.php'));
 
         $config = str_replace("'multisite' => false", "'multisite' => true", $config);
 
