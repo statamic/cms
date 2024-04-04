@@ -640,17 +640,6 @@ class Bard extends Replicator
         return $value;
     }
 
-    public function callExtensions($method, $value, ...$extras)
-    {
-        collect((new Augmentor($this))->extensions())
-            ->filter(fn ($extension) => method_exists($extension, $method))
-            ->each(function ($extension) use ($method, &$value, $extras) {
-                $value = $extension->{$method}($value, ...$extras);
-            });
-
-        return $value;
-    }
-
     public function toGqlType()
     {
         return $this->config('sets') ? parent::toGqlType() : GraphQL::string();
