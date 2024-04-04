@@ -9,13 +9,10 @@ use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
-use Statamic\Support\Traits\Hookable;
 use Tiptap\Editor;
 
 class Augmentor
 {
-    use Hookable;
-
     protected $fieldtype;
     protected $sets = [];
     protected $includeDisabledSets = false;
@@ -106,7 +103,7 @@ class Augmentor
 
     public function convertToHtml($value)
     {
-        $value = $this->runHooks('bard-augment', $value);
+        $value = $this->fieldtype->runAugmentHooks($value);
 
         return $this->renderProsemirrorToHtml(['type' => 'doc', 'content' => $value]);
     }

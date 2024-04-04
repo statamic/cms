@@ -274,7 +274,7 @@ class Bard extends Replicator
             return $this->processRow($row, $index);
         })->all();
 
-        $structure = $this->runHooks('bard-process', $structure);
+        $structure = $this->runHooks('process', $structure);
 
         if ($this->shouldSaveHtml()) {
             return (new Augmentor($this))->withStatamicImageUrls()->convertToHtml($structure);
@@ -396,7 +396,7 @@ class Bard extends Replicator
             return $this->preProcessRow($row, $i);
         })->all();
 
-        $value = $this->runHooks('bard-pre-process', $value);
+        $value = $this->runHooks('pre-process', $value);
 
         return json_encode($value);
     }
@@ -431,7 +431,7 @@ class Bard extends Replicator
             return $value['type'] === 'set';
         })->values()->all();
 
-        $data = $this->runHooks('bard-pre-process-index', $data);
+        $data = $this->runHooks('pre-process-index', $data);
 
         return (new Augmentor($this))->renderProsemirrorToHtml([
             'type' => 'doc',
@@ -457,7 +457,7 @@ class Bard extends Replicator
             }, collect())->all();
         }
 
-        $rules = $this->runHooks('bard-extra-rules', $rules);
+        $rules = $this->runHooks('extra-rules', $rules);
 
         return $rules;
     }
@@ -485,7 +485,7 @@ class Bard extends Replicator
             }, collect())->all();
         }
 
-        $attributes = $this->runHooks('bard-extra-validation-attributes', $attributes);
+        $attributes = $this->runHooks('extra-validation-attributes', $attributes);
 
         return $attributes;
     }
@@ -605,7 +605,7 @@ class Bard extends Replicator
             'linkData' => (object) $this->getLinkData($value),
         ];
 
-        $data = $this->runHooks('bard-preload', $data);
+        $data = $this->runHooks('preload', $data);
 
         return $data;
     }
@@ -636,7 +636,7 @@ class Bard extends Replicator
             return $item;
         })->all();
 
-        $value = $this->runHooks('bard-pre-process-validatable', $value);
+        $value = $this->runHooks('pre-process-validatable', $value);
 
         return $value;
     }
@@ -748,5 +748,10 @@ class Bard extends Replicator
     private function unwrapInlineValue($value)
     {
         return $value[0]['content'] ?? [];
+    }
+
+    public function runAugmentHooks($value)
+    {
+        return $this->runHooks('augment', $value);
     }
 }
