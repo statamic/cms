@@ -16,10 +16,11 @@ use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 
 class Bard extends Replicator
 {
-    use Concerns\ResolvesStatamicUrls;
+    use Concerns\ResolvesStatamicUrls, Hookable;
 
     protected $categories = ['text', 'structured'];
     protected $defaultValue = '[]';
@@ -273,7 +274,7 @@ class Bard extends Replicator
             return $this->processRow($row, $index);
         })->all();
 
-        $structure = $this->callExtensions('process', $structure);
+        $structure = $this->runHooks('bard-process', $structure);
 
         if ($this->shouldSaveHtml()) {
             return (new Augmentor($this))->withStatamicImageUrls()->convertToHtml($structure);
@@ -395,7 +396,7 @@ class Bard extends Replicator
             return $this->preProcessRow($row, $i);
         })->all();
 
-        $value = $this->callExtensions('preProcess', $value);
+        $value = $this->runHooks('bard-pre-process', $value);
 
         return json_encode($value);
     }
@@ -430,7 +431,7 @@ class Bard extends Replicator
             return $value['type'] === 'set';
         })->values()->all();
 
-        $data = $this->callExtensions('preProcessIndex', $data);
+        $data = $this->runHooks('bard-pre-process-index', $data);
 
         return (new Augmentor($this))->renderProsemirrorToHtml([
             'type' => 'doc',
@@ -456,7 +457,7 @@ class Bard extends Replicator
             }, collect())->all();
         }
 
-        $rules = $this->callExtensions('extraRules', $rules, $value);
+        $rules = $this->runHooks('bard-extra-rules', $rules);
 
         return $rules;
     }
@@ -484,7 +485,7 @@ class Bard extends Replicator
             }, collect())->all();
         }
 
-        $attributes = $this->callExtensions('extraValidationAttributes', $attributes, $value);
+        $attributes = $this->runHooks('bard-extra-validation-attributes', $attributes);
 
         return $attributes;
     }
@@ -604,7 +605,7 @@ class Bard extends Replicator
             'linkData' => (object) $this->getLinkData($value),
         ];
 
-        $data = $this->callExtensions('preload', $data, $value);
+        $data = $this->runHooks('bard-preload', $data);
 
         return $data;
     }
@@ -635,7 +636,7 @@ class Bard extends Replicator
             return $item;
         })->all();
 
-        $value = $this->callExtensions('preProcessValidatable', $value);
+        $value = $this->runHooks('bard-pre-process-validatable', $value);
 
         return $value;
     }
