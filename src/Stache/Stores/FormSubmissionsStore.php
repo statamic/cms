@@ -17,6 +17,7 @@ class FormSubmissionsStore extends ChildStore
     protected $valueIndex = Value::class;
     protected $storeIndexes = [
         'form',
+        'date',
     ];
 
     public function getItemKey($item)
