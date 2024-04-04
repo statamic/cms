@@ -15,7 +15,7 @@ class CheckMultisite
             return $next($request);
         }
 
-        throw_if(Site::hasMultiple(), new StatamicProRequiredException('Statamic Pro is required to use multiple sites.'));
+        throw new StatamicProRequiredException('Statamic Pro is required to use multiple sites.');
 
         return $next($request);
     }
