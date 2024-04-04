@@ -8,7 +8,7 @@ class Blink
 
     public function store($name = 'default')
     {
-        return $this->stores[$name] = $this->stores[$name] ?? new BlinkWrapper();
+        return $this->stores[$name] = $this->stores[$name] ?? new BlinkStore();
     }
 
     public function __call($method, $args)
