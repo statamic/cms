@@ -152,8 +152,6 @@ class Multisite extends Command
 
         File::put($configPath, $contents);
 
-        Config::set('statamic.system.multisite', true);
-
         $this->checkLine('Multisite enabled.');
 
         return true;
@@ -209,6 +207,8 @@ class Multisite extends Command
 
     private function moveCollectionContent($collection): void
     {
+        Config::set('statamic.system.multisite', false);
+
         $handle = $collection->handle();
 
         $base = "content/collections/{$handle}";
@@ -239,6 +239,8 @@ class Multisite extends Command
 
     private function convertGlobalSets(): self
     {
+        Config::set('statamic.system.multisite', true);
+
         GlobalSet::all()->each(function ($set) {
             $this->moveGlobalSet($set);
             $this->checkLine("Global [<comment>{$set->handle()}</comment>] updated.");
@@ -260,6 +262,8 @@ class Multisite extends Command
 
     private function convertNavs(): self
     {
+        Config::set('statamic.system.multisite', true);
+
         Nav::all()->each(function ($nav) {
             $this->moveNav($nav);
             $this->checkLine("Nav [<comment>{$nav->handle()}</comment>] updated.");
