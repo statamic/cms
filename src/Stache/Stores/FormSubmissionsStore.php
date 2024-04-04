@@ -12,7 +12,7 @@ use Statamic\Support\Str;
 use Statamic\Yaml\ParseException;
 use Symfony\Component\Finder\SplFileInfo;
 
-class FormSubmissionStore extends ChildStore
+class FormSubmissionsStore extends ChildStore
 {
     protected $valueIndex = Value::class;
     protected $storeIndexes = [

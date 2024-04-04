@@ -6,7 +6,7 @@ use Statamic\Facades\Form;
 
 class SubmissionsStore extends AggregateStore
 {
-    protected $childStore = FormSubmissionStore::class;
+    protected $childStore = FormSubmissionsStore::class;
 
     public function key()
     {
