@@ -27,7 +27,10 @@ class MigrateSitesConfigToYaml extends UpdateScript
 
         // They'll need to manually migrate if there was a problem getting their sites config
         if (! $sites = $this->migrateSites($configPath)) {
-            return $this->outputMigrationError();
+            $this->console->error('There was an error migrating your [config/statamic/sites.php]!');
+            $this->console->line('See upgrade guide to learn more: https://statamic.dev/upgrade-guide');
+
+            return;
         }
 
         $this
@@ -83,11 +86,6 @@ class MigrateSitesConfigToYaml extends UpdateScript
         $config = preg_replace('/env\([\'"]APP_URL[\'"]\)/', '\'{{ config:app:url }}\'', $config);
 
         return $config;
-    }
-
-    private function outputMigrationError()
-    {
-        // TODO: Add helpful error output, instructing them how to manually migrate their sites config
     }
 
     private function saveMigratedSitesToYaml($sites)
