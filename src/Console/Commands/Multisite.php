@@ -115,15 +115,15 @@ class Multisite extends Command
 
     private function ensureMultisiteIsEnabled(): bool
     {
-        $contents = File::get($configPath = config_path('statamic/sites.php'));
+        $contents = File::get($configPath = config_path('statamic/system.php'));
 
-        if (str_contains($contents, "'enabled' => true,")) {
+        if (str_contains($contents, "'multisite' => true,")) {
             return true;
-        } elseif (str_contains($contents, "'enabled' => false,")) {
-            $contents = str_replace("'enabled' => false,", "'enabled' => true,", $contents);
+        } elseif (str_contains($contents, "'multisite' => false,")) {
+            $contents = str_replace("'multisite' => false,", "'multisite' => true,", $contents);
         } else {
-            $this->error('Could not reliably enable multisite, please modify your [config/statamic/sites.php] as follows:');
-            $this->line("'enabled' => true,");
+            $this->error('Could not reliably enable multisite, please modify your [config/statamic/system.php] as follows:');
+            $this->line("'multisite' => true,");
 
             return false;
         }
