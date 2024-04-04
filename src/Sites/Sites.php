@@ -123,7 +123,7 @@ class Sites
     {
         $default = [
             'default' => [
-                'name' => config('app.name'),
+                'name' => '{{ config:app:name }}',
                 'url' => '/',
                 'locale' => 'en_US',
             ],
