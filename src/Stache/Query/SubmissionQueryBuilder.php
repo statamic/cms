@@ -87,7 +87,7 @@ class SubmissionQueryBuilder extends Builder implements QueryBuilderContract
             ? Facades\Form::all()->map->handle()
             : $this->forms;
 
-        // First, we'll get the values from each index grouped by collection
+        // First, we'll get the values from each index grouped by form
         $keys = collect($forms)->map(function ($form) {
             $store = $this->store->store($form);
 
@@ -102,7 +102,7 @@ class SubmissionQueryBuilder extends Builder implements QueryBuilderContract
             });
         });
 
-        // Then, we'll merge all the corresponding index values together from each collection.
+        // Then, we'll merge all the corresponding index values together from each form.
         return $keys->reduce(function ($carry, $form) {
             foreach ($form as $sort => $values) {
                 $carry[$sort] = array_merge($carry[$sort] ?? [], $values);
