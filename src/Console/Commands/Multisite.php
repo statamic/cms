@@ -51,8 +51,11 @@ class Multisite extends Command
             ->convertGlobalSets()
             ->convertNavs()
             ->addPermissions()
-            ->clearCache()
-            ->checkInfo('Successfully converted from single to multisite installation!');
+            ->clearCache();
+
+        $this->checkInfo('Successfully converted from single to multisite installation!');
+
+        $this->line(PHP_EOL.'You may now manage your sites in your cp at [/cp/sites].');
     }
 
     private function isFreshRun(): bool
