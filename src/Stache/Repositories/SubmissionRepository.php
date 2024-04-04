@@ -12,8 +12,6 @@ class SubmissionRepository implements RepositoryContract
 {
     protected $stache;
     protected $store;
-    protected $substitutionsById = [];
-    protected $substitutionsByUri = [];
 
     public function __construct(Stache $stache)
     {
