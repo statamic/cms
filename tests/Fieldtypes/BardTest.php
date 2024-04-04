@@ -1225,6 +1225,88 @@ EOT;
         $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
     }
 
+    /** @test */
+    public function it_calls_extension_hooks()
+    {
+        Augmentor::addExtension('customExtension', new class extends Extension
+        {
+            public static $name = 'customExtension';
+
+            public function augment($value)
+            {
+                return array_reverse($value);
+            }
+
+            public function process($value)
+            {
+                return array_reverse($value);
+            }
+
+            public function preProcess($value)
+            {
+                return array_reverse($value);
+            }
+
+            public function preProcessIndex($value)
+            {
+                return array_reverse($value);
+            }
+
+            public function preProcessValidatable($value)
+            {
+                return array_reverse($value);
+            }
+
+            public function preload($data, $value)
+            {
+                return array_merge($data, [
+                    'customData' => 'some custom data',
+                ]);
+            }
+
+            public function extraRules($rules, $value)
+            {
+                return array_merge($rules, [
+                    'custom_field' => ['required'],
+                ]);
+            }
+
+            public function extraValidationAttributes($attributes, $value)
+            {
+                return array_merge($attributes, [
+                    'custom_field' => 'Custom Field',
+                ]);
+            }
+        });
+
+        $bard = $this->bard(['sets' => null]);
+
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'First'],
+                ],
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Second'],
+                ],
+            ],
+        ];
+        $expectedData = array_reverse($data);
+        $expectedHtml = '<p>Second</p><p>First</p>';
+
+        $this->assertEquals($expectedHtml, $bard->augment($data));
+        $this->assertEquals($expectedData, $bard->process(json_encode($data)));
+        $this->assertEquals(json_encode($expectedData), $bard->preProcess($data));
+        $this->assertEquals($expectedHtml, $bard->preProcessIndex($data));
+        $this->assertArrayHasKey('customData', $bard->preload(json_encode($data)));
+        $this->assertArrayHasKey('custom_field', $bard->extraRules(json_encode($data)));
+        $this->assertArrayHasKey('custom_field', $bard->extraValidationAttributes(json_encode($data)));
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
