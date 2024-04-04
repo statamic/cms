@@ -56,14 +56,16 @@ class Multisite extends Command
 
     private function isFreshRun(): bool
     {
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled() && Site::hasMultiple()) {
             $this->error('Already configured for multi-site.');
 
             return false;
         }
 
-        if ($this->commandMayHaveBeenRan()) {
-            $this->error('Command may have already been run. Did you update your [content/sites.yaml] file?');
+        if (Site::multiEnabled() && $this->commandMayHaveBeenRan()) {
+            $site = Site::default()->handle();
+
+            $this->error("Command may have already been run. Site directories for site [{$site}] already exist!");
 
             return false;
         }
