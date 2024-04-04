@@ -9,6 +9,7 @@ use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
@@ -163,6 +164,8 @@ class Multisite extends Command
         }
 
         File::put($configPath, $contents);
+
+        Config::set('statamic.system.multisite', true);
 
         $this->checkLine('Multisite enabled.');
 
