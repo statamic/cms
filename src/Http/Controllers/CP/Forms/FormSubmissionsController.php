@@ -2,8 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\Extensions\Pagination\LengthAwarePaginator;
-use Statamic\Facades\Config;
 use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
@@ -47,17 +45,9 @@ class FormSubmissionsController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $submissions = $query->get();
+        $submissions = $query->paginate(request('perPage'));
 
-        // Paginate submissions.
-        $totalSubmissionCount = $submissions->count();
-        $perPage = request('perPage') ?? Config::get('statamic.cp.pagination_size');
-        $currentPage = (int) $this->request->page ?: 1;
-        $offset = ($currentPage - 1) * $perPage;
-        $submissions = $submissions->slice($offset, $perPage);
-        $paginator = new LengthAwarePaginator($submissions, $totalSubmissionCount, $perPage, $currentPage);
-
-        return (new Submissions($paginator))
+        return (new Submissions($submissions))
             ->blueprint($form->blueprint())
             ->columnPreferenceKey("forms.{$form->handle()}.columns")
             ->additional(['meta' => [
