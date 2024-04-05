@@ -188,12 +188,14 @@ export default {
 
                     this.$toast.success(__('View saved'));
                     this.showCreateModal = false;
+                    this.savingPresetName = null;
                     this.setPreset(presetHandle);
                 })
                 .catch(error => {
                     this.$toast.error(__('Unable to save view'));
                     this.showCreateModal = false;
                     this.showRenameModal = false;
+                    this.savingPresetName = null;
                 });
         },
 
