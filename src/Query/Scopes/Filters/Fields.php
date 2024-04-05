@@ -64,7 +64,7 @@ class Fields extends Filter
 
     public function visibleTo($key)
     {
-        return in_array($key, ['entries', 'entries-fieldtype', 'forms', 'terms', 'users', 'usergroup-users']);
+        return in_array($key, ['entries', 'entries-fieldtype', 'form-submissions', 'terms', 'users', 'usergroup-users']);
     }
 
     protected function getFields()

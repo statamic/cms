@@ -73,11 +73,13 @@ class FormsController extends CpController
             ->rejectUnlisted()
             ->values();
 
-        $viewData = array_merge(compact('form', 'columns'), [
-            'filters' => Scope::filters('forms', [
+        $viewData = [
+            'form' => $form,
+            'columns' => $columns,
+            'filters' => Scope::filters('form-submissions', [
                 'form' => $form->handle(),
             ]),
-        ]);
+        ];
 
         return view('statamic::forms.show', $viewData);
     }
