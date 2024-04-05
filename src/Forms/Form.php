@@ -296,6 +296,11 @@ class Form implements Arrayable, Augmentable, FormContract
         return FormSubmission::whereForm($this->handle());
     }
 
+    public function querySubmissions()
+    {
+        return FormSubmission::query()->where('form', $this->handle());
+    }
+
     /**
      * Get a submission.
      *

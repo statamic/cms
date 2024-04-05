@@ -4,12 +4,11 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Config;
-use Statamic\Facades\FormSubmission;
+use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
-use Statamic\Support\Str;
 
 class FormSubmissionsController extends CpController
 {
@@ -23,18 +22,25 @@ class FormSubmissionsController extends CpController
             return ['data' => [], 'meta' => ['columns' => []]];
         }
 
-        $query = FormSubmission::query()->where('form', $form->handle());
+        $query = $form->querySubmissions();
+
+        if ($search = request('search')) {
+            $query->where('date', 'like', '%'.$search.'%');
+
+            $form->blueprint()->fields()->all()
+                ->filter(function (Field $field): bool {
+                    return in_array($field->type(), ['text', 'textarea', 'integer']);
+                })
+                ->each(function (Field $field) use ($query, $search) {
+                    $query->orWhere($field->handle(), 'like', '%'.$search.'%');
+                });
+        }
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
             'form' => $form->handle(),
         ]);
 
         $submissions = $query->get();
-
-        // Search submissions.
-        if ($search = $this->request->search) {
-            $submissions = $this->searchSubmissions($submissions);
-        }
 
         // Sort submissions.
         $sort = $this->request->sort ?? 'datestamp';
@@ -55,20 +61,6 @@ class FormSubmissionsController extends CpController
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
             ]]);
-    }
-
-    private function searchSubmissions($submissions)
-    {
-        return $submissions->filter(function ($submission) {
-            return collect($submission->data())
-                ->filter(function ($value) {
-                    return $value && is_string($value);
-                })
-                ->filter(function ($value) {
-                    return Str::contains(strtolower($value), strtolower($this->request->search));
-                })
-                ->isNotEmpty();
-        })->values();
     }
 
     private function sortSubmissions($submissions, $sortBy, $sortOrder)
