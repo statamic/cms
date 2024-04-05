@@ -103,6 +103,8 @@ class Augmentor
 
     public function convertToHtml($value)
     {
+        $value = $this->fieldtype->runAugmentHooks($value);
+
         return $this->renderProsemirrorToHtml(['type' => 'doc', 'content' => $value]);
     }
 
