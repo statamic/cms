@@ -29,6 +29,10 @@ trait Hookable
             debugbar()->addMessage($message, 'hooks');
         }
 
+        if ($closures->isEmpty()) {
+            return $payload;
+        }
+
         return (new Pipeline)
             ->send($payload)
             ->through($closures->all())

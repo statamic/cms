@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
@@ -91,6 +92,8 @@ class AppServiceProvider extends ServiceProvider
             return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
+        TrimStrings::skipWhen(fn (Request $request) => $request->is(config('statamic.cp.route').'/*'));
+
         $this->addAboutCommandInfo();
     }
 
@@ -118,6 +121,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Structures\NavigationRepository::class => \Statamic\Stache\Repositories\NavigationRepository::class,
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
             \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
+            \Statamic\Contracts\Forms\SubmissionRepository::class => \Statamic\Stache\Repositories\SubmissionRepository::class,
         ])->each(function ($concrete, $abstract) {
             if (! $this->app->bound($abstract)) {
                 Statamic::repository($abstract, $concrete);
@@ -152,6 +156,7 @@ class AppServiceProvider extends ServiceProvider
 
         collect([
             'entries' => fn () => Facades\Entry::query(),
+            'form-submissions' => fn () => Facades\FormSubmission::query(),
             'terms' => fn () => Facades\Term::query(),
             'assets' => fn () => Facades\Asset::query(),
             'users' => fn () => Facades\User::query(),
@@ -188,7 +193,6 @@ class AppServiceProvider extends ServiceProvider
 
         AboutCommand::add('Statamic', [
             'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
-            'Antlers' => config('statamic.antlers.version'),
             'Addons' => $addons->count(),
             'Stache Watcher' => config('statamic.stache.watcher') ? 'Enabled' : 'Disabled',
             'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',

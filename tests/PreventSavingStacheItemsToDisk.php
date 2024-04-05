@@ -4,6 +4,7 @@ namespace Tests;
 
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
+use Statamic\Support\Str;
 
 trait PreventSavingStacheItemsToDisk
 {
@@ -15,7 +16,7 @@ trait PreventSavingStacheItemsToDisk
 
         Stache::stores()->each(function ($store) {
             $dir = Path::tidy(__DIR__.'/__fixtures__');
-            $relative = str_after(str_after($store->directory(), $dir), '/');
+            $relative = Str::after(Str::after($store->directory(), $dir), '/');
             $store->directory($this->fakeStacheDirectory.'/'.$relative);
         });
     }

@@ -10,6 +10,7 @@ use Statamic\Contracts\Entries\CollectionRepository;
  * @method static null|\Statamic\Entries\Collection find($id)
  * @method static null|\Statamic\Entries\Collection findByHandle($handle)
  * @method static null|\Statamic\Entries\Collection findByMount($mount)
+ * @method static \Statamic\Contracts\Entries\Collection findOrFail($id)
  * @method static \Statamic\Entries\Collection make(string $handle = null)
  * @method static \Illuminate\Support\Collection handles()
  * @method static bool handleExists(string $handle)

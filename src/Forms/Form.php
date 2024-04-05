@@ -3,7 +3,6 @@
 namespace Statamic\Forms;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -18,15 +17,14 @@ use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
-use Statamic\Facades\Folder;
 use Statamic\Facades\Form as FormFacade;
+use Statamic\Facades\FormSubmission;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Forms\Exporters\Exporter;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Yaml\ParseException;
 
 class Form implements Arrayable, Augmentable, FormContract
 {
@@ -295,20 +293,7 @@ class Form implements Arrayable, Augmentable, FormContract
      */
     public function submissions()
     {
-        $path = config('statamic.forms.submissions').'/'.$this->handle();
-
-        return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
-            try {
-                $data = YAML::parse(File::get($file));
-            } catch (ParseException $e) {
-                $data = [];
-                Log::warning('Could not parse form submission file: '.$file);
-            }
-
-            return $this->makeSubmission()
-                ->id(pathinfo($file)['filename'])
-                ->data($data);
-        });
+        return FormSubmission::whereForm($this->handle());
     }
 
     /**
@@ -319,9 +304,7 @@ class Form implements Arrayable, Augmentable, FormContract
      */
     public function submission($id)
     {
-        return $this->submissions()->filter(function ($submission) use ($id) {
-            return $submission->id() === $id;
-        })->first();
+        return FormSubmission::find($id);
     }
 
     /**
@@ -331,7 +314,7 @@ class Form implements Arrayable, Augmentable, FormContract
      */
     public function makeSubmission()
     {
-        $submission = app(Submission::class);
+        $submission = FormSubmission::make();
 
         $submission->form($this);
 
@@ -381,7 +364,7 @@ class Form implements Arrayable, Augmentable, FormContract
     public function hasFiles()
     {
         return $this->fields()->filter(function ($field) {
-            return $field->fieldtype()->handle() === 'assets';
+            return in_array($field->fieldtype()->handle(), ['assets', 'files']);
         })->isNotEmpty();
     }
 

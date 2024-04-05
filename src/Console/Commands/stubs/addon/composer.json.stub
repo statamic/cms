@@ -5,6 +5,23 @@
             "DummyNamespace\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "DummyNamespace\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "statamic/cms": "^5.0"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^6.1",
+        "orchestra/testbench": "^7.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
     "extra": {
         "statamic": {
             "name": "DummyTitle",

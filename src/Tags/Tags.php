@@ -91,8 +91,8 @@ abstract class Tags
         $this->setContent($properties['content']);
         $this->setContext($properties['context']);
         $this->setParameters($properties['params']);
-        $this->tag = array_get($properties, 'tag');
-        $this->method = array_get($properties, 'tag_method');
+        $this->tag = Arr::get($properties, 'tag');
+        $this->method = Arr::get($properties, 'tag_method');
 
         $this->runHooks('init');
     }

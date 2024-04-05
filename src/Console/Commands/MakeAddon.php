@@ -8,6 +8,7 @@ use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
+use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -80,7 +81,8 @@ class MakeAddon extends GeneratorCommand
             $this
                 ->generateAddonFiles()
                 ->installAddon()
-                ->generateOptional();
+                ->generateOptional()
+                ->installComposerDependencies();
         } catch (\Exception $e) {
             $this->error($e->getMessage());
 
@@ -101,8 +103,8 @@ class MakeAddon extends GeneratorCommand
     {
         $parts = explode('/', $this->package);
 
-        $this->vendorSlug = str_slug(snake_case($parts[0]));
-        $this->nameSlug = str_slug(snake_case($parts[1]));
+        $this->vendorSlug = Str::slug(Str::snake($parts[0]));
+        $this->nameSlug = Str::slug(Str::snake($parts[1]));
         $this->package = "{$this->vendorSlug}/{$this->nameSlug}";
     }
 
@@ -137,8 +139,11 @@ class MakeAddon extends GeneratorCommand
 
         $files = [
             'addon/provider.php.stub' => 'src/ServiceProvider.php',
+            'addon/TestCase.php.stub' => 'tests/TestCase.php',
+            'addon/ExampleTest.php.stub' => 'tests/ExampleTest.php',
             'addon/.gitignore.stub' => '.gitignore',
             'addon/README.md.stub' => 'README.md',
+            'addon/phpunit.xml.stub' => 'phpunit.xml',
         ];
 
         $data = [
@@ -150,6 +155,7 @@ class MakeAddon extends GeneratorCommand
         foreach ($files as $stub => $file) {
             $this->createFromStub($stub, $this->addonPath($file), $data);
         }
+
         $this->checkInfo('Addon boilerplate created successfully.');
 
         return $this;
@@ -179,6 +185,30 @@ class MakeAddon extends GeneratorCommand
         });
 
         $this->checkInfo('Additional components created successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Installs the addon's composer dependencies.
+     *
+     * @return $this
+     */
+    protected function installComposerDependencies()
+    {
+        $this->output->newLine();
+
+        $this->line("Installing your addon's Composer dependencies. This may take a moment...");
+
+        try {
+            Composer::withoutQueue()->throwOnFailure()->install($this->addonPath());
+        } catch (ProcessException $exception) {
+            $this->line($exception->getMessage());
+            $this->output->newLine();
+            throw new \Exception("An error was encountered while installing your addon's Composer dependencies!");
+        }
+
+        $this->checkInfo('Composer dependencies installed successfully.');
 
         return $this;
     }
@@ -239,7 +269,7 @@ class MakeAddon extends GeneratorCommand
     {
         $prefix = $this->runningInPlease ? '' : 'statamic:';
 
-        $name = studly_case($this->nameSlug);
+        $name = Str::studly($this->nameSlug);
 
         // Prevent conflicts when also creating a scope, since they're in the same directory.
         if ($type === 'filter') {
@@ -293,7 +323,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function addonNamespace()
     {
-        return studly_case($this->vendorSlug).'\\'.studly_case($this->nameSlug);
+        return Str::studly($this->vendorSlug).'\\'.Str::studly($this->nameSlug);
     }
 
     /**
@@ -303,7 +333,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function addonTitle()
     {
-        return str_replace('-', ' ', title_case($this->nameSlug));
+        return str_replace('-', ' ', Str::title($this->nameSlug));
     }
 
     /**
