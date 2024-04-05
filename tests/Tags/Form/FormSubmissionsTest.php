@@ -7,8 +7,6 @@ class FormSubmissionsTest extends FormTestCase
     /** @test */
     public function it_renders_submissions()
     {
-        $this->resetSubmissionStache();
-
         $this
             ->post('/!/forms/contact', [
                 'email' => 'san@holo.com',

@@ -557,8 +557,6 @@ EOT
     /** @test */
     public function it_wont_submit_form_and_renders_errors()
     {
-        $this->resetSubmissionStache();
-
         $this->assertEmpty(Form::find('contact')->submissions());
 
         $this
@@ -600,8 +598,6 @@ EOT
     /** @test */
     public function it_will_submit_form_and_render_success()
     {
-        $this->resetSubmissionStache();
-
         $this->assertEmpty(Form::find('contact')->submissions());
 
         $this
@@ -634,8 +630,6 @@ EOT
     /** @test */
     public function it_will_submit_form_and_follow_custom_redirect_with_success()
     {
-        $this->resetSubmissionStache();
-
         $this->assertEmpty(Form::find('contact')->submissions());
 
         $this
