@@ -10,7 +10,7 @@ trait HasOrigin
      * @var string
      */
     protected $origin;
-    private $cachedKeys;
+    protected $cachedKeys;
 
     public function keys()
     {
