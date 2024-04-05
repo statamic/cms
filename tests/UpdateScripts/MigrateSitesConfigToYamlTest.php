@@ -298,7 +298,7 @@ return [
         'arabic' => [
             'name' => 'Arabic',
             'url' => '/ar/',
-            'locale' => 'ar_AR',
+            'locale' => 'ar_SA',
             'direction' => 'rtl',
         ],
     ],
@@ -318,7 +318,7 @@ CONFIG);
             'arabic' => [
                 'name' => 'Arabic',
                 'url' => '/ar/',
-                'locale' => 'ar_AR',
+                'locale' => 'ar_SA',
             ],
         ]);
     }
