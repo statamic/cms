@@ -1285,8 +1285,6 @@ EOT;
         $this->assertArrayHasKey('customData', $bard->preload(json_encode($data)));
         $this->assertArrayHasKey('custom_field', $bard->extraRules(json_encode($data)));
         $this->assertArrayHasKey('custom_field', $bard->extraValidationAttributes(json_encode($data)));
-
-        Bard::clearHooks();
     }
 
     private function bard($config = [])
