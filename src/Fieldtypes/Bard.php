@@ -457,9 +457,7 @@ class Bard extends Replicator
             }, collect())->all();
         }
 
-        $rules = $this->runHooks('extra-rules', $rules);
-
-        return $rules;
+        return $this->runHooks('extra-rules', $rules);
     }
 
     protected function setRuleFieldPrefix($index)
@@ -485,9 +483,7 @@ class Bard extends Replicator
             }, collect())->all();
         }
 
-        $attributes = $this->runHooks('extra-validation-attributes', $attributes);
-
-        return $attributes;
+        return $this->runHooks('extra-validation-attributes', $attributes);
     }
 
     public function isLegacyData($value)
@@ -605,9 +601,7 @@ class Bard extends Replicator
             'linkData' => (object) $this->getLinkData($value),
         ];
 
-        $data = $this->runHooks('preload', $data);
-
-        return $data;
+        return $this->runHooks('preload', $data);
     }
 
     public function preProcessValidatable($value)
@@ -636,9 +630,7 @@ class Bard extends Replicator
             return $item;
         })->all();
 
-        $value = $this->runHooks('pre-process-validatable', $value);
-
-        return $value;
+        return $this->runHooks('pre-process-validatable', $value);
     }
 
     public function toGqlType()
