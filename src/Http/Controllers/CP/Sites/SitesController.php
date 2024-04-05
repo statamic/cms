@@ -15,13 +15,11 @@ class SitesController extends CpController
 
     public function edit()
     {
-        $data = Site::publishFormValues();
-
         $blueprint = Site::blueprint();
 
         $fields = $blueprint
             ->fields()
-            ->addValues($data)
+            ->addValues($this->values())
             ->preProcess();
 
         return view('statamic::sites.configure', [
@@ -29,6 +27,20 @@ class SitesController extends CpController
             'values' => $fields->values(),
             'meta' => $fields->meta(),
         ]);
+    }
+
+    private function values(): array
+    {
+        $sites = collect(Site::config())
+            ->map(fn ($site, $handle) => array_merge(['handle' => $handle], $site))
+            ->values()
+            ->all();
+
+        if (! Site::multiEnabled()) {
+            return $sites[0];
+        }
+
+        return ['sites' => $sites];
     }
 
     public function update(Request $request)

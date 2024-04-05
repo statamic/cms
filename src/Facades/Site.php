@@ -23,7 +23,6 @@ use Statamic\Sites\Sites;
  * @method static string path()
  * @method static \Statamic\Fields\Blueprint blueprint()
  * @method static array config()
- * @method static array publishFormValues()
  *
  * @see \Statamic\Sites\Sites
  */

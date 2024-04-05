@@ -227,20 +227,6 @@ class Sites
             ->all();
     }
 
-    public function publishFormValues(): array
-    {
-        $sites = collect($this->config())
-            ->map(fn ($site, $handle) => array_merge(['handle' => $handle], $site))
-            ->values()
-            ->all();
-
-        if (! $this->multiEnabled()) {
-            return $sites[0];
-        }
-
-        return ['sites' => $sites];
-    }
-
     /**
      * Deprecated! This is being replaced by `setSites()` and `setSiteValue()`.
      *
