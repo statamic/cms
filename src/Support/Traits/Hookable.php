@@ -14,6 +14,11 @@ trait Hookable
         static::$hooks[static::class][$name][] = $hook;
     }
 
+    public static function clearHooks()
+    {
+        static::$hooks[static::class] = [];
+    }
+
     protected function runHooks(string $name, $payload = null)
     {
         $closures = collect(
