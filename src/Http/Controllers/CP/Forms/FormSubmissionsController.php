@@ -20,19 +20,7 @@ class FormSubmissionsController extends CpController
             return ['data' => [], 'meta' => ['columns' => []]];
         }
 
-        $query = $form->querySubmissions();
-
-        if ($search = request('search')) {
-            $query->where('date', 'like', '%'.$search.'%');
-
-            $form->blueprint()->fields()->all()
-                ->filter(function (Field $field): bool {
-                    return in_array($field->type(), ['text', 'textarea', 'integer']);
-                })
-                ->each(function (Field $field) use ($query, $search): void {
-                    $query->orWhere($field->handle(), 'like', '%'.$search.'%');
-                });
-        }
+        $query = $this->indexQuery($form);
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
             'form' => $form->handle(),
@@ -53,6 +41,25 @@ class FormSubmissionsController extends CpController
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
             ]]);
+    }
+
+    protected function indexQuery($form)
+    {
+        $query = $form->querySubmissions();
+
+        if ($search = request('search')) {
+            $query->where('date', 'like', '%'.$search.'%');
+
+            $form->blueprint()->fields()->all()
+                ->filter(function (Field $field): bool {
+                    return in_array($field->type(), ['text', 'textarea', 'integer']);
+                })
+                ->each(function (Field $field) use ($query, $search): void {
+                    $query->orWhere($field->handle(), 'like', '%'.$search.'%');
+                });
+        }
+
+        return $query;
     }
 
     public function destroy($form, $id)
