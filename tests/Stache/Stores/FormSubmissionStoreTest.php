@@ -19,9 +19,6 @@ class FormSubmissionStoreTest extends TestCase
     {
         parent::setUp();
 
-        $app = app();
-        $app['config']->set('statamic.forms.submissions', __DIR__.'/../__fixtures__/content/submissions');
-
         $this->parent = (new SubmissionsStore)->directory(
             $this->directory = Path::tidy(__DIR__.'/../__fixtures__/content/submissions')
         );
