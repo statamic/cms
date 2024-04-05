@@ -154,6 +154,7 @@ return [
     |
     */
 
+    'arr_fieldtype' => 'This is invalid.',
     'code_fieldtype_rulers' => 'This is invalid.',
     'date_fieldtype_date_required' => 'Date is required.',
     'date_fieldtype_end_date_invalid' => 'Not a valid end date.',
