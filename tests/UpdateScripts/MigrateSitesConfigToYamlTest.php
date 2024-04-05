@@ -281,6 +281,48 @@ return [
 CONFIG, File::get(config_path('statamic/system.php')));
     }
 
+    /** @test */
+    public function it_removes_text_direction_since_this_no_longer_does_anything_in_sites_yaml()
+    {
+        File::put(config_path('statamic/sites.php'), <<<'CONFIG'
+<?php
+
+return [
+    'sites' => [
+        'english' => [
+            'name' => 'English',
+            'url' => '/',
+            'locale' => 'en_US',
+            'direction' => 'ltr',
+        ],
+        'arabic' => [
+            'name' => 'Arabic',
+            'url' => '/ar/',
+            'locale' => 'ar_AR',
+            'direction' => 'rtl',
+        ],
+    ],
+];
+CONFIG);
+
+        $this->migrateSitesConfig();
+
+        $this->assertMultisiteEnabledConfigIs(true);
+
+        $this->assertSitesYamlHas([
+            'english' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+            ],
+            'arabic' => [
+                'name' => 'Arabic',
+                'url' => '/ar/',
+                'locale' => 'ar_AR',
+            ],
+        ]);
+    }
+
     private function migrateSitesConfig()
     {
         $this->runUpdateScript(MigrateSitesConfigToYaml::class);

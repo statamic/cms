@@ -60,8 +60,15 @@ class MigrateSitesConfigToYaml extends UpdateScript
         // Delete tmp file
         File::delete($tmpPath);
 
-        // Just return `sites` config
-        return Arr::get($migratedConfig, 'sites');
+        // Get `sites` config
+        $config = Arr::get($migratedConfig, 'sites');
+
+        // Remove `direction` keys
+        $config = collect($config)
+            ->transform(fn ($siteConfig) => Arr::except($siteConfig, ['direction']))
+            ->all();
+
+        return $config;
     }
 
     private function replaceConfigFuncCalls(string $config): string
