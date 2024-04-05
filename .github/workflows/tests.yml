@@ -124,6 +124,14 @@ jobs:
           echo "result=true" >> $GITHUB_OUTPUT
           echo "result=true" >> $env:GITHUB_OUTPUT
 
+      - name: Use Node.js 16.13.0
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.13.0
+
+      - name: Install required npm version
+        run: npm -g install npm@8.5.5
+
       - name: Install dependencies
         if: steps.should-run-tests.outputs.result == 'true'
         run: npm ci
