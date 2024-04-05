@@ -55,7 +55,7 @@
     "fuse.js": "^3.4.6",
     "highlight.js": "^11.7.0",
     "imask": "^6.6.0-alpha.0",
-    "laravel-echo": "^1.6.1",
+    "laravel-echo": "^1.16.0",
     "lowlight": "^2.8.1",
     "marked": "^4.0.10",
     "marked-plaintext": "0.0.2",
