@@ -167,7 +167,7 @@ class EntryRepository implements RepositoryContract
     public function substitute($item)
     {
         $this->substitutionsById[$item->id()] = $item;
-        $this->substitutionsByUri[$item->locale() . '@' . $item->uri()] = $item;
+        $this->substitutionsByUri[$item->locale().'@'.$item->uri()] = $item;
     }
 
     public function applySubstitutions($items)
