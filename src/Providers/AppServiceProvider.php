@@ -103,6 +103,8 @@ class AppServiceProvider extends ServiceProvider
             $this->mergeConfigFrom("{$this->root}/config/$config.php", "statamic.$config");
         });
 
+        $this->app->singleton(Sites::class);
+
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
             \Statamic\Contracts\Taxonomies\TermRepository::class => \Statamic\Stache\Repositories\TermRepository::class,
