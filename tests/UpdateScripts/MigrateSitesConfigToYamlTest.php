@@ -18,6 +18,7 @@ class MigrateSitesConfigToYamlTest extends TestCase
         parent::setUp();
 
         // Start with v4 system config, since most people will have that published
+        File::makeDirectory(config_path('statamic'), 0755, true);
         File::copy(__DIR__.'/__fixtures__/v4/config/system.php', config_path('statamic/system.php'));
 
         // Delete default sites.yaml, since base test copies one in
@@ -27,7 +28,7 @@ class MigrateSitesConfigToYamlTest extends TestCase
     public function tearDown(): void
     {
         // Put back the current system config for other tests
-        File::copy(__DIR__.'/../../config/system.php', config_path('statamic/system.php'));
+        File::delete(config_path('statamic/system.php'));
 
         parent::tearDown();
     }
