@@ -150,39 +150,45 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return $data;
     }
 
-    public function firstOrCreate(array $attributes = [], array $values = [])
+    public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (!is_null($instance = (clone $this)->where($attributes)->first())) {
+        if (! is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
-        return $this->createOrFirst($attributes, $values);
+        /** @var \Statamic\Entries\Entry */
+        $entry = Entry::make();
+        $data = array_merge($attributes, $values);
+        $entry->collection($this->collections[0] ?? $data['collection'] ?? null);
+        $entry->slug($data['slug'] ?? null);
+        $entry->merge($data);
+
+        return $entry;
     }
 
-    public function createOrFirst(array $attributes = [], array $values = [])
+    public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        try {
-            $entry = Entry::make();
-            if (!isset($attributes['collection']) && empty($this->collections)) {
-                return null;
-            }
+        $entry = $this->firstOrNew($attributes, $values);
 
-            $entry->collection($attributes['collection'] ?? $this->collections[0] ?? null);
-
-            $entry->data($attributes)->merge($values);
+        // If the entry is dirty, then it's new and needs to be saved
+        if ($entry->isDirty()) {
             $entry->save();
-            return $entry;
-        } catch (\Exception $e) {
-            return $this->where($attributes)->first();
         }
+
+        return $entry;
     }
 
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
-            if (!$instance->wasRecentlyCreated) {
-                $instance->merge($values)->save();
-            }
-        });
+        $entry = $this->firstOrNew($attributes, $values);
+
+        // If the entry is not dirty, then it already exists and this is an update
+        if (! $entry->isDirty()) {
+            $entry->merge($values);
+        }
+
+        $entry->save();
+
+        return $entry;
     }
 }

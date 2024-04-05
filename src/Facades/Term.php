@@ -18,6 +18,9 @@ use Statamic\Taxonomies\TermCollection;
  * @method static delete($term)
  * @method static TermQueryBuilder query()
  * @method static TermContract make(string $slug = null)
+ * @method static TermContract firstOrNew(array $attributes, array $values)
+ * @method static TermContract firstOrCreate(array $attributes, array $values)
+ * @method static TermContract updateOrCreate(array $attributes, array $values)
  * @method static int entriesCount(Term $term)
  *
  * @see \Statamic\Contracts\Taxonomies\TermRepository

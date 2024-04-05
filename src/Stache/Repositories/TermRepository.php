@@ -138,6 +138,21 @@ class TermRepository implements RepositoryContract
         return app(Term::class)->slug($slug);
     }
 
+    public function firstOrNew(array $attributes, array $values = [])
+    {
+        return $this->query()->firstOrNew($attributes, $values);
+    }
+
+    public function firstOrCreate(array $attributes, array $values = [])
+    {
+        return $this->query()->firstOrCreate($attributes, $values);
+    }
+
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        return $this->query()->updateOrCreate($attributes, $values);
+    }
+
     public function entriesCount(Term $term): int
     {
         $items = $this->store->store($term->taxonomyHandle())

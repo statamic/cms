@@ -116,14 +116,14 @@ class EntryRepository implements RepositoryContract
         return app(Entry::class);
     }
 
+    public function firstOrNew(array $attributes = [], array $values = [])
+    {
+        return $this->query()->firstOrNew($attributes, $values);
+    }
+
     public function firstOrCreate(array $attributes, array $values = [])
     {
         return $this->query()->firstOrCreate($attributes, $values);
-    }
-
-    public function createOrFirst(array $attributes, array $values = [])
-    {
-        return $this->query()->createOrFirst($attributes, $values);
     }
 
     public function updateOrCreate(array $attributes, array $values = [])
@@ -167,7 +167,7 @@ class EntryRepository implements RepositoryContract
     public function substitute($item)
     {
         $this->substitutionsById[$item->id()] = $item;
-        $this->substitutionsByUri[$item->locale().'@'.$item->uri()] = $item;
+        $this->substitutionsByUri[$item->locale() . '@' . $item->uri()] = $item;
     }
 
     public function applySubstitutions($items)

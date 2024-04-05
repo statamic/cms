@@ -4,7 +4,9 @@ namespace Statamic\Stache\Query;
 
 use Statamic\Facades;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Term;
 use Statamic\Support\Arr;
+use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
 
 class TermQueryBuilder extends Builder
@@ -201,5 +203,47 @@ class TermQueryBuilder extends Builder
         }
 
         return $data;
+    }
+
+    public function firstOrNew(array $attributes = [], array $values = [])
+    {
+        if (! is_null($instance = $this->where($attributes)->first())) {
+            return $instance;
+        }
+
+        /** @var \Statamic\Taxonomies\LocalizedTerm */
+        $term = Term::make();
+        $data = array_merge($attributes, $values);
+        $term->taxonomy($this->taxonomies[0] ?? $data['taxonomy'] ?? null);
+        $term->slug($data['slug'] ?? null);
+        $term->merge($data);
+
+        return $term;
+    }
+
+    public function firstOrCreate(array $attributes = [], array $values = [])
+    {
+        $term = $this->firstOrNew($attributes, $values);
+
+        // If the term does not exist then it needs to be saved
+        if (! ($term instanceof LocalizedTerm)) {
+            $term->save();
+        }
+
+        return $term;
+    }
+
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        $term = $this->firstOrNew($attributes, $values);
+
+        // If the term already exists and the values need to be updated
+        if ($term instanceof LocalizedTerm) {
+            $term->merge($values);
+        }
+
+        $term->save();
+
+        return $term;
     }
 }

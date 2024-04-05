@@ -805,40 +805,64 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     /** @test */
-    public function entries_can_be_found_or_created_or_updated()
+    public function entries_can_be_found_made_created_or_updated()
     {
-        $this->createDummyCollectionAndEntries();
+        Collection::make('posts')->save();
 
-        // Create new entry
+        // Make a new entry without saving it
+        $entry = Entry::query()
+            ->where('collection', 'posts')
+            ->firstOrNew(
+                ['slug' => 'new-post-1'],
+                ['title' => 'New Post 1'],
+            );
+        $this->assertEquals('posts', $entry->collectionHandle());
+        $this->assertEquals('new-post-1', $entry->slug());
+        $this->assertEquals('New Post 1', $entry->get('title'));
+        $this->assertNull($entry->id());
+
+        // Create a new entry with id 'new-post-1'
         $entry = Entry::query()
             ->where('collection', 'posts')
             ->firstOrCreate(
-                ['id' => 'id-1'],
-                ['title' => 'Post 1'],
+                ['slug' => 'new-post-1'],
+                ['title' => 'New Post 1'],
             );
-        $this->assertEquals('Post 1', $entry->title);
+        $this->assertEquals('posts', $entry->collectionHandle());
+        $this->assertEquals('new-post-1', $entry->slug);
+        $this->assertEquals('New Post 1', $entry->title);
+        $this->assertNotNull($entry->id());
 
-        // Get the first entry if it already exists
+        // Get the first entry with id 'new-post-1'
         $entry = Entry::query()
             ->where('collection', 'posts')
             ->firstOrCreate(
-                ['id' => 'id-1'],
-                ['title' => 'Post 2'],
+                ['slug' => 'new-post-1'],
+                ['title' => 'New Post 1 - Not Created'],
             );
-        $this->assertEquals('Post 1', $entry->title);
+        $this->assertEquals('posts', $entry->collectionHandle());
+        $this->assertEquals('new-post-1', $entry->slug);
+        $this->assertNotEquals('New Post 1 - Not Created', $entry->title);
+        $this->assertNotNull($entry->id());
 
-        // Create new entry
+        // Create a new entry with id 'new-post-2'
         $entry = Entry::updateOrCreate(
-            ['id' => 'id-2', 'collection' => 'posts'],
-            ['title' => 'Post 2'],
+            ['collection' => 'posts', 'slug' => 'new-post-2'],
+            ['title' => 'New Post 2'],
         );
-        $this->assertEquals('Post 2', $entry->title);
+        $this->assertEquals('posts', $entry->collectionHandle());
+        $this->assertEquals('new-post-2', $entry->slug);
+        $this->assertEquals('New Post 2', $entry->title);
+        $this->assertNotNull($entry->id());
 
-        // Only update the entry if it already exists
+        // Update the entry with id 'new-post-2'
         $entry = Entry::updateOrCreate(
-            ['id' => 'id-1', 'collection' => 'posts'],
-            ['title' => 'Post 1 - Updated'],
+            ['collection' => 'posts', 'slug' => 'new-post-2'],
+            ['title' => 'New Post 2 - Updated'],
         );
-        $this->assertEquals('Post 1 - Updated', $entry->title);
+        $this->assertEquals('posts', $entry->collectionHandle());
+        $this->assertEquals('new-post-2', $entry->slug);
+        $this->assertEquals('New Post 2 - Updated', $entry->title);
+        $this->assertNotNull($entry->id());
     }
 }
