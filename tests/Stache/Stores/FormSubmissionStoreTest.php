@@ -2,6 +2,8 @@
 
 namespace Tests\Stache\Stores;
 
+use Illuminate\Support\Carbon;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
@@ -27,6 +29,21 @@ class FormSubmissionStoreTest extends TestCase
         Stache::registerStore($this->parent);
 
         Stache::store('form-submissions')->directory($this->directory);
+    }
+
+    /** @test */
+    public function it_makes_entry_instances_from_files()
+    {
+        $item = $this->parent->store('contact_form')->makeItemFromFile(
+            Path::tidy($this->directory).'/contact_form/1631083591.2832.yaml',
+            "name: John Smith\nmessage: Hello"
+        );
+
+        $this->assertInstanceOf(Submission::class, $item);
+        $this->assertEquals('1631083591.2832', $item->id());
+        $this->assertEquals('John Smith', $item->get('name'));
+        $this->assertEquals(['name' => 'John Smith', 'message' => 'Hello'], $item->data()->all());
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i:s', '2021-09-08 06:46:31')->eq($item->date()->startOfSecond()));
     }
 
     /** @test */
