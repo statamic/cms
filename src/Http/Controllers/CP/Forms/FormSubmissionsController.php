@@ -40,12 +40,14 @@ class FormSubmissionsController extends CpController
             'form' => $form->handle(),
         ]);
 
-        $submissions = $query->get();
+        $sortField = request('sort', 'date');
+        $sortDirection = request('order', $sortField === 'date' ? 'desc' : 'asc');
 
-        // Sort submissions.
-        $sort = $this->request->sort ?? 'datestamp';
-        $order = $this->request->order ?? ($sort === 'datestamp' ? 'desc' : 'asc');
-        $submissions = $this->sortSubmissions($submissions, $sort, $order);
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $submissions = $query->get();
 
         // Paginate submissions.
         $totalSubmissionCount = $submissions->count();
@@ -61,15 +63,6 @@ class FormSubmissionsController extends CpController
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
             ]]);
-    }
-
-    private function sortSubmissions($submissions, $sortBy, $sortOrder)
-    {
-        return $submissions->sortBy(function ($submission) use ($sortBy) {
-            return $sortBy === 'datestamp'
-                ? $submission->date()->timestamp
-                : $submission->get($sortBy);
-        }, null, $sortOrder === 'desc')->values();
     }
 
     public function destroy($form, $id)
