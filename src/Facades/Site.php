@@ -21,7 +21,7 @@ use Statamic\Sites\Sites;
  * @method static self setSites($sites)
  * @method static self setSiteValue(string $site, string $key, $value)
  * @method static string path()
- * @method static mixed blueprint()
+ * @method static \Statamic\Fields\Blueprint blueprint()
  * @method static array config()
  * @method static array publishFormValues()
  *
