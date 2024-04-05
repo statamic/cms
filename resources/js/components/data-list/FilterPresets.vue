@@ -50,7 +50,7 @@
             @cancel="showRenameModal = false"
             @confirm="savePreset(savingPresetSlug)"
         >
-            <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset()" />
+            <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset(savingPresetSlug)" />
 
             <div v-if="Object.keys(presets).filter(preset => preset !== activePreset).includes(savingPresetSlug)">
                 <small class="help-block text-red-500 mt-2 mb-0" v-text="__('messages.filters_view_already_exists')"></small>
