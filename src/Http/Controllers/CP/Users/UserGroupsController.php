@@ -74,7 +74,11 @@ class UserGroupsController extends CpController
 
         $fields = $blueprint
             ->fields()
-            ->addValues($group->data()->merge(['handle' => $group->handle()])->all())
+            ->addValues($group->data()->merge([
+                'title' => $group->title(),
+                'handle' => $group->handle(),
+                'roles' => $group->roles()->map->handle()->values()->all(),
+            ])->all())
             ->preProcess();
 
         $viewData = [

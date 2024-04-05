@@ -4,7 +4,7 @@ namespace Statamic\Entries;
 
 use Statamic\Events\CollectionTreeSaved;
 
-class UpdateStructuredEntryOrder
+class UpdateStructuredEntryOrderAndParent
 {
     public function handle(CollectionTreeSaved $event)
     {
@@ -19,5 +19,6 @@ class UpdateStructuredEntryOrder
         }
 
         $collection->updateEntryOrder($ids);
+        $collection->updateEntryParent($ids);
     }
 }

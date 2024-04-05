@@ -2,31 +2,45 @@
 
 namespace Statamic\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 use Statamic\Facades\OAuth;
+use Statamic\Support\Str;
 
 class OAuthController
 {
-    public function redirectToProvider($provider)
+    public function redirectToProvider(Request $request, string $provider)
     {
+        $referer = $request->headers->get('referer');
+        $guard = config('statamic.users.guards.web', 'web');
+
+        if (Str::startsWith(parse_url($referer)['path'], Str::ensureLeft(config('statamic.cp.route'), '/'))) {
+            $guard = config('statamic.users.guards.cp', 'web');
+        }
+
+        $request->session()->put('statamic.oauth.guard', $guard);
+
         return Socialite::driver($provider)->redirect();
     }
 
-    public function handleProviderCallback($provider)
+    public function handleProviderCallback(Request $request, string $provider)
     {
+        $oauth = OAuth::provider($provider);
+
         try {
-            $providerUser = Socialite::driver($provider)->user();
+            $providerUser = $oauth->getSocialiteUser();
         } catch (InvalidStateException $e) {
             return $this->redirectToProvider($provider);
         }
 
-        $user = OAuth::provider($provider)->findOrCreateUser($providerUser);
+        $user = $oauth->findOrCreateUser($providerUser);
 
         session()->put('oauth-provider', $provider);
 
-        Auth::login($user, config('statamic.oauth.remember_me', true));
+        Auth::guard($request->session()->get('statamic.oauth.guard'))
+            ->login($user, config('statamic.oauth.remember_me', true));
 
         return redirect()->to($this->successRedirectUrl());
     }

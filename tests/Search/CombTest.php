@@ -222,7 +222,33 @@ EOT;
         $this->assertSame(1, $result['info']['total_results']);
     }
 
-    public function searchesProvider()
+    /**
+     * @test
+     **/
+    public function it_can_search_for_slashes()
+    {
+        $comb = new Comb([
+            ['content' => 'Cont\ent'],
+            ['content' => 'Cont/ent'],
+        ]);
+
+        $result = $comb->lookUp('\\');
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame(1, $result['info']['total_results']);
+
+        $result = $comb->lookUp('/');
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame(1, $result['info']['total_results']);
+
+        $result = $comb->lookUp('Cont\\e');
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame(1, $result['info']['total_results']);
+    }
+
+    public static function searchesProvider()
     {
         return [
             'string with single result' => ['jane', ['Jane Doe']],

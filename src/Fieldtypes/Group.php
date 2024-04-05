@@ -2,8 +2,12 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Values;
+use Statamic\GraphQL\Types\GroupType;
+use Statamic\Support\Str;
 
 class Group extends Fieldtype
 {
@@ -108,7 +112,7 @@ class Group extends Fieldtype
     {
         $method = $shallow ? 'shallowAugment' : 'augment';
 
-        return $this->fields()->addValues($value ?? [])->{$method}()->values()->all();
+        return new Values($this->fields()->addValues($value ?? [])->{$method}()->values()->all());
     }
 
     public function preProcessValidatable($value)
@@ -121,5 +125,26 @@ class Group extends Fieldtype
                 ->values()
                 ->all(),
         );
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::type($this->gqlItemTypeName());
+    }
+
+    public function addGqlTypes()
+    {
+        GraphQL::addType(new GroupType($this, $this->gqlItemTypeName()));
+
+        $this->fields()->all()->each(function ($field) {
+            $field->fieldtype()->addGqlTypes();
+        });
+    }
+
+    private function gqlItemTypeName()
+    {
+        return 'Group_'.collect($this->field->handlePath())->map(function ($part) {
+            return Str::studly($part);
+        })->join('_');
     }
 }

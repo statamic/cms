@@ -26,7 +26,7 @@ class FieldTransformer
 
     private static function inlineTabField(array $submitted)
     {
-        $field = Arr::removeNullValues(array_except($submitted['config'], ['isNew']));
+        $field = Arr::removeNullValues(array_except($submitted['config'], ['isNew', 'icon']));
 
         if (Arr::get($field, 'width') === 100) {
             unset($field['width']);

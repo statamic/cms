@@ -16,6 +16,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Debugbar
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify whether the Antlers profiler should be added
+    | to the Laravel Debugbar. This is incredibly useful for finding
+    | performance impacts within any of your Antlers templates.
+    |
+    */
+
+    'debugbar' => env('STATAMIC_ANTLERS_DEBUGBAR', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Guarded Variables
     |--------------------------------------------------------------------------
     |
