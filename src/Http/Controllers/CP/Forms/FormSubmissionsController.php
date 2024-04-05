@@ -2,13 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\Data\DataCollection;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Config;
+use Statamic\Facades\FormSubmission;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
-use Statamic\Query\ItemQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Str;
 
@@ -24,8 +23,7 @@ class FormSubmissionsController extends CpController
             return ['data' => [], 'meta' => ['columns' => []]];
         }
 
-        $query = (new ItemQueryBuilder())
-            ->withItems(new DataCollection($form->submissions()->values()));
+        $query = FormSubmission::query()->where('form', $form->handle());
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
             'form' => $form->handle(),
