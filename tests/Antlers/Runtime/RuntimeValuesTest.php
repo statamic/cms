@@ -27,7 +27,7 @@ class RuntimeValuesTest extends ParserTestCase
         $template = <<<'EOT'
 {{ title }}
 
-{{ %dont_cache:me_please }}{{ foo }}{{ /%dont_cache:me_please }}
+{{ dont_cache:me_please }}{{ foo }}{{ /dont_cache:me_please }}
 EOT;
 
         $instance = (new class extends Tags

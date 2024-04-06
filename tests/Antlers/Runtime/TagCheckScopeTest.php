@@ -146,11 +146,11 @@ EOT;
         })::register();
         $template = <<<'EOT'
 
-{{ %just_a_tag }}
+{{ just_a_tag }}
     {{ replicator_field }}
         {{ partial:inner }}
     {{ /replicator_field }}
-{{ /%just_a_tag }}
+{{ /just_a_tag }}
 EOT;
         $partial = <<<'PARTIAL'
 {{ stuff }}
