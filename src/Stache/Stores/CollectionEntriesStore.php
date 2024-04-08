@@ -6,6 +6,7 @@ use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
 use Statamic\Entries\RemoveSuffixFromPath;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\File;
@@ -94,6 +95,12 @@ class CollectionEntriesStore extends ChildStore
         if ($collection->dated()) {
             $entry->date((new GetDateFromPath)($path));
         }
+
+        // Blink the entry so that it can be used when building the URI. If it's not in there, it would try
+        // to retrieve the entry, which doesn't exist yet. Then build the URI now so that it gets placed
+        // into the property and stored in the cache, and we don't have to repeatedly re-build it.
+        Blink::store('structure-entries')->put($id, $entry);
+        $entry->uri();
 
         if (isset($idGenerated) || isset($positionGenerated)) {
             $this->writeItemToDiskWithoutIncrementing($entry);

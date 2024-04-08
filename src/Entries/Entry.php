@@ -80,6 +80,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $layout;
     private $computedCallbackCache;
     private $siteCache;
+    private $uri;
 
     public function __construct()
     {
@@ -861,15 +862,19 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function uri()
     {
+        if ($this->uri) {
+            return $this->uri;
+        }
+
         if (! $this->route()) {
             return null;
         }
 
         if ($structure = $this->structure()) {
-            return $structure->entryUri($this);
+            return $this->uri = $structure->entryUri($this);
         }
 
-        return $this->routableUri();
+        return $this->uri = $this->routableUri();
     }
 
     public function fileExtension()
