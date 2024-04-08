@@ -1299,12 +1299,12 @@ EOT;
         $expectedHtml = '<p>Second</p><p>First</p>';
 
         $this->assertEquals($expectedHtml, $bard->augment($data));
-        $this->assertEquals($expectedData, $bard->process(json_encode($data)));
-        $this->assertEquals(json_encode($expectedData), $bard->preProcess($data));
+        $this->assertEquals($expectedData, $bard->process($data));
+        $this->assertEquals($expectedData, $bard->preProcess($data));
         $this->assertEquals($expectedHtml, $bard->preProcessIndex($data));
-        $this->assertArrayHasKey('customData', $bard->preload(json_encode($data)));
-        $this->assertArrayHasKey('custom_field', $bard->extraRules(json_encode($data)));
-        $this->assertArrayHasKey('custom_field', $bard->extraValidationAttributes(json_encode($data)));
+        $this->assertArrayHasKey('customData', $bard->preload($data));
+        $this->assertArrayHasKey('custom_field', $bard->extraRules($data));
+        $this->assertArrayHasKey('custom_field', $bard->extraValidationAttributes($data));
     }
 
     private function bard($config = [])
