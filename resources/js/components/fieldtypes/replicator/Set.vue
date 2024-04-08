@@ -8,10 +8,10 @@
                 <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
                     <label class="text-xs whitespace-nowrap rtl:ml-2 ltr:mr-2 cursor-pointer">
-                        <template v-if="setGroup">
+                        <span v-if="setGroup">
                             {{ setGroup.display }}
                             <svg-icon name="micro/chevron-right" class="w-4" />
-                        </template>
+                        </span>
                         {{ display || config.handle }}
                     </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
