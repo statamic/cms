@@ -39,7 +39,7 @@ class MigrateSitesConfigToYaml extends UpdateScript
             ->ensureMultisiteConfigEnabled($sites)
             ->removeOldSitesConfigFile();
 
-        $this->console->success('Successfully migrated [config/statamic/sites.php] to [content/sites.yaml]!');
+        $this->console->info('Successfully migrated [config/statamic/sites.php] to [content/sites.yaml]!');
     }
 
     private function migrateSites($path)
