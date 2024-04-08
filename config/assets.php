@@ -222,4 +222,17 @@ return [
 
     'additional_uploadable_extensions' => [],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Disable SVG Sanitization
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will automatically sanitize uploaded SVG files to avoid potential
+    | security issues. If you trust your users and need to disable this behaviour,
+    | you may do so here.
+    |
+    */
+
+    'disable_svg_sanitization' => false,
+
 ];
