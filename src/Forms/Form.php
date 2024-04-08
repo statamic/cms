@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Contracts\Forms\SubmissionQueryBuilder;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormCreated;
@@ -294,6 +295,11 @@ class Form implements Arrayable, Augmentable, FormContract
     public function submissions()
     {
         return FormSubmission::whereForm($this->handle());
+    }
+
+    public function querySubmissions(): SubmissionQueryBuilder
+    {
+        return FormSubmission::query()->where('form', $this->handle());
     }
 
     /**

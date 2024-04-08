@@ -5,8 +5,8 @@ namespace Statamic\Facades;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
+use Statamic\Contracts\Forms\SubmissionQueryBuilder;
 use Statamic\Contracts\Forms\SubmissionRepository;
-use Statamic\Stache\Query\SubmissionQueryBuilder;
 
 /**
  * @method static Collection all()

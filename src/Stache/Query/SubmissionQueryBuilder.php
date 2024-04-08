@@ -5,6 +5,7 @@ namespace Statamic\Stache\Query;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\SubmissionQueryBuilder as QueryBuilderContract;
 use Statamic\Facades;
+use Statamic\Query\OrderBy;
 
 class SubmissionQueryBuilder extends Builder implements QueryBuilderContract
 {
@@ -30,6 +31,17 @@ class SubmissionQueryBuilder extends Builder implements QueryBuilderContract
         }
 
         return parent::whereIn($column, $values, $boolean);
+    }
+
+    public function orderBy($column, $direction = 'asc')
+    {
+        if ($column === 'datestamp') {
+            $column = 'date';
+        }
+
+        $this->orderBys[] = new OrderBy($column, $direction);
+
+        return $this;
     }
 
     protected function collect($items = [])
