@@ -941,6 +941,19 @@ class CoreModifiers extends Modifier
         return count(array_intersect($haystack, $needle)) > 0;
     }
 
+    /**
+     * Returns false if the array contains $needle, true otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function doesnt_include($haystack, $params, $context)
+    {
+        return ! $this->includes($haystack, $params, $context);
+    }
+
     private function renderAPStyleHeadline($value)
     {
         $exceptions = [
