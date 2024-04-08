@@ -16,10 +16,11 @@ use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 
 class Bard extends Replicator
 {
-    use Concerns\ResolvesStatamicUrls;
+    use Concerns\ResolvesStatamicUrls, Hookable;
 
     protected $categories = ['text', 'structured'];
     protected $defaultValue = [];
@@ -271,6 +272,8 @@ class Bard extends Replicator
             return $this->processRow($row, $index);
         })->all();
 
+        $structure = $this->runHooks('process', $structure);
+
         if ($this->shouldSaveHtml()) {
             return (new Augmentor($this))->withStatamicImageUrls()->convertToHtml($structure);
         }
@@ -383,13 +386,15 @@ class Bard extends Replicator
             }
         }
 
-        return collect($value)->map(function ($row, $i) {
+        $value = collect($value)->map(function ($row, $i) {
             if ($row['type'] !== 'set') {
                 return $row;
             }
 
             return $this->preProcessRow($row, $i);
         })->all();
+
+        return $this->runHooks('pre-process', $value);
     }
 
     protected function preProcessRow($row, $index)
@@ -420,7 +425,9 @@ class Bard extends Replicator
 
         $data = collect($value)->reject(function ($value) {
             return $value['type'] === 'set';
-        })->values();
+        })->values()->all();
+
+        $data = $this->runHooks('pre-process-index', $data);
 
         return (new Augmentor($this))->renderProsemirrorToHtml([
             'type' => 'doc',
@@ -430,19 +437,23 @@ class Bard extends Replicator
 
     public function extraRules(): array
     {
-        if (! $this->config('sets')) {
-            return [];
+        $rules = [];
+
+        $value = $this->field->value();
+
+        if ($this->config('sets')) {
+            $rules = collect($value)->filter(function ($set) {
+                return $set['type'] === 'set';
+            })->map(function ($set, $index) {
+                $set = $set['attrs']['values'];
+
+                return $this->setRules($set['type'], $set, $index);
+            })->reduce(function ($carry, $rules) {
+                return $carry->merge($rules);
+            }, collect())->all();
         }
 
-        return collect($this->field->value())->filter(function ($set) {
-            return $set['type'] === 'set';
-        })->map(function ($set, $index) {
-            $set = $set['attrs']['values'];
-
-            return $this->setRules($set['type'], $set, $index);
-        })->reduce(function ($carry, $rules) {
-            return $carry->merge($rules);
-        }, collect())->all();
+        return $this->runHooks('extra-rules', $rules);
     }
 
     protected function setRuleFieldPrefix($index)
@@ -452,19 +463,23 @@ class Bard extends Replicator
 
     public function extraValidationAttributes(): array
     {
-        if (! $this->config('sets')) {
-            return [];
+        $attributes = [];
+
+        $value = $this->field->value();
+
+        if ($this->config('sets')) {
+            $attributes = collect($value)->filter(function ($set) {
+                return $set['type'] === 'set';
+            })->map(function ($set, $index) {
+                $set = $set['attrs']['values'];
+
+                return $this->setValidationAttributes($set['type'], $set, $index);
+            })->reduce(function ($carry, $rules) {
+                return $carry->merge($rules);
+            }, collect())->all();
         }
 
-        return collect($this->field->value())->filter(function ($set) {
-            return $set['type'] === 'set';
-        })->map(function ($set, $index) {
-            $set = $set['attrs']['values'];
-
-            return $this->setValidationAttributes($set['type'], $set, $index);
-        })->reduce(function ($carry, $rules) {
-            return $carry->merge($rules);
-        }, collect())->all();
+        return $this->runHooks('extra-validation-attributes', $attributes);
     }
 
     public function isLegacyData($value)
@@ -571,7 +586,7 @@ class Bard extends Replicator
             });
         }
 
-        return [
+        $data = [
             'existing' => $existing,
             'new' => $new,
             'defaults' => $defaults,
@@ -581,6 +596,8 @@ class Bard extends Replicator
             'linkCollections' => $linkCollections,
             'linkData' => (object) $this->getLinkData($value),
         ];
+
+        return $this->runHooks('preload', $data);
     }
 
     public function preProcessValidatable($value)
@@ -591,7 +608,7 @@ class Bard extends Replicator
 
         $value = $value ?? [];
 
-        return collect($value)->map(function ($item, $index) {
+        $value = collect($value)->map(function ($item, $index) {
             if ($item['type'] !== 'set') {
                 return $item;
             }
@@ -608,6 +625,8 @@ class Bard extends Replicator
 
             return $item;
         })->all();
+
+        return $this->runHooks('pre-process-validatable', $value);
     }
 
     public function toGqlType()
@@ -717,5 +736,10 @@ class Bard extends Replicator
     private function unwrapInlineValue($value)
     {
         return $value[0]['content'] ?? [];
+    }
+
+    public function runAugmentHooks($value)
+    {
+        return $this->runHooks('augment', $value);
     }
 }
