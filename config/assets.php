@@ -224,15 +224,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Disable SVG Sanitization
+    | SVG Sanitization
     |--------------------------------------------------------------------------
     |
-    | Statamic will automatically sanitize uploaded SVG files to avoid potential
-    | security issues. If you trust your users and need to disable this behaviour,
-    | you may do so here.
+    | Statamic will automatically sanitize user-uploaded SVG files to avoid potential
+    | security issues. If you trust your users, you may disable thuis behavior.
     |
     */
 
-    'disable_svg_sanitization' => false,
+    'svg_sanitization' => true,
 
 ];

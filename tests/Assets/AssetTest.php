@@ -1821,7 +1821,7 @@ class AssetTest extends TestCase
     {
         Event::fake();
 
-        config()->set('statamic.assets.disable_svg_sanitization', true);
+        config()->set('statamic.assets.svg_sanitization', false);
 
         $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
 
