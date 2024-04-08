@@ -3,6 +3,7 @@
 namespace Statamic\Facades\Endpoint;
 
 use Statamic\Facades\Pattern;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 /**
@@ -209,7 +210,7 @@ class Path
     {
         $path = Str::before($path, '?');
 
-        return array_get(pathinfo($path), 'extension');
+        return Arr::get(pathinfo($path), 'extension');
     }
 
     /**

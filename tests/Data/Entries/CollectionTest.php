@@ -457,10 +457,10 @@ class CollectionTest extends TestCase
         $this->assertNull($datedAndOrdered->customSortDirection());
 
         $alpha->structureContents(['max_depth' => 99]);
-        $this->assertEquals('title', $alpha->sortField());
+        $this->assertEquals('order', $alpha->sortField());
         $this->assertEquals('asc', $alpha->sortDirection());
         $dated->structureContents(['max_depth' => 99]);
-        $this->assertEquals('date', $dated->sortField());
+        $this->assertEquals('order', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
         // Custom sort field and direction should override any other logic.
@@ -500,6 +500,7 @@ class CollectionTest extends TestCase
         Facades\Collection::shouldReceive('save')->with($collection)->once();
         Facades\Collection::shouldReceive('handleExists')->with('test')->once();
         Facades\Blink::shouldReceive('forget')->with('collection-handles')->once();
+        Facades\Blink::shouldReceive('forget')->with('mounted-collections')->once();
         Facades\Blink::shouldReceive('flushStartingWith')->with('collection-test')->once();
 
         $return = $collection->save();

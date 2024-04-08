@@ -201,7 +201,7 @@ abstract class Tree implements Contract, Localization
     protected function removeEmptyChildren($array)
     {
         return collect($array)->map(function ($item) {
-            $item['children'] = $this->removeEmptyChildren(array_get($item, 'children', []));
+            $item['children'] = $this->removeEmptyChildren(Arr::get($item, 'children', []));
 
             if (empty($item['children'])) {
                 unset($item['children']);

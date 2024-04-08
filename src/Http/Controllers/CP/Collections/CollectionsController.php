@@ -13,8 +13,10 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class CollectionsController extends CpController
@@ -187,7 +189,7 @@ class CollectionsController extends CpController
 
         $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
+            'handle' => ['nullable', new Handle],
         ]);
 
         $handle = $request->handle ?? Str::snake($request->title);
@@ -236,15 +238,15 @@ class CollectionsController extends CpController
             ->mount($values['mount'] ?? null)
             ->revisionsEnabled($values['revisions'] ?? false)
             ->taxonomies($values['taxonomies'] ?? [])
-            ->futureDateBehavior(array_get($values, 'future_date_behavior'))
-            ->pastDateBehavior(array_get($values, 'past_date_behavior'))
-            ->mount(array_get($values, 'mount'))
-            ->propagate(array_get($values, 'propagate'))
+            ->futureDateBehavior(Arr::get($values, 'future_date_behavior'))
+            ->pastDateBehavior(Arr::get($values, 'past_date_behavior'))
+            ->mount(Arr::get($values, 'mount'))
+            ->propagate(Arr::get($values, 'propagate'))
             ->titleFormats($values['title_formats'])
             ->requiresSlugs($values['require_slugs'])
             ->previewTargets($values['preview_targets']);
 
-        if ($sites = array_get($values, 'sites')) {
+        if ($sites = Arr::get($values, 'sites')) {
             $collection
                 ->sites($sites)
                 ->originBehavior($values['origin_behavior']);
