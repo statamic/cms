@@ -154,6 +154,7 @@ return [
     |
     */
 
+    'arr_fieldtype' => 'This is invalid.',
     'handle' => 'Must contain only lowercase letters and numbers with underscores as separators.',
     'slug' => 'Must contain only letters and numbers with dashes or underscores as separators.',
     'code_fieldtype_rulers' => 'This is invalid.',

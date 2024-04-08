@@ -1055,6 +1055,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             $this->slug = $slug($this);
         }
 
-        return array_keys(Arr::except(get_object_vars($this), ['computedCallbackCache']));
+        return array_keys(Arr::except(get_object_vars($this), ['cachedKeys', 'computedCallbackCache', 'siteCache']));
     }
 }
