@@ -182,7 +182,6 @@ class SitesConfigTest extends TestCase
                 'url' => '/ar/',
                 'locale' => 'ar_EG',
                 'lang' => 'arabic', // testing custom lang string, because it auto-sets itself off locale
-                'direction' => 'rtl', // by default, `ltr` should be saved
                 'attributes' => [
                     'theme' => 'standard',
                 ],
@@ -200,7 +199,6 @@ class SitesConfigTest extends TestCase
                 'url' => '/ar/',
                 'locale' => 'ar_EG',
                 'lang' => 'arabic',
-                'direction' => 'rtl',
                 'attributes' => [
                     'theme' => 'standard',
                 ],
@@ -336,7 +334,6 @@ class SitesConfigTest extends TestCase
                         'handle' => 'arabic',
                         'url' => '/ar/',
                         'locale' => 'ar_EG',
-                        'direction' => 'rtl', // by default, `ltr` should be saved
                         'attributes' => [
                             'theme' => 'standard',
                         ],
@@ -356,7 +353,6 @@ class SitesConfigTest extends TestCase
                 'name' => 'Arabic (Egypt)',
                 'url' => '/ar/',
                 'locale' => 'ar_EG',
-                'direction' => 'rtl',
                 'attributes' => [
                     'theme' => 'standard',
                 ],
@@ -396,7 +392,7 @@ class SitesConfigTest extends TestCase
                         'handle' => 'english', // this is a required field, so there should be only 3 failures here
                     ],
                     [
-                        'direction' => 'rtl', // this is an optional field, so there should be 4 failures here
+                        'lang' => 'en', // this is an optional field, so there should be 4 failures here
                     ],
                 ],
             ])
