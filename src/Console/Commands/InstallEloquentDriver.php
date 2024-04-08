@@ -265,6 +265,7 @@ class InstallEloquentDriver extends Command
                 $this->runArtisanCommand('migrate');
 
                 $this->switchToEloquentDriver('forms');
+                $this->switchToEloquentDriver('form_submissions');
             },
             message: 'Migrating forms...'
         );
