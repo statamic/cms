@@ -1816,6 +1816,30 @@ class AssetTest extends TestCase
         $this->assertStringNotContainsString('</script>', $asset->contents());
     }
 
+    /** @test */
+    public function it_does_not_sanitizes_svgs_on_upload_when_behaviour_is_disabled()
+    {
+        Event::fake();
+
+        config()->set('statamic.assets.svg_sanitization_on_upload', false);
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.svg');
+
+        $return = $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>'));
+
+        $this->assertEquals($asset, $return);
+        Storage::disk('test')->assertExists('path/to/asset.svg');
+        $this->assertEquals('path/to/asset.svg', $asset->path());
+
+        // Ensure the inline scripts were stripped out.
+        $this->assertStringContainsString('<script', $asset->contents());
+        $this->assertStringContainsString('Bad stuff could go in here.', $asset->contents());
+        $this->assertStringContainsString('</script>', $asset->contents());
+    }
+
     public static function nonGlideableFileExtensionsProvider()
     {
         return [
