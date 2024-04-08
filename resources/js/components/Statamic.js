@@ -4,6 +4,7 @@ import Bard from './Bard';
 import Keys from './keys/Keys';
 import Hooks from './Hooks';
 import Reveal from './Reveal';
+import Sortables from './Sortables';
 import Components from './Components';
 import FieldConditions from './FieldConditions';
 import Callbacks from './Callbacks';
@@ -12,6 +13,7 @@ const bard = new Bard;
 const keys = new Keys;
 const hooks = new Hooks;
 const reveal = new Reveal;
+const sortables = new Sortables;
 const components = new Components;
 const conditions = new FieldConditions;
 const callbacks = new Callbacks;
@@ -53,6 +55,10 @@ export default new Vue({
 
         $reveal() {
             return reveal;
+        },
+
+        $sortables() {
+            return sortables;
         },
 
         $conditions() {

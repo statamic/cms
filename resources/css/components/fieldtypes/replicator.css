@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .replicator-set-container {
-    @apply outline-none;
+    @apply outline-none min-h-[10px];
 }
 
 .replicator-set {

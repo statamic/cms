@@ -1,5 +1,5 @@
 <script>
-import { Sortable, Plugins } from '@shopify/draggable'
+import { Plugins } from '@shopify/draggable'
 
 function move(items, oldIndex, newIndex) {
     const itemRemovedArray = [
@@ -19,6 +19,9 @@ export default {
     props: {
         value: {
             required: true,
+        },
+        group: {
+            default: null,
         },
         itemClass: {
             default: 'sortable-item',
@@ -63,6 +66,7 @@ export default {
     data() {
         return {
             sortable: null,
+            sortableId: this.group || uniqid(),
         }
     },
 
@@ -120,7 +124,7 @@ export default {
 
     methods: {
         setupSortableList() {
-            this.sortable = new Sortable(this.$el, this.computedOptions);
+            this.sortable = this.$sortables.connect(this.sortableId, this.$el, this.computedOptions);
 
             this.sortable.on('drag:start', () => this.$emit('dragstart'));
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
@@ -139,7 +143,7 @@ export default {
         },
 
         destroySortableList() {
-            this.sortable.destroy()
+            this.$sortables.disconnect(this.sortableId, this.$el, this.computedOptions);
         },
     },
 
