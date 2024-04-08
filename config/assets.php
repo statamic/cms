@@ -227,11 +227,12 @@ return [
     | SVG Sanitization
     |--------------------------------------------------------------------------
     |
-    | Statamic will automatically sanitize user-uploaded SVG files to avoid potential
-    | security issues. If you trust your users, you may disable thuis behavior.
+    | Statamic will automatically sanitize SVG files when uploaded to avoid
+    | potential security issues. However, if you have a valid reason for
+    | disabling this, and you trust your users, you may do so here.
     |
     */
 
-    'svg_sanitization' => true,
+    'svg_sanitization_on_upload' => true,
 
 ];
