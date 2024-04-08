@@ -13,6 +13,7 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -907,6 +908,45 @@ class FrontendTest extends TestCase
                 null,                  // and not redirect
             ],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function redirect_is_followed_when_value_is_inherited_from_origin()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        $blueprint = Blueprint::makeFromFields([
+            'redirect' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'url', 'field' => ['type' => 'link']],
+                    ['handle' => 'status', 'field' => ['type' => 'radio', 'options' => [301, 302]]],
+                ],
+            ]]);
+        Blueprint::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
+
+        Collection::make('pages')->sites(['en', 'fr'])->routes(['en' => '{slug}', 'fr' => '{slug}'])->save();
+
+        $entry = tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
+                ],
+            ],
+        ]))->save();
+        tap($entry->makeLocalization('fr'))->save();
+
+        $response = $this->get('/fr/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
     }
 
     /**
