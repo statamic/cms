@@ -2,7 +2,6 @@
 
 namespace Tests\Facades;
 
-use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Tests\TestCase;
 
@@ -17,7 +16,7 @@ class UrlTest extends TestCase
 
     public function testPrependsSiteUrl()
     {
-        Site::setConfig('sites.en.url', 'http://site.com/');
+        $this->setSiteValue('en', 'url', 'http://site.com/');
 
         $this->assertEquals(
             'http://site.com/foo',
@@ -27,7 +26,7 @@ class UrlTest extends TestCase
 
     public function testPrependsSiteUrlWithController()
     {
-        Site::setConfig('sites.en.url', 'http://site.com/index.php/');
+        $this->setSiteValue('en', 'url', 'http://site.com/index.php/');
 
         $this->assertEquals(
             'http://site.com/index.php/foo',
@@ -40,7 +39,7 @@ class UrlTest extends TestCase
         // Override with what would be used on a normal request.
         request()->server->set('SCRIPT_NAME', '/index.php');
 
-        Site::setConfig('sites.en.url', 'http://site.com/index.php/');
+        $this->setSiteValue('en', 'url', 'http://site.com/index.php/');
 
         $this->assertEquals(
             'http://site.com/foo',
@@ -50,7 +49,7 @@ class UrlTest extends TestCase
 
     public function testDeterminesExternalUrl()
     {
-        Site::setConfig('sites.en.url', 'http://this-site.com/');
+        $this->setSiteValue('en', 'url', 'http://this-site.com/');
         $this->assertTrue(URL::isExternal('http://that-site.com'));
         $this->assertTrue(URL::isExternal('http://that-site.com/'));
         $this->assertTrue(URL::isExternal('http://that-site.com/some-slug'));
@@ -65,7 +64,7 @@ class UrlTest extends TestCase
 
     public function testDeterminesExternalUrlWhenUsingRelativeInConfig()
     {
-        Site::setConfig('sites.en.url', '/');
+        $this->setSiteValue('en', 'url', '/');
         $this->assertTrue(URL::isExternal('http://that-site.com'));
         $this->assertTrue(URL::isExternal('http://that-site.com/'));
         $this->assertTrue(URL::isExternal('http://that-site.com/some-slug'));

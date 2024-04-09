@@ -231,6 +231,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddConfigureFormFieldsPermission::class,
         Updates\AddSitePermissions::class,
         Updates\UseClassBasedStatamicUniqueRules::class,
+        Updates\MigrateSitesConfigToYaml::class,
     ];
 
     public function register()

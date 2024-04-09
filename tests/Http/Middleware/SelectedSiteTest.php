@@ -21,11 +21,11 @@ class SelectedSiteTest extends TestCase
      */
     public function it_sets_selected_site_first_authorized_one()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
             'de' => ['url' => '/de/', 'locale' => 'de'],
-        ]]);
+        ]);
 
         Site::setSelected('de');
         $this->assertEquals('de', Site::selected()->handle());
@@ -56,11 +56,11 @@ class SelectedSiteTest extends TestCase
         // The global site selector isn't going to be visible, and they won't be
         // able to able to access any areas that require a site anyway.
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
             'de' => ['url' => '/de/', 'locale' => 'de'],
-        ]]);
+        ]);
 
         Site::setSelected('de');
         $this->assertEquals('de', Site::selected()->handle());

@@ -224,7 +224,7 @@ class NavigationController extends CpController
             ],
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $contents['options']['fields']['sites'] = [
                 'display' => __('Sites'),
                 'type' => 'sites',

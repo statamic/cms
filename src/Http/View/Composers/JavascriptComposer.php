@@ -63,6 +63,7 @@ class JavascriptComposer
             'user' => $this->user($user),
             'paginationSize' => config('statamic.cp.pagination_size'),
             'paginationSizeOptions' => config('statamic.cp.pagination_size_options'),
+            'multisiteEnabled' => Site::multiEnabled(),
             'sites' => $this->sites(),
             'selectedSite' => Site::selected()->handle(),
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),

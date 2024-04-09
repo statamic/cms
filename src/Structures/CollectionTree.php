@@ -31,7 +31,7 @@ class CollectionTree extends Tree implements TreeContract
     {
         $path = Stache::store('collection-trees')->directory();
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $path .= $this->locale().'/';
         }
 

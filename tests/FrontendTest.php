@@ -14,7 +14,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -153,10 +152,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_subdirectory_based_site_is_displayed()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -168,10 +167,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_subdirectory_based_site_is_displayed_with_ending_slash()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -183,10 +182,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_domain_site_is_displayed()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -198,10 +197,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_domain_site_is_displayed_with_ending_slash()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -646,10 +645,10 @@ class FrontendTest extends TestCase
     {
         app('translator')->addNamespace('test', __DIR__.'/__fixtures__/lang');
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<p>{{ trans key="test::messages.hello" }}</p>');
@@ -692,10 +691,10 @@ class FrontendTest extends TestCase
         $frLocale = setlocale(LC_TIME, 0);
         setlocale(LC_TIME, $originalLocale);
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en', 'lang' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale, 'lang' => 'fr'],
-        ]]);
+        ]);
 
         (new class extends Tags
         {
@@ -916,10 +915,10 @@ class FrontendTest extends TestCase
      */
     public function redirect_is_followed_when_value_is_inherited_from_origin()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $blueprint = Blueprint::makeFromFields([
             'redirect' => [

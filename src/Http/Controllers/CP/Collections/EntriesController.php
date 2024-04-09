@@ -73,7 +73,7 @@ class EntriesController extends CpController
             $query->where('title', 'like', '%'.$search.'%');
         }
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
@@ -585,7 +585,7 @@ class EntriesController extends CpController
 
     protected function ensureCollectionIsAvailableOnSite($collection, $site)
     {
-        if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
+        if (Site::multiEnabled() && ! $collection->sites()->contains($site->handle())) {
             return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
     }

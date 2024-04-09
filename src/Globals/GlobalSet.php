@@ -148,7 +148,7 @@ class GlobalSet implements Contract
             'title' => $this->title(),
         ];
 
-        if (! Site::hasMultiple() && ($variables = $this->in(Site::default()->handle()))) {
+        if (! Site::multiEnabled() && ($variables = $this->in(Site::default()->handle()))) {
             $data['data'] = Arr::removeNullValues(
                 $variables->data()->all()
             );

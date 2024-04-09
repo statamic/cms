@@ -8,7 +8,6 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
-use Statamic\Facades\Site;
 use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -110,12 +109,9 @@ GQL;
         // Start with fresh slate for this test so it's easier to mock things with one pages collection...
         Collection::all()->each->delete();
 
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'french', 'locale' => 'fr_FR', 'url' => 'http://test.com/fr/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'french', 'locale' => 'fr_FR', 'url' => 'http://test.com/fr/'],
         ]);
 
         BlueprintRepository::partialMock();
