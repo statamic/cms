@@ -635,6 +635,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return true;
     }
 
+    /**
+     * Delete quietly without firing events.
+     *
+     * @return bool
+     */
     public function deleteQuietly()
     {
         $this->withEvents = false;
