@@ -34,4 +34,27 @@ class MountingTest extends TestCase
         $this->assertEquals($one, Entry::findByUri('/pages/diary/one'));
         $this->assertEquals($two, Entry::findByUri('/pages/diary/two'));
     }
+
+    /** @test */
+    public function updating_a_mounted_page_will_not_update_the_uris_when_slug_is_clean()
+    {
+        Collection::make('pages')->routes('pages/{slug}')->save();
+
+        EntryFactory::collection('pages')->slug('another-page')->create();
+        $mount = EntryFactory::collection('pages')->slug('blog')->create();
+        Collection::make('blog')->routes('{mount}/{slug}')->mount($mount->id())->save();
+
+        $one = EntryFactory::collection('blog')->slug('one')->create();
+        $two = EntryFactory::collection('blog')->slug('two')->create();
+
+        $this->assertEquals($one, Entry::findByUri('/pages/blog/one'));
+        $this->assertEquals($two, Entry::findByUri('/pages/blog/two'));
+
+        // Since we're just saving the mount without changing the slug, we don't want to update the URIs.
+        $mock = \Mockery::mock(Collection::getFacadeRoot())->makePartial();
+        $mock->shouldReceive('updateEntryUris')->never();
+        Collection::swap($mock);
+
+        $mount->save();
+    }
 }
