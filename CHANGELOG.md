@@ -1,5 +1,13 @@
 # Release Notes
 
+## 4.56.1 (2024-04-09)
+
+### What's fixed
+- Fix max depth validation on "Parent" field when collection has no max depth set. [#9850](https://github.com/statamic/cms/issues/9850) by @duncanmcclean
+- Update URIs for mounted collection entries only if slug on mounted entry changed. [#9851](https://github.com/statamic/cms/issues/9851) by @marcorieser
+
+
+
 ## 4.56.0 (2024-04-08)
 
 ### What's new
