@@ -1,5 +1,42 @@
 # Release Notes
 
+## 4.56.1 (2024-04-09)
+
+### What's fixed
+- Fix max depth validation on "Parent" field when collection has no max depth set. [#9850](https://github.com/statamic/cms/issues/9850) by @duncanmcclean
+- Update URIs for mounted collection entries only if slug on mounted entry changed. [#9851](https://github.com/statamic/cms/issues/9851) by @marcorieser
+
+
+
+## 4.56.0 (2024-04-08)
+
+### What's new
+- Bard hooks. [#9823](https://github.com/statamic/cms/issues/9823) by @jacksleight
+- Ability to disable SVG sanitization on upload. [#9839](https://github.com/statamic/cms/issues/9839) by @duncanmcclean
+- Add Edit Blueprint link to form page dropdown. [#9840](https://github.com/statamic/cms/issues/9840) by @jacksleight
+- Track Laravel version in the Outpost. [#9820](https://github.com/statamic/cms/issues/9820) by @jasonvarga
+
+### What's fixed
+- Prevent recursive editing via relationship fieldtype. [#9841](https://github.com/statamic/cms/issues/9841) by @duncanmcclean
+- Improve array fieldtype validation for dynamically keyed fields. [#9834](https://github.com/statamic/cms/issues/9834) by @jesseleite
+- Fix overlapping set group & set name in Safari. [#9837](https://github.com/statamic/cms/issues/9837) by @duncanmcclean
+- Arr::wrap in/notIn values. [#9833](https://github.com/statamic/cms/issues/9833) by @ryanmitchell
+- Fix filter preset issues. [#9826](https://github.com/statamic/cms/issues/9826) by @duncanmcclean
+- Ensure redirects work for localized entries. [#9819](https://github.com/statamic/cms/issues/9819) by @duncanmcclean
+- Fix OAuth login when using independent auth guards. [#9816](https://github.com/statamic/cms/issues/9816) by @duncanmcclean
+- Fix icons in preference save options. [#9827](https://github.com/statamic/cms/issues/9827) by @duncanmcclean
+- Prevent "Permanently added the ECDSA host key for IP address" from being logged as a Git error. [#9828](https://github.com/statamic/cms/issues/9828) by @duncanmcclean
+- Fix deleted sets breaking Bard & Replicator. [#9818](https://github.com/statamic/cms/issues/9818) by @duncanmcclean
+- Prevent overwriting filter views. [#9792](https://github.com/statamic/cms/issues/9792) by @duncanmcclean
+- Fix serializing entries when `slug` property is a closure. [#9791](https://github.com/statamic/cms/issues/9791) by @duncanmcclean
+- Use the configured Git binary in commands. [#9793](https://github.com/statamic/cms/issues/9793) by @duncanmcclean
+- Enforce max depth when validating entry parent. [#9799](https://github.com/statamic/cms/issues/9799) by @duncanmcclean
+- Fix new lines not working in user activation email. [#9798](https://github.com/statamic/cms/issues/9798) by @duncanmcclean
+- Hide "Create Entry" button when all collection blueprints are hidden. [#9744](https://github.com/statamic/cms/issues/9744) by @duncanmcclean
+- Bump vite from 4.5.2 to 4.5.3 [#9821](https://github.com/statamic/cms/issues/9821) by @dependabot
+
+
+
 ## 4.55.0 (2024-03-27)
 
 ### What's new
