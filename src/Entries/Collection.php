@@ -777,7 +777,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
                     return null;
                 }
 
-                return Blink::once("collection-{$this->id()}-mount-{$mount}", function () use ($mount) {
+                return Blink::store('collection-mounts')->once("{$this->id()}-{$mount}", function () use ($mount) {
                     return Entry::find($mount);
                 });
             })

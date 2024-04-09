@@ -365,6 +365,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
             Blink::forget($this->getOriginBlinkKey());
+            Blink::store('collection-mounts')->flush();
         }
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));

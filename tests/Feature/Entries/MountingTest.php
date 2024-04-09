@@ -3,6 +3,7 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -15,6 +16,9 @@ class MountingTest extends TestCase
     /** @test */
     public function updating_a_mounted_page_will_update_the_uris_for_each_entry_in_that_collection()
     {
+        config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+        Cache::clear();
+
         Collection::make('pages')->routes('pages/{slug}')->save();
 
         EntryFactory::collection('pages')->slug('another-page')->create();
@@ -38,6 +42,9 @@ class MountingTest extends TestCase
     /** @test */
     public function updating_a_mounted_page_will_not_update_the_uris_when_slug_is_clean()
     {
+        config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+        Cache::clear();
+
         Collection::make('pages')->routes('pages/{slug}')->save();
 
         EntryFactory::collection('pages')->slug('another-page')->create();
