@@ -330,7 +330,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function save()
     {
-        $isNew = is_null(Facades\Entry::find($this->id()));
+        $oldEntry = Facades\Entry::find($this->id());
+        $isNew = is_null($oldEntry);
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
@@ -375,7 +376,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         $this->taxonomize();
 
-        optional(Collection::findByMount($this))->updateEntryUris();
+        if(!$isNew && $oldEntry->slug() !== $this->slug()) {
+            optional(Collection::findByMount($this))->updateEntryUris();
+        }
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
