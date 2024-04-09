@@ -991,6 +991,7 @@ class AssetTest extends TestCase
             'path/to',
             'path/to/another-asset.txt',
         ], $container->contents()->cached()->keys()->all());
+        Event::assertDispatched(AssetDeleting::class);
         Event::assertDispatched(AssetDeleted::class);
     }
 
@@ -1035,6 +1036,7 @@ class AssetTest extends TestCase
             'path/to',
             'path/to/another-asset.txt',
         ], $container->contents()->cached()->keys()->all());
+        Event::assertNotDispatched(AssetDeleting::class);
         Event::assertNotDispatched(AssetDeleted::class);
     }
 
