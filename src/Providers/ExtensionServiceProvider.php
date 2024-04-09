@@ -238,6 +238,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerAddonManifest();
         $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
+        $this->app->instance('statamic.hooks', collect());
     }
 
     protected function registerAddonManifest()

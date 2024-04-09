@@ -80,7 +80,7 @@
     "vue": "^2.7.14",
     "vue-clickaway": "~2.2.2",
     "vue-countable": "^1.0.9",
-    "vue-draggable-nested-tree": "^2.2.20",
+    "vue-draggable-nested-tree": "^2.3.0-beta.1",
     "vue-js-modal": "^2.0.1",
     "vue-select": "^3.10.1",
     "vue-toasted": "^1.1.27",
@@ -99,6 +99,6 @@
     "laravel-vite-plugin": "^0.7.2",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.0",
-    "vite": "^4.5.2"
+    "vite": "^4.5.3"
   }
 }

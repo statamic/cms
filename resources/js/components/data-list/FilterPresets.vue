@@ -1,13 +1,13 @@
 <template>
-    <div class="pt-2 pr-2">
+    <div class="pt-2 rtl:pl-2 ltr:pr-2">
         <div class="flex flex-wrap items-center">
 
-            <button class="pill-tab mr-1" :class="{ 'active': ! activePreset }" @click="viewAll" v-text="__('All')" />
+            <button class="pill-tab rtl:ml-1 ltr:mr-1" :class="{ 'active': ! activePreset }" @click="viewAll" v-text="__('All')" />
 
             <template v-for="(preset, handle) in presets">
-                <button class="pill-tab active mr-1" v-if="handle === activePreset">
+                <button class="pill-tab active rtl:ml-1 ltr:mr-1" v-if="handle === activePreset">
                     {{ preset.display }}
-                    <dropdown-list class="ml-2" placement="bottom-start">
+                    <dropdown-list class="rtl:mr-2 ltr:ml-2" placement="bottom-start">
                         <template v-slot:trigger>
                             <button class="opacity-50 hover:opacity-100">
                                 <svg-icon name="micro/chevron-down-xs" class="w-2 h-2" />
@@ -19,7 +19,7 @@
                         <dropdown-item :text="__('Delete')" class="warning" @click="deletePreset" />
                     </dropdown-list>
                 </button>
-                <button class="pill-tab mr-1" v-else @click="viewPreset(handle)">
+                <button class="pill-tab rtl:ml-1 ltr:mr-1" v-else @click="viewPreset(handle)">
                     {{ preset.display }}
                 </button>
             </template>
@@ -37,6 +37,10 @@
             @confirm="savePreset(savingPresetSlug)"
         >
             <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset(savingPresetSlug)" />
+
+            <div v-if="presets && Object.keys(presets).includes(savingPresetSlug)">
+                <small class="help-block text-red-500 mt-2 mb-0" v-text="__('messages.filters_view_already_exists')"></small>
+            </div>
         </confirmation-modal>
 
         <confirmation-modal
@@ -44,9 +48,13 @@
             :title="__('Rename View')"
             :buttonText="__('Rename')"
             @cancel="showRenameModal = false"
-            @confirm="savePreset()"
+            @confirm="savePreset(savingPresetSlug)"
         >
-            <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset()" />
+            <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset(savingPresetSlug)" />
+
+            <div v-if="Object.keys(presets).filter(preset => preset !== activePreset).includes(savingPresetSlug)">
+                <small class="help-block text-red-500 mt-2 mb-0" v-text="__('messages.filters_view_already_exists')"></small>
+            </div>
         </confirmation-modal>
 
         <confirmation-modal
@@ -162,15 +170,32 @@ export default {
 
             this.$preferences.set(`${this.preferencesKey}.${presetHandle}`, this.presetPreferencesPayload)
                 .then(response => {
+                    if (this.showRenameModal) {
+                        this.$preferences.remove(`${this.preferencesKey}.${this.activePreset}`)
+                            .then(response => {
+                                this.$toast.success(__('View renamed'));
+                                this.$emit('deleted', this.activePreset);
+                                this.showRenameModal = false;
+                                this.refreshPresets();
+                            })
+                            .catch(error => {
+                                this.$toast.error(__('Unable to rename view'));
+                                this.showRenameModal = false;
+                            });
+
+                        return;
+                    }
+
                     this.$toast.success(__('View saved'));
                     this.showCreateModal = false;
-                    this.showRenameModal = false;
+                    this.savingPresetName = null;
                     this.setPreset(presetHandle);
                 })
                 .catch(error => {
                     this.$toast.error(__('Unable to save view'));
                     this.showCreateModal = false;
                     this.showRenameModal = false;
+                    this.savingPresetName = null;
                 });
         },
 

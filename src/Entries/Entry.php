@@ -377,6 +377,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
             Blink::forget($this->getOriginBlinkKey());
+            Blink::store('collection-mounts')->flush();
         }
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
@@ -387,7 +388,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         $this->taxonomize();
 
-        optional(Collection::findByMount($this))->updateEntryUris();
+        if ($this->isDirty('slug')) {
+            optional(Collection::findByMount($this))->updateEntryUris();
+        }
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -1027,5 +1030,15 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected function getComputedCallbacks()
     {
         return Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function __sleep()
+    {
+        if ($this->slug instanceof Closure) {
+            $slug = $this->slug;
+            $this->slug = $slug($this);
+        }
+
+        return array_keys(get_object_vars($this));
     }
 }
