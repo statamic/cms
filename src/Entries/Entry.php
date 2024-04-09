@@ -376,7 +376,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         $this->taxonomize();
 
-        if(!$isNew && $oldEntry->slug() !== $this->slug()) {
+        if (! $isNew && $oldEntry->slug() !== $this->slug()) {
             optional(Collection::findByMount($this))->updateEntryUris();
         }
 
