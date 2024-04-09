@@ -188,9 +188,19 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         ], $this->data()->except(['updated_at'])->toArray());
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (EntryDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && EntryDeleting::dispatch($this) === false) {
             return false;
         }
 
@@ -216,16 +226,18 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         Facades\Entry::delete($this);
 
-        EntryDeleted::dispatch($this);
+        if ($withEvents) {
+            EntryDeleted::dispatch($this);
+        }
 
         return true;
     }
 
-    public function deleteDescendants()
+    public function deleteDescendants($withEvents = true)
     {
-        $this->descendants()->each(function ($entry) {
-            $entry->deleteDescendants();
-            $entry->delete();
+        $this->descendants()->each(function ($entry) use ($withEvents) {
+            $entry->deleteDescendants($withEvents);
+            $withEvents ? $entry->delete() : $entry->deleteQuietly();
         });
 
         Blink::forget('entry-descendants-'.$this->id());

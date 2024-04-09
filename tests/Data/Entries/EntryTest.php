@@ -1978,6 +1978,21 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $entry = EntryFactory::collection('test')->create();
+
+        $return = $entry->deleteQuietly();
+
+        Event::assertNotDispatched(EntryDeleting::class);
+        Event::assertNotDispatched(EntryDeleted::class);
+
+        $this->assertTrue($return);
+    }
+
+    /** @test */
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         Facades\Entry::spy();
@@ -2012,6 +2027,7 @@ class EntryTest extends TestCase
     public function it_deletes_descendants()
     {
         Event::fake();
+
         config(['statamic.sites.sites' => [
             'en' => [],
             'fr' => [],
@@ -2032,6 +2048,38 @@ class EntryTest extends TestCase
         $this->assertCount(1, Facades\Entry::all());
         $this->assertCount(0, $entry->descendants());
         $this->assertCount(0, $localization->descendants());
+
+        Event::assertDispatched(EntryDeleting::class);
+        Event::assertDispatched(EntryDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_descendants_quietly()
+    {
+        Event::fake();
+        config(['statamic.sites.sites' => [
+            'en' => [],
+            'fr' => [],
+            'de' => [],
+        ]]);
+
+        $entry = EntryFactory::collection('test')->locale('en')->id('1')->create();
+        $localization = EntryFactory::collection('test')->locale('fr')->id('2')->origin('1')->create();
+        $deeperLocalization = EntryFactory::collection('test')->locale('de')->id('3')->origin('2')->create();
+
+        $this->assertCount(3, Facades\Entry::all());
+        $this->assertCount(2, $entry->descendants());
+        $this->assertCount(1, $localization->descendants());
+
+        $return = $entry->deleteDescendants(withEvents: false);
+
+        $this->assertTrue($return);
+        $this->assertCount(1, Facades\Entry::all());
+        $this->assertCount(0, $entry->descendants());
+        $this->assertCount(0, $localization->descendants());
+
+        Event::assertNotDispatched(EntryDeleting::class);
+        Event::assertNotDispatched(EntryDeleted::class);
     }
 
     /** @test */
