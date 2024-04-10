@@ -96,6 +96,9 @@ class DefaultCacher extends AbstractCacher
 
         $key = str_replace($domain, '', $fullUrl);
 
+        // hash the key to handle long route and query parameters which might exceed limits for cache keys
+        $key = md5($key);
+
         return $this->normalizeKey($key);
     }
 }
