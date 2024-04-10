@@ -116,7 +116,7 @@ class InstallEloquentDriver extends Command
                 case 'forms':
                     return config('statamic.eloquent-driver.forms.driver') === 'eloquent';
 
-                case 'form-submissions':
+                case 'form_submissions':
                     return config('statamic.eloquent-driver.form_submissions.driver') === 'eloquent';
 
                 case 'globals':
