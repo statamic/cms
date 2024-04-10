@@ -54,15 +54,6 @@ class InstallEloquentDriver extends Command
 
         if (! File::exists(config_path('statamic/eloquent-driver.php'))) {
             $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-config');
-
-            // By default, all repositories are set `eloquent`. We'll change them back to `file` since we'll switch them one by one
-            File::put(
-                config_path('statamic/eloquent-driver.php'),
-                Str::of(File::get(config_path('statamic/eloquent-driver.php')))
-                    ->replace("=> 'eloquent'", "=> 'file'")
-                    ->__toString()
-            );
-
             $this->components->info('Config file [config/statamic/eloquent-driver.php] published successfully.');
         }
 
