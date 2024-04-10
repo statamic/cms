@@ -244,7 +244,7 @@ class CoreNav
     }
 
     /**
-     * Make users section items.
+     * Make settings section items.
      *
      * @return $this
      */
@@ -256,7 +256,13 @@ class CoreNav
             ->can('configure sites');
 
         Nav::settings('Preferences')
-            ->icon('/cog');
+            ->route('preferences.index')
+            ->icon('/cog')
+            ->children([
+                Nav::item('CP Nav')->route('preferences.nav.index'),
+            ]);
+
+        return $this;
     }
 
     /**
