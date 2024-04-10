@@ -37,21 +37,14 @@ trait RendersAttributes
     /**
      * Render HTML attributes from tag params.
      *
-     * Parameters that are not approved will be filtered out.
-     *
+     * @param  array  $except  Parameters that should be excluded. Typically used for tag parameters that control behavior.
      * @return string
      */
-    protected function renderAttributesFromParams()
+    protected function renderAttributesFromParams(array $except = [])
     {
-        $params = $this->params->filter(fn ($v, $attr) => $this->isAllowedParamAttr($attr))->all();
+        $params = $this->params->reject(fn ($v, $attr) => in_array($attr, $except))->all();
 
         return $this->renderAttributes($params);
-    }
-
-    private function isAllowedParamAttr($attribute): bool
-    {
-        return Str::startsWith($attribute, ['attr:', 'aria-', 'data-'])
-            || in_array($attribute, ['class', 'autocomplete']);
     }
 
     /**
@@ -59,11 +52,11 @@ trait RendersAttributes
      *
      * @return string
      */
-    protected function renderAttributesFromParamsWith(array $attrs)
+    protected function renderAttributesFromParamsWith(array $attrs, array $except = [])
     {
         return collect([
             $this->renderAttributes($attrs),
-            $this->renderAttributesFromParams(),
+            $this->renderAttributesFromParams($except),
         ])->filter()->implode(' ');
     }
 }
