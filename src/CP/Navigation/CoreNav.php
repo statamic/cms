@@ -209,7 +209,7 @@ class CoreNav
                 ->can('resolve duplicate ids');
         }
 
-        $this->makeUtilitiesSection();
+        $this->makeUtilitiesItems();
 
         if (config('statamic.graphql.enabled') && Statamic::pro()) {
             Nav::tools('GraphQL')
@@ -222,7 +222,12 @@ class CoreNav
         return $this;
     }
 
-    protected function makeUtilitiesSection()
+    /**
+     * Make utilities items.
+     *
+     * @return $this
+     */
+    protected function makeUtilitiesItems()
     {
         $utilities = Utility::authorized()->sortBy->navTitle()->map(function ($utility) {
             return Nav::item($utility->navTitle())->url($utility->url());
