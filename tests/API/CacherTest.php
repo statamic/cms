@@ -47,7 +47,8 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         $this->assertTrue(Cache::has($cacheKey));
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
