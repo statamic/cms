@@ -89,6 +89,7 @@ class InstallEloquentDriver extends Command
             'forms' => 'Forms',
             'globals' => 'Globals',
             'navs' => 'Navigations',
+            'nav_trees' => 'Navigation Trees',
             'revisions' => 'Revisions',
             'taxonomies' => 'Taxonomies',
         ])->reject(function ($value, $key) {
@@ -119,8 +120,10 @@ class InstallEloquentDriver extends Command
                         || config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent';
 
                 case 'navs':
-                    return config('statamic.eloquent-driver.navigations.driver') === 'eloquent'
-                        || config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent';
+                    return config('statamic.eloquent-driver.navigations.driver') === 'eloquent';
+
+                case 'nav_trees':
+                    return config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent';
 
                 case 'revisions':
                     return config('statamic.eloquent-driver.revisions.driver') === 'eloquent';
@@ -355,12 +358,9 @@ class InstallEloquentDriver extends Command
         spin(
             callback: function () {
                 $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
-                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-tree-migrations');
-
                 $this->runArtisanCommand('migrate');
 
                 $this->switchToEloquentDriver('navigations');
-                $this->switchToEloquentDriver('navigation_trees');
             },
             message: 'Migrating navs...'
         );
@@ -369,11 +369,35 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing navs?')) {
             spin(
-                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-navs --force'),
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-navs --force --only-navs'),
                 message: 'Importing existing navs...'
             );
 
             $this->components->info('Imported existing navs');
+        }
+    }
+
+    protected function migrateNavTrees(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-tree-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('navigation_trees');
+            },
+            message: 'Migrating nav trees...'
+        );
+
+        $this->components->info('Configured nav trees');
+
+        if (confirm('Would you like to import existing nav trees?')) {
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-navs --force --only-nav-trees'),
+                message: 'Importing existing nav trees...'
+            );
+
+            $this->components->info('Imported existing navs trees');
         }
     }
 
