@@ -89,6 +89,7 @@ class InstallEloquentDriver extends Command
             'forms' => 'Forms',
             'form_submissions' => 'Form Submissions',
             'globals' => 'Globals',
+            'global_variables' => 'Global Variables',
             'navs' => 'Navigations',
             'nav_trees' => 'Navigation Trees',
             'revisions' => 'Revisions',
@@ -120,8 +121,10 @@ class InstallEloquentDriver extends Command
                     return config('statamic.eloquent-driver.form_submissions.driver') === 'eloquent';
 
                 case 'globals':
-                    return config('statamic.eloquent-driver.global_sets.driver') === 'eloquent'
-                        || config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent';
+                    return config('statamic.eloquent-driver.global_sets.driver') === 'eloquent';
+
+                case 'global_variables':
+                    return config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent';
 
                 case 'navs':
                     return config('statamic.eloquent-driver.navigations.driver') === 'eloquent';
@@ -359,11 +362,9 @@ class InstallEloquentDriver extends Command
         spin(
             callback: function () {
                 $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-global-migrations');
-                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-global-variables-migrations');
                 $this->runArtisanCommand('migrate');
 
                 $this->switchToEloquentDriver('global_sets');
-                $this->switchToEloquentDriver('global_set_variables');
             },
             message: 'Migrating globals...'
         );
@@ -372,11 +373,35 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing globals?')) {
             spin(
-                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-globals'),
-                message: 'Importing existing global variables...'
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-globals --only-global-sets'),
+                message: 'Importing existing globals...'
             );
 
             $this->components->info('Imported existing globals');
+        }
+    }
+
+    protected function migrateGlobalVariables(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-global-variables-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('global_set_variables');
+            },
+            message: 'Migrating global variables...'
+        );
+
+        $this->components->info('Configured global variables');
+
+        if (confirm('Would you like to import existing global variables?')) {
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-globals --only-global-variables'),
+                message: 'Importing existing global variables...'
+            );
+
+            $this->components->info('Imported existing global variables');
         }
     }
 
