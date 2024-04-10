@@ -87,6 +87,7 @@ class InstallEloquentDriver extends Command
             'collection_trees' => 'Collection Trees',
             'entries' => 'Entries',
             'forms' => 'Forms',
+            'form_submissions' => 'Form Submissions',
             'globals' => 'Globals',
             'navs' => 'Navigations',
             'nav_trees' => 'Navigation Trees',
@@ -114,6 +115,9 @@ class InstallEloquentDriver extends Command
 
                 case 'forms':
                     return config('statamic.eloquent-driver.forms.driver') === 'eloquent';
+
+                case 'form-submissions':
+                    return config('statamic.eloquent-driver.form_submissions.driver') === 'eloquent';
 
                 case 'globals':
                     return config('statamic.eloquent-driver.global_sets.driver') === 'eloquent'
@@ -310,7 +314,6 @@ class InstallEloquentDriver extends Command
                 $this->runArtisanCommand('migrate');
 
                 $this->switchToEloquentDriver('forms');
-                $this->switchToEloquentDriver('form_submissions');
             },
             message: 'Migrating forms...'
         );
@@ -319,11 +322,35 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing forms?')) {
             spin(
-                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-forms'),
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-forms --only-forms'),
                 message: 'Importing existing forms...'
             );
 
             $this->components->info('Imported existing forms');
+        }
+    }
+
+    protected function migrateFormSubmissions(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-form-submission-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('form_submissions');
+            },
+            message: 'Migrating form submissions...'
+        );
+
+        $this->components->info('Configured form submissions');
+
+        if (confirm('Would you like to import existing form submissions?')) {
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-forms --only-form-submissions'),
+                message: 'Importing existing form submissions...'
+            );
+
+            $this->components->info('Imported existing form submissions');
         }
     }
 
