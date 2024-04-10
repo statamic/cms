@@ -179,7 +179,7 @@ class InstallEloquentDriver extends Command
         spin(
             callback: function () {
                 $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-collection-migrations');
-                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-tree-migrations');
 
                 $this->runArtisanCommand('migrate');
 
@@ -278,6 +278,7 @@ class InstallEloquentDriver extends Command
         spin(
             callback: function () {
                 $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-global-migrations');
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-global-variables-migrations');
                 $this->runArtisanCommand('migrate');
 
                 $this->switchToEloquentDriver('global_sets');
@@ -303,6 +304,7 @@ class InstallEloquentDriver extends Command
         spin(
             callback: function () {
                 $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-migrations');
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-tree-migrations');
 
                 $this->runArtisanCommand('migrate');
 
@@ -352,6 +354,7 @@ class InstallEloquentDriver extends Command
         spin(
             callback: function () {
                 $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-taxonomy-migrations');
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-term-migrations');
                 $this->runArtisanCommand('migrate');
 
                 $this->switchToEloquentDriver('taxonomies');
