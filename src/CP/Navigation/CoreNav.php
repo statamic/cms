@@ -147,6 +147,11 @@ class CoreNav
                     })->filter();
             });
 
+        Nav::content(Site::multiEnabled() ? 'Sites' : 'Site')
+            ->route('sites.edit')
+            ->icon('/sites')
+            ->can('configure sites');
+
         return $this;
     }
 

@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected $configFiles = [
         'antlers', 'api', 'assets', 'autosave', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'markdown', 'oauth', 'protect', 'revisions',
-        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users',
+        'routes', 'search', 'static_caching', 'stache', 'system', 'users',
     ];
 
     public function boot()
@@ -103,9 +103,7 @@ class AppServiceProvider extends ServiceProvider
             $this->mergeConfigFrom("{$this->root}/config/$config.php", "statamic.$config");
         });
 
-        $this->app->singleton(Sites::class, function () {
-            return new Sites(config('statamic.sites'));
-        });
+        $this->app->singleton(Sites::class);
 
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
@@ -121,6 +119,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Structures\NavigationRepository::class => \Statamic\Stache\Repositories\NavigationRepository::class,
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
             \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
+            \Statamic\Contracts\Forms\SubmissionRepository::class => \Statamic\Stache\Repositories\SubmissionRepository::class,
         ])->each(function ($concrete, $abstract) {
             if (! $this->app->bound($abstract)) {
                 Statamic::repository($abstract, $concrete);
@@ -155,6 +154,7 @@ class AppServiceProvider extends ServiceProvider
 
         collect([
             'entries' => fn () => Facades\Entry::query(),
+            'form-submissions' => fn () => Facades\FormSubmission::query(),
             'terms' => fn () => Facades\Term::query(),
             'assets' => fn () => Facades\Asset::query(),
             'users' => fn () => Facades\User::query(),

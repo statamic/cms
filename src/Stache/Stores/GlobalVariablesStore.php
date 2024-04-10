@@ -25,7 +25,7 @@ class GlobalVariablesStore extends BasicStore
 
         $filename = Str::after(Path::tidy($file->getPathName()), $this->directory);
 
-        if (! Site::hasMultiple()) {
+        if (! Site::multiEnabled()) {
             return substr_count($filename, '/') === 0;
         }
 
@@ -39,7 +39,7 @@ class GlobalVariablesStore extends BasicStore
 
         $data = YAML::file($path)->parse($contents);
 
-        if (! Site::hasMultiple()) {
+        if (! Site::multiEnabled()) {
             $data = $data['data'] ?? [];
         }
 
@@ -70,7 +70,7 @@ class GlobalVariablesStore extends BasicStore
 
     protected function writeItemToDisk($item)
     {
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $item->writeFile();
         } else {
             $item->globalSet()->writeFile();
@@ -79,7 +79,7 @@ class GlobalVariablesStore extends BasicStore
 
     protected function deleteItemFromDisk($item)
     {
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $item->deleteFile();
         } else {
             $item->globalSet()->removeLocalization($item)->writeFile();

@@ -406,7 +406,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                if (! Site::hasMultiple() || ! $sites) {
+                if (! Site::multiEnabled() || ! $sites) {
                     $sites = [Site::default()->handle()];
                 }
 
@@ -584,7 +584,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'origin_behavior' => ($ob = $this->originBehavior()) === 'select' ? null : $ob,
         ]));
 
-        if (! Site::hasMultiple()) {
+        if (! Site::multiEnabled()) {
             unset($array['sites'], $array['propagate']);
         }
 
@@ -788,7 +788,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
                     return null;
                 }
 
-                return Blink::once("collection-{$this->id()}-mount-{$mount}", function () use ($mount) {
+                return Blink::store('collection-mounts')->once("{$this->id()}-{$mount}", function () use ($mount) {
                     return Entry::find($mount);
                 });
             })

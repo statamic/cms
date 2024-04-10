@@ -37,7 +37,7 @@ class CollectionsStore extends BasicStore
         $handle = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::file($path)->parse($contents);
 
-        $sites = Arr::get($data, 'sites', Site::hasMultiple() ? [] : [Site::default()->handle()]);
+        $sites = Arr::get($data, 'sites', Site::multiEnabled() ? [] : [Site::default()->handle()]);
 
         $collection = Collection::make($handle)
             ->title(Arr::get($data, 'title'))
