@@ -36,6 +36,7 @@ class CoreNav
             ->makeContentSection()
             ->makeFieldsSection()
             ->makeToolsSection()
+            ->makeSettingsSection()
             ->makeUsersSection();
     }
 
@@ -147,11 +148,6 @@ class CoreNav
                     })->filter();
             });
 
-        Nav::content(Site::multiEnabled() ? 'Sites' : 'Site')
-            ->route('sites.edit')
-            ->icon('/sites')
-            ->can('configure sites');
-
         return $this;
     }
 
@@ -240,6 +236,22 @@ class CoreNav
         }
 
         return $this;
+    }
+
+    /**
+     * Make users section items.
+     *
+     * @return $this
+     */
+    protected function makeSettingsSection()
+    {
+        Nav::settings(Site::multiEnabled() ? 'Sites' : 'Site')
+            ->route('sites.edit')
+            ->icon('/sites')
+            ->can('configure sites');
+
+        Nav::settings('Preferences')
+            ->icon('/cog');
     }
 
     /**
