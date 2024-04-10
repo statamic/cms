@@ -118,7 +118,7 @@ class Sites
 
     public function path(): string
     {
-        return base_path('content/sites.yaml');
+        return resource_path('settings/sites.yaml');
     }
 
     protected function getSavedSites()

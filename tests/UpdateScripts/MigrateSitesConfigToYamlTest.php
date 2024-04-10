@@ -22,7 +22,7 @@ class MigrateSitesConfigToYamlTest extends TestCase
         File::copy(__DIR__.'/__fixtures__/v4/config/system.php', config_path('statamic/system.php'));
 
         // Delete default sites.yaml, since base test copies one in
-        File::delete(base_path('content/sites.yaml'));
+        File::delete(resource_path('settings/sites.yaml'));
     }
 
     public function tearDown(): void
@@ -330,7 +330,7 @@ CONFIG);
         $this->assertFileDoesNotExist(config_path('statamic/sites.php'));
         $this->assertNull(config('statamic.sites.sites'));
 
-        $this->assertFileExists(base_path('content/sites.yaml'));
+        $this->assertFileExists(resource_path('settings/sites.yaml'));
     }
 
     private function assertMultisiteEnabledConfigIs($boolean)
@@ -381,6 +381,6 @@ CONFIG, File::get(config_path('statamic/system.php')));
 
     private function assertSitesYamlHas($sites)
     {
-        $this->assertSame($sites, YAML::file(base_path('content/sites.yaml'))->parse());
+        $this->assertSame($sites, YAML::file(resource_path('settings/sites.yaml'))->parse());
     }
 }
