@@ -84,6 +84,7 @@ class InstallEloquentDriver extends Command
             'assets' => 'Assets',
             'blueprints' => 'Blueprints & Fieldsets',
             'collections' => 'Collections',
+            'collection_trees' => 'Collection Trees',
             'entries' => 'Entries',
             'forms' => 'Forms',
             'globals' => 'Globals',
@@ -102,8 +103,10 @@ class InstallEloquentDriver extends Command
                     return config('statamic.eloquent-driver.blueprints.driver') === 'eloquent';
 
                 case 'collections':
-                    return config('statamic.eloquent-driver.collections.driver') === 'eloquent'
-                        || config('statamic.eloquent-driver.collection_trees.driver') === 'eloquent';
+                    return config('statamic.eloquent-driver.collections.driver') === 'eloquent';
+
+                case 'collection_trees':
+                    return config('statamic.eloquent-driver.collection_trees.driver') === 'eloquent';
 
                 case 'entries':
                     return config('statamic.eloquent-driver.entries.driver') === 'eloquent';
@@ -206,12 +209,9 @@ class InstallEloquentDriver extends Command
         spin(
             callback: function () {
                 $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-collection-migrations');
-                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-tree-migrations');
-
                 $this->runArtisanCommand('migrate');
 
                 $this->switchToEloquentDriver('collections');
-                $this->switchToEloquentDriver('collection_trees');
             },
             message: 'Migrating collections...'
         );
@@ -220,11 +220,35 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing collections?')) {
             spin(
-                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-collections --force'),
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-collections --force --only-collections'),
                 message: 'Importing existing collections...'
             );
 
             $this->components->info('Imported existing collections');
+        }
+    }
+
+    protected function migrateCollectionTrees(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-navigation-tree-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('collection_trees');
+            },
+            message: 'Migrating collection trees...'
+        );
+
+        $this->components->info('Configured collection trees');
+
+        if (confirm('Would you like to import existing collection trees?')) {
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-collections --force --only-collection-trees'),
+                message: 'Importing existing collections...'
+            );
+
+            $this->components->info('Imported existing collection trees');
         }
     }
 
