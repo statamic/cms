@@ -143,6 +143,7 @@ import AssetContainerEditForm from './components/asset-containers/EditForm.vue';
 import NavBuilder from './components/nav/Builder.vue';
 import Updater from './components/updater/Updater.vue';
 import PortalTargets from './components/portals/PortalTargets.vue';
+import SitesEditForm from './components/sites/EditForm.vue';
 
 
 Statamic.app({
@@ -198,6 +199,7 @@ Statamic.app({
         NavBuilder,
         Updater,
         PortalTargets,
+        SitesEditForm,
     },
 
     data: {

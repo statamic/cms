@@ -42,7 +42,7 @@ class FieldTransformer
                     return true;
                 }
 
-                if ($key === 'localizable' && $value === false && ! Site::hasMultiple()) {
+                if ($key === 'localizable' && $value === false && ! Site::multiEnabled()) {
                     return true;
                 }
 

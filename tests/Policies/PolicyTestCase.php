@@ -2,7 +2,6 @@
 
 namespace Tests\Policies;
 
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
 use Tests\FakesRoles;
@@ -15,9 +14,9 @@ class PolicyTestCase extends TestCase
 
     protected function withSites(array $sites)
     {
-        Site::setConfig(['sites' => collect($sites)->mapWithKeys(fn ($site) => [
+        $this->setSites(collect($sites)->mapWithKeys(fn ($site) => [
             $site => ['locale' => $site, 'url' => '/'],
-        ])]);
+        ]));
     }
 
     protected function userWithPermissions(array $permissions)

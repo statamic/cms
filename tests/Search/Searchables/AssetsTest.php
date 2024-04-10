@@ -5,7 +5,6 @@ namespace Tests\Search\Searchables;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\Site;
 use Statamic\Search\Searchables\Assets;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -21,10 +20,10 @@ class AssetsTest extends TestCase
      */
     public function it_gets_assets($locale, $config, $expected)
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Storage::fake('images');
         Storage::fake('documents');

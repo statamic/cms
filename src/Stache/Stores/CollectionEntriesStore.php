@@ -36,7 +36,7 @@ class CollectionEntriesStore extends ChildStore
             $relative = substr($relative, strlen($dir));
         }
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             [$site, $relative] = explode('/', $relative, 2);
             if (! $this->collection()->sites()->contains($site)) {
                 return false;
@@ -115,7 +115,7 @@ class CollectionEntriesStore extends ChildStore
         $collection = pathinfo($path, PATHINFO_DIRNAME);
         $collection = Str::after($collection, $this->parent->directory());
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             [$collection, $site] = explode('/', $collection);
         }
 

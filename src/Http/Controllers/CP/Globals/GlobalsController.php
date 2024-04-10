@@ -111,7 +111,7 @@ class GlobalsController extends CpController
             ->title($values['title'])
             ->blueprint($values['blueprint']);
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $sites = collect(Arr::get($values, 'sites'));
 
             foreach ($sites->filter->enabled as $site) {
@@ -212,7 +212,7 @@ class GlobalsController extends CpController
             ],
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $fields['sites'] = [
                 'display' => __('Sites'),
                 'fields' => [

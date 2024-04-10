@@ -46,11 +46,11 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_gets_and_sets_the_routes()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         // A collection with no sites uses the default site.
         $collection = new Collection;
@@ -88,11 +88,11 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_sets_all_the_routes_identically()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         $collection = (new Collection)->sites(['en', 'fr']);
 
@@ -112,11 +112,11 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_gets_and_sets_the_title_formats()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         // A collection with no sites uses the default site.
         $collection = new Collection;
@@ -159,11 +159,11 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_sets_all_the_title_formats_identically()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         $collection = (new Collection)->sites(['en', 'fr']);
 
@@ -226,10 +226,10 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_gets_and_sets_the_sites_it_can_be_used_in_when_using_multiple_sites()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
-        ]]);
+        ]);
 
         $collection = new Collection;
 
@@ -961,13 +961,10 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_cannot_view_collections_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection1 = tap(Facades\Collection::make('has_some_french')->sites(['en', 'fr', 'de']))->save();
