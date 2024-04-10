@@ -31,7 +31,7 @@ class ForgotPasswordFormTest extends TestCase
     /** @test */
     public function it_renders_form_with_params()
     {
-        $output = $this->tag('{{ user:forgot_password_form redirect="/submitted" error_redirect="/errors" reset_url="/resetting" attr:class="form" attr:id="form" }}{{ /user:forgot_password_form }}');
+        $output = $this->tag('{{ user:forgot_password_form redirect="/submitted" error_redirect="/errors" reset_url="/resetting" class="form" id="form" }}{{ /user:forgot_password_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/password/email" class="form" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_redirect" value="/submitted" />', $output);
