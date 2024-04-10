@@ -24,12 +24,12 @@ class RendersAttributesTest extends TestCase
         $this->assertEquals('', $this->tag->renderAttributes([]));
 
         $output = $this->tag->renderAttributes([
-            'attr:class' => 'm-0 mb-2',
-            'attr::name' => 'first_name',
-            'attr:disabled' => 'true',
-            'attr:autocomplete' => true,
-            'attr:focusable' => false,
-            'attr:dont_render_nulls' => null,
+            'class' => 'm-0 mb-2',
+            ':name' => 'first_name',
+            'disabled' => 'true',
+            'autocomplete' => true,
+            'focusable' => false,
+            'dont_render_nulls' => null,
         ]);
 
         $this->assertEquals('class="m-0 mb-2" :name="first_name" disabled="true" autocomplete="true" focusable="false"', $output);
@@ -54,6 +54,28 @@ class RendersAttributesTest extends TestCase
             ->renderAttributesFromParams();
 
         $this->assertEquals('class="m-0 mb-2" name="Han" src="avatar.jpg" focusable="false" disabled="true" autocomplete="true"', $output);
+    }
+
+    /** @test */
+    public function it_renders_certain_attributes_from_params_without_needing_attr_prefix()
+    {
+        $this->assertEquals('', $this->tag->renderAttributesFromParams());
+
+        $output = $this->tag
+            ->setContext(['first_name' => 'Han'])
+            ->setParameters([
+                'class' => 'm-0 mb-2',
+                'autocomplete' => true,
+                'aria-alfa' => 'bravo',
+                'aria-charlie' => 'delta',
+                'aria-echo' => null,
+                'data-alfa' => 'bravo',
+                'data-charlie' => 'delta',
+                'data-echo' => null,
+            ])
+            ->renderAttributesFromParams();
+
+        $this->assertEquals('class="m-0 mb-2" autocomplete="true" aria-alfa="bravo" aria-charlie="delta" data-alfa="bravo" data-charlie="delta"', $output);
     }
 }
 

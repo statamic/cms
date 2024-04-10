@@ -37,17 +37,21 @@ trait RendersAttributes
     /**
      * Render HTML attributes from tag params.
      *
-     * Parameters that are not prefixed with attr: will be automatically removed.
+     * Parameters that are not approved will be filtered out.
      *
      * @return string
      */
     protected function renderAttributesFromParams()
     {
-        $params = $this->params->filter(function ($value, $attribute) {
-            return preg_match('/^attr:/', $attribute);
-        })->all();
+        $params = $this->params->filter(fn ($v, $attr) => $this->isAllowedParamAttr($attr))->all();
 
         return $this->renderAttributes($params);
+    }
+
+    private function isAllowedParamAttr($attribute): bool
+    {
+        return Str::startsWith($attribute, ['attr:', 'aria-', 'data-'])
+            || in_array($attribute, ['class', 'autocomplete']);
     }
 
     /**
