@@ -252,7 +252,7 @@ EOT;
         $this->assertSame('FINAL_LITERAL</figure>', $nodes[2]->content);
 
         $template = <<<'EOT'
- <div class="list-of-classes">     {{ partial src="svg/" values="{{ article_icon_color:key }} {{ article_icon_size:key }}" }}FINAL_LITERAL </div> 
+ <div class="list-of-classes">     {{ partial src="svg/" values="{{ article_icon_color:key }} {{ article_icon_size:key }}" }}FINAL_LITERAL </div>
 EOT;
 
         $nodes = $this->parseNodes($template);
@@ -263,7 +263,7 @@ EOT;
         $this->assertInstanceOf(LiteralNode::class, $nodes[2]);
 
         $this->assertSame(' <div class="list-of-classes">     ', $nodes[0]->content);
-        $this->assertSame('FINAL_LITERAL </div> ', $nodes[2]->content);
+        $this->assertSame('FINAL_LITERAL </div>', $nodes[2]->content);
     }
 
     public function test_shorthand_variable_syntax()
@@ -332,7 +332,7 @@ EOT;
     public function test_curly_braces_inside_a_parameter_can_be_ignored_entirely()
     {
         $template = <<<'EOT'
-{{ form @x-data="{ open: false }" @attr:x-bind="..." @x-init="() => { open = true }" x-show="open" }}
+{{ form \x-data="{ open: false }" \attr:x-bind="..." \x-init="() => { open = true }" x-show="open" }}
 EOT;
 
         $nodes = $this->parseNodes($template);
@@ -348,17 +348,17 @@ EOT;
 
         $pXData = $antlersNode->parameters[0];
         $this->assertSame('x-data', $pXData->name);
-        $this->assertSame('@x-data', $pXData->originalName);
+        $this->assertSame('\x-data', $pXData->originalName);
         $this->assertSame('{ open: false }', $pXData->value);
 
         $pXBind = $antlersNode->parameters[1];
         $this->assertSame('attr:x-bind', $pXBind->name);
-        $this->assertSame('@attr:x-bind', $pXBind->originalName);
+        $this->assertSame('\attr:x-bind', $pXBind->originalName);
         $this->assertSame('...', $pXBind->value);
 
         $pXInit = $antlersNode->parameters[2];
         $this->assertSame('x-init', $pXInit->name);
-        $this->assertSame('@x-init', $pXInit->originalName);
+        $this->assertSame('\x-init', $pXInit->originalName);
         $this->assertSame('() => { open = true }', $pXInit->value);
 
         $pXShow = $antlersNode->parameters[3];
