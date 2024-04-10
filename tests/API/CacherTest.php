@@ -79,7 +79,8 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $this->assertFalse(Cache::has("api-cache:$endpoint"));
+        $hash = md5($endpoint);
+        $this->assertFalse(Cache::has("api-cache:$hash"));
         $this->assertNull(Cache::get('api-cache:tracked-responses'));
     }
 
@@ -102,7 +103,8 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $this->assertTrue(Cache::has($cacheKey = "api-cache:$endpoint"));
+        $hash = md5($endpoint);
+        $this->assertTrue(Cache::has($cacheKey = "api-cache:$hash"));
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
     }
 
@@ -126,7 +128,8 @@ class CacherTest extends TestCase
         $this->makeEntry('apple')->save();
 
         $endpoint = '/api/collections/articles/entries';
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         Carbon::setTestNow(now());
 
@@ -150,7 +153,8 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         $this->assertTrue(Cache::has($cacheKey));
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
@@ -173,12 +177,14 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $this->assertTrue(Cache::has("api-cache:$endpointOne"));
-        $this->assertTrue(Cache::has("api-cache:$endpointTwo"));
+        $hashOne = md5($endpointOne);
+        $hashTwo = md5($endpointTwo);
+        $this->assertTrue(Cache::has("api-cache:$hashOne"));
+        $this->assertTrue(Cache::has("api-cache:$hashTwo"));
 
         $cachedResponses = [
-            "api-cache:$endpointOne",
-            "api-cache:$endpointTwo",
+            "api-cache:$hashOne",
+            "api-cache:$hashTwo",
         ];
 
         $this->assertEquals($cachedResponses, Cache::get('api-cache:tracked-responses'));
@@ -202,14 +208,16 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $this->assertTrue(Cache::has("api-cache:$endpointOne"));
-        $this->assertTrue(Cache::has("api-cache:$endpointTwo"));
+        $hashOne = md5($endpointOne);
+        $hashTwo = md5($endpointTwo);
+        $this->assertTrue(Cache::has("api-cache:$hashOne"));
+        $this->assertTrue(Cache::has("api-cache:$hashTwo"));
         $this->assertCount(2, Cache::get('api-cache:tracked-responses'));
 
         $entry->save();
 
-        $this->assertFalse(Cache::has("api-cache:$endpointOne"));
-        $this->assertFalse(Cache::has("api-cache:$endpointTwo"));
+        $this->assertFalse(Cache::has("api-cache:$hashOne"));
+        $this->assertFalse(Cache::has("api-cache:$hashTwo"));
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
     }
 
@@ -230,14 +238,17 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $this->assertTrue(Cache::has("api-cache:$endpointOne"));
-        $this->assertTrue(Cache::has("api-cache:$endpointTwo"));
+        $hashOne = md5($endpointOne);
+        $hashTwo = md5($endpointTwo);
+
+        $this->assertTrue(Cache::has("api-cache:$hashOne"));
+        $this->assertTrue(Cache::has("api-cache:$hashTwo"));
         $this->assertCount(2, Cache::get('api-cache:tracked-responses'));
 
         Facades\Form::make('contact')->save();
 
-        $this->assertFalse(Cache::has("api-cache:$endpointOne"));
-        $this->assertFalse(Cache::has("api-cache:$endpointTwo"));
+        $this->assertFalse(Cache::has("api-cache:$hashOne"));
+        $this->assertFalse(Cache::has("api-cache:$hashTwo"));
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
     }
 
@@ -254,7 +265,8 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         $this->assertFalse(Cache::has($cacheKey));
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
@@ -273,7 +285,8 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         $this->assertFalse(Cache::has($cacheKey));
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
@@ -293,7 +306,8 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         $this->assertFalse(Cache::has($cacheKey));
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
