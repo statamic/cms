@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.0.0-alpha.2 (2024-04-10)
+
+### What's changed
+- Change tag parameter parse-prevention character from @ to backslash. [#9856](https://github.com/statamic/cms/issues/9856) by @jasonvarga
+- Revert requirement of prefixing attributes with `:attr`. [#9854](https://github.com/statamic/cms/issues/9854) by @jasonvarga
+
+
+
 ## 5.0.0-alpha.1 (2024-04-09)
 
 ### What's new
