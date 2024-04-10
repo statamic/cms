@@ -257,7 +257,7 @@ class CoreNav
 
         Nav::settings('Preferences')
             ->route('preferences.index')
-            ->icon('/cog')
+            ->icon('/settings')
             ->children([
                 Nav::item('CP Nav')->route('preferences.nav.index'),
             ]);
