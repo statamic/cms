@@ -159,7 +159,7 @@ class InstallEloquentDriver extends Command
         if (confirm('Would you like to import existing asset containers?')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-assets --force --only-asset-containers'),
-                message: 'Importing existing assets...'
+                message: 'Importing existing asset containers...'
             );
 
             $this->components->info('Imported existing asset containers');
