@@ -77,7 +77,6 @@ class InstallEloquentDriver extends Command
     }
 
     protected function availableRepositories(): Collection
-
     {
         return collect([
             'asset_containers' => 'Asset Containers',
