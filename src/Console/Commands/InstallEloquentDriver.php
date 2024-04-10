@@ -77,8 +77,10 @@ class InstallEloquentDriver extends Command
     }
 
     protected function availableRepositories(): Collection
+
     {
         return collect([
+            'asset_containers' => 'Asset Containers',
             'assets' => 'Assets',
             'blueprints' => 'Blueprints & Fieldsets',
             'collections' => 'Collections',
@@ -90,9 +92,11 @@ class InstallEloquentDriver extends Command
             'taxonomies' => 'Taxonomies',
         ])->reject(function ($value, $key) {
             switch ($key) {
+                case 'asset_containers':
+                    return config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent';
+
                 case 'assets':
-                    return config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent'
-                        || config('statamic.eloquent-driver.assets.driver') === 'eloquent';
+                    return config('statamic.eloquent-driver.assets.driver') === 'eloquent';
 
                 case 'blueprints':
                     return config('statamic.eloquent-driver.blueprints.driver') === 'eloquent';
@@ -125,6 +129,30 @@ class InstallEloquentDriver extends Command
         });
     }
 
+    protected function migrateAssetContainers(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-asset-container-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('asset_containers');
+            },
+            message: 'Migrating asset containers...'
+        );
+
+        $this->components->info('Configured asset containers');
+
+        if (confirm('Would you like to import existing asset containers?')) {
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-assets --force --only-asset-containers'),
+                message: 'Importing existing assets...'
+            );
+
+            $this->components->info('Imported existing asset containers');
+        }
+    }
+
     protected function migrateAssets(): void
     {
         spin(
@@ -132,7 +160,6 @@ class InstallEloquentDriver extends Command
                 $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-asset-migrations');
                 $this->runArtisanCommand('migrate');
 
-                $this->switchToEloquentDriver('asset_containers');
                 $this->switchToEloquentDriver('assets');
             },
             message: 'Migrating assets...'
@@ -142,7 +169,7 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing assets?')) {
             spin(
-                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-assets --force'),
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-assets --force --only-assets'),
                 message: 'Importing existing assets...'
             );
 
