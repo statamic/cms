@@ -5,6 +5,12 @@ module.exports = {
         './resources/**/*.{html,js,vue,blade.php}',
         './tests/**/*.{html,vue,blade.php}'
     ],
+    safelist: [
+        {
+            pattern: /m[l|r]-\d+/,
+            variants: ['md', 'lg', 'xl']
+        },
+    ],
     theme: {
         colors: {
             transparent: 'transparent',
