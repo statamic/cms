@@ -14,7 +14,10 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class TaxonomiesController extends CpController
 {
@@ -99,10 +102,10 @@ class TaxonomiesController extends CpController
 
         $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
+            'handle' => ['nullable', new Handle],
         ]);
 
-        $handle = $request->handle ?? snake_case($request->title);
+        $handle = $request->handle ?? Str::snake($request->title);
 
         if (Taxonomy::findByHandle($handle)) {
             throw new \Exception('Taxonomy already exists');
@@ -110,7 +113,7 @@ class TaxonomiesController extends CpController
 
         $taxonomy = Taxonomy::make($handle)->title($request->title);
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $taxonomy->sites([Site::default()->handle()]);
         }
 
@@ -133,8 +136,8 @@ class TaxonomiesController extends CpController
             'collections' => $taxonomy->collections()->map->handle()->all(),
             'sites' => $taxonomy->sites()->all(),
             'preview_targets' => $taxonomy->basePreviewTargets(),
-            'term_template' => $taxonomy->termTemplate(),
-            'template' => $taxonomy->template(),
+            'term_template' => $taxonomy->hasCustomTermTemplate() ? $taxonomy->termTemplate() : null,
+            'template' => $taxonomy->hasCustomTemplate() ? $taxonomy->template() : null,
             'layout' => $taxonomy->layout(),
         ];
 
@@ -170,7 +173,7 @@ class TaxonomiesController extends CpController
             ->template($values['template'] ?? null)
             ->layout($values['layout'] ?? null);
 
-        if ($sites = array_get($values, 'sites')) {
+        if ($sites = Arr::get($values, 'sites')) {
             $taxonomy->sites($sites);
         }
 
@@ -251,7 +254,7 @@ class TaxonomiesController extends CpController
                         'type' => 'html',
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <span class="mr-4">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <span class="rtl:ml-4 ltr:mr-4">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
                             '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
@@ -265,7 +268,7 @@ class TaxonomiesController extends CpController
             ],
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $fields['sites'] = [
                 'display' => __('Sites'),
                 'fields' => [

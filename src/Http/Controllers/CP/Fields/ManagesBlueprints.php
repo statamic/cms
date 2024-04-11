@@ -33,7 +33,7 @@ trait ManagesBlueprints
     private function setBlueprintContents(Request $request, Blueprint $blueprint)
     {
         $tabs = collect($request->tabs)->mapWithKeys(function ($tab) {
-            return [array_pull($tab, 'handle') => [
+            return [Arr::pull($tab, 'handle') => [
                 'display' => $tab['display'],
                 'sections' => $this->tabSections($tab['sections']),
             ]];

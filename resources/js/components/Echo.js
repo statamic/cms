@@ -5,7 +5,12 @@ window.Pusher = Pusher;
 class Echo {
 
     constructor() {
+        this.configCallbacks = [];
         this.bootedCallbacks = [];
+    }
+
+    config(callback) {
+        this.configCallbacks.push(callback);
     }
 
     booted(callback) {
@@ -13,14 +18,13 @@ class Echo {
     }
 
     start() {
-        const config = {
-            broadcaster: 'pusher',
-            key: Statamic.$config.get('broadcasting.pusher.key'),
-            cluster: Statamic.$config.get('broadcasting.pusher.cluster'),
-            encrypted: Statamic.$config.get('broadcasting.pusher.encrypted'),
+        let config = {
+            ...Statamic.$config.get('broadcasting.options'),
             csrfToken: Statamic.$config.get('csrfToken'),
             authEndpoint: Statamic.$config.get('broadcasting.endpoint'),
         };
+
+        this.configCallbacks.forEach(callback => config = callback(config));
 
         this.echo = new LaravelEcho(config);
 

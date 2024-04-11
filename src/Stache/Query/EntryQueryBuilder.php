@@ -7,6 +7,7 @@ use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
+use Statamic\Support\Arr;
 
 class EntryQueryBuilder extends Builder implements QueryBuilder
 {
@@ -205,5 +206,21 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
                 $query->where('date', 'invalid'); // intentionally trigger no results.
             }
         }
+    }
+
+    public function prepareForFakeQuery(): array
+    {
+        $data = parent::prepareForFakeQuery();
+
+        if (! empty($this->collections)) {
+            $data['wheres'] = Arr::prepend($data['wheres'], [
+                'type' => 'In',
+                'column' => 'collection',
+                'values' => $this->collections,
+                'boolean' => 'and',
+            ]);
+        }
+
+        return $data;
     }
 }

@@ -28,10 +28,10 @@ class EntriesTest extends TestCase
 
         Carbon::setTestNow(Carbon::parse('2021-01-03'));
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $blog = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->dated(true)->pastDateBehavior('public')->futureDateBehavior('private')->save();
         $events = Facades\Collection::make('events')->sites(['en', 'fr'])->dated(true)->pastDateBehavior('private')->futureDateBehavior('public')->save();
@@ -62,7 +62,7 @@ class EntriesTest extends TestCase
         $this->assertEquals($expectedIds, $results->map->id()->all());
     }
 
-    public function augmentQueryBuilderProvider()
+    public static function augmentQueryBuilderProvider()
     {
         return [
             'published (default, no where clause)' => [['456', '123'], fn ($q) => null],
