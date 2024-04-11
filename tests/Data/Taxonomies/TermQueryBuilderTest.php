@@ -20,10 +20,10 @@ class TermQueryBuilderTest extends TestCase
     /** @test */
     public function it_gets_terms()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr/'],
-        ]]);
+        ]);
 
         Taxonomy::make('tags')->sites(['en', 'fr'])->save();
         Term::make('a')->taxonomy('tags')->dataForLocale('en', ['title' => 'Alfa'])->dataForLocale('fr', ['title' => 'Le Alfa'])->save();
@@ -340,10 +340,10 @@ class TermQueryBuilderTest extends TestCase
     /** @test */
     public function it_substitutes_terms_by_uri_and_site()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Taxonomy::make('tags')->sites(['en', 'fr'])->save();
         Term::make('tag-1')->slug('tag-1')->taxonomy('tags')

@@ -1395,7 +1395,7 @@ class CoreModifiers extends Modifier
     public function link($value, $params)
     {
         $attributes = $this->buildAttributesFromParameters($params);
-        $title = array_pull($attributes, 'title', null);
+        $title = Arr::pull($attributes, 'title', null);
 
         return Html::link($value, $title, $attributes);
     }
@@ -1543,7 +1543,7 @@ class CoreModifiers extends Modifier
      */
     public function modifyDate($value, $params)
     {
-        return $this->carbon($value)->modify(Arr::get($params, 0));
+        return $this->carbon($value)->copy()->modify(Arr::get($params, 0));
     }
 
     /**
@@ -1787,7 +1787,7 @@ class CoreModifiers extends Modifier
             $value = $value->all();
         }
 
-        return array_random($value);
+        return Arr::random($value);
     }
 
     /**

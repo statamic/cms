@@ -36,7 +36,7 @@
   .CodeMirror-linenumber {
     padding: 0 3px 0 5px;
     min-width: 20px;
-    text-align: right;
+    @apply text-right;
     color: #999;
     white-space: nowrap;
   }
@@ -270,7 +270,7 @@
 
   .CodeMirror-widget {}
 
-  .CodeMirror-rtl pre { direction: rtl; }
+  .CodeMirror-rtl pre { direction: ltr; }
 
   .CodeMirror-code {
     outline: none;

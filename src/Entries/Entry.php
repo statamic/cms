@@ -78,6 +78,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
+    private $computedCallbackCache;
+    private $siteCache;
 
     public function __construct()
     {
@@ -95,6 +97,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return $this
             ->fluentlyGetOrSet('locale')
             ->setter(function ($locale) {
+                $this->siteCache = null;
+
                 return $locale instanceof \Statamic\Sites\Site ? $locale->handle() : $locale;
             })
             ->getter(function ($locale) {
@@ -105,7 +109,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function site()
     {
-        return Site::get($this->locale());
+        if ($this->siteCache) {
+            return $this->siteCache;
+        }
+
+        return $this->siteCache = Site::get($this->locale());
     }
 
     public function authors()
@@ -115,17 +123,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function collection($collection = null)
     {
-        return $this
-            ->fluentlyGetOrSet('collection')
-            ->setter(function ($collection) {
-                return $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
-            })
-            ->getter(function ($collection) {
-                return $collection ? Blink::once("collection-{$collection}", function () use ($collection) {
-                    return Collection::findByHandle($collection);
-                }) : null;
-            })
-            ->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->collection ? Blink::once("collection-{$this->collection}", function () {
+                return Collection::findByHandle($this->collection);
+            }) : null;
+        }
+
+        $this->computedCallbackCache = null;
+        $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
+
+        return $this;
     }
 
     public function blueprint($blueprint = null)
@@ -188,9 +195,19 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         ], $this->data()->except(['updated_at'])->toArray());
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (EntryDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && EntryDeleting::dispatch($this) === false) {
             return false;
         }
 
@@ -216,16 +233,18 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         Facades\Entry::delete($this);
 
-        EntryDeleted::dispatch($this);
+        if ($withEvents) {
+            EntryDeleted::dispatch($this);
+        }
 
         return true;
     }
 
-    public function deleteDescendants()
+    public function deleteDescendants($withEvents = true)
     {
-        $this->descendants()->each(function ($entry) {
-            $entry->deleteDescendants();
-            $entry->delete();
+        $this->descendants()->each(function ($entry) use ($withEvents) {
+            $entry->deleteDescendants($withEvents);
+            $withEvents ? $entry->delete() : $entry->deleteQuietly();
         });
 
         Blink::forget('entry-descendants-'.$this->id());
@@ -365,6 +384,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
             Blink::forget($this->getOriginBlinkKey());
+            Blink::store('collection-mounts')->flush();
         }
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
@@ -375,7 +395,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         $this->taxonomize();
 
-        optional(Collection::findByMount($this))->updateEntryUris();
+        if ($this->isDirty('slug')) {
+            optional(Collection::findByMount($this))->updateEntryUris();
+        }
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -433,7 +455,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return vsprintf('%s/%s/%s%s%s.%s', [
             rtrim(Stache::store('entries')->directory(), '/'),
             $this->collectionHandle(),
-            Site::hasMultiple() ? $this->locale().'/' : '',
+            Site::multiEnabled() ? $this->locale().'/' : '',
             $prefix,
             $this->slug() ?? $this->id(),
             $this->fileExtension(),
@@ -1014,6 +1036,20 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     protected function getComputedCallbacks()
     {
-        return Facades\Collection::getComputedCallbacks($this->collection);
+        if ($this->computedCallbackCache) {
+            return $this->computedCallbackCache;
+        }
+
+        return $this->computedCallbackCache = Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function __sleep()
+    {
+        if ($this->slug instanceof Closure) {
+            $slug = $this->slug;
+            $this->slug = $slug($this);
+        }
+
+        return array_keys(Arr::except(get_object_vars($this), ['cachedKeys', 'computedCallbackCache', 'siteCache']));
     }
 }

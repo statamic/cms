@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Term;
 use Statamic\Http\Controllers\CP\PreviewController;
+use Statamic\Support\Arr;
 
 class TermPreviewController extends PreviewController
 {
@@ -18,7 +19,7 @@ class TermPreviewController extends PreviewController
             ->addValues($preview = $request->preview)
             ->process();
 
-        $values = array_except($fields->values()->all(), ['slug']);
+        $values = Arr::except($fields->values()->all(), ['slug']);
 
         $term = Term::make()
             ->slug($preview['slug'] ?? 'slug')

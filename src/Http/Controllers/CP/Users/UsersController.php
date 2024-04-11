@@ -16,6 +16,7 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Rules\UniqueUserValue;
 use Statamic\Search\Result;
 use Symfony\Component\Mailer\Exception\TransportException;
 
@@ -68,9 +69,19 @@ class UsersController extends CpController
             'blueprints' => ['user'],
         ]);
 
-        $users = $query
-            ->orderBy(request('sort', 'email'), request('order', 'asc'))
-            ->paginate(request('perPage'));
+        $sortField = request('sort');
+        $sortDirection = request('order', 'asc');
+
+        if (! $sortField && ! request('search')) {
+            $sortField = config('statamic.user.sort_field', 'email');
+            $sortDirection = config('statamic.user.sort_direction', 'asc');
+        }
+
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $users = $query->paginate(request('perPage'));
 
         if ($users->getCollection()->first() instanceof Result) {
             $users->setCollection($users->getCollection()->map->getSearchable());
@@ -155,7 +166,7 @@ class UsersController extends CpController
 
         $fields = $blueprint->fields()->except(['roles', 'groups'])->addValues($request->all());
 
-        $fields->validate(['email' => 'required|email|unique_user_value']);
+        $fields->validate(['email' => ['required', 'email', new UniqueUserValue]]);
 
         if ($request->input('_validate_only')) {
             return [];
@@ -267,7 +278,7 @@ class UsersController extends CpController
 
         $fields
             ->validator()
-            ->withRules(['email' => 'required|unique_user_value:{id}'])
+            ->withRules(['email' => ['required', 'email', new UniqueUserValue(except: $user->id())]])
             ->withReplacements(['id' => $user->id()])
             ->validate();
 
@@ -297,20 +308,5 @@ class UsersController extends CpController
             'title' => $user->title(),
             'saved' => is_bool($save) ? $save : true,
         ];
-    }
-
-    public function destroy($user)
-    {
-        throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (! $user = User::find($user)) {
-            return $this->pageNotFound();
-        }
-
-        $this->authorize('delete', $user);
-
-        $user->delete();
-
-        return response('', 204);
     }
 }
