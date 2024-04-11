@@ -133,7 +133,8 @@ class InstallEloquentDriver extends Command
                     return config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent';
 
                 case 'revisions':
-                    return config('statamic.eloquent-driver.revisions.driver') === 'eloquent';
+                    return ! config('statamic.revisions.enabled')
+                        || config('statamic.eloquent-driver.revisions.driver') === 'eloquent';
 
                 case 'taxonomies':
                     return config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent';
@@ -141,12 +142,6 @@ class InstallEloquentDriver extends Command
                 case 'terms':
                     return config('statamic.eloquent-driver.terms.driver') === 'eloquent';
             }
-        })->filter(function ($value, $key) {
-            if ($key === 'revisions') {
-                return config('statamic.revisions.enabled');
-            }
-
-            return true;
         });
     }
 
