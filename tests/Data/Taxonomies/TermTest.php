@@ -464,4 +464,20 @@ class TermTest extends TestCase
         Facades\Term::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(TermDeleted::class);
     }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $return = $term->deleteQuietly();
+
+        Event::assertNotDispatched(TermDeleting::class);
+        Event::assertNotDispatched(TermDeleted::class);
+
+        $this->assertTrue($return);
+    }
 }

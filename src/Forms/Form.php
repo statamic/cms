@@ -217,12 +217,22 @@ class Form implements Arrayable, Augmentable, FormContract
         }
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     /**
      * Delete form and associated submissions.
      */
     public function delete()
     {
-        if (FormDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && FormDeleting::dispatch($this) === false) {
             return false;
         }
 
@@ -230,7 +240,11 @@ class Form implements Arrayable, Augmentable, FormContract
 
         File::delete($this->path());
 
-        FormDeleted::dispatch($this);
+        if ($withEvents) {
+            FormDeleted::dispatch($this);
+        }
+
+        return true;
     }
 
     /**

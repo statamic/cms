@@ -143,12 +143,12 @@ jobs:
     name: Slack Notification
     runs-on: ubuntu-20.04
     needs: [php-tests, js-tests]
-    if: always() && github.event_name == 'schedule'
+    if: always()
     steps:
       - uses: technote-space/workflow-conclusion-action@v1
       - name: Send Slack notification
         uses: 8398a7/action-slack@v2
-        if: env.WORKFLOW_CONCLUSION == 'failure'
+        if: env.WORKFLOW_CONCLUSION == 'failure' && github.event_name == 'schedule'
         with:
           status: failure
           author_name: ${{ github.actor }}

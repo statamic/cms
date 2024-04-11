@@ -509,6 +509,18 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->saveQuietly();
+
+        Event::assertNotDispatched(CollectionSaved::class);
+        Event::assertNotDispatched(CollectionSaving::class);
+    }
+
+    /** @test */
     public function it_dispatches_collection_saved()
     {
         Event::fake();
@@ -1018,5 +1030,20 @@ class CollectionTest extends TestCase
         $this->assertFalse($return);
         Facades\Collection::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(CollectionDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $collection = Facades\Collection::make('test')->save();
+
+        $return = $collection->deleteQuietly();
+
+        Event::assertNotDispatched(CollectionDeleting::class);
+        Event::assertNotDispatched(CollectionDeleted::class);
+
+        $this->assertTrue($return);
     }
 }
