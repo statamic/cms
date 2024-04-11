@@ -655,7 +655,7 @@ export default {
                     }, 1);
                 },
                 onUpdate: () => {
-                    this.json = this.editor.getJSON().content;
+                    this.json = clone(this.editor.getJSON().content);
                     this.html = this.editor.getHTML();
                 },
                 onCreate: ({ editor }) => {
