@@ -20,7 +20,7 @@ abstract class AddonTestCase extends OrchestraTestCase
         $this->withoutMix();
         $this->withoutVite();
 
-        Version::shouldReceive('get'->zeroOrMoreTimes()->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
+        Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
         $this->addToAssertionCount(-1);
 
         \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
