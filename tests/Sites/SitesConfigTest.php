@@ -21,7 +21,7 @@ class SitesConfigTest extends TestCase
     {
         parent::setUp();
 
-        File::put($this->yamlPath = base_path('content/sites.yaml'), YAML::dump([
+        File::put($this->yamlPath = resource_path('sites.yaml'), YAML::dump([
             'english' => [
                 'name' => 'English',
                 'url' => '/',
