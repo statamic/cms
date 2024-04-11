@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Query;
 
-use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
@@ -26,7 +25,7 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         if ($column === 'status') {
-            Log::debug('Filtering by status is deprecated. Use whereStatus() instead.');
+            trigger_error('Filtering by status is deprecated. Use whereStatus() instead.', E_USER_DEPRECATED);
         }
 
         return parent::where($column, $operator, $value, $boolean);
@@ -41,7 +40,7 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         if ($column === 'status') {
-            Log::debug('Filtering by status is deprecated. Use whereStatus() instead.');
+            trigger_error('Filtering by status is deprecated. Use whereStatus() instead.', E_USER_DEPRECATED);
         }
 
         return parent::whereIn($column, $values, $boolean);
