@@ -10,6 +10,10 @@ module.exports = {
             pattern: /m[l|r]-\d+/,
             variants: ['md', 'lg', 'xl']
         },
+        {
+            pattern: /p[x|y]-\d+/,
+            variants: ['md', 'lg', 'xl']
+        },
     ],
     theme: {
         colors: {
