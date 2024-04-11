@@ -31,7 +31,7 @@ class NavTree extends Tree implements TreeContract
     {
         $path = Stache::store('nav-trees')->directory();
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $path .= $this->locale().'/';
         }
 

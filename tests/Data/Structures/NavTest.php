@@ -56,11 +56,11 @@ class NavTest extends StructureTestCase
     /** @test */
     public function trees_exist_if_they_exist_as_files()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
             'de' => ['url' => '/de/', 'locale' => 'de'],
-        ]]);
+        ]);
 
         // ...unlike collection structure trees, that exist if they're defined in the collection
         // regardless of whether a file exists.
@@ -158,13 +158,10 @@ class NavTest extends StructureTestCase
     /** @test */
     public function it_gets_available_sites_from_trees()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $nav = tap(Facades\Nav::make()->handle('test'))->save();
@@ -178,13 +175,10 @@ class NavTest extends StructureTestCase
     /** @test */
     public function it_cannot_view_navs_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $nav1 = tap(Facades\Nav::make()->handle('has_some_french'))->save();

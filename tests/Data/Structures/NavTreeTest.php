@@ -6,7 +6,6 @@ use Facades\Statamic\Structures\BranchIds;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Nav;
-use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Structures\NavTree;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -66,10 +65,10 @@ class NavTreeTest extends TestCase
     /** @test */
     public function it_gets_the_path_when_using_multisite()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'one' => ['locale' => 'en_US', 'url' => '/one'],
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
-        ]]);
+        ]);
         $tree = Nav::make('links')->makeTree('en');
         $this->assertEquals($this->directory.'/en/links.yaml', $tree->path());
     }

@@ -36,7 +36,7 @@ class FormCreateTest extends FormTestCase
     /** @test */
     public function it_renders_form_with_params()
     {
-        $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" attr:class="form" attr:id="form" }}{{ /form:contact }}');
+        $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /form:contact }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/forms/contact" class="form" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_redirect" value="/submitted" />', $output);

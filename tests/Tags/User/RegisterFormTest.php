@@ -36,7 +36,7 @@ class RegisterFormTest extends TestCase
     /** @test */
     public function it_renders_form_with_params()
     {
-        $output = $this->tag('{{ user:register_form redirect="/submitted" error_redirect="/errors" attr:class="form" attr:id="form" }}{{ /user:register_form }}');
+        $output = $this->tag('{{ user:register_form redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /user:register_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register" class="form" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_redirect" value="/submitted" />', $output);

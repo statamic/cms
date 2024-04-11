@@ -195,9 +195,19 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         ], $this->data()->except(['updated_at'])->toArray());
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (EntryDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && EntryDeleting::dispatch($this) === false) {
             return false;
         }
 
@@ -223,16 +233,18 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         Facades\Entry::delete($this);
 
-        EntryDeleted::dispatch($this);
+        if ($withEvents) {
+            EntryDeleted::dispatch($this);
+        }
 
         return true;
     }
 
-    public function deleteDescendants()
+    public function deleteDescendants($withEvents = true)
     {
-        $this->descendants()->each(function ($entry) {
-            $entry->deleteDescendants();
-            $entry->delete();
+        $this->descendants()->each(function ($entry) use ($withEvents) {
+            $entry->deleteDescendants($withEvents);
+            $withEvents ? $entry->delete() : $entry->deleteQuietly();
         });
 
         Blink::forget('entry-descendants-'.$this->id());
@@ -372,6 +384,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
             Blink::forget($this->getOriginBlinkKey());
+            Blink::store('collection-mounts')->flush();
         }
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
@@ -382,7 +395,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         $this->taxonomize();
 
-        optional(Collection::findByMount($this))->updateEntryUris();
+        if ($this->isDirty('slug')) {
+            optional(Collection::findByMount($this))->updateEntryUris();
+        }
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -440,7 +455,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return vsprintf('%s/%s/%s%s%s.%s', [
             rtrim(Stache::store('entries')->directory(), '/'),
             $this->collectionHandle(),
-            Site::hasMultiple() ? $this->locale().'/' : '',
+            Site::multiEnabled() ? $this->locale().'/' : '',
             $prefix,
             $this->slug() ?? $this->id(),
             $this->fileExtension(),
@@ -1035,6 +1050,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             $this->slug = $slug($this);
         }
 
-        return array_keys(Arr::except(get_object_vars($this), ['computedCallbackCache']));
+        return array_keys(Arr::except(get_object_vars($this), ['cachedKeys', 'computedCallbackCache', 'siteCache']));
     }
 }
