@@ -4,7 +4,6 @@ namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -773,9 +772,11 @@ class EntryQueryBuilderTest extends TestCase
     /** @test */
     public function filtering_using_where_status_column_writes_deprecation_log()
     {
-        $this->createDummyCollectionAndEntries();
+        $this->withoutDeprecationHandling();
+        $this->expectException(\ErrorException::class);
+        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
 
-        Log::shouldReceive('debug')->with('Filtering by status is deprecated. Use whereStatus() instead.')->once();
+        $this->createDummyCollectionAndEntries();
 
         Entry::query()->where('collection', 'posts')->where('status', 'published')->get();
     }
@@ -783,9 +784,11 @@ class EntryQueryBuilderTest extends TestCase
     /** @test */
     public function filtering_using_whereIn_status_column_writes_deprecation_log()
     {
-        $this->createDummyCollectionAndEntries();
+        $this->withoutDeprecationHandling();
+        $this->expectException(\ErrorException::class);
+        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
 
-        Log::shouldReceive('debug')->with('Filtering by status is deprecated. Use whereStatus() instead.')->once();
+        $this->createDummyCollectionAndEntries();
 
         Entry::query()->where('collection', 'posts')->whereIn('status', ['published'])->get();
     }
@@ -830,7 +833,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals($expected, Entry::query()->whereStatus($status)->get()->map->id->all());
     }
 
-    public function filterByStatusProvider()
+    public static function filterByStatusProvider()
     {
         return [
             'draft' => ['draft', [
