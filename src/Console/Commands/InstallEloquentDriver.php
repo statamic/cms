@@ -141,6 +141,12 @@ class InstallEloquentDriver extends Command
                 case 'terms':
                     return config('statamic.eloquent-driver.terms.driver') === 'eloquent';
             }
+        })->filter(function ($value, $key) {
+            if ($key === 'revisions') {
+                return config('statamic.revisions.enabled');
+            }
+
+            return true;
         });
     }
 
