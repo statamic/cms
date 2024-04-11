@@ -7,11 +7,11 @@ module.exports = {
     ],
     safelist: [
         {
-            pattern: /m[l|r]-\d+/,
+            pattern: /m[l|r]-(?:[0-9]|10|11|12|14|16)$/,
             variants: ['md', 'lg', 'xl']
         },
         {
-            pattern: /p[x|y]-\d+/,
+            pattern: /p[x|y]-(?:[0-9]|10|11|12|14|16)$/,
             variants: ['md', 'lg', 'xl']
         },
     ],
