@@ -93,6 +93,7 @@ class InstallEloquentDriver extends Command
             'nav_trees' => 'Navigation Trees',
             'revisions' => 'Revisions',
             'taxonomies' => 'Taxonomies',
+            'terms' => 'Terms',
         ])->reject(function ($value, $key) {
             switch ($key) {
                 case 'asset_containers':
@@ -135,8 +136,10 @@ class InstallEloquentDriver extends Command
                     return config('statamic.eloquent-driver.revisions.driver') === 'eloquent';
 
                 case 'taxonomies':
-                    return config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent'
-                        || config('statamic.eloquent-driver.terms.driver') === 'eloquent';
+                    return config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent';
+
+                case 'terms':
+                    return config('statamic.eloquent-driver.terms.driver') === 'eloquent';
             }
         });
     }
@@ -480,11 +483,9 @@ class InstallEloquentDriver extends Command
         spin(
             callback: function () {
                 $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-taxonomy-migrations');
-                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-term-migrations');
                 $this->runArtisanCommand('migrate');
 
                 $this->switchToEloquentDriver('taxonomies');
-                $this->switchToEloquentDriver('terms');
             },
             message: 'Migrating taxonomies...'
         );
@@ -493,11 +494,35 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing taxonomies?')) {
             spin(
-                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-taxonomies --force'),
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-taxonomies --force --only-taxonomies'),
                 message: 'Importing existing taxonomies...'
             );
 
             $this->components->info('Imported existing taxonomies');
+        }
+    }
+
+    protected function migrateTerms(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-term-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('terms');
+            },
+            message: 'Migrating terms...'
+        );
+
+        $this->components->info('Configured terms');
+
+        if (confirm('Would you like to import existing terms?')) {
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-taxonomies --force --only-terms'),
+                message: 'Importing existing terms...'
+            );
+
+            $this->components->info('Imported existing terms');
         }
     }
 
