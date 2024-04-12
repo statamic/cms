@@ -15,6 +15,14 @@ trait HasAugmentedData
 
     public function augmentedArrayData()
     {
-        return method_exists($this, 'values') ? $this->values() : $this->data();
+        if (method_exists($this, 'values')) {
+            return $this->values();
+        }
+
+        if (method_exists($this, 'data')) {
+            return $this->data();
+        }
+
+        throw new \Exception('Augmentable object must have a values() or data() method, or override the augmentedArrayData() method.');
     }
 }
