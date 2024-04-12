@@ -8,6 +8,7 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use ReflectionClass;
 use Statamic\Console\Processes\Composer;
 use Statamic\Extend\Manifest;
+use Statamic\Facades\Path;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
@@ -97,5 +98,19 @@ abstract class AddonTestCase extends OrchestraTestCase
         ];
 
         $app['config']->set('statamic.users.repository', 'file');
+
+        $app['config']->set('statamic.stache.watcher', false);
+        $app['config']->set('statamic.stache.stores.taxonomies.directory', $directory.'/../tests/__fixtures__/content/taxonomies');
+        $app['config']->set('statamic.stache.stores.terms.directory', $directory.'/../tests/__fixtures__/content/taxonomies');
+        $app['config']->set('statamic.stache.stores.collections.directory', $directory.'/../tests/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.entries.directory', $directory.'/../tests/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.navigation.directory', $directory.'/../tests/__fixtures__/content/navigation');
+        $app['config']->set('statamic.stache.stores.globals.directory', $directory.'/../tests/__fixtures__/content/globals');
+        $app['config']->set('statamic.stache.stores.global-variables.directory', $directory.'/../tests/__fixtures__/content/globals');
+        $app['config']->set('statamic.stache.stores.asset-containers.directory', $directory.'/../tests/__fixtures__/content/assets');
+        $app['config']->set('statamic.stache.stores.nav-trees.directory', $directory.'/../tests/__fixtures__/content/structures/navigation');
+        $app['config']->set('statamic.stache.stores.collection-trees.directory', $directory.'/../tests/__fixtures__/content/structures/collections');
+        $app['config']->set('statamic.stache.stores.form-submissions.directory', $directory.'/../tests/__fixtures__/content/submissions');
+        $app['config']->set('statamic.stache.stores.users.directory', $directory.'/../tests/__fixtures__/users');
     }
 }
