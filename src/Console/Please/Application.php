@@ -61,7 +61,7 @@ class Application extends ConsoleApplication
     /**
      * Resolve deferred commands.
      */
-    protected function resolveDeferredCommands()
+    public function resolveDeferredCommands()
     {
         foreach ($this->deferredCommands as $command) {
             $this->add($command);

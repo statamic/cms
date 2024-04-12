@@ -32,6 +32,13 @@ class Kernel extends ConsoleKernel
         return $this->artisan;
     }
 
+    public function call($command, array $parameters = [], $outputBuffer = null)
+    {
+        $this->getArtisan()->resolveDeferredCommands();
+
+        return parent::call($command, $parameters, $outputBuffer);
+    }
+
     protected function shouldDiscoverCommands()
     {
         return get_class($this) === __CLASS__;
