@@ -224,6 +224,7 @@ class Replicator extends Fieldtype
             'defaults' => $defaults,
             'collapsed' => [],
             'previews' => $previews,
+            'groupKey' => $this->groupKey(),
         ];
     }
 
@@ -307,5 +308,26 @@ class Replicator extends Fieldtype
     public function toQueryableValue($value)
     {
         return empty($value) ? null : $value;
+    }
+
+    protected function groupKey()
+    {
+        return md5(serialize($this->field->config('sets')));
+
+        // if (! $parent = $this->field->parent()) {
+        //     return;
+        // }
+        // if (! $blueprint = $parent->blueprint()) {
+        //     return;
+        // }
+        // if (! $handlePath = $this->field->handlePath()) {
+        //     return;
+        // }
+
+        // return implode('.', [
+        //     $blueprint->namespace(),
+        //     $blueprint->handle(),
+        //     ...$handlePath,
+        // ]);
     }
 }

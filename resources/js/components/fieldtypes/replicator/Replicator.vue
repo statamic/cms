@@ -69,9 +69,12 @@
                     :previews="previews[set._id]"
                     :show-field-previews="config.previews"
                     :can-add-set="canAddSet"
+                    :can-copy-set="canCopySet"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
                     @duplicated="duplicateSet(set._id)"
+                    @cut="copySet(set._id, true)"
+                    @copied="copySet(set._id)"
                     @updated="updated"
                     @meta-updated="updateSetMeta(set._id, $event)"
                     @removed="removed(set, index)"
@@ -86,7 +89,9 @@
                             :sets="setConfigs"
                             :index="index"
                             :enabled="canAddSet"
-                            @added="addSet" />
+                            :paste-enabled="canPasteSet"
+                            @added="addSet"
+                            @pasted="pasteSet" />
                     </template>
                 </replicator-set>
             </div>
@@ -98,7 +103,9 @@
             :groups="groupConfigs"
             :sets="setConfigs"
             :index="value.length"
-            @added="addSet" />
+            :paste-enabled="canPasteSet"
+            @added="addSet"
+            @pasted="pasteSet" />
 
     </section>
 
@@ -135,6 +142,7 @@ export default {
             collapsed: clone(this.meta.collapsed),
             previews: this.meta.previews,
             fullScreenMode: false,
+            copiedSet: null,
             provide: {
                 storeName: this.storeName,
                 replicatorSets: this.config.sets
@@ -148,6 +156,16 @@ export default {
             if (this.isReadOnly) return false;
 
             return !this.config.max_sets || this.value.length < this.config.max_sets;
+        },
+
+        canCopySet() {
+            return this.meta.groupKey !== null;
+        },
+
+        canPasteSet() {
+            if (!this.canAddSet) return false;
+
+            return this.meta.groupKey !== null && this.copiedSet?.groupKey === this.meta.groupKey;
         },
 
         setConfigs() {
@@ -241,6 +259,51 @@ export default {
             this.expandSet(set._id);
         },
 
+        copySet(id, cut = false) {
+            const index = this.value.findIndex(v => v._id === id);
+            const value = this.value[index];
+            const meta = this.meta.existing[id];
+
+            const payload = {
+                value,
+                meta,
+                groupKey: this.meta.groupKey,
+            };
+
+            this.$events.$emit('replicator-set-copied', payload);
+            localStorage.setItem('statamic.replicator.set', JSON.stringify(payload));
+
+            if (cut) {
+                this.removed(value, index);                
+            }
+        },
+
+        pasteSet(index) {
+            if (!this.copiedSet) {
+                return;
+            }
+
+            const set = {
+                ...this.copiedSet.value,
+                _id: uniqid(),
+            };
+
+            this.updateSetPreviews(set._id, {});
+
+            this.updateSetMeta(set._id, this.copiedSet.meta);
+
+            this.update([
+                ...this.value.slice(0, index),
+                set,
+                ...this.value.slice(index)
+            ]);
+
+            this.expandSet(set._id);
+
+            this.$events.$emit('replicator-set-copied', null);
+            localStorage.setItem('statamic.replicator.set', JSON.stringify(null));
+        },
+
         updateSetPreviews(id, previews) {
             this.previews[id] = previews;
         },
@@ -284,10 +347,46 @@ export default {
 
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
+
+        setCopied(payload) {
+            this.copiedSet = payload;
+        },
+
+        storageInit() {
+            const payload = JSON.parse(localStorage.getItem('statamic.replicator.set'));
+            if (!payload) {
+                return;
+            }
+
+            this.copiedSet = payload;
+        },
+
+        storageUpdated(event) {
+            if (event.key !== 'statamic.replicator.set') {
+                return;
+            }
+
+            const payload = JSON.parse(event.newValue);
+            if (!payload) {
+                return;
+            }
+
+            this.copiedSet = payload;
+        },
+
     },
 
     mounted() {
         if (this.config.collapse) this.collapseAll();
+
+        this.$events.$on('replicator-set-copied', this.setCopied);
+        window.addEventListener('storage', this.storageUpdated);
+        this.storageInit();
+    },
+
+    beforeDestroy() {
+        this.$events.$off('replicator-set-copied', this.setCopied);
+        window.removeEventListener('storage', this.storageUpdated);
     },
 
     watch: {
