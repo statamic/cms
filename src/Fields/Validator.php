@@ -81,7 +81,7 @@ class Validator
         foreach ($overrides as $field => $fieldRules) {
             $fieldRules = self::explodeRules($fieldRules);
 
-            if (array_has($original, $field)) {
+            if (Arr::has($original, $field)) {
                 $original[$field] = array_merge($original[$field], $fieldRules);
             } else {
                 $original[$field] = $fieldRules;

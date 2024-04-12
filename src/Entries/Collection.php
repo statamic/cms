@@ -63,6 +63,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     protected $titleFormats = [];
     protected $previewTargets = [];
     protected $autosave;
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -406,7 +407,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                if (! Site::hasMultiple() || ! $sites) {
+                if (! Site::multiEnabled() || ! $sites) {
                     $sites = [Site::default()->handle()];
                 }
 
@@ -459,28 +460,43 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $translation;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
 
-        if ($isNew && CollectionCreating::dispatch($this) === false) {
-            return false;
-        }
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
 
-        if (CollectionSaving::dispatch($this) === false) {
-            return false;
+        if ($withEvents) {
+            if ($isNew && CollectionCreating::dispatch($this) === false) {
+                return false;
+            }
+
+            if (CollectionSaving::dispatch($this) === false) {
+                return false;
+            }
         }
 
         Facades\Collection::save($this);
 
         Blink::forget('collection-handles');
+        Blink::forget('mounted-collections');
         Blink::flushStartingWith("collection-{$this->id()}");
 
-        if ($isNew) {
-            CollectionCreated::dispatch($this);
-        }
+        if ($withEvents) {
+            if ($isNew) {
+                CollectionCreated::dispatch($this);
+            }
 
-        CollectionSaved::dispatch($this);
+            CollectionSaved::dispatch($this);
+        }
 
         return $this;
     }
@@ -583,7 +599,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'origin_behavior' => ($ob = $this->originBehavior()) === 'select' ? null : $ob,
         ]));
 
-        if (! Site::hasMultiple()) {
+        if (! Site::multiEnabled()) {
             unset($array['sites'], $array['propagate']);
         }
 
@@ -747,15 +763,25 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this->structure !== null || $this->structureContents !== null;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (CollectionDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && CollectionDeleting::dispatch($this) === false) {
             return false;
         }
 
-        $this->queryEntries()->get()->each(function ($entry) {
-            $entry->deleteDescendants();
-            $entry->delete();
+        $this->queryEntries()->get()->each(function ($entry) use ($withEvents) {
+            $entry->deleteDescendants($withEvents);
+            $withEvents ? $entry->delete() : $entry->deleteQuietly();
         });
 
         if ($this->hasStructure()) {
@@ -764,7 +790,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         Facades\Collection::delete($this);
 
-        CollectionDeleted::dispatch($this);
+        if ($withEvents) {
+            CollectionDeleted::dispatch($this);
+        }
+
+        Blink::forget('mounted-collections');
 
         return true;
     }
@@ -785,7 +815,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
                     return null;
                 }
 
-                return Blink::once("collection-{$this->id()}-mount-{$mount}", function () use ($mount) {
+                return Blink::store('collection-mounts')->once("{$this->id()}-{$mount}", function () use ($mount) {
                     return Entry::find($mount);
                 });
             })

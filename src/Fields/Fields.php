@@ -256,7 +256,7 @@ class Fields
             throw new \Exception("Field {$config['field']} not found.");
         }
 
-        if ($overrides = array_get($config, 'config')) {
+        if ($overrides = Arr::get($config, 'config')) {
             $field->setConfig(array_merge($field->config(), $overrides));
         }
 
@@ -283,7 +283,7 @@ class Fields
                 });
             }
 
-            if ($prefix = array_get($config, 'prefix')) {
+            if ($prefix = Arr::get($config, 'prefix')) {
                 $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
                     $field = clone $field;
                     $handle = $prefix.$field->handle();

@@ -5,7 +5,6 @@ namespace Tests\Search\Searchables;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Search\Searchables\Entries;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -21,10 +20,10 @@ class EntriesTest extends TestCase
      */
     public function it_gets_entries($locale, $config, $expected)
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::make('blog')->sites(['en', 'fr'])->save();
         Collection::make('pages')->sites(['en'])->save();

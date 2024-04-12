@@ -28,11 +28,8 @@ class GlobalSetTest extends TestCase
     /** @test */
     public function it_gets_file_contents_for_saving_with_a_single_site()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
         ]);
 
         $set = (new GlobalSet)->title('The title');
@@ -59,13 +56,10 @@ EOT;
     /** @test */
     public function it_gets_file_contents_for_saving_with_multiple_sites()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $set = (new GlobalSet)->title('The title');
@@ -96,13 +90,10 @@ EOT;
     {
         Event::fake();
 
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $set = (new GlobalSet)->title('SEO Settings');
@@ -136,13 +127,10 @@ EOT;
     /** @test */
     public function saving_a_new_global_set_will_create_its_localizations()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         // when it queries for fresh localizations
@@ -167,13 +155,10 @@ EOT;
     /** @test */
     public function saving_an_existing_global_set_will_save_or_delete_its_localizations()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $set = GlobalSet::make('test');
@@ -212,13 +197,10 @@ EOT;
     {
         Event::fake();
 
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $set = (new GlobalSet)->title('SEO Settings');
@@ -246,13 +228,10 @@ EOT;
     {
         Event::fake();
 
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $set = (new GlobalSet)->title('SEO Settings');
@@ -281,13 +260,10 @@ EOT;
             return false;
         });
 
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $set = (new GlobalSet)->title('SEO Settings');
@@ -314,13 +290,10 @@ EOT;
             return false;
         });
 
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $set = (new GlobalSet)->title('SEO Settings');
@@ -345,13 +318,10 @@ EOT;
         config(['cache.default' => 'file']);
         Cache::clear();
 
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
         ]);
 
         $global = tap(GlobalSet::make('test'), function ($global) {
@@ -382,13 +352,10 @@ EOT;
     /** @test */
     public function it_gets_available_sites_from_localizations()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $set = GlobalSet::make('test');
@@ -403,13 +370,10 @@ EOT;
     /** @test */
     public function it_cannot_view_global_sets_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $set1 = GlobalSet::make('has_some_french');
@@ -475,5 +439,20 @@ EOT;
         $this->assertFalse($return);
         GlobalSet::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(GlobalSetDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $set = (new GlobalSet)->title('SEO Settings');
+
+        $return = $set->deleteQuietly();
+
+        Event::assertNotDispatched(GlobalSetDeleting::class);
+        Event::assertNotDispatched(GlobalSetDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

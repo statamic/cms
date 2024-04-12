@@ -26,22 +26,23 @@ class EntriesTest extends TestCase
     {
         parent::setUp();
 
-        Carbon::setTestNow(Carbon::parse('2021-01-02'));
+        Carbon::setTestNow(Carbon::parse('2021-01-03'));
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
-        $collection = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->dated(true)->pastDateBehavior('private')->futureDateBehavior('private')->save();
+        $blog = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->sites(['en', 'fr'])->dated(true)->pastDateBehavior('public')->futureDateBehavior('private')->save();
+        $events = Facades\Collection::make('events')->sites(['en', 'fr'])->dated(true)->pastDateBehavior('private')->futureDateBehavior('public')->save();
 
-        EntryFactory::id('123')->collection($collection)->slug('one')->data(['title' => 'One'])->date('2021-01-02')->create();
-        EntryFactory::id('456')->collection($collection)->slug('two')->data(['title' => 'Two'])->date('2021-01-02')->create();
-        EntryFactory::id('789')->collection($collection)->slug('three')->data(['title' => 'Three'])->date('2021-01-02')->create();
-        EntryFactory::id('910')->collection($collection)->slug('four')->data(['title' => 'Four'])->date('2021-01-02')->create();
-        EntryFactory::id('draft')->collection($collection)->slug('draft')->data(['title' => 'Draft'])->published(false)->create();
-        EntryFactory::id('scheduled')->collection($collection)->slug('scheduled')->data(['title' => 'Scheduled'])->date('2021-01-03')->create();
-        EntryFactory::id('expired')->collection($collection)->slug('expired')->data(['title' => 'Expired'])->date('2021-01-01')->create();
+        EntryFactory::id('123')->collection($blog)->slug('one')->data(['title' => 'One'])->date('2021-01-02')->create();
+        EntryFactory::id('456')->collection($blog)->slug('two')->data(['title' => 'Two'])->date('2021-01-02')->create();
+        EntryFactory::id('789')->collection($blog)->slug('three')->data(['title' => 'Three'])->date('2021-01-02')->create();
+        EntryFactory::id('910')->collection($blog)->slug('four')->data(['title' => 'Four'])->date('2021-01-02')->create();
+        EntryFactory::id('draft')->collection($blog)->slug('draft')->data(['title' => 'Draft'])->published(false)->date('2021-01-02')->create();
+        EntryFactory::id('scheduled')->collection($blog)->slug('scheduled')->data(['title' => 'Scheduled'])->date('2021-01-04')->create();
+        EntryFactory::id('expired')->collection($events)->slug('expired')->data(['title' => 'Expired'])->date('2021-01-01')->create();
     }
 
     /**
@@ -65,10 +66,10 @@ class EntriesTest extends TestCase
     {
         return [
             'published (default, no where clause)' => [['456', '123'], fn ($q) => null],
-            'status published (explicit where status clause)' => [['456', '123'], fn ($q) => $q->where('status', 'published')],
-            'status draft' => [['draft'], fn ($q) => $q->where('status', 'draft')],
-            'status scheduled' => [['scheduled'], fn ($q) => $q->where('status', 'scheduled')],
-            'status expired' => [['expired'], fn ($q) => $q->where('status', 'expired')],
+            'status published (explicit where status clause)' => [['456', '123'], fn ($q) => $q->whereStatus('published')],
+            'status draft' => [['draft'], fn ($q) => $q->whereStatus('draft')],
+            'status scheduled' => [['scheduled'], fn ($q) => $q->whereStatus('scheduled')],
+            'status expired' => [['expired'], fn ($q) => $q->whereStatus('expired')],
             'any status' => [['456', '123', 'draft', 'scheduled', 'expired'], fn ($q) => $q->whereAnyStatus()],
             'published true' => [['456', '123', 'scheduled', 'expired'], fn ($q) => $q->where('published', true)],
             'published false' => [['draft'], fn ($q) => $q->where('published', false)],

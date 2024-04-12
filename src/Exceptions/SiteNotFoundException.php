@@ -21,8 +21,8 @@ class SiteNotFoundException extends Exception implements ProvidesSolution
 
     public function getSolution(): Solution
     {
-        return BaseSolution::create("The {$this->siteHandle} site was not found.")
-            ->setSolutionDescription('Check the spelling of the site handle in your sites.php config.')
+        return BaseSolution::create("The [{$this->siteHandle}] site was not found.")
+            ->setSolutionDescription('Check the spelling of the site handle in your [resources/sites.yaml].')
             ->setDocumentationLinks([
                 'Read the multi-site guide' => Statamic::docsUrl('/multi-site#configuration'),
             ]);
