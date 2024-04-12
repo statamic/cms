@@ -39,7 +39,7 @@ class EventServiceProvider extends ServiceProvider
         \Statamic\Listeners\UpdateTermReferences::class,
     ];
 
-    public function boot()
+    public function register()
     {
         $this->booting(function () {
             foreach ($this->listen as $event => $listeners) {
@@ -52,7 +52,10 @@ class EventServiceProvider extends ServiceProvider
                 Event::subscribe($subscriber);
             }
         });
+    }
 
+    public function boot()
+    {
         Event::macro('forgetListener', function ($event, $handler) {
             $this->listeners[$event] = Arr::where($this->listeners[$event], function ($eventHandler) use ($handler) {
                 return $eventHandler != $handler;
