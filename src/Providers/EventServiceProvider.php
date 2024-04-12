@@ -2,8 +2,8 @@
 
 namespace Statamic\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\ServiceProvider;
 use Statamic\Support\Arr;
 
 class EventServiceProvider extends ServiceProvider
