@@ -14,8 +14,7 @@
         "statamic/cms": "^5.0"
     },
     "require-dev": {
-        "nunomaduro/collision": "^6.1",
-        "orchestra/testbench": "^7.0"
+        "orchestra/testbench": "^9.0"
     },
     "config": {
         "allow-plugins": {
@@ -32,5 +31,7 @@
                 "DummyNamespace\\ServiceProvider"
             ]
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
