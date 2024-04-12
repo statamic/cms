@@ -23,7 +23,6 @@ use Wilderborn\Partyline\Facade as Partyline;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\text;
-use function Termwind\ask;
 
 class Multisite extends Command
 {
