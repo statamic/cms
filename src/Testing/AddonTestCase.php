@@ -43,7 +43,7 @@ abstract class AddonTestCase extends OrchestraTestCase
     {
         $uses = array_flip(class_uses_recursive(static::class));
 
-        if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
+        if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
             $this->deleteFakeStacheDirectory();
         }
 
@@ -97,5 +97,19 @@ abstract class AddonTestCase extends OrchestraTestCase
         ];
 
         $app['config']->set('statamic.users.repository', 'file');
+
+        $app['config']->set('statamic.stache.watcher', false);
+        $app['config']->set('statamic.stache.stores.taxonomies.directory', $directory.'/../tests/__fixtures__/content/taxonomies');
+        $app['config']->set('statamic.stache.stores.terms.directory', $directory.'/../tests/__fixtures__/content/taxonomies');
+        $app['config']->set('statamic.stache.stores.collections.directory', $directory.'/../tests/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.entries.directory', $directory.'/../tests/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.navigation.directory', $directory.'/../tests/__fixtures__/content/navigation');
+        $app['config']->set('statamic.stache.stores.globals.directory', $directory.'/../tests/__fixtures__/content/globals');
+        $app['config']->set('statamic.stache.stores.global-variables.directory', $directory.'/../tests/__fixtures__/content/globals');
+        $app['config']->set('statamic.stache.stores.asset-containers.directory', $directory.'/../tests/__fixtures__/content/assets');
+        $app['config']->set('statamic.stache.stores.nav-trees.directory', $directory.'/../tests/__fixtures__/content/structures/navigation');
+        $app['config']->set('statamic.stache.stores.collection-trees.directory', $directory.'/../tests/__fixtures__/content/structures/collections');
+        $app['config']->set('statamic.stache.stores.form-submissions.directory', $directory.'/../tests/__fixtures__/content/submissions');
+        $app['config']->set('statamic.stache.stores.users.directory', $directory.'/../tests/__fixtures__/users');
     }
 }

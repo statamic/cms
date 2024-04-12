@@ -13,8 +13,11 @@ trait PreventsSavingStacheItemsToDisk
         $this->fakeStacheDirectory = Path::tidy($this->fakeStacheDirectory);
 
         Stache::stores()->each(function ($store) {
-            $dir = Path::tidy(Str::before($this->fakeStacheDirectory, '/dev-null'));
-            $relative = Str::after(Str::after($store->directory(), $dir), '/');
+            $fixturesPath = Str::before($this->fakeStacheDirectory, '/dev-null');
+            $storeDirectory = '/'.Path::makeRelative($store->directory());
+
+            $relative = Str::after(Str::after($storeDirectory, $fixturesPath), '/');
+
             $store->directory($this->fakeStacheDirectory.'/'.$relative);
         });
     }
