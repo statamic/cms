@@ -34,7 +34,7 @@ class AddonsDiscover extends Command
         $this->newLine();
         $manifest->build();
 
-        $this->components->info("Discovering addons.");
+        $this->components->info('Discovering addons.');
 
         foreach (array_keys($manifest->manifest) as $package) {
             $this->components->task("Discovered Addon: <info>{$package}</info>");
