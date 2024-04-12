@@ -8,6 +8,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\CanManageBlueprints;
+use Statamic\Support\Str;
 
 class FieldsController extends CpController
 {
@@ -85,9 +86,16 @@ class FieldsController extends CpController
                 },
             ],
         ];
+
         $customMessages = [
             'handle.not_in' => __('statamic::validation.reserved'),
         ];
+
+        $referer = $request->headers->get('referer');
+
+        if (Str::contains($referer, 'forms/') && Str::contains($referer, '/blueprint') && $request->values['handle'] === 'date') {
+            $extraRules['handle'][] = 'not_in:date';
+        }
 
         if ($request->type === 'date' && $request->values['handle'] === 'date') {
             $extraRules['mode'] = 'in:single';
