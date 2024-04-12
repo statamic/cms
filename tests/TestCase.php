@@ -16,6 +16,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
+    protected $fakeStacheDirectory = __DIR__.'/__fixtures__/dev-null';
 
     protected function setUp(): void
     {
