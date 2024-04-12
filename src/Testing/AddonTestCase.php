@@ -8,7 +8,6 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use ReflectionClass;
 use Statamic\Console\Processes\Composer;
 use Statamic\Extend\Manifest;
-use Statamic\Facades\Path;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
