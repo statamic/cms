@@ -2,9 +2,9 @@
 
 namespace Tests;
 
-use Statamic\Testing\Concerns\PreventSavingStacheItemsToDisk as BasePreventSavingStacheItemsToDisk;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk as BasePreventsSavingStacheItemsToDisk;
 
 trait PreventSavingStacheItemsToDisk
 {
-    use BasePreventSavingStacheItemsToDisk;
+    use BasePreventsSavingStacheItemsToDisk;
 }

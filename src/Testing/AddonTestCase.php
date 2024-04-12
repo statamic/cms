@@ -10,7 +10,7 @@ use Statamic\Console\Processes\Composer;
 use Statamic\Extend\Manifest;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
-use Statamic\Testing\Concerns\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 abstract class AddonTestCase extends OrchestraTestCase
 {
@@ -25,7 +25,7 @@ abstract class AddonTestCase extends OrchestraTestCase
 
         $uses = array_flip(class_uses_recursive(static::class));
 
-        if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
+        if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
             $reflection = new ReflectionClass($this);
             $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), '/tests').'/tests/__fixtures__/dev-null';
 

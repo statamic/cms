@@ -6,7 +6,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Support\Str;
 
-trait PreventSavingStacheItemsToDisk
+trait PreventsSavingStacheItemsToDisk
 {
     protected function preventSavingStacheItemsToDisk(): void
     {
