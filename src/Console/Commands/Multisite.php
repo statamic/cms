@@ -21,6 +21,10 @@ use Statamic\Rules\Handle;
 use Statamic\Statamic;
 use Wilderborn\Partyline\Facade as Partyline;
 
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\text;
+use function Termwind\ask;
+
 class Multisite extends Command
 {
     use ConfirmableTrait, EnhancesCommands, RunsInPlease, ValidatesInput;
@@ -53,15 +57,15 @@ class Multisite extends Command
             ->addPermissions()
             ->clearCache();
 
-        $this->checkInfo('Successfully converted from single to multisite installation!');
+        $this->components->info('Successfully converted from single to multisite installation!');
 
-        $this->line(PHP_EOL.'You may now manage your sites in your cp at [/cp/sites].');
+        $this->line('You may now manage your sites in the Control Panel at [/cp/sites].');
     }
 
     private function isFreshRun(): bool
     {
         if (Site::multiEnabled() && Site::hasMultiple()) {
-            $this->error('Already configured for multi-site.');
+            $this->components->error('Already configured for multi-site.');
 
             return false;
         }
@@ -69,7 +73,7 @@ class Multisite extends Command
         if (Site::multiEnabled() && $this->commandMayHaveBeenRan()) {
             $site = Site::default()->handle();
 
-            $this->error("Command may have already been run. Site directories for site [{$site}] already exist!");
+            $this->components->error("Command may have already been run. Site directories for site [{$site}] already exist!");
 
             return false;
         }
@@ -105,7 +109,7 @@ class Multisite extends Command
 
     private function promptForSiteHandle(): bool
     {
-        $this->siteHandle = $this->ask('Please enter a site handle (default site content will be moved into folders with this name)', Site::default()->handle());
+        $this->siteHandle = text(label: 'Please enter a site handle (default site content will be moved into folders with this name)', default: Site::default()->handle());
 
         if ($this->validationFails($this->siteHandle, ['required', new Handle])) {
             return $this->promptForSiteHandle();
@@ -120,20 +124,20 @@ class Multisite extends Command
             return true;
         }
 
-        if (! $this->confirm('Statamic Pro is required for multiple sites. Enable pro and continue?', true)) {
+        if (! confirm('Statamic Pro is required for multiple sites. Enable pro and continue?', true)) {
             return false;
         }
 
         Statamic::enablePro();
 
         if (! Statamic::pro()) {
-            $this->error('Could not reliably enable pro, please modify your [config/statamic/editions.php] as follows:');
+            $this->components->error('Could not reliably enable pro, please modify your [config/statamic/editions.php] as follows:');
             $this->line("'pro' => env('STATAMIC_PRO_ENABLED', false)");
 
             return false;
         }
 
-        $this->checkLine('Statamic Pro enabled.');
+        $this->components->info('Statamic Pro enabled successfully.');
 
         return true;
     }
@@ -147,7 +151,7 @@ class Multisite extends Command
         } elseif (str_contains($contents, "'multisite' => false,")) {
             $contents = str_replace("'multisite' => false,", "'multisite' => true,", $contents);
         } else {
-            $this->error('Could not reliably enable multisite, please modify your [config/statamic/system.php] as follows:');
+            $this->components->error('Could not reliably enable multisite, please modify your [config/statamic/system.php] as follows:');
             $this->line("'multisite' => true,");
 
             return false;
@@ -155,7 +159,7 @@ class Multisite extends Command
 
         File::put($configPath, $contents);
 
-        $this->checkLine('Multisite enabled.');
+        $this->components->info('Multisite enabled.');
 
         return true;
     }
@@ -179,19 +183,25 @@ class Multisite extends Command
     {
         $siteConfig = collect(Site::config())->first();
 
-        Site::setSites([$this->siteHandle => $siteConfig])->save();
-
-        $this->checkLine('Site config updated.');
+        $this->components->task(
+            description: 'Updating site config...',
+            task: function () use ($siteConfig) {
+                Site::setSites([$this->siteHandle => $siteConfig])->save();
+            }
+        );
 
         return $this;
     }
 
     private function clearStache(): self
     {
-        Stache::disableUpdatingIndexes();
-        Stache::clear();
-
-        $this->checkLine('Stache cleared.');
+        $this->components->task(
+            description: 'Clearing Stache...',
+            task: function () {
+                Stache::disableUpdatingIndexes();
+                Stache::clear();
+            }
+        );
 
         return $this;
     }
@@ -199,10 +209,14 @@ class Multisite extends Command
     private function convertCollections(): self
     {
         Collection::all()->each(function ($collection) {
-            $this->moveCollectionContent($collection);
-            $this->moveCollectionTrees($collection);
-            $this->updateCollection($collection);
-            $this->checkLine("Collection [<comment>{$collection->handle()}</comment>] updated.");
+            $this->components->task(
+                description: "Updating collection [{$collection->handle()}]...",
+                task: function () use ($collection) {
+                    $this->moveCollectionContent($collection);
+                    $this->moveCollectionTrees($collection);
+                    $this->updateCollection($collection);
+                }
+            );
         });
 
         return $this;
@@ -245,8 +259,12 @@ class Multisite extends Command
         Config::set('statamic.system.multisite', true);
 
         GlobalSet::all()->each(function ($set) {
-            $this->moveGlobalSet($set);
-            $this->checkLine("Global [<comment>{$set->handle()}</comment>] updated.");
+            $this->components->task(
+                description: "Updating global [{$set->handle()}]...",
+                task: function () use ($set) {
+                    $this->moveGlobalSet($set);
+                }
+            );
         });
 
         return $this;
@@ -268,8 +286,12 @@ class Multisite extends Command
         Config::set('statamic.system.multisite', true);
 
         Nav::all()->each(function ($nav) {
-            $this->moveNav($nav);
-            $this->checkLine("Nav [<comment>{$nav->handle()}</comment>] updated.");
+            $this->components->task(
+                description: "Updating nav [{$nav->handle()}]...",
+                task: function () use ($nav) {
+                    $this->moveNav($nav);
+                }
+            );
         });
 
         return $this;
@@ -287,9 +309,13 @@ class Multisite extends Command
     private function addPermissions(): self
     {
         Role::all()->each(function ($role) {
-            $role->addPermission("access {$this->siteHandle} site");
-            $role->save();
-            $this->checkLine("Site permissions added to [<comment>{$role->handle()}</comment>] role.");
+            $this->components->task(
+                description: "Adding site permissions to [{$role->handle()}] role...",
+                task: function () use ($role) {
+                    $role->addPermission("access {$this->siteHandle} site");
+                    $role->save();
+                }
+            );
         });
 
         return $this;
@@ -297,9 +323,12 @@ class Multisite extends Command
 
     private function clearCache(): self
     {
-        Cache::clear();
-
-        $this->checkLine('Cache cleared.');
+        $this->components->task(
+            description: 'Clearing cache...',
+            task: function () {
+                Cache::clear();
+            }
+        );
 
         return $this;
     }
