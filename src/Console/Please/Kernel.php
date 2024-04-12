@@ -4,7 +4,6 @@ namespace Statamic\Console\Please;
 
 use App\Console\Kernel as ConsoleKernel;
 use Statamic\Console\Please\Application as Please;
-use Statamic\Statamic;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Kernel extends ConsoleKernel
