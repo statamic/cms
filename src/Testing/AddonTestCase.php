@@ -1,13 +1,16 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Testing;
 
 use Facades\Statamic\Version;
+use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use ReflectionClass;
 use Statamic\Console\Processes\Composer;
+use Statamic\Extend\Manifest;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
+use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 abstract class AddonTestCase extends OrchestraTestCase
 {
@@ -20,11 +23,31 @@ abstract class AddonTestCase extends OrchestraTestCase
         $this->withoutMix();
         $this->withoutVite();
 
+        $uses = array_flip(class_uses_recursive(static::class));
+
+        if (isset($uses[PreventsSavingStacheItemsToDisk::class])) {
+            $reflection = new ReflectionClass($this);
+            $this->fakeStacheDirectory = Str::before(dirname($reflection->getFileName()), '/tests').'/tests/__fixtures__/dev-null';
+
+            $this->preventSavingStacheItemsToDisk();
+        }
+
         Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn(Composer::create(__DIR__.'/../')->installedVersion(Statamic::PACKAGE));
         $this->addToAssertionCount(-1);
 
         \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
         $this->addToAssertionCount(-1); // Dont want to assert this
+    }
+
+    public function tearDown(): void
+    {
+        $uses = array_flip(class_uses_recursive(static::class));
+
+        if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
+            $this->deleteFakeStacheDirectory();
+        }
+
+        parent::tearDown();
     }
 
     protected function getPackageProviders($app)
