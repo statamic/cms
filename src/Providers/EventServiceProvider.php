@@ -2,7 +2,7 @@
 
 namespace Statamic\Providers;
 
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Statamic\Support\Arr;
 
@@ -41,20 +41,22 @@ class EventServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->booting(function () {
+            foreach ($this->listen as $event => $listeners) {
+                foreach (array_unique($listeners, SORT_REGULAR) as $listener) {
+                    Event::listen($event, $listener);
+                }
+            }
+
+            foreach ($this->subscribe as $subscriber) {
+                Event::subscribe($subscriber);
+            }
+        });
+
         Event::macro('forgetListener', function ($event, $handler) {
             $this->listeners[$event] = Arr::where($this->listeners[$event], function ($eventHandler) use ($handler) {
                 return $eventHandler != $handler;
             });
         });
-    }
-
-    /**
-     * Determine if events and listeners should be automatically discovered.
-     *
-     * @return bool
-     */
-    public function shouldDiscoverEvents()
-    {
-        return true;
     }
 }
