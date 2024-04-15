@@ -62,6 +62,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     protected $titleFormats = [];
     protected $previewTargets = [];
     protected $autosave;
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -268,6 +269,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return Facades\Entry::query()->where('collection', $this->handle());
     }
 
+    public function hasVisibleEntryBlueprint()
+    {
+        return $this->entryBlueprints()->reject->hidden()->isNotEmpty();
+    }
+
     public function entryBlueprints()
     {
         $blink = 'collection-entry-blueprints-'.$this->handle();
@@ -316,7 +322,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         return Blink::once($blink, function () use ($blueprint) {
             if (is_null($blueprint)) {
-                return $this->entryBlueprints()->reject->hidden()->first();
+                return $this->entryBlueprints()->reject->hidden()->first() ?? $this->entryBlueprints()->first();
             }
 
             return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
@@ -435,16 +441,28 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $translation;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
 
-        if ($isNew && CollectionCreating::dispatch($this) === false) {
-            return false;
-        }
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
 
-        if (CollectionSaving::dispatch($this) === false) {
-            return false;
+        if ($withEvents) {
+            if ($isNew && CollectionCreating::dispatch($this) === false) {
+                return false;
+            }
+
+            if (CollectionSaving::dispatch($this) === false) {
+                return false;
+            }
         }
 
         Facades\Collection::save($this);
@@ -452,11 +470,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         Blink::forget('collection-handles');
         Blink::flushStartingWith("collection-{$this->id()}");
 
-        if ($isNew) {
-            CollectionCreated::dispatch($this);
-        }
+        if ($withEvents) {
+            if ($isNew) {
+                CollectionCreated::dispatch($this);
+            }
 
-        CollectionSaved::dispatch($this);
+            CollectionSaved::dispatch($this);
+        }
 
         return $this;
     }
@@ -471,6 +491,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function updateEntryOrder($ids = null)
     {
         Facades\Collection::updateEntryOrder($this, $ids);
+
+        return $this;
+    }
+
+    public function updateEntryParent($ids = null)
+    {
+        Facades\Collection::updateEntryParent($this, $ids);
 
         return $this;
     }
@@ -727,15 +754,25 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this->structure !== null || $this->structureContents !== null;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (CollectionDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && CollectionDeleting::dispatch($this) === false) {
             return false;
         }
 
-        $this->queryEntries()->get()->each(function ($entry) {
-            $entry->deleteDescendants();
-            $entry->delete();
+        $this->queryEntries()->get()->each(function ($entry) use ($withEvents) {
+            $entry->deleteDescendants($withEvents);
+            $withEvents ? $entry->delete() : $entry->deleteQuietly();
         });
 
         if ($this->hasStructure()) {
@@ -744,7 +781,9 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         Facades\Collection::delete($this);
 
-        CollectionDeleted::dispatch($this);
+        if ($withEvents) {
+            CollectionDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -765,7 +804,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
                     return null;
                 }
 
-                return Blink::once("collection-{$this->id()}-mount-{$mount}", function () use ($mount) {
+                return Blink::store('collection-mounts')->once("{$this->id()}-{$mount}", function () use ($mount) {
                     return Entry::find($mount);
                 });
             })

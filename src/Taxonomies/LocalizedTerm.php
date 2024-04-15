@@ -426,6 +426,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
         return $this->term->save();
     }
 
+    public function deleteQuietly()
+    {
+        return $this->term->deleteQuietly();
+    }
+
     public function delete()
     {
         return $this->term->delete();

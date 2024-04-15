@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 trait QueriesConditions
@@ -151,7 +152,7 @@ trait QueriesConditions
             $value = $this->getPipedValues($value);
         }
 
-        return $query->whereIn($field, $value);
+        return $query->whereIn($field, Arr::wrap($value));
     }
 
     protected function queryNotInCondition($query, $field, $value)
@@ -160,7 +161,7 @@ trait QueriesConditions
             $value = $this->getPipedValues($value);
         }
 
-        return $query->whereNotIn($field, $value);
+        return $query->whereNotIn($field, Arr::wrap($value));
     }
 
     protected function queryStartsWithCondition($query, $field, $value)

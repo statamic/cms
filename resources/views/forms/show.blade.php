@@ -21,6 +21,9 @@
                     @can('edit', $form)
                         <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
                     @endcan
+                    @can('configure form fields')
+                        <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('forms.blueprint.edit', $form->handle()) }}"></dropdown-item>
+                    @endcan
                     @can('delete', $form)
                         <dropdown-item :text="__('Delete Form')" class="warning" @click="$refs.deleter.confirm()">
                             <resource-deleter

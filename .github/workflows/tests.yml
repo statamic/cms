@@ -124,6 +124,11 @@ jobs:
           echo "result=true" >> $GITHUB_OUTPUT
           echo "result=true" >> $env:GITHUB_OUTPUT
 
+      - name: Use Node.js 16.13.0
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.13.0
+
       - name: Install required npm version
         if: steps.should-run-tests.outputs.result == 'true'
         run: npm -g install npm@8.5.5
@@ -145,7 +150,7 @@ jobs:
       - uses: technote-space/workflow-conclusion-action@v1
       - name: Send Slack notification
         uses: 8398a7/action-slack@v2
-        if: env.WORKFLOW_CONCLUSION == 'failure'
+        if: env.WORKFLOW_CONCLUSION == 'failure' && github.event_name == 'schedule'
         with:
           status: failure
           author_name: ${{ github.actor }}

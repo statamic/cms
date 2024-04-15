@@ -240,15 +240,27 @@ class Term implements TermContract
         return true;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (TermDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && TermDeleting::dispatch($this) === false) {
             return false;
         }
 
         Facades\Term::delete($this);
 
-        TermDeleted::dispatch($this);
+        if ($withEvents) {
+            TermDeleted::dispatch($this);
+        }
 
         return true;
     }
