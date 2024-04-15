@@ -3,6 +3,7 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
@@ -600,6 +601,32 @@ class TermQueryBuilderTest extends TestCase
 
         $terms = Term::query()->offset(1)->get();
         $this->assertEquals(['b', 'c'], $terms->map->slug()->all());
+    }
+
+    /** @test */
+    public function term_can_be_found_using_find_or_new()
+    {
+        Taxonomy::make('tags')->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'Alfa']))->save();
+
+        $findOrNew = Term::query()
+            ->where('taxonomy', 'tags')
+            ->findOrNew('tags::alfa');
+
+        $this->assertEquals($term->slug(), $findOrNew->slug());
+    }
+
+    /** @test */
+    public function term_can_be_created_using_find_or_new()
+    {
+        Taxonomy::make('tags')->save();
+
+        $findOrNew = Term::query()
+            ->where('taxonomy', 'tags')
+            ->findOrNew('tags::alfa');
+
+        $this->assertEmpty($findOrNew->slug());
+        $this->assertInstanceOf(TermContract::class, $findOrNew);
     }
 
     /** @test */

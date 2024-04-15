@@ -206,6 +206,15 @@ class TermQueryBuilder extends Builder
         return $data;
     }
 
+    public function findOrNew($id)
+    {
+        if (! is_null($term = $this->find($id))) {
+            return $term;
+        }
+
+        return Term::make();
+    }
+
     public function firstOrNew(array $attributes = [], array $values = [])
     {
         if (! is_null($instance = $this->where($attributes)->first())) {

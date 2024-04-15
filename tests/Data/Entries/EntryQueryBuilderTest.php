@@ -4,6 +4,7 @@ namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -892,6 +893,32 @@ class EntryQueryBuilderTest extends TestCase
             'post-3',
             'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
+    }
+
+    /** @test */
+    public function entry_can_be_found_using_find_or_new()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $findOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->findOrNew('hoff');
+
+        $this->assertSame($entry, $findOrNew);
+    }
+
+    /** @test */
+    public function entry_can_be_created_using_find_or_new()
+    {
+        Collection::make('posts')->save();
+
+        $findOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->findOrNew('hoff');
+
+        $this->assertNull($findOrNew->id());
+        $this->assertInstanceOf(EntryContract::class, $findOrNew);
     }
 
     /** @test */

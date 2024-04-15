@@ -224,6 +224,15 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return $data;
     }
 
+    public function findOrNew($id)
+    {
+        if (! is_null($entry = $this->find($id))) {
+            return $entry;
+        }
+
+        return Entry::make();
+    }
+
     public function firstOrNew(array $attributes = [], array $values = [])
     {
         if (! is_null($instance = $this->where($attributes)->first())) {

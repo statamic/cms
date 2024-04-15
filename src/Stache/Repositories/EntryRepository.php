@@ -92,6 +92,11 @@ class EntryRepository implements RepositoryContract
             : $entry;
     }
 
+    public function findOrNew($id)
+    {
+        return $this->query()->findOrNew($id);
+    }
+
     public function firstOrNew(array $attributes = [], array $values = [])
     {
         return $this->query()->firstOrNew($attributes, $values);

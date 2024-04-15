@@ -16,6 +16,8 @@ interface EntryRepository
 
     public function findByUri(string $uri);
 
+    public function findOrNew($id);
+
     public function firstOrNew(array $attributes, array $values = []);
 
     public function firstOrCreate(array $attributes, array $values = []);
