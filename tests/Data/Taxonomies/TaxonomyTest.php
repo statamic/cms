@@ -19,7 +19,6 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
-use Statamic\Support\Arr;
 use Statamic\Taxonomies\Taxonomy;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -156,9 +155,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_gets_the_url_when_the_site_is_using_a_subdirectory()
     {
-        $config = config('statamic.sites');
-        Arr::set($config, 'sites.en.url', '/subdirectory/');
-        Site::setConfig($config);
+        $this->setSiteValue('en', 'url', '/subdirectory/');
 
         $taxonomy = (new Taxonomy)->handle('tags');
 
@@ -436,13 +433,10 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $taxonomy1 = tap(Facades\Taxonomy::make('has_some_french')->sites(['en', 'fr', 'de']))->save();
@@ -504,5 +498,20 @@ class TaxonomyTest extends TestCase
         $this->assertFalse($return);
         Facades\Taxonomy::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(TaxonomyDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Facades\Taxonomy::make('test'))->save();
+
+        $return = $taxonomy->deleteQuietly();
+
+        Event::assertNotDispatched(TaxonomyDeleting::class);
+        Event::assertNotDispatched(TaxonomyDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

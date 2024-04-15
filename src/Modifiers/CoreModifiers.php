@@ -1395,7 +1395,7 @@ class CoreModifiers extends Modifier
     public function link($value, $params)
     {
         $attributes = $this->buildAttributesFromParameters($params);
-        $title = array_pull($attributes, 'title', null);
+        $title = Arr::pull($attributes, 'title', null);
 
         return Html::link($value, $title, $attributes);
     }
@@ -1787,7 +1787,7 @@ class CoreModifiers extends Modifier
             $value = $value->all();
         }
 
-        return array_random($value);
+        return Arr::random($value);
     }
 
     /**
@@ -2543,10 +2543,6 @@ class CoreModifiers extends Modifier
 
         if (Compare::isQueryBuilder($value)) {
             $value = $value->get();
-        }
-
-        if ($value instanceof Collection || $value instanceof Augmentable) {
-            $value = $value->toAugmentedArray();
         }
 
         return json_encode($value, $options);

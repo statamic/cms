@@ -1,6 +1,6 @@
 @php use Statamic\Facades\Site; @endphp
 
-<div class="card p-0 overflow-hidden h-full">
+<div class="card p-0 overflow-hidden h-full flex flex-col">
     <div class="flex justify-between items-center p-4">
         <h2>
             <a class="flex items-center" href="{{ $collection->showUrl() }}">
@@ -10,13 +10,13 @@
                 <span v-pre>{{ __($title) }}</span>
             </a>
         </h2>
-        @can('create', ['Statamic\Contracts\Entries\Entry', $collection])
+        @if($canCreate)
         <create-entry-button
             button-class="btn-primary"
             url="{{ $collection->createEntryUrl(Site::selected()) }}"
             :blueprints="{{ $blueprints->toJson() }}"
             text="{{ $button }}"></create-entry-button>
-        @endcan
+        @endif
     </div>
     <collection-widget
         collection="{{ $collection->handle() }}"
