@@ -895,64 +895,107 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     /** @test */
-    public function entries_can_be_found_made_created_or_updated()
+    public function entry_can_be_found_using_first_or_new()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->firstOrNew(
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'David Hasselhoff']
+            );
+
+        $this->assertSame($entry, $firstOrNew);
+    }
+
+    /** @test */
+    public function entry_can_be_created_using_first_or_new()
     {
         Collection::make('posts')->save();
 
-        // Make a new entry without saving it
-        $entry = Entry::query()
+        $firstOrNew = Entry::query()
             ->where('collection', 'posts')
             ->firstOrNew(
-                ['slug' => 'new-post-1'],
-                ['title' => 'New Post 1'],
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'David Hasselhoff']
             );
-        $this->assertEquals('posts', $entry->collectionHandle());
-        $this->assertEquals('new-post-1', $entry->slug());
-        $this->assertEquals('New Post 1', $entry->get('title'));
-        $this->assertNull($entry->id());
 
-        // Create a new entry with id 'new-post-1'
-        $entry = Entry::query()
+        $this->assertNull($firstOrNew->id());
+        $this->assertSame('David Hasselhoff', $firstOrNew->title);
+        $this->assertSame('david-hasselhoff', $firstOrNew->slug());
+        $this->assertSame('posts', $firstOrNew->collection()->handle());
+    }
+
+    /** @test */
+    public function entry_can_be_found_using_first_or_create()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrCreate = Entry::query()
             ->where('collection', 'posts')
             ->firstOrCreate(
-                ['slug' => 'new-post-1'],
-                ['title' => 'New Post 1'],
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'David Hasselhoff']
             );
-        $this->assertEquals('posts', $entry->collectionHandle());
-        $this->assertEquals('new-post-1', $entry->slug);
-        $this->assertEquals('New Post 1', $entry->title);
-        $this->assertNotNull($entry->id());
 
-        // Get the first entry with id 'new-post-1'
-        $entry = Entry::query()
+        $this->assertSame($entry, $firstOrCreate);
+    }
+
+    /** @test */
+    public function entry_can_be_created_using_first_or_create()
+    {
+        Collection::make('posts')->save();
+
+        $firstOrCreate = Entry::query()
             ->where('collection', 'posts')
             ->firstOrCreate(
-                ['slug' => 'new-post-1'],
-                ['title' => 'New Post 1 - Not Created'],
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'David Hasselhoff']
             );
-        $this->assertEquals('posts', $entry->collectionHandle());
-        $this->assertEquals('new-post-1', $entry->slug);
-        $this->assertNotEquals('New Post 1 - Not Created', $entry->title);
-        $this->assertNotNull($entry->id());
 
-        // Create a new entry with id 'new-post-2'
-        $entry = Entry::updateOrCreate(
-            ['collection' => 'posts', 'slug' => 'new-post-2'],
-            ['title' => 'New Post 2'],
-        );
-        $this->assertEquals('posts', $entry->collectionHandle());
-        $this->assertEquals('new-post-2', $entry->slug);
-        $this->assertEquals('New Post 2', $entry->title);
-        $this->assertNotNull($entry->id());
+        $this->assertNotNull($firstOrCreate->id());
+        $this->assertSame('David Hasselhoff', $firstOrCreate->title);
+        $this->assertSame('david-hasselhoff', $firstOrCreate->slug());
+        $this->assertSame('posts', $firstOrCreate->collection()->handle());
+    }
 
-        // Update the entry with id 'new-post-2'
-        $entry = Entry::updateOrCreate(
-            ['collection' => 'posts', 'slug' => 'new-post-2'],
-            ['title' => 'New Post 2 - Updated'],
-        );
-        $this->assertEquals('posts', $entry->collectionHandle());
-        $this->assertEquals('new-post-2', $entry->slug);
-        $this->assertEquals('New Post 2 - Updated', $entry->title);
-        $this->assertNotNull($entry->id());
+    /** @test */
+    public function entry_can_be_found_and_updated_using_update_or_create()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $updateOrCreate = Entry::query()
+            ->where('collection', 'posts')
+            ->updateOrCreate(
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'The Hoff']
+            );
+
+        $this->assertSame($entry->id(), $updateOrCreate->id());
+        $this->assertSame('The Hoff', $updateOrCreate->title);
+        $this->assertSame('david-hasselhoff', $updateOrCreate->slug());
+        $this->assertSame('posts', $updateOrCreate->collection()->handle());
+    }
+
+    /** @test */
+    public function entry_can_be_created_using_update_or_create()
+    {
+        Collection::make('posts')->save();
+
+        $updateOrCreate = Entry::query()
+            ->where('collection', 'posts')
+            ->updateOrCreate(
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'The Hoff']
+            );
+
+        $this->assertNotNull($updateOrCreate->id());
+        $this->assertSame('The Hoff', $updateOrCreate->title);
+        $this->assertSame('david-hasselhoff', $updateOrCreate->slug());
+        $this->assertSame('posts', $updateOrCreate->collection()->handle());
     }
 }
