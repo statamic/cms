@@ -15,6 +15,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\AssetsMeta::class,
         Commands\GlideClear::class,
         Commands\Install::class,
+        Commands\InstallCollaboration::class,
         Commands\InstallEloquentDriver::class,
         Commands\InstallSsg::class,
         Commands\FlatCamp::class,
