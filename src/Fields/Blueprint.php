@@ -639,13 +639,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     protected function resetFieldsCache()
     {
         if ($this->parent) {
-            $blueprintHandle = $this->invade($this->parent, function () {
-                if (property_exists($this, 'blueprint')) {
-                    return $this->blueprint;
-                }
-
-                return null;
-            });
+            $blueprintHandle = (fn () => property_exists($this, 'blueprint') ? $this->blueprint : null)->call($this->parent);
 
             if ($blueprintHandle && $blueprintHandle === $this->lastBlueprintHandle) {
                 return $this;
