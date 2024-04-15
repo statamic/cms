@@ -943,7 +943,7 @@ class EntryQueryBuilderTest extends TestCase
 
         $findOrNew = Entry::query()
             ->where('collection', 'posts')
-            ->findOr('hoff',  function () {
+            ->findOr('hoff', function () {
                 return 'This could be anything.';
             });
 
