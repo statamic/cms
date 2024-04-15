@@ -26,11 +26,10 @@ use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Support\Traits\InvadesProperties;
 
 class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 {
-    use ExistsAsFile, HasAugmentedData, InvadesProperties;
+    use ExistsAsFile, HasAugmentedData;
 
     protected $handle;
     protected $namespace;
