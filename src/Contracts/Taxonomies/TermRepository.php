@@ -16,13 +16,13 @@ interface TermRepository
 
     public function findOrFail($id);
 
-    public function make(?string $slug = null);
-
     public function firstOrNew(array $attributes, array $values = []);
 
     public function firstOrCreate(array $attributes, array $values = []);
 
     public function updateOrCreate(array $attributes, array $values = []);
+
+    public function make(?string $slug = null);
 
     public function query();
 

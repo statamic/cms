@@ -92,6 +92,21 @@ class EntryRepository implements RepositoryContract
             : $entry;
     }
 
+    public function firstOrNew(array $attributes = [], array $values = [])
+    {
+        return $this->query()->firstOrNew($attributes, $values);
+    }
+
+    public function firstOrCreate(array $attributes, array $values = [])
+    {
+        return $this->query()->firstOrCreate($attributes, $values);
+    }
+
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        return $this->query()->updateOrCreate($attributes, $values);
+    }
+
     public function save($entry)
     {
         if (! $entry->id()) {
@@ -114,21 +129,6 @@ class EntryRepository implements RepositoryContract
     public function make(): Entry
     {
         return app(Entry::class);
-    }
-
-    public function firstOrNew(array $attributes = [], array $values = [])
-    {
-        return $this->query()->firstOrNew($attributes, $values);
-    }
-
-    public function firstOrCreate(array $attributes, array $values = [])
-    {
-        return $this->query()->firstOrCreate($attributes, $values);
-    }
-
-    public function updateOrCreate(array $attributes, array $values = [])
-    {
-        return $this->query()->updateOrCreate($attributes, $values);
     }
 
     public function taxonomize($entry)
