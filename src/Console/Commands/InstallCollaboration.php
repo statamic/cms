@@ -43,7 +43,7 @@ class InstallCollaboration extends Command
     {
         if (! Composer::isInstalled('statamic/collaboration')) {
             spin(
-                fn () => Composer::withoutQueue()->throwOnFailure()->require('statamic/collaboration'),
+                fn () => Composer::withoutQueue()->throwOnFailure()->require('statamic/collaboration', 'dev-statamic-5-support', '--no-scripts'),
                 'Installing the statamic/collaboration addon...'
             );
 
