@@ -47,9 +47,11 @@ class CollectionRepository implements RepositoryContract
             return null;
         }
 
-        return $this->all()->first(function ($collection) use ($mount) {
-            return optional($collection->mount())->id() === $mount->id();
-        });
+        return Blink::once('mounted-collections', fn () => $this
+            ->all()
+            ->keyBy(fn ($collection) => $collection->mount()?->id())
+            ->filter()
+        )->get($mount->id());
     }
 
     public function findOrFail($id): Collection

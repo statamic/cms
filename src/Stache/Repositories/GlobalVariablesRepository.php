@@ -7,7 +7,6 @@ use Statamic\Contracts\Globals\Variables;
 use Statamic\Exceptions\GlobalVariablesNotFoundException;
 use Statamic\Globals\VariablesCollection;
 use Statamic\Stache\Stache;
-use Statamic\Support\Str;
 
 class GlobalVariablesRepository implements RepositoryContract
 {
@@ -45,10 +44,13 @@ class GlobalVariablesRepository implements RepositoryContract
 
     public function whereSet($handle): VariablesCollection
     {
-        return $this
-            ->all()
-            ->filter(fn ($variable) => Str::before($variable->id(), '::') == $handle)
-            ->values();
+        $keys = $this->store
+            ->index('handle')
+            ->items()
+            ->filter(fn ($value) => $value == $handle)
+            ->keys();
+
+        return VariablesCollection::make($this->store->getItems($keys));
     }
 
     public function save($variable)

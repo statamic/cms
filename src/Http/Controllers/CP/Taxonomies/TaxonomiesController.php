@@ -16,6 +16,8 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class TaxonomiesController extends CpController
 {
@@ -103,7 +105,7 @@ class TaxonomiesController extends CpController
             'handle' => ['nullable', new Handle],
         ]);
 
-        $handle = $request->handle ?? snake_case($request->title);
+        $handle = $request->handle ?? Str::snake($request->title);
 
         if (Taxonomy::findByHandle($handle)) {
             throw new \Exception('Taxonomy already exists');
@@ -111,7 +113,7 @@ class TaxonomiesController extends CpController
 
         $taxonomy = Taxonomy::make($handle)->title($request->title);
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $taxonomy->sites([Site::default()->handle()]);
         }
 
@@ -171,7 +173,7 @@ class TaxonomiesController extends CpController
             ->template($values['template'] ?? null)
             ->layout($values['layout'] ?? null);
 
-        if ($sites = array_get($values, 'sites')) {
+        if ($sites = Arr::get($values, 'sites')) {
             $taxonomy->sites($sites);
         }
 
@@ -266,7 +268,7 @@ class TaxonomiesController extends CpController
             ],
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $fields['sites'] = [
                 'display' => __('Sites'),
                 'fields' => [

@@ -37,15 +37,12 @@ trait RendersAttributes
     /**
      * Render HTML attributes from tag params.
      *
-     * Parameters that are not prefixed with attr: will be automatically removed.
-     *
+     * @param  array  $except  Parameters that should be excluded. Typically used for tag parameters that control behavior.
      * @return string
      */
-    protected function renderAttributesFromParams()
+    protected function renderAttributesFromParams(array $except = [])
     {
-        $params = $this->params->filter(function ($value, $attribute) {
-            return preg_match('/^attr:/', $attribute);
-        })->all();
+        $params = $this->params->reject(fn ($v, $attr) => in_array($attr, $except))->all();
 
         return $this->renderAttributes($params);
     }
@@ -55,11 +52,11 @@ trait RendersAttributes
      *
      * @return string
      */
-    protected function renderAttributesFromParamsWith(array $attrs)
+    protected function renderAttributesFromParamsWith(array $attrs, array $except = [])
     {
         return collect([
             $this->renderAttributes($attrs),
-            $this->renderAttributesFromParams(),
+            $this->renderAttributesFromParams($except),
         ])->filter()->implode(' ');
     }
 }

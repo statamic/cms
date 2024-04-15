@@ -73,7 +73,7 @@ class EntriesController extends CpController
             $query->where('title', 'like', '%'.$search.'%');
         }
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
@@ -501,8 +501,10 @@ class EntriesController extends CpController
         // If the entry being edited is not the root, then we don't have anything to worry about.
         // If the parent is the root, that's fine, and is handled during the tree update later.
         if (! $parent || ! $entry->page()->isRoot()) {
+            $maxDepth = $entry->collection()->structure()->maxDepth();
+
             // If a parent is selected, validate that it doesn't exceed the max depth of the structure.
-            if ($parent && Entry::find($parent)->page()->depth() >= $entry->collection()->structure()->maxDepth()) {
+            if ($parent && $maxDepth && Entry::find($parent)->page()->depth() >= $maxDepth) {
                 throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_exceeds_max_depth')]);
             }
 
@@ -583,7 +585,7 @@ class EntriesController extends CpController
 
     protected function ensureCollectionIsAvailableOnSite($collection, $site)
     {
-        if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
+        if (Site::multiEnabled() && ! $collection->sites()->contains($site->handle())) {
             return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
     }

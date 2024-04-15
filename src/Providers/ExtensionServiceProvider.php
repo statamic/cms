@@ -231,6 +231,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddConfigureFormFieldsPermission::class,
         Updates\AddSitePermissions::class,
         Updates\UseClassBasedStatamicUniqueRules::class,
+        Updates\MigrateSitesConfigToYaml::class,
     ];
 
     public function register()
@@ -239,6 +240,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerAddonManifest();
         $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
+        $this->app->instance('statamic.hooks', collect());
     }
 
     protected function registerAddonManifest()

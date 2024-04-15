@@ -4,6 +4,7 @@ namespace Statamic\Tags\Concerns;
 
 use Closure;
 use Illuminate\Support\MessageBag;
+use Statamic\Support\Str;
 
 trait RendersForms
 {
@@ -69,7 +70,10 @@ trait RendersForms
             $attrs['enctype'] = 'multipart/form-data';
         }
 
-        $attrs = $this->renderAttributesFromParamsWith($attrs);
+        $attrs = $this->renderAttributesFromParamsWith(
+            $attrs,
+            except: array_merge(['method', 'action'], $knownTagParams)
+        );
 
         $html = collect(['<form', $attrs])->filter()->implode(' ').'>';
 
@@ -126,7 +130,7 @@ trait RendersForms
     {
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
-        $missing = str_random();
+        $missing = Str::random();
         $old = old($field->handle(), $missing);
         $default = $field->value() ?? $field->defaultValue();
         $value = $old === $missing ? $default : $old;

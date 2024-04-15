@@ -100,6 +100,7 @@ return [
     'fieldset_link_fields_prefix_instructions' => 'Every field in the linked fieldset will be prefixed with this. Useful if you want to import the same fields multiple times.',
     'fieldsets_handle_instructions' => 'Used to reference this fieldset elsewhere. It\'s non-trivial to change later.',
     'fieldsets_title_instructions' => 'Usually describes what fields will be inside, like Image Block or Meta Data',
+    'filters_view_already_exists' => 'A view already exists with this name. Creating this view will overwrite the existing view with this name.',
     'focal_point_instructions' => 'Setting a focal point allows dynamic photo cropping with a subject that stays in frame.',
     'focal_point_previews_are_examples' => 'Crop previews are for example only',
     'forgot_password_enter_email' => 'Enter your email address so we can send a reset password link.',

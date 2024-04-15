@@ -28,11 +28,11 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_reorder_sections()
     {
-        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
-        $reorderedSections = ['Top Level', 'Users', 'Fields', 'Content', 'Tools'];
+        $reorderedSections = ['Top Level', 'Users', 'Fields', 'Content', 'Tools', 'Settings'];
 
         // Recommended syntax...
         $this->assertEquals($reorderedSections, $this->buildNavWithPreferences([
@@ -43,6 +43,7 @@ class NavPreferencesTest extends TestCase
                 'fields' => '@inherit',
                 'content' => '@inherit',
                 'tools' => '@inherit',
+                'settings' => '@inherit',
             ],
         ])->keys()->all());
 
@@ -142,6 +143,7 @@ class NavPreferencesTest extends TestCase
                     'content::collections' => '@inherit',
                     'content::navigation' => '@inherit',
                     'content::assets' => '@inherit',
+                    'content::site' => '@inherit',
                 ],
             ],
         ])->get('Content')->map->display()->all());
@@ -155,6 +157,7 @@ class NavPreferencesTest extends TestCase
                 'content::collections' => '@inherit',
                 'content::navigation' => '@inherit',
                 'content::assets' => '@inherit',
+                'content::site' => '@inherit',
             ],
         ])->get('Content')->map->display()->all());
 
@@ -169,6 +172,7 @@ class NavPreferencesTest extends TestCase
                         'content::collections' => '@inherit',
                         'content::navigation' => '@inherit',
                         'content::assets' => '@inherit',
+                        'content::site' => '@inherit',
                     ],
                 ],
             ],
@@ -210,6 +214,7 @@ class NavPreferencesTest extends TestCase
                     'content::collections' => '@inherit',
                     'content::navigation' => '@inherit',
                     'content::assets' => '@inherit',
+                    'content::site' => '@inherit',
                 ],
             ],
         ])->get('Content')->map->display()->all());
@@ -223,6 +228,7 @@ class NavPreferencesTest extends TestCase
                     'content::collections' => '@inherit',
                     'content::navigation' => '@inherit',
                     'content::assets' => '@inherit',
+                    'content::site' => '@inherit',
                 ],
             ],
         ])->get('Content')->map->display()->all());
@@ -356,11 +362,11 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_rename_sections()
     {
-        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
-        $renamedSections = ['Top Level', 'Data', 'Fields', 'Tools', 'Pals'];
+        $renamedSections = ['Top Level', 'Data', 'Fields', 'Tools', 'Settings', 'Pals'];
 
         // Recommended syntax...
         $this->assertEquals($renamedSections, $this->buildNavWithPreferences([
@@ -667,11 +673,11 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_hide_sections()
     {
-        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
-        $sectionsAfterHiding = ['Top Level', 'Fields', 'Tools'];
+        $sectionsAfterHiding = ['Top Level', 'Fields', 'Tools', 'Settings'];
 
         // Recommended syntax...
         $this->assertEquals($sectionsAfterHiding, $this->buildNavWithPreferences([
@@ -1418,11 +1424,11 @@ class NavPreferencesTest extends TestCase
                 ->url('/cp/seo-pro');
         });
 
-        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO pro'];
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users', 'SEO pro'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
-        $renamedSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO Pro Renamed'];
+        $renamedSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users', 'SEO Pro Renamed'];
 
         $this->assertEquals($renamedSections, $this->buildNavWithPreferences([
             'seo_pro' => [
@@ -1445,11 +1451,11 @@ class NavPreferencesTest extends TestCase
                 ]);
         });
 
-        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO pro'];
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users', 'SEO pro'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
-        $renamedSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
+        $renamedSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users'];
 
         $this->assertEquals($renamedSections, $this->buildNavWithPreferences([
             'seo_pro' => [
@@ -1467,7 +1473,7 @@ class NavPreferencesTest extends TestCase
                 ->url('/cp/seo-pro');
         });
 
-        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO pro'];
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users', 'SEO pro'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
@@ -1481,7 +1487,7 @@ class NavPreferencesTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals(['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO pro'], $nav->keys()->all());
+        $this->assertEquals(['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users', 'SEO pro'], $nav->keys()->all());
         $this->assertEquals(['SEO Settings', 'New Item'], $nav->get('SEO pro')->map->display()->all());
     }
 
@@ -1494,7 +1500,7 @@ class NavPreferencesTest extends TestCase
                 ->url('/cp/seo-pro');
         });
 
-        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO Pro'];
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users', 'SEO Pro'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
@@ -1511,10 +1517,10 @@ class NavPreferencesTest extends TestCase
         ], true);
 
         // Since we moved the SEO item to top level, it should hide SEO section by default...
-        $this->assertEquals(['Top Level', 'Content', 'Fields', 'Tools', 'Users'], $nav->keys()->all());
+        $this->assertEquals(['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users'], $nav->keys()->all());
 
         // But still show empty section when `withHidden` flag is true, so that user can re-add items to this core/extended section...
-        $this->assertEquals(['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO Pro'], $navWithHidden->keys()->all());
+        $this->assertEquals(['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users', 'SEO Pro'], $navWithHidden->keys()->all());
         $this->assertTrue($navWithHidden->get('SEO Pro')->isEmpty());
     }
 
@@ -1574,7 +1580,7 @@ class NavPreferencesTest extends TestCase
         ]);
 
         // Assert section order, with section rename from 'Content' to 'Site'
-        $this->assertEquals(['Top Level', 'Tools', 'Users', 'Site', 'Fields'], $nav->keys()->all());
+        $this->assertEquals(['Top Level', 'Tools', 'Users', 'Site', 'Fields', 'Settings'], $nav->keys()->all());
 
         // Assert top level items, with aliased 'Pages' item
         $this->assertEquals([

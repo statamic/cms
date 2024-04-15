@@ -86,6 +86,11 @@ trait HasAugmentedInstance
         return $this->toEvaluatedAugmentedArray();
     }
 
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
+    }
+
     public function __get($key)
     {
         $value = $this->augmentedValue($key);

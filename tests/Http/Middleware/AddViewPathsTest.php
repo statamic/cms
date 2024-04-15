@@ -5,6 +5,7 @@ namespace Tests\Http\Middleware;
 use Illuminate\Http\Request;
 use Statamic\Facades\Site;
 use Statamic\Http\Middleware\AddViewPaths;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,10 +20,10 @@ class AddViewPathsTest extends TestCase
      */
     public function adds_view_paths($isAmpEnabled, $requestUrl, $expectedPaths)
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         view()->getFinder()->setPaths($originalPaths = [
             '/path/to/views',
@@ -54,10 +55,10 @@ class AddViewPathsTest extends TestCase
      */
     public function adds_namespaced_view_paths($requestUrl, $expectedPaths)
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         view()->getFinder()->replaceNamespace('foo', [
             '/path/to/views',
@@ -71,14 +72,14 @@ class AddViewPathsTest extends TestCase
         $handled = false;
 
         (new AddViewPaths())->handle($request, function () use ($expectedPaths, &$handled) {
-            $this->assertEquals($expectedPaths, array_get(view()->getFinder()->getHints(), 'foo'));
+            $this->assertEquals($expectedPaths, Arr::get(view()->getFinder()->getHints(), 'foo'));
             $handled = true;
 
             return new Response;
         });
 
         $this->assertTrue($handled);
-        $this->assertEquals($originalHints, array_get(view()->getFinder()->getHints(), 'foo'));
+        $this->assertEquals($originalHints, Arr::get(view()->getFinder()->getHints(), 'foo'));
     }
 
     private function setCurrentSiteBasedOnUrl($requestUrl)

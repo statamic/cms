@@ -9,7 +9,7 @@ class SitePolicy
 {
     public function view($user, $site)
     {
-        if (! Site::hasMultiple()) {
+        if (! Site::multiEnabled()) {
             return true;
         }
 
