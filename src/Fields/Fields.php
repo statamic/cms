@@ -3,10 +3,11 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
+use Facades\Statamic\Fields\FieldsetRecursionStack;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Statamic\Exceptions\FieldsetNotFoundException;
+use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Support\Arr;
@@ -21,12 +22,9 @@ class Fields
     protected $filled = [];
     protected $withValidatableValues = false;
     protected $withComputedValues = false;
-    protected $importedFieldsets = [];
 
-    public function __construct($items = [], $parent = null, $parentField = null, $parentIndex = null, array $importedFieldsets = [])
+    public function __construct($items = [], $parent = null, $parentField = null, $parentIndex = null)
     {
-        $this->importedFieldsets = $importedFieldsets;
-
         $this
             ->setParent($parent)
             ->setParentField($parentField, $parentIndex)
@@ -272,24 +270,22 @@ class Fields
 
     private function getImportedFields(array $config): array
     {
-        if (count($this->importedFieldsets) > 1 && in_array($config['import'], $this->importedFieldsets)) {
-            Log::warning('Recursive fieldsets are not supported.', [
-                'importing' => $config['import'],
-                'imported' => $this->importedFieldsets,
-            ]);
+        $recursion = FieldsetRecursionStack::getFacadeRoot();
 
-            return [];
+        if ($recursion->count() > 1 && $recursion->has($config['import'])) {
+            throw new FieldsetRecursionException($config['import']);
         }
 
         $blink = 'blueprint-imported-fields-'.md5(json_encode($config));
-        $this->importedFieldsets[] = $config['import'];
 
-        return Blink::once($blink, function () use ($config) {
+        $recursion->push($config['import']);
+
+        $imported = Blink::once($blink, function () use ($config) {
             if (! $fieldset = FieldsetRepository::find($config['import'])) {
                 throw new FieldsetNotFoundException($config['import']);
             }
 
-            $fields = $fieldset->fields($this->importedFieldsets)->all();
+            $fields = $fieldset->fields()->all();
 
             if ($overrides = $config['config'] ?? null) {
                 $fields = $fields->map(function ($field, $handle) use ($overrides) {
@@ -313,6 +309,10 @@ class Fields
                 ->setParent($this->parent)
                 ->setParentField($this->parentField, $this->parentIndex);
         })->all();
+
+        $recursion->pop();
+
+        return $imported;
     }
 
     public function meta()
