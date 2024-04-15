@@ -43,7 +43,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     protected $ensuredFields = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
-    protected $lastBlueprintHandle = null;
+    private $lastBlueprintHandle = null;
 
     private ?Columns $columns = null;
 
