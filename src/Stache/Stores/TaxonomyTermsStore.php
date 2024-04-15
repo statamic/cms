@@ -28,7 +28,7 @@ class TaxonomyTermsStore extends ChildStore
 
     public function getItemFilter(SplFileInfo $file)
     {
-        $dir = str_finish($this->directory(), '/');
+        $dir = Str::finish($this->directory(), '/');
         $relative = $file->getPathname();
 
         if (substr($relative, 0, strlen($dir)) == $dir) {
@@ -45,7 +45,7 @@ class TaxonomyTermsStore extends ChildStore
     public function makeItemFromFile($path, $contents)
     {
         $taxonomy = pathinfo($path, PATHINFO_DIRNAME);
-        $taxonomy = str_after($taxonomy, $this->parent->directory());
+        $taxonomy = Str::after($taxonomy, $this->parent->directory());
 
         $data = YAML::file($path)->parse($contents);
 
@@ -60,7 +60,6 @@ class TaxonomyTermsStore extends ChildStore
         }
 
         $term->dataForLocale($term->defaultLocale(), $data);
-        $term->syncOriginal();
 
         return $term;
     }

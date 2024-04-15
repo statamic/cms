@@ -7,7 +7,6 @@ use Illuminate\Filesystem\Filesystem;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Facades;
 use Statamic\Facades\Path;
-use Statamic\Facades\Site;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\CollectionTreeStore;
 use Statamic\Structures\CollectionTree;
@@ -113,10 +112,10 @@ YAML;
     /** @test */
     public function it_makes_nav_tree_instances_from_files_when_using_multisite()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
-        ]]);
+        ]);
 
         $contents = <<<'YAML'
 tree:

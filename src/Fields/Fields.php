@@ -260,11 +260,14 @@ class Fields
             throw new \Exception("Field {$config['field']} not found.");
         }
 
-        if ($overrides = array_get($config, 'config')) {
+        if ($overrides = Arr::get($config, 'config')) {
             $field->setConfig(array_merge($field->config(), $overrides));
         }
 
-        return $field->setParent($this->parent)->setHandle($config['handle']);
+        return $field
+            ->setParent($this->parent)
+            ->setParentField($this->parentField, $this->parentIndex)
+            ->setHandle($config['handle']);
     }
 
     private function getImportedFields(array $config): array
@@ -294,7 +297,7 @@ class Fields
                 });
             }
 
-            if ($prefix = array_get($config, 'prefix')) {
+            if ($prefix = Arr::get($config, 'prefix')) {
                 $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
                     $field = clone $field;
                     $handle = $prefix.$field->handle();
@@ -305,7 +308,11 @@ class Fields
             }
 
             return $fields;
-        })->each->setParent($this->parent)->all();
+        })->each(function ($field) {
+            $field
+                ->setParent($this->parent)
+                ->setParentField($this->parentField, $this->parentIndex);
+        })->all();
     }
 
     public function meta()

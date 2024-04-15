@@ -6,9 +6,12 @@ use BadMethodCallException;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Facades\Compare;
 use Statamic\Fields\Value;
+use Statamic\Support\Traits\Hookable;
 
 trait HasAugmentedInstance
 {
+    use Hookable;
+
     public function augmentedValue($key)
     {
         return $this->augmented()->get($key);
@@ -38,7 +41,7 @@ trait HasAugmentedInstance
 
     public function augmented()
     {
-        return $this->newAugmentedInstance();
+        return $this->runHooks('augmented', $this->newAugmentedInstance());
     }
 
     abstract public function newAugmentedInstance(): Augmented;
@@ -81,6 +84,11 @@ trait HasAugmentedInstance
     public function toArray()
     {
         return $this->toEvaluatedAugmentedArray();
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
     }
 
     public function __get($key)

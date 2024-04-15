@@ -83,7 +83,8 @@ class ConditionProcessor
                      * @var AbstractNode[] $interpolationRegion
                      */
                     foreach ($branch->head->processedInterpolationRegions as $varKey => $interpolationRegion) {
-                        $interpolationResult = $this->processor->cloneProcessor()->setData($data)->render($interpolationRegion);
+                        $interpolationResult = $this->processor->cloneProcessor()
+                            ->setIsInterpolationProcessor(true)->setData($data)->render($interpolationRegion);
 
                         $dataToUse[$varKey] = $interpolationResult;
                         $interpolationReplacements[$varKey] = $interpolationResult;

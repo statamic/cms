@@ -6,6 +6,7 @@ use Mockery;
 use Statamic\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Imaging\GlideImageManipulator;
+use Statamic\Support\Arr;
 use Tests\TestCase;
 
 class GlideImageManipulatorTest extends TestCase
@@ -137,7 +138,7 @@ class GlideImageManipulatorTest extends TestCase
         $this->man->fit('crop_focal');
 
         $this->assertArrayHasKey('fit', $this->man->getParams());
-        $this->assertEquals('crop-60-40', array_get($this->man->getParams(), 'fit'));
+        $this->assertEquals('crop-60-40', Arr::get($this->man->getParams(), 'fit'));
     }
 
     /** @test */
@@ -149,6 +150,6 @@ class GlideImageManipulatorTest extends TestCase
         $this->man->fit('crop_focal');
 
         $this->assertArrayHasKey('fit', $this->man->getParams());
-        $this->assertEquals('crop', array_get($this->man->getParams(), 'fit'));
+        $this->assertEquals('crop', Arr::get($this->man->getParams(), 'fit'));
     }
 }

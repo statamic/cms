@@ -3,7 +3,7 @@
     <div>
 
         <button class="btn flex w-full justify-center items-center" @click="open = true">
-            <svg-icon name="light/hyperlink" class="mr-2 w-4 h-4" />
+            <svg-icon name="light/hyperlink" class="rtl:ml-2 ltr:mr-2 w-4 h-4" />
             <span>{{ __('Link Existing') }}</span>
         </button>
 
@@ -34,12 +34,12 @@
                             v-model="reference">
                             <template slot="option" slot-scope="option">
                                 <div class="flex items-center">
-                                    <span v-text="option.fieldset" class="text-2xs text-gray-500 mr-2" />
+                                    <span v-text="option.fieldset" class="text-2xs text-gray-500 rtl:ml-2 ltr:mr-2" />
                                     <span v-text="option.label" />
                                 </div>
                             </template>
                             <template v-slot:no-options>
-                               <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                               <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
                            </template>
                         </v-select>
                         <button
@@ -67,7 +67,7 @@
                             v-model="fieldset"
                         >
                             <template v-slot:no-options>
-                                <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
                             </template>
                         </v-select>
                         <p class="text-sm font-medium mt-6 mb-2" v-text="__('Prefix')" />

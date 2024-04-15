@@ -40,18 +40,10 @@ class EntriesTest extends TestCase
 
         app('statamic.scopes')[PostType::handle()] = PostType::class;
         app('statamic.scopes')[PostAnimal::handle()] = PostAnimal::class;
-    }
 
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set('statamic.sites', [
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
         ]);
     }
 
@@ -556,6 +548,19 @@ class EntriesTest extends TestCase
         ]));
 
         $this->assertEquals([3], $this->getEntries(['taxonomy:tags:all' => $builder])->map->slug()->all());
+    }
+
+    /** @test */
+    public function it_chunks_entries()
+    {
+        $this->makeEntry('1')->save();
+        $this->makeEntry('2')->save();
+        $this->makeEntry('3')->save();
+
+        $entries = $this->getEntries(['chunk' => 2]);
+
+        $this->assertEquals([1, 2], $entries->first()->map->slug()->all());
+        $this->assertEquals([3], $entries->last()->map->slug()->all());
     }
 }
 

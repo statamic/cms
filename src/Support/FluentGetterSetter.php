@@ -3,8 +3,6 @@
 namespace Statamic\Support;
 
 use Closure;
-use ReflectionException;
-use ReflectionObject;
 
 class FluentGetterSetter
 {
@@ -105,11 +103,7 @@ class FluentGetterSetter
      */
     protected function runGetterLogic()
     {
-        try {
-            $value = $this->reflectedProperty()->getValue($this->object);
-        } catch (ReflectionException $exception) {
-            $value = $this->object->{$this->property} ?? null;
-        }
+        $value = $this->getProperty($this->object, $this->property);
 
         if ($getter = $this->getter) {
             $value = $getter($value);
@@ -129,27 +123,20 @@ class FluentGetterSetter
             $value = $setter($value);
         }
 
-        try {
-            $this->reflectedProperty()->setValue($this->object, $value);
-        } catch (ReflectionException $exception) {
-            $this->object->{$this->property} = $value;
-        }
+        $this->setProperty($this->object, $this->property, $value);
 
         if ($afterSetter = $this->afterSetter) {
             $afterSetter($value);
         }
     }
 
-    /**
-     * Get reflected property.
-     *
-     * @return \ReflectionProperty
-     */
-    protected function reflectedProperty()
+    private function getProperty($object, $property)
     {
-        $property = (new ReflectionObject($this->object))->getProperty($this->property);
-        $property->setAccessible(true);
+        return (fn () => $this->{$property})->call($object);
+    }
 
-        return $property;
+    private function setProperty($object, $property, $value)
+    {
+        (fn () => $this->{$property} = $value)->call($object);
     }
 }

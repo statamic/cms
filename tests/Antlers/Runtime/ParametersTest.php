@@ -3,6 +3,9 @@
 namespace Tests\Antlers\Runtime;
 
 use Carbon\Carbon;
+use Statamic\Fields\Field;
+use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Group;
 use Statamic\Tags\Tags;
 use Tests\Antlers\Fixtures\Addon\Tags\EchoMethod;
 use Tests\Antlers\Fixtures\Addon\Tags\TestTags as Test;
@@ -335,6 +338,29 @@ EOT;
         $this->assertSame('123:456', $result);
     }
 
+    public function test_shorthand_parameter_variable_syntax()
+    {
+        $data = [
+            'name' => 'Bacon',
+        ];
+
+        (new class extends Tags
+        {
+            protected static $handle = 'test';
+
+            public function index()
+            {
+                return 'From the tag! '.$this->params->get('name');
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ test :$name }}
+EOT;
+
+        $this->assertSame('From the tag! Bacon', $this->renderString($template, $data, true));
+    }
+
     public function test_numeric_literals_inside_variable_bindings_stay_numbers()
     {
         (new class extends Tags
@@ -364,5 +390,62 @@ EOT;
             $this->renderString('{{ test :my_value="123.0" }}{{ my_value + 0.5 }}{{ /test }}', [], true),
             'Floats'
         );
+    }
+
+    public function test_values_objects_are_resolved_when_processing_tag_params()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'test';
+
+            public function index()
+            {
+                return $this->params->get('param');
+            }
+        })::register();
+
+        $theGroup = new Group();
+
+        $theField = new Field('the_group', [
+            'type' => 'group',
+            'fields' => [
+                ['handle' => 'one', 'field' => ['type' => 'text']],
+                ['handle' => 'two', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        $theGroup->setField($theField);
+
+        $theValue = new Value([
+            'one' => 'One',
+            'two' => 'Two',
+        ], 'the_group', $theGroup);
+
+        $data = [
+            'thing' => [
+                [
+                    'the_group' => $theValue,
+                ],
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{ thing scope="block" }}
+{{ test :param="block:the_group:two" }}
+{{ /thing }}
+EOT;
+
+        $this->assertSame('Two', trim($this->renderString($template, $data, true)));
+
+        // Test when the group is the first part of the path.
+        $data = [
+            'the_group' => $theValue,
+        ];
+
+        $template = <<<'EOT'
+{{ test :param="the_group:one" }}
+EOT;
+
+        $this->assertSame('One', trim($this->renderString($template, $data, true)));
     }
 }

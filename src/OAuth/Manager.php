@@ -14,20 +14,28 @@ class Manager
 
     public function provider($provider)
     {
-        return static::$providers[$provider] = static::$providers[$provider] ?? new Provider($provider);
+        if (isset(static::$providers[$provider])) {
+            return static::$providers[$provider];
+        }
+
+        return static::$providers[$provider] = $this->providers()->get($provider);
     }
 
     public function providers()
     {
         return collect(config('statamic.oauth.providers'))
-            ->map(function ($provider, $key) {
-                // Allow users to specify just the name as a string, or as a name/label pair.
-                // eg. ['github' => 'GitHub', 'facebook']
-                $expanded = is_string($key);
+            ->mapWithKeys(function ($value, $key) {
+                $provider = $value;
+                $config = [];
 
-                return $this
-                    ->provider($expanded ? $key : $provider)
-                    ->label($expanded ? $provider : null);
+                // When the $key is NOT an integer, it means the provider has config settings.
+                // eg. ['github' => 'GitHub', 'facebook' => ['label' => 'Facebook', 'stateless' => true]]
+                if (! is_int($key)) {
+                    $provider = $key;
+                    $config = is_array($value) ? $value : ['label' => $value];
+                }
+
+                return [$provider => new Provider($provider, $config)];
             });
     }
 }
