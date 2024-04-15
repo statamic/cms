@@ -3,11 +3,9 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
-use Facades\Statamic\Fields\FieldsetRecursionStack;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
 use Statamic\Exceptions\FieldsetNotFoundException;
-use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Support\Arr;
@@ -270,15 +268,9 @@ class Fields
 
     private function getImportedFields(array $config): array
     {
-        $recursion = FieldsetRecursionStack::getFacadeRoot();
-
-        if ($recursion->count() > 1 && $recursion->has($config['import'])) {
-            throw new FieldsetRecursionException($config['import']);
-        }
+        $recursion = tap(app(FieldsetRecursionStack::class))->push($config['import']);
 
         $blink = 'blueprint-imported-fields-'.md5(json_encode($config));
-
-        $recursion->push($config['import']);
 
         $imported = Blink::once($blink, function () use ($config) {
             if (! $fieldset = FieldsetRepository::find($config['import'])) {

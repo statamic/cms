@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Illuminate\Support\Collection;
+use Statamic\Exceptions\FieldsetRecursionException;
 
 class FieldsetRecursionStack
 {
@@ -13,26 +14,15 @@ class FieldsetRecursionStack
 
     public function push(string $import)
     {
+        if ($this->stack->contains($import)) {
+            throw new FieldsetRecursionException($import, $this->stack->last());
+        }
+
         $this->stack->push($import);
     }
 
     public function pop()
     {
         $this->stack->pop();
-    }
-
-    public function count(): int
-    {
-        return $this->stack->count();
-    }
-
-    public function has(string $import): bool
-    {
-        return $this->stack->contains($import);
-    }
-
-    public function last()
-    {
-        return $this->stack->last();
     }
 }
