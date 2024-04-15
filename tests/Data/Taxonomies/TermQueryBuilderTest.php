@@ -603,58 +603,6 @@ class TermQueryBuilderTest extends TestCase
     }
 
     /** @test */
-    public function terms_can_be_found_made_created_or_updated()
-    {
-        Taxonomy::make('tags')->save();
-
-        // Make a new term
-        $term = Term::query()
-            ->where('taxonomy', 'tags')
-            ->firstOrNew(
-                ['slug' => 'term-1'],
-                ['title' => 'Term 1'],
-            );
-        $this->assertEquals('Term 1', $term->title());
-        $this->assertNull(Term::find('term-1'));
-
-        // Create a new term
-        $term = Term::query()
-            ->where('taxonomy', 'tags')
-            ->firstOrCreate(
-                ['slug' => 'term-1'],
-                ['title' => 'Term 1'],
-            );
-        $this->assertEquals('Term 1', $term->title());
-        $this->assertNotNull(Term::find('tags::term-1'));
-
-        // Get the first term
-        $term = Term::query()
-            ->where('taxonomy', 'tags')
-            ->firstOrCreate(
-                ['slug' => 'term-1'],
-                ['title' => 'Term 1 - Updated'],
-            );
-        $this->assertNotEquals('Term 1 - Updated', $term->title());
-        $this->assertNotNull(Term::find('tags::term-1'));
-
-        // Create a new term
-        $term = Term::updateOrCreate(
-            ['slug' => 'term-2', 'taxonomy' => 'tags'],
-            ['title' => 'Term 2'],
-        );
-        $this->assertEquals('Term 2', $term->title());
-        $this->assertNotNull(Term::find('tags::term-2'));
-
-        // Update the term
-        $term = Term::updateOrCreate(
-            ['slug' => 'term-2', 'taxonomy' => 'tags'],
-            ['title' => 'Term 2 - Updated'],
-        );
-        $this->assertEquals('Term 2 - Updated', $term->title());
-        $this->assertNotNull(Term::find('tags::term-2'));
-    }
-
-    /** @test */
     public function term_can_be_found_using_first_or_new()
     {
         Taxonomy::make('tags')->save();
