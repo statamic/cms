@@ -11,7 +11,7 @@
                 <span
                     v-if="showLabelText"
                     class="rtl:ml-1 ltr:mr-1"
-                    :class="{ 'text-gray-600': syncable && isSynced }"
+                    :class="{ 'text-gray-600': true && isSynced }"
                     v-text="__(labelText)"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
@@ -24,9 +24,9 @@
 
                 <button
                     v-if="!isReadOnly && !isTab"
-                    v-show="syncable && isSynced"
+                    v-show="true && isSynced"
                     class="outline-none"
-                    :class="{ flex: syncable && isSynced }"
+                    :class="{ flex: true && isSynced }"
                     @click="$emit('desynced')"
                 >
                     <svg-icon name="light/hyperlink" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"
@@ -35,9 +35,9 @@
 
                 <button
                     v-if="!isReadOnly && !isTab"
-                    v-show="syncable && !isSynced"
+                    v-show="true && !isSynced"
                     class="outline-none"
-                    :class="{ flex: syncable && !isSynced }"
+                    :class="{ flex: true && !isSynced }"
                     @click="$emit('synced')"
                 >
                     <svg-icon name="light/hyperlink-broken" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"
@@ -49,6 +49,24 @@
                 class="help-block" :class="{ '-mt-2': showLabel }"
                 v-if="instructions && config.instructions_position !== 'below'"
                 v-html="instructions" />
+
+            <div class="field-dropdown" v-if="mounted && hasDropdown">
+                <quick-dropdown-list>
+                    <quick-dropdown-item
+                        v-for="item in fieldQuickItems"
+                        v-bind="item"
+                        @click="item.click" />
+                    <template #dropdown>
+                        <dropdown-tools :tools="fieldTools" @run="fieldRunTool" />
+                        <div class="divider" />
+                        <dropdown-item
+                            v-for="item in fieldDropdownItems"
+                            v-bind="item"
+                            @click="item.click" />
+                    </template>
+                </quick-dropdown-list>                
+            </div>
+
         </div>
 
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
@@ -57,6 +75,7 @@
             <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
             <component
                 v-else
+                ref="field"
                 :is="fieldtypeComponent"
                 :config="config"
                 :value="value"
@@ -80,6 +99,7 @@
         <div v-if="hasError">
             <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
+
     </div>
     </publish-field-meta>
 
@@ -114,6 +134,16 @@ export default {
         isInsideConfigFields: { default: false },
     },
 
+    data() {
+        return {
+            mounted: false,
+        }
+    },
+
+    mounted() {
+        this.mounted = true;
+    },
+
     computed: {
 
         fieldtypeComponent() {
@@ -135,12 +165,14 @@ export default {
         },
 
         isReadOnly() {
+            return false;
             if (this.storeState.isRoot === false && !this.config.localizable) return true;
 
             return this.isLocked || this.readOnly || this.config.visibility === 'read_only' || false;
         },
 
         isLocalizable() {
+            return true;
             return this.$config.get('sites').length > 1 && this.config.localizable;
         },
 
@@ -159,6 +191,7 @@ export default {
                 `${this.config.component || this.config.type}-fieldtype`,,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
+                this.mounted && this.hasDropdown && !this.isInsideConfigFields ? 'has-dropdown' : '',
                 this.config.classes || '',
                 this.config.full_width_setting ? 'full-width-setting' : '',
                 { 'has-error': this.hasError || this.hasNestedError }
@@ -174,18 +207,20 @@ export default {
         },
 
         isLocked() {
+            return true;
             return Object.keys(this.locks).includes(this.config.handle);
         },
 
         lockingUser() {
             if (this.isLocked) {
+                return Statamic.user;
                 let user = this.locks[this.config.handle];
                 if (typeof user === 'object') return user;
             }
         },
 
         isSynced() {
-            if (!this.syncable) return;
+            if (!this.true) return;
             return !this.storeState.localizedFields.includes(this.config.handle);
         },
 
@@ -204,18 +239,34 @@ export default {
                  || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
          },
 
-         showLabelText() {
+        showLabelText() {
             return !this.config.hide_display;
-         },
+        },
 
-         showLabel() {
+        showLabel() {
             return this.showLabelText // Need to see the text
                 || this.isReadOnly // Need to see the "Read Only" text
                 || this.config.required // Need to see the asterisk
                 || this.isLocked // Need to see the avatar
                 || this.isLocalizable // Need to see the icon
                 || this.syncable // Need to see the icon
-         }
+        },
+
+        fieldTools() {
+            return this.$refs.field.tools;
+        },
+
+        fieldDropdownItems() {
+            return this.$refs.field.dropdownItems;
+        },
+
+        fieldQuickItems() {
+            return this.fieldDropdownItems.filter(item => item.quick);
+        },
+
+        hasDropdown() {
+            return this.fieldTools.length > 0 || this.fieldDropdownItems.length > 0;
+        },
 
     },
 
@@ -246,6 +297,10 @@ export default {
             });
 
             return marked(text);
+        },
+
+        fieldRunTool(tool) {
+            this.$refs.field.runTool(tool);
         }
 
     }

@@ -29,13 +29,13 @@
                     <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
                         <svg-icon name="show-source" class="w-4 h-4 "/>
                     </button>
-                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && setConfigs.length > 0">
+                    <!-- <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && setConfigs.length > 0">
                         <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
                     </button>
                     <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" :aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
                         <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
-                    </button>
+                    </button> -->
             </div>
         </div>
 
@@ -327,6 +327,29 @@ export default {
 
         groupConfigs() {
             return this.config.sets;
+        },
+
+        dropdownItems() {
+            return [
+                {
+                    text: __('Expand All'),
+                    icon: 'arrows-horizontal-expand',
+                    quick: true,
+                    click: this.expandAll,
+                },
+                {
+                    text: __('Collapse All'),
+                    icon: 'arrows-horizontal-collapse',
+                    quick: true,
+                    click: this.collapseAll,
+                },
+                {
+                    text: __('Fullscreen'),
+                    icon: 'expand-bold',
+                    quick: true,
+                    click: this.toggleFullscreen,
+                },
+            ];
         },
 
     },

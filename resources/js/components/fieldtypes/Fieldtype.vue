@@ -1,5 +1,11 @@
 <script>
+import HasTools from '../HasTools';
+
 export default {
+
+    mixins: [
+        HasTools,
+    ],
 
     props: {
         value: {
@@ -40,7 +46,7 @@ export default {
 
         updateMeta(value) {
             this.$emit('meta-updated', value);
-        }
+        },
     },
 
     computed: {
@@ -75,7 +81,23 @@ export default {
             let prefix = this.fieldPathPrefix ? this.fieldPathPrefix+'.' : '';
 
             return prefix+'field_'+this.config.handle;
-        }
+        },
+
+        dropdownItems() {
+            return [];
+        },
+
+        toolPayload() { 
+            return {
+                field: this,
+                value: this.value,
+                config: this.config,
+                meta: this.meta,
+                update: this.update,
+                updateMeta: this.updateMeta,
+            };
+        },
+
     },
 
     watch: {
@@ -92,4 +114,4 @@ export default {
     }
 
 }
-</script>
+</script>../HasTools
