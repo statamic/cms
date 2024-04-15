@@ -6,6 +6,7 @@ use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Term;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
 
@@ -211,22 +212,24 @@ class TermQueryBuilder extends Builder
             return $instance;
         }
 
-        /** @var \Statamic\Taxonomies\LocalizedTerm */
-        $term = Term::make();
         $data = array_merge($attributes, $values);
-        $term->taxonomy($this->taxonomies[0] ?? $data['taxonomy'] ?? null);
-        $term->slug($data['slug'] ?? null);
-        $term->merge($data);
 
-        return $term;
+        if (($this->taxonomies && count($this->taxonomies) > 1) && ! isset($data['taxonomy'])) {
+            throw new \Exception('Please specify a taxonomy.');
+        }
+
+        return Term::make()
+            ->taxonomy($this->taxonomies[0] ?? $data['taxonomy'])
+            ->slug($data['slug'] ?? (isset($data['title']) ? Str::slug($data['title']) : null))
+            ->data(Arr::except($data, ['taxonomy', 'slug']));
     }
 
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
         $term = $this->firstOrNew($attributes, $values);
 
-        // If the term does not exist then it needs to be saved
-        if (! ($term instanceof LocalizedTerm)) {
+        // When the term is not a LocalizedTerm, it means it's newe and should be saved.
+        if (! $term instanceof LocalizedTerm) {
             $term->save();
         }
 
@@ -237,8 +240,12 @@ class TermQueryBuilder extends Builder
     {
         $term = $this->firstOrNew($attributes, $values);
 
-        // If the term already exists and the values need to be updated
+        // When the term is a LocalizedTerm, it means it's existing and should be updated.
         if ($term instanceof LocalizedTerm) {
+            if ($slug = Arr::get($values, 'slug')) {
+                $term->slug($slug);
+            }
+
             $term->merge($values);
         }
 
