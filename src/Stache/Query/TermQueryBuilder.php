@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Query;
 
+use Closure;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Term;
@@ -213,6 +214,15 @@ class TermQueryBuilder extends Builder
         }
 
         return Term::make();
+    }
+
+    public function findOr($id, Closure $callback)
+    {
+        if (! is_null($term = $this->find($id))) {
+            return $term;
+        }
+
+        return $callback();
     }
 
     public function firstOrNew(array $attributes = [], array $values = [])

@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Closure;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 use Statamic\Exceptions\TaxonomyNotFoundException;
@@ -115,6 +116,11 @@ class TermRepository implements RepositoryContract
     public function findOrNew($id)
     {
         return $this->query()->findOrNew($id);
+    }
+
+    public function findOr($id, Closure $callback)
+    {
+        return $this->query()->findOr($id, $callback);
     }
 
     public function firstOrNew(array $attributes, array $values = [])

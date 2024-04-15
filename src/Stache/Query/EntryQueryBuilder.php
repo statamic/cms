@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Query;
 
+use Closure;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
@@ -231,6 +232,15 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         return Entry::make();
+    }
+
+    public function findOr($id, Closure $callback)
+    {
+        if (! is_null($entry = $this->find($id))) {
+            return $entry;
+        }
+
+        return $callback();
     }
 
     public function firstOrNew(array $attributes = [], array $values = [])

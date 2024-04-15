@@ -922,6 +922,35 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     /** @test */
+    public function entry_can_be_found_using_find_or()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $findOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->findOr('hoff', function () {
+                return 'This could be anything.';
+            });
+
+        $this->assertSame($entry, $findOrNew);
+    }
+
+    /** @test */
+    public function callback_is_called_using_find_or()
+    {
+        Collection::make('posts')->save();
+
+        $findOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->findOr('hoff',  function () {
+                return 'This could be anything.';
+            });
+
+        $this->assertSame('This could be anything.', $findOrNew);
+    }
+
+    /** @test */
     public function entry_can_be_found_using_first_or_new()
     {
         Collection::make('posts')->save();

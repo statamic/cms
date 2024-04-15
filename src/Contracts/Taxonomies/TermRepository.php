@@ -2,6 +2,8 @@
 
 namespace Statamic\Contracts\Taxonomies;
 
+use Closure;
+
 interface TermRepository
 {
     public function all();
@@ -17,6 +19,8 @@ interface TermRepository
     public function findOrFail($id);
 
     public function findOrNew($id);
+
+    public function findOr($id, Closure $callback);
 
     public function firstOrNew(array $attributes, array $values = []);
 

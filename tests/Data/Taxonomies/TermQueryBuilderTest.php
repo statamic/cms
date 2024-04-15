@@ -630,6 +630,35 @@ class TermQueryBuilderTest extends TestCase
     }
 
     /** @test */
+    public function term_can_be_found_using_find_or()
+    {
+        Taxonomy::make('tags')->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'Alfa']))->save();
+
+        $findOrNew = Term::query()
+            ->where('taxonomy', 'tags')
+            ->findOr('tags::alfa', function () {
+                return 'This could be anything.';
+            });
+
+        $this->assertEquals($term->slug(), $findOrNew->slug());
+    }
+
+    /** @test */
+    public function callback_is_called_using_find_or()
+    {
+        Taxonomy::make('tags')->save();
+
+        $findOrNew = Term::query()
+            ->where('taxonomy', 'tags')
+            ->findOr('tags::alfa', function () {
+                return 'This could be anything.';
+            });
+
+        $this->assertSame('This could be anything.', $findOrNew);
+    }
+
+    /** @test */
     public function term_can_be_found_using_first_or_new()
     {
         Taxonomy::make('tags')->save();
