@@ -3,10 +3,10 @@
 namespace Tests\Fieldtypes;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Preference;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Date;
 use Tests\TestCase;
 
@@ -35,7 +35,7 @@ class DateTest extends TestCase
         $this->assertEquals($expected, $augmented->format('Y M d H:i:s'));
     }
 
-    public function augmentProvider()
+    public static function augmentProvider()
     {
         return [
             'date' => [
@@ -124,7 +124,7 @@ class DateTest extends TestCase
         $this->assertSame($expected, $this->fieldtype($config)->process($value));
     }
 
-    public function processProvider()
+    public static function processProvider()
     {
         return [
             'null' => [
@@ -137,6 +137,11 @@ class DateTest extends TestCase
                 ['date' => null, 'time' => null],
                 null,
             ],
+            'object with missing time' => [
+                [],
+                ['date' => null],
+                null,
+            ],
             'date with default format' => [
                 [],
                 ['date' => '2012-08-29', 'time' => null],
@@ -146,6 +151,11 @@ class DateTest extends TestCase
                 ['format' => 'Y--m--d'],
                 ['date' => '2012-08-29', 'time' => null],
                 '2012--08--29',
+            ],
+            'date with missing time' => [
+                [],
+                ['date' => '2012-08-29'],
+                '2012-08-29',
             ],
             'date with time' => [
                 ['time_enabled' => true],
@@ -171,6 +181,11 @@ class DateTest extends TestCase
                 ['mode' => 'range', 'format' => 'Y--m--d'],
                 ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
                 ['start' => '2012--08--29', 'end' => '2013--09--27'],
+            ],
+            'range with format containing time has end date at end of day' => [
+                ['mode' => 'range', 'format' => 'Y-m-d H:i:s'],
+                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+                ['start' => '2012-08-29 00:00:00', 'end' => '2013-09-27 23:59:59'],
             ],
         ];
     }
@@ -202,7 +217,7 @@ class DateTest extends TestCase
         $this->assertSame($expected, $this->fieldtype($config)->preProcess($value));
     }
 
-    public function preProcessProvider()
+    public static function preProcessProvider()
     {
         return [
             'null' => [
@@ -306,7 +321,7 @@ class DateTest extends TestCase
         $this->assertSame($expected, $this->fieldtype($config)->preProcessIndex($value));
     }
 
-    public function preProcessIndexProvider()
+    public static function preProcessIndexProvider()
     {
         return [
             'null' => [
@@ -438,15 +453,142 @@ class DateTest extends TestCase
     /**
      * @test
      *
+     * @dataProvider validatablesProvider
+     */
+    public function it_preprocess_validatables($config, $input, $expected)
+    {
+        $fieldtype = $this->fieldtype($config);
+
+        $value = $fieldtype->preProcessValidatable($input);
+
+        if ($expected === null) {
+            $this->assertNull($value);
+        } else {
+            $this->assertEquals($expected, $value->format('Y-m-d H:i:s'));
+        }
+    }
+
+    public static function validatablesProvider()
+    {
+        // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
+
+        return [
+            'null' => [
+                [],
+                null,
+                null,
+            ],
+            'null date when not required' => [
+                [],
+                ['date' => null, 'time' => null],
+                null,
+            ],
+            'valid date' => [
+                [],
+                ['date' => '2012-01-29', 'time' => null],
+                '2012-01-29 00:00:00',
+            ],
+            'valid date and time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '13:00'],
+                '2012-01-29 13:00:00',
+            ],
+            'valid date and time with seconds' => [
+                ['time_enabled' => true, 'time_seconds_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '13:14:15'],
+                '2012-01-29 13:14:15',
+            ],
+            'null time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => null],
+                '2012-01-29 00:00:00',
+            ],
+            // A carbon instance would be passed in if it was already processed.
+            // e.g. if it was nested inside a Replicator.
+            'carbon instance' => [
+                [],
+                Carbon::parse('2012-01-29'),
+                '2012-01-29 00:00:00',
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider rangeValidatablesProvider
+     */
+    public function it_preprocess_range_validatables($config, $input, $expected)
+    {
+        $fieldtype = $this->fieldtype($config);
+
+        $value = $fieldtype->preProcessValidatable($input);
+
+        if ($expected === null) {
+            $this->assertNull($value);
+        } else {
+            $format = 'Y-m-d H:i:s';
+            $this->assertEquals($expected, [
+                'start' => $value['start']->format($format),
+                'end' => $value['end']->format($format),
+            ]);
+        }
+    }
+
+    public static function rangeValidatablesProvider()
+    {
+        // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
+
+        return [
+            'null' => [
+                ['mode' => 'range'],
+                null,
+                null,
+            ],
+            'valid date range' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29', 'end' => '2012-01-30']],
+                [
+                    'start' => '2012-01-29 00:00:00',
+                    'end' => '2012-01-30 00:00:00',
+                ],
+            ],
+            'null date in range mode' => [
+                ['mode' => 'range'],
+                ['date' => null],
+                null,
+            ],
+            'both dates null' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => null, 'end' => null]],
+                null,
+            ],
+            // Start/end array with carbon instances would be passed in if it was already processed.
+            // e.g. if it was nested inside a Replicator.
+            'carbon instances' => [
+                ['mode' => 'range'],
+                ['start' => Carbon::parse('2012-01-29'), 'end' => Carbon::parse('2012-02-14')],
+                [
+                    'start' => '2012-01-29 00:00:00',
+                    'end' => '2012-02-14 00:00:00',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     *
      * @dataProvider validationProvider
      */
     public function it_validates($config, $input, $expected)
     {
-        $field = $this->fieldtype($config)->field();
         $messages = [];
+        $field = $this->fieldtype($config)->field();
+        $fields = (new Fields)->setFields(collect([$field]))->addValues(['test' => $input]);
 
         try {
-            Validator::validate(['test' => $input], $field->rules(), [], $field->validationAttributes());
+            $fields->validate();
         } catch (ValidationException $e) {
             $messages = $e->validator->errors()->all();
         }
@@ -454,12 +596,17 @@ class DateTest extends TestCase
         $this->assertEquals($expected, $messages);
     }
 
-    public function validationProvider()
+    public static function validationProvider()
     {
         return [
             'valid date' => [
                 [],
-                ['date' => '2012-01-29'],
+                ['date' => '2012-01-29', 'time' => null],
+                [],
+            ],
+            'null' => [
+                [],
+                null,
                 [],
             ],
             'not an array' => [
@@ -474,22 +621,22 @@ class DateTest extends TestCase
             ],
             'null date when not required' => [
                 [],
-                ['date' => null],
+                ['date' => null, 'time' => null],
                 [],
             ],
             'null required date via bool' => [
                 ['required' => true],
-                ['date' => null],
+                ['date' => null, 'time' => null],
                 ['Date is required.'],
             ],
             'null required date via validate' => [
                 ['validate' => 'required'],
-                ['date' => null],
+                ['date' => null, 'time' => null],
                 ['Date is required.'],
             ],
             'invalid date format' => [
                 [],
-                ['date' => 'marchtember oneteenth'],
+                ['date' => 'marchtember oneteenth', 'time' => null],
                 ['Not a valid date.'],
             ],
             'invalid date' => [

@@ -2,12 +2,15 @@
     <div class="flex items-center">
 
         <!-- Link type selector -->
-        <div class="w-40 mr-4">
+        <div class="w-28 rtl:ml-4 ltr:mr-4">
             <v-select
                 v-model="option"
+                append-to-body
+                :calculate-position="positionOptions"
                 :options="options"
                 :clearable="false"
                 :reduce="(option) => option.value"
+
             >
                 <template #option="{ label }">
                   {{ __(label) }}
@@ -49,9 +52,11 @@
 </template>
 
 <script>
+import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, PositionsSelectOptions],
 
     data() {
 
@@ -114,7 +119,9 @@ export default {
             this.update(url);
         },
 
-        meta(meta) {
+        meta(meta, oldMeta) {
+            if (JSON.stringify(meta) === JSON.stringify(oldMeta)) return;
+
             this.metaChanging = true;
             this.urlValue = meta.initialUrl;
             this.option = meta.initialOption;

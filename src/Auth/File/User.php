@@ -23,7 +23,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
  */
 class User extends BaseUser
 {
-    use ExistsAsFile, FluentlyGetsAndSets, HasPreferencesInProperty, ContainsData {
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasPreferencesInProperty {
         data as traitData;
     }
 
@@ -355,5 +355,17 @@ class User extends BaseUser
     public function fresh()
     {
         return Facades\User::find($this->id);
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'email' => $this->email(),
+            'groups' => $this->get('groups', []),
+            'password_hash' => $this->passwordHash(),
+            'permissions' => $this->get('permissions', []),
+            'roles' => $this->get('roles', []),
+            'super' => $this->get('super', false),
+        ], $this->data()->toArray());
     }
 }

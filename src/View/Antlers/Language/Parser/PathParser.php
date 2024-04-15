@@ -150,6 +150,7 @@ class PathParser
             if ($this->isParsingString && $this->cur == DocumentParser::String_EscapeCharacter && $this->next == $terminator) {
                 $currentChars[] = $terminator;
                 $this->currentIndex += 1;
+
                 continue;
             }
 
@@ -166,6 +167,7 @@ class PathParser
                         }
                     } else {
                         $currentChars[] = $this->cur;
+
                         continue;
                     }
                 } else {
@@ -181,24 +183,29 @@ class PathParser
             if ($this->isParsingString) {
                 if (ctype_space($this->cur)) {
                     $currentChars[] = $this->cur;
+
                     continue;
                 } elseif ($this->cur == DocumentParser::String_EscapeCharacter) {
                     if ($this->next == DocumentParser::String_EscapeCharacter) {
                         $currentChars[] = DocumentParser::String_EscapeCharacter;
                         $this->currentIndex += 1;
                         $ignorePrevious = true;
+
                         continue;
                     } elseif ($this->next == 'n') {
                         $currentChars[] = "\n";
                         $this->currentIndex += 1;
+
                         continue;
                     } elseif ($this->next == 't') {
                         $currentChars[] = "\t";
                         $this->currentIndex += 1;
+
                         continue;
                     } elseif ($this->next == 'r') {
                         $currentChars[] = "\r";
                         $this->currentIndex += 1;
+
                         continue;
                     }
                 }
@@ -247,6 +254,7 @@ class PathParser
                 $activeDelimiter = self::ColonSeparator;
                 $this->currentIndex += 1;
                 $isParsingAccessor = false;
+
                 continue;
             }
 
@@ -259,6 +267,7 @@ class PathParser
 
                             if ($lastPart->delimiter == self::ColonSeparator) {
                                 $lastPart->delimiter .= $this->cur;
+
                                 continue;
                             }
                         }
@@ -308,9 +317,11 @@ class PathParser
 
                 $parts[] = $pathNode;
                 $currentChars = [];
+
                 continue;
             } else {
                 $currentChars[] = $this->cur;
+
                 continue;
             }
         }
@@ -369,6 +380,7 @@ class PathParser
                 $isParsingString = true;
                 $terminator = $cur;
                 $nestedChars[] = $cur;
+
                 continue;
             }
 
@@ -383,6 +395,7 @@ class PathParser
                 $nestedChars[] = $cur;
                 $isParsingString = false;
                 $terminator = null;
+
                 continue;
             }
 
@@ -395,6 +408,7 @@ class PathParser
                     break;
                 } else {
                     $nestedChars[] = $cur;
+
                     continue;
                 }
             } else {

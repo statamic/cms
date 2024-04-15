@@ -15,8 +15,8 @@ use Tests\TestCase;
 /** @group graphql */
 class AssetsTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['assets'];
 

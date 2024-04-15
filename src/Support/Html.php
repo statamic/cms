@@ -66,7 +66,6 @@ class Html
     /**
      * Transform the string to an Html serializable object.
      *
-     * @param $html
      * @return \Illuminate\Support\HtmlString
      */
     protected static function toHtmlString($html)
@@ -123,8 +122,6 @@ class Html
     /**
      * Generate a description list of items.
      *
-     * @param  array  $list
-     * @param  array  $attributes
      * @return \Illuminate\Support\HtmlString
      */
     public static function dl(array $list, array $attributes = [])
@@ -191,6 +188,25 @@ class Html
         } else {
             return '<li>'.e($value, false).'</li>';
         }
+    }
+
+    /**
+     * Create the HTML for a nested listing attribute.
+     *
+     * @param  mixed  $key
+     * @param  string  $type
+     * @param  mixed  $value
+     * @return string
+     */
+    protected static function nestedListing($key, $type, $value)
+    {
+        $html = '<li>';
+
+        if (! is_int($key)) {
+            $html .= $key;
+        }
+
+        return $html.static::listing($type, $value).'</li>';
     }
 
     /**
@@ -266,7 +282,6 @@ class Html
      * Parse each text part of an HTML string (no tags) through a callback function.
      *
      * @param  string  $value
-     * @param  Closure  $callback
      * @return string
      */
     public static function mapText($value, Closure $callback)

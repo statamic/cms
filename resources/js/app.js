@@ -6,6 +6,8 @@ import * as Globals from './bootstrap/globals'
 import { default as underscore } from 'underscore'
 import Cookies from 'cookies-js';
 
+import.meta.glob(['../img/**']);
+
 let global_functions = Object.keys(Globals)
 global_functions.forEach(fnName => { window[fnName] = Globals[fnName] })
 
@@ -64,6 +66,7 @@ Vue.prototype.$events = new Vue();
 Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
 Vue.prototype.$keys = Statamic.$keys;
+Vue.prototype.$reveal = Statamic.$reveal;
 
 import Moment from 'moment';
 window.moment = Vue.moment = Vue.prototype.$moment = Moment;

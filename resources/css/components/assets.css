@@ -4,16 +4,8 @@
 
 .asset-modal {
 	.saving {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
+        @apply absolute inset-0 flex items-center rounded-sm bg-white/90;
 		z-index: 200;
-		background: rgba(255, 255, 255, .9);
-		display: flex;
-		align-items: center;
-		border-radius: 3px;
 
 		.inner {
 			text-align: center;
@@ -24,13 +16,13 @@
 		i {
 			position: relative;
 			top: -1px;
-			margin-right: 10px;
+			margin-right: 10px ; [dir="rtl"] & { margin-left: 10px ; margin-right: 0 ; }
 		}
 	}
 }
 
 .drag-notification {
-    @apply text-lg absolute inset-0 text-center rounded flex items-center justify-center;
+    @apply text-xs @sm:text-lg absolute leading-tight p-1 inset-0 text-center rounded flex items-center justify-center;
     border: 1px dashed theme('colors.gray.600');
     pointer-events: none;
     z-index: 1049;
@@ -42,15 +34,18 @@
    ========================================================================== */
 
 .asset-table-listing {
-	position: relative;
+    @apply border rounded relative overflow-hidden;
+
 
     table {
-        @apply select-none border w-full rounded-b;
-        margin: 0;
+        @apply select-none border-none w-full rounded-b m-0;
+    }
+    tbody tr {
+        @apply outline-none;
     }
 
-    tbody tr {
-        @apply border-b outline-none;
+    tbody tr:not(:last-child) {
+        @apply border-b;
     }
 
     tbody tr td {
@@ -65,12 +60,12 @@
 
     .search {
         flex: 1;
-        margin-right: 15px;
-        margin-left: 0;
+        margin-right: 15px ; [dir="rtl"] & { margin-left: 15px ; margin-right: 0 ; }
+        margin-left: 0 ; [dir="rtl"] & { margin-right: 0 ; margin-left: 0 ; }
     }
 
     > .btn {
-        margin-right: 15px;
+        margin-right: 15px ; [dir="rtl"] & { margin-left: 15px ; margin-right: 0 ; }
     }
 }
 
@@ -84,26 +79,13 @@
 .asset-tile.draggable-source--is-dragging { @apply opacity-50; }
 .asset-tile.draggable-mirror { @apply shadow-lg; }
 
-.assets-fieldtype .extremely-narrow .asset-grid-listing {
-    grid-template-columns: 1fr;
-}
-
-.assets-fieldtype .really-narrow .asset-table-listing .asset-filesize {
-    display: none;
-}
-
-.assets-fieldtype .extremely-narrow .asset-table-listing .asset-set-alt {
-    display: none;
-}
 
   /* Grid Listing
   ========================================================================== */
 
 .asset-grid-listing {
-    @apply bg-white grid relative;
+    @apply bg-white grid relative p-4 gap-4;
     grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
-    grid-gap: 16px;
-    padding: 16px;
 }
 
 
@@ -114,7 +96,7 @@
     @apply bg-white relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded;
 
     .asset-thumb {
-        @apply flex justify-center items-center;
+        @apply flex justify-center items-center w-full h-full rounded;
         > img, > svg, > .svg-img {
             @apply max-h-full max-w-full absolute;
         }
@@ -166,9 +148,9 @@
 
             > * {
                 @apply absolute w-auto h-auto max-w-full max-h-full;
-                left: 50%;
+                left: 50% ; [dir="rtl"] & { left: auto ; right: 50% ; }
                 top: 50%;
-                transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%) ; [dir="rtl"] & { transform: translate(50%, -50%); }
                 box-shadow: 0 0 32px rgba(0, 0, 0, .35);
             }
         }

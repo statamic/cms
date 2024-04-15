@@ -2,10 +2,13 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\Site;
+use Statamic\Statamic;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
@@ -17,7 +20,10 @@ use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Runtime\Tracing\TraceManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\Parser;
+use Statamic\View\Blade\AntlersBladePrecompiler;
 use Statamic\View\Cascade;
+use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
+use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
 use Statamic\View\Store;
 
 class ViewServiceProvider extends ServiceProvider
@@ -37,6 +43,7 @@ class ViewServiceProvider extends ServiceProvider
 
         $this->registerRuntimeAntlers();
         $this->registerRegexAntlers();
+        $this->registerBladeDirectives();
 
         $this->app->bind(ParserContract::class, function ($app) {
             return config('statamic.antlers.version', 'regex') === 'regex'
@@ -88,6 +95,10 @@ class ViewServiceProvider extends ServiceProvider
 
         $this->app->singleton(ModifierManager::class, function ($app) {
             return new ModifierManager();
+        });
+
+        $this->app->singleton(PerformanceTracer::class, function () {
+            return new PerformanceTracer();
         });
 
         $this->app->bind('antlers.runtime', function ($app) {
@@ -146,6 +157,15 @@ class ViewServiceProvider extends ServiceProvider
                 $runtimeConfig->traceManager->registerTracer(GlobalDebugManager::getTimingsTracer());
             }
 
+            if ($this->profilerEnabled()) {
+                if (! $isTracingOn) {
+                    $runtimeConfig->traceManager = new TraceManager();
+                    $runtimeConfig->isTracingEnabled = true;
+                }
+
+                $runtimeConfig->traceManager->registerTracer(app(PerformanceTracer::class));
+            }
+
             $parser->isolateRuntimes(GlobalRuntimeState::$requiresRuntimeIsolation)
                 ->setRuntimeConfiguration($runtimeConfig);
 
@@ -153,8 +173,21 @@ class ViewServiceProvider extends ServiceProvider
         });
     }
 
+    public function registerBladeDirectives()
+    {
+        Blade::directive('tags', function ($expression) {
+            return "<?php extract(\Statamic\View\Blade\TagsDirective::handle($expression)) ?>";
+        });
+    }
+
     public function boot()
     {
+        ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
+
+        Blade::precompiler(function ($content) {
+            return AntlersBladePrecompiler::compile($content);
+        });
+
         View::macro('withoutExtractions', function () {
             if ($this->engine instanceof Engine) {
                 $this->engine->withoutExtractions();
@@ -170,5 +203,14 @@ class ViewServiceProvider extends ServiceProvider
         }
 
         ini_set('pcre.backtrack_limit', config('statamic.system.pcre_backtrack_limit', -1));
+
+        if ($this->profilerEnabled()) {
+            debugbar()->addCollector(new PerformanceCollector);
+        }
+    }
+
+    private function profilerEnabled()
+    {
+        return debugbar()->isEnabled() && config('statamic.antlers.debugbar', true) && ! Statamic::isCpRoute();
     }
 }

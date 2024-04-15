@@ -30,7 +30,7 @@ class UrlBuilderTest extends TestCase
             'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
         ]]);
 
-        $entry = \Statamic\Facades\Entry::make()
+        $entry = tap(\Statamic\Facades\Entry::make()
             ->id('post')
             ->locale('en')
             ->collection(
@@ -38,11 +38,10 @@ class UrlBuilderTest extends TestCase
             )
             ->slug('post')
             ->date('2015-01-02')
-            ->data(['foo' => 'bar', 'slashed' => 'foo/bar']);
+            ->data(['foo' => 'bar', 'slashed' => 'foo/bar'])
+        )->save();
 
-        $entry->addLocalization(
-            $entry->makeLocalization('fr')->slug('le-post')
-        );
+        $entry->makeLocalization('fr')->slug('le-post')->save();
 
         $this->builder = app(UrlBuilder::class)->content($entry);
         $this->entry = $entry;

@@ -64,7 +64,9 @@ class Tags extends BaseTags
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
-        $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver);
+
+        $data['fields'] = collect($data['sections'])->flatMap->fields->all();
+
         $data['honeypot'] = $form->honeypot();
 
         if ($jsDriver) {
@@ -240,7 +242,10 @@ class Tags extends BaseTags
      */
     protected function getFields($sessionHandle, $jsDriver, $fields = null)
     {
-        return collect($fields ?? $this->form()->fields())
+        $form = $this->form();
+
+        return collect($fields ?? $form->fields())
+            ->each(fn ($field) => $field->setForm($form))
             ->map(function ($field) use ($sessionHandle, $jsDriver) {
                 return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
                     return $jsDriver

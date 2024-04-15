@@ -45,7 +45,7 @@
                         </button>
 
                         <button @click="remove" class="btn btn-icon" :alt="__('Remove')">
-                            <svg-icon name="micro/sharp-trash" class="h-4 my-2" />
+                            <span class="text-lg antialiased w-4">×</span>
                         </button>
                     </div>
                 </div>
@@ -81,9 +81,9 @@
                 {{ label }}
             </div>
             <button
-                class="text-blue border-l px-2 py-1 hover:bg-gray-200"
+                class="text-blue rtl:border-r ltr:border-l px-2 py-1 hover:bg-gray-200"
                 @click="edit"
-                v-if="needsAlt"
+                v-if="showSetAlt && needsAlt"
             >
                 {{ asset.values.alt ? "✅" : __("Set Alt") }}
             </button>
@@ -117,10 +117,6 @@ export default {
         isInBardField() {
             return this.$parent.isInBardField;
         },
-
-        needsAlt() {
-            return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
-        }
     }
 };
 </script>

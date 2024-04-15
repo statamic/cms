@@ -4,12 +4,12 @@
     <div class="nav-main-inner">
         @foreach ($nav as $section)
             @if ($section['display'] !== 'Top Level')
-                <h6>{{ __($section['display']) }}</h6>
+                <h6 v-pre>{{ __($section['display']) }}</h6>
             @endif
             <ul>
                 @foreach ($section['items'] as $item)
                     @unless ($item->view())
-                        <li class="{{ $item->isActive() ? 'current' : '' }}">
+                        <li class="{{ $item->isActive() ? 'current' : '' }}" v-pre>
                             <a href="{{ $item->url() }}">
                                 <i>{!! $item->svg() !!}</i><span>{{ __($item->name()) }}</span>
                             </a>

@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::outside')
 @section('title', __('Log in'))
@@ -21,7 +23,7 @@
             </div>
 
             @if($emailLoginEnabled)
-                <div class="text-center text-sm text-gray-700 py-6">&mdash; or &mdash;</div>
+                <div class="text-center text-sm text-gray-700 py-6">&mdash; {{ __('or') }} &mdash;</div>
 
                 <div class="login-with-email" v-if="! showEmailLogin">
                     <a class="btn w-full" @click.prevent="showEmailLogin = true">
@@ -50,7 +52,7 @@
             <div class="flex justify-between items-center">
                 <label for="remember-me" class="flex items-center cursor-pointer">
                     <input type="checkbox" name="remember" id="remember-me">
-                    <span class="ml-2">{{ __('Remember me') }}</span>
+                    <span class="rtl:mr-2 ltr:ml-2">{{ __('Remember me') }}</span>
                 </label>
                 <button type="submit" class="btn-primary">{{ __('Log in') }}</button>
             </div>
@@ -58,7 +60,7 @@
     </div>
     </login>
 </div>
-@if (! $oauth)
+@if ($emailLoginEnabled)
     <div class="w-full text-center mt-4">
         <a href="{{ cp_route('password.request') }}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
             {{ __('Forgot password?') }}

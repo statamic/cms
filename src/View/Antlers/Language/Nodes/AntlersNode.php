@@ -280,6 +280,8 @@ class AntlersNode extends AbstractNode
      */
     private $hasModifierParametersCache = null;
 
+    public $hasScopeAdjustingParameters = false;
+
     /**
      * Returns a new AntlersNode with basic details copied.
      *
@@ -382,10 +384,6 @@ class AntlersNode extends AbstractNode
     /**
      * Returns the value of a single parameter by name.
      *
-     * @param $parameterName
-     * @param  NodeProcessor  $processor
-     * @param $data
-     * @param $default
      * @return array|mixed|\Statamic\Contracts\Query\Builder|string|string[]|null
      */
     public function getSingleParameterValueByName($parameterName, NodeProcessor $processor, $data, $default = null)
@@ -476,7 +474,10 @@ class AntlersNode extends AbstractNode
     public function reduceParameterInterpolations(ParameterNode $param, NodeProcessor $processor, $mutateVar, $data)
     {
         if ($param->parent != null && ! empty($param->interpolations)) {
-            foreach ($param->interpolations as $interpolationVar) {
+            $parameterInterpolations = $param->interpolations;
+            rsort($parameterInterpolations);
+
+            foreach ($parameterInterpolations as $interpolationVar) {
                 if (array_key_exists($interpolationVar, $param->parent->processedInterpolationRegions)) {
                     $interpolationResult = $processor->cloneProcessor()
                         ->setData($data)

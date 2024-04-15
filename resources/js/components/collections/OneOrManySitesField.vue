@@ -20,10 +20,11 @@
                 </thead>
                 <tbody>
                     <tr v-for="site in sites" :key="site.handle">
-                        <td class="align-middle" v-text="site.name" />
+                        <td class="align-middle" v-text="__(site.name)" />
                         <td>
                             <text-input
-                                class="font-mono text-xs"
+                                dir="ltr"
+                                class="slug-field"
                                 :value="value[site.handle]"
                                 @input="updateSiteValue(site.handle, $event)" />
                         </td>
@@ -33,7 +34,7 @@
         </div>
 
         <div v-if="!hasMultipleSites || !inMultipleMode">
-            <text-input :value="value" @input="update" class="font-mono text-xs" />
+            <text-input :value="value" @input="update" class="slug-field" dir="ltr" />
         </div>
     </div>
 

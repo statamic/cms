@@ -130,15 +130,15 @@ class Structure extends Tags
             $absoluteUrl = $page->absoluteUrl();
 
             return array_merge($data, [
-                'children'    => $children,
-                'parent'      => $parent,
-                'depth'       => $depth,
-                'index'       => $index,
-                'count'       => $index + 1,
-                'first'       => $index === 0,
-                'last'        => $index === count($tree) - 1,
-                'is_current'  => ! is_null($url) && rtrim($url, '/') === rtrim($this->currentUrl, '/'),
-                'is_parent'   => ! is_null($url) && $this->siteAbsoluteUrl !== $absoluteUrl && URL::isAncestorOf($this->currentUrl, $url),
+                'children' => $children,
+                'parent' => $parent,
+                'depth' => $depth,
+                'index' => $index,
+                'count' => $index + 1,
+                'first' => $index === 0,
+                'last' => $index === count($tree) - 1,
+                'is_current' => ! is_null($url) && rtrim($url, '/') === rtrim($this->currentUrl, '/'),
+                'is_parent' => ! is_null($url) && $this->siteAbsoluteUrl !== $absoluteUrl && URL::isAncestorOf($this->currentUrl, $url),
                 'is_external' => URL::isExternal((string) $absoluteUrl),
             ]);
         })->filter()->values();

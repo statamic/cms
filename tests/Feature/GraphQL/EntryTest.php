@@ -16,9 +16,9 @@ use Tests\TestCase;
 /** @group graphql */
 class EntryTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['collections'];
 
@@ -77,7 +77,7 @@ GQL;
             ]);
     }
 
-    public function findEventOneByArg()
+    public static function findEventOneByArgProvider()
     {
         return [
             ['id: "3"'],
@@ -89,7 +89,7 @@ GQL;
     /**
      * @test
      *
-     * @dataProvider findEventOneByArg
+     * @dataProvider findEventOneByArgProvider
      */
     public function it_cannot_query_against_non_allowed_sub_resource_with_other_args($arg)
     {
@@ -697,13 +697,13 @@ GQL;
 GQL;
 
         $this
-                ->withoutExceptionHandling()
-                ->post('/graphql', ['query' => $query])
-                ->assertGqlOk()
-                ->assertExactJson(['data' => ['entry' => [
-                    'id' => '6',
-                    'title' => 'That was so rad!',
-                ]]]);
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => [
+                'id' => '6',
+                'title' => 'That was so rad!',
+            ]]]);
 
         $query = <<<'GQL'
 {

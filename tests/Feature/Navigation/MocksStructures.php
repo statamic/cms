@@ -21,6 +21,7 @@ trait MocksStructures
             $s->shouldReceive('collections')->andReturn(collect());
             $s->shouldReceive('expectsRoot')->andReturnFalse();
             $s->shouldReceive('maxDepth')->andReturnNull();
+            $s->shouldReceive('sites')->andReturn(collect(['en']));
         });
     }
 

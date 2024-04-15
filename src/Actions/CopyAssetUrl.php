@@ -15,7 +15,7 @@ class CopyAssetUrl extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof Asset;
+        return $item instanceof Asset && $item->absoluteUrl();
     }
 
     public function visibleToBulk($items)

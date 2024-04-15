@@ -188,7 +188,6 @@ class TagPairAnalyzer
     /**
      * @param  AbstractNode[]  $nodes
      * @param  AntlersNode  $node
-     * @param $scanFor
      */
     private function findClosingPair($nodes, $node, $scanFor)
     {
@@ -226,12 +225,14 @@ class TagPairAnalyzer
 
                             $refStack += 1;
                         }
+
                         continue;
                     }
 
                     if (array_key_exists($candidateNode->name->compound, $scanForFlip)) {
                         if ($refStack > 0) {
                             $refStack -= 1;
+
                             continue;
                         }
                     }
@@ -247,8 +248,6 @@ class TagPairAnalyzer
     }
 
     /**
-     * @param $documentNodes
-     * @param $document
      * @return array
      *
      * @throws SyntaxErrorException
@@ -354,7 +353,7 @@ class TagPairAnalyzer
             $nestedNodeKeyMap = [];
 
             foreach ($nodes as $node) {
-                if ($node instanceof  AntlersNode && $node->isClosedBy != null) {
+                if ($node instanceof AntlersNode && $node->isClosedBy != null) {
                     $content = $this->document->getText(
                         $node->endPosition->index + 1,
                         $node->isClosedBy->startPosition->index);

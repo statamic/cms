@@ -428,7 +428,7 @@ EOT;
     /** @test */
     public function ternary_condition_inside_parameter()
     {
-        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
+        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\TestTags::class;
 
         $this->assertEquals('yes', $this->renderString(
             "{{ test variable='{{ good ? 'yes' : 'fail' }}' }}",
@@ -646,7 +646,8 @@ EOT;
     public function tags_with_curlies_in_params_gets_parsed()
     {
         // the variables are inside Test@index
-        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
+        // $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\TestTags::class;
+        \Tests\Fixtures\Addon\Tags\TestTags::register();
 
         $template = "{{ test variable='{string}' }}";
 
@@ -729,7 +730,7 @@ EOT;
     /** @test */
     public function empty_values_are_not_overridden_by_previous_iteration_with_parsing()
     {
-        $this->app['statamic.tags']['test'] = \Tests\Antlers\Fixtures\Addon\Tags\Test::class;
+        $this->app['statamic.tags']['test'] = \Tests\Antlers\Fixtures\Addon\Tags\TestTags::class;
 
         // Variable name was changed from "loop" to "loopvar" compared to the original test to avoid a
         // headache since the base test class is going to be loading all of the core Statamic Tags.
@@ -1231,7 +1232,8 @@ EOT;
         Log::shouldReceive('debug')->once()
             ->with('Cannot render an object variable as a string: {{ object }}');
 
-        $object = new class {
+        $object = new class
+        {
         };
 
         $this->assertEquals('', $this->renderString('{{ object }}', compact('object')));
@@ -1748,7 +1750,8 @@ EOT;
             $m->shouldNotReceive('get')->with('augmented');
         });
 
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
         };
         $augmented = new Value(['drink' => 'la croix'], 'augmented', $fieldtype);
 
@@ -2211,7 +2214,8 @@ before
 after
 EOT;
         $this->assertEquals($expected, $this->renderString($template, [
-            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator {
+            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator
+            {
             }),
         ]));
     }
@@ -2434,7 +2438,7 @@ EOT;
         ]));
     }
 
-    public function objectInConditionProvider()
+    public static function objectInConditionProvider()
     {
         return [
             'with __toString' => [new class()
@@ -2451,7 +2455,8 @@ EOT;
                     return 'foo';
                 }
             }, ],
-            'without __call or __toString' => [new class() {
+            'without __call or __toString' => [new class()
+            {
                 //
             }, ],
         ];

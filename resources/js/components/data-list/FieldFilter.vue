@@ -36,12 +36,12 @@
 
             <div class="flex border-t text-gray-800">
                 <button
-                    class="p-2 hover:bg-gray-100 rounded-bl text-xs flex-1"
+                    class="p-2 hover:bg-gray-100 rtl:rounded-br ltr:rounded-bl text-xs flex-1"
                     v-text="__('Clear')"
                     @click="resetAll"
                 />
                 <button
-                    class="p-2 hover:bg-gray-100 flex-1 rounded-br border-l text-xs"
+                    class="p-2 hover:bg-gray-100 flex-1 rtl:rounded-bl ltr:rounded-br rtl:border-r ltr:border-l text-xs"
                     v-text="__('Close')"
                     @click="$emit('closed')"
                 />
@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import Validator from '../field-conditions/Validator.js';
 import PublishField from '../publish/Field.vue';
 
 export default {
@@ -105,8 +106,12 @@ export default {
         isFilterComplete() {
             if (! this.filter) return false;
 
-            let fields = _.chain(this.filter.fields).mapObject(field => field.handle).values().value();
-            let allFieldsFilled = _.values(this.fieldValues).filter(value => value).length === fields.length;
+            let visibleFields = _.chain(this.filter.fields).filter(function (field) {
+                let validator = new Validator(field, this.fieldValues);
+                return validator.passesConditions();
+            }, this).mapObject(field => field.handle).values().value();
+
+            let allFieldsFilled = _.chain(this.fieldValues).filter((value, handle) => visibleFields.includes(handle) && value).values().value().length === visibleFields.length;
 
             return this.field !== null && allFieldsFilled;
         },

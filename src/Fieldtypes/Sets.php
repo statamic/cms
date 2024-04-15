@@ -2,15 +2,19 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\CP\FieldtypeFactory;
+use Statamic\Facades\File;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 class Sets extends Fieldtype
 {
     protected $selectable = false;
+
+    protected static $iconsDirectory = null;
+    protected static $iconsFolder = 'plump';
 
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the
@@ -20,6 +24,10 @@ class Sets extends Fieldtype
     public function preProcess($sets)
     {
         $sets = collect($sets);
+
+        if ($sets->isEmpty()) {
+            return [];
+        }
 
         // If the first set doesn't have a "sets" key, it would be the legacy format.
         // We'll put it in a "main" group so it's compatible with the new format.
@@ -63,9 +71,13 @@ class Sets extends Fieldtype
     {
         $sets = collect($sets);
 
-        // If the first set has a "fields" key, it would be the legacy format.
+        if ($sets->isEmpty()) {
+            return [];
+        }
+
+        // If the first set doesn't have a "sets" key, it would be the legacy format.
         // We'll put it in a "main" group so it's compatible with the new format.
-        if (Arr::has($sets->first(), 'fields')) {
+        if (! Arr::has($sets->first(), 'sets')) {
             $sets = collect([
                 'main' => [
                     'sets' => $sets->all(),
@@ -76,15 +88,16 @@ class Sets extends Fieldtype
         return collect($sets)->map(function ($group, $groupHandle) {
             return array_merge($group, [
                 'handle' => $groupHandle,
-                'sets' => collect($group['sets'])->map(function ($config, $name) {
-                    return array_merge($config, [
-                        'handle' => $name,
-                        'id' => $name,
-                        'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
-                    ]);
-                })
-                ->values()
-                ->all(),
+                'sets' => collect($group['sets'])
+                    ->map(function ($config, $name) {
+                        return array_merge($config, [
+                            'handle' => $name,
+                            'id' => $name,
+                            'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
+                        ]);
+                    })
+                    ->values()
+                    ->all(),
             ]);
         })->values()->all();
     }
@@ -117,41 +130,39 @@ class Sets extends Fieldtype
                 ],
             ];
         })
-        ->all();
+            ->all();
     }
 
-    private function moveOutNameKey($fields)
+    /**
+     * Allow the user to set custom icon directory and/or folder for SVG set icons.
+     *
+     * @param  string|null  $directory
+     * @param  string|null  $folder
+     */
+    public static function setIconsDirectory($directory = null, $folder = null)
     {
-        $processed = [];
-
-        foreach ($fields as $field) {
-            $handle = $field['handle'];
-            unset($field['handle']);
-            $processed[$handle] = $this->recursivelyProcess($field);
+        // If they are specifying new base directory, ensure we do not assume sub-folder
+        if ($directory) {
+            static::$iconsDirectory = $directory;
+            static::$iconsFolder = $folder;
         }
 
-        return $processed;
-    }
-
-    private function recursivelyProcess($config)
-    {
-        // Get the fieldtype for this field
-        $type = $config['type'];
-        $config_fieldtype = FieldtypeFactory::create($type);
-
-        // Get the fieldtype's config fieldset
-        $fieldset = $config_fieldtype->getConfigFieldset();
-
-        // Process all the fields in the fieldset
-        foreach ($fieldset->fieldtypes() as $field) {
-            // Ignore if the field isn't in the config
-            if (! in_array($field->getName(), array_keys($config))) {
-                continue;
-            }
-
-            $config[$field->getName()] = $field->process($config[$field->getName()]);
+        // Of if they are specifying just a sub-folder, use that with original base directory
+        elseif ($folder) {
+            static::$iconsFolder = $folder;
         }
 
-        return Fieldset::cleanFieldForSaving($config);
+        // Then provide to script for <icon-fieldtype> selector components in blueprint config
+        Statamic::provideToScript([
+            'setIconsDirectory' => static::$iconsDirectory,
+            'setIconsFolder' => static::$iconsFolder,
+        ]);
+
+        // And finally, provide the file contents of all custom svg icons to script,
+        // but only if custom directory because our <svg-icon> component cannot
+        // reference custom paths at runtime without a full Vite re-build
+        if ($directory) {
+            Icon::provideCustomSvgIconsToScript($directory, $folder);
+        }
     }
 }

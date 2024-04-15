@@ -21,6 +21,10 @@ export default {
             type: Boolean,
             default: false
         },
+        showFieldPreviews: {
+            type: Boolean,
+            default: false
+        },
         namePrefix: String,
         fieldPathPrefix: String,
     },
@@ -56,11 +60,21 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.value;
         },
 
+        fieldPathKeys() {
+            const prefix = this.fieldPathPrefix || this.handle;
+
+            return prefix.split('.');
+        },
+
         fieldId() {
-            return 'field_'+this.config.handle;
+            let prefix = this.fieldPathPrefix ? this.fieldPathPrefix+'.' : '';
+
+            return prefix+'field_'+this.config.handle;
         }
     },
 
@@ -69,6 +83,8 @@ export default {
         replicatorPreview: {
             immediate: true,
             handler(text) {
+                if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
                 this.$emit('replicator-preview-updated', text);
             }
         }

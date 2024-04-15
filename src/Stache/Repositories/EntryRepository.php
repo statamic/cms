@@ -6,6 +6,9 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
+use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Exceptions\EntryNotFoundException;
+use Statamic\Facades\Collection;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
 use Statamic\Support\Arr;
@@ -30,11 +33,19 @@ class EntryRepository implements RepositoryContract
 
     public function whereCollection(string $handle): EntryCollection
     {
+        if (! Collection::find($handle)) {
+            throw new CollectionNotFoundException($handle);
+        }
+
         return $this->query()->where('collection', $handle)->get();
     }
 
     public function whereInCollection(array $handles): EntryCollection
     {
+        collect($handles)
+            ->reject(fn ($collection) => Collection::find($collection))
+            ->each(fn ($collection) => throw new CollectionNotFoundException($collection));
+
         return $this->query()->whereIn('collection', $handles)->get();
     }
 
@@ -43,7 +54,18 @@ class EntryRepository implements RepositoryContract
         return $this->query()->where('id', $id)->first();
     }
 
-    public function findByUri(string $uri, string $site = null): ?Entry
+    public function findOrFail($id): Entry
+    {
+        $entry = $this->find($id);
+
+        if (! $entry) {
+            throw new EntryNotFoundException($id);
+        }
+
+        return $entry;
+    }
+
+    public function findByUri(string $uri, ?string $site = null): ?Entry
     {
         $site = $site ?? $this->stache->sites()->first();
 
@@ -52,9 +74,9 @@ class EntryRepository implements RepositoryContract
         }
 
         $entry = $this->query()
-                ->where('uri', $uri)
-                ->where('site', $site)
-                ->first();
+            ->where('uri', $uri)
+            ->where('site', $site)
+            ->first();
 
         if (! $entry) {
             return null;

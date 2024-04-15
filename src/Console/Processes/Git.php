@@ -2,6 +2,8 @@
 
 namespace Statamic\Console\Processes;
 
+use Statamic\Support\Str;
+
 class Git extends Process
 {
     /**
@@ -41,8 +43,6 @@ class Git extends Process
 
     /**
      * Git push.
-     *
-     * @return null
      */
     public function push()
     {
@@ -75,5 +75,25 @@ class Git extends Process
                 return is_null($part);
             })
             ->all();
+    }
+
+    /**
+     * Prepare error (stderr) output.
+     *
+     * @param  string  $type
+     * @param  string  $buffer
+     */
+    protected function prepareErrorOutput($type, $buffer)
+    {
+        $ignore = [
+            'remote: Resolving deltas',
+            'Permanently added the ECDSA host key for IP address',
+        ];
+
+        if (Str::contains($buffer, $ignore)) {
+            return;
+        }
+
+        parent::prepareErrorOutput($type, $buffer);
     }
 }

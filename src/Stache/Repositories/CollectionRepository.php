@@ -51,7 +51,7 @@ class CollectionRepository implements RepositoryContract
         });
     }
 
-    public function make(string $handle = null): Collection
+    public function make(?string $handle = null): Collection
     {
         return app(Collection::class)->handle($handle);
     }
@@ -90,6 +90,11 @@ class CollectionRepository implements RepositoryContract
     public function updateEntryOrder(Collection $collection, $ids = null)
     {
         $this->store->updateEntryOrder($collection, $ids);
+    }
+
+    public function updateEntryParent(Collection $collection, $ids = null)
+    {
+        $this->store->updateEntryParent($collection, $ids);
     }
 
     public function whereStructured(): IlluminateCollection

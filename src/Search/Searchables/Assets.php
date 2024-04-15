@@ -49,11 +49,11 @@ class Assets extends Provider
 
             return compact('container', 'path');
         })
-        ->groupBy->container
-        ->flatMap(fn ($group, $container) => Asset::query()
-            ->where('container', $container)
-            ->whereIn('path', $group->map->path->all())
-            ->get()
-        );
+            ->groupBy->container
+            ->flatMap(fn ($group, $container) => Asset::query()
+                ->where('container', $container)
+                ->whereIn('path', $group->map->path->all())
+                ->get()
+            );
     }
 }

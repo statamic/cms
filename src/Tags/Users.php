@@ -6,11 +6,11 @@ use Statamic\Facades\User;
 
 class Users extends Tags
 {
-    use Concerns\QueriesConditions,
-        Concerns\QueriesScopes,
+    use Concerns\GetsQueryResults,
+        Concerns\OutputsItems,
+        Concerns\QueriesConditions,
         Concerns\QueriesOrderBys,
-        Concerns\GetsQueryResults,
-        Concerns\OutputsItems;
+        Concerns\QueriesScopes;
 
     /**
      * {{ get_content from="" }} ... {{ /get_content }}.
@@ -19,12 +19,12 @@ class Users extends Tags
     {
         $query = $this->query();
 
-        if ($group = $this->params->get('group')) {
-            $query->where('group', $group);
+        if ($groups = $this->params->explode('group', [])) {
+            $query->whereGroupIn($groups);
         }
 
-        if ($role = $this->params->get('role')) {
-            $query->where('role', $role);
+        if ($roles = $this->params->explode('role', [])) {
+            $query->whereRoleIn($roles);
         }
 
         return $this->output($this->results($query));
@@ -39,5 +39,10 @@ class Users extends Tags
         $this->queryOrderBys($query);
 
         return $query;
+    }
+
+    protected function defaultOrderBy()
+    {
+        return config('statamic.users.sort_field', 'email').':'.config('statamic.users.sort_direction', 'asc');
     }
 }

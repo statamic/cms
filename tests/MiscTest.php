@@ -10,8 +10,8 @@ use Statamic\View\View;
 
 class MiscTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesViews;
+    use PreventSavingStacheItemsToDisk;
 
     /**
      * @test
@@ -59,7 +59,7 @@ EOT;
         $this->assertEquals($expected, View::make('test')->cascadeContent($a)->render());
     }
 
-    public function localesTagTestProvider()
+    public static function localesTagTestProvider()
     {
         return [
             'without parameter' => [false],

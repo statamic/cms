@@ -13,8 +13,6 @@ trait StoresScopedComputedFieldCallbacks
 
     /**
      * @param  string|array  $scopes
-     * @param  string  $field
-     * @param  Closure  $callback
      */
     public function computed($scopes, string $field, Closure $callback)
     {

@@ -9,8 +9,8 @@ use Tests\TestCase;
 /** @group user-repo */
 class StacheUserRepositoryTest extends TestCase
 {
-    use UserRepositoryTests;
     use PreventSavingStacheItemsToDisk;
+    use UserRepositoryTests;
 
     public function userClass()
     {

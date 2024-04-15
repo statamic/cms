@@ -16,9 +16,11 @@ class AssetContainerContents
     protected $filteredFiles;
     protected $filteredDirectories;
 
-    public function __construct($container)
+    public function container($container)
     {
         $this->container = $container;
+
+        return $this;
     }
 
     /**
@@ -43,8 +45,6 @@ class AssetContainerContents
 
     /**
      * Flysystem's `DirectoryListing` gives us type, timestamps, dirname, and will allow us perform more efficient filtering, caching, etc.
-     *
-     * @return DirectoryListing
      */
     private function getRawFlysystemDirectoryListing(): DirectoryListing
     {
@@ -85,9 +85,6 @@ class AssetContainerContents
      * Note: S3 doesn't always return directories as part of the listings, so
      * this method ensures we get consistent results with S3 filesystems.
      * For more info, see: https://github.com/statamic/cms/pull/7205
-     *
-     * @param  Collection  $files
-     * @return Collection
      */
     private function ensureMissingDirectoriesExist(Collection $files): Collection
     {

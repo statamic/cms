@@ -19,7 +19,7 @@ class UserRegistrationTest extends TestCase
         Event::fake();
 
         $this
-            ->post(route('statamic.register'), ['email'=>'foo@bar.com', 'password'=>'password', 'password_confirmation'=>'password'])
+            ->post(route('statamic.register'), ['email' => 'foo@bar.com', 'password' => 'password', 'password_confirmation' => 'password'])
             ->assertRedirect();
 
         Event::assertDispatched(UserRegistering::class);
@@ -36,7 +36,7 @@ class UserRegistrationTest extends TestCase
         });
 
         $this
-            ->post(route('statamic.register'), ['email'=>'foo@bar.com', 'password'=>'password', 'password_confirmation'=>'password'])
+            ->post(route('statamic.register'), ['email' => 'foo@bar.com', 'password' => 'password', 'password_confirmation' => 'password'])
             ->assertRedirect();
 
         $this->assertNull(User::findByEmail('foo@bar.com'));

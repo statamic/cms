@@ -2,7 +2,8 @@
 
 namespace Statamic\Providers;
 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route as Routes;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
@@ -29,7 +30,7 @@ class RouteServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        Route::mixin(new Router);
+        Routes::mixin(new Router);
 
         $this->bindCollections();
         $this->bindEntries();
@@ -45,13 +46,19 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindCollections()
     {
-        Route::bind('collection', function ($handle, $route = null) {
-            if (! $this->isCpOrApiRoute($route)) {
+        Routes::bind('collection', function ($handle, $route = null) {
+            if (! $this->needsCollectionBinding($route)) {
                 return $handle;
             }
 
+            $field = $route->bindingFieldFor('collection') ?? 'handle';
+
+            $collection = $field == 'handle'
+                ? Collection::findByHandle($handle)
+                : Collection::all()->firstWhere($field, $handle);
+
             throw_unless(
-                $collection = Collection::findByHandle($handle),
+                $collection,
                 new NotFoundHttpException("Collection [$handle] not found.")
             );
 
@@ -59,15 +66,32 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsCollectionBinding(?Route $route): bool
+    {
+        if (! $route) {
+            return false;
+        }
+
+        return $this->isCpOrApiRoute($route) || $this->isFrontendBindingEnabled();
+    }
+
     protected function bindEntries()
     {
-        Route::bind('entry', function ($handle, $route = null) {
-            if ($this->isApiRoute($route) || ! $this->isCpRoute($route)) {
+        Routes::bind('entry', function ($handle, $route = null) {
+            if (! $this->needsEntryBinding($route)) {
                 return $handle;
             }
 
+            $field = $route->bindingFieldFor('entry') ?? 'id';
+
+            $entry = $field == 'id'
+                ? Entry::find($handle)
+                : Entry::query()->where($field, $handle)->first();
+
+            $collection = $route->parameter('collection');
+
             throw_if(
-                ! ($entry = Entry::find($handle)) || $entry->collection()->id() !== $route->parameter('collection')->id(),
+                ! $entry || ($collection && $entry->collection()->id() !== $collection->id()),
                 new NotFoundHttpException("Entry [$handle] not found.")
             );
 
@@ -75,15 +99,38 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsEntryBinding(?Route $route): bool
+    {
+        if (! $route) {
+            return false;
+        }
+
+        if ($this->isCpRoute($route)) {
+            return true;
+        }
+
+        if ($this->isApiRoute($route)) {
+            return false;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindTaxonomies()
     {
-        Route::bind('taxonomy', function ($handle, $route = null) {
-            if (! $this->isCpOrApiRoute($route)) {
+        Routes::bind('taxonomy', function ($handle, $route = null) {
+            if (! $this->needsTaxonomyBinding($route)) {
                 return $handle;
             }
 
+            $field = $route->bindingFieldFor('taxonomy') ?? 'handle';
+
+            $taxonomy = $field == 'handle'
+                ? Taxonomy::findByHandle($handle)
+                : Taxonomy::all()->firstWhere($field, $handle);
+
             throw_unless(
-                $taxonomy = Taxonomy::findByHandle($handle),
+                $taxonomy,
                 new NotFoundHttpException("Taxonomy [$handle] not found.")
             );
 
@@ -91,18 +138,46 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsTaxonomyBinding(?Route $route): bool
+    {
+        if (! $route) {
+            return false;
+        }
+
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindTerms()
     {
-        Route::bind('term', function ($handle, $route = null) {
-            if ($this->isApiRoute($route) || ! $this->isCpRoute($route)) {
+        Routes::bind('term', function ($handle, $route = null) {
+            if (! $this->needsTermBinding($route)) {
                 return $handle;
             }
 
-            $id = $route->parameter('taxonomy')->handle().'::'.$handle;
+            $field = $route->bindingFieldFor('term') ?? 'id';
+
+            $taxonomy = $route->parameter('taxonomy');
+
+            if ($field == 'id' && $taxonomy) {
+                $handle = $taxonomy->handle().'::'.$handle;
+            }
+
             $site = $route->parameter('site') ?? Site::default()->handle();
 
+            $term = $field == 'id'
+                ? Term::find($handle)?->in($site)
+                : Term::query()
+                    ->where($field, $handle)
+                    ->where('site', $site)
+                    ->when($taxonomy, fn ($query) => $query->where('taxonomy', $taxonomy->handle()))
+                    ->first();
+
             throw_unless(
-                ($term = Term::find($id)->in($site)) && $term->taxonomy()->id() === $route->parameter('taxonomy')->id(),
+                $term || ($term && $taxonomy && $term->taxonomy()->id() === $taxonomy->id()),
                 new NotFoundHttpException("Taxonomy term [$handle] not found.")
             );
 
@@ -110,15 +185,38 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsTermBinding(?Route $route): bool
+    {
+        if (! $route) {
+            return false;
+        }
+
+        if ($this->isCpRoute($route)) {
+            return true;
+        }
+
+        if ($this->isApiRoute($route)) {
+            return false;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindAssetContainers()
     {
-        Route::bind('asset_container', function ($handle, $route = null) {
-            if (! $this->isCpOrApiRoute($route)) {
+        Routes::bind('asset_container', function ($handle, $route = null) {
+            if (! $this->needsAssetContainerBinding($route)) {
                 return $handle;
             }
 
+            $field = $route->bindingFieldFor('asset_container') ?? 'handle';
+
+            $container = $field == 'handle'
+                ? AssetContainer::findByHandle($handle)
+                : AssetContainer::all()->firstWhere($field, $handle);
+
             throw_unless(
-                $container = AssetContainer::findByHandle($handle),
+                $container,
                 new NotFoundHttpException("Asset container [$handle] not found.")
             );
 
@@ -126,17 +224,40 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsAssetContainerBinding(?Route $route): bool
+    {
+        if (! $route) {
+            return false;
+        }
+
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindAssets()
     {
-        Route::bind('asset', function ($handle, $route = null) {
-            if (! $this->isCpOrApiRoute($route)) {
+        Routes::bind('asset', function ($handle, $route = null) {
+            if (! $this->needsAssetBinding($route)) {
                 return $handle;
             }
 
-            $id = $route->parameter('asset_container')->handle().'::'.$handle;
+            $field = $route->bindingFieldFor('asset') ?? 'id';
+
+            $container = $route->parameter('asset_container');
+
+            if ($field == 'id') {
+                $handle = $container->handle().'::'.$handle;
+            }
+
+            $asset = $field == 'id'
+                ? Asset::find($handle)
+                : $container->queryAssets()->where($field, $handle)->first();
 
             throw_unless(
-                $asset = Asset::find($id),
+                $asset,
                 new NotFoundHttpException("Asset [$handle] not found.")
             );
 
@@ -144,17 +265,36 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsAssetBinding(?Route $route): bool
+    {
+        if (! $route) {
+            return false;
+        }
+
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindGlobalSets()
     {
-        Route::bind('global', function ($handle, $route = null) {
-            if (! $this->isCpOrApiRoute($route)) {
+        Routes::bind('global', function ($handle, $route = null) {
+            if (! $this->needsGlobalsBinding($route)) {
                 return $handle;
             }
+
+            $field = $route->bindingFieldFor('global') ?? 'handle';
+
+            $global = $field == 'handle'
+                ? GlobalSet::findByHandle($handle)
+                : GlobalSet::all()->first(fn ($set) => $set->$field($handle));
 
             $site = Site::default()->handle();
 
             throw_unless(
-                $globalSet = GlobalSet::findByHandle($handle)->in($site),
+                $globalSet = $global?->in($site),
                 new NotFoundHttpException("Global set [$handle] not found.")
             );
 
@@ -162,15 +302,34 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsGlobalsBinding(?Route $route): bool
+    {
+        if (! $route) {
+            return false;
+        }
+
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindSites()
     {
-        Route::bind('site', function ($handle, $route = null) {
-            if (! $this->isCpOrApiRoute($route)) {
+        Routes::bind('site', function ($handle, $route = null) {
+            if (! $this->needsSiteBinding($route)) {
                 return $handle;
             }
 
+            $field = $route->bindingFieldFor('site') ?? 'handle';
+
+            $site = $field == 'handle'
+                ? Site::get($handle)
+                : Site::all()->firstWhere($field, $handle);
+
             throw_unless(
-                $site = Site::get($handle),
+                $site,
                 new NotFoundHttpException("Site [$handle] not found.")
             );
 
@@ -178,10 +337,23 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsSiteBinding(?Route $route): bool
+    {
+        if (! $route) {
+            return false;
+        }
+
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindRevisions()
     {
-        Route::bind('revision', function ($reference, $route = null) {
-            if (! $this->isCpOrApiRoute($route)) {
+        Routes::bind('revision', function ($reference, $route = null) {
+            if (! $this->needsRevisionBinding($route)) {
                 return $reference;
             }
 
@@ -202,16 +374,38 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsRevisionBinding(?Route $route): bool
+    {
+        if (! $route) {
+            return false;
+        }
+
+        if ($this->isCpRoute($route)) {
+            return true;
+        }
+
+        if ($this->isApiRoute($route)) {
+            return false;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindForms()
     {
-        Route::bind('form', function ($handle, $route = null) {
-            if (! $this->isCpOrApiRoute($route)
-                && ! Str::startsWith($route->uri(), config('statamic.routes.action').'/forms/')) {
+        Routes::bind('form', function ($handle, $route = null) {
+            if (! $this->needsFormBinding($route)) {
                 return $handle;
             }
 
+            $field = $route->bindingFieldFor('form') ?? 'handle';
+
+            $form = $field == 'handle'
+                ? Form::find($handle)
+                : Form::all()->firstWhere($field, $handle);
+
             throw_unless(
-                $form = Form::find($handle),
+                $form,
                 new NotFoundHttpException("Form [$handle] not found.")
             );
 
@@ -219,12 +413,34 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
-    private function isApiRoute(\Illuminate\Routing\Route $route = null)
+    private function needsFormBinding(?Route $route): bool
     {
-        if (is_null($route)) {
+        if (! $route) {
             return false;
         }
 
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        if ($this->isFrontendBindingEnabled()) {
+            return true;
+        }
+
+        if ($route) {
+            return Str::startsWith($route->uri(), config('statamic.routes.action').'/forms/');
+        }
+
+        return false;
+    }
+
+    private function isFrontendBindingEnabled()
+    {
+        return config('statamic.routes.bindings', false);
+    }
+
+    private function isApiRoute(Route $route)
+    {
         $api = Str::ensureRight(config('statamic.api.route'), '/');
 
         if ($api === '/') {
@@ -234,12 +450,8 @@ class RouteServiceProvider extends ServiceProvider
         return Str::startsWith($route->uri(), $api);
     }
 
-    private function isCpRoute(\Illuminate\Routing\Route $route = null)
+    private function isCpRoute(Route $route)
     {
-        if (is_null($route)) {
-            return false;
-        }
-
         $cp = Str::ensureRight(config('statamic.cp.route'), '/');
 
         if ($cp === '/') {
@@ -249,12 +461,8 @@ class RouteServiceProvider extends ServiceProvider
         return Str::startsWith($route->uri(), $cp);
     }
 
-    private function isCpOrApiRoute(\Illuminate\Routing\Route $route = null)
+    private function isCpOrApiRoute(Route $route)
     {
-        if (is_null($route)) {
-            return false;
-        }
-
         return $this->isCpRoute($route) || $this->isApiRoute($route);
     }
 }

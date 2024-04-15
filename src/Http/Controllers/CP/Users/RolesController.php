@@ -24,7 +24,7 @@ class RolesController extends CpController
         $roles = Role::all()->map(function ($role) {
             return [
                 'id' => $role->handle(),
-                'title' => $role->title(),
+                'title' => __($role->title()),
                 'handle' => $role->handle(),
                 'permissions' => $role->isSuper() ? __('Super User') : $role->permissions()->count(),
                 'edit_url' => $role->editUrl(),
@@ -66,9 +66,21 @@ class RolesController extends CpController
             'permissions' => 'array',
         ]);
 
+        $handle = $request->handle ?: snake_case($request->title);
+
+        if (Role::find($handle)) {
+            $error = __('A Role with that handle already exists.');
+
+            if ($request->wantsJson()) {
+                return response()->json(['message' => $error], 422);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
+
         $role = Role::make()
             ->title($request->title)
-            ->handle($request->handle ?: snake_case($request->title));
+            ->handle($handle);
 
         if ($request->super && User::current()->isSuper()) {
             $role->permissions(['super']);

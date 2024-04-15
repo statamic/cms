@@ -12,6 +12,7 @@ use Statamic\CP\Utilities\UtilityRepository;
  * @method static mixed authorized()
  * @method static mixed find($handle)
  * @method static void routes()
+ * @method static void extend(\Closure $closure)
  *
  * @see \Statamic\CP\Utilities\UtilityRepository
  */

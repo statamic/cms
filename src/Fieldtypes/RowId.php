@@ -8,4 +8,9 @@ class RowId
     {
         return str_random(8);
     }
+
+    public function handle(): string
+    {
+        return config('statamic.system.row_id_handle', 'id');
+    }
 }

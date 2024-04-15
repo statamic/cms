@@ -43,8 +43,6 @@ class AssetContainerManager
      * Since a directory cannot reliably be detected as a URL, a
      * temporary file will be written, and we'll check for that directly.
      *
-     * @param $url
-     * @param $path
      * @return bool
      */
     public function urlExists($url, $path)
@@ -66,7 +64,6 @@ class AssetContainerManager
      * Get an Amazon S3 filesystem instance.
      *
      * @param  array  $config  An array containing key, secret, region, bucket, and path.
-     * @return
      */
     public function createS3Filesystem($config)
     {

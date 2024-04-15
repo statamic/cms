@@ -8,10 +8,12 @@ class UniqueUserValue
 {
     public function validate($attribute, $value, $parameters, $validator)
     {
-        [$except] = array_pad($parameters, 1, null);
+        [$except, $column] = array_pad($parameters, 2, null);
+
+        $column ??= $attribute;
 
         $existing = User::query()
-            ->where($attribute, $value)
+            ->where($column, $value)
             ->first();
 
         if (! $existing) {

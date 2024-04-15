@@ -22,10 +22,11 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\GraphQL\ResolvesValues;
+use Statamic\Support\Str;
 
-class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract, ArrayAccess, Arrayable
+class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializable, Protectable, ResolvesValuesContract, Responsable
 {
-    use HasAugmentedInstance, ForwardsCalls, TracksQueriedColumns, ResolvesValues, ContainsSupplementalData;
+    use ContainsSupplementalData, ForwardsCalls, HasAugmentedInstance, ResolvesValues, TracksQueriedColumns;
 
     protected $tree;
     protected $reference;
@@ -193,10 +194,13 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
             return $uris[$this->reference] = $this->entry()->uri();
         }
 
+        $parentUri = $this->parent && ! $this->parent->isRoot() ? $this->parent->uri() : '';
+        $parentUri = Str::replace(['.html', '.htm'], '', $parentUri);
+
         return $uris[$this->reference] = app(UrlBuilder::class)
             ->content($this)
             ->merge([
-                'parent_uri' => $this->parent && ! $this->parent->isRoot() ? $this->parent->uri() : '',
+                'parent_uri' => $parentUri,
                 'slug' => $this->isRoot() ? '' : $this->slug(),
                 'depth' => $this->depth,
                 'is_root' => $this->isRoot(),

@@ -45,8 +45,8 @@ body:
       label: Antlers Parser
       description: If using 3.3+, which Antlers Parser are you using?
       options:
-        - regex (default)
-        - runtime (new)
+        - Runtime (default)
+        - Regex (legacy)
     validations:
       required: false
   - type: textarea

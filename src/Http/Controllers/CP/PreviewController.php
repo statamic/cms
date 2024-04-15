@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP;
 
 use Facades\Statamic\CP\LivePreview;
 use Illuminate\Http\Request;
+use Statamic\Facades\URL;
 
 class PreviewController extends CpController
 {
@@ -40,7 +41,7 @@ class PreviewController extends CpController
 
     private function getPreviewUrl($data, $target, $token)
     {
-        $url = $data->previewTargets()[$target]['url'];
+        $url = URL::makeAbsolute($data->previewTargets()[$target]['url']);
 
         return vsprintf('%s%slive-preview=%s&token=%s', [
             $url,

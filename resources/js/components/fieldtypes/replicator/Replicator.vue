@@ -8,8 +8,8 @@
 <div :class="{ wrapperClasses: fullScreenMode }">
 <div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-gray-200': fullScreenMode }">
 
-    <header class="bg-white fixed top-0 inset-x-0 border-b p-3 pl-4 flex items-center justify-between shadow z-max" v-if="fullScreenMode">
-        <h2 v-text="config.display" class="flex-1" />
+    <header class="bg-white fixed top-0 inset-x-0 border-b p-3 rtl:pr-4 ltr:pl-4 flex items-center justify-between shadow z-max" v-if="fullScreenMode">
+        <h2 v-text="__(config.display)" class="flex-1" />
             <div class="flex items-center">
                 <div class="btn-group">
                     <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
@@ -19,13 +19,13 @@
                         <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-1 text-gray-750" />
                     </button>
                 </div>
-                <button class="btn-close ml-2" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
+                <button class="btn-close rtl:mr-2 ltr:ml-2" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
             </div>
     </header>
 
     <section :class="{'mt-12 p-4 bg-gray-200': fullScreenMode}">
 
-        <div class="flex justify-end" :class="{'absolute top-3 right-3 @md:right-6': !config.hide_display}" v-if="! fullScreenMode">
+        <div class="flex justify-end" :class="{'absolute top-3 rtl:left-3 ltr:right-3 @md:right-6': !config.hide_display}" v-if="! fullScreenMode">
             <div class="btn-group">
                 <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
                     <svg-icon name="arrows-horizontal-expand" class="h-3.5 px-0.5 text-gray-750" />
@@ -33,7 +33,7 @@
                 <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
                     <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-0.5 text-gray-750" />
                 </button>
-                <button @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
+                <button v-if="config.fullscreen" @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
                     <svg-icon name="expand-bold" class="h-3.5 px-0.5 text-gray-750" v-show="! fullScreenMode" />
                     <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750" v-show="fullScreenMode" />
                 </button>
@@ -79,12 +79,13 @@
                     @blur="blurred"
                     @previews-updated="updateSetPreviews(set._id, $event)"
                 >
-                    <template v-slot:picker v-if="canAddSet">
+                    <template v-slot:picker>
                         <add-set-button
                             class="between"
                             :groups="groupConfigs"
                             :sets="setConfigs"
                             :index="index"
+                            :enabled="canAddSet"
                             @added="addSet" />
                     </template>
                 </replicator-set>
@@ -132,18 +133,16 @@ export default {
         return {
             focused: false,
             collapsed: clone(this.meta.collapsed),
+            previews: this.meta.previews,
             fullScreenMode: false,
             provide: {
-                storeName: this.storeName
+                storeName: this.storeName,
+                replicatorSets: this.config.sets
             }
         }
     },
 
     computed: {
-
-        previews() {
-            return this.meta.previews;
-        },
 
         canAddSet() {
             if (this.isReadOnly) return false;
@@ -174,7 +173,9 @@ export default {
         },
 
         replicatorPreview() {
-            return `${this.config.display}: ${__n(':count set|:count sets', this.value.length)}`;
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
+            return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
         }
     },
 
@@ -241,13 +242,7 @@ export default {
         },
 
         updateSetPreviews(id, previews) {
-            this.updateMeta({
-                ...this.meta,
-                previews: {
-                    ...this.meta.previews,
-                    [id]: previews,
-                },
-            });
+            this.previews[id] = previews;
         },
 
         collapseSet(id) {
@@ -311,6 +306,18 @@ export default {
 
         collapsed(collapsed) {
             this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+        },
+
+        previews: {
+            deep: true,
+            handler(value) {
+                if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
+                    return
+                }
+                const meta = this.meta;
+                meta.previews = value;
+                this.updateMeta(meta);
+            }
         },
 
     }

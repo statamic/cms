@@ -28,7 +28,7 @@ class RendersFormsTest extends TestCase
         $output = $this->tag->formOpen('http://localhost:8000/submit');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost:8000/submit">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
+        $this->assertStringContainsString(csrf_field(), $output);
         $this->assertStringNotContainsString('<input type="hidden" name="_method"', $output);
     }
 
@@ -38,7 +38,7 @@ class RendersFormsTest extends TestCase
         $output = $this->tag->formOpen('http://localhost:8000/submit', 'DELETE');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost:8000/submit">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
+        $this->assertStringContainsString(csrf_field(), $output);
         $this->assertStringContainsString('<input type="hidden" name="_method" value="DELETE">', $output);
     }
 
@@ -55,7 +55,7 @@ class RendersFormsTest extends TestCase
             ->formOpen('http://localhost:8000/submit', 'DELETE');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost:8000/submit" class="mb-2" id="form">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
+        $this->assertStringContainsString(csrf_field(), $output);
         $this->assertStringContainsString('<input type="hidden" name="_method" value="DELETE">', $output);
     }
 
@@ -161,7 +161,7 @@ EOT;
         $this->assertStringContainsString('>'.$rendered['value'].'</textarea', $rendered['field']);
     }
 
-    public function renderTextProvider()
+    public static function renderTextProvider()
     {
         return [
             'no value, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => null],
@@ -201,7 +201,7 @@ EOT;
         }
     }
 
-    public function renderToggleProvider()
+    public static function renderToggleProvider()
     {
         return [
             'no value, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => false],
@@ -299,7 +299,7 @@ EOT;
         }
     }
 
-    public function renderSingleSelectProvider()
+    public static function renderSingleSelectProvider()
     {
         return [
             'no value, no default, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => null],
@@ -386,7 +386,7 @@ EOT;
         }
     }
 
-    public function renderMultipleSelectProvider()
+    public static function renderMultipleSelectProvider()
     {
         return [
             'no value, no default, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => null],

@@ -45,7 +45,7 @@ class NavigationRepository implements RepositoryContract
         $this->store->delete($nav);
     }
 
-    public function make(string $handle = null): Nav
+    public function make(?string $handle = null): Nav
     {
         return app(Nav::class)->handle($handle);
     }

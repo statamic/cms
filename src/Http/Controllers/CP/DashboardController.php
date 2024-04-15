@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\Facades\Preference;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Widgets\Loader;
 
@@ -11,7 +12,6 @@ class DashboardController extends CpController
     /**
      * View for the CP dashboard.
      *
-     * @param  Loader  $loader
      * @return mixed
      */
     public function index(Loader $loader)
@@ -34,6 +34,13 @@ class DashboardController extends CpController
         return collect($widgets)
             ->map(function ($config) {
                 return is_string($config) ? ['type' => $config] : $config;
+            })
+            ->filter(function ($config) {
+                if (! $sites = $config['sites'] ?? null) {
+                    return true;
+                }
+
+                return in_array(Site::selected()->handle(), $sites);
             })
             ->filter(function ($config) {
                 return collect($config['can'] ?? $config['permissions'] ?? ['access cp'])

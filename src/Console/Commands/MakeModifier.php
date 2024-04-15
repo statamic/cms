@@ -65,8 +65,8 @@ class MakeModifier extends GeneratorCommand
 
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
-                    ->add()->protected()->property('modifiers', $modifierClassValue)
-                    ->save();
+                ->add()->protected()->property('modifiers', $modifierClassValue)
+                ->save();
         } catch (\Exception $e) {
             $this->comment("Don't forget to register the Modifier class in your addon's service provider.");
         }

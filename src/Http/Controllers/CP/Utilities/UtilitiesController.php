@@ -17,7 +17,7 @@ class UtilitiesController extends CpController
 
     public function show(Request $request)
     {
-        $utility = Utility::find($this->getUtilityHandle($request));
+        $utility = Utility::findBySlug($this->getUtilityHandle($request));
 
         if ($view = $utility->view()) {
             return view($view, $utility->viewData($request));

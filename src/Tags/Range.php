@@ -12,6 +12,10 @@ class Range extends Tags
         $to = $this->params->int(['to', 'times']);
         $vars = [];
 
+        if ($to === 0 && ! $this->params->has('from')) {
+            return [];
+        }
+
         foreach (range($from, $to) as $i) {
             $vars[] = [
                 'value' => $i,

@@ -6,33 +6,36 @@
         :close-on-select="false"
         :disabled="config.disabled || isReadOnly"
         :multiple="true"
-        :placeholder="config.placeholder"
+        :placeholder="__(config.placeholder)"
         :searchable="true"
         :select-on-key-codes="[9, 13, 188]"
         :taggable="true"
+        :append-to-body="true"
         :value="value"
         @input="update"
         @search:focus="$emit('focus')"
         @search:blur="$emit('blur')">
             <template #selected-option-container><i class="hidden"></i></template>
-            <template #search="{ events, attributes }" v-if="config.multiple">
+            <template #search="{ events, attributes }">
                 <input
                     :placeholder="config.placeholder"
                     class="vs__search"
                     type="search"
                     v-on="events"
                     v-bind="attributes"
+                    @paste="onPaste"
                 >
             </template>
              <template #no-options>
-                <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
             </template>
             <template #footer="{ deselect }">
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
                     :value="value"
-                    :distance="10"
+                    :distance="5"
+                    :mirror="false"
                     @input="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
@@ -47,6 +50,12 @@
             </template>
     </v-select>
 </template>
+
+<style scoped>
+    .draggable-source--is-dragging {
+        @apply opacity-75 bg-transparent border-dashed
+    }
+</style>
 
 <script>
 import HasInputOptions from './HasInputOptions.js'
@@ -64,6 +73,14 @@ export default {
     methods: {
         focus() {
             this.$refs.input.focus();
+        },
+
+        onPaste(event) {
+            const pastedValue = event.clipboardData.getData('text');
+
+            this.update([...this.value, ...pastedValue.split(',')]);
+
+            event.preventDefault();
         },
     },
 

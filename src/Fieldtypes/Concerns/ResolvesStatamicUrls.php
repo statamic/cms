@@ -9,7 +9,6 @@ trait ResolvesStatamicUrls
     /**
      * Resolve `statamic://` URLs in string based markdown and html content.
      *
-     * @param  string  $content
      * @return string
      */
     protected function resolveStatamicUrls(string $content)

@@ -55,7 +55,6 @@ class Users extends ResourceCollection
         $columns->put('last_login',
             Column::make('last_login')
                 ->label(__('Last Login'))
-                ->sortable(false)
                 ->defaultOrder($columns->max('defaultOrder') + 1)
         );
 

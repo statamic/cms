@@ -2,27 +2,24 @@
 
 namespace Statamic\Forms\Exporters;
 
-class JsonExporter extends AbstractExporter
+class JsonExporter extends Exporter
 {
-    /**
-     * Perform the export.
-     *
-     * @return string
-     */
-    public function export()
+    protected static string $title = 'JSON';
+
+    public function export(): string
     {
-        $submissions = $this->form()->submissions()->toArray();
+        $submissions = $this->form->submissions()->toArray();
 
         return json_encode($submissions);
     }
 
-    /**
-     * Get the content type.
-     *
-     * @return string
-     */
-    public function contentType()
+    public function contentType(): string
     {
         return 'application/json';
+    }
+
+    public function extension(): string
+    {
+        return 'json';
     }
 }

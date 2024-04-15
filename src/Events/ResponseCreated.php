@@ -13,9 +13,6 @@ class ResponseCreated extends Event
 
     public $data;
 
-    /**
-     * @param  Response  $response
-     */
     public function __construct(Response $response, $data)
     {
         $this->response = $response;

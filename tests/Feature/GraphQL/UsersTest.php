@@ -14,8 +14,8 @@ use Tests\TestCase;
 /** @group graphql */
 class UsersTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['users'];
 
@@ -372,7 +372,7 @@ GQL;
             ]);
     }
 
-    public function userPasswordFilterProvider()
+    public static function userPasswordFilterProvider()
     {
         return [
             'password' => ['password', '{ password: "abc" }'],

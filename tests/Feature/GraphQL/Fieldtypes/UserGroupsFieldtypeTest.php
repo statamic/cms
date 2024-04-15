@@ -14,9 +14,9 @@ use Tests\TestCase;
 /** @group graphql */
 class UserGroupsFieldtypeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
-    use FakesUserGroups;
     use EnablesQueries;
+    use FakesUserGroups;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['collections'];
 

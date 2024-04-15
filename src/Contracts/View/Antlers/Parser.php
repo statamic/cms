@@ -69,7 +69,6 @@ interface Parser
     /**
      * Sets a render callback.
      *
-     * @param $callback
      * @return Parser
      */
     public function callback($callback);

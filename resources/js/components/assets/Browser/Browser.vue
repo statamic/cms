@@ -23,7 +23,7 @@
 
                 <div class="publish-tabs tabs rounded-none rounded-t mb-3 shadow-none" v-if="showContainerTabs">
                     <button class="tab-button" v-for="item in containers" :key="item.id"
-                        v-text="item.title"
+                        v-text="__(item.title)"
                         :class="{
                             active: item.id === container.id,
                             'border-b border-gray-300': item.id !== container.id
@@ -50,19 +50,17 @@
                                 <div class="flex items-center justify-between p-2 text-sm">
                                     <data-list-search class="h-8" ref="search" v-model="searchQuery" />
 
-                                    <template v-if="! hasSelections">
-                                        <button v-if="canCreateFolders" class="btn btn-sm ml-3" @click="creatingFolder = true">
-                                            <svg-icon name="folder-add" class="h-4 w-4 mr-2" />
-                                            <span>{{ __('Create Folder') }}</span>
-                                        </button>
+                                    <button v-if="canCreateFolders" class="btn btn-sm rtl:mr-3 ltr:ml-3" @click="creatingFolder = true">
+                                        <svg-icon name="folder-add" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
+                                        <span>{{ __('Create Folder') }}</span>
+                                    </button>
 
-                                        <button v-if="canUpload" class="btn btn-sm ml-3" @click="openFileBrowser">
-                                            <svg-icon name="upload" class="h-4 w-4 mr-2 text-current" />
-                                            <span>{{ __('Upload') }}</span>
-                                        </button>
-                                    </template>
+                                    <button v-if="canUpload" class="btn btn-sm rtl:mr-3 ltr:ml-3" @click="openFileBrowser">
+                                        <svg-icon name="upload" class="h-4 w-4 rtl:ml-2 ltr:mr-2 text-current" />
+                                        <span>{{ __('Upload') }}</span>
+                                    </button>
 
-                                    <div class="btn-group ml-3">
+                                    <div class="btn-group rtl:mr-3 ltr:ml-3">
                                         <button class="btn btn-sm" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                             <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                         </button>
@@ -105,7 +103,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-400 group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 rtl:ml-2 ltr:mr-2 inline-block text-blue-400 group-hover:text-blue" />
                                                 ..
                                             </a>
                                         </td>
@@ -115,7 +113,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-400 group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 rtl:ml-2 ltr:mr-2 inline-block text-blue-400 group-hover:text-blue" />
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
@@ -124,9 +122,6 @@
 
                                         <th class="actions-column" :colspan="columns.length">
                                             <dropdown-list placement="left-start" v-if="folderActions(folder).length">
-                                                <!-- TODO: Folder edit -->
-                                                <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
-
                                                 <data-list-inline-actions
                                                     :item="folder.path"
                                                     :url="folderActionUrl"
@@ -135,23 +130,14 @@
                                                     @completed="actionCompleted"
                                                 />
                                             </dropdown-list>
-
-                                            <folder-editor
-                                                v-if="editedFolderPath === folder.path"
-                                                :initial-directory="folder.basename"
-                                                :container="container"
-                                                :path="path"
-                                                @closed="editedFolderPath = null"
-                                                @updated="folderUpdated(i, $event)"
-                                            />
                                         </th>
                                     </tr>
                                 </template>
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
                                     <div class="flex items-center w-fit-content group">
-                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-2 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
-                                        <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue" @click.stop="$emit('edit-asset', asset)">
+                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 rtl:ml-2 ltr:mr-2 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
+                                        <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue normal-nums" @click.stop="$emit('edit-asset', asset)">
                                             {{ asset.basename }}
                                         </label>
                                     </div>
@@ -202,7 +188,12 @@
                                         <div class="asset-meta flex items-center">
                                             <div class="asset-filename text-center w-full px-2 py-1" v-text="folder.basename" :title="folder.basename" />
                                         </div>
-                                        <dropdown-list autoclose v-if="folderActions(folder).length" class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                        <dropdown-list v-if="folderActions(folder).length"
+                                            class="absolute top-1 rtl:left-2 ltr:right-2 opacity-0 group-hover:opacity-100"
+                                            :class="{ 'opacity-100': actionOpened === folder.path }"
+                                            @opened="actionOpened = folder.path"
+                                            @closed="actionOpened = null"
+                                        >
                                              <data-list-inline-actions
                                                  :item="folder.path"
                                                  :url="folderActionUrl"
@@ -225,7 +216,7 @@
                                             @dblclick.stop="$emit('edit-asset', asset)"
                                         >
                                             <div class="asset-thumb-container">
-                                                <div class="asset-thumb">
+                                                <div class="asset-thumb" :class="{'bg-checkerboard': asset.can_be_transparent}">
                                                     <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-4 h-full w-full': asset.extension === 'svg'}" />
                                                     <file-icon
                                                         v-else
@@ -239,7 +230,10 @@
                                             </div>
                                         </div>
                                         <dropdown-list
-                                            class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                            class="absolute top-1 rtl:left-2 ltr:right-2 opacity-0 group-hover:opacity-100"
+                                            :class="{ 'opacity-100': actionOpened === asset.id }"
+                                            @opened="actionOpened = asset.id"
+                                            @closed="actionOpened = null"
                                         >
                                              <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                              <div class="divider" v-if="asset.actions.length" />
@@ -282,7 +276,7 @@
             @saved="assetSaved"
         />
 
-        <folder-creator
+        <create-folder
             v-if="creatingFolder"
             :container="container"
             :path="path"
@@ -298,8 +292,7 @@
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
-import FolderCreator from '../Folder/Create.vue';
-import FolderEditor from '../Folder/Edit.vue';
+import CreateFolder from './CreateFolder.vue';
 import HasPagination from '../../data-list/HasPagination';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
@@ -320,8 +313,7 @@ export default {
         Breadcrumbs,
         Uploader,
         Uploads,
-        FolderEditor,
-        FolderCreator,
+        CreateFolder,
     },
 
     props: {
@@ -333,6 +325,7 @@ export default {
         restrictFolderNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         maxFiles: Number,
+        queryScopes: Array,
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
@@ -355,7 +348,6 @@ export default {
             folder: {},
             searchQuery: '',
             editedAssetId: this.initialEditingAssetId,
-            editedFolderPath: null,
             creatingFolder: false,
             uploads: [],
             page: 1,
@@ -367,7 +359,8 @@ export default {
             actionUrl: null,
             folderActionUrl: null,
             shifting: false,
-            lastItemClicked: null
+            lastItemClicked: null,
+            actionOpened: null,
         }
     },
 
@@ -392,15 +385,15 @@ export default {
         },
 
         canEdit() {
-            return this.can('edit '+ this.container.id +' assets')
+            return this.can('edit '+ this.container.id +' assets') || this.can('configure asset containers')
         },
 
         canUpload() {
-            return this.folder && this.container.allow_uploads;
+            return this.folder && this.container.allow_uploads && (this.can('upload '+ this.container.id +' assets') || this.can('configure asset containers'));
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation && (this.can('upload '+ this.container.id +' assets') || this.can('configure asset containers'));
         },
 
         parameters() {
@@ -410,6 +403,7 @@ export default {
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 search: this.searchQuery,
+                queryScopes: this.queryScopes,
             }
         },
 
@@ -452,6 +446,11 @@ export default {
         this.$events.$on('editor-action-completed', this.actionCompleted);
     },
 
+    destroyed() {
+        this.$events.$off('editor-action-started', this.actionStarted);
+        this.$events.$off('editor-action-completed', this.actionCompleted);
+    },
+
     watch: {
 
         initialContainer() {
@@ -459,6 +458,7 @@ export default {
         },
 
         container(container) {
+            this.initializing = true;
             this.preferencesPrefix = `assets.${container.id}`;
             this.mode = this.getPreference('mode') || 'table';
             this.setInitialPerPage();
@@ -470,7 +470,7 @@ export default {
         },
 
         parameters(after, before) {
-            if (JSON.stringify(before) === JSON.stringify(after)) return;
+            if (this.initializing || JSON.stringify(before) === JSON.stringify(after)) return;
             this.loadAssets();
         },
 
@@ -490,7 +490,11 @@ export default {
                 : this.path;
 
             this.$emit('navigated', this.container, path);
-        }
+        },
+
+        searchQuery() {
+            this.page = 1;
+        },
 
     },
 
@@ -609,11 +613,6 @@ export default {
             this.folders.push(folder);
             this.folders = _.sortBy(this.folders, 'title');
             this.creatingFolder = false;
-        },
-
-        folderUpdated(index, newFolder) {
-            this.folders[index] = newFolder;
-            this.editedFolderPath = null;
         },
 
         sorted(column, direction) {

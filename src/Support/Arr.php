@@ -73,7 +73,6 @@ class Arr
     /**
      * Checks if an array is associative.
      *
-     * @param $array
      * @return bool
      */
     public static function assoc($array)
@@ -84,7 +83,6 @@ class Arr
     /**
      * Deep merges arrays better than array_merge_recursive().
      *
-     * @param  array  $array1
      * @param  array  $array2
      * @return array
      */

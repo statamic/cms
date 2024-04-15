@@ -4,15 +4,16 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Support\Facades\Schema;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\UserRepositoryManager;
 use Statamic\Console\RunsInPlease;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Auth\UserRepository as UserRepositoryContract;
+use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Stache\Repositories\UserRepository as FileRepository;
+use Statamic\Stache\Stores\UsersStore;
 
 class ImportUsers extends Command
 {
@@ -62,11 +63,8 @@ class ImportUsers extends Command
             return;
         }
 
-        if (! in_array(Schema::getColumnType('users', 'id'), ['guid', 'string'])) {
-            $this->error('Your users table must use UUIDs for ids in order for this migration to run');
-
-            return;
-        }
+        $store = app(UsersStore::class)->directory(config('statamic.stache.stores.users.directory', base_path('users')));
+        Stache::registerStore($store);
 
         app()->bind(UserContract::class, FileUser::class);
         app()->bind(UserRepositoryContract::class, FileRepository::class);

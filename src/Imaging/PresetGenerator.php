@@ -11,9 +11,6 @@ class PresetGenerator
      */
     private $generator;
 
-    /**
-     * @param  ImageGenerator  $generator
-     */
     public function __construct(ImageGenerator $generator)
     {
         $this->generator = $generator;

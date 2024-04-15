@@ -7,7 +7,6 @@ interface Config
     /**
      * Populate the config object with data.
      *
-     * @param  array  $config
      * @return void
      */
     public function hydrate(array $config);

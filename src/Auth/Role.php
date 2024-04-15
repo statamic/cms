@@ -9,7 +9,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 
-abstract class Role implements RoleContract, Augmentable, ArrayAccess, Arrayable
+abstract class Role implements Arrayable, ArrayAccess, Augmentable, RoleContract
 {
     use HasAugmentedData;
 

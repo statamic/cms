@@ -13,8 +13,8 @@ use Tests\PreventSavingStacheItemsToDisk;
 
 class RuntimeValuesTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesViews;
+    use PreventSavingStacheItemsToDisk;
 
     public function test_supplemented_values_are_not_cached()
     {

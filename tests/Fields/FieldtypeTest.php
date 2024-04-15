@@ -330,10 +330,12 @@ class FieldtypeTest extends TestCase
     /** @test */
     public function it_will_only_append_config_fields_to_the_intended_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype {
+        $fieldtype = new class extends Fieldtype
+        {
         };
 
-        $fieldtypeWithAppendedConfig = new class extends Fieldtype {
+        $fieldtypeWithAppendedConfig = new class extends Fieldtype
+        {
         };
 
         $fieldtypeWithAppendedConfig::appendConfigField('group', ['type' => 'text']);
@@ -363,7 +365,7 @@ class FieldtypeTest extends TestCase
         $this->assertEquals($expectedConfigFields, $fieldtype->configFields()->all()->map(fn ($field) => $field->type())->all());
     }
 
-    public function configBlueprintProvider()
+    public static function configBlueprintProvider()
     {
         return [
             'linear fields results in one section' => [

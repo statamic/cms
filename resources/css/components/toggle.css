@@ -11,7 +11,7 @@
     }
 
     .inline-label {
-        @apply ml-2 font-normal text-gray-700;
+        @apply rtl:mr-2 ltr:ml-2 font-normal text-gray-700;
         a {
             @apply text-gray-800 underline;
             &:hover {
@@ -27,7 +27,7 @@
 }
 
 .toggle-container {
-    @apply bg-white cursor-pointer relative border;
+    @apply bg-white cursor-pointer relative border shrink-0;
     height: 22px;
     width: 46px;
     border-radius: 20px;
@@ -53,7 +53,7 @@
 .toggle-knob {
     position: absolute;
     top: 1px;
-    right: 0;
+    right: 0 ; [dir="rtl"] & { right: auto ; left: 0 ; }
     width: 20px;
     height: 20px;
     border-radius: 50%;
@@ -115,9 +115,9 @@
 /* Inside the Sidebar
   ========================================================================== */
 .publish-sidebar .toggle-fieldtype {
-    @apply flex items-center justify-between;
+    @apply flex items-center justify-between flex-wrap;
     .field-inner > label { margin: 0; }
-    .toggle-fieldtype-wrapper { margin-left: 8px; }
+    .toggle-fieldtype-wrapper { margin-left: 8px ; [dir="rtl"] & { margin-right: 8px ; margin-left: 0 ; } }
     .help-block { margin-top: 4px !important; }
 }
 
@@ -125,6 +125,5 @@
   ========================================================================== */
 
 .grid-table td.toggle-fieldtype {
-    width: 1%;
     padding-top: 14px;
 }

@@ -64,7 +64,7 @@ trait Routable
     public function absoluteUrl()
     {
         if ($this->isRedirect()) {
-            return $this->redirectUrl();
+            return $this->absoluteRedirectUrl();
         }
 
         return $this->absoluteUrlWithoutRedirect();
@@ -72,16 +72,7 @@ trait Routable
 
     public function absoluteUrlWithoutRedirect()
     {
-        if (! $uri = $this->uri()) {
-            return null;
-        }
-
-        $url = vsprintf('%s/%s', [
-            rtrim($this->site()->absoluteUrl(), '/'),
-            ltrim($uri, '/'),
-        ]);
-
-        return $url === '/' ? $url : rtrim($url, '/');
+        return $this->makeAbsolute($this->uri());
     }
 
     public function isRedirect()
@@ -95,5 +86,28 @@ trait Routable
         if ($redirect = $this->value('redirect')) {
             return (new \Statamic\Routing\ResolveRedirect)($redirect, $this);
         }
+    }
+
+    public function absoluteRedirectUrl()
+    {
+        return $this->makeAbsolute($this->redirectUrl());
+    }
+
+    private function makeAbsolute($url)
+    {
+        if (! $url) {
+            return null;
+        }
+
+        if (! Str::startsWith($url, '/')) {
+            return $url;
+        }
+
+        $url = vsprintf('%s/%s', [
+            rtrim($this->site()->absoluteUrl(), '/'),
+            ltrim($url, '/'),
+        ]);
+
+        return $url === '/' ? $url : rtrim($url, '/');
     }
 }

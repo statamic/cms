@@ -12,8 +12,8 @@ use Tests\TestCase;
 /** @group graphql */
 class ReplicatorFieldtypeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['collections'];
 
@@ -300,7 +300,7 @@ GQL;
             ]]);
     }
 
-    public function groupedSetsProvider()
+    public static function groupedSetsProvider()
     {
         return [
             'grouped sets (new)' => [true],

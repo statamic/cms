@@ -24,12 +24,13 @@ class CacheController extends CpController
 
     protected function getStacheStats()
     {
+        $size = Stache::fileSize();
         $time = Stache::buildTime();
         $built = Stache::buildDate();
 
         return [
             'records' => Stache::fileCount(),
-            'size' => Str::fileSizeForHumans(Stache::fileSize()),
+            'size' => $size ? Str::fileSizeForHumans($size) : null,
             'time' => $time ? Str::timeForHumans($time) : __('Refresh'),
             'rebuilt' => $built ? $built->diffForHumans() : __('Refresh'),
         ];

@@ -43,10 +43,6 @@ class ThumbnailController extends Controller
      */
     protected $mutex;
 
-    /**
-     * @param  Server  $server
-     * @param  ImageGenerator  $generator
-     */
     public function __construct(Server $server, ImageGenerator $generator)
     {
         $this->server = $server;

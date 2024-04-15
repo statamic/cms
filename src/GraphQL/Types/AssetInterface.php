@@ -99,6 +99,9 @@ class AssetInterface extends InterfaceType
             'ratio' => [
                 'type' => GraphQL::float(),
             ],
+            'duration' => [
+                'type' => GraphQL::float(),
+            ],
         ];
 
         foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {

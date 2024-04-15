@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { Sortable } from '@shopify/draggable';
+import {Sortable, Plugins} from '@shopify/draggable';
 import { availableButtons, addButtonHtml } from './buttons';
 
 export default {
@@ -43,9 +43,12 @@ export default {
         buttons: {
             deep: true,
             handler(buttons) {
-                this.data = buttons
+                const enabledButtonNames = buttons
                     .filter(button => button.enabled)
                     .map(button => button.name);
+                if (JSON.stringify(enabledButtonNames) !== JSON.stringify(this.data)) {
+                    this.data = enabledButtonNames;
+                }
             }
         },
 
@@ -112,10 +115,13 @@ export default {
         initSortable() {
             new Sortable(this.$refs.buttons, {
                 draggable: 'button',
-                delay: 200
+                mirror: { constrainDimensions: true, xAxis: true, appendTo: 'body' },
+                swapAnimation: { horizontal: true },
+                plugins: [Plugins.SwapAnimation],
+                distance: 10
             }).on('sortable:stop', e => {
                 this.buttons.splice(e.newIndex, 0, this.buttons.splice(e.oldIndex, 1)[0]);
-            });
+            }).on('mirror:create', (e) => e.cancel());
         },
 
         toggleButton(name) {

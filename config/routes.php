@@ -18,6 +18,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Enable Route Bindings
+    |--------------------------------------------------------------------------
+    |
+    | Whether route bindings for Statamic repositories (entry, taxonomy,
+    | collections, etc) are enabled for front end routes. This may be
+    | useful if you want to make your own custom routes with them.
+    |
+    */
+
+    'bindings' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Action Route Prefix
     |--------------------------------------------------------------------------
     |

@@ -21,8 +21,6 @@ class PreferenceController extends CpController
 
     /**
      * Store a user preference.
-     *
-     * @param  Request  $request
      */
     public function store(Request $request)
     {

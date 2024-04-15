@@ -2,13 +2,13 @@
 
 namespace Statamic\Tags;
 
-use Facades\Statamic\View\Cascade;
+use Statamic\Facades\Cascade;
 
 class Yields extends Tags
 {
     protected static $aliases = ['yield'];
 
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         $name = explode(':', $this->tag)[1];
 

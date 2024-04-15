@@ -16,7 +16,6 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Filter by container.
      *
-     * @param  string  $container
      * @return $this
      */
     public function filterByContainer(string $container)
@@ -57,7 +56,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                     && $this->getConfiguredAssetsFieldContainer($field) === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
-                $field->get('max_files') === 1
+                $this->hasStringValue($field, $dottedPrefix)
                     ? $this->updateStringValue($field, $dottedPrefix)
                     : $this->updateArrayValue($field, $dottedPrefix);
             });
@@ -101,7 +100,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                     && $field->get('container') === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
-                $field->get('save_html') === true
+                $this->hasStringValue($field, $dottedPrefix)
                     ? $this->updateStatamicUrlsInStringValue($field, $dottedPrefix)
                     : $this->updateStatamicUrlsInArrayValue($field, $dottedPrefix);
             });

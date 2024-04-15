@@ -5,7 +5,7 @@
         <header class="mb-6">
             <breadcrumb :url="breadcrumbUrl" :title="__('Fieldsets')" />
             <div class="flex items-center justify-between">
-                <h1>{{ initialTitle }}</h1>
+                <h1>{{ __(initialTitle) }}</h1>
                 <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
             </div>
         </header>
@@ -34,9 +34,10 @@
 
         <div class="card @container" :class="{ 'pt-2': !fields.length }">
             <fields
-                :fields="fieldset.fields"
+                :fields="fields"
                 :editing-field="editingField"
                 :exclude-fieldset="fieldset.handle"
+                :suggestable-condition-fields="suggestableConditionFields(this)"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-linked="fieldLinked"
@@ -53,8 +54,11 @@
 <script>
 import Fields from '../blueprints/Fields.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
+import SuggestsConditionalFields from '../blueprints/SuggestsConditionalFields';
 
 export default {
+
+    mixins: [SuggestsConditionalFields],
 
     components: {
         Fields
@@ -81,6 +85,10 @@ export default {
             set(fields) {
                 this.fieldset.fields = fields;
             }
+        },
+
+        fieldsForConditionSuggestions() {
+            return this.fields;
         }
 
     },

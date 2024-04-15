@@ -10,7 +10,7 @@ use Statamic\Extend\RegistersItself;
 
 abstract class Action implements Arrayable
 {
-    use HasHandle, HasTitle, HasFields, RegistersItself;
+    use HasFields, HasHandle, HasTitle, RegistersItself;
 
     protected static $binding = 'actions';
 

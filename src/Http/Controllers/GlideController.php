@@ -34,9 +34,6 @@ class GlideController extends Controller
 
     /**
      * GlideController constructor.
-     *
-     * @param  \League\Glide\Server  $server
-     * @param  \Illuminate\Http\Request  $request
      */
     public function __construct(Server $server, Request $request)
     {
@@ -108,8 +105,6 @@ class GlideController extends Controller
     /**
      * Generate an image.
      *
-     * @param $type
-     * @param $item
      * @return mixed
      */
     private function generateBy($type, $item)

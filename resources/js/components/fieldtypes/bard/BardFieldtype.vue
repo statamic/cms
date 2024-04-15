@@ -32,7 +32,7 @@
                     <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && setConfigs.length > 0">
                         <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
                     </button>
-                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" :aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
                         <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
                     </button>
@@ -58,7 +58,7 @@
                 :should-show="shouldShowSetButton"
                 :is-showing="showAddSetButton"
                 v-if="editor"
-                v-slot="{ x, y }"
+                v-slot="{ y }"
                 @shown="showAddSetButton = true"
                 @hidden="showAddSetButton = false"
             >
@@ -72,7 +72,7 @@
                         <button
                             type="button"
                             class="btn-round group bard-add-set-button"
-                            :style="{ transform: `translate(${x}px, ${y}px)` }"
+                            :style="{ transform: `translateY(${y}px)` }"
                             :aria-label="__('Add Set')"
                             v-tooltip="__('Add Set')"
                             @click="addSetButtonClicked"
@@ -83,15 +83,14 @@
                 </set-picker>
             </floating-menu>
 
-            <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
+            <div class="bard-error" v-if="initError" v-html="initError"></div>
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
-        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit)">
+        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit || config.word_count)">
             <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
             <div v-else />
-
-            <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
+            <div v-if="config.character_limit || config.word_count" v-text="characterAndWordCountText" />
         </div>
     </div>
 </div>
@@ -104,6 +103,7 @@
 import uniqid from 'uniqid';
 import reduce from 'underscore/modules/reduce';
 import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';
+import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
@@ -174,13 +174,14 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
-            invalid: false,
+            initError: null,
             pageHeader: null,
             escBinding: null,
             showAddSetButton: false,
             provide: {
                 bard: this.makeBardProvide(),
-                storeName: this.storeName
+                storeName: this.storeName,
+                bardSets: this.config.sets
             }
         }
     },
@@ -214,6 +215,24 @@ export default {
 
                 return moment.utc(duration.asMilliseconds()).format("mm:ss");
             }
+        },
+
+        characterAndWordCountText() {
+            const showWordCount = this.config.word_count;
+            const wordCount = this.editor.storage.characterCount.words();
+            const wordCountText = `${__n(':count word|:count words', wordCount)}`;
+            const charLimit = this.config.character_limit;
+            const showCharLimit = charLimit > 0;
+            const charCount = this.editor.storage.characterCount.characters();
+
+            // If both are enabled, show a more verbose combined string.
+            if (showCharLimit && showWordCount) {
+                return `${wordCountText}, ${__(':count/:total characters', { count: charCount, total: charLimit })}`;
+            }
+
+            // Otherwise show one or the other.
+            if (showCharLimit) return `${charCount}/${charLimit}`;
+            if (showWordCount) return wordCountText;
         },
 
         isFirstCreation() {
@@ -269,6 +288,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             const stack = JSON.parse(this.value);
             let text = '';
             while (stack.length) {
@@ -278,7 +299,7 @@ export default {
                 } else if (node.type === 'set') {
                     const handle = node.attrs.values.type;
                     const set = this.setConfigs.find(set => set.handle === handle);
-                    text += ` [${set ? set.display : handle}]`;
+                    text += ` [${__(set ? set.display : handle)}]`;
                 }
                 if (text.length > 150) {
                     break;
@@ -327,6 +348,15 @@ export default {
         this.pageHeader = document.querySelector('.global-header');
 
         this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
+
+        this.$nextTick(() => {
+            let el = document.querySelector(`label[for="${this.fieldId}"]`);
+            if (el) {
+                el.addEventListener('click', () => {
+                    this.editor.commands.focus();
+                });
+            }
+        });
     },
 
     beforeDestroy() {
@@ -338,8 +368,13 @@ export default {
 
     watch: {
 
-        json(json) {
+        json(json, oldJson) {
             if (!this.mounted) return;
+
+            let jsonValue = JSON.stringify(json);
+            let oldJsonValue = JSON.stringify(oldJson);
+                        
+            if (jsonValue === oldJsonValue) return;
 
             // Prosemirror's JSON will include spaces between tags.
             // For example (this is not the actual json)...
@@ -347,7 +382,7 @@ export default {
             // But, Laravel's TrimStrings middleware would remove them.
             // Those spaces need to be there, otherwise it would be rendered as <p>One<b>two</b>three</p>
             // To combat this, we submit the JSON string instead of an object.
-            this.updateDebounced(JSON.stringify(json));
+            this.updateDebounced(jsonValue);
         },
 
         value(value, oldValue) {
@@ -386,7 +421,9 @@ export default {
 
         fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
             this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
-            this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+            this.$nextTick(() => {
+                this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+            });
         },
 
         fullScreenMode() {
@@ -406,9 +443,16 @@ export default {
 
             this.updateSetMeta(id, this.meta.new[handle]);
 
+            const { $head } = this.editor.view.state.selection;
+            const { nodeBefore } = $head;
+
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
-                this.editor.commands.set({ id, values });
+                if (nodeBefore) {
+                    this.editor.commands.setAt({ attrs: { id, values }, pos: $head.pos });
+                } else {
+                    this.editor.commands.set({ id, values });
+                }
             });
         },
 
@@ -426,6 +470,20 @@ export default {
             this.$nextTick(() => {
                 this.editor.commands.setAt({ attrs: { id, enabled, values }, pos });
             });
+        },
+
+        pasteSet(attrs) {
+            const old_id = attrs.id;
+            const id = uniqid();
+            const enabled = attrs.enabled;
+            const values = Object.assign({}, attrs.values);
+
+            let previews = Object.assign({}, this.previews[old_id] || {});
+            this.previews = Object.assign({}, this.previews, { [id]: previews });
+
+            this.updateSetMeta(id, this.meta.existing[old_id] || this.meta.defaults[values.type] || {});
+
+            return { id, enabled, values };
         },
 
         collapseSet(id) {
@@ -471,8 +529,8 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock = $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
-
-            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock;
+            const isAroundInlineImage = state.selection.$to.nodeBefore?.type.name === 'image' || state.selection.$to.nodeAfter?.type.name === 'image'
+            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
             return this.setConfigs.length && (this.config.always_show_set_button || isActive);
         },
 
@@ -597,7 +655,7 @@ export default {
                     }, 1);
                 },
                 onUpdate: () => {
-                    this.json = this.editor.getJSON().content;
+                    this.json = clone(this.editor.getJSON().content);
                     this.html = this.editor.getHTML();
                 },
                 onCreate: ({ editor }) => {
@@ -606,11 +664,37 @@ export default {
                         try {
                             state.schema.nodeFromJSON(content);
                         } catch (error) {
-                            this.invalid = true;
+                            const invalidError = this.invalidError(error);
+                            if (invalidError) {
+                                this.initError = invalidError;
+                            } else {
+                                this.initError = __('Something went wrong');
+                                console.error(error);
+                            }
                         }
                     }
                 }
             });
+        },
+
+        invalidError(error) {
+            const messages = {
+                'Invalid text node in JSON': 'Invalid content, text values must be strings',
+                'Empty text nodes are not allowed': 'Invalid content, text values cannot be empty',
+            };
+
+            if (messages[error.message]) {
+                return __(messages[error.message]);
+            }
+
+            let match;
+            if (match = error.message.match(/^(?:There is no|Unknown) (?:node|mark) type:? (\w*)(?: in this schema)?$/)) {
+                if (match[1]) {
+                    return __('Invalid content, :type button/extension is not enabled', { type: match[1] });
+                } else {
+                    return __('Invalid content, nodes and marks must have a type');
+                }
+            }
         },
 
         valueToContent(value) {
@@ -623,14 +707,41 @@ export default {
         },
 
         getExtensions() {
+            let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
+
+            if (this.config.inline === 'break') {
+                modeExts.push(HardBreak.extend({
+                    addKeyboardShortcuts() {
+                        return {
+                            ...this.parent?.(),
+                            'Enter': () => this.editor.commands.setHardBreak(),
+                        }
+                    },
+                }));
+            }
+
+            if (this.config.placeholder) {
+                modeExts.push(Placeholder.configure({ placeholder: __(this.config.placeholder) }));
+            }
+
+            // Allow passthrough of Ctrl/Cmd + Enter to submit the form
+            const DisableCtrlEnter = Extension.create({
+                addKeyboardShortcuts() {
+                    return {
+                        'Ctrl-Enter': () => true,
+                        'Cmd-Enter': () => true,
+                    }
+                },
+            });
+
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
-                ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
+                ...modeExts,
+                DisableCtrlEnter,
                 Dropcursor,
                 Gapcursor,
                 History,
                 Paragraph,
-                Placeholder.configure({ placeholder: this.config.placeholder }),
                 Set.configure({ bard: this }),
                 Text
             ];
@@ -667,12 +778,15 @@ export default {
             if (btns.includes('h6')) levels.push(6);
             if (levels.length) exts.push(Heading.configure({ levels }));
 
+            let alignmentTypes = ['paragraph'];
+            if (levels.length) alignmentTypes.push('heading');
+
             let alignments = [];
             if (btns.includes('alignleft')) alignments.push('left');
             if (btns.includes('aligncenter')) alignments.push('center');
             if (btns.includes('alignright')) alignments.push('right');
             if (btns.includes('alignjustify')) alignments.push('justify');
-            if (alignments.length) exts.push(TextAlign.configure({ types: ['heading', 'paragraph'], alignments }));
+            if (alignments.length) exts.push(TextAlign.configure({ types: alignmentTypes, alignments }));
 
             if (btns.includes('table')) {
                 exts.push(

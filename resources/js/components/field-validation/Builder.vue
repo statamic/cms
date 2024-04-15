@@ -28,7 +28,7 @@
                 <p>
                     {{ __('messages.field_validation_advanced_instructions') }}
                     <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
-                    <span v-if="helpBlock" class="italic text-gray-500 float-right">
+                    <span v-if="helpBlock" class="italic text-gray-500 ltr:float-right rtl:float-left">
                         {{ __('Example') }}:
                         <span class="italic text-blue-400">{{ helpBlock }}</span>
                     </span>
@@ -59,10 +59,10 @@
                     />
                 </template>
                 <template #option="{ value, display }">
-                    {{ display }} <code class="ml-2">{{ valueWithoutTrailingColon(value) }}</code>
+                    {{ __(display) }} <code class="rtl:mr-2 ltr:ml-2">{{ valueWithoutTrailingColon(value) }}</code>
                 </template>
                 <template #no-options="{ search }">
-                    <div class="vs__dropdown-option text-left">{{ __('Add') }} <code class="ml-2">{{ search }}</code></div>
+                    <div class="vs__dropdown-option rtl:text-right ltr:text-left">{{ __('Add') }} <code class="rtl:mr-2 ltr:ml-2">{{ search }}</code></div>
                 </template>
             </v-select>
 
@@ -78,6 +78,8 @@
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
+                    :distance="5"
+                    :mirror="false"
                     v-model="rules"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap outline-none">
@@ -96,6 +98,11 @@
 
 </template>
 
+<style scoped>
+    .draggable-source--is-dragging {
+        @apply opacity-75 bg-transparent border-dashed
+    }
+</style>
 
 <script>
 import RULES from './Rules.js';

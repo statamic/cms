@@ -36,9 +36,7 @@ export default {
             let originalValues = new Values(this.values, this.jsonSubmittingFields);
             let newValues = new Values(responseValues, this.jsonSubmittingFields);
 
-            preserveFields.forEach(dottedKey => {
-                newValues.set(dottedKey, originalValues.get(dottedKey));
-            });
+            newValues.mergeDottedKeys(preserveFields, originalValues);
 
             return newValues.all();
         },

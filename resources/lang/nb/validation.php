@@ -97,6 +97,13 @@ return [
     'reserved' => 'Dette er et reservert ord.',
     'parent_causes_root_children' => 'Dette vil føre til at rot-nivå kan ha undersider.',
     'parent_cannot_be_itself' => 'Kan ikke være ens egen forelder.',
+    'time' => 'Tid',
+    'date_fieldtype_date_required' => 'Dato er påkrevd.',
+    'date_fieldtype_time_required' => 'Tid er påkrevd.',
+    'date_fieldtype_start_date_required' => 'Startdato er påkrevd.',
+    'date_fieldtype_start_date_invalid' => 'Ikke gyldig startdato.',
+    'date_fieldtype_end_date_required' => 'Sluttdato er påkrevd.',
+    'date_fieldtype_end_date_invalid' => 'Ikke gyldig sluttdato.',
     'custom.attribute-name.rule-name' => 'brukerdefinert melding',
     'attributes' => [],
 ];

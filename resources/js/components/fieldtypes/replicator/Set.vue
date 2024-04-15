@@ -7,11 +7,17 @@
             <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2 cursor-pointer"/>
+                    <label class="text-xs whitespace-nowrap rtl:ml-2 ltr:mr-2 cursor-pointer">
+                        <span v-if="setGroup">
+                            {{ setGroup.display }}
+                            <svg-icon name="micro/chevron-right" class="w-4" />
+                        </span>
+                        {{ display || config.handle }}
+                    </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
-                        <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(config.instructions), html:true }" />
+                        <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
                     </div>
-                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8">
+                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
                         <div
                             v-html="previewText"
                             class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
@@ -20,7 +26,7 @@
                 <div class="replicator-set-controls" v-if="!isReadOnly">
                     <toggle-fieldtype
                         handle="set-enabled"
-                        class="toggle-sm mr-2"
+                        class="toggle-sm rtl:ml-2 ltr:mr-2"
                         @input="toggleEnabledState"
                         :value="values.enabled"
                         v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
@@ -44,6 +50,7 @@
                     :set-index="index"
                     :field-path="fieldPath(field)"
                     :read-only="isReadOnly"
+                    :show-field-previews="showFieldPreviews"
                     @updated="updated(field.handle, $event)"
                     @meta-updated="metaUpdated(field.handle, $event)"
                     @focus="$emit('focus')"
@@ -76,6 +83,8 @@ export default {
     components: { SetField },
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText],
+
+    inject: ['replicatorSets'],
 
     props: {
         config: {
@@ -127,6 +136,12 @@ export default {
         }
     },
 
+    data() {
+        return {
+            fieldPreviews: this.previews,
+        }
+    },
+
     computed: {
 
         fields() {
@@ -134,11 +149,19 @@ export default {
         },
 
         display() {
-            return this.config.display || this.values.type;
+            return __(this.config.display) || this.values.type;
         },
 
         instructions() {
-            return this.config.instructions ? markdown(this.config.instructions) : null;
+            return this.config.instructions ? markdown(__(this.config.instructions)) : null;
+        },
+
+        setGroup() {
+            if (this.replicatorSets.length < 1) return null;
+
+            return this.replicatorSets.find((group) => {
+                return group.sets.filter((set) => set.handle === this.config.handle).length > 0;
+            });
         },
 
         hasMultipleFields() {
@@ -166,9 +189,7 @@ export default {
         },
 
         previewUpdated(handle, value) {
-            setTimeout(() => {
-                this.$emit('previews-updated', { ...this.previews, [handle]: value });
-            }, 0);
+            this.$emit('previews-updated', this.fieldPreviews = { ...this.fieldPreviews, [handle]: value });
         },
 
         destroy() {

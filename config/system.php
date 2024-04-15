@@ -108,7 +108,7 @@ return [
     */
 
     'php_memory_limit' => '-1',
-    'php_max_execution_time' => '-1',
+    'php_max_execution_time' => '0',
     'ajax_timeout' => '600000',
     'pcre_backtrack_limit' => '-1',
 
@@ -151,5 +151,18 @@ return [
     */
 
     'update_references' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Row ID handle
+    |--------------------------------------------------------------------------
+    |
+    | Rows in Grid, Replicator, and Bard fields will be given a unique ID using
+    | the "id" field. You may need your own field named "id", in which case
+    | you may customize the handle of the field that Statamic will use.
+    |
+    */
+
+    'row_id_handle' => 'id',
 
 ];

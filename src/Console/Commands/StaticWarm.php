@@ -20,18 +20,21 @@ use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
 {
-    use RunsInPlease;
     use EnhancesCommands;
+    use Hookable;
+    use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
         {--queue : Queue the requests}
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
+        {--insecure : Skip SSL verification}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -71,7 +74,7 @@ class StaticWarm extends Command
     private function warm(): void
     {
         $client = new Client([
-            'verify' => ! $this->laravel->isLocal(),
+            'verify' => $this->shouldVerifySsl(),
             'auth' => $this->option('user') && $this->option('password')
                 ? [$this->option('user'), $this->option('password')]
                 : null,
@@ -162,6 +165,7 @@ class StaticWarm extends Command
             ->merge($this->taxonomyUris())
             ->merge($this->termUris())
             ->merge($this->customRouteUris())
+            ->merge($this->additionalUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
                 return $cacher->isExcluded($uri);
@@ -170,12 +174,25 @@ class StaticWarm extends Command
             ->values();
     }
 
+    private function shouldVerifySsl(): bool
+    {
+        if ($this->option('insecure')) {
+            return false;
+        }
+
+        return ! $this->laravel->isLocal();
+    }
+
     protected function entryUris(): Collection
     {
         $this->line('[ ] Entries...');
 
         $entries = Facades\Entry::all()->map(function (Entry $entry) {
             if (! $entry->published() || $entry->private()) {
+                return null;
+            }
+
+            if ($entry->isRedirect()) {
                 return null;
             }
 
@@ -264,5 +281,16 @@ class StaticWarm extends Command
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Custom routes");
 
         return $routes;
+    }
+
+    protected function additionalUris(): Collection
+    {
+        $this->line('[ ] Additional...');
+
+        $uris = $this->runHooks('additional', collect());
+
+        $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Additional");
+
+        return $uris->map(fn ($uri) => URL::makeAbsolute($uri));
     }
 }

@@ -3,9 +3,12 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
+use Closure;
+use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Traits\Localizable;
 use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
@@ -20,15 +23,20 @@ use Statamic\Data\ContainsComputedData;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
+use Statamic\Events\EntryCreating;
 use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
@@ -45,19 +53,20 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues, Arrayable, ArrayAccess, SearchableContract
+class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
-    use Routable {
-        uri as routableUri;
-    }
+    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
-    use ContainsData, ContainsComputedData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, Searchable;
-    use ResolvesValues {
-        resolveGqlValue as traitResolveGqlValue;
-    }
+    use HasDirtyState;
     use HasOrigin {
         value as originValue;
         values as originValues;
+    }
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
+    use Routable {
+        uri as routableUri;
     }
 
     protected $id;
@@ -65,7 +74,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $blueprint;
     protected $date;
     protected $locale;
-    protected $localizations;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
     protected $template;
@@ -127,15 +135,27 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) use ($key) {
-                return Blink::once($key, function () use ($blueprint) {
-                    if (! $blueprint) {
-                        $blueprint = $this->hasOrigin()
-                            ? $this->origin()->blueprint()->handle()
-                            : $this->get('blueprint');
-                    }
+                if (Blink::has($key)) {
+                    return Blink::get($key);
+                }
 
-                    return $this->collection()->entryBlueprint($blueprint, $this);
-                });
+                if (! $blueprint) {
+                    $blueprint = $this->hasOrigin()
+                        ? $this->origin()->blueprint()->handle()
+                        : $this->get('blueprint');
+                }
+
+                $blueprint = $this->collection()->entryBlueprint($blueprint, $this);
+
+                if (! $blueprint) {
+                    throw new BlueprintNotFoundException($this->value('blueprint'), 'collections/'.$this->collection()->handle());
+                }
+
+                Blink::put($key, $blueprint);
+
+                EntryBlueprintFound::dispatch($blueprint, $this);
+
+                return $blueprint;
             })
             ->setter(function ($blueprint) use ($key) {
                 Blink::forget($key);
@@ -155,8 +175,35 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return new AugmentedEntry($this);
     }
 
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'collection' => $this->collectionHandle(),
+            'locale' => $this->locale(),
+            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
+            'slug' => $this->slug(),
+            'date' => optional($this->date())->format('Y-m-d-Hi'),
+            'published' => $this->published(),
+            'path' => $this->initialPath() ?? $this->path(),
+        ], $this->data()->except(['updated_at'])->toArray());
+    }
+
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && EntryDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         if ($this->descendants()->map->fresh()->filter()->isNotEmpty()) {
             throw new \Exception('Cannot delete an entry with localizations.');
         }
@@ -169,7 +216,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     if (optional($parent)->isRoot()) {
                         $parent = null;
                     }
-                    $this->page()->pages()->all()->each(function ($child) use ($tree, $parent) {
+                    $this->page()?->pages()->all()->each(function ($child) use ($tree, $parent) {
                         $tree->move($child->id(), optional($parent)->id());
                     });
                     $tree->remove($this);
@@ -179,19 +226,21 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         Facades\Entry::delete($this);
 
-        EntryDeleted::dispatch($this);
+        if ($withEvents) {
+            EntryDeleted::dispatch($this);
+        }
 
         return true;
     }
 
-    public function deleteDescendants()
+    public function deleteDescendants($withEvents = true)
     {
-        $this->descendants()->each(function ($entry) {
-            $entry->deleteDescendants();
-            $entry->delete();
+        $this->descendants()->each(function ($entry) use ($withEvents) {
+            $entry->deleteDescendants($withEvents);
+            $withEvents ? $entry->delete() : $entry->deleteQuietly();
         });
 
-        $this->localizations = null;
+        Blink::forget('entry-descendants-'.$this->id());
 
         return true;
     }
@@ -302,13 +351,22 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && EntryCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (EntrySaving::dispatch($this) === false) {
                 return false;
             }
         }
 
         if ($this->collection()->autoGeneratesTitles()) {
-            $this->set('title', $this->autoGeneratedTitle());
+            $autoGeneratedTitle = $this->autoGeneratedTitle();
+            $originAutoGeneratedTitle = $this->origin()?->autoGeneratedTitle();
+
+            if ($autoGeneratedTitle !== $originAutoGeneratedTitle) {
+                $this->set('title', $autoGeneratedTitle);
+            }
         }
 
         $this->slug($this->slug());
@@ -318,11 +376,21 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         if ($this->id()) {
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
+            Blink::forget($this->getOriginBlinkKey());
+            Blink::store('collection-mounts')->flush();
         }
+
+        $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
+
+        $stack = InitiatorStack::entry($this)->push();
+
+        $this->directDescendants()->each->{$withEvents ? 'save' : 'saveQuietly'}();
 
         $this->taxonomize();
 
-        optional(Collection::findByMount($this))->updateEntryUris();
+        if ($this->isDirty('slug')) {
+            optional(Collection::findByMount($this))->updateEntryUris();
+        }
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -343,6 +411,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     $this->makeLocalization($siteHandle)->save();
                 });
         }
+
+        $stack->pop();
+
+        $this->syncOriginal();
 
         return true;
     }
@@ -465,7 +537,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     return null;
                 }
 
-                if ($date instanceof \Carbon\Carbon) {
+                if ($date instanceof \Carbon\CarbonInterface) {
                     return $date;
                 }
 
@@ -637,16 +709,33 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->descendants()->get($locale);
     }
 
-    public function descendants()
+    public function ancestors()
     {
-        if (! $this->localizations) {
-            $this->localizations = Facades\Entry::query()
+        $ancestors = collect();
+
+        $origin = $this->origin();
+
+        while ($origin) {
+            $ancestors->push($origin);
+            $origin = $origin->origin();
+        }
+
+        return $ancestors;
+    }
+
+    public function directDescendants()
+    {
+        return Blink::once('entry-descendants-'.$this->id(), function () {
+            return Facades\Entry::query()
                 ->where('collection', $this->collectionHandle())
                 ->where('origin', $this->id())->get()
                 ->keyBy->locale();
-        }
+        });
+    }
 
-        $localizations = collect($this->localizations);
+    public function descendants()
+    {
+        $localizations = $this->directDescendants();
 
         foreach ($localizations as $loc) {
             $localizations = $localizations->merge($loc->descendants());
@@ -660,11 +749,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->in($locale) !== null;
     }
 
+    /** @deprecated */
     public function addLocalization($entry)
     {
         $entry->origin($this);
-
-        $this->localizations[$entry->locale()] = $entry;
 
         return $this;
     }
@@ -678,11 +766,41 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->published($this->published)
             ->slug($this->slug());
 
+        if ($callback = $this->addToStructure($site, $this->parent())) {
+            $localization->afterSave($callback);
+        }
+
         if ($this->collection()->dated()) {
             $localization->date($this->date());
         }
 
         return $localization;
+    }
+
+    private function addToStructure($site, $parent = null): ?Closure
+    {
+        // If it's orderable (linear - a max depth of 1) then don't add it.
+        if ($this->collection()->orderable()) {
+            return null;
+        }
+
+        // Collection not structured? Don't add it.
+        if (! $structure = $this->collection()->structure()) {
+            return null;
+        }
+
+        $tree = $structure->in($site);
+        $parent = optional($parent)->in($site);
+
+        return function ($entry) use ($parent, $tree) {
+            if (! $parent || $parent->isRoot()) {
+                $tree->append($entry);
+            } else {
+                $tree->appendTo($parent->id(), $entry);
+            }
+
+            $tree->save();
+        };
     }
 
     public function supplementTaxonomies()
@@ -841,7 +959,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        $title = (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+        $title = $this->withLocale($this->site()->locale(), fn () => (string) Antlers::parse($format, $this->augmented()->except('slug')->all()));
 
         return trim($title);
     }
@@ -865,7 +983,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             }, $format);
         }
 
-        return (string) Antlers::parse($format, $this->augmented()->all());
+        return (string) Antlers::parse($format, array_merge($this->routeData(), [
+            'site' => $this->site(),
+            'uri' => $this->uri(),
+            'url' => $this->url(),
+            'permalink' => $this->absoluteUrl(),
+            'locale' => $this->locale(),
+        ]));
     }
 
     public function repository()
@@ -906,5 +1030,15 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected function getComputedCallbacks()
     {
         return Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function __sleep()
+    {
+        if ($this->slug instanceof Closure) {
+            $slug = $this->slug;
+            $this->slug = $slug($this);
+        }
+
+        return array_keys(get_object_vars($this));
     }
 }

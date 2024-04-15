@@ -11,6 +11,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Validation\AllowedFile;
 
 class AssetsController extends CpController
 {
@@ -68,11 +69,7 @@ class AssetsController extends CpController
         $request->validate([
             'container' => 'required',
             'folder' => 'required',
-            'file' => ['file', function ($attribute, $value, $fail) {
-                if (in_array(trim(strtolower($value->getClientOriginalExtension())), ['php', 'php3', 'php4', 'php5', 'phtml'])) {
-                    $fail(__('validation.uploaded'));
-                }
-            }],
+            'file' => ['file', new AllowedFile],
         ]);
 
         $container = AssetContainer::find($request->container);

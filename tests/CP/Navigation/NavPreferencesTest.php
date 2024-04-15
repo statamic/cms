@@ -2,14 +2,15 @@
 
 namespace Tests\CP\Navigation;
 
+use Illuminate\Support\Facades\Request;
 use Statamic\Facades;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class NavPreferencesTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk,
-        Concerns\HashedIdAssertions;
+    use Concerns\HashedIdAssertions;
+    use PreventSavingStacheItemsToDisk;
 
     protected $shouldPreventNavBeingBuilt = false;
 
@@ -502,8 +503,8 @@ class NavPreferencesTest extends TestCase
             ],
         ]);
         $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Pages'], $nav->get('Content')->map->display()->all());
-        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
-        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
     }
 
     /** @test */
@@ -595,8 +596,8 @@ class NavPreferencesTest extends TestCase
             ],
         ]);
         $this->assertEquals(['Dashboard', 'Pages'], $nav->get('Top Level')->map->display()->all());
-        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
-        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
 
         // Aliasing in same section should just copy the item...
         $nav = $this->buildNavWithPreferences([
@@ -1635,6 +1636,55 @@ class NavPreferencesTest extends TestCase
 
         $this->assertEquals('@hide', $contentItems->keyBy->display()->get('Navigation')->manipulations()['action']);
         $this->assertEquals('@modify', $contentItems->keyBy->display()->get('Globetrotters')->manipulations()['action']);
+    }
+
+    /** @test */
+    public function it_checks_active_status_on_moved_items()
+    {
+        Facades\Taxonomy::make('topics')->save();
+        Facades\Taxonomy::make('tags')->save();
+
+        $items = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections::articles' => [
+                    'action' => '@move',
+                    'children' => [
+                        'content::taxonomies::topics' => '@move',
+                    ],
+                ],
+            ],
+        ], true);
+
+        $articles = $items->get('Top Level')->keyBy->display()->get('Articles');
+        $topics = $articles->children()->first();
+        $taxonomies = $items->get('Content')->keyBy->display()->get('Taxonomies');
+        $tags = $items->get('Content')->keyBy->display()->get('Taxonomies')->children()->first();
+
+        $this->assertFalse($articles->isActive());
+        $this->assertFalse($topics->isActive());
+        $this->assertFalse($taxonomies->isActive());
+        $this->assertFalse($tags->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/collections/articles'));
+
+        $this->assertTrue($articles->isActive());
+        $this->assertFalse($topics->isActive());
+        $this->assertFalse($taxonomies->isActive());
+        $this->assertFalse($tags->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/taxonomies/topics'));
+
+        $this->assertTrue($articles->isActive());
+        $this->assertTrue($topics->isActive());
+        $this->assertFalse($taxonomies->isActive());
+        $this->assertFalse($tags->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/taxonomies/tags'));
+
+        $this->assertFalse($articles->isActive());
+        $this->assertFalse($topics->isActive());
+        $this->assertTrue($taxonomies->isActive());
+        $this->assertTrue($tags->isActive());
     }
 
     private function buildNavWithPreferences($preferences, $withHidden = false)

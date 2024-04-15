@@ -12,7 +12,7 @@ class FormBlueprintController extends CpController
 
     public function __construct()
     {
-        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
+        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure form fields');
     }
 
     public function edit($form)

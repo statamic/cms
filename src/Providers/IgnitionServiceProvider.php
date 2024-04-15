@@ -19,7 +19,7 @@ class IgnitionServiceProvider extends ServiceProvider
     {
         try {
             $this->app->make(SolutionProviderRepository::class)
-                      ->registerSolutionProviders($this->providers);
+                ->registerSolutionProviders($this->providers);
         } catch (BindingResolutionException $e) {
             //
         }

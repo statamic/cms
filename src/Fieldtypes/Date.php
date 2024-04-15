@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
+use Statamic\Exceptions\ValidationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Fields\DateField;
@@ -71,13 +72,13 @@ class Date extends Fieldtype
             [
                 'display' => __('Timepicker'),
                 'fields' => [
-                    'time_enabled'  => [
+                    'time_enabled' => [
                         'display' => __('Time Enabled'),
                         'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
                         'type' => 'toggle',
                         'default' => false,
                     ],
-                    'time_seconds_enabled'  => [
+                    'time_seconds_enabled' => [
                         'display' => __('Show Seconds'),
                         'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
                         'type' => 'toggle',
@@ -181,7 +182,7 @@ class Date extends Fieldtype
         ];
     }
 
-    private function splitDateTimeForPreProcessRange(array $range = null)
+    private function splitDateTimeForPreProcessRange(?array $range = null)
     {
         return ['date' => $range, 'time' => null];
     }
@@ -202,7 +203,7 @@ class Date extends Fieldtype
 
     private function processSingle($data)
     {
-        return $this->processDateTime($data['date'].' '.$data['time']);
+        return $this->processDateTime($data['date'].' '.($data['time'] ?? '00:00'));
     }
 
     private function processRange($data)
@@ -211,13 +212,20 @@ class Date extends Fieldtype
 
         return [
             'start' => $this->processDateTime($date['start']),
-            'end' => $this->processDateTime($date['end']),
+            'end' => $this->processDateTimeEndOfDay($date['end']),
         ];
     }
 
     private function processDateTime($value)
     {
         $date = Carbon::parse($value);
+
+        return $this->formatAndCast($date, $this->saveFormat());
+    }
+
+    private function processDateTimeEndOfDay($value)
+    {
+        $date = Carbon::parse($value)->endOfDay();
 
         return $this->formatAndCast($date, $this->saveFormat());
     }
@@ -346,11 +354,6 @@ class Date extends Fieldtype
         }
     }
 
-    public function rules(): array
-    {
-        return [new ValidationRule($this)];
-    }
-
     public function timeEnabled()
     {
         return $this->config('time_enabled');
@@ -359,5 +362,60 @@ class Date extends Fieldtype
     public function secondsEnabled()
     {
         return $this->config('time_seconds_enabled');
+    }
+
+    public function preProcessValidatable($value)
+    {
+        if ($error = (new ValidationRule($this))($value)) {
+            throw ValidationException::withMessages([
+                $this->field->handle() => $error,
+            ]);
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        if ($this->config('mode', 'single') === 'single') {
+            return $this->preProcessSingleValidatable($value);
+        }
+
+        if (isset($value['start'])) {
+            // It was already processed.
+            return $value;
+        }
+
+        return $this->preProcessRangeValidatable($value['date']);
+    }
+
+    private function preProcessSingleValidatable($value)
+    {
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
+        if (! $value['date']) {
+            return null;
+        }
+
+        $time = $value['time'] ?? '00:00';
+
+        if (substr_count($time, ':') === 1) {
+            $time .= ':00';
+        }
+
+        return Carbon::createFromFormat(self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT, $value['date'].' '.$time);
+    }
+
+    private function preProcessRangeValidatable($value)
+    {
+        if (! isset($value['start'])) {
+            return null;
+        }
+
+        return [
+            'start' => Carbon::createFromFormat(self::DEFAULT_DATE_FORMAT, $value['start'])->startOfDay(),
+            'end' => Carbon::createFromFormat(self::DEFAULT_DATE_FORMAT, $value['end'])->startOfDay(),
+        ];
     }
 }

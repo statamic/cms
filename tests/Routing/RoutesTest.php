@@ -5,6 +5,9 @@ namespace Tests\Routing;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Config;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -27,6 +30,10 @@ class RoutesTest extends TestCase
 
         $app->booted(function () {
             Route::statamic('/basic-route-with-data', 'test', ['hello' => 'world']);
+
+            Route::statamic('/basic-route-with-data-from-closure', 'test', function () {
+                return ['hello' => 'world'];
+            });
 
             Route::statamic('/basic-route-without-data', 'test');
 
@@ -67,6 +74,26 @@ class RoutesTest extends TestCase
             Route::statamic('/xml-with-custom-type', 'feed', [
                 'content_type' => 'json',
             ]);
+
+            Route::middleware(\Illuminate\Routing\Middleware\SubstituteBindings::class)->group(function () {
+
+                Route::get('/bindings/entry/{entry}', function ($entry) {
+                    return ['title' => $entry->get('title')];
+                });
+
+                Route::get('/bindings/entry/slug/{entry:slug}', function ($entry) {
+                    return ['title' => $entry->get('title')];
+                });
+
+                Route::get('/bindings/term/{term}', function ($term) {
+                    return ['title' => $term->get('title')];
+                });
+
+                Route::get('/bindings/term/title/{term:slug}', function ($term) {
+                    return ['title' => $term->get('title')];
+                });
+
+            });
         });
     }
 
@@ -77,6 +104,17 @@ class RoutesTest extends TestCase
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
         $this->get('/basic-route-with-data')
+            ->assertOk()
+            ->assertSee('Hello world');
+    }
+
+    /** @test */
+    public function it_renders_a_view_with_data_from_a_closure()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/basic-route-with-data-from-closure')
             ->assertOk()
             ->assertSee('Hello world');
     }
@@ -132,7 +170,7 @@ class RoutesTest extends TestCase
             ->assertDontSee('The layout');
     }
 
-    public function undefinedLayoutRouteProvider()
+    public static function undefinedLayoutRouteProvider()
     {
         return [
             'null' => ['route-with-null-layout'],
@@ -248,5 +286,45 @@ class RoutesTest extends TestCase
         $this
             ->get('/xml-with-custom-type')
             ->assertHeader('Content-Type', 'application/json');
+    }
+
+    /** @test */
+    public function it_loads_entry_by_binding()
+    {
+        Config::set('statamic.routes.bindings', true);
+
+        $collection = Collection::make('pages')->save();
+        EntryFactory::id('pages-blog')->collection($collection)->slug('blog')->data(['title' => 'Blog'])->create();
+
+        $this->get('/bindings/entry/pages-blog')
+            ->assertOk()
+            ->assertJson(['title' => 'Blog']);
+
+        $this->get('/bindings/entry/slug/blog')
+            ->assertOk()
+            ->assertJson(['title' => 'Blog']);
+
+        $this->get('/bindings/entry/slug/blog2')
+            ->assertNotFound();
+    }
+
+    /** @test */
+    public function it_loads_term_by_binding()
+    {
+        Config::set('statamic.routes.bindings', true);
+
+        $taxonomy = Taxonomy::make('pages')->save();
+        Term::make()->taxonomy('pages')->slug('blog')->data(['title' => 'Blog'])->save();
+
+        $this->get('/bindings/term/pages::blog')
+            ->assertOk()
+            ->assertJson(['title' => 'Blog']);
+
+        $this->get('/bindings/term/title/Blog')
+            ->assertOk()
+            ->assertJson(['title' => 'Blog']);
+
+        $this->get('/bindings/term/title/Blog2')
+            ->assertNotFound();
     }
 }

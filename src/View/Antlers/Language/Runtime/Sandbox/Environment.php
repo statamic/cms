@@ -91,6 +91,7 @@ class Environment
     protected $interpolationKeys = [];
     protected $assignments = [];
     protected $dataManagerInterpolations = [];
+    private $protectedScopes = ['view'];
 
     /**
      * @var LanguageOperatorManager|null
@@ -277,7 +278,6 @@ class Environment
 
     /**
      * @param  SemanticGroup[]  $statements
-     * @return null
      *
      * @throws RuntimeException
      * @throws SyntaxErrorException
@@ -382,7 +382,8 @@ class Environment
         }
 
         if (is_numeric($result)) {
-            $value = $result >= 1;
+            // Updated to be != 0 to be consistent with PHP behavior.
+            $value = $result != 0;
             $this->unlock();
 
             return $value;
@@ -517,6 +518,7 @@ class Environment
                 }
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof StringConcatenationOperator) {
                 $left = array_pop($stack);
@@ -540,6 +542,7 @@ class Environment
                 }
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof FactorialOperator) {
                 $left = array_pop($stack);
@@ -567,6 +570,7 @@ class Environment
 
                 $stack[] = ($leftValue / $rightValue);
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof ExponentiationOperator) {
                 $left = array_pop($stack);
@@ -580,6 +584,7 @@ class Environment
 
                 $stack[] = pow($leftValue, $rightValue);
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof ModulusOperator) {
                 $left = array_pop($stack);
@@ -594,6 +599,7 @@ class Environment
                 $stack[] = ($leftValue % $rightValue);
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof MultiplicationOperator) {
                 $left = array_pop($stack);
@@ -607,6 +613,7 @@ class Environment
 
                 $stack[] = ($leftValue * $rightValue);
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof SubtractionOperator) {
                 $left = array_pop($stack);
@@ -620,6 +627,7 @@ class Environment
 
                 $stack[] = ($leftValue - $rightValue);
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof EqualCompOperator) {
                 $left = array_pop($stack);
@@ -647,6 +655,7 @@ class Environment
                 $stack[] = $left == $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof GreaterThanCompOperator) {
                 $left = array_pop($stack);
@@ -661,6 +670,7 @@ class Environment
                 $stack[] = $left > $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof GreaterThanEqualCompOperator) {
                 $left = array_pop($stack);
@@ -675,6 +685,7 @@ class Environment
                 $stack[] = $left >= $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LessThanCompOperator) {
                 $left = array_pop($stack);
@@ -689,6 +700,7 @@ class Environment
                 $stack[] = $left < $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LessThanEqualCompOperator) {
                 $left = array_pop($stack);
@@ -703,6 +715,7 @@ class Environment
                 $stack[] = $left <= $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof NotEqualCompOperator) {
                 $left = array_pop($stack);
@@ -717,6 +730,7 @@ class Environment
                 $stack[] = $left != $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof NotStrictEqualCompOperator) {
                 $left = array_pop($stack);
@@ -731,6 +745,7 @@ class Environment
                 $stack[] = $left !== $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof SpaceshipCompOperator) {
                 $left = array_pop($stack);
@@ -745,6 +760,7 @@ class Environment
                 $stack[] = $left <=> $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof StrictEqualCompOperator) {
                 $left = array_pop($stack);
@@ -759,6 +775,7 @@ class Environment
                 $stack[] = $left === $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LogicalOrOperator) {
                 $left = $this->getValue(array_pop($stack));
@@ -778,6 +795,7 @@ class Environment
                 }
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LogicalAndOperator) {
                 $left = $this->getValue(array_pop($stack));
@@ -785,6 +803,7 @@ class Environment
 
                 $stack[] = ($this->getComparisonValue($left) && $this->getComparisonValue($right));
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LogicalXorOperator) {
                 $left = $this->getValue(array_pop($stack));
@@ -793,12 +812,15 @@ class Environment
                 $stack[] = ($this->getComparisonValue($left) xor $this->getComparisonValue($right));
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LogicGroup) {
                 $stack[] = $currentNode;
+
                 continue;
             } elseif ($currentNode instanceof NullCoalescenceGroup) {
                 $stack[] = $this->adjustValue($this->evaluateNullCoalescence($currentNode), $currentNode);
+
                 continue;
             } elseif ($currentNode instanceof TernaryCondition) {
                 $stack[] = $this->adjustValue($this->evaluateTernaryGroup($currentNode), $currentNode);
@@ -811,6 +833,7 @@ class Environment
 
                 // Need to skip over the value node.
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LanguageOperatorConstruct) {
                 if (! array_key_exists($currentNode->content, LanguageOperatorRegistry::$operators)) {
@@ -863,18 +886,21 @@ class Environment
                 }
 
                 $i += 3;
+
                 continue;
             } elseif ($currentNode instanceof MethodInvocationNode) {
                 $leftNode = array_pop($stack);
 
                 if ($leftNode == null) {
                     $stack[] = null;
+
                     continue;
                 }
                 $leftVal = $this->getValue($leftNode);
 
                 if ($leftVal == null) {
                     $stack[] = null;
+
                     continue;
                 }
 
@@ -903,6 +929,7 @@ class Environment
                         $exception->getMessage()
                     );
                 }
+
                 continue;
             }
 
@@ -938,10 +965,12 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $right;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $right;
 
-                if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
-                    GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                    if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
+                        GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                    }
                 }
 
                 return null;
@@ -983,7 +1012,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $newVal;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $newVal;
+                }
 
                 return null;
             } elseif ($operand instanceof DivisionAssignmentOperator) {
@@ -1010,7 +1041,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof ModulusAssignmentOperator) {
@@ -1036,7 +1069,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof MultiplicationAssignmentOperator) {
@@ -1062,7 +1097,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof SubtractionAssignmentOperator) {
@@ -1088,7 +1125,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof ConditionalVariableFallbackOperator) {
@@ -1118,7 +1157,6 @@ class Environment
     /**
      * Evaluates the provided null coalescence group.
      *
-     * @param  NullCoalescenceGroup  $group  The group.
      * @return mixed|DirectionGroup|ListValueNode|string
      *
      * @throws RuntimeException
@@ -1315,7 +1353,7 @@ class Environment
             }
         }
 
-        if (! empty($this->interpolationReplacements)) {
+        if (! empty($this->interpolationReplacements) && is_string($value)) {
             if (Str::contains($value, $this->interpolationKeys)) {
                 $value = strtr($value, $this->interpolationReplacements);
             }
@@ -1529,7 +1567,11 @@ class Environment
             $varName = $this->nameOf($val);
 
             if ($val->isInterpolationReference) {
-                $interpolationValue = $this->adjustValue($this->nodeProcessor->reduceInterpolatedVariable($val), $val);
+                if (array_key_exists($varName->normalizedReference, $this->data)) {
+                    $interpolationValue = $this->adjustValue($this->data[$varName->normalizedReference], $val);
+                } else {
+                    $interpolationValue = $this->adjustValue($this->nodeProcessor->reduceInterpolatedVariable($val), $val);
+                }
 
                 // If the currently active node is an instance of ArithmeticNodeContract,
                 // we will ask the runtime type coercion to convert whatever value

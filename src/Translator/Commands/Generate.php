@@ -241,7 +241,7 @@ class Generate extends Command
         $this->getApplication()->find('translate')->run(new ArrayInput([
             'command' => 'translate',
             'lang' => $this->input->getArgument('lang'),
-            '--key'  => $this->input->getOption('key'),
+            '--key' => $this->input->getOption('key'),
         ]), $this->output);
     }
 }

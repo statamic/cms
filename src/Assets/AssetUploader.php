@@ -3,7 +3,9 @@
 namespace Statamic\Assets;
 
 use Illuminate\Support\Carbon;
+use Statamic\Facades\Image;
 use Statamic\Facades\Path;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -24,7 +26,12 @@ class AssetUploader extends Uploader
 
     protected function uploadPath(UploadedFile $file)
     {
-        $ext = $file->getClientOriginalExtension();
+        $ext = $this->getNewExtension() ?? $file->getClientOriginalExtension();
+
+        if (config('statamic.assets.lowercase')) {
+            $ext = strtolower($ext);
+        }
+
         $filename = self::getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
 
         $directory = $this->asset->folder();
@@ -49,6 +56,23 @@ class AssetUploader extends Uploader
     protected function disk()
     {
         return $this->asset->container()->disk();
+    }
+
+    protected function getNewExtension()
+    {
+        if (! $preset = $this->asset->container()->sourcePreset()) {
+            return null;
+        }
+
+        if (! $this->asset->isImage()) {
+            return null;
+        }
+
+        if (! $ext = Arr::get(Image::userManipulationPresets(), "$preset.fm")) {
+            return null;
+        }
+
+        return $ext;
     }
 
     public static function getSafeFilename($string)

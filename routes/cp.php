@@ -6,7 +6,7 @@ use Statamic\Http\Controllers\CP\AddonEditionsController;
 use Statamic\Http\Controllers\CP\AddonsController;
 use Statamic\Http\Controllers\CP\API\AddonsController as AddonsApiController;
 use Statamic\Http\Controllers\CP\API\TemplatesController;
-use Statamic\Http\Controllers\CP\Assets\ActionController;
+use Statamic\Http\Controllers\CP\Assets\ActionController as AssetActionController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainerBlueprintController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainersController;
 use Statamic\Http\Controllers\CP\Assets\AssetsController;
@@ -20,6 +20,7 @@ use Statamic\Http\Controllers\CP\Assets\ThumbnailController;
 use Statamic\Http\Controllers\CP\Auth\CsrfTokenController;
 use Statamic\Http\Controllers\CP\Auth\ExtendSessionController;
 use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
+use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
@@ -47,6 +48,7 @@ use Statamic\Http\Controllers\CP\Fields\MetaController;
 use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
+use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
 use Statamic\Http\Controllers\CP\Forms\FormBlueprintController;
 use Statamic\Http\Controllers\CP\Forms\FormExportController;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
@@ -88,6 +90,7 @@ use Statamic\Http\Controllers\CP\Users\PasswordController;
 use Statamic\Http\Controllers\CP\Users\RolesController;
 use Statamic\Http\Controllers\CP\Users\UserActionController;
 use Statamic\Http\Controllers\CP\Users\UserBlueprintController;
+use Statamic\Http\Controllers\CP\Users\UserGroupBlueprintController;
 use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
@@ -109,6 +112,8 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('extend', ExtendSessionController::class)->name('extend');
 
     Route::get('unauthorized', UnauthorizedController::class)->name('unauthorized');
+
+    Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
 });
 
 Route::middleware('statamic.cp.authenticated')->group(function () {
@@ -212,15 +217,15 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::patch('asset-containers/{asset_container}/folders/{path}', [FoldersController::class, 'update'])->where('path', '.*');
     Route::get('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'edit'])->name('asset-containers.blueprint.edit');
     Route::patch('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'update'])->name('asset-containers.blueprint.update');
-    Route::post('assets/actions', [ActionController::class, 'run'])->name('assets.actions.run');
-    Route::post('assets/actions/list', [ActionController::class, 'bulkActions'])->name('assets.actions.bulk');
+    Route::post('assets/actions', [AssetActionController::class, 'run'])->name('assets.actions.run');
+    Route::post('assets/actions/list', [AssetActionController::class, 'bulkActions'])->name('assets.actions.bulk');
     Route::get('assets/browse', [BrowserController::class, 'index'])->name('assets.browse.index');
     Route::get('assets/browse/search/{asset_container}/{path?}', [BrowserController::class, 'search'])->where('path', '.*');
     Route::post('assets/browse/folders/{asset_container}/actions', [FolderActionController::class, 'run'])->name('assets.folders.actions.run');
     Route::get('assets/browse/folders/{asset_container}/{path?}', [BrowserController::class, 'folder'])->where('path', '.*');
     Route::get('assets/browse/{asset_container}/{path?}/edit', [BrowserController::class, 'edit'])->where('path', '.*')->name('assets.browse.edit');
     Route::get('assets/browse/{asset_container}/{path?}', [BrowserController::class, 'show'])->where('path', '.*')->name('assets.browse.show');
-    Route::get('assets-fieldtype', [FieldtypeController::class, 'index']);
+    Route::post('assets-fieldtype', [FieldtypeController::class, 'index']);
     Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset']);
     Route::get('assets/{encoded_asset}/download', [AssetsController::class, 'download'])->name('assets.download');
     Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');
@@ -232,15 +237,17 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('edit', [FieldsController::class, 'edit'])->name('fields.edit');
         Route::post('update', [FieldsController::class, 'update'])->name('fields.update');
         Route::get('field-meta', [MetaController::class, 'show']);
-        Route::resource('fieldsets', FieldsetController::class);
+        Route::resource('fieldsets', FieldsetController::class)->except(['show']);
         Route::get('blueprints', [BlueprintController::class, 'index'])->name('blueprints.index');
+        Route::get('blueprints/{namespace}/{handle}', [BlueprintController::class, 'edit'])->name('blueprints.edit');
+        Route::patch('blueprints/{namespace}/{handle}', [BlueprintController::class, 'update'])->name('blueprints.update');
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
     });
 
     Route::get('updater', [UpdaterController::class, 'index'])->name('updater');
     Route::get('updater/count', [UpdaterController::class, 'count']);
-    Route::get('updater/{product}', [UpdateProductController::class, 'show'])->name('updater.product');
-    Route::get('updater/{product}/changelog', [UpdateProductController::class, 'changelog']);
+    Route::get('updater/{marketplaceProductSlug}', [UpdateProductController::class, 'show'])->name('updater.product');
+    Route::get('updater/{marketplaceProductSlug}/changelog', [UpdateProductController::class, 'changelog']);
 
     Route::group(['prefix' => 'duplicates'], function () {
         Route::get('/', [DuplicatesController::class, 'index'])->name('duplicates');
@@ -250,8 +257,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('addons', [AddonsController::class, 'index'])->name('addons.index');
     Route::post('addons/editions', AddonEditionsController::class);
 
-    Route::post('forms/actions', [ActionController::class, 'run'])->name('forms.actions.run');
-    Route::post('forms/actions/list', [ActionController::class, 'bulkActions'])->name('forms.actions.bulk');
+    Route::post('forms/actions', [FormActionController::class, 'run'])->name('forms.actions.run');
+    Route::post('forms/actions/list', [FormActionController::class, 'bulkActions'])->name('forms.actions.bulk');
     Route::post('forms/{form}/submissions/actions', [SubmissionActionController::class, 'run'])->name('forms.submissions.actions.run');
     Route::post('forms/{form}/submissions/actions/list', [SubmissionActionController::class, 'bulkActions'])->name('forms.submissions.actions.bulk');
     Route::resource('forms', FormsController::class);
@@ -267,6 +274,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::resource('users', UsersController::class);
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
     Route::get('account', AccountController::class)->name('account');
+    Route::get('user-groups/blueprint', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.blueprint.edit');
+    Route::patch('user-groups/blueprint', [UserGroupBlueprintController::class, 'update'])->name('user-groups.blueprint.update');
     Route::resource('user-groups', UserGroupsController::class);
     Route::resource('roles', RolesController::class);
 
@@ -291,8 +300,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
-        Route::resource('addons', AddonsApiController::class);
-        Route::resource('templates', TemplatesController::class);
+        Route::resource('addons', AddonsApiController::class)->only('index');
+        Route::resource('templates', TemplatesController::class)->only('index');
     });
 
     Route::group(['prefix' => 'preferences', 'as' => 'preferences.'], function () {

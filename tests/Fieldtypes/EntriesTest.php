@@ -13,12 +13,14 @@ use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Entries;
+use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxItems;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EntriesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use TestsQueryableValueWithMaxItems;
 
     public function setUp(): void
     {
@@ -59,7 +61,7 @@ class EntriesTest extends TestCase
         $this->assertEquals($expectedIds, $results->map->id()->all());
     }
 
-    public function augmentQueryBuilderProvider()
+    public static function augmentQueryBuilderProvider()
     {
         return [
             'published (default, no where clause)' => [['456', '123'], fn ($q) => null],
@@ -159,7 +161,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -178,7 +181,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -298,7 +302,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -332,7 +337,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 

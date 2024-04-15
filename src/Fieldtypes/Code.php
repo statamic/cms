@@ -103,6 +103,15 @@ class Code extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
+                    'rulers' => [
+                        'display' => __('Rulers'),
+                        'instructions' => __('statamic::fieldtypes.code.config.rulers'),
+                        'type' => 'array',
+                        'key_header' => __('Columns'),
+                        'value_header' => __('Line Style (dashed or solid)'),
+                        'add_button' => __('Add Ruler'),
+                        'validate' => 'code_fieldtype_rulers',
+                    ],
                 ],
             ],
             [

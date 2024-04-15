@@ -1,7 +1,7 @@
 <template>
 <div>
-    <div class="flex justify-end absolute top-3 right-3 @md:right-6" v-if="! grid.fullScreenMode">
-        <button @click="grid.toggleFullScreen" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
+    <div class="flex justify-end absolute top-3 rtl:left-3 ltr:right-3 @md:rtl:left-6 @md:ltr:right-6" v-if="! grid.fullScreenMode">
+        <button v-if="allowFullscreen" @click="grid.toggleFullScreen" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
             <svg-icon name="expand-bold" class="h-3.5 px-0.5 text-gray-750" v-show="! grid.fullScreenMode" />
             <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750" v-show="grid.fullScreenMode" />
         </button>
@@ -18,7 +18,15 @@
         @dragend="$emit('blur')"
         @input="(rows) => $emit('sorted', rows)"
     >
-        <div class="grid-stacked" slot-scope="{}">
+        <div
+            class="grid-stacked"
+            :class="{
+                'mt-0': !allowFullscreen && hideDisplay,
+                'mt-4': !hideDisplay,
+                'mt-10': allowFullscreen,
+            }"
+            slot-scope="{}"
+        >
             <stacked-row
                 v-for="(row, index) in rows"
                 :key="`row-${row._id}`"
@@ -54,7 +62,7 @@ export default {
     components: {
         StackedRow,
         SortableList
-    }
+    },
 
 }
 </script>

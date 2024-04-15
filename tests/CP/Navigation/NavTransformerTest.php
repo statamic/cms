@@ -889,7 +889,8 @@ class NavTransformerTest extends TestCase
     {
         $transformed = $this->transform([
             [
-                'display_original' => 'Custom Section',
+                'display' => 'Custom Section',
+                'action' => '@create',
                 'items' => [
                     [
                         'id' => 'content::collections::pages',
@@ -903,7 +904,42 @@ class NavTransformerTest extends TestCase
 
         $expected = [
             'custom_section' => [
-                'content::collections::pages' => '@alias',
+                'display' => 'Custom Section',
+                'action' => '@create',
+                'items' => [
+                    'content::collections::pages' => '@alias',
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $transformed);
+    }
+
+    /** @test */
+    public function it_can_create_a_new_section_with_special_characters_in_display()
+    {
+        $transformed = $this->transform([
+            [
+                'display' => 'Foo & Bar Section (One + Two)',
+                'action' => '@create',
+                'items' => [
+                    [
+                        'id' => 'content::collections::pages',
+                        'manipulations' => [
+                            'action' => '@alias',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $expected = [
+            'foo_bar_section_one_two' => [
+                'display' => 'Foo & Bar Section (One + Two)',
+                'action' => '@create',
+                'items' => [
+                    'content::collections::pages' => '@alias',
+                ],
             ],
         ];
 
@@ -1033,7 +1069,8 @@ class NavTransformerTest extends TestCase
             ['display_original' => 'Content'],
             ['display_original' => 'Users'],
             [
-                'display_original' => 'Custom Section',
+                'display' => 'Custom Section',
+                'action' => '@create',
                 'items' => [
                     [
                         'id' => 'content::collections::pages',
@@ -1056,7 +1093,11 @@ class NavTransformerTest extends TestCase
                 'content' => '@inherit',
                 'users' => '@inherit',
                 'custom_section' => [
-                    'content::collections::pages' => '@alias',
+                    'display' => 'Custom Section',
+                    'action' => '@create',
+                    'items' => [
+                        'content::collections::pages' => '@alias',
+                    ],
                 ],
             ],
         ];
@@ -1247,6 +1288,7 @@ class NavTransformerTest extends TestCase
                     ],
                 ],
                 'custom_section' => [
+                    'display' => 'Custom Section',
                     'action' => '@create',
                     'items' => [
                         'custom_section::new_item' => [

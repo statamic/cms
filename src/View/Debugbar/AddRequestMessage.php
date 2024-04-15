@@ -10,7 +10,6 @@ class AddRequestMessage
     /**
      * Handle the event.
      *
-     * @param  ViewRendered  $event
      * @return void
      */
     public function handle(ViewRendered $event)

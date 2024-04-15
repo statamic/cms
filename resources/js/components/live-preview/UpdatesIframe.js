@@ -13,11 +13,18 @@ const postMessageToIframe = (container, url, payload) => {
 
     container.firstChild.contentWindow.postMessage({
         name: 'statamic.preview.updated',
+        url,
         ...payload
     }, targetOrigin);
 }
 
 export default {
+    data() {
+        return {
+            previousUrl: null,
+        }
+    },
+
     methods: {
         updateIframeContents(url, target, payload) {
             const iframe = document.createElement('iframe');
@@ -27,10 +34,13 @@ export default {
             this.setIframeAttributes(iframe);
 
             const container = this.$refs.contents;
+            let iframeUrl = new URL(url);
+            let cleanUrl = iframeUrl.host + iframeUrl.pathname;
 
             // If there's no iframe yet, just append it.
             if (! container.firstChild) {
                 container.appendChild(iframe);
+                this.previousUrl = cleanUrl;
                 return;
             }
 
@@ -45,16 +55,17 @@ export default {
                 return;
             }
 
-            let isSameOrigin = url.startsWith('/') || new URL(url).host === window.location.host;
+            let isSameOrigin = url.startsWith('/') || iframeUrl.host === window.location.host;
+            let preserveScroll = isSameOrigin && cleanUrl === this.previousUrl;
 
-            let scroll = isSameOrigin ? [
+            let scroll = preserveScroll ? [
                 container.firstChild.contentWindow.scrollX ?? 0,
                 container.firstChild.contentWindow.scrollY ?? 0
             ] : null;
 
             container.replaceChild(iframe, container.firstChild);
 
-            if (isSameOrigin) {
+            if (preserveScroll) {
                 let iframeContentWindow = iframe.contentWindow;
                 const iframeScrollUpdate = (event) => {
                     iframeContentWindow.scrollTo(...scroll);
@@ -63,6 +74,8 @@ export default {
                 iframeContentWindow.addEventListener('DOMContentLoaded', iframeScrollUpdate, true);
                 iframeContentWindow.addEventListener('load', iframeScrollUpdate, true);
             }
+
+            this.previousUrl = cleanUrl;
         },
 
         setIframeAttributes(iframe) {

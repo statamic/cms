@@ -7,13 +7,13 @@
             <breadcrumb :url="breadcrumbUrl" :title="__('Collections')" />
 
             <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+                <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list class="mr-2" v-if="!!this.$scopedSlots.twirldown">
+                <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="!!this.$scopedSlots.twirldown">
                     <slot name="twirldown" />
                 </dropdown-list>
 
-                <div class="btn-group mr-4" v-if="canUseStructureTree && !treeIsDirty">
+                <div class="btn-group rtl:ml-4 ltr:mr-4" v-if="canUseStructureTree && !treeIsDirty">
                     <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                         <svg-icon name="light/structures" class="h-4 w-4"/>
                     </button>
@@ -25,7 +25,7 @@
                 <template v-if="view === 'tree'">
 
                     <a
-                        class="text-2xs text-blue mr-4 underline"
+                        class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
                         v-if="treeIsDirty"
                         v-text="__('Discard changes')"
                         @click="cancelTreeProgress"
@@ -33,14 +33,14 @@
 
                     <site-selector
                         v-if="sites.length > 1"
-                        class="mr-4"
+                        class="rtl:ml-4 ltr:mr-4"
                         :sites="sites"
                         :value="site"
                         @input="site = $event.handle"
                     />
 
                     <button
-                        class="btn mr-4"
+                        class="btn rtl:ml-4 ltr:mr-4"
                         :class="{ 'disabled': !treeIsDirty, 'btn-danger': deletedEntries.length }"
                         :disabled="!treeIsDirty"
                         @click="saveTree"
@@ -52,23 +52,23 @@
                 <template v-if="view === 'list' && reorderable">
                     <site-selector
                         v-if="sites.length > 1 && reordering && site"
-                        class="mr-4"
+                        class="rtl:ml-4 ltr:mr-4"
                         :sites="sites"
                         :value="site"
                         @input="site = $event.handle"
                     />
 
-                    <button class="btn mr-4"
+                    <button class="btn rtl:ml-4 ltr:mr-4"
                         v-if="!reordering"
                         @click="reordering = true"
                         v-text="__('Reorder')" />
 
                     <template v-if="reordering">
-                        <button class="btn ml-2"
+                        <button class="btn rtl:mr-2 ltr:ml-2"
                             @click="reordering = false"
                             v-text="__('Cancel')" />
 
-                        <button class="btn-primary ml-2"
+                        <button class="btn-primary rtl:mr-2 ltr:ml-2"
                             @click="$refs.list.saveOrder"
                             v-text="__('Save Order')" />
                     </template>
@@ -103,8 +103,8 @@
         <page-tree
             v-if="canUseStructureTree && view === 'tree'"
             ref="tree"
-            :has-collection="true"
             :collections="[handle]"
+            :blueprints="blueprints"
             :create-url="createUrl"
             :pages-url="structurePagesUrl"
             :submit-url="structureSubmitUrl"
@@ -134,7 +134,7 @@
                         v-for="blueprint in blueprints"
                         :key="blueprint.handle"
                         @click="createEntry(blueprint.handle, branch.id)"
-                        v-text="blueprints.length > 1 ? blueprint.title : __('Create Child Entry')" />
+                        v-text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')" />
                 </template>
                 <template v-if="branch.can_delete">
                     <li class="divider"></li>
@@ -182,7 +182,7 @@ export default {
         title: { type: String, required: true },
         handle: { type: String, required: true },
         canCreate: { type: Boolean, required: true },
-        createUrl: { type: String, required: true },
+        createUrls: { type: Object, required: true },
         createLabel: { type: String, required: true },
         blueprints: { type: Array, required: true },
         breadcrumbUrl: { type: String, required: true },
@@ -243,6 +243,10 @@ export default {
             }
             countChildren(this.entryBeingDeleted);
             return children;
+        },
+
+        createUrl() {
+            return this.createUrls[this.site || this.initialSite];
         }
 
     },

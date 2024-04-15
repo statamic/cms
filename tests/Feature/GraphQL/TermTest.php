@@ -15,8 +15,8 @@ use Tests\TestCase;
 /** @group graphql */
 class TermTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['taxonomies'];
 

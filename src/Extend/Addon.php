@@ -168,7 +168,6 @@ final class Addon
     /**
      * Make an addon instance from package details.
      *
-     * @param  array  $package
      * @return self
      */
     public static function makeFromPackage(array $package)

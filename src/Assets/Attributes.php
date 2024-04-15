@@ -66,7 +66,7 @@ class Attributes
      */
     private function getImageAttributes()
     {
-        return \Facades\Statamic\Imaging\Attributes::from($this->asset->disk()->filesystem()->getDriver(), $this->asset->path());
+        return \Facades\Statamic\Imaging\Attributes::from($this->asset->disk()->filesystem(), $this->asset->path());
     }
 
     /**
@@ -76,7 +76,7 @@ class Attributes
      */
     private function getSvgAttributes()
     {
-        return \Facades\Statamic\Imaging\Attributes::from($this->asset->disk()->filesystem()->getDriver(), $this->asset->path());
+        return \Facades\Statamic\Imaging\Attributes::from($this->asset->disk()->filesystem(), $this->asset->path());
     }
 
     /**

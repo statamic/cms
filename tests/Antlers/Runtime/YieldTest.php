@@ -401,4 +401,57 @@ EOT;
 
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), $this->renderString($template, $data, true));
     }
+
+    public function test_yield_can_be_used_inside_conditions()
+    {
+        $template = <<<'EOT'
+{{ if {yield:section_name} }}
+Hello, universe!
+{{ /if }}
+EOT;
+
+        $this->assertSame('', trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+{{ section:section_name }}Some content.{{ /section:section_name }}
+
+{{ if {yield:section_name} }}
+Hello, universe!
+{{ /if }}
+EOT;
+
+        $this->assertSame('Hello, universe!', trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+{{ if {yield:section_name} }}
+Hello, universe!
+{{ /if }}
+EOT;
+
+        $this->assertSame('', trim($this->renderString($template, [], true)));
+    }
+
+    public function test_condition_blocks_do_not_leak_their_condition_state()
+    {
+        $template = <<<'EOT'
+{{ if false }}
+    {{# It doesn't matter whats inside here #}}
+{{ else }}
+    Else Statement.
+{{ /if }}
+
+{{ section:seo_body }}Content{{ section:seo_body }}
+
+{{ yield:seo_body }}
+EOT;
+
+        $expected = <<<'EXPECTED'
+Else Statement.
+
+
+Content
+EXPECTED;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
 }

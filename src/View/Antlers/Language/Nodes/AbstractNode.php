@@ -48,6 +48,8 @@ abstract class AbstractNode
      */
     public $originalAbstractNode = null;
 
+    public $isVirtual = false;
+
     public function __construct()
     {
         $this->refId = StringUtilities::uuidv4();

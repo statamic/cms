@@ -41,7 +41,7 @@ class Presenter
         while ($i <= $this->paginator->lastPage()) {
             $pages[] = [
                 'page' => $i,
-                'url'  => $this->paginator->url($i),
+                'url' => $this->paginator->url($i),
             ];
 
             $i++;
@@ -87,7 +87,7 @@ class Presenter
         foreach ($array as $key => $value) {
             $mapped[] = [
                 'page' => $key,
-                'url'  => $value,
+                'url' => $value,
             ];
         }
 

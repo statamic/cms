@@ -35,4 +35,15 @@ class UniqueUserValueTest extends TestCase
             ['email' => 'unique_user_value:123']
         )->passes());
     }
+
+    /** @test */
+    public function it_supports_overwriting_the_column()
+    {
+        User::make()->email('foo@bar.com')->save();
+
+        $this->assertTrue(Validator::make(
+            ['baz' => 'foo@bar.com'],
+            ['baz' => 'unique_user_value:null,email']
+        )->fails());
+    }
 }

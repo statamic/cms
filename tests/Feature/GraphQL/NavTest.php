@@ -14,9 +14,9 @@ use Tests\TestCase;
 /** @group graphql */
 class NavTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['navs'];
 

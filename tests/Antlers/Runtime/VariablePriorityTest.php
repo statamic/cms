@@ -190,7 +190,7 @@ EOT;
                 'if_exists' => 'partial:if_exists',
             ],
             'redirect' => 'redirect',
-            'route' =>  'route',
+            'route' => 'route',
             'search' => 'search',
             'section' => 'section',
             'session' => [

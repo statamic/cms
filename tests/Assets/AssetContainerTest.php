@@ -19,6 +19,9 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Events\AssetContainerCreated;
+use Statamic\Events\AssetContainerCreating;
+use Statamic\Events\AssetContainerDeleted;
+use Statamic\Events\AssetContainerDeleting;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
@@ -261,7 +264,7 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($expectedWarm, $container->warmPresets());
     }
 
-    public function warmPresetProvider()
+    public static function warmPresetProvider()
     {
         return [
             'no source, no presets' => [null, null, true, ['small', 'medium', 'large', 'max']],
@@ -285,6 +288,10 @@ class AssetContainerTest extends TestCase
         $return = $container->save();
 
         $this->assertEquals($container, $return);
+
+        Event::assertDispatched(AssetContainerCreating::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
 
         Event::assertDispatched(AssetContainerSaving::class, function ($event) use ($container) {
             return $event->container === $container;
@@ -330,8 +337,28 @@ class AssetContainerTest extends TestCase
 
         $this->assertEquals($container, $return);
 
+        Event::assertNotDispatched(AssetContainerCreating::class);
         Event::assertNotDispatched(AssetContainerSaving::class);
         Event::assertNotDispatched(AssetContainerSaved::class);
+        Event::assertNotDispatched(AssetContainerCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_asset_container_doesnt_save()
+    {
+        Event::fake([AssetContainerCreated::class]);
+        Facades\AssetContainer::spy();
+
+        Event::listen(AssetContainerCreating::class, function () {
+            return false;
+        });
+
+        $container = new AssetContainer;
+
+        $return = $container->save();
+
+        $this->assertFalse($return);
+
         Event::assertNotDispatched(AssetContainerCreated::class);
     }
 
@@ -824,6 +851,20 @@ class AssetContainerTest extends TestCase
     /**
      * @test
      *
+     * @see https://github.com/statamic/cms/issues/8825
+     * @see https://github.com/statamic/cms/pull/8826
+     **/
+    public function it_doesnt_get_kebab_case_folder_assets_when_querying_snake_case_folder()
+    {
+        tap($this->containerWithDisk('snake-kebab')->assets('foo_bar', true), function ($assets) {
+            $this->assertCount(1, $assets);
+            $this->assertEquals('foo_bar/alfa.txt', $assets->first()->path());
+        });
+    }
+
+    /**
+     * @test
+     *
      * @see https://github.com/statamic/cms/issues/5405
      * @see https://github.com/statamic/cms/pull/5433
      **/
@@ -954,11 +995,67 @@ class AssetContainerTest extends TestCase
             });
     }
 
-    private function containerWithDisk()
+    /** @test */
+    public function it_fires_events_when_deleting()
+    {
+        Event::fake();
+
+        Storage::fake('test');
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $container->save();
+
+        $return = $container->delete();
+
+        Event::assertDispatched(AssetContainerDeleted::class);
+        Event::assertDispatched(AssetContainerDeleting::class);
+
+        $this->assertTrue($return);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        Storage::fake('test');
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $container->save();
+
+        $return = $container->deleteQuietly();
+
+        Event::assertNotDispatched(AssetContainerDeleted::class);
+        Event::assertNotDispatched(AssetContainerDeleting::class);
+
+        $this->assertTrue($return);
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Event::fake([AssetContainerDeleted::class]);
+
+        Event::listen(AssetContainerDeleting::class, function () {
+            return false;
+        });
+
+        Storage::fake('test');
+
+        $container = Facades\AssetContainer::make('test');
+        $container->save();
+
+        $return = $container->delete();
+
+        $this->assertFalse($return);
+        Event::assertNotDispatched(AssetContainerDeleted::class);
+    }
+
+    private function containerWithDisk($fixture = 'container')
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__.'/__fixtures__/container',
+            'root' => __DIR__.'/__fixtures__/'.$fixture,
         ]]);
 
         $container = (new AssetContainer)->handle('test')->disk('test');

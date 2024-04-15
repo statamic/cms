@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Statamic\Assets\AssetContainerContents;
 use Statamic\Filesystem\FilesystemAdapter;
 
 class FilesystemServiceProvider extends ServiceProvider
@@ -11,6 +12,10 @@ class FilesystemServiceProvider extends ServiceProvider
     {
         $this->app->bind(FilesystemAdapter::class, function () {
             return new FilesystemAdapter($this->app->make('files'), base_path());
+        });
+
+        $this->app->bind(AssetContainerContents::class, function () {
+            return new AssetContainerContents();
         });
 
         $paths = [

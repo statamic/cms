@@ -12,12 +12,15 @@ use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\TaxonomyCreated;
+use Statamic\Events\TaxonomyCreating;
 use Statamic\Events\TaxonomyDeleted;
+use Statamic\Events\TaxonomyDeleting;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Search;
@@ -28,9 +31,9 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAccess, Arrayable
+class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData, ContainsSupplementalData;
+    use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
     protected $handle;
     protected $title;
@@ -41,6 +44,9 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
+    protected $template;
+    protected $termTemplate;
+    protected $layout;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -108,12 +114,21 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function termBlueprint($blueprint = null, $term = null)
     {
-        $blueprint = $this->getBaseTermBlueprint($blueprint);
+        if (! $blueprint = $this->getBaseTermBlueprint($blueprint)) {
+            return null;
+        }
 
-        $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
+        $this->ensureTermBlueprintFields($blueprint);
 
-        if ($blueprint) {
-            TermBlueprintFound::dispatch($blueprint->setParent($term ?? $this), $term);
+        $blueprint->setParent($term ?? $this);
+
+        // Only dispatch the event when there's no term.
+        // When there is a term, the event is dispatched from the term.
+        if (! $term) {
+            Blink::once(
+                'collection-termblueprintfound-'.$this->handle().'-'.$blueprint->handle(),
+                fn () => TermBlueprintFound::dispatch($blueprint)
+            );
         }
 
         return $blueprint;
@@ -133,7 +148,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     {
         $blueprint
             ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
-            ->ensureField('slug', ['type' => 'slug', 'required' => true], 'sidebar');
+            ->ensureField('slug', ['type' => 'slug', 'required' => true, 'validate' => 'max:200'], 'sidebar');
 
         return $blueprint;
     }
@@ -197,6 +212,10 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && TaxonomyCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (TaxonomySaving::dispatch($this) === false) {
                 return false;
             }
@@ -215,13 +234,29 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         return true;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && TaxonomyDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->queryTerms()->get()->each->delete();
 
         Facades\Taxonomy::delete($this);
 
-        TaxonomyDeleted::dispatch($this);
+        if ($withEvents) {
+            TaxonomyDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -239,6 +274,9 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             'title' => $this->title,
             'blueprints' => $this->blueprints,
             'preview_targets' => $this->previewTargetsForFile(),
+            'template' => $this->template,
+            'term_template' => $this->termTemplate,
+            'layout' => $this->layout,
         ];
 
         if (Site::hasMultiple()) {
@@ -344,20 +382,50 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         return $fallback;
     }
 
-    public function template()
+    public function termTemplate($termTemplate = null)
     {
-        $template = $this->handle().'.index';
+        return $this
+            ->fluentlyGetOrSet('termTemplate')
+            ->getter(function ($termTemplate) {
+                if ($termTemplate ?? false) {
+                    return $termTemplate;
+                }
 
-        if ($collection = $this->collection()) {
-            $template = $collection->handle().'.'.$template;
-        }
+                $termTemplate = $this->handle().'.show';
 
-        return $template;
+                return $termTemplate;
+            })
+            ->args(func_get_args());
     }
 
-    public function layout()
+    public function template($template = null)
     {
-        return 'layout';
+        return $this
+            ->fluentlyGetOrSet('template')
+            ->getter(function ($template) {
+                if ($template ?? false) {
+                    return $template;
+                }
+
+                $template = $this->handle().'.index';
+
+                if ($collection = $this->collection()) {
+                    $template = $collection->handle().'.'.$template;
+                }
+
+                return $template;
+            })
+            ->args(func_get_args());
+    }
+
+    public function layout($layout = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('layout')
+            ->getter(function ($layout) {
+                return $layout ?? 'layout';
+            })
+            ->args(func_get_args());
     }
 
     public function searchIndex($index = null)
@@ -461,5 +529,15 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
                 'refresh' => $target['refresh'],
             ];
         })->filter()->values()->all();
+    }
+
+    public function hasCustomTemplate()
+    {
+        return $this->template !== null;
+    }
+
+    public function hasCustomTermTemplate()
+    {
+        return $this->termTemplate !== null;
     }
 }

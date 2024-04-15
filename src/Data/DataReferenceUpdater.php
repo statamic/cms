@@ -125,7 +125,7 @@ abstract class DataReferenceUpdater
         collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
             $dottedPrefix = "{$dottedKey}.{$setKey}.";
             $setHandle = Arr::get($set, 'type');
-            $fields = Arr::get($field->config(), "sets.{$setHandle}.fields");
+            $fields = Arr::get($field->fieldtype()->flattenedSetsConfig(), "{$setHandle}.fields");
 
             if ($setHandle && $fields) {
                 $this->recursivelyUpdateFields((new Fields($fields))->all(), $dottedPrefix);
@@ -170,7 +170,7 @@ abstract class DataReferenceUpdater
         collect($sets)->each(function ($set, $setKey) use ($dottedKey, $field) {
             $dottedPrefix = "{$dottedKey}.{$setKey}.attrs.values.";
             $setHandle = Arr::get($set, 'attrs.values.type');
-            $fields = Arr::get($field->config(), "sets.{$setHandle}.fields");
+            $fields = Arr::get($field->fieldtype()->flattenedSetsConfig(), "{$setHandle}.fields");
 
             if ($setHandle && $fields) {
                 $this->recursivelyUpdateFields((new Fields($fields))->all(), $dottedPrefix);
@@ -206,6 +206,22 @@ abstract class DataReferenceUpdater
     public function isRemovingValue()
     {
         return is_null($this->newValue);
+    }
+
+    /**
+     * Determine if field has string value.
+     *
+     * @param  \Statamic\Fields\Field  $field
+     * @param  null|string  $dottedPrefix
+     * @return bool
+     */
+    protected function hasStringValue($field, $dottedPrefix)
+    {
+        $data = $this->item->data()->all();
+
+        $dottedKey = $dottedPrefix.$field->handle();
+
+        return is_string(Arr::get($data, $dottedKey));
     }
 
     /**

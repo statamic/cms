@@ -12,7 +12,7 @@
                             :value="element.key"
                             :selected="element.key === selectedKey" />
                     </select>
-                    <svg-icon name="micro/chevron-down-xs" class="w-2 ml-2" />
+                    <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-2 ltr:ml-2" />
                 </div>
                     <input
                         type="text"
@@ -25,16 +25,18 @@
             </div>
         </div>
 
-        <table v-else-if="isKeyed" class="array-table">
-            <tbody>
-                <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
-                    <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] || element.key }}</label></th>
-                    <td>
-                        <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div v-else-if="isKeyed" class="array-table-wrapper">
+            <table class="array-table">
+                <tbody>
+                    <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
+                        <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] || element.key }}</label></th>
+                        <td>
+                            <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <template v-else-if="isDynamic">
             <div class="table-field">
@@ -53,6 +55,7 @@
                         :vertical="true"
                         item-class="sortable-row"
                         handle-class="sortable-handle"
+                        :mirror="false"
                     >
                         <tbody>
                             <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
@@ -167,6 +170,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return _.reduce(this.value, (carry, value, key) => {
                 let str = `${key}: ${value}`;
                 if (carry) str = carry + ', ' + str;
@@ -178,6 +183,9 @@ export default {
     methods: {
         addValue() {
             this.data.push(this.newSortableValue());
+            this.$nextTick(() => {
+                this.$el.querySelector('tr:last-child input').focus();
+            });
         },
 
         confirmDeleteValue(index) {

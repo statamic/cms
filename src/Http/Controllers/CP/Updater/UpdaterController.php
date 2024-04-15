@@ -35,14 +35,12 @@ class UpdaterController extends CpController
 
     /**
      * Updates count.
-     *
-     * @param  Request  $request
      */
     public function count(Request $request)
     {
         $this->authorize('view updates');
 
-        return UpdatesOverview::count($request->input('clearCache', false));
+        return UpdatesOverview::count();
     }
 
     /**

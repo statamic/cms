@@ -4,12 +4,12 @@
             <div
                 v-for="(item, i) in items"
                 :key="item.id"
-                class="relationship-index-field-item"
+                class="relationship-index-field-item h-5"
                 :class="{ 'mb-1.5': i < items.length-1 }"
             >
                 <div class="flex items-center shrink">
                     <div v-if="item.hasOwnProperty('published') && item.published !== null"
-                        class="little-dot h-1 w-1 mr-1" :class="[item.published ? 'bg-green-600' : 'bg-gray-400']" />
+                        class="little-dot h-1 w-1 rtl:ml-1 ltr:mr-1" :class="[item.published ? 'bg-green-600' : 'bg-gray-400']" />
                     <a :href="item.edit_url" :title="item.title" v-text="item.title" />
                 </div>
             </div>
@@ -33,11 +33,11 @@ export default {
 
     computed: {
         items() {
-            return this.showingAll ? this.value : this.value.slice(0, 2);
+            return this.showingAll ? this.value : this.value?.slice(0, 2);
         },
 
         hasMore() {
-            return this.value.length > 2;
+            return this.value?.length > 2;
         },
     },
 

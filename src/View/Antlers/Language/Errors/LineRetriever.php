@@ -127,7 +127,7 @@ class LineRetriever
             $node instanceof NullConstant || $node instanceof TrueConstant || $node instanceof FalseConstant ||
             $node instanceof LogicalNegationOperator || $node instanceof LanguageOperatorConstruct ||
             $node instanceof ArgSeparator || $node instanceof StatementSeparatorNode || $node instanceof AdditionAssignmentOperator ||
-            $node instanceof AdditionOperator || $node instanceof SubtractionAssignmentOperator || $node instanceof  SubtractionOperator ||
+            $node instanceof AdditionOperator || $node instanceof SubtractionAssignmentOperator || $node instanceof SubtractionOperator ||
             $node instanceof ExponentiationOperator || $node instanceof MultiplicationAssignmentOperator || $node  instanceof MultiplicationOperator ||
             $node instanceof DivisionAssignmentOperator || $node instanceof DivisionOperator || $node instanceof ModulusAssignmentOperator ||
             $node instanceof ModulusOperator || $node instanceof SpaceshipCompOperator || $node instanceof LessThanEqualCompOperator ||

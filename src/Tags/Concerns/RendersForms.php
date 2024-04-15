@@ -133,11 +133,12 @@ trait RendersForms
         $value = $old === $missing ? $default : $old;
 
         $data = array_merge($field->toArray(), [
+            'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
             'old' => old($field->handle()),
             'value' => $value,
-        ]);
+        ], $field->fieldtype()->extraRenderableFieldData());
 
         if ($manipulateDataCallback instanceof Closure) {
             $data = $manipulateDataCallback($data, $field);

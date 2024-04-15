@@ -136,7 +136,6 @@ trait HasPreferences
      * Modify a preference using a callback.
      *
      * @param  string  $key
-     * @param  Closure  $callback
      * @return $this
      */
     public function modifyPreference($key, Closure $callback)

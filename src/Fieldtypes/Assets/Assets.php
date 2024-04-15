@@ -32,6 +32,12 @@ class Assets extends Fieldtype
                         'min' => 1,
                         'type' => 'integer',
                     ],
+                    'min_files' => [
+                        'display' => __('Min Files'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.min_files'),
+                        'min' => 1,
+                        'type' => 'integer',
+                    ],
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.assets.config.mode'),
@@ -48,6 +54,7 @@ class Assets extends Fieldtype
                         'type' => 'asset_container',
                         'max_items' => 1,
                         'mode' => 'select',
+                        'required' => true,
                         'default' => AssetContainer::all()->count() == 1 ? AssetContainer::all()->first()->handle() : null,
                     ],
                     'folder' => [
@@ -78,6 +85,17 @@ class Assets extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
                         'type' => 'toggle',
                         'default' => true,
+                    ],
+                    'show_set_alt' => [
+                        'display' => __('Show Set Alt'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.show_set_alt'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.query_scopes'),
+                        'type' => 'taggable',
                     ],
                 ],
             ],
@@ -194,6 +212,10 @@ class Assets extends Fieldtype
             $rules[] = 'max:'.$max;
         }
 
+        if ($min = $this->config('min_files')) {
+            $rules[] = 'min:'.$min;
+        }
+
         return $rules;
     }
 
@@ -261,5 +283,16 @@ class Assets extends Fieldtype
         }
 
         return $type;
+    }
+
+    public function toQueryableValue($value)
+    {
+        if (! $value) {
+            return null;
+        }
+
+        return $this->config('max_files') === 1
+            ? collect($value)->first()
+            : collect($value)->filter()->all();
     }
 }

@@ -2,7 +2,9 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Data;
+use Statamic\Facades\Site;
 use Statamic\Support\Str;
 use Tiptap\Marks\Link;
 
@@ -41,6 +43,13 @@ class LinkMark extends Link
                 },
             ],
             'title' => [],
+            'rel' => [
+                'renderHTML' => function ($attributes) {
+                    return [
+                        'rel' => $attributes->rel ?? '',
+                    ];
+                },
+            ],
         ];
     }
 
@@ -54,6 +63,10 @@ class LinkMark extends Link
 
         if (! $item = Data::find($ref)) {
             return '';
+        }
+
+        if ($item instanceof Entry) {
+            return ($item->in(Site::current()->handle()) ?? $item)->url();
         }
 
         return $item->url();

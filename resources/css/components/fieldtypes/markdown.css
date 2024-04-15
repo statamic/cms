@@ -37,7 +37,7 @@
         @apply flex items-center;
 
         button {
-            @apply text-gray-700 inline-block focus:outline-none px-2 py-1 mr-1;
+            @apply text-gray-700 inline-block focus:outline-none px-2 py-1 rtl:ml-1 ltr:mr-1;
 
             &:hover {
                 @apply text-blue;
@@ -73,7 +73,7 @@
     }
 
     .markdown-cheatsheet-helper {
-        @apply py-2 px-4 inline-block;
+        @apply p-2 inline-block;
     }
 
     .markdown-asset-helper {
@@ -91,6 +91,13 @@
     .markdown-toolbar {
         @apply text-white border-b border-gray-950 shadow-lg;
         background: linear-gradient(180deg, theme('colors.gray.900'), hsl(210, 20%, 13%));
+    }
+
+    .editor {
+        @apply bg-gray-800 text-gray-200;
+        .cm-header {
+            @apply text-white;
+        }
     }
 
     .helpers {
@@ -147,7 +154,7 @@
     }
 
     .markdown-preview {
-        @apply border-none p-2 text-left;
+        @apply border-none p-2 rtl:text-right ltr:text-left;
         p { line-height: 1.2; }
     }
 }
@@ -191,6 +198,14 @@
 
     ul {
         @apply list-disc;
+    }
+
+    pre {
+        @apply rounded px-4 py-2;
+        color: #c7254e;
+        background-color: #f9f2f4;
+
+        code { @apply p-0 }
     }
 }
 

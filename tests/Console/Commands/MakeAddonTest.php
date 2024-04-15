@@ -105,10 +105,11 @@ class MakeAddonTest extends TestCase
 
         // Fieldtype stuff
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/package.json'));
-        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/webpack.mix.js'));
+        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/vite.config.js'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/src/Fieldtypes/KnightRider.php'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/resources/js/addon.js'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/resources/js/components/fieldtypes/KnightRider.vue'));
+        $this->assertDirectoryExists(base_path('addons/hasselhoff/knight-rider/resources/dist'));
     }
 
     /** @test */

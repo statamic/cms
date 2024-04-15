@@ -41,7 +41,7 @@ class AddonsQuery
         $params = [
             'page' => $this->page,
             'search' => $this->search,
-            'filter' => ['statamic' => 3],
+            'filter' => ['statamic' => '3,4'],
         ];
 
         if ($this->installed) {

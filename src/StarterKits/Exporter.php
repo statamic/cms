@@ -33,7 +33,7 @@ class Exporter
         $this->exportPath = $absolutePath;
 
         if (! $this->files->exists($this->exportPath)) {
-            throw new StarterKitException("Path [$exportPath] does not exist.");
+            throw new StarterKitException("Path [$this->exportPath] does not exist.");
         }
 
         if (! $this->files->exists(base_path('starter-kit.yaml'))) {

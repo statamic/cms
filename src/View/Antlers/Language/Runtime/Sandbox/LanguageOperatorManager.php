@@ -25,7 +25,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesWhere;
 
 class LanguageOperatorManager
 {
-    use ExecutesOrderBy, ExecutesGroupBy, ExecutesWhere;
+    use ExecutesGroupBy, ExecutesOrderBy, ExecutesWhere;
 
     /**
      * @var NodeProcessor|null

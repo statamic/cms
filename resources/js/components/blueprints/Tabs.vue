@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="!singleTab && tabs.length > 0" class="tabs-container relative">
-            <div ref="tabs" class="tabs flex-1 flex space-x-3 overflow-auto pr-6" role="tablist">
+            <div ref="tabs" class="tabs flex-1 flex space-x-3 overflow-auto rtl:pl-6 ltr:pr-6" role="tablist">
                 <tab
                     ref="tab"
                     v-for="tab in tabs"
@@ -17,10 +17,14 @@
                 />
                 <div class="fade-left" v-if="canScrollLeft" />
             </div>
-            <div class="fade-right right-10" />
-            <button class="btn-round ml-2 flex items-center justify-center relative top-1" @click="addAndEditTab" v-tooltip="addTabText">
+            <div class="fade-right rtl:left-10 ltr:right-10" />
+            <button class="btn-round rtl:mr-2 ltr:ml-2 flex items-center justify-center relative top-1" @click="addAndEditTab" v-tooltip="addTabText">
                 <svg-icon name="add" class="w-3 h-3" />
             </button>
+        </div>
+        <button v-if="!singleTab && tabs.length === 0" class="btn" @click="addAndEditTab" v-text="addTabText" />
+        <div v-if="errors" class="-mt-2">
+            <small class="help-block text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
         <tab-content
             v-for="tab in tabs"
@@ -92,6 +96,9 @@ export default {
             type: Boolean,
             default: false
         },
+        errors: {
+            type: Array
+        }
     },
 
     data() {
@@ -113,6 +120,7 @@ export default {
 
         tabs(tabs) {
             this.$emit('updated', tabs);
+            this.makeSortable();
         }
 
     },

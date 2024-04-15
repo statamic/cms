@@ -326,7 +326,7 @@ class PermissionsTest extends TestCase
                 $permission->children([
                     $permissions->make('replaced child {placeholder}')->label('Replaced :placeholder')->children([
                         $permissions->make('replaced nested child {placeholder}')
-                                    ->label('Replaced Nested :placeholder'),
+                            ->label('Replaced Nested :placeholder'),
                     ]),
                 ])->replacements('placeholder', function () {
                     return [

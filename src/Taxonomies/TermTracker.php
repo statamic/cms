@@ -20,9 +20,6 @@ class TermTracker
      */
     private $taxonomyStache;
 
-    /**
-     * @param  Stache  $stache
-     */
     public function __construct(Stache $stache)
     {
         $this->stache = $stache;
@@ -40,9 +37,6 @@ class TermTracker
         $events->listen(RepositoryItemRemoved::class, self::class.'@remove');
     }
 
-    /**
-     * @param  RepositoryItemInserted  $event
-     */
     public function insert(RepositoryItemInserted $event)
     {
         if ($event->item instanceof TaxonomyContract) {
@@ -101,9 +95,6 @@ class TermTracker
         }
     }
 
-    /**
-     * @param  RepositoryItemRemoved  $event
-     */
     public function remove(RepositoryItemRemoved $event)
     {
         $this->taxonomyStache->removeData($event->id);

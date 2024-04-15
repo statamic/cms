@@ -3,6 +3,7 @@
 namespace Statamic\Tags\Concerns;
 
 use Statamic\Facades\Blink;
+use Statamic\Tags\Chunks;
 
 trait GetsQueryResults
 {
@@ -10,16 +11,20 @@ trait GetsQueryResults
     {
         $this->setPaginationParameterPrecedence();
 
-        if ($paginate = $this->params->get('paginate')) {
+        if ($paginate = $this->params->int('paginate')) {
             return $this->paginatedResults($query, $paginate);
         }
 
-        if ($limit = $this->params->get('limit')) {
+        if ($limit = $this->params->int('limit')) {
             $query->limit($limit);
         }
 
-        if ($offset = $this->params->get('offset')) {
+        if ($offset = $this->params->int('offset')) {
             $query->offset($offset);
+        }
+
+        if ($chunk = $this->params->int('chunk')) {
+            return $this->chunkedResults($query, $chunk);
         }
 
         return $query->get();
@@ -57,5 +62,14 @@ trait GetsQueryResults
             ->all();
 
         $query->whereNotin('id', $offsetIds);
+    }
+
+    protected function chunkedResults($query, $chunkSize)
+    {
+        $results = Chunks::make();
+
+        $query->chunk($chunkSize, fn ($chunk) => $results->push($chunk));
+
+        return $results;
     }
 }

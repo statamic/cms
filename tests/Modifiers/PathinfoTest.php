@@ -13,9 +13,9 @@ class PathinfoTest extends TestCase
         $path = '/directory/file.pdf';
 
         $this->assertEquals([
-            'dirname'   => '/directory',
-            'basename'  => 'file.pdf',
-            'filename'  => 'file',
+            'dirname' => '/directory',
+            'basename' => 'file.pdf',
+            'filename' => 'file',
             'extension' => 'pdf',
         ], $this->modify($path));
     }

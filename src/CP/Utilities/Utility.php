@@ -40,7 +40,7 @@ class Utility
 
     public function slug()
     {
-        return Str::slug($this->handle);
+        return Str::slug(Str::replace('_', '-', $this->handle));
     }
 
     public function action($action = null)
@@ -99,7 +99,7 @@ class Utility
         return cp_route('utilities.index').'/'.$this->slug();
     }
 
-    public function routes(Closure $routes = null)
+    public function routes(?Closure $routes = null)
     {
         return $this->fluentlyGetOrSet('routes')->args(func_get_args());
     }

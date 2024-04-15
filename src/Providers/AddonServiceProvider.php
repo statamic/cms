@@ -13,8 +13,8 @@ use Statamic\Actions\Action;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
-use Statamic\Facades\File;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
@@ -148,6 +148,11 @@ abstract class AddonServiceProvider extends ServiceProvider
     /**
      * @var string
      */
+    protected $blueprintNamespace;
+
+    /**
+     * @var string
+     */
     protected $fieldsetNamespace;
 
     /**
@@ -199,6 +204,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootMiddleware()
                 ->bootUpdateScripts()
                 ->bootViews()
+                ->bootBlueprints()
                 ->bootFieldsets()
                 ->bootPublishAfterInstall()
                 ->bootAddon();
@@ -604,7 +610,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             return $this;
         }
 
-        if (empty($this->scripts) && empty($this->stylesheets) && empty($this->vite)) {
+        if (empty($this->scripts) && empty($this->stylesheets) && empty($this->vite) && empty($this->publishables)) {
             return $this;
         }
 
@@ -614,6 +620,20 @@ abstract class AddonServiceProvider extends ServiceProvider
                 '--force' => true,
             ]);
         });
+
+        return $this;
+    }
+
+    protected function bootBlueprints()
+    {
+        if (! file_exists($path = "{$this->getAddon()->directory()}resources/blueprints")) {
+            return $this;
+        }
+
+        Blueprint::addNamespace(
+            $this->blueprintNamespace ?? $this->getAddon()->slug(),
+            $path
+        );
 
         return $this;
     }

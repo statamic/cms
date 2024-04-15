@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Collections\Blueprints;
 
-use Statamic\Auth\User;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;

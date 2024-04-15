@@ -44,7 +44,16 @@ export default {
                 }
             });
 
-            disableBodyScroll(this.$el);
+            disableBodyScroll(this.$el, {
+                allowTouchMove: el => {
+                    while (el && el !== document.body) {
+                        if (el.classList.contains('overflow-scroll')) {
+                            return true;
+                        }
+                        el = el.parentElement;
+                    }
+                },
+            });
         },
 
         destroyStacks() {

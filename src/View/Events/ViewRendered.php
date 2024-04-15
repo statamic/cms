@@ -12,9 +12,6 @@ class ViewRendered extends Event
      */
     public $view;
 
-    /**
-     * @param  View  $view
-     */
     public function __construct(View $view)
     {
         $this->view = $view;

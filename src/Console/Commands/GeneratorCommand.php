@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 abstract class GeneratorCommand extends IlluminateGeneratorCommand
 {
     protected $package;
+    protected $shownAddonPathError;
 
     /**
      * Execute the console command.

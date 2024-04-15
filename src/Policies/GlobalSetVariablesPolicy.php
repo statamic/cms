@@ -2,10 +2,25 @@
 
 namespace Statamic\Policies;
 
+use Statamic\Facades\User;
+
 class GlobalSetVariablesPolicy extends GlobalSetPolicy
 {
-    public function edit($user, $set)
+    use Concerns\HasMultisitePolicy;
+
+    public function view($user, $variables)
     {
-        return $this->view($user, $set);
+        $user = User::fromUser($user);
+
+        if (! $this->userCanAccessSite($user, $variables->site())) {
+            return false;
+        }
+
+        return $user->hasPermission("edit {$variables->handle()} globals");
+    }
+
+    public function edit($user, $variables)
+    {
+        return $this->view($user, $variables);
     }
 }

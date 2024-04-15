@@ -15,8 +15,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function setUp(): void
     {
-        require_once __DIR__.'/ConsoleKernel.php';
-
         parent::setUp();
 
         $this->withoutVite();
@@ -76,7 +74,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         ];
 
         foreach ($configs as $config) {
-            $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
+            $app['config']->set("statamic.$config", require (__DIR__."/../config/{$config}.php"));
         }
     }
 
@@ -103,6 +101,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.stache.stores.entries.directory', __DIR__.'/__fixtures__/content/collections');
         $app['config']->set('statamic.stache.stores.navigation.directory', __DIR__.'/__fixtures__/content/navigation');
         $app['config']->set('statamic.stache.stores.globals.directory', __DIR__.'/__fixtures__/content/globals');
+        $app['config']->set('statamic.stache.stores.global-variables.directory', __DIR__.'/__fixtures__/content/globals');
         $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
         $app['config']->set('statamic.stache.stores.nav-trees.directory', __DIR__.'/__fixtures__/content/structures/navigation');
         $app['config']->set('statamic.stache.stores.collection-trees.directory', __DIR__.'/__fixtures__/content/structures/collections');
@@ -122,13 +121,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $viewPaths[] = __DIR__.'/__fixtures__/views/';
 
         $app['config']->set('view.paths', $viewPaths);
-    }
-
-    public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
-    {
-        $args = static::normalizeArgsForWindows(func_get_args());
-
-        parent::assertEquals(...$args);
     }
 
     protected function assertEveryItem($items, $callback)
@@ -178,7 +170,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     // This method is unavailable on earlier versions of Laravel.
-    public function partialMock($abstract, \Closure $mock = null)
+    public function partialMock($abstract, ?\Closure $mock = null)
     {
         $mock = \Mockery::mock(...array_filter(func_get_args()))->makePartial();
         $this->app->instance($abstract, $mock);
@@ -222,5 +214,18 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
             return $this;
         });
+    }
+
+    public function __call($name, $arguments)
+    {
+        if ($name == 'assertStringEqualsStringIgnoringLineEndings') {
+            return Assert::assertThat(
+                $arguments[1],
+                new StringEqualsStringIgnoringLineEndings($arguments[0]),
+                $arguments[2] ?? ''
+            );
+        }
+
+        throw new \BadMethodCallException("Method [$name] does not exist.");
     }
 }

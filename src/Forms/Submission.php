@@ -8,6 +8,7 @@ use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\SubmissionCreated;
+use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
@@ -17,7 +18,7 @@ use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Submission implements SubmissionContract, Augmentable
+class Submission implements Augmentable, SubmissionContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedData;
 
@@ -33,6 +34,8 @@ class Submission implements SubmissionContract, Augmentable
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+
+    protected ?string $redirect = null;
 
     public function __construct()
     {
@@ -149,6 +152,10 @@ class Submission implements SubmissionContract, Augmentable
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && SubmissionCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (SubmissionSaving::dispatch($this) === false) {
                 return false;
             }
@@ -169,14 +176,28 @@ class Submission implements SubmissionContract, Augmentable
         }
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     /**
      * Delete this submission.
      */
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         File::delete($this->getPath());
 
-        SubmissionDeleted::dispatch($this);
+        if ($withEvents) {
+            SubmissionDeleted::dispatch($this);
+        }
+
+        return true;
     }
 
     /**

@@ -11,9 +11,9 @@
             :multiple="multiple"
             :options="options"
             :get-option-key="(option) => option.id"
-            :get-option-label="(option) => option.title"
+            :get-option-label="(option) => __(option.title)"
             :create-option="(value) => ({ title: value, id: value })"
-            :placeholder="config.placeholder || __('Choose...')"
+            :placeholder="__(config.placeholder) || __('Choose...')"
             :searchable="true"
             :taggable="isTaggable"
             :value="items"
@@ -25,7 +25,7 @@
             <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
             <template #search="{ events, attributes }" v-if="multiple">
                 <input
-                    :placeholder="config.placeholder || __('Choose...')"
+                    :placeholder="__(config.placeholder) || __('Choose...')"
                     class="vs__search"
                     type="search"
                     v-on="events"
@@ -33,7 +33,7 @@
                 >
             </template>
              <template #no-options>
-                <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
             </template>
             <template #footer="{ deselect }" v-if="multiple">
                 <sortable-list
@@ -41,11 +41,12 @@
                     handle-class="sortable-item"
                     :value="items"
                     :distance="5"
+                    :mirror="false"
                     @input="input"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="item in items" :key="item.id" class="vs__selected mt-2" :class="{ 'sortable-item': !readOnly }">
-                            {{ item.title }}
+                            {{ __(item.title) }}
                             <button v-if="!readOnly" @click="deselect(item)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                                 <span>×</span>
                             </button>
@@ -62,19 +63,18 @@
 </template>
 
 <style scoped>
-    .draggable-mirror {
-        display: none !important;
-    }
     .draggable-source--is-dragging {
         @apply opacity-75 bg-transparent border-dashed
     }
 </style>
 
 <script>
+import PositionsSelectOptions from '../../../mixins/PositionsSelectOptions';
 import { SortableList, SortableItem } from '../../sortable/Sortable';
-import { computePosition, offset, flip } from '@floating-ui/dom';
 
 export default {
+
+    mixins: [PositionsSelectOptions],
 
     components: {
         SortableList,
@@ -151,24 +151,6 @@ export default {
             }
 
             this.$emit('input', items);
-        },
-
-        positionOptions(dropdownList, component, { width }) {
-            dropdownList.style.width = width
-
-            computePosition(component.$refs.toggle, dropdownList, {
-                placement: 'bottom',
-                middleware: [
-                    offset({ mainAxis: 0, crossAxis: -1 }),
-                    flip(),
-                ]
-            }).then(({ x, y }) => {
-                Object.assign(dropdownList.style, {
-                    // Round to avoid blurry text
-                    left: `${Math.round(x)}px`,
-                    top: `${Math.round(y)}px`,
-                });
-            });
         },
 
     }

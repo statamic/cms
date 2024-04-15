@@ -29,18 +29,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Listing Filters
-    |--------------------------------------------------------------------------
-    |
-    | Whether to always show the filters on listing pages or hide them behind
-    | a toggle button to keep things more simple.
-    |
-    */
-
-    'always_show_filters' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Dashboard Widgets
     |--------------------------------------------------------------------------
     |
@@ -138,4 +126,16 @@ return [
 
     'custom_css_url' => env('STATAMIC_CUSTOM_CSS_URL', null),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Thumbnails
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define additional CP asset thumbnail presets.
+    |
+    */
+
+    'thumbnail_presets' => [
+        // 'medium' => 800,
+    ],
 ];

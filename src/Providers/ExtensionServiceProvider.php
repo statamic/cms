@@ -37,12 +37,15 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\Publish::class,
         Actions\Unpublish::class,
         Actions\SendPasswordReset::class,
+        Actions\AssignRoles::class,
+        Actions\AssignGroups::class,
         Actions\MoveAsset::class,
         Actions\RenameAsset::class,
         Actions\ReplaceAsset::class,
         Actions\ReuploadAsset::class,
         Actions\MoveAssetFolder::class,
         Actions\RenameAssetFolder::class,
+        Actions\Impersonate::class,
     ];
 
     protected $fieldtypes = [
@@ -66,6 +69,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Floatval::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
+        Fieldtypes\Group::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Html::class,
         Fieldtypes\Icon::class,
@@ -73,6 +77,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Link::class,
         Fieldtypes\Lists::class,
         Fieldtypes\Markdown::class,
+        Fieldtypes\Markdown\Buttons::class,
+        Fieldtypes\Navs::class,
         Fieldtypes\NestedFields::class,
         Fieldtypes\Radio::class,
         Fieldtypes\Range::class,
@@ -84,6 +90,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Sites::class,
         Fieldtypes\Structures::class,
         Fieldtypes\Slug::class,
+        Fieldtypes\Spacer::class,
         Fieldtypes\Table::class,
         Fieldtypes\Taggable::class,
         Fieldtypes\Terms::class,
@@ -144,6 +151,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Assets::class,
         Tags\Cache::class,
         Tags\Can::class,
+        Tags\Children::class,
         Tags\Collection\Collection::class,
         Tags\Cookie::class,
         Tags\Dd::class,
@@ -220,6 +228,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddGraphQLPermission::class,
         Updates\AddAssignRolesAndGroupsPermissions::class,
         Updates\AddDefaultPreferencesToGitConfig::class,
+        Updates\AddConfigureFormFieldsPermission::class,
+        Updates\AddSitePermissions::class,
     ];
 
     public function register()
@@ -228,6 +238,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerAddonManifest();
         $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
+        $this->app->instance('statamic.hooks', collect());
     }
 
     protected function registerAddonManifest()

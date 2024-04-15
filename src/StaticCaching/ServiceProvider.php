@@ -2,10 +2,10 @@
 
 namespace Statamic\StaticCaching;
 
-use Facades\Statamic\View\Cascade;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Statamic\Facades\Cascade;
 use Statamic\StaticCaching\NoCache\Session;
 
 class ServiceProvider extends LaravelServiceProvider

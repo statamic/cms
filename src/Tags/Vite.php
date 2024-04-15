@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use Illuminate\Foundation\Vite as LaravelVite;
+use Statamic\Support\Str;
 
 class Vite extends Tags
 {
@@ -20,9 +21,13 @@ class Vite extends Tags
         $directory = $this->params->get('directory', 'build');
         $hot = $this->params->get('hot');
 
-        return app(LaravelVite::class)
+        [$scriptAttrs, $styleAttrs] = $this->parseAttrs();
+
+        return $this->vite()
             ->withEntryPoints($src)
             ->useBuildDirectory($directory)
+            ->useStyleTagAttributes($styleAttrs)
+            ->useScriptTagAttributes($scriptAttrs)
             ->useHotFile($hot ? base_path($hot) : null)
             ->toHtml();
     }
@@ -41,9 +46,38 @@ class Vite extends Tags
         $directory = $this->params->get('directory', 'build');
         $hot = $this->params->get('hot');
 
-        return app(LaravelVite::class)
+        return $this->vite()
             ->useBuildDirectory($directory)
             ->useHotFile($hot ? base_path($hot) : null)
             ->asset($src);
+    }
+
+    private function vite()
+    {
+        return clone app(LaravelVite::class);
+    }
+
+    private function parseAttrs()
+    {
+        $script = collect();
+        $style = collect();
+
+        $attrs = $this->params
+            ->filter(fn ($_, $key) => Str::startsWith($key, 'attr:'))
+            ->keyBy(fn ($_, $key) => Str::after($key, 'attr:'))
+            ->filter(function ($value, $key) use ($script, $style) {
+                if (Str::startsWith($key, 'script:')) {
+                    $script->put(Str::after($key, 'script:'), $value);
+                } elseif (Str::startsWith($key, 'style:')) {
+                    $style->put(Str::after($key, 'style:'), $value);
+                } else {
+                    return true;
+                }
+            });
+
+        return [
+            $attrs->merge($script)->all(),
+            $attrs->merge($style)->all(),
+        ];
     }
 }

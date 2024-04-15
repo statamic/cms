@@ -12,6 +12,9 @@ use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Statamic\Events\BlueprintCreated;
+use Statamic\Events\BlueprintCreating;
+use Statamic\Events\BlueprintDeleted;
+use Statamic\Events\BlueprintDeleting;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
 use Statamic\Facades;
@@ -439,6 +442,7 @@ class BlueprintTest extends TestCase
                                     'visibility' => 'visible',
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'autocomplete' => null,
                                 ],
                             ],
                         ],
@@ -552,6 +556,7 @@ class BlueprintTest extends TestCase
                                     'visibility' => 'visible',
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'autocomplete' => null,
                                 ],
                                 [
                                     'handle' => 'nested_deeper_two',
@@ -571,6 +576,7 @@ class BlueprintTest extends TestCase
                                     'visibility' => 'visible',
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'autocomplete' => null,
                                 ],
                             ],
                         ],
@@ -594,6 +600,10 @@ class BlueprintTest extends TestCase
         $return = $blueprint->save();
 
         $this->assertEquals($blueprint, $return);
+
+        Event::assertDispatched(BlueprintCreating::class, function ($event) use ($blueprint) {
+            return $event->blueprint === $blueprint;
+        });
 
         Event::assertDispatched(BlueprintSaving::class, function ($event) use ($blueprint) {
             return $event->blueprint === $blueprint;
@@ -640,8 +650,26 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($blueprint, $return);
 
+        Event::assertNotDispatched(BlueprintCreating::class);
         Event::assertNotDispatched(BlueprintSaving::class);
         Event::assertNotDispatched(BlueprintSaved::class);
+        Event::assertNotDispatched(BlueprintCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_blueprint_doesnt_save()
+    {
+        Event::fake([BlueprintCreated::class]);
+
+        Event::listen(BlueprintCreating::class, function () {
+            return false;
+        });
+
+        $blueprint = new Blueprint;
+
+        $return = $blueprint->save();
+
+        $this->assertFalse($return);
         Event::assertNotDispatched(BlueprintCreated::class);
     }
 
@@ -855,7 +883,7 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('existing'));
         $this->assertEquals(['tabs' => [
             'tab_one' => [
-                'sections'=> [
+                'sections' => [
                     [
                         'fields' => [
                             ['handle' => 'first', 'field' => ['type' => 'text']],
@@ -1038,7 +1066,7 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'tabs' => [
                 'tab_one' => [
-                    'sections'=> [
+                    'sections' => [
                         [
                             'fields' => [
                                 ['handle' => 'one', 'field' => ['type' => 'text']],
@@ -1393,5 +1421,52 @@ class BlueprintTest extends TestCase
         $blueprint = (new Blueprint)->setHandle('test');
         $this->assertInstanceOf(QueryableValue::class, $blueprint);
         $this->assertEquals('test', $blueprint->toQueryableValue());
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $blueprint = (new Blueprint)->setHandle('test');
+
+        $blueprint->delete();
+
+        Event::assertDispatched(BlueprintDeleting::class, function ($event) use ($blueprint) {
+            return $event->blueprint === $blueprint;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Blueprint::spy();
+        Event::fake([BlueprintDeleted::class]);
+
+        Event::listen(BlueprintDeleting::class, function () {
+            return false;
+        });
+
+        $blueprint = (new Blueprint)->setHandle('test');
+        $return = $blueprint->delete();
+
+        $this->assertFalse($return);
+        Facades\Blueprint::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(BlueprintDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $blueprint = (new Blueprint)->setHandle('test');
+
+        $return = $blueprint->deleteQuietly();
+
+        Event::assertNotDispatched(BlueprintDeleting::class);
+        Event::assertNotDispatched(BlueprintDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

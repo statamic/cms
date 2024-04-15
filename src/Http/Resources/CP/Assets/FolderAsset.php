@@ -15,7 +15,6 @@ class FolderAsset extends JsonResource
             'basename' => $this->basename(),
             'extension' => $this->extension(),
             'url' => $this->absoluteUrl(),
-
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),
             'last_modified_relative' => $this->lastModified()->diffForHumans(),
 
@@ -23,6 +22,7 @@ class FolderAsset extends JsonResource
                 return [
                     'is_image' => true,
                     'thumbnail' => $this->thumbnailUrl('small'),
+                    'can_be_transparent' => $this->isSvg() || $this->extension() === 'png',
                     'alt' => $this->alt,
                 ];
             }),

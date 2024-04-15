@@ -17,7 +17,6 @@ class DataCollection extends IlluminateCollection
     /**
      * Limit a collection.
      *
-     * @param $limit
      * @return static
      */
     public function limit($limit)

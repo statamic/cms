@@ -74,9 +74,12 @@ $additionalKeys = [
         'date.title',
         'entries.title',
         'float.title',
+        'form.title',
         'grid.title',
+        'group.title',
         'hidden.title',
         'html.title',
+        'icon.title',
         'integer.title',
         'link.title',
         'list.title',
@@ -104,7 +107,6 @@ $additionalKeys = [
         'users.title',
         'video.title',
         'yaml.title',
-        'form.title',
     ],
 ];
 

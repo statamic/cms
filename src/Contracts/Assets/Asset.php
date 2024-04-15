@@ -67,7 +67,6 @@ interface Asset
     /**
      * Upload a file.
      *
-     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
      * @return mixed
      */
     public function upload(UploadedFile $file);
@@ -77,7 +76,7 @@ interface Asset
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function download(string $name = null, array $headers = []);
+    public function download(?string $name = null, array $headers = []);
 
     /**
      * Get the asset file contents.

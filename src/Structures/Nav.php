@@ -3,12 +3,15 @@
 namespace Statamic\Structures;
 
 use Statamic\Contracts\Structures\Nav as Contract;
+use Statamic\Contracts\Structures\NavTree;
 use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\NavBlueprintFound;
 use Statamic\Events\NavDeleted;
+use Statamic\Events\NavDeleting;
 use Statamic\Events\NavSaved;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
@@ -31,6 +34,10 @@ class Nav extends Structure implements Contract
 
     public function delete()
     {
+        if (NavDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\Nav::delete($this);
 
         NavDeleted::dispatch($this);
@@ -87,7 +94,7 @@ class Nav extends Structure implements Contract
 
     public function newTreeInstance()
     {
-        return new NavTree;
+        return app(NavTree::class);
     }
 
     public function in($site)
@@ -102,6 +109,11 @@ class Nav extends Structure implements Contract
         })->filter();
     }
 
+    public function sites()
+    {
+        return $this->trees()->keys();
+    }
+
     public function existsIn($site)
     {
         return $this->trees()->has($site);
@@ -109,8 +121,14 @@ class Nav extends Structure implements Contract
 
     public function blueprint()
     {
+        if (Blink::has($blink = 'nav-blueprint-'.$this->handle())) {
+            return Blink::get($blink);
+        }
+
         $blueprint = Blueprint::find('navigation.'.$this->handle())
             ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('navigation');
+
+        Blink::put($blink, $blueprint);
 
         NavBlueprintFound::dispatch($blueprint, $this);
 

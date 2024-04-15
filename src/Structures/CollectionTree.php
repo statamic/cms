@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Facades\Statamic\Structures\CollectionTreeDiff;
+use Statamic\Contracts\Structures\CollectionTree as TreeContract;
 use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Events\CollectionTreeDeleted;
 use Statamic\Events\CollectionTreeSaved;
@@ -11,7 +12,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 
-class CollectionTree extends Tree
+class CollectionTree extends Tree implements TreeContract
 {
     public function structure()
     {

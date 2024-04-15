@@ -2,7 +2,9 @@
 
 namespace Statamic\CP\Navigation;
 
+use Illuminate\Support\Collection;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -19,6 +21,7 @@ class NavItem
     protected $icon;
     protected $children;
     protected $isChild;
+    protected $wasOriginallyChild;
     protected $authorization;
     protected $active;
     protected $view;
@@ -132,6 +135,36 @@ class NavItem
     }
 
     /**
+     * Generate active URL pattern to determine when to resolve children for `hasActiveChild()` checks.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function generateActivePatternForCpUrl($url)
+    {
+        $cpUrl = url(config('statamic.cp.route')).'/';
+
+        $relativeUrl = str_replace($cpUrl, '', URL::removeQueryAndFragment($url));
+
+        return $relativeUrl.'(/(.*)?|$)';
+    }
+
+    /**
+     * Generate active URL patterns for this item's children.
+     *
+     * @return Collection
+     */
+    protected function generateActivePatternsForChildren()
+    {
+        if (! $this->children()) {
+            return collect();
+        }
+
+        return collect(NavBuilder::getUnresolvedChildrenUrlsForItem($this) ?? [])
+            ->map(fn ($url) => $this->generateActivePatternForCpUrl($url));
+    }
+
+    /**
      * Get editable url for nav builder UI.
      */
     public function editableUrl()
@@ -240,7 +273,39 @@ class NavItem
             ->getter(function ($value) {
                 return (bool) $value;
             })
+            ->afterSetter(function ($value) {
+                if ($value === true && ! isset($this->wasOriginallyChild)) {
+                    $this->wasOriginallyChild = $value;
+                }
+            })
             ->value($isChild);
+    }
+
+    /**
+     * Check if this nav item was ever a child before user preferences were applied.
+     *
+     * @param  bool|null  $isChild
+     * @return mixed
+     */
+    protected function wasOriginallyChild()
+    {
+        return (bool) $this->wasOriginallyChild;
+    }
+
+    /**
+     * Active URL pattern to determine when to resolve children for `hasActiveChild()` checks.
+     *
+     * Though we still check active patterns for nested URLs internally, having to manually
+     * use this method should not be needed anymore, not to mention it is confusing for
+     * addon devs to know when they even need to use it, thus we are deprecating it.
+     *
+     * @deprecated
+     *
+     * @return $this
+     */
+    public function active($pattern = null)
+    {
+        return $this->fluentlyGetOrSet('active')->value($pattern);
     }
 
     /**
@@ -304,30 +369,84 @@ class NavItem
     }
 
     /**
-     * Get or set pattern for active state styling.
-     *
-     * @param  string|null  $pattern
-     * @return mixed
-     */
-    public function active($pattern = null)
-    {
-        return $this->fluentlyGetOrSet('active')->value($pattern);
-    }
-
-    /**
-     * Get whether the nav item is currently active.
+     * Determine whether the nav item is currently active.
      *
      * @return bool
      */
     public function isActive()
     {
-        if (! $this->active) {
+        if ($this->hasActiveChild()) {
+            return true;
+        }
+
+        // If the current URL is not explicitly referenced in the CP nav,
+        // and if this item is/was ever a child nav item,
+        // then check against URL heirarchy conventions using regex pattern.
+        if ($this->currentUrlIsNotExplicitlyReferencedInNav() && $this->wasOriginallyChild()) {
+            return $this->isActiveByPattern($this->active);
+        }
+
+        return request()->url() === URL::removeQueryAndFragment($this->url);
+    }
+
+    /**
+     * Determine whether the nav item has a currently active child.
+     *
+     * @return bool
+     */
+    protected function hasActiveChild()
+    {
+        // If children are already resolved to a collection, just check `isActive()` on each child item.
+        if ($this->children() instanceof Collection) {
+            return $this
+                ->children()
+                ->filter(fn ($item) => $item->isActive())
+                ->isNotEmpty();
+        }
+
+        // If the current URL is not explicitly referenced in the CP nav,
+        // and if this item has children to check against,
+        // then check against URL heirarchy conventions using regex pattern.
+        if ($this->currentUrlIsNotExplicitlyReferencedInNav() && $this->children()) {
+            return $this->isActiveByPattern($this->generateActivePatternsForChildren());
+        }
+
+        // If children closure has not been resolved, and children urls are cached, check against cached children.
+        if ($childrenUrls = NavBuilder::getUnresolvedChildrenUrlsForItem($this)) {
+            return collect($childrenUrls)
+                ->map(fn ($url) => URL::removeQueryAndFragment($url))
+                ->contains(request()->url());
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether the current URL is explicitly referenced in nav.
+     *
+     * @return bool
+     */
+    protected function currentUrlIsNotExplicitlyReferencedInNav()
+    {
+        return ! NavBuilder::getAllUrls()->contains(request()->url());
+    }
+
+    /**
+     * Determine whether the nav item is currently active using the regex technique for deeply nested hierarchical urls.
+     *
+     * @param  string|array  $active
+     * @return bool
+     */
+    protected function isActiveByPattern($active)
+    {
+        if (! $active) {
             return false;
         }
 
-        $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
-
-        return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
+        return collect($active)
+            ->map(fn ($pattern) => preg_quote(config('statamic.cp.route'), '#').'/'.$pattern)
+            ->filter(fn ($pattern) => preg_match('#'.$pattern.'#', request()->decodedPath()) === 1)
+            ->isNotEmpty();
     }
 
     /**
@@ -431,27 +550,18 @@ class NavItem
      */
     public static function snakeCase($string)
     {
-        $string = Str::modifyMultiple($string, ['lower', 'snake']);
+        // Preserve colons `:` segments for child items and cloned ids.
+        $string = Str::replace(':', '___colon___', $string);
+
+        // Convert to lowercase and slug, removing all special characters.
+        $string = Str::modifyMultiple($string, ['lower', 'slug']);
+
+        // Convert to snake case.
         $string = Str::replace('-', '_', $string);
 
+        // Put colons `:` back for child items and cloned ids.
+        $string = Str::replace('___colon___', ':', $string);
+
         return $string;
-    }
-
-    /**
-     * Generate active pattern for CP url.
-     *
-     * @param  string  $url
-     * @return string
-     */
-    protected function generateActivePatternForCpUrl($url)
-    {
-        $cpUrl = url(config('statamic.cp.route')).'/';
-
-        $url = Str::before($url, '?'); // Remove query params
-        $url = Str::before($url, '#'); // Remove anchors
-
-        $relativeUrl = str_replace($cpUrl, '', $url);
-
-        return $relativeUrl.'(/(.*)?|$)';
     }
 }

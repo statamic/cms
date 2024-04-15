@@ -16,8 +16,6 @@ class Lock
 
     /**
      * Instantiate lock file helper.
-     *
-     * @param  string  $file
      */
     public function __construct(string $file = 'composer.lock')
     {
@@ -29,7 +27,6 @@ class Lock
     /**
      * Instantiate lock file helper.
      *
-     * @param  string  $file
      * @return static
      */
     public static function file(string $file = 'composer.lock')
@@ -39,8 +36,6 @@ class Lock
 
     /**
      * Backup lock file, using vanilla PHP so that this can be run in a Composer hook.
-     *
-     * @param  string  $file
      */
     public static function backup(string $file = 'composer.lock')
     {
@@ -92,7 +87,6 @@ class Lock
     /**
      * Get installed version of a specific package.
      *
-     * @param  string  $package
      * @return string
      */
     public function getInstalledVersion(string $package)
@@ -116,7 +110,6 @@ class Lock
     /**
      * Get installed version of a specific package, normalized for comparisons.
      *
-     * @param  string  $package
      * @return string
      */
     public function getNormalizedInstalledVersion(string $package)
@@ -127,7 +120,6 @@ class Lock
     /**
      * Check if package is installed.
      *
-     * @param  string  $package
      * @return bool
      */
     public function isPackageInstalled(string $package)
@@ -145,7 +137,6 @@ class Lock
     /**
      * Check if package is installed as dev dependency.
      *
-     * @param  string  $package
      * @return bool
      */
     public function isDevPackageInstalled(string $package)

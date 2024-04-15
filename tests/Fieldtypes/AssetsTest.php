@@ -16,12 +16,14 @@ use Statamic\Fieldtypes\Assets\MaxRule;
 use Statamic\Fieldtypes\Assets\MimesRule;
 use Statamic\Fieldtypes\Assets\MimetypesRule;
 use Statamic\Fieldtypes\Assets\MinRule;
+use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxItems;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use TestsQueryableValueWithMaxItems;
 
     public function setUp(): void
     {
@@ -104,6 +106,8 @@ class AssetsTest extends TestCase
     /** @test */
     public function it_replaces_dimensions_rule()
     {
+        config()->set('statamic.cp.route', '/');
+
         $replaced = $this->fieldtype(['validate' => ['dimensions:width=180,height=180']])->fieldRules();
 
         $this->assertIsArray($replaced);
@@ -115,6 +119,8 @@ class AssetsTest extends TestCase
     /** @test */
     public function it_replaces_image_rule()
     {
+        config()->set('statamic.cp.route', '/');
+
         $replaced = $this->fieldtype(['validate' => ['image']])->fieldRules();
 
         $this->assertIsArray($replaced);
@@ -126,6 +132,8 @@ class AssetsTest extends TestCase
     /** @test */
     public function it_replaces_mimes_rule()
     {
+        config()->set('statamic.cp.route', '/');
+
         $replaced = $this->fieldtype(['validate' => ['mimes:jpg,png']])->fieldRules();
 
         $this->assertIsArray($replaced);
@@ -137,6 +145,8 @@ class AssetsTest extends TestCase
     /** @test */
     public function it_replaces_mimestypes_rule()
     {
+        config()->set('statamic.cp.route', '/');
+
         $replaced = $this->fieldtype(['validate' => ['mimetypes:image/jpg,image/png']])->fieldRules();
 
         $this->assertIsArray($replaced);
@@ -148,6 +158,8 @@ class AssetsTest extends TestCase
     /** @test */
     public function it_replaces_min_filesize_rule()
     {
+        config()->set('statamic.cp.route', '/');
+
         $replaced = $this->fieldtype(['validate' => ['min_filesize:100']])->fieldRules();
 
         $this->assertIsArray($replaced);
@@ -159,6 +171,8 @@ class AssetsTest extends TestCase
     /** @test */
     public function it_replaces_max_filesize_rule()
     {
+        config()->set('statamic.cp.route', '/');
+
         $replaced = $this->fieldtype(['validate' => ['max_filesize:100']])->fieldRules();
 
         $this->assertIsArray($replaced);
@@ -170,6 +184,8 @@ class AssetsTest extends TestCase
     /** @test */
     public function it_doesnt_replace_non_image_related_rule()
     {
+        config()->set('statamic.cp.route', '/');
+
         $replaced = $this->fieldtype(['validate' => ['file']])->fieldRules();
 
         $this->assertIsArray($replaced);
@@ -182,5 +198,10 @@ class AssetsTest extends TestCase
         return (new Assets)->setField(new Field('test', array_merge([
             'type' => 'assets',
         ], $config)));
+    }
+
+    private function maxItemsConfigKey()
+    {
+        return 'max_files';
     }
 }

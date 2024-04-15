@@ -90,8 +90,8 @@ class MakeWidget extends GeneratorCommand
 
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
-                    ->add()->protected()->property('widgets', $widgetClassValue)
-                    ->save();
+                ->add()->protected()->property('widgets', $widgetClassValue)
+                ->save();
         } catch (\Exception $e) {
             $this->info("Don't forget to register the Widget class in your addon's service provider.");
         }

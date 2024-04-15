@@ -265,7 +265,7 @@ class FieldsTest extends TestCase
     public function it_throws_exception_when_trying_to_import_a_non_existent_fieldset()
     {
         $this->expectException('Exception');
-        $this->expectExceptionMessage('Fieldset test_partial not found.');
+        $this->expectExceptionMessage('Fieldset [test_partial] not found');
         FieldsetRepository::shouldReceive('find')->with('test_partial')->once()->andReturnNull();
 
         (new Fields)->createFields([
@@ -425,6 +425,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'autocomplete' => null,
             ],
             [
                 'handle' => 'two',
@@ -500,6 +501,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'autocomplete' => null,
             ],
             [
                 'handle' => 'nested_deeper_two',
@@ -519,6 +521,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'autocomplete' => null,
             ],
         ], $fields->toPublishArray());
     }
@@ -979,5 +982,79 @@ class FieldsTest extends TestCase
         $collection = $fields->all();
         $this->assertEquals('foo', $collection['one']->parentField());
         $this->assertEquals('foo', $collection['two']->parentField());
+    }
+
+    /**
+     * @test
+     */
+    public function it_sets_the_parentindex_on_all_fields()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+        ]);
+
+        $collection = $fields->all();
+        $this->assertNull($collection['one']->parentIndex());
+        $this->assertNull($collection['two']->parentIndex());
+
+        $fields->setParentField('foo', 1);
+        $collection = $fields->all();
+        $this->assertEquals(1, $collection['one']->parentIndex());
+        $this->assertEquals(1, $collection['two']->parentIndex());
+    }
+
+    /**
+     * @test
+     */
+    public function it_sets_the_parentfield_and_parentindex_on_imported_fields()
+    {
+        $fieldset = (new Fieldset)->setHandle('partial')->setContents([
+            'fields' => [
+                ['handle' => 'bar', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('partial')->once()->andReturn($fieldset);
+
+        $parentField = new Field('foo', ['type' => 'replicator']);
+
+        $fields = new Fields(
+            [['import' => 'partial']],
+            null,
+            $parentField,
+            1,
+        );
+
+        $collection = $fields->all();
+        $this->assertEquals($parentField, $collection['bar']->parentField());
+        $this->assertEquals(1, $collection['bar']->parentIndex());
+    }
+
+    /**
+     * @test
+     */
+    public function it_sets_the_parentfield_and_parentindex_on_referenced_fields()
+    {
+        $fieldset = (new Fieldset)->setHandle('partial')->setContents([
+            'fields' => [
+                ['handle' => 'bar', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('partial')->once()->andReturn($fieldset);
+
+        $parentField = new Field('foo', ['type' => 'replicator']);
+
+        $fields = new Fields(
+            [['handle' => 'bar', 'field' => 'partial.bar']],
+            null,
+            $parentField,
+            1,
+        );
+
+        $collection = $fields->all();
+        $this->assertEquals($parentField, $collection['bar']->parentField());
+        $this->assertEquals(1, $collection['bar']->parentIndex());
     }
 }

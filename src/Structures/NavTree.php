@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Facades\Statamic\Structures\BranchIds;
+use Statamic\Contracts\Structures\NavTree as TreeContract;
 use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
@@ -11,7 +12,7 @@ use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 
-class NavTree extends Tree
+class NavTree extends Tree implements TreeContract
 {
     public function structure()
     {

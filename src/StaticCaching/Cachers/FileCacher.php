@@ -5,6 +5,7 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
@@ -34,8 +35,6 @@ class FileCacher extends AbstractCacher
     private $nocachePlaceholder;
 
     /**
-     * @param  Writer  $writer
-     * @param  Repository  $cache
      * @param  array  $config
      */
     public function __construct(Writer $writer, Repository $cache, $config)
@@ -71,7 +70,6 @@ class FileCacher extends AbstractCacher
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     public function getCachedPage(Request $request)
@@ -125,6 +123,8 @@ class FileCacher extends AbstractCacher
                 $this->writer->delete($this->getFilePath($value, $site));
                 $this->forgetUrl($key, $domain);
             });
+
+        UrlInvalidated::dispatch($url, $domain);
     }
 
     public function getCachePaths()
@@ -158,7 +158,6 @@ class FileCacher extends AbstractCacher
     /**
      * Get the path to the cached file.
      *
-     * @param $url
      * @return string
      */
     public function getFilePath($url, $site = null)
@@ -207,7 +206,7 @@ class FileCacher extends AbstractCacher
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            url: window.location.href,
+            url: window.location.href.split('#')[0],
             sections: Object.keys(map)
         })
     })
@@ -225,12 +224,20 @@ class FileCacher extends AbstractCacher
         for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
             meta.content = data.csrf;
         }
-        
+
+        for (const input of document.querySelectorAll('script[data-csrf="$csrfPlaceholder"]')) {
+            input.setAttribute('data-csrf', data.csrf);
+        }
+
         if (window.hasOwnProperty('livewire_token')) {
             window.livewire_token = data.csrf
         }
 
-        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
+        if (window.hasOwnProperty('livewireScriptConfig')) {
+            window.livewireScriptConfig.csrf = data.csrf
+        }
+
+        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));
     });
 })();
 EOT;

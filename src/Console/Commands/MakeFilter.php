@@ -65,8 +65,8 @@ class MakeFilter extends GeneratorCommand
 
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
-                    ->add()->protected()->property('filters', $filterClassValue)
-                    ->save();
+                ->add()->protected()->property('filters', $filterClassValue)
+                ->save();
         } catch (\Exception $e) {
             $this->comment("Don't forget to register the Filter class in your addon's service provider.");
         }

@@ -2,15 +2,17 @@
 
 namespace Statamic\Tags;
 
+use Illuminate\Support\Traits\Macroable;
 use Statamic\Extend\HasAliases;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Antlers;
 use Statamic\Support\Arr;
+use Statamic\Support\Traits\Hookable;
 
 abstract class Tags
 {
-    use HasHandle, HasAliases, RegistersItself;
+    use HasAliases, HasHandle, Hookable, Macroable, RegistersItself;
 
     protected static $binding = 'tags';
 
@@ -91,6 +93,8 @@ abstract class Tags
         $this->setParameters($properties['params']);
         $this->tag = array_get($properties, 'tag');
         $this->method = array_get($properties, 'tag_method');
+
+        $this->runHooks('init');
     }
 
     public function setParser($parser)
@@ -131,6 +135,16 @@ abstract class Tags
     {
         if ($this->wildcardHandled || ! method_exists($this, $this->wildcardMethod)) {
             throw new \BadMethodCallException("Call to undefined method {$method}.");
+        }
+
+        if (static::hasMacro($method)) {
+            $macro = static::$macros[$method];
+
+            if ($macro instanceof \Closure) {
+                $macro = $macro->bindTo($this, static::class);
+            }
+
+            return $macro(...$args);
         }
 
         $this->wildcardHandled = true;
@@ -197,9 +211,11 @@ abstract class Tags
      */
     public function parseNoResults($data = [])
     {
-        return $this->parse(array_merge($data, [
+        $data = array_merge($data, [
             'no_results' => true,
             'total_results' => 0,
-        ]));
+        ]);
+
+        return $this->parser ? $this->parse($data) : $data;
     }
 }

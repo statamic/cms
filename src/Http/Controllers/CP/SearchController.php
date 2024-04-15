@@ -16,7 +16,7 @@ class SearchController extends CpController
             ->search($request->query('q'))
             ->get()
             ->filter(function (Result $item) {
-                return User::current()->can('view', $item->getSearchable());
+                return ! empty($item->getCpUrl()) && User::current()->can('view', $item->getSearchable());
             })
             ->take(10)
             ->map(function (Result $result) {
@@ -26,6 +26,7 @@ class SearchController extends CpController
                     'url' => $result->getCpUrl(),
                     'badge' => $result->getCpBadge(),
                 ];
-            });
+            })
+            ->values();
     }
 }
