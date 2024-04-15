@@ -75,7 +75,7 @@ class MakeAddonTest extends TestCase
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
 
         $this->artisan('statamic:make:addon', ['addon' => 'erso/deaths-tar-vulnerability'])
-            ->expectsOutput('Addon already exists!');
+            ->expectsOutputToContain('Addon already exists!');
 
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
     }
