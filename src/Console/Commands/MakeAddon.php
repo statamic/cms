@@ -12,6 +12,8 @@ use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
+use function Laravel\Prompts\spin;
+
 class MakeAddon extends GeneratorCommand
 {
     use EnhancesCommands, RunsInPlease, ValidatesInput;
@@ -72,7 +74,7 @@ class MakeAddon extends GeneratorCommand
         $this->normalizePackage();
 
         if (! $this->option('force') && $this->addonAlreadyExists()) {
-            $this->error('Addon already exists!');
+            $this->components->error('Addon already exists!');
 
             return;
         }
@@ -80,20 +82,30 @@ class MakeAddon extends GeneratorCommand
         try {
             $this
                 ->generateAddonFiles()
-                ->installAddon()
-                ->generateOptional()
-                ->installComposerDependencies();
+                ->generateOptional();
+
+            $this->components->info('Addon files created.');
+
+            $this
+                ->installComposerDependencies()
+                ->installAddon();
         } catch (\Exception $e) {
-            $this->error($e->getMessage());
+            $this->components->error($e->getMessage());
 
             return 1;
         }
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
-        $this->output->newLine();
-        $this->info("🎉 Your addon package is ready: <comment>{$relativePath}</comment>");
-        $this->line('Learn how to build addons in our docs: <comment>https://statamic.dev/extending/addons</comment>');
+        $this->components->info('Your addon is ready! 🎉');
+
+        $this->components->bulletList([
+            "You can find your addon in <comment>{$relativePath}</comment>",
+            'Learn how to build addons in our docs: <comment>https://statamic.dev/extending/addons</comment>',
+            "When you're ready, you can publish your addon to the Marketplace: <comment>https://statamic.com/sell</comment>",
+        ]);
+
+        $this->newLine();
     }
 
     /**
@@ -133,8 +145,6 @@ class MakeAddon extends GeneratorCommand
      */
     protected function generateAddonFiles()
     {
-        $this->line('Creating addon...');
-
         $this->generateComposerJson();
 
         $files = [
@@ -156,8 +166,6 @@ class MakeAddon extends GeneratorCommand
             $this->createFromStub($stub, $this->addonPath($file), $data);
         }
 
-        $this->checkInfo('Addon boilerplate created successfully.');
-
         return $this;
     }
 
@@ -177,14 +185,9 @@ class MakeAddon extends GeneratorCommand
             return $this;
         }
 
-        $this->output->newLine();
-        $this->line('Generating additional addon components...');
-
         $optional->each(function ($type) {
             $this->runOptionalAddonGenerator($type);
         });
-
-        $this->checkInfo('Additional components created successfully.');
 
         return $this;
     }
@@ -196,19 +199,22 @@ class MakeAddon extends GeneratorCommand
      */
     protected function installComposerDependencies()
     {
-        $this->output->newLine();
+        spin(
+            function () {
+                try {
+                    Composer::withoutQueue()->throwOnFailure()->install($this->addonPath());
+                } catch (ProcessException $exception) {
+                    $this->line($exception->getMessage());
+                    throw new \Exception("An error was encountered while installing your addon's Composer dependencies.");
+                }
+            },
+            "Installing your addon's Composer dependencies..."
+        );
 
-        $this->line("Installing your addon's Composer dependencies. This may take a moment...");
-
-        try {
-            Composer::withoutQueue()->throwOnFailure()->install($this->addonPath());
-        } catch (ProcessException $exception) {
-            $this->line($exception->getMessage());
-            $this->output->newLine();
-            throw new \Exception("An error was encountered while installing your addon's Composer dependencies!");
-        }
-
-        $this->checkInfo('Composer dependencies installed successfully.');
+        $this->components->info('Composer dependencies installed.');
+        $this->components->bulletList([
+            'This allows you to run tests from within the addon directory.',
+        ]);
 
         return $this;
     }
@@ -231,7 +237,11 @@ class MakeAddon extends GeneratorCommand
 
         $this->files->put(base_path('composer.json'), $json);
 
-        $this->info("Repository added to your application's composer.json successfully.");
+        $this->components->info("Repository added to your app's composer.json.");
+        $this->components->bulletList([
+            'This allows Composer to reference your addon locally during development.',
+            'When you publish your package, you should remove this from your composer.json file.',
+        ]);
 
         return $this;
     }
@@ -243,19 +253,21 @@ class MakeAddon extends GeneratorCommand
      */
     protected function installAddon()
     {
-        $this->output->newLine();
-        $this->line('Installing your addon with Composer. This may take a moment...');
         $this->addRepositoryPath();
 
-        try {
-            Composer::withoutQueue()->throwOnFailure()->require($this->package);
-        } catch (ProcessException $exception) {
-            $this->line($exception->getMessage());
-            $this->output->newLine();
-            throw new \Exception('An error was encountered while installing your addon!');
-        }
+        spin(
+            function () {
+                try {
+                    Composer::withoutQueue()->throwOnFailure()->require($this->package);
+                } catch (ProcessException $exception) {
+                    $this->line($exception->getMessage());
+                    throw new \Exception('An error was encountered while installing your addon.');
+                }
+            },
+            'Installing your addon with Composer...'
+        );
 
-        $this->checkInfo('Addon installed successfully.');
+        $this->components->info('Addon installed into your app via Composer.');
 
         return $this;
     }
@@ -282,7 +294,7 @@ class MakeAddon extends GeneratorCommand
             $arguments['--force'] = true;
         }
 
-        $this->call("{$prefix}make:{$type}", $arguments);
+        $this->callSilent("{$prefix}make:{$type}", $arguments);
     }
 
     /**

@@ -770,6 +770,97 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     /** @test */
+    public function filtering_using_where_status_column_writes_deprecation_log()
+    {
+        $this->withoutDeprecationHandling();
+        $this->expectException(\ErrorException::class);
+        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::query()->where('collection', 'posts')->where('status', 'published')->get();
+    }
+
+    /** @test */
+    public function filtering_using_whereIn_status_column_writes_deprecation_log()
+    {
+        $this->withoutDeprecationHandling();
+        $this->expectException(\ErrorException::class);
+        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::query()->where('collection', 'posts')->whereIn('status', ['published'])->get();
+    }
+
+    /** @test */
+    public function filtering_by_unexpected_status_throws_exception()
+    {
+        $this->expectExceptionMessage('Invalid status [foo]');
+
+        Entry::query()->whereStatus('foo')->get();
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider filterByStatusProvider
+     */
+    public function it_filters_by_status($status, $expected)
+    {
+        Collection::make('pages')->dated(false)->save();
+        EntryFactory::collection('pages')->id('page')->published(true)->create();
+        EntryFactory::collection('pages')->id('page-draft')->published(false)->create();
+
+        Collection::make('blog')->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
+        EntryFactory::collection('blog')->id('blog-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('blog')->id('blog-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('blog')->id('blog-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('blog')->id('blog-past-draft')->published(false)->date(now()->subDay())->create();
+
+        Collection::make('events')->dated(true)->futureDateBehavior('public')->pastDateBehavior('private')->save();
+        EntryFactory::collection('events')->id('event-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('events')->id('event-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('events')->id('event-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('events')->id('event-past-draft')->published(false)->date(now()->subDay())->create();
+
+        Collection::make('calendar')->dated(true)->futureDateBehavior('public')->pastDateBehavior('public')->save();
+        EntryFactory::collection('calendar')->id('calendar-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('calendar')->id('calendar-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('calendar')->id('calendar-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('calendar')->id('calendar-past-draft')->published(false)->date(now()->subDay())->create();
+
+        $this->assertEquals($expected, Entry::query()->whereStatus($status)->get()->map->id->all());
+    }
+
+    public static function filterByStatusProvider()
+    {
+        return [
+            'draft' => ['draft', [
+                'page-draft',
+                'blog-future-draft',
+                'blog-past-draft',
+                'event-future-draft',
+                'event-past-draft',
+                'calendar-future-draft',
+                'calendar-past-draft',
+            ]],
+            'published' => ['published', [
+                'page',
+                'blog-past',
+                'event-future',
+                'calendar-future',
+                'calendar-past',
+            ]],
+            'scheduled' => ['scheduled', [
+                'blog-future',
+            ]],
+            'expired' => ['expired', [
+                'event-past',
+            ]],
+        ];
+    }
+
     public function values_can_be_plucked()
     {
         $this->createDummyCollectionAndEntries();

@@ -2545,10 +2545,6 @@ class CoreModifiers extends Modifier
             $value = $value->get();
         }
 
-        if ($value instanceof Collection || $value instanceof Augmentable) {
-            $value = $value->toAugmentedArray();
-        }
-
         return json_encode($value, $options);
     }
 

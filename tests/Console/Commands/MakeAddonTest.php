@@ -56,10 +56,10 @@ class MakeAddonTest extends TestCase
     public function it_cannot_make_addon_with_invalid_composer_package_name()
     {
         $this->artisan('statamic:make:addon', ['addon' => 'deaths-tar-vulnerability'])
-            ->expectsOutput(trans('statamic::validation.composer_package'));
+            ->expectsOutputToContain(trans('statamic::validation.composer_package'));
 
         $this->artisan('statamic:make:addon', ['addon' => 'some/path/deaths-tar-vulnerability'])
-            ->expectsOutput(trans('statamic::validation.composer_package'));
+            ->expectsOutputToContain(trans('statamic::validation.composer_package'));
 
         $this->assertFileDoesNotExist(base_path('addons/erso/deaths-tar-vulnerability'));
     }
@@ -75,7 +75,7 @@ class MakeAddonTest extends TestCase
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
 
         $this->artisan('statamic:make:addon', ['addon' => 'erso/deaths-tar-vulnerability'])
-            ->expectsOutput('Addon already exists!');
+            ->expectsOutputToContain('Addon already exists!');
 
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
     }

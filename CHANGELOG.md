@@ -1,5 +1,14 @@
 # Release Notes
 
+## 5.0.0-alpha.3 (2024-04-11)
+
+### What's changed
+- Add new 'Settings' CP Nav section. [#9857](https://github.com/statamic/cms/issues/9857) by @jesseleite
+- Avoid querying status. [#9317](https://github.com/statamic/cms/issues/9317) by @jasonvarga
+- Ensure expectation count isn't negative if Version is not called. [#9863](https://github.com/statamic/cms/issues/9863) by @ryanmitchell
+
+
+
 ## 5.0.0-alpha.2 (2024-04-10)
 
 ### What's changed
