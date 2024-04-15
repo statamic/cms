@@ -5,7 +5,6 @@ namespace Statamic\Console\Commands;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Process\ProcessResult;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
@@ -63,7 +62,7 @@ class InstallEloquentDriver extends Command
             DB::connection()->getPDO();
             DB::connection()->getDatabaseName();
         } catch (\PDOException $e) {
-            return $this->components->error("Failed to connect to the configured database. Please check your database configuration and try again.");
+            return $this->components->error('Failed to connect to the configured database. Please check your database configuration and try again.');
         }
 
         if ($this->availableRepositories()->isEmpty()) {
