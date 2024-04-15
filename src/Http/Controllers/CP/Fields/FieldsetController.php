@@ -74,6 +74,8 @@ class FieldsetController extends CpController
     {
         $fieldset = Facades\Fieldset::find($fieldset);
 
+        $fieldset->validateRecursion();
+
         $vue = [
             'title' => $fieldset->title(),
             'handle' => $fieldset->handle(),
@@ -102,7 +104,11 @@ class FieldsetController extends CpController
             'fields' => collect($request->fields)->map(function ($field) {
                 return FieldTransformer::fromVue($field);
             })->all(),
-        ]))->save();
+        ]));
+
+        $fieldset->validateRecursion();
+
+        $fieldset->save();
 
         return response('', 204);
     }
