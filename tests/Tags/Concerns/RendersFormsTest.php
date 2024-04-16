@@ -47,7 +47,7 @@ class RendersFormsTest extends TestCase
     {
         $output = $this->tag
             ->setParameters([
-                'attr:class' => 'mb-2',
+                'class' => 'mb-2',
                 'attr:id' => 'form',
                 'method' => 'this should not render',
                 'action' => 'this should not render',

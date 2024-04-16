@@ -15,9 +15,9 @@ class SvgTagTest extends TestCase
         File::copy(__DIR__.'/../../resources/svg/icons/light/users.svg', resource_path('users.svg'));
     }
 
-    private function tag($tag)
+    private function tag($tag, $variables = [])
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, $variables);
     }
 
     /** @test */
@@ -30,7 +30,7 @@ class SvgTagTest extends TestCase
     /** @test */
     public function it_renders_svg_with_additional_params()
     {
-        $this->assertStringStartsWith('<svg class="mb-2" xmlns="', $this->tag('{{ svg src="users" sanitize="false" attr:class="mb-2" }}'));
+        $this->assertStringStartsWith('<svg class="mb-2" xmlns="', $this->tag('{{ svg src="users" sanitize="false" class="mb-2" }}'));
     }
 
     /** @test */
@@ -78,5 +78,15 @@ SVG);
         File::put(resource_path('xmltag.svg'), $svg);
 
         $this->assertEquals($svg, $this->tag('{{ svg src="xmltag" }}'));
+    }
+
+    /** @test */
+    public function fails_gracefully_when_src_is_empty()
+    {
+        $output = $this->tag('{{ svg :src="icon" }}', [
+            'icon' => null,
+        ]);
+
+        $this->assertEmpty((string) $output);
     }
 }

@@ -17,6 +17,8 @@ interface UserRepository
 
     public function findByOAuthId(Provider $provider, string $id): ?User;
 
+    public function findOrFail($id): User;
+
     public function current(): ?User;
 
     public function fromUser($user): ?User;

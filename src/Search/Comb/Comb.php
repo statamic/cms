@@ -934,10 +934,10 @@ class Comb
         $output = [];
 
         if (! is_array($words)) {
-            $output = str_singular($words);
+            $output = Str::singular($words);
         } else {
             foreach ($words as $word) {
-                array_push($output, str_singular($word));
+                array_push($output, Str::singular($word));
             }
         }
 

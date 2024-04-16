@@ -10,6 +10,9 @@ use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\StarterKits\Installer as StarterKitInstaller;
 use Statamic\StarterKits\LicenseManager as StarterKitLicenseManager;
 
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\text;
+
 class StarterKitInstall extends Command
 {
     use RunsInPlease, ValidatesInput;
@@ -59,7 +62,8 @@ class StarterKitInstall extends Command
             ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
-            ->withUser($cleared && $this->input->isInteractive() && ! $this->option('cli-install'))
+            ->isInteractive($isInteractive = $this->input->isInteractive())
+            ->withUser($cleared && $isInteractive && ! $this->option('cli-install'))
             ->usingSubProcess($this->option('cli-install'))
             ->force($this->option('force'));
 
@@ -81,7 +85,7 @@ class StarterKitInstall extends Command
             $this->comment('composer global update statamic/cli'.PHP_EOL);
         }
 
-        $this->info("Starter kit [$package] was successfully installed.");
+        $this->components->info("Starter kit [$package] was successfully installed.");
     }
 
     /**
@@ -91,7 +95,7 @@ class StarterKitInstall extends Command
      */
     protected function getPackage()
     {
-        return $this->argument('package') ?: $this->ask('Package');
+        return $this->argument('package') ?: text('Package');
     }
 
     /**
@@ -104,7 +108,7 @@ class StarterKitInstall extends Command
         if ($this->option('clear-site')) {
             return true;
         } elseif ($this->input->isInteractive()) {
-            return $this->confirm('Clear site first?', false);
+            return confirm('Clear site first?', false);
         }
 
         return false;

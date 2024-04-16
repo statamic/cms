@@ -12,6 +12,8 @@ interface NavigationRepository
 
     public function findByHandle($handle): ?Nav;
 
+    public function findOrFail($id): Nav;
+
     public function save(Nav $nav);
 
     public function make(?string $handle = null): Nav;

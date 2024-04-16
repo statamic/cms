@@ -48,7 +48,11 @@ class Svg extends Tags
             $svg = $this->params->get('src');
         }
 
-        $attributes = $this->renderAttributesFromParams();
+        if (empty($svg)) {
+            return '';
+        }
+
+        $attributes = $this->renderAttributesFromParams(except: ['src', 'title', 'desc', 'sanitize']);
 
         if ($this->params->get('title') || $this->params->get('desc')) {
             $svg = $this->setTitleAndDesc($svg);

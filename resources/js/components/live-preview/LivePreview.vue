@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <v-portal :to="livePreviewFieldsPortal" :disabled="!previewing">
+        <v-portal :to="livePreviewFieldsPortal" :disabled="!portalEnabled">
             <provider :variables="provides">
                 <slot name="default" />
             </provider>
@@ -101,6 +101,7 @@ export default {
 
     data() {
         return {
+            portalEnabled: false,
             panesVisible: false,
             headerVisible: false,
             editorWidth: null,
@@ -185,7 +186,13 @@ export default {
 
     watch: {
 
-        previewing(enabled) {
+        previewing(enabled, wasEnabled) {
+            if (wasEnabled && !enabled) {
+                this.$nextTick(() => this.portalEnabled = false);
+            } else {
+                this.portalEnabled = enabled;
+            }
+
             if (!enabled) return;
 
             this.update();

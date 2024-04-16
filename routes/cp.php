@@ -73,6 +73,7 @@ use Statamic\Http\Controllers\CP\Preferences\UserPreferenceController;
 use Statamic\Http\Controllers\CP\SearchController;
 use Statamic\Http\Controllers\CP\SelectSiteController;
 use Statamic\Http\Controllers\CP\SessionTimeoutController;
+use Statamic\Http\Controllers\CP\Sites\SitesController;
 use Statamic\Http\Controllers\CP\SlugController;
 use Statamic\Http\Controllers\CP\StartPageController;
 use Statamic\Http\Controllers\CP\Taxonomies\PublishedTermsController;
@@ -233,6 +234,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('svgs/{encoded_asset}', [SvgController::class, 'show'])->name('assets.svgs.show');
     Route::get('pdfs/{encoded_asset}', [PdfController::class, 'show'])->name('assets.pdfs.show');
 
+    Route::get('sites', [SitesController::class, 'edit'])->name('sites.edit');
+    Route::patch('sites', [SitesController::class, 'update'])->name('sites.update');
+
     Route::group(['prefix' => 'fields'], function () {
         Route::get('/', [FieldsController::class, 'index'])->name('fields.index');
         Route::post('edit', [FieldsController::class, 'edit'])->name('fields.edit');
@@ -320,20 +324,21 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('js', [PreferenceController::class, 'store'])->name('store');
         Route::delete('js/{key}', [PreferenceController::class, 'destroy'])->name('destroy');
 
-        Route::group(['prefix' => 'nav', 'as' => 'nav.'], function () {
-            Route::get('/', [NavController::class, 'index'])->name('index');
-            Route::get('edit', [UserNavController::class, 'edit'])->name('user.edit');
-            Route::patch('/', [UserNavController::class, 'update'])->name('user.update');
-            Route::delete('/', [UserNavController::class, 'destroy'])->name('user.destroy');
+    });
 
-            Route::middleware([RequireStatamicPro::class, 'can:manage preferences'])->group(function () {
-                Route::get('roles/{role}/edit', [RoleNavController::class, 'edit'])->name('role.edit');
-                Route::patch('roles/{role}', [RoleNavController::class, 'update'])->name('role.update');
-                Route::delete('roles/{role}', [RoleNavController::class, 'destroy'])->name('role.destroy');
-                Route::get('default/edit', [DefaultNavController::class, 'edit'])->name('default.edit');
-                Route::patch('default', [DefaultNavController::class, 'update'])->name('default.update');
-                Route::delete('default', [DefaultNavController::class, 'destroy'])->name('default.destroy');
-            });
+    Route::group(['prefix' => 'nav', 'as' => 'preferences.nav.'], function () {
+        Route::get('/', [NavController::class, 'index'])->name('index');
+        Route::get('edit', [UserNavController::class, 'edit'])->name('user.edit');
+        Route::patch('/', [UserNavController::class, 'update'])->name('user.update');
+        Route::delete('/', [UserNavController::class, 'destroy'])->name('user.destroy');
+
+        Route::middleware([RequireStatamicPro::class, 'can:manage preferences'])->group(function () {
+            Route::get('roles/{role}/edit', [RoleNavController::class, 'edit'])->name('role.edit');
+            Route::patch('roles/{role}', [RoleNavController::class, 'update'])->name('role.update');
+            Route::delete('roles/{role}', [RoleNavController::class, 'destroy'])->name('role.destroy');
+            Route::get('default/edit', [DefaultNavController::class, 'edit'])->name('default.edit');
+            Route::patch('default', [DefaultNavController::class, 'update'])->name('default.update');
+            Route::delete('default', [DefaultNavController::class, 'destroy'])->name('default.destroy');
         });
     });
 

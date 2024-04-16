@@ -1057,7 +1057,7 @@ class DocumentParser
                 }
             }
 
-            if ($this->cur == self::AtChar && ($this->prev != null && ctype_space($this->prev))) {
+            if ($this->cur == self::String_EscapeCharacter && ($this->prev != null && ctype_space($this->prev))) {
                 if ($this->next != null && (ctype_alpha($this->next) || $this->next == self::Punctuation_Underscore || $this->next == self::AtChar)) {
                     // It is possible that we might be starting some escaped content.
                     // We will need more information to determine this, but let's

@@ -46,7 +46,7 @@ class StaticWarm extends Command
     public function handle()
     {
         if (! config('statamic.static_caching.strategy')) {
-            $this->error('Static caching is not enabled.');
+            $this->components->error('Static caching is not enabled.');
 
             return 1;
         }
@@ -54,7 +54,7 @@ class StaticWarm extends Command
         $this->shouldQueue = $this->option('queue');
 
         if ($this->shouldQueue && config('queue.default') === 'sync') {
-            $this->error('The queue connection is set to "sync". Queueing will be disabled.');
+            $this->components->error('The queue connection is set to "sync". Queueing will be disabled.');
             $this->shouldQueue = false;
         }
 
@@ -62,10 +62,10 @@ class StaticWarm extends Command
 
         $this->warm();
 
-        $this->output->newLine();
-        $this->info($this->shouldQueue
-            ? 'All requests to warm the static cache have been added to the queue.'
-            : 'The static cache has been warmed.'
+        $this->components->info(
+            $this->shouldQueue
+                ? 'All requests to warm the static cache have been added to the queue.'
+                : 'The static cache has been warmed.'
         );
 
         return 0;
@@ -118,7 +118,7 @@ class StaticWarm extends Command
 
     public function outputSuccessLine(Response $response, $index): void
     {
-        $this->checkLine($this->getRelativeUri($index));
+        $this->components->twoColumnDetail($this->getRelativeUri($index), '<info>✓ Cached</info>');
     }
 
     public function outputFailureLine($exception, $index): void
@@ -137,7 +137,7 @@ class StaticWarm extends Command
             $message = $exception->getMessage();
         }
 
-        $this->crossLine("$uri → <fg=cyan>$message</fg=cyan>");
+        $this->components->twoColumnDetail($uri, "<fg=cyan>$message</fg=cyan>");
     }
 
     private function getRelativeUri(int $index): string

@@ -69,7 +69,7 @@ class DataResponse implements Responsable
 
     protected function getRedirect()
     {
-        if (! $raw = $this->data->get('redirect')) {
+        if (! $raw = (method_exists($this->data, 'value') ? $this->data->value('redirect') : $this->data->get('redirect'))) {
             return;
         }
 
