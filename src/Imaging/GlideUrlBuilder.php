@@ -34,8 +34,6 @@ class GlideUrlBuilder extends ImageUrlBuilder
     {
         $this->item = $item;
 
-        $filename = null;
-
         switch ($this->itemType()) {
             case 'url':
                 $path = 'http/'.base64_encode($item);
@@ -57,7 +55,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
 
         $builder = UrlBuilderFactory::create($this->options['route'], $this->options['key']);
 
-        if ($filename) {
+        if (isset($filename)) {
             $path .= Str::ensureLeft(URL::encode($filename), '/');
         }
 
