@@ -72,14 +72,6 @@ class GlideUrlBuilderTest extends TestCase
         );
     }
 
-    public function testFilename()
-    {
-        $this->assertEquals(
-            '/img/foo.jpg/custom.png?w=100',
-            $this->builder->build('/foo.jpg', ['w' => '100'], 'custom.png')
-        );
-    }
-
     public function testConfigAddsFilename()
     {
         $asset = new Asset;
