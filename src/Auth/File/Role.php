@@ -27,8 +27,8 @@ class Role extends BaseRole
     public function title(?string $title = null)
     {
         if (func_num_args() === 0) {
-            return $this->title;
-        }
+            return $this->title ?? ucfirst($this->handle);
+        };
 
         $this->title = $title;
 
