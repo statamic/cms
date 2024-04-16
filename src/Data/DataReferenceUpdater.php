@@ -209,6 +209,22 @@ abstract class DataReferenceUpdater
     }
 
     /**
+     * Determine if field has string value.
+     *
+     * @param  \Statamic\Fields\Field  $field
+     * @param  null|string  $dottedPrefix
+     * @return bool
+     */
+    protected function hasStringValue($field, $dottedPrefix)
+    {
+        $data = $this->item->data()->all();
+
+        $dottedKey = $dottedPrefix.$field->handle();
+
+        return is_string(Arr::get($data, $dottedKey));
+    }
+
+    /**
      * Update string value on item.
      *
      * @param  \Statamic\Fields\Field  $field
