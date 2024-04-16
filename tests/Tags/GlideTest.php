@@ -18,9 +18,9 @@ class GlideTest extends TestCase
     {
         $this->createImageInPublicDirectory();
 
-        $this->assertEquals('/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag());
-        $this->assertEquals('/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag(false));
-        $this->assertEquals('http://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag(true));
+        $this->assertEquals('/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag());
+        $this->assertEquals('/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag(false));
+        $this->assertEquals('http://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag(true));
     }
 
     /**
@@ -32,9 +32,9 @@ class GlideTest extends TestCase
     {
         $this->createImageInPublicDirectory();
 
-        $this->assertEquals('http://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag());
-        $this->assertEquals('/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag(false));
-        $this->assertEquals('http://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag(true));
+        $this->assertEquals('http://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag());
+        $this->assertEquals('/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag(false));
+        $this->assertEquals('http://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag(true));
     }
 
     /**
@@ -46,9 +46,9 @@ class GlideTest extends TestCase
     {
         $this->createImageInPublicDirectory();
 
-        $this->assertEquals('https://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag());
-        $this->assertEquals('/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag(false));
-        $this->assertEquals('https://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag(true));
+        $this->assertEquals('https://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag());
+        $this->assertEquals('/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag(false));
+        $this->assertEquals('https://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag(true));
     }
 
     /**
