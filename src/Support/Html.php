@@ -341,15 +341,16 @@ class Html
      *
      * @param  string|array  $value  The value to sanitize
      * @param  bool  $antlers  Whether Antlers (curly braces) should be escaped.
+     * @param  bool  $doubleEncode  Whether existing HTML entities should be double-encoded.
      * @return string
      */
-    public static function sanitize($value, $antlers = true)
+    public static function sanitize($value, $antlers = true, $doubleEncode = true)
     {
         if (is_array($value)) {
             return Arr::sanitize($value, $antlers);
         }
 
-        $value = self::entities($value);
+        $value = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
 
         if ($antlers) {
             $value = str_replace(['{', '}'], ['&lbrace;', '&rbrace;'], $value);

@@ -79,6 +79,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     protected $template;
     protected $layout;
     protected $augmentationReferenceKey;
+    private $computedCallbackCache;
+    private $siteCache;
 
     public function __construct()
     {
@@ -107,6 +109,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return $this
             ->fluentlyGetOrSet('locale')
             ->setter(function ($locale) {
+                $this->siteCache = null;
+
                 return $locale instanceof \Statamic\Sites\Site ? $locale->handle() : $locale;
             })
             ->getter(function ($locale) {
@@ -117,7 +121,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function site()
     {
-        return Site::get($this->locale());
+        if ($this->siteCache) {
+            return $this->siteCache;
+        }
+
+        return $this->siteCache = Site::get($this->locale());
     }
 
     public function authors()
@@ -133,6 +141,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             }) : null;
         }
 
+        $this->computedCallbackCache = null;
         $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
 
         return $this;
@@ -198,9 +207,19 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ], $this->data()->except(['updated_at'])->toArray());
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (EntryDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && EntryDeleting::dispatch($this) === false) {
             return false;
         }
 
@@ -226,16 +245,18 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         Facades\Entry::delete($this);
 
-        EntryDeleted::dispatch($this);
+        if ($withEvents) {
+            EntryDeleted::dispatch($this);
+        }
 
         return true;
     }
 
-    public function deleteDescendants()
+    public function deleteDescendants($withEvents = true)
     {
-        $this->descendants()->each(function ($entry) {
-            $entry->deleteDescendants();
-            $entry->delete();
+        $this->descendants()->each(function ($entry) use ($withEvents) {
+            $entry->deleteDescendants($withEvents);
+            $withEvents ? $entry->delete() : $entry->deleteQuietly();
         });
 
         Blink::forget('entry-descendants-'.$this->id());
@@ -375,6 +396,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
             Blink::forget($this->getOriginBlinkKey());
+            Blink::store('collection-mounts')->flush();
         }
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
@@ -385,7 +407,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         $this->taxonomize();
 
-        optional(Collection::findByMount($this))->updateEntryUris();
+        if ($this->isDirty('slug')) {
+            optional(Collection::findByMount($this))->updateEntryUris();
+        }
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -443,7 +467,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return vsprintf('%s/%s/%s%s%s.%s', [
             rtrim(Stache::store('entries')->directory(), '/'),
             $this->collectionHandle(),
-            Site::hasMultiple() ? $this->locale().'/' : '',
+            Site::multiEnabled() ? $this->locale().'/' : '',
             $prefix,
             $this->slug() ?? $this->id(),
             $this->fileExtension(),
@@ -1024,6 +1048,20 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function getComputedCallbacks()
     {
-        return Facades\Collection::getComputedCallbacks($this->collection);
+        if ($this->computedCallbackCache) {
+            return $this->computedCallbackCache;
+        }
+
+        return $this->computedCallbackCache = Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function __sleep()
+    {
+        if ($this->slug instanceof Closure) {
+            $slug = $this->slug;
+            $this->slug = $slug($this);
+        }
+
+        return array_keys(Arr::except(get_object_vars($this), ['cachedKeys', 'computedCallbackCache', 'siteCache']));
     }
 }

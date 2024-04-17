@@ -2,7 +2,7 @@
 
 namespace Statamic\Contracts\Data;
 
-interface Augmentable
+interface Augmentable extends \JsonSerializable
 {
     public function augmentedValue($key);
 

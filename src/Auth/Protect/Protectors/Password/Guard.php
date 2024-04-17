@@ -2,6 +2,8 @@
 
 namespace Statamic\Auth\Protect\Protectors\Password;
 
+use Statamic\Support\Arr;
+
 class Guard
 {
     protected $config;
@@ -13,7 +15,7 @@ class Guard
 
     public function check($password)
     {
-        $allowed = array_get($this->config, 'allowed', []);
+        $allowed = Arr::get($this->config, 'allowed', []);
 
         return in_array($password, $allowed);
     }
