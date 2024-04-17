@@ -319,7 +319,7 @@ class Entries extends Relationship
         return new \Statamic\Entries\EntryCollection($value);
     }
 
-    protected function queryBuilder($values)
+    private function queryBuilder($values)
     {
         $site = Site::current()->handle();
         if (($parent = $this->field()->parent()) && ($parent instanceof Localization || $parent instanceof LocalizedTerm)) {
@@ -335,10 +335,8 @@ class Entries extends Relationship
             ->filter()
             ->all();
 
-        $query = (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
+        return (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
             ->whereIn('id', $ids);
-
-        return $query;
     }
 
     public function augment($values)
