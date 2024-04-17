@@ -1,5 +1,30 @@
 # Release Notes
 
+## 5.0.0-alpha.4 (2024-04-17)
+
+### What's changed
+- JSON Serialization. [#9672](https://github.com/statamic/cms/issues/9672) by @jasonvarga
+- Default field values defined in blueprints will be used for output rather than only on publish
+  forms. [#9010](https://github.com/statamic/cms/issues/9010) by @duncanmcclean
+- Always append original filenames to Glide URLs. [#9616](https://github.com/statamic/cms/issues/9616) by @duncanmcclean
+- Ability to set custom Glide hashes. [#9918](https://github.com/statamic/cms/issues/9918) by @jasonvarga
+- Remove manual Glide filenames. [#9913](https://github.com/statamic/cms/issues/9913) by @jasonvarga
+- Reduce the number of times the `fieldsCache` is reset. [#9585](https://github.com/statamic/cms/issues/9585) by
+  @JohnathonKoster
+  @duncanmcclean
+- Add `install:collaboration` command [#9760](https://github.com/statamic/cms/issues/9760) by @duncanmcclean
+- Add `install:eloquent-driver` command [#9669](https://github.com/statamic/cms/issues/9669) by @duncanmcclean
+- Improve handling of recursive fieldsets. [#9539](https://github.com/statamic/cms/issues/9539) by @JohnathonKoster
+- Improvements to `please` commands. [#9720](https://github.com/statamic/cms/issues/9720) by @duncanmcclean
+- Fix issues with Please commands on Laravel 11. [#9877](https://github.com/statamic/cms/issues/9877) by @duncanmcclean
+- Fix event listeners not being triggered with Laravel 11. [#9876](https://github.com/statamic/cms/issues/9876) by
+  @duncanmcclean
+- Addon Testing Changes. [#9871](https://github.com/statamic/cms/issues/9871) by @duncanmcclean
+- Make the SVG tag fail gracefully when `src` value is empty. [#9905](https://github.com/statamic/cms/issues/9905) by
+- Fix duplicated field config header. [#9896](https://github.com/statamic/cms/issues/9896) by @peimn
+
+
+
 ## 5.0.0-alpha.3 (2024-04-11)
 
 ### What's changed
