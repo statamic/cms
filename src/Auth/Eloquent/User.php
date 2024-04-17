@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\User as BaseUser;
-use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
