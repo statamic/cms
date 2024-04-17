@@ -12,6 +12,7 @@ use Statamic\Auth\File\UserGroup;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades;
+use Statamic\Support\Str;
 use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
@@ -238,7 +239,7 @@ class EloquentUserTest extends TestCase
                 'name' => $this->faker->name(),
                 'email' => $this->faker->unique()->safeEmail(),
                 // 'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
-                'remember_token' => str_random(10),
+                'remember_token' => Str::random(10),
             ])
             );
     }

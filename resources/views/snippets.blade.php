@@ -9,7 +9,7 @@
 			<div class="panel-body">
 				<h1>Put teh snipples up in hurr.</h1>
 			</div>
-			
+
 		</div>
 	</div>
 </div>

@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
+use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
-use Statamic\Validation\AllowedFile;
 
 class FrontendFormRequest extends FormRequest
 {
@@ -110,7 +110,7 @@ class FrontendFormRequest extends FormRequest
     {
         // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
         return $fields->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets' && $this->hasFile($field->handle()))
+            ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files']) && $this->hasFile($field->handle()))
             ->map(fn ($field) => Arr::wrap($this->file($field->handle())))
             ->all();
     }

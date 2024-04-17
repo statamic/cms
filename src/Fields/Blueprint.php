@@ -42,6 +42,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     protected $ensuredFields = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    private $lastBlueprintHandle = null;
+
     private ?Columns $columns = null;
 
     public function setHandle(string $handle)
@@ -399,7 +401,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function title()
     {
-        return array_get($this->contents, 'title', Str::humanize(Str::of($this->handle)->after('::')->afterLast('.')));
+        return Arr::get($this->contents, 'title', Str::humanize(Str::of($this->handle)->after('::')->afterLast('.')));
     }
 
     public function isNamespaced(): bool
@@ -474,15 +476,27 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (BlueprintDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && BlueprintDeleting::dispatch($this) === false) {
             return false;
         }
 
         BlueprintRepository::delete($this);
 
-        BlueprintDeleted::dispatch($this);
+        if ($withEvents) {
+            BlueprintDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -623,6 +637,16 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     protected function resetFieldsCache()
     {
+        if ($this->parent) {
+            $blueprint = (fn () => property_exists($this, 'blueprint') ? $this->blueprint : null)->call($this->parent);
+
+            if ($blueprint && $blueprint === $this->lastBlueprintHandle) {
+                return $this;
+            }
+
+            $this->lastBlueprintHandle = $blueprint;
+        }
+
         $this->fieldsCache = null;
 
         Blink::forget($this->contentsBlinkKey());

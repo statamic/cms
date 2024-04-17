@@ -7,20 +7,15 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Query\Builder as LaravelQueryBuilder;
 use JsonSerializable;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Fields\Value;
+use Tests\TestCase;
 
 class AugmentedCollectionTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        m::close();
-    }
-
     /** @test */
     public function it_calls_toArray_on_each_item()
     {
@@ -147,7 +142,7 @@ class AugmentedCollectionTest extends TestCase
             new TestArrayableObject,
             new TestJsonableObject,
             new TestJsonSerializeObject,
-            $augmentable = new TestAugmentableObject,
+            $augmentable = new TestAugmentableObject(['foo' => 'bar']),
             'baz',
             $value,
         ]);
@@ -156,7 +151,7 @@ class AugmentedCollectionTest extends TestCase
             ['foo' => 'bar'],
             ['foo' => 'bar'],
             ['foo' => 'bar'],
-            $augmentable,
+            ['foo' => 'bar'],
             'baz',
             'value json serialized',
         ], $c->jsonSerialize());
@@ -172,7 +167,7 @@ class AugmentedCollectionTest extends TestCase
             new TestArrayableObject,
             new TestJsonableObject,
             new TestJsonSerializeObject,
-            new TestAugmentableObject,
+            new TestAugmentableObject(['foo' => 'bar']),
             'baz',
             $value,
         ]);
@@ -216,6 +211,16 @@ class TestJsonSerializeObject implements JsonSerializable
 class TestAugmentableObject implements Augmentable
 {
     use HasAugmentedData;
+
+    public function __construct(private $data)
+    {
+
+    }
+
+    public function augmentedArrayData()
+    {
+        return $this->data;
+    }
 
     public function toShallowAugmentedArray()
     {

@@ -39,6 +39,7 @@ class FeatureTest extends TestCase
             $stache->store('collection-trees')->directory($dir.'/content/structures/collections');
             $stache->store('nav-trees')->directory($dir.'/content/structures/navigation');
             $stache->store('users')->directory($dir.'/users');
+            $stache->store('form-submissions')->directory($dir.'/content/submissions');
         });
     }
 

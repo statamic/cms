@@ -4,7 +4,7 @@ namespace Statamic\Console\Please;
 
 use App\Console\Kernel as ConsoleKernel;
 use Statamic\Console\Please\Application as Please;
-use Statamic\Statamic;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Kernel extends ConsoleKernel
 {
@@ -15,8 +15,31 @@ class Kernel extends ConsoleKernel
      */
     protected function getArtisan()
     {
-        return tap(
-            new Please($this->app, $this->events, Statamic::version())
-        )->setName('Statamic');
+        if (is_null($this->artisan)) {
+            $this->artisan = tap(
+                (new Please($this->app, $this->events, $this->app->version()))
+                    ->resolveCommands($this->commands)
+                    ->setContainerCommandLoader()
+            )->setName('Statamic');
+
+            if ($this->symfonyDispatcher instanceof EventDispatcher) {
+                $this->artisan->setDispatcher($this->symfonyDispatcher);
+                $this->artisan->setSignalsToDispatchEvent();
+            }
+        }
+
+        return $this->artisan;
+    }
+
+    public function call($command, array $parameters = [], $outputBuffer = null)
+    {
+        $this->getArtisan()->resolveDeferredCommands();
+
+        return parent::call($command, $parameters, $outputBuffer);
+    }
+
+    protected function shouldDiscoverCommands()
+    {
+        return get_class($this) === __CLASS__;
     }
 }

@@ -5,12 +5,16 @@ namespace Statamic\Stache\Query;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
+use Statamic\Facades\Collection;
+use Statamic\Support\Arr;
 
 class EntryQueryBuilder extends Builder implements QueryBuilder
 {
     use QueriesTaxonomizedEntries;
 
-    protected $collections;
+    private const STATUSES = ['published', 'draft', 'scheduled', 'expired'];
+
+    protected $collections = [];
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -18,6 +22,10 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             $this->collections[] = $operator;
 
             return $this;
+        }
+
+        if ($column === 'status') {
+            trigger_error('Filtering by status is deprecated. Use whereStatus() instead.', E_USER_DEPRECATED);
         }
 
         return parent::where($column, $operator, $value, $boolean);
@@ -29,6 +37,10 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             $this->collections = array_merge($this->collections ?? [], $values);
 
             return $this;
+        }
+
+        if ($column === 'status') {
+            trigger_error('Filtering by status is deprecated. Use whereStatus() instead.', E_USER_DEPRECATED);
         }
 
         return parent::whereIn($column, $values, $boolean);
@@ -130,5 +142,84 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return collect($collections)->flatMap(function ($collection) use ($column) {
             return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
         });
+    }
+
+    public function whereStatus(string $status)
+    {
+        if (! in_array($status, self::STATUSES)) {
+            throw new \Exception("Invalid status [$status]");
+        }
+
+        if ($status === 'draft') {
+            return $this->where('published', false);
+        }
+
+        $this->where('published', true);
+
+        return $this->where(fn ($query) => $this
+            ->getCollectionsForStatus()
+            ->each(fn ($collection) => $query->orWhere(fn ($q) => $this->addCollectionStatusLogicToQuery($q, $status, $collection))));
+    }
+
+    private function getCollectionsForStatus()
+    {
+        // Since we have to add nested queries for each collection, if collections have been provided,
+        // we'll use those to avoid the need for adding unnecessary query clauses.
+
+        if (empty($this->collections)) {
+            return Collection::all();
+        }
+
+        return collect($this->collections)->map(fn ($handle) => Collection::find($handle));
+    }
+
+    private function addCollectionStatusLogicToQuery($query, $status, $collection)
+    {
+        // Using collectionHandle instead of collection because we intercept collection
+        // and put it on a property. In this case we actually want the indexed value.
+        // We can probably refactor this elsewhere later.
+        $query->where('collectionHandle', $collection->handle());
+
+        if ($collection->futureDateBehavior() === 'public' && $collection->pastDateBehavior() === 'public') {
+            if ($status === 'scheduled' || $status === 'expired') {
+                $query->where('date', 'invalid'); // intentionally trigger no results.
+            }
+        }
+
+        if ($collection->futureDateBehavior() === 'private') {
+            $status === 'scheduled'
+                ? $query->where('date', '>', now())
+                : $query->where('date', '<', now());
+
+            if ($status === 'expired') {
+                $query->where('date', 'invalid'); // intentionally trigger no results.
+            }
+        }
+
+        if ($collection->pastDateBehavior() === 'private') {
+            $status === 'expired'
+                ? $query->where('date', '<', now())
+                : $query->where('date', '>', now());
+
+            if ($status === 'scheduled') {
+                $query->where('date', 'invalid'); // intentionally trigger no results.
+            }
+        }
+    }
+
+    public function prepareForFakeQuery(): array
+    {
+        $data = parent::prepareForFakeQuery();
+
+        if (! empty($this->collections)) {
+            $data['wheres'] = Arr::prepend($data['wheres'], [
+                'type' => 'In',
+                'column' => 'collection',
+                'values' => $this->collections,
+                'boolean' => 'and',
+            ]);
+        }
+
+        return $data;
     }
 }
