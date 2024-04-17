@@ -1,5 +1,30 @@
 # Release Notes
 
+## 4.57.0 (2024-04-17)
+
+### What's new
+- Add deleteQuietly methods. [#9666](https://github.com/statamic/cms/issues/9666) by @ryanmitchell
+- Support using closures for Statamic route data. [#9868](https://github.com/statamic/cms/issues/9868) by @arthurperton
+
+### What's fixed
+- Fix single unpublished entries in listing column. [#9917](https://github.com/statamic/cms/issues/9917) by @jacksleight
+- Prevent computed fields from being sortable in listing tables. [#9916](https://github.com/statamic/cms/issues/9916) by @duncanmcclean
+- Fix Grid styles messing up row-controls of nested fields. [#9910](https://github.com/statamic/cms/issues/9910) by @duncanmcclean
+- Fix icons color. [#9895](https://github.com/statamic/cms/issues/9895) by @peimn
+- Fix Nova icon not displaying in Icon Fieldtype. [#9906](https://github.com/statamic/cms/issues/9906) by @duncanmcclean
+- Add title fallback for roles & groups. [#9907](https://github.com/statamic/cms/issues/9907) by @duncanmcclean
+- Fix Bard scrolling editor/page on link insert. [#9886](https://github.com/statamic/cms/issues/9886) by @jacksleight
+- Hash API cache keys the key to handle long route and query parameters. [#9858](https://github.com/statamic/cms/issues/9858) by @Smef
+- Fix regression on bard/replicator group set previews. [#9901](https://github.com/statamic/cms/issues/9901) by @caseydwyer
+- Fix arrow direction in fav creator for RTL. [#9897](https://github.com/statamic/cms/issues/9897) by @peimn
+- Fixes for asset/term reference updater strictness. [#9878](https://github.com/statamic/cms/issues/9878) by @jesseleite
+- Add `date` to reserved fields for form blueprints. [#9872](https://github.com/statamic/cms/issues/9872) by @duncanmcclean
+- Fix tables in Bard not saving updates. [#9867](https://github.com/statamic/cms/issues/9867) by @jacksleight
+- Add tailwind safelist with horizontal margins and padding. [#9864](https://github.com/statamic/cms/issues/9864) by @jasonvarga
+- Fix PHPUnit deprecations. [#9912](https://github.com/statamic/cms/issues/9912) by @jasonvarga
+
+
+
 ## 4.56.1 (2024-04-09)
 
 ### What's fixed
