@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging;
 
+use Closure;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\ServerFactory;
@@ -12,6 +13,8 @@ use Statamic\Support\Str;
 
 class GlideManager
 {
+    private Closure $customHashCallable;
+
     /**
      * Create glide server.
      *
@@ -30,28 +33,7 @@ class GlideManager
             'watermarks' => public_path(),
         ], $config));
 
-        $server
-            ->setCachePathCallable(function ($path, $params) {
-                // to avoid having to recreate the getCachePath method from glide server
-                // we run getCachePath again without this callback function
-                $customCallable = $this->getCachePathCallable();
-
-                $this->setCachePathCallable(null);
-                $cachePath = $this->getCachePath($path, $params);
-                $this->setCachePathCallable($customCallable);
-
-                // then we append our original filename to the end
-                $filename = Str::afterLast($cachePath, '/');
-                $cachePath = Str::beforeLast($cachePath, '/');
-
-                $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.pathinfo($path, PATHINFO_BASENAME);
-
-                if ($extension = ($params['fm'] ?? false)) {
-                    $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
-                }
-
-                return $cachePath;
-            });
+        $server->setCachePathCallable($this->getCachePathCallable());
 
         return $server;
     }
@@ -178,5 +160,46 @@ class GlideManager
         return collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
             return [$legend[$param] ?? $param => $value];
         })->all();
+    }
+
+    private function getCachePathCallable()
+    {
+        $hashCallable = $this->getHashCallable();
+
+        return function ($path, $params) use ($hashCallable) {
+            $sourcePath = $this->getSourcePath($path);
+
+            if ($this->sourcePathPrefix) {
+                $sourcePath = substr($sourcePath, strlen($this->sourcePathPrefix) + 1);
+            }
+
+            $params = $this->getAllParams($params);
+            unset($params['s'], $params['p']);
+            ksort($params);
+
+            $ext = $params['fm'] ?? pathinfo($path, PATHINFO_EXTENSION);
+            $ext = $ext === 'pjpg' ? 'jpg' : $ext;
+            $ext = $ext ? ".$ext" : '';
+
+            return vsprintf('%s/%s/%s/%s%s', [
+                $this->cachePathPrefix,
+                $sourcePath,
+                $hashCallable($sourcePath, $params),
+                pathinfo($path, PATHINFO_FILENAME),
+                $ext,
+            ]);
+        };
+    }
+
+    private function getHashCallable()
+    {
+        return $this->customHashCallable ?? function (string $source, array $params) {
+            return md5($source.'?'.http_build_query($params));
+        };
+    }
+
+    public function generateHashUsing(Closure $callback)
+    {
+        $this->customHashCallable = $callback;
     }
 }
