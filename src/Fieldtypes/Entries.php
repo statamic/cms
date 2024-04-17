@@ -319,7 +319,7 @@ class Entries extends Relationship
         return new \Statamic\Entries\EntryCollection($value);
     }
 
-    public function augment($values)
+    private function queryBuilder($values)
     {
         $site = Site::current()->handle();
         if (($parent = $this->field()->parent()) && ($parent instanceof Localization || $parent instanceof LocalizedTerm)) {
@@ -335,8 +335,13 @@ class Entries extends Relationship
             ->filter()
             ->all();
 
-        $query = (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
+        return (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
             ->whereIn('id', $ids);
+    }
+
+    public function augment($values)
+    {
+        $query = $this->queryBuilder($values);
 
         return $this->config('max_items') === 1 ? $query->first() : $query;
     }
@@ -409,13 +414,7 @@ class Entries extends Relationship
 
     protected function getItemsForPreProcessIndex($values): SupportCollection
     {
-        if (! $augmented = $this->augment($values)) {
-            return collect();
-        }
-
-        return $this->config('max_items') === 1
-            ? collect([$augmented])
-            : $augmented->whereAnyStatus()->get();
+        return $this->queryBuilder($values)->whereAnyStatus()->get();
     }
 
     public function filter()
