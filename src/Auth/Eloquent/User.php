@@ -144,15 +144,6 @@ class User extends BaseUser
         return $this;
     }
 
-    public function hasRole($role)
-    {
-        $role = $role instanceof RoleContract ? $role->handle() : $role;
-
-        return $this->roles()
-            ->merge($this->groups()->map->roles()->flatten()->filter()->keyBy->handle())
-            ->has($role);
-    }
-
     public function groups($groups = null)
     {
         return is_null($groups)
