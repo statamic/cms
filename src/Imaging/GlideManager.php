@@ -30,28 +30,7 @@ class GlideManager
             'watermarks' => public_path(),
         ], $config));
 
-        $server
-            ->setCachePathCallable(function ($path, $params) {
-                // to avoid having to recreate the getCachePath method from glide server
-                // we run getCachePath again without this callback function
-                $customCallable = $this->getCachePathCallable();
-
-                $this->setCachePathCallable(null);
-                $cachePath = $this->getCachePath($path, $params);
-                $this->setCachePathCallable($customCallable);
-
-                // then we append our original filename to the end
-                $filename = Str::afterLast($cachePath, '/');
-                $cachePath = Str::beforeLast($cachePath, '/');
-
-                $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.pathinfo($path, PATHINFO_BASENAME);
-
-                if ($extension = ($params['fm'] ?? false)) {
-                    $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
-                }
-
-                return $cachePath;
-            });
+        $server->setCachePathCallable($this->getCachePathCallable());
 
         return $server;
     }
@@ -178,5 +157,30 @@ class GlideManager
         return collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
             return [$legend[$param] ?? $param => $value];
         })->all();
+    }
+
+    private function getCachePathCallable()
+    {
+        return function ($path, $params) {
+            // to avoid having to recreate the getCachePath method from glide server
+            // we run getCachePath again without this callback function
+            $customCallable = $this->getCachePathCallable();
+
+            $this->setCachePathCallable(null);
+            $cachePath = $this->getCachePath($path, $params);
+            $this->setCachePathCallable($customCallable);
+
+            // then we append our original filename to the end
+            $filename = Str::afterLast($cachePath, '/');
+            $cachePath = Str::beforeLast($cachePath, '/');
+
+            $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.pathinfo($path, PATHINFO_BASENAME);
+
+            if ($extension = ($params['fm'] ?? false)) {
+                $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
+            }
+
+            return $cachePath;
+        };
     }
 }
