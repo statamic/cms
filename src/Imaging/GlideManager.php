@@ -162,13 +162,24 @@ class GlideManager
     private function getCachePathCallable()
     {
         return function ($path, $params) {
-            // to avoid having to recreate the getCachePath method from glide server
-            // we run getCachePath again without this callback function
-            $customCallable = $this->getCachePathCallable();
+            $sourcePath = $this->getSourcePath($path);
 
-            $this->setCachePathCallable(null);
-            $cachePath = $this->getCachePath($path, $params);
-            $this->setCachePathCallable($customCallable);
+            if ($this->sourcePathPrefix) {
+                $sourcePath = substr($sourcePath, strlen($this->sourcePathPrefix) + 1);
+            }
+
+            $params = $this->getAllParams($params);
+            unset($params['s'], $params['p']);
+            ksort($params);
+
+            $hash = md5($sourcePath.'?'.http_build_query($params));
+            $cachePath = $this->cachePathPrefix.'/'.$sourcePath.'/'.$hash;
+
+            if ($this->cacheWithFileExtensions) {
+                $ext = (isset($params['fm']) ? $params['fm'] : pathinfo($path)['extension']);
+                $ext = ($ext === 'pjpg') ? 'jpg' : $ext;
+                $cachePath .= '.'.$ext;
+            }
 
             // then we append our original filename to the end
             $filename = Str::afterLast($cachePath, '/');
