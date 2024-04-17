@@ -163,10 +163,7 @@ class User extends BaseUser
         return collect($this->get('roles', []))
             ->map(function ($role) {
                 return Facades\Role::find($role);
-            })
-            ->merge($this->groups()->map->roles()->flatten())
-            ->filter()
-            ->keyBy->handle();
+            })->filter()->keyBy->handle();
     }
 
     public function assignRole($role)
@@ -200,7 +197,9 @@ class User extends BaseUser
     {
         $role = $role instanceof RoleContract ? $role->handle() : $role;
 
-        return $this->roles()->has($role);
+        return $this->roles()
+            ->merge($this->groups()->map->roles()->flatten()->filter()->keyBy->handle())
+            ->has($role);
     }
 
     public function addToGroup($group)
