@@ -164,8 +164,8 @@ class User extends BaseUser
             ->map(function ($role) {
                 return Facades\Role::find($role);
             })
-            ->filter()
             ->merge($this->groups()->map->roles()->flatten())
+            ->filter()
             ->keyBy->handle();
     }
 
