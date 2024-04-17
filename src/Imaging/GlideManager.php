@@ -161,7 +161,9 @@ class GlideManager
 
     private function getCachePathCallable()
     {
-        return function ($path, $params) {
+        $hashCallable = $this->getHashCallable();
+
+        return function ($path, $params) use ($hashCallable) {
             $sourcePath = $this->getSourcePath($path);
 
             if ($this->sourcePathPrefix) {
@@ -172,7 +174,7 @@ class GlideManager
             unset($params['s'], $params['p']);
             ksort($params);
 
-            $hash = md5($sourcePath.'?'.http_build_query($params));
+            $hash = $hashCallable($sourcePath, $params);
             $cachePath = $this->cachePathPrefix.'/'.$sourcePath.'/'.$hash;
 
             if ($this->cacheWithFileExtensions) {
@@ -192,6 +194,13 @@ class GlideManager
             }
 
             return $cachePath;
+        };
+    }
+
+    private function getHashCallable()
+    {
+        return function (string $source, array $params) {
+            return md5($source.'?'.http_build_query($params));
         };
     }
 }
