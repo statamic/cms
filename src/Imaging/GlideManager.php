@@ -177,26 +177,17 @@ class GlideManager
             unset($params['s'], $params['p']);
             ksort($params);
 
-            $hash = $hashCallable($sourcePath, $params);
-            $cachePath = $this->cachePathPrefix.'/'.$sourcePath.'/'.$hash;
+            $ext = $params['fm'] ?? pathinfo($path, PATHINFO_EXTENSION);
+            $ext = $ext === 'pjpg' ? 'jpg' : $ext;
+            $ext = $ext ? ".$ext" : '';
 
-            if ($this->cacheWithFileExtensions) {
-                $ext = (isset($params['fm']) ? $params['fm'] : pathinfo($path)['extension']);
-                $ext = ($ext === 'pjpg') ? 'jpg' : $ext;
-                $cachePath .= '.'.$ext;
-            }
-
-            // then we append our original filename to the end
-            $filename = Str::afterLast($cachePath, '/');
-            $cachePath = Str::beforeLast($cachePath, '/');
-
-            $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.pathinfo($path, PATHINFO_BASENAME);
-
-            if ($extension = ($params['fm'] ?? false)) {
-                $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
-            }
-
-            return $cachePath;
+            return vsprintf('%s/%s/%s/%s%s', [
+                $this->cachePathPrefix,
+                $sourcePath,
+                $hashCallable($sourcePath, $params),
+                pathinfo($path, PATHINFO_FILENAME),
+                $ext,
+            ]);
         };
     }
 
