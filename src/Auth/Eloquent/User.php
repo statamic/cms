@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth\Eloquent;
 
+use Statamic\Contracts\Auth\Role as RoleContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -145,9 +146,11 @@ class User extends BaseUser
 
     public function hasRole($role)
     {
-        return $this->roles()->has(
-            is_string($role) ? $role : $role->handle()
-        );
+        $role = $role instanceof RoleContract ? $role->handle() : $role;
+
+        return $this->roles()
+            ->merge($this->groups()->map->roles()->flatten()->filter()->keyBy->handle())
+            ->has($role);
     }
 
     public function groups($groups = null)
