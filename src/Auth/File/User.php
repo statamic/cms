@@ -163,7 +163,10 @@ class User extends BaseUser
         return collect($this->get('roles', []))
             ->map(function ($role) {
                 return Facades\Role::find($role);
-            })->filter()->keyBy->handle();
+            })
+            ->filter()
+            ->merge($this->groups()->map->roles()->flatten())
+            ->keyBy->handle();
     }
 
     public function assignRole($role)
