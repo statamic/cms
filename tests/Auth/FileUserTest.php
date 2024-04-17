@@ -97,7 +97,7 @@ class FileUserTest extends TestCase
 
         $userGroup->shouldReceive('id')->andReturn('usergroup');
         $userGroup->shouldReceive('handle')->andReturn('usergroup');
-        $userGroup->shouldReceive('roles')->once()->andReturn(collect([$userGroupRole]));
+        $userGroup->shouldReceive('roles')->once()->andReturn(collect([$userGroupRole]))->times(3);
 
         Role::shouldReceive('find')->with('direct')->andReturn($directRole);
         Role::shouldReceive('all')->andReturn(collect([$directRole])); // the stache calls this when getting a user. unrelated to test.
