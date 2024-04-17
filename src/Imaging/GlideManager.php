@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging;
 
+use Closure;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\ServerFactory;
@@ -12,6 +13,8 @@ use Statamic\Support\Str;
 
 class GlideManager
 {
+    private Closure $customHashCallable;
+
     /**
      * Create glide server.
      *
@@ -199,8 +202,13 @@ class GlideManager
 
     private function getHashCallable()
     {
-        return function (string $source, array $params) {
+        return $this->customHashCallable ?? function (string $source, array $params) {
             return md5($source.'?'.http_build_query($params));
         };
+    }
+
+    public function generateHashUsing(Closure $callback)
+    {
+        $this->customHashCallable = $callback;
     }
 }
