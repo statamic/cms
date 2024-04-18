@@ -5,6 +5,7 @@ namespace Statamic\Stache\Query;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Support\Arr;
 
@@ -83,18 +84,16 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             return Collection::handles()->all();
         }
 
-        return Collection::handles()
-            ->flatMap(fn ($collection) => $this->getWhereColumnKeysFromStore($collection, ['column' => 'collectionHandle']))
-            ->keys()
-            ->mapWithKeys(function ($value) {
-                [$collection, $id] = explode('::', $value);
+        return Blink::once('entry-to-collection-map', function () {
+            return Collection::handles()
+                ->flatMap(fn ($collection) => $this->getWhereColumnKeysFromStore($collection, ['column' => 'collectionHandle']))
+                ->keys()
+                ->mapWithKeys(function ($value) {
+                    [$collection, $id] = explode('::', $value);
 
-                return [$id => $collection];
-            })
-            ->only($ids->all())
-            ->unique()
-            ->values()
-            ->all();
+                    return [$id => $collection];
+                });
+        })->only($ids->all())->unique()->values()->all();
     }
 
     protected function getKeysFromCollections($collections)
