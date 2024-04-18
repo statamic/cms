@@ -1,7 +1,7 @@
 <template>
     <div class="max-w-lg mt-4 mx-auto">
 
-        <div class="rounded p-6 lg:px-20 lg:py-10 shadow bg-white">
+        <div class="rounded p-6 lg:px-20 lg:py-10 shadow bg-white dark:bg-dark-600 dark:shadow-dark">
             <header class="text-center mb-16">
                 <h1 class="mb-6">{{ __('Create Fieldset') }}</h1>
                 <p class="text-gray" v-text="__('messages.fields_fieldsets_description')" />

@@ -323,6 +323,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this->setPreference('locale', $locale);
     }
 
+    public function preferredTheme()
+    {
+        return $this->getPreference('theme') ?? 'auto';
+    }
+
     public function getCpSearchResultBadge(): string
     {
         return __('User');

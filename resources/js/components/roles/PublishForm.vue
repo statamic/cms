@@ -13,7 +13,7 @@
 
                 <form-group
                     handle="title"
-                    class="border-b"
+                    class="border-b dark:border-dark-900"
                     :display="__('Title')"
                     :errors="errors.title"
                     :instructions="__('messages.role_title_instructions')"
@@ -22,7 +22,7 @@
                 />
 
                 <form-group
-                    class="border-b"
+                    class="border-b dark:border-dark-900"
                     fieldtype="slug"
                     handle="handle"
                     :display="__('Handle')"

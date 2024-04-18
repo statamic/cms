@@ -7,7 +7,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <div class="pt-px text-2xs text-gray-600 rtl:mr-4 ltr:ml-4 flex" v-if="! canEdit">
+                <div class="pt-px text-2xs text-gray-600 dark:text-dark-200 rtl:mr-4 ltr:ml-4 flex" v-if="! canEdit">
                     <svg-icon name="light/lock" class="w-4 rtl:ml-1 ltr:mr-1 -mt-1" /> {{ __('Read Only') }}
                 </div>
 
@@ -36,7 +36,7 @@
             </div>
         </header>
 
-        <div v-if="fieldset.empty" class="text-center mt-10 border-2 border-dashed rounded-lg px-8 py-32">
+        <div v-if="fieldset.empty" class="text-center mt-10 border-2 dark:border-dark-300 border-dashed rounded-lg px-8 py-32">
             <div class="max-w-md mx-auto opacity-50">
                 <h1 class="my-6" v-text="__('This Global Set has no fields.')" />
                 <p v-text="__('messages.global_set_no_fields_description')" />

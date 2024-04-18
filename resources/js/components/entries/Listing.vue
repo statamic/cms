@@ -16,7 +16,7 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card overflow-hidden p-0 relative">
-                    <div v-if="!reordering" class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
+                    <div v-if="!reordering" class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
 
                         <data-list-filter-presets
                             ref="presets"
@@ -218,7 +218,7 @@ export default {
 
             // When reordering, we *need* a site, since mixing them up would be awkward.
             // If we're dealing with multiple sites, it's possible the user "cleared"
-            // the site filter so we'll want to fall back to the initial site.
+            // the site filter, so we'll want to fall back to the initial site.
             this.setSiteFilter(this.currentSite || this.initialSite);
 
             this.page = 1;

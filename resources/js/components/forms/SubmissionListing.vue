@@ -18,7 +18,7 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card overflow-hidden p-0 relative">
-                    <div class="flex flex-wrap items-center justify-between p-2 text-sm border-b">
+                    <div class="flex flex-wrap items-center justify-between p-2 text-sm border-b dark:border-dark-900">
                         <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
                         <data-list-column-picker class="rtl:mr-2 ltr:ml-2" :preferences-key="preferencesKey('columns')" />
                     </div>

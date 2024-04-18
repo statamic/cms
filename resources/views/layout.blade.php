@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ Statamic::cpLocale() }}" dir="{{ Statamic::cpDirection() }}">
+<html lang="{{ Statamic::cpLocale() }}" dir="{{ Statamic::cpDirection() }}" class="{{ $user->preferredTheme() }}">
 <head>
     @include('statamic::partials.head')
 </head>

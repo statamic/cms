@@ -20,7 +20,7 @@
             tabindex="-1"
         />
 
-        <span v-if="! (isDirty || searching)" class="rounded px-1 pb-px text-2xs border text-gray-600">/</span>
+        <span v-if="! (isDirty || searching)" class="rounded px-1 pb-px text-2xs border dark:border-dark-300 text-gray-600 dark:text-dark-200">/</span>
         <loading-graphic v-if="searching" :size="14" :inline="true" text="" class="global-search-loading-indicator" />
 
         <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">

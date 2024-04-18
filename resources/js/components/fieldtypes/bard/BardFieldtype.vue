@@ -77,7 +77,7 @@
                             v-tooltip="__('Add Set')"
                             @click="addSetButtonClicked"
                         >
-                            <svg-icon name="micro/plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
+                            <svg-icon name="micro/plus" class="w-3 h-3 text-gray-800 dark:text-dark-175 group-hover:text-black dark:group-hover:dark-text-100" />
                         </button>
                     </template>
                 </set-picker>
@@ -373,7 +373,7 @@ export default {
 
             let jsonValue = JSON.stringify(json);
             let oldJsonValue = JSON.stringify(oldJson);
-                        
+
             if (jsonValue === oldJsonValue) return;
 
             // Prosemirror's JSON will include spaces between tags.

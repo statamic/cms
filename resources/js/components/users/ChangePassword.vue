@@ -34,7 +34,7 @@
                 :config="{ input_type: this.inputType }"
             />
         </div>
-        <div class="flex items-center bg-gray-21 border-t rounded-b px-4 py-2">
+        <div class="flex items-center bg-gray-21 dark:bg-dark-575 border-t dark:border-dark-900 rounded-b px-4 py-2">
             <button class="btn-primary" @click.prevent="save">{{ __('Change Password') }}</button>
             <label class="rtl:mr-4 ltr:ml-4">
                 <input type="checkbox" v-model="reveal" />

@@ -99,6 +99,7 @@ import './components/Permission';
 
 import GlobalSearch from './components/GlobalSearch.vue';
 import GlobalSiteSelector from './components/GlobalSiteSelector.vue';
+import DarkModeToggle from './components/DarkModeToggle.vue';
 import Login from './components/login/login';
 import LoginModal from './components/login/LoginModal.vue';
 import BaseEntryCreateForm from './components/entries/BaseCreateForm.vue';
@@ -154,6 +155,7 @@ Statamic.app({
     components: {
         GlobalSearch,
         GlobalSiteSelector,
+        DarkModeToggle,
         Login,
         LoginModal,
         BaseEntryCreateForm,
