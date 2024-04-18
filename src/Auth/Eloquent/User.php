@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\User as BaseUser;
+use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
@@ -148,6 +149,13 @@ class User extends BaseUser
         return is_null($groups)
             ? $this->getGroups()
             : $this->setGroups($groups);
+    }
+
+    public function hasRole($role)
+    {
+        $role = $role instanceof RoleContract ? $role->handle() : $role;
+
+        return $this->roles()->has($role);
     }
 
     protected function getGroups()
