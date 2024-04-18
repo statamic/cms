@@ -58,15 +58,43 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     protected function getFilteredKeys()
     {
-        $collections = empty($this->collections)
-            ? Facades\Collection::handles()
-            : $this->collections;
+        $this->collections = $collections = $this->initCollections();
 
         $this->addTaxonomyWheres();
 
         return empty($this->wheres)
             ? $this->getKeysFromCollections($collections)
             : $this->getKeysFromCollectionsWithWheres($collections, $this->wheres);
+    }
+
+    private function initCollections(): array
+    {
+        // If the collections property isn't empty, it means the user has explicitly
+        // queried for them. In that case, we'll use them and skip the auto-detection.
+        if (! empty($this->collections)) {
+            return $this->collections;
+        }
+
+        // Otherwise, we'll detect them by looking at where clauses targeting the "id" column.
+        $ids = collect($this->wheres)->where('column', 'id')->flatMap(fn ($where) => $where['values'] ?? [$where['value']]);
+
+        // If no IDs were queried, fall back to all collections.
+        if ($ids->isEmpty()) {
+            return Collection::handles()->all();
+        }
+
+        return Collection::handles()
+            ->flatMap(fn ($collection) => $this->getWhereColumnKeysFromStore($collection, ['column' => 'collectionHandle']))
+            ->keys()
+            ->mapWithKeys(function ($value) {
+                [$collection, $id] = explode('::', $value);
+
+                return [$id => $collection];
+            })
+            ->only($ids->all())
+            ->unique()
+            ->values()
+            ->all();
     }
 
     protected function getKeysFromCollections($collections)
