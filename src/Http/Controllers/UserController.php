@@ -84,7 +84,7 @@ class UserController extends Controller
             ->data($values);
 
         if ($roles = config('statamic.users.new_user_roles')) {
-            $user->roles($roles);
+            $user->explicitRoles($roles);
         }
 
         if ($groups = config('statamic.users.new_user_groups')) {
