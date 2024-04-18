@@ -43,6 +43,10 @@ class FrontendController extends Controller
         $data = Arr::pull($params, 'data');
         $data = array_merge($params, is_callable($data) ? $data() : $data);
 
+        if (! Arr::has($data, 'page')) {
+            $data['page'] = [];
+        }
+
         $view = app(View::class)
             ->template($view)
             ->layout(Arr::get($data, 'layout', 'layout'))
