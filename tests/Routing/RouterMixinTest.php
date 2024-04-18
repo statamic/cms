@@ -42,7 +42,7 @@ class RouterMixinTest extends TestCase
 
         $this->assertEquals([
             'view' => 'view-name',
-            'data' => ['foo' => 'bar', 'page' => []],
+            'data' => ['foo' => 'bar'],
         ], $route->defaults);
 
         $this->assertEquals(FrontendController::class.'@route', $route->getActionName());
