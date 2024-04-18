@@ -227,6 +227,10 @@ class Field implements Arrayable
 
     public function isSortable()
     {
+        if ($this->get('visibility') === 'computed') {
+            return false;
+        }
+
         if (is_null($this->get('sortable'))) {
             return true;
         }
