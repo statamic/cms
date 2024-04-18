@@ -39,7 +39,7 @@ abstract class AddonTestCase extends OrchestraTestCase
         $this->addToAssertionCount(-1); // Dont want to assert this
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $uses = array_flip(class_uses_recursive(static::class));
 
