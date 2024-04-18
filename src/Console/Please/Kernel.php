@@ -4,6 +4,7 @@ namespace Statamic\Console\Please;
 
 use App\Console\Kernel as ConsoleKernel;
 use Statamic\Console\Please\Application as Please;
+use Statamic\Statamic;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Kernel extends ConsoleKernel
@@ -17,7 +18,7 @@ class Kernel extends ConsoleKernel
     {
         if (is_null($this->artisan)) {
             $this->artisan = tap(
-                (new Please($this->app, $this->events, $this->app->version()))
+                (new Please($this->app, $this->events, Statamic::version()))
                     ->resolveCommands($this->commands)
                     ->setContainerCommandLoader()
             )->setName('Statamic');
