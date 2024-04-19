@@ -59,7 +59,9 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     protected function getFilteredKeys()
     {
-        $this->collections = $collections = $this->initCollections();
+        $collections = empty($this->collections)
+            ? Facades\Collection::handles()
+            : $this->collections;
 
         $this->addTaxonomyWheres();
 
@@ -68,7 +70,12 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             : $this->getKeysFromCollectionsWithWheres($collections, $this->wheres);
     }
 
-    private function initCollections(): array
+    private function addCollectionWheres(): void
+    {
+        $this->collections = $this->getCollectionWheres();
+    }
+
+    private function getCollectionWheres(): array
     {
         // If the collections property isn't empty, it means the user has explicitly
         // queried for them. In that case, we'll use them and skip the auto-detection.
@@ -173,6 +180,8 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     public function whereStatus(string $status)
     {
+        $this->addCollectionWheres();
+
         if (! in_array($status, self::STATUSES)) {
             throw new \Exception("Invalid status [$status]");
         }
