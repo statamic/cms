@@ -350,7 +350,7 @@ class Entries extends Relationship
         $query = $this->queryBuilder($values);
 
         if ($single) {
-            return tap($query->first(), fn ($entry) => Blink::put($key, $entry));
+            return Blink::once($key, fn () => $query->first());
         } else {
             return $query;
         }

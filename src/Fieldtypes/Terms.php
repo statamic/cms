@@ -117,7 +117,7 @@ class Terms extends Relationship
         $query = $this->queryBuilder($values);
 
         if ($single) {
-            return tap($query->first(), fn ($term) => Blink::put($key, $term));
+            return Blink::once($key, fn () => $query->first());
         } else {
             return $query;
         }
