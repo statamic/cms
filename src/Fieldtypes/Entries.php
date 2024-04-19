@@ -24,6 +24,8 @@ use Statamic\Search\Index;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
 use Statamic\Taxonomies\LocalizedTerm;
+use Illuminate\Support\Str;
+use Statamic\Query\Scopes\Filter;
 
 class Entries extends Relationship
 {
@@ -105,6 +107,11 @@ class Entries extends Relationship
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
                         'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
                 ],
             ],
