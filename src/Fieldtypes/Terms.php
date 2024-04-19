@@ -11,6 +11,7 @@ use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
 use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
@@ -107,6 +108,23 @@ class Terms extends Relationship
 
     public function augment($values)
     {
+        $single = $this->config('max_items') === 1;
+
+        if ($single && Blink::has($key = 'terms-augment-'.$values)) {
+            return Blink::get($key);
+        }
+
+        $query = $this->queryBuilder($values);
+
+        if ($single) {
+            return tap($query->first(), fn ($term) => Blink::put($key, $term));
+        } else {
+            return $query;
+        }
+    }
+
+    private function queryBuilder($values)
+    {
         // The parent is the item this terms fieldtype exists on. Most commonly an
         // entry, but could also be something else, like another taxonomy term.
         $parent = $this->field->parent();
@@ -133,7 +151,7 @@ class Terms extends Relationship
             $query->where('collection', $parent->collectionHandle());
         }
 
-        return $this->config('max_items') === 1 ? $query->first() : $query;
+        return $query;
     }
 
     private function convertAugmentationValuesToIds($values)
