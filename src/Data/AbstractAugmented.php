@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Fields\Value;
 use Statamic\Statamic;
@@ -56,7 +57,7 @@ abstract class AbstractAugmented implements Augmented
                 : new Value($value, $method, null, $this->data);
         }
 
-        if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
+        if ($this->methodExistsOnData($method, $handle)) {
             return $this->wrapValue($this->data->$method(), $handle);
         }
 
@@ -78,6 +79,15 @@ abstract class AbstractAugmented implements Augmented
     private function methodExistsOnThisClass($method)
     {
         return method_exists($this, $method) && ! in_array($method, ['select', 'except']);
+    }
+
+    private function methodExistsOnData(string $method, string $handle): bool
+    {
+        if ($this->data instanceof User && $handle === 'notifications') {
+            return false;
+        }
+
+        return method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle));
     }
 
     protected function getFromData($handle)
