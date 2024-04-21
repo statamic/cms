@@ -4,6 +4,7 @@ namespace Statamic\Exceptions;
 
 use Illuminate\Auth\AuthenticationException as Exception;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Facades\Redirect;
 
 class AuthenticationException extends Exception implements Responsable
 {
@@ -18,7 +19,7 @@ class AuthenticationException extends Exception implements Responsable
     {
         if (! config('statamic.cp.auth.enabled', true)) {
             return config('statamic.cp.auth.redirect_to')
-                ? redirect(config('statamic.cp.auth.redirect_to'))
+                ? Redirect::guest(config('statamic.cp.auth.redirect_to'))
                 : abort(401);
         }
 
