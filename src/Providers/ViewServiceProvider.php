@@ -43,7 +43,6 @@ class ViewServiceProvider extends ServiceProvider
 
         $this->registerRuntimeAntlers();
         $this->registerRegexAntlers();
-        $this->registerBladeDirectives();
 
         $this->app->bind(ParserContract::class, function ($app) {
             return config('statamic.antlers.version', 'regex') === 'regex'
@@ -183,6 +182,8 @@ class ViewServiceProvider extends ServiceProvider
     public function boot()
     {
         ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
+
+        $this->registerBladeDirectives();
 
         Blade::precompiler(function ($content) {
             return AntlersBladePrecompiler::compile($content);
