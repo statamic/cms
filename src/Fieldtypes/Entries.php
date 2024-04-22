@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
@@ -340,9 +341,15 @@ class Entries extends Relationship
 
     public function augment($values)
     {
+        $single = $this->config('max_items') === 1;
+
+        if ($single && Blink::has($key = 'entries-augment-'.json_encode($values))) {
+            return Blink::get($key);
+        }
+
         $query = $this->queryBuilder($values);
 
-        return $this->config('max_items') === 1 ? $query->first() : $query;
+        return $single ? Blink::once($key, fn () => $query->first()) : $query;
     }
 
     public function shallowAugment($values)
