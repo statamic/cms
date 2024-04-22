@@ -100,6 +100,7 @@ return [
     'fieldset_link_fields_prefix_instructions' => 'Tous les champs du jeu de champs lié seront préfixés avec ceci. Utile quand vous voulez importer les mêmes champs plusieurs fois.',
     'fieldsets_handle_instructions' => 'Comment vous allez faire référence à ce jeu de champs sur le frontal. Ne peut pas être facilement changé.',
     'fieldsets_title_instructions' => 'Décrit généralement quels champs sont inclus, comme "Bloc Image" ou "Metadonnées"',
+    'filters_view_already_exists' => 'Une vue existe déjà avec ce nom. En créant cette vue vous allez donc écraser la vue existante qui porte le même nom.',
     'focal_point_instructions' => 'La définition d’un point focal permet un recadrage dynamique des photos avec un sujet qui reste dans le cadre.',
     'focal_point_previews_are_examples' => 'Les aperçus de recadrage n’ont qu’une valeur d’exemple',
     'forgot_password_enter_email' => 'Entrez votre adresse e-mail afin que nous puissions envoyer un lien de réinitialisation du mot de passe.',
