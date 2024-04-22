@@ -16,7 +16,7 @@ class MigrateSitesConfigToYaml extends UpdateScript
     public function update()
     {
         // Skip if already migrated
-        if (File::exists(base_path('content/sites.yaml'))) {
+        if (File::exists(resource_path('sites.yaml'))) {
             return;
         }
 
@@ -39,7 +39,7 @@ class MigrateSitesConfigToYaml extends UpdateScript
             ->ensureMultisiteConfigEnabled($sites)
             ->removeOldSitesConfigFile();
 
-        $this->console->info('Successfully migrated [config/statamic/sites.php] to [content/sites.yaml]!');
+        $this->console->info('Successfully migrated [config/statamic/sites.php] to [resources/sites.yaml]!');
     }
 
     private function migrateSites($path)

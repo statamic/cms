@@ -3,7 +3,7 @@
 namespace {{ namespace }}\Tests;
 
 use {{ namespace }}\ServiceProvider;
-use Statamic\Extend\AddonTestCase;
+use Statamic\Testing\AddonTestCase;
 
 abstract class TestCase extends AddonTestCase
 {

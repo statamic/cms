@@ -33,7 +33,7 @@ class OAuthController
         try {
             $providerUser = $oauth->getSocialiteUser();
         } catch (InvalidStateException $e) {
-            return $this->redirectToProvider($provider);
+            return $this->redirectToProvider($request, $provider);
         }
 
         $user = $oauth->findOrCreateUser($providerUser);

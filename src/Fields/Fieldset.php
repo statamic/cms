@@ -8,6 +8,7 @@ use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetDeleting;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
+use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
@@ -83,6 +84,14 @@ class Fieldset
     public function title()
     {
         return $this->contents['title'] ?? Str::humanize(Str::of($this->handle)->after('::')->afterLast('.'));
+    }
+
+    /**
+     * @throws FieldsetRecursionException
+     */
+    public function validateRecursion()
+    {
+        $this->fields();
     }
 
     public function fields(): Fields
@@ -235,15 +244,27 @@ class Fieldset
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (FieldsetDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && FieldsetDeleting::dispatch($this) === false) {
             return false;
         }
 
         FieldsetRepository::delete($this);
 
-        FieldsetDeleted::dispatch($this);
+        if ($withEvents) {
+            FieldsetDeleted::dispatch($this);
+        }
 
         return true;
     }

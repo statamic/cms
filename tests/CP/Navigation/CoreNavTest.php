@@ -21,9 +21,10 @@ class CoreNavTest extends TestCase
     {
         $expected = collect([
             'Top Level' => ['Dashboard', 'Playground'],
-            'Content' => ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Site'],
+            'Content' => ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'],
             'Fields' => ['Blueprints', 'Fieldsets'],
             'Tools' => ['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL'],
+            'Settings' => ['Site', 'Preferences'],
             'Users' => ['Users', 'Groups', 'Permissions'],
         ]);
 
@@ -35,6 +36,7 @@ class CoreNavTest extends TestCase
         $this->assertEquals($expected->get('Content'), $nav->get('Content')->map->display()->all());
         $this->assertEquals($expected->get('Fields'), $nav->get('Fields')->map->display()->all());
         $this->assertEquals($expected->get('Tools'), $nav->get('Tools')->map->display()->all());
+        $this->assertEquals($expected->get('Settings'), $nav->get('Settings')->map->display()->all());
         $this->assertEquals($expected->get('Users'), $nav->get('Users')->map->display()->all());
     }
 
@@ -48,8 +50,8 @@ class CoreNavTest extends TestCase
         $nav = $this->build();
 
         $this->assertEquals(
-            ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Sites'],
-            $nav->get('Content')->map->display()->all()
+            ['Sites', 'Preferences'],
+            $nav->get('Settings')->map->display()->all()
         );
     }
 

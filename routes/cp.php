@@ -324,20 +324,21 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('js', [PreferenceController::class, 'store'])->name('store');
         Route::delete('js/{key}', [PreferenceController::class, 'destroy'])->name('destroy');
 
-        Route::group(['prefix' => 'nav', 'as' => 'nav.'], function () {
-            Route::get('/', [NavController::class, 'index'])->name('index');
-            Route::get('edit', [UserNavController::class, 'edit'])->name('user.edit');
-            Route::patch('/', [UserNavController::class, 'update'])->name('user.update');
-            Route::delete('/', [UserNavController::class, 'destroy'])->name('user.destroy');
+    });
 
-            Route::middleware([RequireStatamicPro::class, 'can:manage preferences'])->group(function () {
-                Route::get('roles/{role}/edit', [RoleNavController::class, 'edit'])->name('role.edit');
-                Route::patch('roles/{role}', [RoleNavController::class, 'update'])->name('role.update');
-                Route::delete('roles/{role}', [RoleNavController::class, 'destroy'])->name('role.destroy');
-                Route::get('default/edit', [DefaultNavController::class, 'edit'])->name('default.edit');
-                Route::patch('default', [DefaultNavController::class, 'update'])->name('default.update');
-                Route::delete('default', [DefaultNavController::class, 'destroy'])->name('default.destroy');
-            });
+    Route::group(['prefix' => 'nav', 'as' => 'preferences.nav.'], function () {
+        Route::get('/', [NavController::class, 'index'])->name('index');
+        Route::get('edit', [UserNavController::class, 'edit'])->name('user.edit');
+        Route::patch('/', [UserNavController::class, 'update'])->name('user.update');
+        Route::delete('/', [UserNavController::class, 'destroy'])->name('user.destroy');
+
+        Route::middleware([RequireStatamicPro::class, 'can:manage preferences'])->group(function () {
+            Route::get('roles/{role}/edit', [RoleNavController::class, 'edit'])->name('role.edit');
+            Route::patch('roles/{role}', [RoleNavController::class, 'update'])->name('role.update');
+            Route::delete('roles/{role}', [RoleNavController::class, 'destroy'])->name('role.destroy');
+            Route::get('default/edit', [DefaultNavController::class, 'edit'])->name('default.edit');
+            Route::patch('default', [DefaultNavController::class, 'update'])->name('default.update');
+            Route::delete('default', [DefaultNavController::class, 'destroy'])->name('default.destroy');
         });
     });
 

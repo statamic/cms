@@ -8,6 +8,7 @@ use IteratorAggregate;
 use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\View\Antlers\Parser;
+use Statamic\Facades\Compare;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
 
@@ -39,13 +40,19 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function value()
     {
+        $raw = $this->raw;
+
         if (! $this->fieldtype) {
-            return $this->raw;
+            return $raw;
+        }
+
+        if (! $raw && ($default = $this->fieldtype->field()?->defaultValue())) {
+            $raw = $default;
         }
 
         $value = $this->shallow
-            ? $this->fieldtype->shallowAugment($this->raw)
-            : $this->fieldtype->augment($this->raw);
+            ? $this->fieldtype->shallowAugment($raw)
+            : $this->fieldtype->augment($raw);
 
         return $value;
     }
@@ -60,8 +67,12 @@ class Value implements IteratorAggregate, JsonSerializable
     {
         $value = $this->value();
 
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
         if ($value instanceof Augmentable || $value instanceof Collection) {
-            $value = $value->toAugmentedArray();
+            $value = $value->toArray();
         }
 
         return $value;

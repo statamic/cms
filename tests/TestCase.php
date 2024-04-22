@@ -16,6 +16,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
+    protected $fakeStacheDirectory = __DIR__.'/__fixtures__/dev-null';
 
     protected function setUp(): void
     {
@@ -42,7 +43,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $this->addGqlMacros();
 
         // We changed the default sites setup but the tests assume defaults like the following.
-        File::put(base_path('content/sites.yaml'), YAML::dump([
+        File::put(resource_path('sites.yaml'), YAML::dump([
             'en' => [
                 'name' => 'English',
                 'url' => 'http://localhost/',

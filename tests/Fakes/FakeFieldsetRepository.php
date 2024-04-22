@@ -2,10 +2,12 @@
 
 namespace Tests\Fakes;
 
+use Illuminate\Support\Collection;
 use Statamic\Fields\Fieldset;
+use Statamic\Fields\FieldsetRepository;
 use Statamic\Support\Arr;
 
-class FakeFieldsetRepository
+class FakeFieldsetRepository extends FieldsetRepository
 {
     protected $fieldsets = [];
 
@@ -24,7 +26,7 @@ class FakeFieldsetRepository
         $this->fieldsets[$fieldset->handle()] = $fieldset;
     }
 
-    public function all()
+    public function all(): Collection
     {
         return collect($this->fieldsets);
     }
