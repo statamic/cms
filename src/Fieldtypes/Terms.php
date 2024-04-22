@@ -110,7 +110,7 @@ class Terms extends Relationship
     {
         $single = $this->config('max_items') === 1;
 
-        if ($single && Blink::has($key = 'terms-augment-'.$values)) {
+        if ($single && Blink::has($key = 'terms-augment-'.json_encode($values))) {
             return Blink::get($key);
         }
 

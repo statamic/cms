@@ -343,7 +343,7 @@ class Entries extends Relationship
     {
         $single = $this->config('max_items') === 1;
 
-        if ($single && Blink::has($key = 'entries-augment-'.$values)) {
+        if ($single && Blink::has($key = 'entries-augment-'.json_encode($values))) {
             return Blink::get($key);
         }
 
