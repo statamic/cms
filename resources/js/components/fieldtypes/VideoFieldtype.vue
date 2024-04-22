@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <p v-if="isInvalid" class="text-red-500 mt-4">{{ __('Please provide a valid URL.') }}</p>
+        <p v-if="isInvalid" class="text-red-500 mt-4">{{ __('statamic::validation.url') }}</p>
 
         <div class="video-preview-wrapper" v-if="!isInvalid && (isEmbeddable || isVideo)">
             <div class="embed-video" v-if="isEmbeddable && canShowIframe">
