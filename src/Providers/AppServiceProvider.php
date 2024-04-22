@@ -135,7 +135,7 @@ class AppServiceProvider extends ServiceProvider
                 ->setRepository('user', \Statamic\Contracts\Auth\UserRepository::class);
         });
 
-        $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function () {
+        $this->app->singleton(\Statamic\Fields\BlueprintRepository::class, function () {
             return (new \Statamic\Fields\BlueprintRepository)
                 ->setDirectory(resource_path('blueprints'))
                 ->setFallback('default', function () {

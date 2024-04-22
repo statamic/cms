@@ -329,6 +329,8 @@ class CollectionTest extends TestCase
         $this->assertEquals($blueprintOne, $collection->entryBlueprint('one'));
         $this->assertEquals($blueprintTwo, $collection->entryBlueprint('two'));
         $this->assertNull($collection->entryBlueprint('three'));
+
+        $this->assertTrue($collection->hasVisibleEntryBlueprint());
     }
 
     /** @test */
@@ -351,6 +353,27 @@ class CollectionTest extends TestCase
 
         // But assert that it can still get a specific blueprint for editing the blueprint, etc.
         $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+
+        $this->assertTrue($collection->hasVisibleEntryBlueprint());
+    }
+
+    /** @test */
+    public function it_gets_first_entry_blueprint_when_they_are_all_hidden()
+    {
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'apple' => $blueprintOne = (new Blueprint)->setHandle('apple')->setHidden(true),
+            'berry' => $blueprintTwo = (new Blueprint)->setHandle('berry')->setHidden(true),
+            'cherry' => $blueprintThree = (new Blueprint)->setHandle('cherry')->setHidden(true),
+        ]));
+
+        $blueprints = $collection->entryBlueprints();
+
+        $this->assertCount(3, $blueprints);
+        $this->assertEquals($blueprintOne, $collection->entryBlueprint());
+        $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+        $this->assertFalse($collection->hasVisibleEntryBlueprint());
     }
 
     /** @test */
@@ -482,6 +505,18 @@ class CollectionTest extends TestCase
         $return = $collection->save();
 
         $this->assertEquals($collection, $return);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->saveQuietly();
+
+        Event::assertNotDispatched(CollectionSaved::class);
+        Event::assertNotDispatched(CollectionSaving::class);
     }
 
     /** @test */
@@ -926,7 +961,7 @@ class CollectionTest extends TestCase
         $this->assertCount(0, $collection->queryEntries()->get());
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],
@@ -997,5 +1032,20 @@ class CollectionTest extends TestCase
         $this->assertFalse($return);
         Facades\Collection::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(CollectionDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $collection = Facades\Collection::make('test')->save();
+
+        $return = $collection->deleteQuietly();
+
+        Event::assertNotDispatched(CollectionDeleting::class);
+        Event::assertNotDispatched(CollectionDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

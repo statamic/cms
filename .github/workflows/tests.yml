@@ -40,7 +40,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v42
         with:
           files: |
             config
@@ -58,7 +58,9 @@ jobs:
       - name: Determine whether tests should run
         id: should-run-tests
         if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
-        run: echo "result=true" >> $GITHUB_OUTPUT
+        run: |
+          echo "result=true" >> $GITHUB_OUTPUT
+          echo "result=true" >> $env:GITHUB_OUTPUT
 
       - name: Update apt sources
         if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
@@ -108,16 +110,24 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v42
         with:
           files: |
             **.{js,vue,ts}
             package.json
+            .github/workflows/tests.yml
 
       - name: Determine whether tests should run
         id: should-run-tests
         if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
-        run: echo "result=true" >> $GITHUB_OUTPUT
+        run: |
+          echo "result=true" >> $GITHUB_OUTPUT
+          echo "result=true" >> $env:GITHUB_OUTPUT
+
+      - name: Use Node.js 16.13.0
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.13.0
 
       - name: Install required npm version
         if: steps.should-run-tests.outputs.result == 'true'
@@ -135,7 +145,7 @@ jobs:
     name: Slack Notification
     runs-on: ubuntu-20.04
     needs: [php-tests, js-tests]
-    if: always()
+    if: always() && github.event_name == 'schedule'
     steps:
       - uses: technote-space/workflow-conclusion-action@v1
       - name: Send Slack notification

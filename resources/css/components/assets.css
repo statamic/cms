@@ -16,7 +16,7 @@
 		i {
 			position: relative;
 			top: -1px;
-			margin-right: 10px;
+			margin-right: 10px ; [dir="rtl"] & { margin-left: 10px ; margin-right: 0 ; }
 		}
 	}
 }
@@ -60,12 +60,12 @@
 
     .search {
         flex: 1;
-        margin-right: 15px;
-        margin-left: 0;
+        margin-right: 15px ; [dir="rtl"] & { margin-left: 15px ; margin-right: 0 ; }
+        margin-left: 0 ; [dir="rtl"] & { margin-right: 0 ; margin-left: 0 ; }
     }
 
     > .btn {
-        margin-right: 15px;
+        margin-right: 15px ; [dir="rtl"] & { margin-left: 15px ; margin-right: 0 ; }
     }
 }
 
@@ -148,9 +148,9 @@
 
             > * {
                 @apply absolute w-auto h-auto max-w-full max-h-full;
-                left: 50%;
+                left: 50% ; [dir="rtl"] & { left: auto ; right: 50% ; }
                 top: 50%;
-                transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%) ; [dir="rtl"] & { transform: translate(50%, -50%); }
                 box-shadow: 0 0 32px rgba(0, 0, 0, .35);
             }
         }

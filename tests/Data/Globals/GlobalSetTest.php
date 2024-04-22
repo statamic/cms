@@ -476,4 +476,19 @@ EOT;
         GlobalSet::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(GlobalSetDeleted::class);
     }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $set = (new GlobalSet)->title('SEO Settings');
+
+        $return = $set->deleteQuietly();
+
+        Event::assertNotDispatched(GlobalSetDeleting::class);
+        Event::assertNotDispatched(GlobalSetDeleted::class);
+
+        $this->assertTrue($return);
+    }
 }

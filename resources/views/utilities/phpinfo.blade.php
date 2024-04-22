@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', __('PHP Info'))
 
@@ -14,7 +16,7 @@
     <div class="card p-0">
         <table class="data-table">
             <tr>
-                <th class="pl-4 py-2 w-1/4">{{ __('PHP Version') }}</th>
+                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('PHP Version') }}</th>
                 <td>{{ PHP_VERSION }}</td>
             </tr>
         </table>
@@ -26,7 +28,7 @@
             <table class="data-table">
                 @foreach ($items as $name => $value)
                 <tr>
-                    <th class="pl-4 py-2 w-1/4">{{ $name }}</th>
+                    <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ $name }}</th>
                     <td class="break-all">{{ is_array($value) ? join(', ', $value) : $value }}</td>
                 </tr>
                 @endforeach

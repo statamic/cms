@@ -12,7 +12,7 @@
                             :value="element.key"
                             :selected="element.key === selectedKey" />
                     </select>
-                    <svg-icon name="micro/chevron-down-xs" class="w-2 ml-2" />
+                    <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-2 ltr:ml-2" />
                 </div>
                     <input
                         type="text"

@@ -29,7 +29,7 @@
 .filter-badge {
     @apply text-2xs text-gray-800 bg-white border border-dashed border-gray-600 flex items-center rounded-full;
     height: 1.625rem;
-    padding-left: 10px;
+    padding-left: 10px ; [dir="rtl"] & { padding-right: 10px ; padding-left: 0 ; }
 
     button {
         @apply px-2 text-base text-gray-600 flex items-center rounded;

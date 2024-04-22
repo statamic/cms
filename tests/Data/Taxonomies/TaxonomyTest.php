@@ -465,7 +465,7 @@ class TaxonomyTest extends TestCase
         $this->assertFalse($user->can('view', $taxonomy3));
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],
@@ -504,5 +504,20 @@ class TaxonomyTest extends TestCase
         $this->assertFalse($return);
         Facades\Taxonomy::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(TaxonomyDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Facades\Taxonomy::make('test'))->save();
+
+        $return = $taxonomy->deleteQuietly();
+
+        Event::assertNotDispatched(TaxonomyDeleting::class);
+        Event::assertNotDispatched(TaxonomyDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

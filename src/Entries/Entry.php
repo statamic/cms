@@ -23,6 +23,7 @@ use Statamic\Data\ContainsComputedData;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
@@ -56,6 +57,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 {
     use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
+    use HasDirtyState;
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -173,9 +175,32 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return new AugmentedEntry($this);
     }
 
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'collection' => $this->collectionHandle(),
+            'locale' => $this->locale(),
+            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
+            'slug' => $this->slug(),
+            'date' => optional($this->date())->format('Y-m-d-Hi'),
+            'published' => $this->published(),
+            'path' => $this->initialPath() ?? $this->path(),
+        ], $this->data()->except(['updated_at'])->toArray());
+    }
+
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (EntryDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && EntryDeleting::dispatch($this) === false) {
             return false;
         }
 
@@ -201,16 +226,18 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         Facades\Entry::delete($this);
 
-        EntryDeleted::dispatch($this);
+        if ($withEvents) {
+            EntryDeleted::dispatch($this);
+        }
 
         return true;
     }
 
-    public function deleteDescendants()
+    public function deleteDescendants($withEvents = true)
     {
-        $this->descendants()->each(function ($entry) {
-            $entry->deleteDescendants();
-            $entry->delete();
+        $this->descendants()->each(function ($entry) use ($withEvents) {
+            $entry->deleteDescendants($withEvents);
+            $withEvents ? $entry->delete() : $entry->deleteQuietly();
         });
 
         Blink::forget('entry-descendants-'.$this->id());
@@ -350,6 +377,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
             Blink::forget($this->getOriginBlinkKey());
+            Blink::store('collection-mounts')->flush();
         }
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
@@ -360,7 +388,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         $this->taxonomize();
 
-        optional(Collection::findByMount($this))->updateEntryUris();
+        if ($this->isDirty('slug')) {
+            optional(Collection::findByMount($this))->updateEntryUris();
+        }
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -383,6 +413,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         }
 
         $stack->pop();
+
+        $this->syncOriginal();
 
         return true;
     }
@@ -998,5 +1030,15 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected function getComputedCallbacks()
     {
         return Facades\Collection::getComputedCallbacks($this->collection);
+    }
+
+    public function __sleep()
+    {
+        if ($this->slug instanceof Closure) {
+            $slug = $this->slug;
+            $this->slug = $slug($this);
+        }
+
+        return array_keys(get_object_vars($this));
     }
 }

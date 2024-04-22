@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', Statamic::crumb($form->title(), 'Forms'))
 @section('wrapper_class', 'max-w-full')
@@ -11,13 +13,16 @@
         ])
         <div class="flex items-center">
             <h1 class="flex-1">
-                {{ $form->title() }}
+                {{ __($form->title()) }}
             </h1>
 
             @if(\Statamic\Facades\User::current()->can('edit', $form) || \Statamic\Facades\User::current()->can('delete', $form))
-                <dropdown-list class="mr-2">
+                <dropdown-list class="rtl:ml-2 ltr:mr-2">
                     @can('edit', $form)
                         <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
+                    @endcan
+                    @can('configure form fields')
+                        <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('forms.blueprint.edit', $form->handle()) }}"></dropdown-item>
                     @endcan
                     @can('delete', $form)
                         <dropdown-item :text="__('Delete Form')" class="warning" @click="$refs.deleter.confirm()">

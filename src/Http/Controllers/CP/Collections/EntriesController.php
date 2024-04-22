@@ -201,8 +201,6 @@ class EntriesController extends CpController
 
         $values = $fields->process()->values();
 
-        $parent = $values->pull('parent');
-
         if ($explicitBlueprint = $values->pull('blueprint')) {
             $entry->blueprint($explicitBlueprint);
         }
@@ -225,18 +223,24 @@ class EntriesController extends CpController
             $tree = $entry->structure()->in($entry->locale());
         }
 
+        $parent = $values->get('parent');
+
         if ($structure && ! $collection->orderable()) {
             $this->validateParent($entry, $tree, $parent);
 
-            $entry->afterSave(function ($entry) use ($parent, $tree) {
-                if ($parent && optional($tree->find($parent))->isRoot()) {
-                    $parent = null;
-                }
+            if (! $entry->revisionsEnabled()) {
+                $entry->afterSave(function ($entry) use ($parent, $tree) {
+                    if ($parent && optional($tree->find($parent))->isRoot()) {
+                        $parent = null;
+                    }
 
-                $tree
-                    ->move($entry->id(), $parent)
-                    ->save();
-            });
+                    $tree
+                        ->move($entry->id(), $parent)
+                        ->save();
+                });
+
+                $values->forget('parent');
+            }
         }
 
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
@@ -259,13 +263,12 @@ class EntriesController extends CpController
 
         [$values] = $this->extractFromFields($entry, $blueprint);
 
-        return (new EntryResource($entry->fresh()))
-            ->additional([
-                'saved' => $saved,
-                'data' => [
-                    'values' => $values,
-                ],
-            ]);
+        return [
+            'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
+                'values' => $values,
+            ]),
+            'saved' => $saved,
+        ];
     }
 
     public function create(Request $request, $collection, $site)
@@ -455,6 +458,10 @@ class EntriesController extends CpController
 
         if ($entry->hasStructure()) {
             $values['parent'] = array_filter([optional($entry->parent())->id()]);
+
+            if ($entry->revisionsEnabled() && $entry->has('parent')) {
+                $values['parent'] = [$entry->get('parent')];
+            }
         }
 
         if ($entry->collection()->dated()) {
@@ -507,6 +514,13 @@ class EntriesController extends CpController
         // If the entry being edited is not the root, then we don't have anything to worry about.
         // If the parent is the root, that's fine, and is handled during the tree update later.
         if (! $parent || ! $entry->page()->isRoot()) {
+            $maxDepth = $entry->collection()->structure()->maxDepth();
+
+            // If a parent is selected, validate that it doesn't exceed the max depth of the structure.
+            if ($parent && $maxDepth && Entry::find($parent)->page()->depth() >= $maxDepth) {
+                throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_exceeds_max_depth')]);
+            }
+
             return;
         }
 
