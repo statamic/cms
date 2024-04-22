@@ -11,7 +11,7 @@
     "require": {
         "ext-json": "*",
         "ajthinking/archetype": "^1.0.3",
-        "composer/composer": "^1.10.22 || ^2.2.22",
+        "composer/semver": "^3.4",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9.21",
