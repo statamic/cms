@@ -11,6 +11,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Allow password logins to be used when user has a passkey
+    |--------------------------------------------------------------------------
+    |
+    | Whether or not the password field should be shown to users that
+    | have set up a passkey, or whether it should be hidden.
+    |
+    */
+
+    'allow_password_login_with_passkey' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Remember Me
     |--------------------------------------------------------------------------
     |

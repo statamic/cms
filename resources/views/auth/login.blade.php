@@ -13,10 +13,7 @@
         inline-template
         :show-email-login="!{{ $str::bool($oauth) }}"
         :has-error="{{ $str::bool(count($errors) > 0) }}"
-        :web-authn-routes=@json([
-            'options' => route('statamic.cp.webauthn.verify-options'),
-            'verify' => route('statamic.cp.webauthn.verify'),
-        ])
+        :web-authn-routes=@json($webauthnRoutes)
     >
         <div>
             @if ($oauth)
@@ -29,15 +26,9 @@
                         </div>
                     @endforeach
 
-                    @if ($webAuthnEnabled)
-                    <div class="provider mb-2" v-show="showWebAuthn">
-                        <button class="w-full btn-primary" @click="webAuthn()">{{ __('Log in with passkey') }}</button>
-                        <div class="text-red-500 text-xs mt-2 text-center" v-if="showWebAuthnError" v-text="webAuthnError" />
-                    </div>
-                    @endif
                 </div>
 
-                @if($emailLoginEnabled)
+                @if ($emailLoginEnabled)
                     <div class="text-center text-sm text-gray-700 py-6">&mdash; {{ __('or') }} &mdash;</div>
 
                     <div class="login-with-email" v-if="! showEmailLogin">
@@ -55,22 +46,39 @@
 
                 <div class="mb-8">
                     <label class="mb-2" for="input-email">{{ __('Email') }}</label>
-                    <input type="text" class="input-text input-text" name="email" value="{{ old('email') }}" autofocus id="input-email">
+                    <input type="text" class="input-text input-text" name="email" value="{{ old('email') }}" autofocus id="input-email" @input="checkUser">
                     @if ($hasError('email'))<div class="text-red-500 text-xs mt-2">{{ $errors->first('email') }}</div>@endif
                 </div>
 
-                <div class="mb-8">
+                @if ($webAuthnEnabled)
+                <div :class="{ 'hidden' : ! emailChecked }">
+                @endif
+
+                <div class="mb-8" v-show="passwordEnabled">
                     <label class="mb-2" for="input-password">{{ __('Password') }}</label>
                     <input type="password" class="input-text input-text" name="password" id="input-password">
                     @if ($hasError('password'))<div class="text-red-500 text-xs mt-2">{{ $errors->first('password') }}</div>@endif
                 </div>
-                <div class="flex justify-between items-center">
+
+                <div class="flex justify-between items-center" :class="{ 'hidden' : ! passwordEnabled, 'flex' : passwordEnabled }">
                     <label for="remember-me" class="flex items-center cursor-pointer">
                         <input type="checkbox" name="remember" id="remember-me">
                         <span class="rtl:mr-2 ltr:ml-2">{{ __('Remember me') }}</span>
                     </label>
                     <button type="submit" class="btn-primary">{{ __('Log in') }}</button>
                 </div>
+
+                <div class="text-center text-sm text-gray-700 py-6" v-show="passwordEnabled && webAuthnEnabled">&mdash; {{ __('or') }} &mdash;</div>
+
+                <div class="provider" v-show="webAuthnEnabled">
+                    <button class="w-full btn-primary" @click="webAuthn()">{{ __('Log in with passkey') }}</button>
+                    <div class="text-red-500 text-xs mt-2 text-center" v-if="showWebAuthnError" v-text="webAuthnError"></div>
+                </div>
+
+                @if ($webAuthnEnabled)
+                </div>
+                @endif
+
             </form>
 
         </div>

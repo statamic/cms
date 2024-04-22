@@ -35,11 +35,16 @@ class LoginController extends CpController
         $data = [
             'title' => __('Log in'),
             'webAuthnEnabled' => $webAuthnEnabled = config('statamic.webauthn.enabled'),
-            'oauth' => $enabled = OAuth::enabled() || $webAuthnEnabled,
+            'oauth' => $enabled = OAuth::enabled(),
             'emailLoginEnabled' => $enabled ? config('statamic.oauth.email_login_enabled') : true,
             'providers' => OAuth::enabled() ? OAuth::providers() : [],
             'referer' => $this->getReferrer($request),
             'hasError' => $this->hasError(),
+            'webauthnRoutes' => [
+                'checkuser' => route('statamic.cp.webauthn.user-options'),
+                'options' => route('statamic.cp.webauthn.verify-options'),
+                'verify' => route('statamic.cp.webauthn.verify'),
+            ],
         ];
 
         $view = view('statamic::auth.login', $data);

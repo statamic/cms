@@ -347,4 +347,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
         return $field->fieldtype()->toQueryableValue($value);
     }
+
+    public function passkeys()
+    {
+        return Facades\Passkey::query()
+            ->where('user', $this->id())
+            ->get();
+    }
 }

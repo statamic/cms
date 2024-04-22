@@ -102,6 +102,21 @@ class WebAuthnController
         return redirect()->back();
     }
 
+    public function userOptions(Request $request)
+    {
+        if (! $user = User::findByEmail($request->email)) {
+            return [];
+        }
+
+        $passkeys = $user->passkeys();
+
+        if ($passkeys->isEmpty()) {
+            return [];
+        }
+
+        return config('statamic.webauthn.allow_password_login_with_passkey') ? ['password', 'passkey'] : ['passkey'];
+    }
+
     public function verifyOptions($challenge = false)
     {
         if (! $challenge) {
@@ -168,14 +183,8 @@ class WebAuthnController
 
     public function view()
     {
-        $user = User::current();
-
-        $passkeys = Passkey::query()
-            ->where('user', $user->id())
-            ->get();
-
         return view('statamic::users.webauthn', [
-            'passkeys' => $passkeys,
+            'passkeys' => User::current()->passkeys(),
             'routes' => [
                 'options' => route('statamic.cp.webauthn.create-options'),
                 'verify' => route('statamic.cp.webauthn.create'),
