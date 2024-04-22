@@ -1,5 +1,19 @@
 # Release Notes
 
+## 4.57.1 (2024-04-22)
+
+### What's improved
+- French translations. [#9939](https://github.com/statamic/cms/issues/9939) by @ebeauchamps
+
+### What's fixed
+- Require composer/semver instead of composer/composer. [#9947](https://github.com/statamic/cms/issues/9947) by @jasonvarga
+- Fix `DimensionsRule` for Livewire. [#9927](https://github.com/statamic/cms/issues/9927) by @aerni
+- Fix Blade compiler error. [#9946](https://github.com/statamic/cms/issues/9946) by @duncanmcclean
+- Prevent passing HTML to the Video fieldtype. [#9944](https://github.com/statamic/cms/issues/9944) by @duncanmcclean
+- Fix missing OAuth controller argument. [#9942](https://github.com/statamic/cms/issues/9942) by @simonolog
+
+
+
 ## 4.57.0 (2024-04-17)
 
 ### What's new
