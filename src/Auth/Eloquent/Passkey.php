@@ -21,7 +21,7 @@ class Passkey extends BasePasskey
         if ($model->id) {
             $this->id($model->id);
             $this->user($model->user_id);
-            $this->data(Arr::except($model->data, ['id']));
+            $this->data($model->data, ['id']);
         }
 
         return $this;
@@ -32,7 +32,7 @@ class Passkey extends BasePasskey
         $model = $this->model() ?? app(config('statamic.webauthn.model'))::findOrNew($this->id());
         $model->id = $this->id();
         $model->user_id = $this->user()?->getKey();
-        $model->data = Arr::except($this->fileData(), ['user_id']);
+        $model->data = Arr::except($this->fileData(), ['id']);
         $model->save();
 
         $this->model($model);

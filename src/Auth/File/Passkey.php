@@ -69,7 +69,6 @@ class Passkey implements PasskeyContract
     {
         return $this->data()->merge([
             'id' => (string) $this->id(),
-            'user' => $this->user()?->id(),
         ])->all();
     }
 
