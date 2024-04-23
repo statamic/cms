@@ -1363,8 +1363,11 @@ class EntryTest extends TestCase
         $mock->shouldReceive('store')->with('structure-uris')->once()->andReturn(
             $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
         );
-        $mock->shouldReceive('store')->with('structure-entries')->once()->andReturn(
-            $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
+        $mock->shouldReceive('store')->with('structure-entries')->twice()->andReturn(
+            tap($this->mock(\Spatie\Blink\Blink::class), function ($m) {
+                $m->shouldReceive('forget')->with('a')->once();
+                $m->shouldReceive('put')->once();
+            })
         );
 
         $entry->save();
