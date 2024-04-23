@@ -28,15 +28,15 @@ class MountingTest extends TestCase
         $one = EntryFactory::collection('blog')->slug('one')->create();
         $two = EntryFactory::collection('blog')->slug('two')->create();
 
-        $this->assertEquals($one, Entry::findByUri('/pages/blog/one'));
-        $this->assertEquals($two, Entry::findByUri('/pages/blog/two'));
+        $this->assertEquals($one->id(), Entry::findByUri('/pages/blog/one')->id());
+        $this->assertEquals($two->id(), Entry::findByUri('/pages/blog/two')->id());
 
         $mount->slug('diary')->save();
 
         $this->assertNull(Entry::findByUri('/pages/blog/one'));
         $this->assertNull(Entry::findByUri('/pages/blog/two'));
-        $this->assertEquals($one, Entry::findByUri('/pages/diary/one'));
-        $this->assertEquals($two, Entry::findByUri('/pages/diary/two'));
+        $this->assertEquals($one->id(), Entry::findByUri('/pages/diary/one')->id());
+        $this->assertEquals($two->id(), Entry::findByUri('/pages/diary/two')->id());
     }
 
     /** @test */

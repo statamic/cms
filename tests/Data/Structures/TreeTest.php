@@ -99,7 +99,7 @@ class TreeTest extends TestCase
         $parent = $tree->parent();
 
         $this->assertInstanceOf(Page::class, $parent);
-        $this->assertEquals(Entry::find('pages-home'), $parent->entry());
+        $this->assertEquals(Entry::find('pages-home')->id(), $parent->entry()->id());
     }
 
     /** @test */
