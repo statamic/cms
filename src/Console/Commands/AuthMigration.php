@@ -94,10 +94,6 @@ class AuthMigration extends Command
 
     private function createPasskeysTable()
     {
-        if (config('statamic.users.tables.passkeys', false) == false) {
-            return;
-        }
-
         $from = __DIR__.'/stubs/auth/statamic_passkeys_table.php.stub';
         $file = Carbon::now()->format('Y_m_d_His').'_statamic_passkeys_table';
 
@@ -105,7 +101,7 @@ class AuthMigration extends Command
 
         $contents = File::get($from);
 
-        $contents = str_replace('PASSKEYS_TABLE', config('statamic.users.tables.passkeys', 'passkeys'), $contents);
+        $contents = str_replace('PASSKEYS_TABLE', config('statamic.users.tables.passkeys', 'user_passkeys'), $contents);
 
         File::put($to, $contents);
 

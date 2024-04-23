@@ -67,7 +67,7 @@
                 <div class="text-center text-sm text-gray-700 py-6" v-show="passwordEnabled && webAuthnEnabled">&mdash; {{ __('or') }} &mdash;</div>
 
                 <div class="provider" v-show="webAuthnEnabled">
-                    <button class="w-full btn-primary" @click="webAuthn()">{{ __('Log in with passkey') }}</button>
+                    <button class="w-full btn-primary" type="button" @click="webAuthn()">{{ __('Log in with passkey') }}</button>
                     <div class="text-red-500 text-xs mt-2 text-center" v-if="showWebAuthnError" v-text="webAuthnError"></div>
                 </div>
 

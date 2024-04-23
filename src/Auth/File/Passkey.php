@@ -4,18 +4,15 @@ namespace Statamic\Auth\File;
 
 use Carbon\Carbon;
 use Statamic\Contracts\Auth\Passkey as PasskeyContract;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Data\ContainsData;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Data\TracksQueriedColumns;
-use Statamic\Data\TracksQueriedRelations;
 use Statamic\Facades;
-use Statamic\Facades\Stache;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Webauthn\PublicKeyCredentialSource;
 
 class Passkey implements PasskeyContract
 {
-    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations;
+    use ContainsData, FluentlyGetsAndSets;
 
     protected $id;
     protected $user;
@@ -36,7 +33,7 @@ class Passkey implements PasskeyContract
         return $this
             ->fluentlyGetOrSet('user')
             ->setter(function ($user) {
-                return is_string($user) ? $user : $user->id();
+                return $user instanceof UserContract ? $user->id() : $user;
             })
             ->getter(function ($id) {
                 return Facades\User::find($id);
@@ -44,12 +41,28 @@ class Passkey implements PasskeyContract
             ->args(func_get_args());
     }
 
-    public function path()
+    public function delete()
     {
-        return vsprintf('%s/%s.yaml', [
-            rtrim(Stache::store('passkeys')->directory(), '/'),
-            $this->id(),
-        ]);
+        if (! $user = $this->user()) {
+            return;
+        }
+
+        $user->passkeys($user->passkeys()->reject(fn ($key) => $key->id() == $this->id()));
+
+        $user->save();
+    }
+
+    public function save()
+    {
+        if (! $user = $this->user()) {
+            return;
+        }
+
+        $passkeys = $user->passkeys()->reject(fn ($key) => $key->id() == $this->id());
+
+        $user->passkeys($passkeys->push($this));
+
+        $user->save();
     }
 
     public function fileData()
@@ -58,25 +71,6 @@ class Passkey implements PasskeyContract
             'id' => (string) $this->id(),
             'user' => $this->user()?->id(),
         ])->all();
-    }
-
-    public function fresh()
-    {
-        return Facades\Passkey::find($this->id);
-    }
-
-    public function save()
-    {
-        Facades\Passkey::save($this);
-
-        return $this;
-    }
-
-    public function delete()
-    {
-        Facades\Passkey::delete($this);
-
-        return true;
     }
 
     public function lastLogin()

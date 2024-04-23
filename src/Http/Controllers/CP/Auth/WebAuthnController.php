@@ -9,7 +9,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Statamic\Facades\Passkey;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
 use Webauthn;
@@ -69,7 +69,7 @@ class WebAuthnController
             throw new Exception(__('Invalid user'));
         }
 
-        $passkey = Passkey::make()
+        $passkey = app(Passkey::class)
             ->id($publicKeyCredential->id)
             ->user($user)
             ->data($publicKeyCredentialSource->jsonSerialize());
@@ -87,9 +87,13 @@ class WebAuthnController
 
     public function delete(Request $request, $id)
     {
-        $passkey = Passkey::find($id);
+        if (! $user = User::current()) {
+            abort(403);
+        }
 
-        if (! $passkey || ($passkey->user() != User::current())) {
+        $passkey = $user->passkeys()->firstWhere(fn ($key) => $key->id() == $id);
+
+        if (! $passkey) {
             abort(403);
         }
 
@@ -133,17 +137,16 @@ class WebAuthnController
     public function verify(Request $request)
     {
         // https://webauthn-doc.spomky-labs.com/pure-php/authenticate-your-users#response-verification
-
         $publicKeyCredential = $this->credentialLoader()->load($request->getContent());
 
         if (! $publicKeyCredential->response instanceof Webauthn\AuthenticatorAssertionResponse) {
             throw new Exception(__('Invalid credentials'));
         }
 
-        // get from passkey repository
-        $passkey = Passkey::find($publicKeyCredential->id);
+        $user = User::findByEmail($request->input('email'));
 
-        if (! $passkey) {
+        // get from passkey repository
+        if (! $passkey = $user->passkeys()->firstWhere(fn ($key) => $key->id() == $publicKeyCredential->id)) {
             throw new Exception(__('No matching passkey found'));
         }
 

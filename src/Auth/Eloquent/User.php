@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\User as BaseUser;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
@@ -370,5 +371,18 @@ class User extends BaseUser
         return array_merge([
             'email' => $this->email(),
         ], $this->model()->attributesToArray());
+    }
+
+    public function passkeys($passkeys = null)
+    {
+        if (func_num_args() === 0) {
+            return app(config('statamic.webauthn.model'))::where('user_id', $this->id())
+                ->get()
+                ->map(fn ($model) => app(Passkey::class)->model($model));
+        }
+
+        $this->passkeys = $passkeys;
+
+        return $this;
     }
 }

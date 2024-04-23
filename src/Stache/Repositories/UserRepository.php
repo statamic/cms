@@ -2,12 +2,13 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Auth\File\PasskeyRepository;
+use Statamic\Auth\File\Passkey;
 use Statamic\Auth\File\RoleRepository;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\File\UserGroupRepository;
 use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
+use Statamic\Contracts\Auth\Passkey as PasskeyContract;
 use Statamic\Contracts\Auth\User;
 use Statamic\Exceptions\UserNotFoundException;
 use Statamic\Stache\Query\UserQueryBuilder;
@@ -20,7 +21,6 @@ class UserRepository extends BaseRepository
     protected $config;
     protected $roleRepository = RoleRepository::class;
     protected $userGroupRepository = UserGroupRepository::class;
-    protected $passkeyRepository = PasskeyRepository::class;
 
     public function __construct(Stache $stache, array $config = [])
     {
@@ -87,6 +87,7 @@ class UserRepository extends BaseRepository
     {
         return [
             User::class => FileUser::class,
+            PasskeyContract::class => Passkey::class,
         ];
     }
 }

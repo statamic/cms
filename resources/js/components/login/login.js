@@ -63,6 +63,8 @@ export default {
             const authOptionsResponse = await fetch(this.webAuthnRoutes.options);
             const startAuthResponse = await startAuthentication(await authOptionsResponse.json());
 
+            startAuthResponse.email = document.getElementById('input-email').value;
+
             this.$axios.post(this.webAuthnRoutes.verify, startAuthResponse)
                 .then(response => {
                     if (response && response.data.redirect) {

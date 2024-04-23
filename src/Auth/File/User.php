@@ -30,6 +30,7 @@ class User extends BaseUser
 
     protected $id;
     protected $email;
+    protected $passkeys;
     protected $password;
     protected $permissions;
 
@@ -350,6 +351,7 @@ class User extends BaseUser
             'id' => (string) $this->id(),
             'password_hash' => $this->password(),
             'preferences' => $this->preferences(),
+            'passkeys' => $this->passkeys()->map(fn ($key) => $key->fileData())->all(),
         ])->all();
     }
 
@@ -368,5 +370,14 @@ class User extends BaseUser
             'roles' => $this->get('roles', []),
             'super' => $this->get('super', false),
         ], $this->data()->toArray());
+    }
+
+    public function passkeys($passkeys = null)
+    {
+        return $this->fluentlyGetOrSet('passkeys')
+            ->getter(function ($passkeys) {
+                return collect($passkeys ?? []);
+            })
+            ->args(func_get_args());
     }
 }

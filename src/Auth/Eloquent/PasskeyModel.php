@@ -10,7 +10,9 @@ class PasskeyModel extends Eloquent
 
     protected $keyType = 'string';
 
-    protected $table = 'passkeys';
+    public $incrementing = false;
+
+    protected $table = 'user_passkeys';
 
     protected $casts = [
         'data' => 'json',
