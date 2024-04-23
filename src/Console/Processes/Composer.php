@@ -292,18 +292,6 @@ class Composer extends Process
     }
 
     /**
-     * Absolute path to the Composer binary.
-     */
-    public function composerBinary(): string
-    {
-        if (DIRECTORY_SEPARATOR === '\\') {
-            return $this->run('where composer');
-        }
-
-        return $this->run('which composer');
-    }
-
-    /**
      * Prepare process arguments.
      *
      * @param  array  $parts
@@ -314,10 +302,17 @@ class Composer extends Process
         return array_merge([
             $this->phpBinary(),
             "-d memory_limit={$this->memoryLimit}",
-            // $this->composerBinary(),
-            statamic_path('composer.phar'),
+            $this->composerBinary(),
             $this->colorized ? '--ansi' : '--no-ansi',
         ], $parts);
+    }
+
+    /**
+     * Absolute path to the Composer binary.
+     */
+    private function composerBinary(): string
+    {
+        return $this->run(DIRECTORY_SEPARATOR === '\\' ? 'where composer' : 'which composer');
     }
 
     /**
