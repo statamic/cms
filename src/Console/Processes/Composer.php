@@ -296,11 +296,13 @@ class Composer extends Process
      */
     public function composerBinary(): string
     {
-        if (DIRECTORY_SEPARATOR === '\\') {
-            return $this->run('where composer');
-        }
+        return getenv('COMPOSER_BINARY');
 
-        return $this->run('which composer');
+        // if (DIRECTORY_SEPARATOR === '\\') {
+        //     return $this->run('where composer');
+        // }
+
+        // return $this->run('which composer');
     }
 
     /**
