@@ -5,6 +5,22 @@
             "DummyNamespace\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "DummyNamespace\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "statamic/cms": "^5.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
     "extra": {
         "statamic": {
             "name": "DummyTitle",
@@ -15,5 +31,7 @@
                 "DummyNamespace\\ServiceProvider"
             ]
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

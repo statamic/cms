@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Facade;
 use Statamic\Sites\Sites;
 
 /**
+ * @method static bool multiEnabled()
  * @method static mixed all()
  * @method static mixed authorized()
  * @method static mixed default()
@@ -17,7 +18,11 @@ use Statamic\Sites\Sites;
  * @method static void resolveCurrentUrlUsing(Closure $callback)
  * @method static mixed selected()
  * @method static void setSelected($site)
- * @method static void setConfig($key, $value = null)
+ * @method static self setSites($sites)
+ * @method static self setSiteValue(string $site, string $key, $value)
+ * @method static string path()
+ * @method static \Statamic\Fields\Blueprint blueprint()
+ * @method static array config()
  *
  * @see \Statamic\Sites\Sites
  */

@@ -8,15 +8,10 @@ use Statamic\Facades\UserGroup;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Users\Group;
 use Statamic\Stache\Indexes\Users\Role;
-use Symfony\Component\Finder\SplFileInfo;
+use Statamic\Support\Arr;
 
 class UsersStore extends BasicStore
 {
-    public function getItemFilter(SplFileInfo $file)
-    {
-        return $file->getRelativePath() == '' && parent::getItemFilter($file);
-    }
-
     protected function storeIndexes()
     {
         $groups = UserGroup::all()->mapWithKeys(function ($group) {
@@ -45,7 +40,7 @@ class UsersStore extends BasicStore
     {
         $data = YAML::file($path)->parse($contents);
 
-        if (! $id = array_pull($data, 'id')) {
+        if (! $id = Arr::pull($data, 'id')) {
             $idGenerated = true;
             $id = app('stache')->generateId();
         }
@@ -54,10 +49,10 @@ class UsersStore extends BasicStore
             ->id($id)
             ->initialPath($path)
             ->email(pathinfo($path, PATHINFO_FILENAME))
-            ->preferences(array_pull($data, 'preferences', []))
+            ->preferences(Arr::pull($data, 'preferences', []))
             ->data($data);
 
-        if (array_get($data, 'password') || isset($idGenerated)) {
+        if (Arr::get($data, 'password') || isset($idGenerated)) {
             $user->writeFile();
         }
 

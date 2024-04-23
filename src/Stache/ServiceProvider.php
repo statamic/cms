@@ -8,6 +8,7 @@ use Statamic\Auth\File\PasskeyQueryBuilder;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
+use Statamic\Stache\Query\SubmissionQueryBuilder;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 
@@ -33,8 +34,8 @@ class ServiceProvider extends LaravelServiceProvider
             return new AssetQueryBuilder($this->app->make(Stache::class)->store('assets'));
         });
 
-        $this->app->bind(PasskeyQueryBuilder::class, function () {
-            return new PasskeyQueryBuilder($this->app->make(Stache::class)->store('passkeys'));
+        $this->app->bind(SubmissionQueryBuilder::class, function () {
+            return new SubmissionQueryBuilder($this->app->make(Stache::class)->store('form-submissions'));
         });
     }
 

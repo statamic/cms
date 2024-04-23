@@ -10,7 +10,7 @@
                 <div class="item-move sortable-handle" data-drag-handle />
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
                     <label class="text-xs whitespace-nowrap rtl:ml-2 ltr:mr-2">
-                        <span v-if="setGroup">
+                        <span v-if="isSetGroupVisible">
                             {{ setGroup.display }}
                             <svg-icon name="micro/chevron-right" class="w-4" />
                         </span>
@@ -128,6 +128,10 @@ export default {
             return this.bardSets.find((group) => {
                 return group.sets.filter((set) => set.handle === this.config.handle).length > 0;
             });
+        },
+
+        isSetGroupVisible() {
+            return this.bardSets.length > 1 && this.setGroup?.display;
         },
 
         isReadOnly() {

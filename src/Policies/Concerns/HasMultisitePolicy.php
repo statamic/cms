@@ -14,7 +14,7 @@ trait HasMultisitePolicy
 
     protected function userCanAccessAnySite($user, $sites)
     {
-        if (! Sites::hasMultiple()) {
+        if (! Sites::multiEnabled()) {
             return true;
         }
 

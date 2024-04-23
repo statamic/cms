@@ -64,7 +64,7 @@
     }
 }
 
-.grid-table tbody .row-controls {
+.grid-table tbody .grid-row-controls {
     @apply rtl:pr-0 ltr:pl-0 text-center;
     width: 1%;
     padding-top: 21px; /*  pseudo-center for text/select fields */

@@ -89,9 +89,9 @@ return [
             'directory' => base_path('users'),
         ],
 
-        'passkeys' => [
-            'class' => Stores\PasskeysStore::class,
-            'directory' => base_path('users/passkeys'),
+        'form-submissions' => [
+            'class' => Stores\SubmissionsStore::class,
+            'directory' => storage_path('forms'),
         ],
 
     ],

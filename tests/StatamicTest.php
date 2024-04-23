@@ -159,6 +159,7 @@ class StatamicTest extends TestCase
             'terms' => \Statamic\Stache\Query\TermQueryBuilder::class,
             'assets' => \Statamic\Assets\QueryBuilder::class,
             'users' => \Statamic\Stache\Query\UserQueryBuilder::class,
+            'form-submissions' => \Statamic\Stache\Query\SubmissionQueryBuilder::class,
         ];
 
         foreach ($aliases as $alias => $class) {

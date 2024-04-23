@@ -269,11 +269,11 @@ class TermTest extends TestCase
     /** @test */
     public function it_gets_preview_targets()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
-        ]]);
+        ]);
 
         $taxonomy = tap(Taxonomy::make('tags')->sites(['en', 'fr', 'de']))->save();
 

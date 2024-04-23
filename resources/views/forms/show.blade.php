@@ -68,6 +68,7 @@
         initial-sort-column="datestamp"
         initial-sort-direction="desc"
         :initial-columns="{{ $columns->toJson() }}"
+        :filters="{{ $filters->toJson() }}"
         v-cloak
     >
         <div slot="no-results" class="text-center border-2 border-dashed rounded-lg">
