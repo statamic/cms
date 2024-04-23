@@ -307,6 +307,8 @@ class Composer extends Process
      */
     private function prepareProcessArguments($parts)
     {
+        dump($this->composerBinary());
+
         return array_merge([
             $this->phpBinary(),
             "-d memory_limit={$this->memoryLimit}",
