@@ -50,10 +50,6 @@
                     @if ($hasError('email'))<div class="text-red-500 text-xs mt-2">{{ $errors->first('email') }}</div>@endif
                 </div>
 
-                @if ($webAuthnEnabled)
-                <div :class="{ 'hidden' : ! emailChecked }">
-                @endif
-
                 <div class="mb-8" v-show="passwordEnabled">
                     <label class="mb-2" for="input-password">{{ __('Password') }}</label>
                     <input type="password" class="input-text input-text" name="password" id="input-password">
@@ -74,10 +70,6 @@
                     <button class="w-full btn-primary" @click="webAuthn()">{{ __('Log in with passkey') }}</button>
                     <div class="text-red-500 text-xs mt-2 text-center" v-if="showWebAuthnError" v-text="webAuthnError"></div>
                 </div>
-
-                @if ($webAuthnEnabled)
-                </div>
-                @endif
 
             </form>
 

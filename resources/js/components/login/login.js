@@ -33,7 +33,6 @@ export default {
 
     data() {
         return {
-            emailChecked: false,
             passwordEnabled: true,
             webAuthnEnabled: false,
             webAuthnError: false,
@@ -46,8 +45,6 @@ export default {
                 email: event.target.value
             })
                 .then(response => {
-                    this.emailChecked = true;
-
                     if (response.data && response.data.includes('passkey')) {
                         this.passwordEnabled = response.data.includes('password');
                         this.webAuthnEnabled = true;
