@@ -1,5 +1,12 @@
 # Release Notes
 
+## 4.57.2 (2024-04-23)
+
+### What's fixed
+- Fix missing composer binary (starter kits couldn't install). [#9950](https://github.com/statamic/cms/issues/9950) by @duncanmcclean
+
+
+
 ## 4.57.1 (2024-04-22)
 
 ### What's improved
