@@ -8,7 +8,8 @@ use Tests\TestCase;
 
 class MakeAddonTest extends TestCase
 {
-    use Concerns\CleansUpGeneratedPaths;
+    use Concerns\BacksUpComposerJson,
+        Concerns\CleansUpGeneratedPaths;
 
     private $files;
 
@@ -19,11 +20,13 @@ class MakeAddonTest extends TestCase
         $this->markTestSkippedInWindows();
 
         $this->files = app(Filesystem::class);
+        $this->backupComposerJson();
     }
 
     public function tearDown(): void
     {
         $this->cleanupPaths();
+        $this->restoreComposerJson();
 
         parent::tearDown();
     }
