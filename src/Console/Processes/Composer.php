@@ -292,6 +292,14 @@ class Composer extends Process
     }
 
     /**
+     * Absolute path to the Composer binary.
+     */
+    public function composerBinary(): string
+    {
+        return $this->run('which composer');
+    }
+
+    /**
      * Prepare process arguments.
      *
      * @param  array  $parts
@@ -302,7 +310,7 @@ class Composer extends Process
         return array_merge([
             $this->phpBinary(),
             "-d memory_limit={$this->memoryLimit}",
-            'vendor/bin/composer',
+            $this->composerBinary(),
             $this->colorized ? '--ansi' : '--no-ansi',
         ], $parts);
     }
