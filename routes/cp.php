@@ -119,7 +119,6 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
 
     Route::group(['prefix' => 'webauthn'], function () {
-        Route::post('user-options', [WebAuthnController::class, 'userOptions'])->name('webauthn.user-options');
         Route::get('verify', [WebAuthnController::class, 'verifyOptions'])->name('webauthn.verify-options');
         Route::post('verify', [WebAuthnController::class, 'verify'])->name('webauthn.verify');
     });

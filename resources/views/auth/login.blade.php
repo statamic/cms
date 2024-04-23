@@ -46,17 +46,17 @@
 
                 <div class="mb-8">
                     <label class="mb-2" for="input-email">{{ __('Email') }}</label>
-                    <input type="text" class="input-text input-text" name="email" value="{{ old('email') }}" autofocus id="input-email" @input="checkUser">
+                    <input type="text" class="input-text input-text" name="email" value="{{ old('email') }}" autofocus id="input-email">
                     @if ($hasError('email'))<div class="text-red-500 text-xs mt-2">{{ $errors->first('email') }}</div>@endif
                 </div>
 
-                <div class="mb-8" v-show="passwordEnabled">
+                <div class="mb-8">
                     <label class="mb-2" for="input-password">{{ __('Password') }}</label>
                     <input type="password" class="input-text input-text" name="password" id="input-password">
                     @if ($hasError('password'))<div class="text-red-500 text-xs mt-2">{{ $errors->first('password') }}</div>@endif
                 </div>
 
-                <div class="flex justify-between items-center" :class="{ 'hidden' : ! passwordEnabled, 'flex' : passwordEnabled }">
+                <div class="flex justify-between items-center">
                     <label for="remember-me" class="flex items-center cursor-pointer">
                         <input type="checkbox" name="remember" id="remember-me">
                         <span class="rtl:mr-2 ltr:ml-2">{{ __('Remember me') }}</span>
@@ -64,12 +64,14 @@
                     <button type="submit" class="btn-primary">{{ __('Log in') }}</button>
                 </div>
 
-                <div class="text-center text-sm text-gray-700 py-6" v-show="passwordEnabled && webAuthnEnabled">&mdash; {{ __('or') }} &mdash;</div>
+                @if ($webAuthnEnabled)
+                <div class="text-center text-sm text-gray-700 py-6" v-show="showWebAuthn">&mdash; {{ __('or') }} &mdash;</div>
 
-                <div class="provider" v-show="webAuthnEnabled">
+                <div class="provider" v-show="showWebAuthn">
                     <button class="w-full btn-primary" type="button" @click="webAuthn()">{{ __('Log in with passkey') }}</button>
                     <div class="text-red-500 text-xs mt-2 text-center" v-if="showWebAuthnError" v-text="webAuthnError"></div>
                 </div>
+                @endif
 
             </form>
 

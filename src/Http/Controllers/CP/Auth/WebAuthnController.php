@@ -106,21 +106,6 @@ class WebAuthnController
         return redirect()->back();
     }
 
-    public function userOptions(Request $request)
-    {
-        if (! $user = User::findByEmail($request->email)) {
-            return [];
-        }
-
-        $passkeys = $user->passkeys();
-
-        if ($passkeys->isEmpty()) {
-            return [];
-        }
-
-        return config('statamic.webauthn.allow_password_login_with_passkey') ? ['password', 'passkey'] : ['passkey'];
-    }
-
     public function verifyOptions($challenge = false)
     {
         if (! $challenge) {
@@ -143,7 +128,7 @@ class WebAuthnController
             throw new Exception(__('Invalid credentials'));
         }
 
-        $user = User::findByEmail($request->input('email'));
+        $user = User::find($publicKeyCredential->response->userHandle);
 
         // get from passkey repository
         if (! $passkey = $user->passkeys()->firstWhere(fn ($key) => $key->id() == $publicKeyCredential->id)) {
