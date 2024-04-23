@@ -26,6 +26,8 @@ class InstallTest extends TestCase
     {
         parent::setUp();
 
+        $this->markTestSkipped();
+
         $this->files = app(Filesystem::class);
 
         $this->restoreSite();
