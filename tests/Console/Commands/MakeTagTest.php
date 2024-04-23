@@ -8,7 +8,8 @@ use Tests\TestCase;
 
 class MakeTagTest extends TestCase
 {
-    use Concerns\CleansUpGeneratedPaths;
+    use Concerns\BacksUpComposerJson,
+        Concerns\CleansUpGeneratedPaths;
 
     private $files;
 
@@ -17,11 +18,13 @@ class MakeTagTest extends TestCase
         parent::setUp();
 
         $this->files = app(Filesystem::class);
+        $this->backupComposerJson();
     }
 
     public function tearDown(): void
     {
         $this->cleanupPaths();
+        $this->restoreComposerJson();
 
         parent::tearDown();
     }
