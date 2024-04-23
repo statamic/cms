@@ -310,8 +310,7 @@ class Composer extends Process
         return array_merge([
             $this->phpBinary(),
             "-d memory_limit={$this->memoryLimit}",
-            // $this->composerBinary(),
-            '/usr/local/bin/composer',
+            $this->composerBinary(),
             $this->colorized ? '--ansi' : '--no-ansi',
         ], $parts);
     }
