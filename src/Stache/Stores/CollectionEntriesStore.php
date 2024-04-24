@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Illuminate\Support\Facades\Cache;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
@@ -96,11 +97,9 @@ class CollectionEntriesStore extends ChildStore
             $entry->date((new GetDateFromPath)($path));
         }
 
-        // Blink the entry so that it can be used when building the URI. If it's not in there, it would try
-        // to retrieve the entry, which doesn't exist yet. Then build the URI now so that it gets placed
-        // into the property and stored in the cache, and we don't have to repeatedly re-build it.
+        // Blink the entry so that it can be used when building the URI. If it's not
+        // in there, it would try to retrieve the entry, which doesn't exist yet.
         Blink::store('structure-entries')->put($id, $entry);
-        $entry->uri();
 
         if (isset($idGenerated) || isset($positionGenerated)) {
             $this->writeItemToDiskWithoutIncrementing($entry);
@@ -223,5 +222,29 @@ class CollectionEntriesStore extends ChildStore
         }
 
         $item->writeFile($path);
+    }
+
+    protected function cacheItem($item)
+    {
+        $key = $this->getItemKey($item);
+
+        $cacheKey = $this->getItemCacheKey($key);
+
+        Cache::forever($cacheKey, ['entry' => $item, 'uri' => $item->uri()]);
+    }
+
+    protected function getCachedItem($key)
+    {
+        $cacheKey = $this->getItemCacheKey($key);
+
+        if (! $cache = Cache::get($cacheKey)) {
+            return null;
+        }
+
+        if ($cache['uri']) {
+            Blink::store('entry-uris')->put($cache['entry']->id(), $cache['uri']);
+        }
+
+        return $cache['entry'];
     }
 }
