@@ -20,8 +20,9 @@ const NUMBER_SPECIFIC_COMPARISONS = [
 ];
 
 export default class {
-    constructor(field, values, store, storeName) {
+    constructor(field, values, store, storeName, fieldPath) {
         this.field = field;
+        this.fieldPath = fieldPath;
         this.values = values;
         this.rootValues = store ? store.state.publish[storeName].values : false;
         this.store = store;
@@ -264,6 +265,7 @@ export default class {
             root: this.rootValues,
             store: this.store,
             storeName: this.storeName,
+            fieldPath: this.fieldPath,
         });
 
         return this.showOnPass ? passes : ! passes;
