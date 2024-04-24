@@ -8,8 +8,8 @@ use Tests\TestCase;
 
 class MakeScopeTest extends TestCase
 {
-    use Concerns\BacksUpComposerJson,
-        Concerns\CleansUpGeneratedPaths;
+    use Concerns\CleansUpGeneratedPaths,
+        Concerns\FakesComposerInstalls;
 
     private $files;
 
@@ -18,13 +18,12 @@ class MakeScopeTest extends TestCase
         parent::setUp();
 
         $this->files = app(Filesystem::class);
-        $this->backupComposerJson();
+        $this->fakeSuccessfulComposerRequire();
     }
 
     public function tearDown(): void
     {
         $this->cleanupPaths();
-        $this->restoreComposerJson();
 
         parent::tearDown();
     }
