@@ -440,6 +440,9 @@ abstract class EloquentQueryBuilder implements Builder
      */
     public function chunk($count, callable $callback)
     {
+        // Make sure the items are sorted by the primary key, so we can paginate properly.
+        $this->orderBy($this->builder->getModel()->getKeyName());
+
         $page = 1;
 
         do {
@@ -482,6 +485,9 @@ abstract class EloquentQueryBuilder implements Builder
         if ($chunkSize < 1) {
             throw new InvalidArgumentException('The chunk size should be at least 1');
         }
+
+        // Make sure the items are sorted by the primary key, so we can paginate properly.
+        $this->orderBy($this->builder->getModel()->getKeyName());
 
         return LazyCollection::make(function () use ($chunkSize) {
             $page = 1;
