@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -145,6 +146,13 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     public function getAuthPasswordName()
     {
         return 'password';
+    }
+
+    public function hasRole($role)
+    {
+        $role = $role instanceof RoleContract ? $role->handle() : $role;
+
+        return $this->roles()->has($role);
     }
 
     /**
