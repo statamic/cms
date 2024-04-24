@@ -34,6 +34,7 @@ use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Assets\DimensionsRule;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -1481,6 +1482,15 @@ class AssetTest extends TestCase
         $this->assertEquals(30, $asset->width());
         $this->assertEquals(60, $asset->height());
         $this->assertEquals(0.5, $asset->ratio());
+    }
+
+    /** @test */
+    public function it_passes_the_dimensions_validation()
+    {
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60);
+        $validDimensions = (new DimensionsRule(['max_width=10']))->passes('Image', [$file]);
+
+        $this->assertFalse($validDimensions);
     }
 
     /** @test */
