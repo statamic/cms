@@ -440,8 +440,7 @@ abstract class EloquentQueryBuilder implements Builder
      */
     public function chunk($count, callable $callback)
     {
-        // Make sure the items are sorted by the primary key, so we can paginate properly.
-        $this->orderBy($this->builder->getModel()->getKeyName());
+        $this->enforceOrderBy();
 
         $page = 1;
 
@@ -486,8 +485,7 @@ abstract class EloquentQueryBuilder implements Builder
             throw new InvalidArgumentException('The chunk size should be at least 1');
         }
 
-        // Make sure the items are sorted by the primary key, so we can paginate properly.
-        $this->orderBy($this->builder->getModel()->getKeyName());
+        $this->enforceOrderBy();
 
         return LazyCollection::make(function () use ($chunkSize) {
             $page = 1;
@@ -504,5 +502,17 @@ abstract class EloquentQueryBuilder implements Builder
                 }
             }
         });
+    }
+
+    /**
+     * Add a generic "order by" clause if the query doesn't already have one.
+     *
+     * @return void
+     */
+    protected function enforceOrderBy()
+    {
+        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
+            $this->orderBy($this->builder->getModel()->getQualifiedKeyName(), 'asc');
+        }
     }
 }
