@@ -3,10 +3,10 @@
 namespace Statamic\Auth\File;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
-use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Data;
@@ -152,16 +152,19 @@ class User extends BaseUser
         return 'remember_token';
     }
 
-    public function roles($roles = null)
+    public function roles(): Collection
     {
-        return is_null($roles)
-            ? $this->getRoles()
-            : $this->set('roles', $roles);
+        return $this->explicitRoles()
+            ->merge($this->groups()->flatMap->roles()->keyBy->handle());
     }
 
-    protected function getRoles()
+    public function explicitRoles($roles = null)
     {
-        return collect($this->get('roles', []))
+        if (func_num_args() === 1) {
+            return $this->set('roles', $roles);
+        }
+
+        return collect($this->get('roles'))
             ->map(function ($role) {
                 return Facades\Role::find($role);
             })->filter()->keyBy->handle();
@@ -192,13 +195,6 @@ class User extends BaseUser
         $this->set('roles', $roles);
 
         return $this;
-    }
-
-    public function hasRole($role)
-    {
-        $role = $role instanceof RoleContract ? $role->handle() : $role;
-
-        return $this->roles()->has($role);
     }
 
     public function addToGroup($group)
