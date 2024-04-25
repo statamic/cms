@@ -511,7 +511,7 @@ abstract class EloquentQueryBuilder implements Builder
      */
     protected function enforceOrderBy()
     {
-        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
+        if (empty($this->builder->query->orders) && empty($this->builder->query->unionOrders)) {
             $this->orderBy($this->builder->getModel()->getQualifiedKeyName(), 'asc');
         }
     }
