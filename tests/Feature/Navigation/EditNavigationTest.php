@@ -32,7 +32,7 @@ class EditNavigationTest extends TestCase
     }
 
     /** @test */
-    public function it_denies_access_if_user_doesnt_have_edit_permission()
+    public function it_denies_access_if_user_doesnt_have_configure_permission()
     {
         $nav = $this->createNav('foo');
         Nav::shouldReceive('all')->andReturn(collect([$nav]));
