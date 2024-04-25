@@ -299,6 +299,34 @@ class UpdateAssetReferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_updates_multi_assets_fields_even_when_existing_field_value_is_null()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'pics',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'pics' => null,
+        ]))->save();
+
+        $this->assertNull($entry->get('pics'));
+
+        $this->assetNorris->path('content/norris.jpg')->save();
+
+        $this->assertNull($entry->fresh()->get('pics'));
+    }
+
+    /** @test */
     public function it_nullifies_references_when_deleting_an_asset()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
