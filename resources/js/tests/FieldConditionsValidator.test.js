@@ -374,6 +374,29 @@ test('it can call a custom function', () => {
     expect(Fields.showField({unless: 'custom reallyLovesAnimals'})).toBe(true);
 });
 
+test('it can call a custom function considering nested fields', () => {
+    Fields.setValues({ nested:
+        [
+            { favorite_animals: ['cats', 'dogs'], }
+        ]
+    });
+
+    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, store, storeName, root, fieldPath }) {
+        expect(target).toBe(null);
+        expect(params).toEqual([]);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
+        expect(fieldPath).toBe('nested.0.favorite_animals');
+
+        let nestedValue = fieldPath.split('.').reduce((acc, key) => acc[key], root);
+        expect(nestedValue).toStrictEqual(['cats', 'dogs']);
+
+        return nestedValue.length > 3;
+    });
+
+    expect(Fields.showField({if: 'reallyLovesAnimals'}, 'nested.0.favorite_animals')).toBe(false);
+});
+
 test('it can call a custom function using params against root values', () => {
     Fields.setStoreValues({
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
@@ -406,24 +429,6 @@ test('it can call a custom function on a specific field', () => {
     });
 
     expect(Fields.showField({handle: 'favorite_animals', if: {'favorite_animals': 'custom lovesAnimals'}})).toBe(true);
-});
-
-test('it can call a custom function on a specific nested field', () => {
-    Fields.setValues({
-        favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
-    }, 'nested');
-
-    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, values, fieldPath }) {
-        expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
-        expect(values.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
-        expect(params).toEqual([]);
-        expect(store).toBe(Store);
-        expect(storeName).toBe('base');
-        expect(fieldPath).toBe('nested.0.favorite_animals');
-        return values.favorite_animals.length > 3;
-    });
-
-    expect(Fields.showField({if: {'favorite_animals': 'custom lovesAnimals'}}, 'nested.0.favorite_animals')).toBe(true);
 });
 
 test('it can call a custom function on a specific field using params against a root value', () => {
