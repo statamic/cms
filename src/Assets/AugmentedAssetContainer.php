@@ -17,6 +17,7 @@ class AugmentedAssetContainer extends AbstractAugmented
             'search_index',
             'api_url',
             'assets',
+            'max_size',
         ];
     }
 

@@ -62,6 +62,7 @@ class ListAssetContainersTest extends TestCase
                 'blueprint_url' => 'http://localhost/cp/asset-containers/three/blueprint',
                 'can_edit' => false,
                 'can_delete' => false,
+                'max_size' => null
             ],
             [
                 'id' => 'two',
@@ -76,6 +77,7 @@ class ListAssetContainersTest extends TestCase
                 'blueprint_url' => 'http://localhost/cp/asset-containers/two/blueprint',
                 'can_edit' => false,
                 'can_delete' => false,
+                'max_size' => null
             ],
         ];
     }

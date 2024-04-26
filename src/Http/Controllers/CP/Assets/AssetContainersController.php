@@ -28,7 +28,7 @@ class AssetContainersController extends CpController
                 'allow_moving' => $container->allowMoving(),
                 'allow_renaming' => $container->allowRenaming(),
                 'allow_uploads' => $container->allowUploads(),
-                'maxSize' => $container->maxSize(),
+                'max_size' => $container->maxSize(),
                 'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
