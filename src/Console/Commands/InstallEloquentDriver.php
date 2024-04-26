@@ -102,6 +102,7 @@ class InstallEloquentDriver extends Command
             'revisions' => 'Revisions',
             'taxonomies' => 'Taxonomies',
             'terms' => 'Terms',
+            'tokens' => 'Tokens',
         ])->reject(function ($value, $key) {
             switch ($key) {
                 case 'asset_containers':
@@ -149,6 +150,9 @@ class InstallEloquentDriver extends Command
 
                 case 'terms':
                     return config('statamic.eloquent-driver.terms.driver') === 'eloquent';
+
+                case 'tokens':
+                    return config('statamic.eloquent-driver.tokens.driver') === 'eloquent';
             }
         });
     }
@@ -533,6 +537,21 @@ class InstallEloquentDriver extends Command
 
             $this->components->info('Imported existing terms');
         }
+    }
+
+    protected function migrateTokens(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-token-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('tokens');
+            },
+            message: 'Migrating tokens...'
+        );
+
+        $this->components->info('Configured tokens');
     }
 
     private function switchToEloquentDriver(string $repository): void
