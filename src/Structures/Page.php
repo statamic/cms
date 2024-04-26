@@ -42,7 +42,6 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
     private $absoluteUrl;
     private $absoluteUrlWithoutRedirect;
     private $blueprint;
-    private $entry;
     private $routeData;
     private $status;
     private $structure;
@@ -131,19 +130,15 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
 
     public function entry(): ?Entry
     {
-        if ($this->entry !== null) {
-            return $this->entry;
-        }
-
         if (! $this->reference) {
             return null;
         }
 
         if ($cached = Blink::store('structure-entries')->get($this->reference)) {
-            return $this->entry = $cached;
+            return $cached;
         }
 
-        return $this->entry = $this->tree->entry($this->reference);
+        return $this->tree->entry($this->reference);
     }
 
     public function reference()

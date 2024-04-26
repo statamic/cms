@@ -179,7 +179,7 @@ class UsersController extends CpController
             ->data($values);
 
         if ($request->roles && User::current()->can('assign roles')) {
-            $user->roles($request->roles);
+            $user->explicitRoles($request->roles);
         }
 
         if ($request->groups && User::current()->can('assign user groups')) {
@@ -295,7 +295,7 @@ class UsersController extends CpController
         $user->email($request->email);
 
         if (User::current()->can('assign roles')) {
-            $user->roles($request->roles);
+            $user->explicitRoles($request->roles);
         }
 
         if (User::current()->can('assign user groups')) {

@@ -948,6 +948,7 @@
     "Unable to change password": "Passwort kann nicht geändert werden.",
     "Unable to delete filter preset": "Filtervoreinstellung kann nicht gelöscht werden.",
     "Unable to delete view": "Ansicht kann nicht gelöscht werden.",
+    "Unable to rename view": "Ansicht kann nicht umbenannt werden.",
     "Unable to save changes": "Änderungen können nicht gespeichert werden.",
     "Unable to save column preferences.": "Spaltenvoreinstellungen können nicht gespeichert werden.",
     "Unable to save favorite": "Favorit kann nicht gespeichert werden.",
@@ -1000,6 +1001,7 @@
     "View deleted": "Ansicht gelöscht",
     "View History": "Verlauf anzeigen",
     "View on Marketplace": "Auf Marktplatz anzeigen",
+    "View renamed": "Ansicht umbenannt",
     "View saved": "Ansicht gespeichert",
     "View Site": "Website anzeigen",
     "View Useful Links": "Nützliche Links anzeigen",
@@ -1032,6 +1034,7 @@
     "You are not authorized to view this collection.": "Du bist nicht berechtigt, diese Sammlung anzuzeigen.",
     "You are now impersonating": "Du gibst dich jetzt aus als",
     "You can't do this while logged in": "Dies ist nicht möglich, wenn du eingeloggt bist.",
+    "You're already editing this item.": "Du bearbeitest diesen Eintrag bereits.",
     "Your Favorites": "Meine Favoriten",
     "Your working copy will be replaced by the contents of this revision.": "Deine Arbeitskopie wird durch den Inhalt dieser Überarbeitung ersetzt."
 }

@@ -36,7 +36,7 @@ class ListedEntry extends JsonResource
             'status' => $entry->status(),
             'private' => $entry->private(),
             'date' => $this->when($collection->dated(), function () {
-                return $this->resource->date()->inPreferredFormat();
+                return $this->resource->blueprint()->field('date')->fieldtype()->preProcessIndex($this->resource->date());
             }),
 
             $this->merge($this->values(['slug' => $entry->slug()])),
