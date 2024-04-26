@@ -3,17 +3,19 @@
 namespace Statamic\Tokens;
 
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Tokens\Token as TokenContract;
+use Statamic\Contracts\Tokens\TokenRepository as Contract;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 
-class TokenRepository
+class TokenRepository implements Contract
 {
-    public function make(?string $token, string $handler, array $data = []): Token
+    public function make(?string $token, string $handler, array $data = []): TokenContract
     {
         return new Token($token, $handler, $data);
     }
 
-    public function find(string $token)
+    public function find(string $token): ?TokenContract
     {
         $path = storage_path('statamic/tokens/'.$token.'.yaml');
 
@@ -24,21 +26,21 @@ class TokenRepository
         return $this->makeFromPath($path);
     }
 
-    public function save(Token $token)
+    public function save(TokenContract $token): bool
     {
         File::put(storage_path('statamic/tokens/'.$token->token().'.yaml'), $token->fileContents());
 
         return true;
     }
 
-    public function delete(Token $token)
+    public function delete(TokenContract $token): bool
     {
         File::delete(storage_path('statamic/tokens/'.$token->token().'.yaml'));
 
         return true;
     }
 
-    public function collectGarbage()
+    public function collectGarbage(): void
     {
         File::getFilesByType(storage_path('statamic/tokens'), 'yaml')
             ->map(fn ($path) => $this->makeFromPath($path))
