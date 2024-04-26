@@ -1,5 +1,15 @@
 # Release Notes
 
+## 5.0.0-alpha.6 (2024-04-26)
+
+### What's changed
+- Add tokens to eloquent cli install. [#9962](https://github.com/statamic/cms/issues/9962) by @ryanmitchell
+- Token class changes [#9964](https://github.com/statamic/cms/issues/9964) by @jasonvarga
+- Revert caching entry to property on Page instances [#9958](https://github.com/statamic/cms/issues/9958) by @jasonvarga
+- Changes to `User` role methods [#9921](https://github.com/statamic/cms/issues/9921) by @duncanmcclean
+
+
+
 ## 5.0.0-alpha.5 (2024-04-22)
 
 ### What's changed
