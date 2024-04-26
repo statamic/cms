@@ -630,8 +630,12 @@ class EntryTest extends TestCase
         $this->assertNull($entry->url());
     }
 
-    /** @test */
-    public function it_gets_urls_for_first_child_redirects()
+    /**
+     * @test
+     *
+     * @dataProvider firstChildRedirectProvider
+     */
+    public function it_gets_urls_for_first_child_redirects($value)
     {
         \Event::fake(); // Don't invalidate static cache etc when saving entries.
 
@@ -641,9 +645,9 @@ class EntryTest extends TestCase
 
         $collection = tap((new Collection)->handle('pages')->routes('{parent_uri}/{slug}'))->save();
 
-        $parent = tap((new Entry)->id('1')->locale('en')->collection($collection)->slug('parent')->set('redirect', '@child'))->save();
+        $parent = tap((new Entry)->id('1')->locale('en')->collection($collection)->slug('parent')->set('redirect', $value))->save();
         $child = tap((new Entry)->id('2')->locale('en')->collection($collection)->slug('child'))->save();
-        $noChildren = tap((new Entry)->id('3')->locale('en')->collection($collection)->slug('nochildren')->set('redirect', '@child'))->save();
+        $noChildren = tap((new Entry)->id('3')->locale('en')->collection($collection)->slug('nochildren')->set('redirect', $value))->save();
 
         $collection->structureContents([
             'expects_root' => false, // irrelevant. just can't pass an empty array at the moment.
@@ -682,6 +686,14 @@ class EntryTest extends TestCase
         $this->assertEquals('http://domain.com/nochildren', $noChildren->absoluteUrl());
         $this->assertEquals('http://domain.com/nochildren', $noChildren->absoluteUrlWithoutRedirect());
         $this->assertEquals(404, $noChildren->redirectUrl());
+    }
+
+    public static function firstChildRedirectProvider()
+    {
+        return [
+            'string' => ['@child'],
+            'array' => [['url' => '@child']],
+        ];
     }
 
     /** @test */
