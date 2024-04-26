@@ -12,7 +12,7 @@ class TokenRepository implements Contract
 {
     public function make(?string $token, string $handler, array $data = []): TokenContract
     {
-        return new Token($token, $handler, $data);
+        return app()->makeWith(TokenContract::class, compact('token', 'handler', 'data'));
     }
 
     public function find(string $token): ?TokenContract
@@ -57,5 +57,12 @@ class TokenRepository implements Contract
         return $this
             ->make($token, $yaml['handler'], $yaml['data'] ?? [])
             ->expireAt(Carbon::createFromTimestamp($yaml['expires_at']));
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            TokenContract::class => Token::class,
+        ];
     }
 }
