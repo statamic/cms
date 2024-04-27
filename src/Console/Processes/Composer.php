@@ -321,7 +321,7 @@ class Composer extends Process
             return $this->locateComposerPharOnWindows($output);
         }
 
-        return $this->output;
+        return $output;
     }
 
     private function locateComposerPharOnWindows($output)
