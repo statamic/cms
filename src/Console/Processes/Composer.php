@@ -324,7 +324,7 @@ class Composer extends Process
         return $output;
     }
 
-    private function locateComposerPharOnWindows($output)
+    private function locateComposerPharOnWindows($output): string
     {
         $output = StringUtilities::normalizeLineEndings($output);
 
