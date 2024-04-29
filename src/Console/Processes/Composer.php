@@ -205,6 +205,16 @@ class Composer extends Process
     }
 
     /**
+     * Install Composer dependencies.
+     *
+     * @return void
+     */
+    public function install(string $workingDirectory)
+    {
+        $this->runComposerCommand('install', '--working-dir='.$workingDirectory);
+    }
+
+    /**
      * Get cached output for package process.
      *
      * @return mixed
@@ -302,9 +312,17 @@ class Composer extends Process
         return array_merge([
             $this->phpBinary(),
             "-d memory_limit={$this->memoryLimit}",
-            'vendor/bin/composer',
+            $this->composerBinary(),
             $this->colorized ? '--ansi' : '--no-ansi',
         ], $parts);
+    }
+
+    /**
+     * Absolute path to the Composer binary.
+     */
+    private function composerBinary(): string
+    {
+        return $this->run(DIRECTORY_SEPARATOR === '\\' ? 'where composer' : 'which composer');
     }
 
     /**

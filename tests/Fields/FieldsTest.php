@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
+use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
@@ -589,14 +590,14 @@ class FieldsTest extends TestCase
                 ['type' => 'replicator_set', 'two' => 'foo'],
                 ['type' => 'replicator_set', 'griddy_in_reppy' => [
                     ['one' => 'foo'],
-                    ['bardo_in_griddy_in_reppy' => json_encode($bardValues = [
+                    ['bardo_in_griddy_in_reppy' => $bardValues = [
                         ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'two' => 'foo']]],
                         ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'foo']]],
-                        ['type' => 'set', 'attrs' => ['type' => 'bard_set', 'values' => ['type' => 'bard_set', 'bardo_in_bardo_in_griddy_in_reppy' => json_encode($doubleNestedBardValues = [
+                        ['type' => 'set', 'attrs' => ['type' => 'bard_set', 'values' => ['type' => 'bard_set', 'bardo_in_bardo_in_griddy_in_reppy' => $doubleNestedBardValues = [
                             ['type' => 'set', 'attrs' => ['values' => ['type' => 'bard_set', 'two' => 'foo']]],
                             ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'foo']]],
-                        ])]]],
-                    ])],
+                        ]]]],
+                    ]],
                 ]],
             ],
         ];
@@ -1002,5 +1003,126 @@ class FieldsTest extends TestCase
         $collection = $fields->all();
         $this->assertEquals(1, $collection['one']->parentIndex());
         $this->assertEquals(1, $collection['two']->parentIndex());
+    }
+
+    /**
+     * @test
+     */
+    public function it_sets_the_parentfield_and_parentindex_on_imported_fields()
+    {
+        $fieldset = (new Fieldset)->setHandle('partial')->setContents([
+            'fields' => [
+                ['handle' => 'bar', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('partial')->once()->andReturn($fieldset);
+
+        $parentField = new Field('foo', ['type' => 'replicator']);
+
+        $fields = new Fields(
+            [['import' => 'partial']],
+            null,
+            $parentField,
+            1,
+        );
+
+        $collection = $fields->all();
+        $this->assertEquals($parentField, $collection['bar']->parentField());
+        $this->assertEquals(1, $collection['bar']->parentIndex());
+    }
+
+    /**
+     * @test
+     */
+    public function it_sets_the_parentfield_and_parentindex_on_referenced_fields()
+    {
+        $fieldset = (new Fieldset)->setHandle('partial')->setContents([
+            'fields' => [
+                ['handle' => 'bar', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('partial')->once()->andReturn($fieldset);
+
+        $parentField = new Field('foo', ['type' => 'replicator']);
+
+        $fields = new Fields(
+            [['handle' => 'bar', 'field' => 'partial.bar']],
+            null,
+            $parentField,
+            1,
+        );
+
+        $collection = $fields->all();
+        $this->assertEquals($parentField, $collection['bar']->parentField());
+        $this->assertEquals(1, $collection['bar']->parentIndex());
+    }
+
+    /** @test */
+    public function it_does_not_allow_recursive_imports()
+    {
+        $this->expectException(FieldsetRecursionException::class);
+
+        $one = (new Fieldset)->setHandle('one')->setContents([
+            'fields' => [
+                [
+                    'import' => 'two',
+                ],
+            ],
+        ]);
+
+        $two = (new Fieldset)->setHandle('two')->setContents([
+            'fields' => [
+                [
+                    'import' => 'one',
+                ],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('one')->zeroOrMoreTimes()->andReturn($one);
+        FieldsetRepository::shouldReceive('find')->with('two')->zeroOrMoreTimes()->andReturn($two);
+
+        new Fields([
+            [
+                'import' => 'one',
+            ],
+        ]);
+    }
+
+    /** @test */
+    public function import_recursion_check_should_reset_across_instances()
+    {
+        $one = (new Fieldset)->setHandle('one')->setContents([
+            'fields' => [
+                [
+                    'import' => 'two',
+                ],
+            ],
+        ]);
+
+        $two = (new Fieldset)->setHandle('two')->setContents([
+            'fields' => [
+                [
+                    'handle' => 'foo',
+                    'field' => ['type' => 'text'],
+                ],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('one')->zeroOrMoreTimes()->andReturn($one);
+        FieldsetRepository::shouldReceive('find')->with('two')->zeroOrMoreTimes()->andReturn($two);
+
+        new Fields([
+            [
+                'import' => 'one',
+            ],
+        ]);
+
+        new Fields([
+            [
+                'import' => 'two',
+            ],
+        ]);
     }
 }

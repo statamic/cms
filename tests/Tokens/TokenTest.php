@@ -5,7 +5,7 @@ namespace Tests\Tokens;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Statamic\Facades;
-use Statamic\Tokens\Token;
+use Statamic\Tokens\FileToken as Token;
 use Tests\TestCase;
 
 class TokenTest extends TestCase

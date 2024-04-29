@@ -120,6 +120,7 @@ class Outpost
             'statamic_version' => Statamic::version(),
             'statamic_pro' => Statamic::pro(),
             'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version(),
             'packages' => $this->packagePayload(),
         ];
     }

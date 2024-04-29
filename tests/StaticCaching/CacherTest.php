@@ -6,7 +6,6 @@ use Illuminate\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Mockery;
-use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Tests\TestCase;
 
@@ -76,10 +75,10 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_the_base_url_when_sites_have_absolute_urls()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'default' => ['url' => 'http://example.com'],
             'uk' => ['url' => 'http://example.co.uk'],
-        ]]);
+        ]);
 
         $cacher = $this->cacher();
 
@@ -89,10 +88,10 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_the_base_url_when_sites_have_absolute_urls_with_trailing_slashes()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'default' => ['url' => 'http://example.com/'],
             'uk' => ['url' => 'http://example.co.uk/'],
-        ]]);
+        ]);
 
         $cacher = $this->cacher();
 
@@ -102,10 +101,10 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_the_base_url_when_sites_have_relative_urls()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'default' => ['url' => '/default'],
             'uk' => ['url' => '/uk'],
-        ]]);
+        ]);
 
         config(['app.url' => 'http://app.com']);
 
@@ -117,10 +116,10 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_the_base_url_when_sites_have_relative_urls_with_trailing_slashes()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'default' => ['url' => '/default/'],
             'uk' => ['url' => '/uk/'],
-        ]]);
+        ]);
 
         config(['app.url' => 'http://app.com']);
 
@@ -132,10 +131,10 @@ class CacherTest extends TestCase
     /** @test */
     public function gets_the_base_url_when_site_is_just_a_slash()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'default' => ['url' => '/'],
             'uk' => ['url' => '/uk/'],
-        ]]);
+        ]);
 
         config(['app.url' => 'http://app.com']);
 
@@ -265,10 +264,10 @@ class CacherTest extends TestCase
     {
         $cache = app(Repository::class);
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'default' => ['url' => 'http://example.com'],
             'uk' => ['url' => 'http://example.co.uk'],
-        ]]);
+        ]);
 
         $cache->forever('static-cache:domains', [
             'http://example.com',
