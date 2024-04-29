@@ -22,6 +22,7 @@ use Symfony\Component\Finder\SplFileInfo;
 class CollectionEntriesStore extends ChildStore
 {
     protected $collection;
+    private bool $shouldBlinkEntryUris = true;
 
     protected function collection()
     {
@@ -241,10 +242,19 @@ class CollectionEntriesStore extends ChildStore
             return null;
         }
 
-        if ($cache['uri']) {
+        if ($this->shouldBlinkEntryUris && $cache['uri']) {
             Blink::store('entry-uris')->put($cache['entry']->id(), $cache['uri']);
         }
 
         return $cache['entry'];
+    }
+
+    public function withoutBlinkingEntryUris($callback)
+    {
+        $this->shouldBlinkEntryUris = false;
+        $return = $callback();
+        $this->shouldBlinkEntryUris = true;
+
+        return $return;
     }
 }

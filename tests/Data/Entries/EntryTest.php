@@ -637,8 +637,6 @@ class EntryTest extends TestCase
      */
     public function it_gets_urls_for_first_child_redirects($value)
     {
-        \Event::fake(); // Don't invalidate static cache etc when saving entries.
-
         $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
         ]);
