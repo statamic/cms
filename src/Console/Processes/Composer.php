@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Composer\Lock;
 use Statamic\Jobs\RunComposer;
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class Composer extends Process
 {
@@ -312,7 +313,43 @@ class Composer extends Process
      */
     private function composerBinary(): string
     {
-        return $this->run(DIRECTORY_SEPARATOR === '\\' ? 'where composer' : 'which composer');
+        $isWindows = DIRECTORY_SEPARATOR === '\\';
+
+        $output = $this->run($isWindows ? 'where composer' : 'which composer');
+
+        if ($isWindows) {
+            return $this->locateComposerPharOnWindows($output);
+        }
+
+        return $output;
+    }
+
+    private function locateComposerPharOnWindows($output): string
+    {
+        $output = StringUtilities::normalizeLineEndings($output);
+
+        if (! Str::contains($output, "\n")) {
+            $candidates = [trim($output)];
+        } else {
+            $candidates = explode("\n", $output);
+        }
+
+        foreach ($candidates as $candidate) {
+            // Do we have a bat file? The phar is likely beside it.
+            if (Str::endsWith($candidate, '.bat')) {
+                // Remove that 🦇 extension.
+                $candidate = mb_substr($candidate, 0, mb_strlen($candidate) - 4);
+            }
+
+            $pharPath = $candidate.'.phar';
+
+            if (file_exists($pharPath)) {
+                // Use "composer.phar" if we have it.
+                return $pharPath;
+            }
+        }
+
+        return $output;
     }
 
     /**
