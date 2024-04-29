@@ -3,7 +3,6 @@
 namespace Statamic\Licensing;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\MessageBag;
 use Statamic\Support\Arr;
 
@@ -121,6 +120,6 @@ class LicenseManager
 
     public function usingLicenseKeyFile()
     {
-        return File::exists(storage_path('license.key'));
+        return $this->outpost->usingLicenseKeyFile();
     }
 }

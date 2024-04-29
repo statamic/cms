@@ -77,28 +77,8 @@ class Outpost
 
     private function performRequest()
     {
-        if (File::exists(storage_path('license.key'))) {
-            try {
-                $encrypter = new Encrypter(config('statamic.system.license_key'));
-                $licenseKey = $encrypter->decrypt(File::get(storage_path('license.key')));
-                $licenseKey = json_decode($licenseKey, true);
-            } catch (DecryptException|RuntimeException $e) {
-                return ['error' => 500];
-            }
-
-            $licenseKey['packages'] = collect($licenseKey['packages'])
-                ->merge(
-                    Addon::all()
-                        ->reject(fn ($addon) => array_key_exists($addon->package(), $licenseKey['packages']))
-                        ->mapWithKeys(fn ($addon) => [$addon->package() => [
-                            'valid' => ! $addon->isCommercial(),
-                            'exists' => $addon->existsOnMarketplace(),
-                            'version_limit' => null,
-                        ]])
-                )
-                ->all();
-
-            return $licenseKey;
+        if ($this->usingLicenseKeyFile()) {
+            return $this->licenseKeyFileResponse();
         }
 
         $response = $this->client->request('POST', self::ENDPOINT, [
@@ -108,6 +88,27 @@ class Outpost
         ]);
 
         return json_decode($response->getBody()->getContents(), true);
+    }
+
+    private function licenseKeyFileResponse()
+    {
+        try {
+            $encrypter = new Encrypter(config('statamic.system.license_key'));
+            $decrypted = $encrypter->decrypt(File::get($this->licenseKeyPath()));
+            $response = collect(json_decode($decrypted, true));
+        } catch (DecryptException|RuntimeException $e) {
+            return ['error' => 500];
+        }
+
+        return $response->put('packages', collect($response['packages'])->merge(
+            Addon::all()
+                ->reject(fn ($addon) => array_key_exists($addon->package(), $response['packages']))
+                ->mapWithKeys(fn ($addon) => [$addon->package() => [
+                    'valid' => ! $addon->isCommercial(),
+                    'exists' => $addon->existsOnMarketplace(),
+                    'version_limit' => null,
+                ]])
+        ))->toArray();
     }
 
     public function payload()
@@ -230,5 +231,15 @@ class Outpost
         return $this->cache()->getStore() instanceof LockProvider
             ? $this->cache()->lock($key, $seconds)
             : new NoLock($key, $seconds);
+    }
+
+    public function usingLicenseKeyFile()
+    {
+        return File::exists($this->licenseKeyPath());
+    }
+
+    private function licenseKeyPath()
+    {
+        return storage_path('license.key');
     }
 }
