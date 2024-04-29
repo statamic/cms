@@ -37,7 +37,7 @@ EOT;
     {
         Collection::make('pages')->routes('{slug}')->save();
 
-        EntryFactory::collection('pages')->id('1')->data(['title' => 'The Title', 'content' => 'The content'])->slug('/')->create();
+        EntryFactory::collection('pages')->id('1')->data(['title' => 'The Title', 'content' => 'The content'])->slug('test')->create();
 
         $layout = <<<'LAYOUT'
 {{ yield:test }}
@@ -59,7 +59,7 @@ PARTIAL;
         $this->viewShouldReturnRaw('default', $default);
         $this->viewShouldReturnRaw('test', $partial);
 
-        $response = $this->get('/')->assertOk();
+        $response = $this->get('test')->assertOk();
         $content = trim(StringUtilities::normalizeLineEndings($response->content()));
 
         $expected = <<<'EXPECTED'
