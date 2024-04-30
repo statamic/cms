@@ -11,6 +11,8 @@ use Illuminate\Support\LazyCollection;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Exceptions\ItemNotFoundException;
+use Statamic\Exceptions\MultipleRecordsFoundException;
+use Statamic\Exceptions\RecordsNotFoundException;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 
@@ -559,6 +561,23 @@ abstract class Builder implements Contract
         }
 
         return $callback();
+    }
+
+    public function sole($columns = ['*'])
+    {
+        $result = $this->get($columns);
+
+        $count = $result->count();
+
+        if ($count === 0) {
+            throw new RecordsNotFoundException();
+        }
+
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
+        }
+
+        return $result->first();
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)

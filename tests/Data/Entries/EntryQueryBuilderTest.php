@@ -5,6 +5,8 @@ namespace Tests\Data\Entries;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Statamic\Exceptions\ItemNotFoundException;
+use Statamic\Exceptions\MultipleRecordsFoundException;
+use Statamic\Exceptions\RecordsNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -823,5 +825,43 @@ class EntryQueryBuilderTest extends TestCase
             });
 
         $this->assertSame('fallback', $firstOrFail);
+    }
+
+    /** @test */
+    public function sole_entry_is_returned()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $sole = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->sole();
+
+        $this->assertSame($entry, $sole);
+    }
+
+    /** @test */
+    public function exception_is_thrown_by_sole_when_multiple_entries_are_returned_from_query()
+    {
+        Collection::make('posts')->save();
+        EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+        EntryFactory::collection('posts')->id('smoff')->slug('joe-hasselsmoff')->data(['title' => 'Joe Hasselsmoff'])->create();
+
+        $this->expectException(MultipleRecordsFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->sole();
+    }
+
+    /** @test */
+    public function exception_is_thrown_by_sole_when_no_entries_are_returned_from_query()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->sole();
     }
 }

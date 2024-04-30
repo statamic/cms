@@ -10,6 +10,8 @@ use Illuminate\Support\LazyCollection;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Exceptions\ItemNotFoundException;
+use Statamic\Exceptions\MultipleRecordsFoundException;
+use Statamic\Exceptions\RecordsNotFoundException;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
 use Statamic\Support\Arr;
@@ -94,6 +96,23 @@ abstract class EloquentQueryBuilder implements Builder
         }
 
         return $callback();
+    }
+
+    public function sole($columns = ['*'])
+    {
+        $result = $this->get($columns);
+
+        $count = $result->count();
+
+        if ($count === 0) {
+            throw new RecordsNotFoundException();
+        }
+
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
+        }
+
+        return $result->first();
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
