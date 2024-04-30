@@ -268,9 +268,11 @@ class Fields
 
     private function getImportedFields(array $config): array
     {
+        $recursion = tap(app(FieldsetRecursionStack::class))->push($config['import']);
+
         $blink = 'blueprint-imported-fields-'.md5(json_encode($config));
 
-        return Blink::once($blink, function () use ($config) {
+        $imported = Blink::once($blink, function () use ($config) {
             if (! $fieldset = FieldsetRepository::find($config['import'])) {
                 throw new FieldsetNotFoundException($config['import']);
             }
@@ -299,6 +301,10 @@ class Fields
                 ->setParent($this->parent)
                 ->setParentField($this->parentField, $this->parentIndex);
         })->all();
+
+        $recursion->pop();
+
+        return $imported;
     }
 
     public function meta()

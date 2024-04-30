@@ -9,6 +9,7 @@ use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\EntryNotFoundException;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Rules\Slug;
 use Statamic\Stache\Query\EntryQueryBuilder;
@@ -177,6 +178,7 @@ class EntryRepository implements RepositoryContract
 
     public function substitute($item)
     {
+        Blink::store('entry-uris')->forget($item->id());
         $this->substitutionsById[$item->id()] = $item;
         $this->substitutionsByUri[$item->locale().'@'.$item->uri()] = $item;
     }

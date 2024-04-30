@@ -36,12 +36,12 @@ class ResolveRedirect
             return null;
         }
 
-        if ($redirect === '@child') {
-            return $this->firstChild($parent);
-        }
-
         if (is_array($redirect)) {
             $redirect = $redirect['url'];
+        }
+
+        if ($redirect === '@child') {
+            return $this->firstChild($parent);
         }
 
         if ($redirect instanceof Values) {

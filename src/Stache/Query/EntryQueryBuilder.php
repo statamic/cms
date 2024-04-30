@@ -6,6 +6,7 @@ use Closure;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Support\Arr;
@@ -69,6 +70,39 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return empty($this->wheres)
             ? $this->getKeysFromCollections($collections)
             : $this->getKeysFromCollectionsWithWheres($collections, $this->wheres);
+    }
+
+    private function addCollectionWheres(): void
+    {
+        $this->collections = $this->getCollectionWheres();
+    }
+
+    private function getCollectionWheres(): array
+    {
+        // If the collections property isn't empty, it means the user has explicitly
+        // queried for them. In that case, we'll use them and skip the auto-detection.
+        if (! empty($this->collections)) {
+            return $this->collections;
+        }
+
+        // Otherwise, we'll detect them by looking at where clauses targeting the "id" column.
+        $ids = collect($this->wheres)->where('column', 'id')->flatMap(fn ($where) => $where['values'] ?? [$where['value']]);
+
+        // If no IDs were queried, fall back to all collections.
+        if ($ids->isEmpty()) {
+            return Collection::handles()->all();
+        }
+
+        return Blink::once('entry-to-collection-map', function () {
+            return Collection::handles()
+                ->flatMap(fn ($collection) => $this->getWhereColumnKeysFromStore($collection, ['column' => 'collectionHandle']))
+                ->keys()
+                ->mapWithKeys(function ($value) {
+                    [$collection, $id] = explode('::', $value);
+
+                    return [$id => $collection];
+                });
+        })->only($ids->all())->unique()->values()->all();
     }
 
     protected function getKeysFromCollections($collections)
@@ -148,6 +182,8 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     public function whereStatus(string $status)
     {
+        $this->addCollectionWheres();
+
         if (! in_array($status, self::STATUSES)) {
             throw new \Exception("Invalid status [$status]");
         }

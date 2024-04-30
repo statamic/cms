@@ -142,7 +142,7 @@ return [
     'unique' => 'This value has already been taken.',
     'uploaded' => 'Failed to upload.',
     'uppercase' => 'Must be uppercase.',
-    'url' => 'Format is invalid.',
+    'url' => 'Must be a valid URL.',
     'uuid' => 'Must be a valid UUID.',
 
     /*
@@ -169,6 +169,7 @@ return [
     'duplicate_field_handle' => 'A field with a handle of :handle already exists.',
     'duplicate_uri' => 'Duplicate URI :value',
     'email_available' => 'A user with this email already exists.',
+    'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',
     'one_site_without_origin' => 'At least one site must not have an origin.',
     'options_require_keys' => 'All options must have keys.',
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',

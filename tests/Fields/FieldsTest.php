@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
+use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
@@ -1056,5 +1057,72 @@ class FieldsTest extends TestCase
         $collection = $fields->all();
         $this->assertEquals($parentField, $collection['bar']->parentField());
         $this->assertEquals(1, $collection['bar']->parentIndex());
+    }
+
+    /** @test */
+    public function it_does_not_allow_recursive_imports()
+    {
+        $this->expectException(FieldsetRecursionException::class);
+
+        $one = (new Fieldset)->setHandle('one')->setContents([
+            'fields' => [
+                [
+                    'import' => 'two',
+                ],
+            ],
+        ]);
+
+        $two = (new Fieldset)->setHandle('two')->setContents([
+            'fields' => [
+                [
+                    'import' => 'one',
+                ],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('one')->zeroOrMoreTimes()->andReturn($one);
+        FieldsetRepository::shouldReceive('find')->with('two')->zeroOrMoreTimes()->andReturn($two);
+
+        new Fields([
+            [
+                'import' => 'one',
+            ],
+        ]);
+    }
+
+    /** @test */
+    public function import_recursion_check_should_reset_across_instances()
+    {
+        $one = (new Fieldset)->setHandle('one')->setContents([
+            'fields' => [
+                [
+                    'import' => 'two',
+                ],
+            ],
+        ]);
+
+        $two = (new Fieldset)->setHandle('two')->setContents([
+            'fields' => [
+                [
+                    'handle' => 'foo',
+                    'field' => ['type' => 'text'],
+                ],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('one')->zeroOrMoreTimes()->andReturn($one);
+        FieldsetRepository::shouldReceive('find')->with('two')->zeroOrMoreTimes()->andReturn($two);
+
+        new Fields([
+            [
+                'import' => 'one',
+            ],
+        ]);
+
+        new Fields([
+            [
+                'import' => 'two',
+            ],
+        ]);
     }
 }

@@ -20,7 +20,8 @@ class UserGroupTest extends TestCase
     public function it_gets_and_sets_the_title()
     {
         $group = UserGroup::make();
-        $this->assertNull($group->title());
+        $group->handle('testing');
+        $this->assertEquals('Testing', $group->title());
 
         $return = $group->title('Test');
 

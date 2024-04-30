@@ -100,7 +100,7 @@ class ImportUsers extends Command
                 }
 
                 if (count($data->get('roles', [])) > 0) {
-                    $eloquentUser->roles($data->get('roles'));
+                    $eloquentUser->explicitRoles($data->get('roles'));
                 }
 
                 $eloquentUser->saveToDatabase();

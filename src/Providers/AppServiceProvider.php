@@ -13,6 +13,7 @@ use Statamic\Facades\Addon;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\Token;
+use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
@@ -120,6 +121,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
             \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
             \Statamic\Contracts\Forms\SubmissionRepository::class => \Statamic\Stache\Repositories\SubmissionRepository::class,
+            \Statamic\Contracts\Tokens\TokenRepository::class => \Statamic\Tokens\FileTokenRepository::class,
         ])->each(function ($concrete, $abstract) {
             if (! $this->app->bound($abstract)) {
                 Statamic::repository($abstract, $concrete);
@@ -151,6 +153,8 @@ class AppServiceProvider extends ServiceProvider
             return (new \Statamic\Fields\FieldsetRepository)
                 ->setDirectory(resource_path('fieldsets'));
         });
+
+        $this->app->singleton(FieldsetRecursionStack::class);
 
         collect([
             'entries' => fn () => Facades\Entry::query(),

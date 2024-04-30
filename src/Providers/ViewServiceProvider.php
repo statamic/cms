@@ -41,7 +41,6 @@ class ViewServiceProvider extends ServiceProvider
         });
 
         $this->registerAntlers();
-        $this->registerBladeDirectives();
 
         $this->app->singleton(Engine::class, function ($app) {
             return new Engine($app['files'], $app[ParserContract::class]);
@@ -164,6 +163,8 @@ class ViewServiceProvider extends ServiceProvider
     public function boot()
     {
         ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
+
+        $this->registerBladeDirectives();
 
         Blade::precompiler(function ($content) {
             return AntlersBladePrecompiler::compile($content);

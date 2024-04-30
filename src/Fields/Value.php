@@ -40,13 +40,19 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function value()
     {
+        $raw = $this->raw;
+
         if (! $this->fieldtype) {
-            return $this->raw;
+            return $raw;
+        }
+
+        if (! $raw && ($default = $this->fieldtype->field()?->defaultValue())) {
+            $raw = $default;
         }
 
         $value = $this->shallow
-            ? $this->fieldtype->shallowAugment($this->raw)
-            : $this->fieldtype->augment($this->raw);
+            ? $this->fieldtype->shallowAugment($raw)
+            : $this->fieldtype->augment($raw);
 
         return $value;
     }

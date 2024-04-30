@@ -4,8 +4,10 @@ namespace Statamic\Auth\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\User as BaseUser;
+use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
@@ -84,28 +86,26 @@ class User extends BaseUser
         // TODO
     }
 
-    public function roles($roles = null)
+    public function roles(): Collection
     {
-        return is_null($roles)
-            ? $this->getRoles()
-            : $this->setRoles($roles);
+        return $this->explicitRoles()
+            ->merge($this->groups()->flatMap->roles()->keyBy->handle());
     }
 
-    protected function getRoles()
+    public function explicitRoles($roles = null)
     {
+        if (func_num_args() === 1) {
+            $this->roles = collect();
+
+            $this->assignRole($roles);
+
+            return $this;
+        }
+
         return $this->roles = $this->roles
             ?? (new Roles($this))->all()->map(function ($row) {
                 return Role::find($row->role_id);
             })->keyBy->handle();
-    }
-
-    protected function setRoles($roles)
-    {
-        $this->roles = collect();
-
-        $this->assignRole($roles);
-
-        return $this;
     }
 
     protected function saveRoles()
@@ -143,18 +143,18 @@ class User extends BaseUser
         return $this;
     }
 
-    public function hasRole($role)
-    {
-        return $this->roles()->has(
-            is_string($role) ? $role : $role->handle()
-        );
-    }
-
     public function groups($groups = null)
     {
         return is_null($groups)
             ? $this->getGroups()
             : $this->setGroups($groups);
+    }
+
+    public function hasRole($role)
+    {
+        $role = $role instanceof RoleContract ? $role->handle() : $role;
+
+        return $this->roles()->has($role);
     }
 
     protected function getGroups()
