@@ -4,6 +4,7 @@ namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use Statamic\Exceptions\ItemNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -768,5 +769,59 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Support\LazyCollection::class, $entries);
         $this->assertCount(3, $entries);
+    }
+
+    /** @test */
+    public function entry_can_be_found_using_first_or_fail()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOrFail();
+
+        $this->assertSame($entry, $firstOrFail);
+    }
+
+    /** @test */
+    public function exception_is_thrown_when_entry_does_not_exist_using_first_or_fail()
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'ze-hoff')
+            ->firstOrFail();
+    }
+
+    /** @test */
+    public function entry_can_be_found_using_first_or()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOr(function () {
+                return 'fallback';
+            });
+
+        $this->assertSame($entry, $firstOrFail);
+    }
+
+    /** @test */
+    public function callback_is_called_when_entry_does_not_exist_using_first_or()
+    {
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOr(function () {
+                return 'fallback';
+            });
+
+        $this->assertSame('fallback', $firstOrFail);
     }
 }

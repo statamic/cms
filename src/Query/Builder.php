@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\LazyCollection;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
+use Statamic\Exceptions\ItemNotFoundException;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 
@@ -531,9 +532,33 @@ abstract class Builder implements Contract
         return $this->where('id', $id)->get($columns)->first();
     }
 
-    public function first()
+    public function first($columns = ['*'])
     {
-        return $this->get()->first();
+        return $this->get($columns)->first();
+    }
+
+    public function firstOrFail($columns = ['*'])
+    {
+        if (! is_null($item = $this->first($columns))) {
+            return $item;
+        }
+
+        throw new ItemNotFoundException();
+    }
+
+    public function firstOr($columns = ['*'], ?Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->first($columns))) {
+            return $model;
+        }
+
+        return $callback();
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
