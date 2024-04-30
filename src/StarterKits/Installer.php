@@ -39,7 +39,7 @@ final class Installer
      */
     public function __construct(string $package, $console = null, ?LicenseManager $licenseManager = null)
     {
-        [$this->package, $this->branch] = $this->parseRawPackageArg($package);
+        $this->package = $package;
 
         $this->licenseManager = $licenseManager;
 
@@ -60,17 +60,16 @@ final class Installer
     }
 
     /**
-     * Parse out package and branch from raw package arg.
+     * Install from specific branch.
+     *
+     * @param  string|null  $branch
+     * @return $this
      */
-    protected function parseRawPackageArg(string $package): array
+    public function branch($branch = null)
     {
-        $parts = explode(':', $package);
+        $this->branch = $branch;
 
-        if (count($parts) === 1) {
-            $parts[] = null;
-        }
-
-        return $parts;
+        return $this;
     }
 
     /**
