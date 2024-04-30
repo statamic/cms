@@ -11,6 +11,7 @@ use Statamic\StarterKits\Installer as StarterKitInstaller;
 use Statamic\StarterKits\LicenseManager as StarterKitLicenseManager;
 
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\text;
 
 class StarterKitInstall extends Command
 {
@@ -97,7 +98,7 @@ class StarterKitInstall extends Command
      */
     protected function getPackageAndBranch()
     {
-        $package = $this->argument('package') ?: $this->ask('Package');
+        $package = $this->argument('package') ?: text('Package');
 
         $parts = explode(':', $package);
 
