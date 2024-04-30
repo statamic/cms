@@ -84,11 +84,20 @@ class CollectionsStore extends BasicStore
 
     public function updateEntryUris($collection, $ids = null)
     {
-        $index = Stache::store('entries')
-            ->store($collection->handle())
-            ->index('uri');
+        $store = Stache::store('entries')->store($collection->handle());
+        $this->updateEntriesWithinIndex($store->index('uri'), $ids);
+        $this->updateEntriesWithinStore($store, $ids);
+    }
 
-        $this->updateEntriesWithinIndex($index, $ids);
+    private function updateEntriesWithinStore($store, $ids)
+    {
+        if (empty($ids)) {
+            $ids = $store->paths()->keys();
+        }
+
+        $entries = $store->withoutBlinkingEntryUris(fn () => collect($ids)->map(fn ($id) => Entry::find($id))->filter());
+
+        $entries->each(fn ($entry) => $store->cacheItem($entry));
     }
 
     public function updateEntryOrder($collection, $ids = null)

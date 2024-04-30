@@ -1,5 +1,28 @@
 # Release Notes
 
+## 5.0.0-alpha.6 (2024-04-26)
+
+### What's changed
+- Add tokens to eloquent cli install. [#9962](https://github.com/statamic/cms/issues/9962) by @ryanmitchell
+- Token class changes [#9964](https://github.com/statamic/cms/issues/9964) by @jasonvarga
+- Revert caching entry to property on Page instances [#9958](https://github.com/statamic/cms/issues/9958) by @jasonvarga
+- Changes to `User` role methods [#9921](https://github.com/statamic/cms/issues/9921) by @duncanmcclean
+
+
+
+## 5.0.0-alpha.5 (2024-04-22)
+
+### What's changed
+- Blink augmentation of terms and entries fieldtypes. [#9938](https://github.com/statamic/cms/issues/9938) by @jasonvarga
+- Fix slowdown caused by status PR. [#9928](https://github.com/statamic/cms/issues/9928) by @jasonvarga
+- Update GraphiQL. [#9934](https://github.com/statamic/cms/issues/9934) by @duncanmcclean
+- Drop legacy `rebing/graphql-laravel` code. [#9935](https://github.com/statamic/cms/issues/9935) by @duncanmcclean
+- Fix statamic-prefixed commands not working when running `Artisan::call()` within please. [#9926](https://github.com/statamic/cms/issues/9926) by @jasonvarga
+- Make `tearDown` method protected on `AddonTestCase`. [#9924](https://github.com/statamic/cms/issues/9924) by @duncanmcclean
+- Fix please version. [#9925](https://github.com/statamic/cms/issues/9925) by @jasonvarga
+
+
+
 ## 5.0.0-alpha.4 (2024-04-17)
 
 ### What's changed

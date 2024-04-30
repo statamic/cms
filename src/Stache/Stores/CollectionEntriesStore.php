@@ -2,10 +2,12 @@
 
 namespace Statamic\Stache\Stores;
 
+use Illuminate\Support\Facades\Cache;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
 use Statamic\Entries\RemoveSuffixFromPath;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\File;
@@ -20,6 +22,7 @@ use Symfony\Component\Finder\SplFileInfo;
 class CollectionEntriesStore extends ChildStore
 {
     protected $collection;
+    private bool $shouldBlinkEntryUris = true;
 
     protected function collection()
     {
@@ -94,6 +97,10 @@ class CollectionEntriesStore extends ChildStore
         if ($collection->dated()) {
             $entry->date((new GetDateFromPath)($path));
         }
+
+        // Blink the entry so that it can be used when building the URI. If it's not
+        // in there, it would try to retrieve the entry, which doesn't exist yet.
+        Blink::store('structure-entries')->put($id, $entry);
 
         if (isset($idGenerated) || isset($positionGenerated)) {
             $this->writeItemToDiskWithoutIncrementing($entry);
@@ -216,5 +223,38 @@ class CollectionEntriesStore extends ChildStore
         }
 
         $item->writeFile($path);
+    }
+
+    protected function cacheItem($item)
+    {
+        $key = $this->getItemKey($item);
+
+        $cacheKey = $this->getItemCacheKey($key);
+
+        Cache::forever($cacheKey, ['entry' => $item, 'uri' => $item->uri()]);
+    }
+
+    protected function getCachedItem($key)
+    {
+        $cacheKey = $this->getItemCacheKey($key);
+
+        if (! $cache = Cache::get($cacheKey)) {
+            return null;
+        }
+
+        if ($this->shouldBlinkEntryUris && $cache['uri']) {
+            Blink::store('entry-uris')->put($cache['entry']->id(), $cache['uri']);
+        }
+
+        return $cache['entry'];
+    }
+
+    public function withoutBlinkingEntryUris($callback)
+    {
+        $this->shouldBlinkEntryUris = false;
+        $return = $callback();
+        $this->shouldBlinkEntryUris = true;
+
+        return $return;
     }
 }

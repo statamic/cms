@@ -393,6 +393,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         Facades\Entry::save($this);
 
         if ($this->id()) {
+            Blink::store('entry-uris')->forget($this->id());
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
             Blink::forget($this->getOriginBlinkKey());
@@ -888,15 +889,23 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function uri()
     {
+        if ($this->id() && Blink::store('entry-uris')->has($this->id())) {
+            return Blink::store('entry-uris')->get($this->id());
+        }
+
         if (! $this->route()) {
             return null;
         }
 
-        if ($structure = $this->structure()) {
-            return $structure->entryUri($this);
+        $uri = ($structure = $this->structure())
+            ? $structure->entryUri($this)
+            : $this->routableUri();
+
+        if ($uri && $this->id()) {
+            Blink::store('entry-uris')->put($this->id(), $uri);
         }
 
-        return $this->routableUri();
+        return $uri;
     }
 
     public function fileExtension()
@@ -1021,6 +1030,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         // Avoid using the authors() method.
         if ($field === 'authors') {
             return $this->value('authors');
+        }
+
+        // Reset the cached uri so it gets recalculated.
+        if ($field === 'uri') {
+            Blink::store('entry-uris')->forget($this->id());
         }
 
         if (method_exists($this, $method = Str::camel($field))) {

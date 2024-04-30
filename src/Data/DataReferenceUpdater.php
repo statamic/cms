@@ -263,7 +263,13 @@ abstract class DataReferenceUpdater
 
         $dottedKey = $dottedPrefix.$field->handle();
 
-        $fieldData = collect(Arr::dot(Arr::get($data, $dottedKey, [])));
+        $fieldData = Arr::get($data, $dottedKey, []);
+
+        if (! $fieldData) {
+            return;
+        }
+
+        $fieldData = collect(Arr::dot($fieldData));
 
         if (! $fieldData->contains($this->originalValue())) {
             return;

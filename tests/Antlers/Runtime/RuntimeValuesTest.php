@@ -20,16 +20,6 @@ class RuntimeValuesTest extends ParserTestCase
     {
         $this->withFakeViews();
 
-        Collection::make('pages')->routes(['en' => '{slug}'])->save();
-        EntryFactory::collection('pages')->id('1')->slug('home')->data(['title' => 'Home'])->create();
-        EntryFactory::collection('pages')->id('2')->slug('about')->data(['title' => 'About'])->create();
-
-        $template = <<<'EOT'
-{{ title }}
-
-{{ dont_cache:me_please }}{{ foo }}{{ /dont_cache:me_please }}
-EOT;
-
         $instance = (new class extends Tags
         {
             public static $handle = 'dont_cache';
@@ -48,6 +38,16 @@ EOT;
         });
 
         $instance::register();
+
+        Collection::make('pages')->routes(['en' => '{slug}'])->save();
+        EntryFactory::collection('pages')->id('1')->slug('home')->data(['title' => 'Home'])->create();
+        EntryFactory::collection('pages')->id('2')->slug('about')->data(['title' => 'About'])->create();
+
+        $template = <<<'EOT'
+{{ title }}
+
+{{ dont_cache:me_please }}{{ foo }}{{ /dont_cache:me_please }}
+EOT;
 
         $this->viewShouldReturnRaw('default', $template);
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');

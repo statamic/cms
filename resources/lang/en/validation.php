@@ -142,7 +142,7 @@ return [
     'unique' => 'This value has already been taken.',
     'uploaded' => 'Failed to upload.',
     'uppercase' => 'Must be uppercase.',
-    'url' => 'Format is invalid.',
+    'url' => 'Must be a valid URL.',
     'uuid' => 'Must be a valid UUID.',
 
     /*
