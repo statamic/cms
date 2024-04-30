@@ -190,6 +190,13 @@ class FieldsController extends CpController
                 'default' => 'visible',
                 'type' => 'select',
             ],
+            'localizable' => [
+                'display' => __('Localizable'),
+                'instructions' => __('statamic::messages.fields_localizable_instructions'),
+                'type' => 'toggle',
+                'validate' => 'boolean',
+                'default' => false,
+            ],
             'replicator_preview' => [
                 'display' => __('Preview'),
                 'instructions' => __('statamic::messages.fields_replicator_preview_instructions'),
