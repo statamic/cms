@@ -580,6 +580,11 @@ abstract class Builder implements Contract
         return $result->first();
     }
 
+    public function exists()
+    {
+        return $this->count() >= 1;
+    }
+
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);

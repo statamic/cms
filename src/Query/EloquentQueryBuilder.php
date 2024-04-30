@@ -115,6 +115,11 @@ abstract class EloquentQueryBuilder implements Builder
         return $result->first();
     }
 
+    public function exists()
+    {
+        return $this->builder->count() >= 1;
+    }
+
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
         $paginator = $this->builder->paginate($perPage, $this->selectableColumns($columns), $pageName, $page);
