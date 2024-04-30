@@ -172,6 +172,7 @@ return [
     'outpost_error_422' => 'Error communicating with statamic.com.',
     'outpost_error_429' => 'Too many requests to statamic.com.',
     'outpost_issue_try_later' => 'There was an issue communicating with statamic.com. Please try again later.',
+    'outpost_license_key_error' => 'Statamic was unable to decrypt the provided license key file. Please re-download from statamic.com.',
     'password_protect_enter_password' => 'Enter password to unlock',
     'password_protect_incorrect_password' => 'Incorrect password.',
     'password_protect_token_invalid' => 'Invalid or expired token.',
