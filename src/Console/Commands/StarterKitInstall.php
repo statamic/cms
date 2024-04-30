@@ -11,7 +11,6 @@ use Statamic\StarterKits\Installer as StarterKitInstaller;
 use Statamic\StarterKits\LicenseManager as StarterKitLicenseManager;
 
 use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\text;
 
 class StarterKitInstall extends Command
 {
