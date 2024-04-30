@@ -864,4 +864,18 @@ class EntryQueryBuilderTest extends TestCase
             ->where('collection', 'posts')
             ->sole();
     }
+
+    /** @test */
+    public function exists_returns_true_when_results_are_found()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertTrue(Entry::query()->exists());
+    }
+
+    /** @test */
+    public function exists_returns_false_when_no_results_are_found()
+    {
+        $this->assertFalse(Entry::query()->exists());
+    }
 }
