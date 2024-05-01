@@ -43,7 +43,7 @@ abstract class AbstractAugmented implements Augmented
         $this->isSelecting = true;
 
         foreach ($keys as $key) {
-            $arr[$key] = (new TransientValue(null, $key, null))->withAugmentationReferences($this, $fields->get($key));
+            $arr[$key] = $this->transientValue($key, $fields);
         }
 
         $this->isSelecting = false;
@@ -51,16 +51,21 @@ abstract class AbstractAugmented implements Augmented
         return (new AugmentedCollection($arr))->withRelations($this->relations);
     }
 
-    abstract public function keys();
-
-    public function getAugmentedMethodValue($method)
+    private function transientValue($key, $fields)
     {
-        if ($this->methodExistsOnThisClass($method)) {
-            return $this->$method();
-        }
+        $callback = function (Value $value) use ($key, $fields) {
+            $deferred = $this->get($key, $fields->get($key)?->fieldtype());
 
-        return $this->data->$method();
+            $value->setFieldtype($deferred->fieldtype());
+            $value->setAugmentable($deferred->augmentable());
+
+            return $deferred->raw();
+        };
+
+        return new Value($callback, $key);
     }
+
+    abstract public function keys();
 
     protected function adjustFieldtype($handle, $fieldtype)
     {
@@ -126,46 +131,35 @@ abstract class AbstractAugmented implements Augmented
     {
         $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
 
-        return (new DeferredValue(
-            null,
-            $handle,
-            $fieldtype,
-            $this->data
-        ))->withAugmentedReference($this);
+        return new Value(fn () => $this->getFromData($handle), $handle, $fieldtype, $this->data);
     }
 
     protected function wrapAugmentedMethodInvokable(string $method, string $handle, $fieldtype = null)
     {
-        $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
-
-        return (new InvokableValue(
-            null,
+        return new Value(
+            fn () => $this->$method(),
             $handle,
-            $fieldtype,
-            $this->data
-        ))->setInvokableDetails($method, $this);
+            null,
+            $this->data,
+        );
     }
 
     protected function wrapDataMethodInvokable(string $method, string $handle, $fieldtype = null)
     {
-        $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
-
-        return (new InvokableValue(
-            null,
+        return new Value(
+            fn () => $this->data->$method(),
             $handle,
-            $fieldtype,
+            $this->adjustFieldtype($handle, $fieldtype),
             $this->data
-        ))->setInvokableDetails($method, $this->data);
+        );
     }
 
     protected function wrapValue($value, $handle, $fieldtype = null)
     {
-        $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
-
         return new Value(
             $value,
             $handle,
-            $fieldtype,
+            $this->adjustFieldtype($handle, $fieldtype),
             $this->data
         );
     }

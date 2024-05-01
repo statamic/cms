@@ -14,6 +14,7 @@ use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
 
 class Value implements IteratorAggregate, JsonSerializable
 {
+    private $resolver;
     protected $raw;
     protected $handle;
     protected $fieldtype;
@@ -22,7 +23,12 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function __construct($value, $handle = null, $fieldtype = null, $augmentable = null, $shallow = false)
     {
-        $this->raw = $value;
+        if ($value instanceof \Closure) {
+            $this->resolver = $value;
+        } else {
+            $this->raw = $value;
+        }
+
         $this->handle = $handle;
         $this->fieldtype = $fieldtype;
         $this->augmentable = $augmentable;
@@ -42,7 +48,22 @@ class Value implements IteratorAggregate, JsonSerializable
 
     protected function resolve()
     {
-        //
+        if (! $this->resolver) {
+            return;
+        }
+
+        $callback = $this->resolver;
+        $value = $callback($this);
+        $this->resolver = null;
+
+        if ($value instanceof Value) {
+            //            $this->resolvedValueInstance = $value;
+            $this->fieldtype = $value->fieldtype();
+            $this->raw = $value->raw();
+        } else {
+            //            $this->fieldtype = null;
+            $this->raw = $value;
+        }
     }
 
     public function materialize()
@@ -152,9 +173,19 @@ class Value implements IteratorAggregate, JsonSerializable
         return $this->fieldtype;
     }
 
+    public function setFieldtype($fieldtype)
+    {
+        $this->fieldtype = $fieldtype;
+    }
+
     public function augmentable()
     {
         return $this->augmentable;
+    }
+
+    public function setAugmentable($augmentable)
+    {
+        $this->augmentable = $augmentable;
     }
 
     public function handle()
