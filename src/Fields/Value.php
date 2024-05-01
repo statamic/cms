@@ -35,16 +35,36 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function raw()
     {
+        $this->resolve();
+
         return $this->raw;
+    }
+
+    protected function resolve()
+    {
+        //
     }
 
     public function materialize()
     {
-        return $this;
+        $this->resolve();
+
+        return $this->toValue();
+    }
+
+    protected function toValue()
+    {
+        if (static::class === Value::class) {
+            return $this;
+        }
+
+        return new Value($this->raw, $this->handle, $this->fieldtype, $this->augmentable, $this->shallow);
     }
 
     public function value()
     {
+        $this->resolve();
+
         $raw = $this->raw;
 
         if (! $this->fieldtype) {
@@ -127,6 +147,8 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function fieldtype()
     {
+        $this->resolve();
+
         return $this->fieldtype;
     }
 
@@ -142,11 +164,15 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function shallow()
     {
+        $this->resolve();
+
         return new static($this->raw, $this->handle, $this->fieldtype, $this->augmentable, true);
     }
 
     public function isRelationship(): bool
     {
+        $this->resolve();
+
         return optional($this->fieldtype)->isRelationship() ?? false;
     }
 }

@@ -3,13 +3,10 @@
 namespace Statamic\Data;
 
 use Statamic\Contracts\Data\Augmented;
-use Statamic\Data\Concerns\ResolvesValues;
 use Statamic\Fields\Value;
 
 class DeferredValue extends Value
 {
-    use ResolvesValues;
-
     protected Augmented $augmentedReference;
     protected $hasResolved = false;
 

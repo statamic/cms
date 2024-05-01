@@ -3,14 +3,11 @@
 namespace Statamic\Data;
 
 use Statamic\Contracts\Data\Augmented;
-use Statamic\Data\Concerns\ResolvesValues;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 
 class TransientValue extends Value
 {
-    use ResolvesValues;
-
     private ?Augmented $augmentedReference = null;
     private ?Field $fieldReference;
     private bool $hasResolved = false;

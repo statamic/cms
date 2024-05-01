@@ -3,14 +3,11 @@
 namespace Statamic\Data;
 
 use Statamic\Contracts\Data\Augmented;
-use Statamic\Data\Concerns\ResolvesValues;
 use Statamic\Fields\Value;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
 class InvokableValue extends Value
 {
-    use ResolvesValues;
-
     private $methodTarget;
     private bool $hasResolved = false;
     private string $methodName;
@@ -24,7 +21,7 @@ class InvokableValue extends Value
         return $this;
     }
 
-    private function resolve()
+    protected function resolve()
     {
         if ($this->hasResolved) {
             return;
@@ -76,6 +73,6 @@ class InvokableValue extends Value
             return $this->resolvedValueInstance;
         }
 
-        return $this->toValue();
+        return new Value($this->raw, $this->handle, $this->fieldtype, $this->augmentable, $this->shallow);
     }
 }
