@@ -43,19 +43,18 @@ class InvokableValue extends Value
 
     private function resolveAugmented()
     {
-        $this->raw = $this->methodTarget->getAugmentedMethodValue($this->methodName);
+        $value = $this->methodTarget->getAugmentedMethodValue($this->methodName);
 
-        if ($this->raw instanceof Value) {
-            // Store the original Value instance, if we have it.
-            $this->resolvedValueInstance = $this->raw;
-
-            // Shift some values around.
-            $this->fieldtype = $this->raw->fieldtype();
-            $this->raw = $this->raw->raw();
+        if ($value instanceof Value) {
+            $this->resolvedValueInstance = $value;
+            $this->fieldtype = $value->fieldtype();
+            $this->raw = $value->raw();
         } else {
-            // Replicate previous behavior of not having
-            // a field set if the method call did not
-            // return a Value instance.
+            // If the method doesn't return a value instance, it's intentionally returning just a raw value.
+            // For example, the `uri` method, which is just a string.
+            // Or, a method that has the same name as a blueprint field, like `authors`.
+            // We'll remove the fieldtype, otherwise when value() gets run, it would try to augment it, and we don't want that.
+            $this->raw = $value;
             $this->fieldtype = null;
         }
     }
