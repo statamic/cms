@@ -43,8 +43,9 @@ class BulkAugmentor
                 continue;
             }
 
-            $referenceKeys[$reference] = $item->augmented()->keys();
-            $referenceFields[$reference] = $item->augmented()->blueprintFields();
+            $augmented = $item->augmented();
+            $referenceKeys[$reference] = $augmented->keys();
+            $referenceFields[$reference] = $augmented->blueprintFields();
         }
 
         for ($i = 0; $i < $count; $i++) {
