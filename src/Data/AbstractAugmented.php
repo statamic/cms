@@ -64,11 +64,7 @@ abstract class AbstractAugmented implements Augmented
 
     protected function adjustFieldtype($handle, $fieldtype)
     {
-        if ($fieldtype !== null) {
-            return $fieldtype;
-        }
-
-        return $this->getFieldtype($handle);
+        return $fieldtype ?? $this->getFieldtype($handle);
     }
 
     public function get($handle, $fieldtype = null): Value
