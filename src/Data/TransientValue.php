@@ -2,20 +2,22 @@
 
 namespace Statamic\Data;
 
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\Concerns\ResolvesValues;
+use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 
 class TransientValue extends Value
 {
     use ResolvesValues;
 
-    protected $augmentedReference;
-    protected $fieldReference;
-    protected $hasResolved = false;
+    private ?Augmented $augmentedReference = null;
+    private ?Field $fieldReference;
+    private bool $hasResolved = false;
 
-    public function withAugmentationReferences($augmentable, $field)
+    public function withAugmentationReferences(Augmented $augmented, $field)
     {
-        $this->augmentedReference = $augmentable;
+        $this->augmentedReference = $augmented;
         $this->fieldReference = $field;
 
         return $this;
@@ -27,21 +29,18 @@ class TransientValue extends Value
             return;
         }
 
-        $this->hasResolved = true;
-
-        if ($this->augmentedReference === null) {
-            return;
-        }
-
         // Calling ->get() directly will materialize any other deferred values for us.
         $value = $this->augmentedReference->get($this->handle, $this->fieldReference?->fieldtype());
-
-        if ($value === null) {
-            return;
-        }
 
         $this->raw = $value->raw();
         $this->fieldtype = $value->fieldtype();
         $this->augmentable = $value->augmentable();
+
+        $this->hasResolved = true;
+    }
+
+    public function shallow()
+    {
+        return parent::shallow()->withAugmentationReferences($this->augmentedReference, $this->fieldReference);
     }
 }

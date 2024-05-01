@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\Concerns\ResolvesValues;
 use Statamic\Fields\Value;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
@@ -10,61 +11,61 @@ class InvokableValue extends Value
 {
     use ResolvesValues;
 
-    protected $methodTarget = null;
-    protected bool $hasResolved = false;
-    protected string $methodName;
-    protected bool $proxyThroughAugmented = false;
-    protected $resolvedValueInstance = null;
+    private $methodTarget;
+    private bool $hasResolved = false;
+    private string $methodName;
+    private ?Value $resolvedValueInstance = null;
 
-    public function setInvokableDetails(string $method, bool $proxyCall, $target): self
+    public function setInvokableDetails(string $method, $target): self
     {
-        $this->proxyThroughAugmented = $proxyCall;
         $this->methodName = $method;
         $this->methodTarget = $target;
 
         return $this;
     }
 
-    protected function resolve()
+    private function resolve()
     {
         if ($this->hasResolved) {
             return;
         }
 
-        if ($this->methodTarget == null) {
-            $this->hasResolved = true;
-
-            return;
-        }
-
         $curIsolationState = GlobalRuntimeState::$requiresRuntimeIsolation;
-
         GlobalRuntimeState::$requiresRuntimeIsolation = true;
-        if ($this->proxyThroughAugmented && method_exists($this->methodTarget, 'getAugmentedMethodValue')) {
-            $this->raw = $this->methodTarget->getAugmentedMethodValue($this->methodName);
 
-            if (! $this->raw instanceof Value) {
-                // Replicate previous behavior of not having
-                // a field set if the method call did not
-                // return a Value instance.
-                $this->fieldtype = null;
-            } else {
-                // Store the original Value instance, if we have it.
-                $this->resolvedValueInstance = $this->raw;
-
-                // Shift some values around.
-                $this->fieldtype = $this->raw->fieldtype();
-                $this->raw = $this->raw->raw();
-            }
-        } elseif (! $this->proxyThroughAugmented) {
-            $this->raw = $this->methodTarget->{$this->methodName}();
+        if ($this->methodTarget instanceof Augmented) {
+            $this->resolveAugmented();
+        } else {
+            $this->resolveAugmentable();
         }
-
-        $this->methodTarget = null;
 
         $this->hasResolved = true;
 
         GlobalRuntimeState::$requiresRuntimeIsolation = $curIsolationState;
+    }
+
+    private function resolveAugmented()
+    {
+        $this->raw = $this->methodTarget->getAugmentedMethodValue($this->methodName);
+
+        if ($this->raw instanceof Value) {
+            // Store the original Value instance, if we have it.
+            $this->resolvedValueInstance = $this->raw;
+
+            // Shift some values around.
+            $this->fieldtype = $this->raw->fieldtype();
+            $this->raw = $this->raw->raw();
+        } else {
+            // Replicate previous behavior of not having
+            // a field set if the method call did not
+            // return a Value instance.
+            $this->fieldtype = null;
+        }
+    }
+
+    private function resolveAugmentable()
+    {
+        $this->raw = $this->methodTarget->{$this->methodName}();
     }
 
     public function materialize()

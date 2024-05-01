@@ -76,9 +76,9 @@ abstract class AbstractAugmented implements Augmented
         $method = Str::camel($handle);
 
         if ($this->methodExistsOnThisClass($method)) {
-            $value = $this->wrapInvokable($method, true, $this, $handle, $fieldtype);
+            $value = $this->wrapAugmentedMethodInvokable($method, $handle, $fieldtype);
         } elseif (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
-            $value = $this->wrapInvokable($method, false, $this->data, $handle, $fieldtype);
+            $value = $this->wrapDataMethodInvokable($method, $handle, $fieldtype);
         } else {
             $value = $this->wrapDeferredValue($handle, $fieldtype);
         }
@@ -134,7 +134,7 @@ abstract class AbstractAugmented implements Augmented
         ))->withAugmentedReference($this);
     }
 
-    protected function wrapInvokable(string $method, bool $proxy, $methodTarget, string $handle, $fieldtype = null)
+    protected function wrapAugmentedMethodInvokable(string $method, string $handle, $fieldtype = null)
     {
         $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
 
@@ -143,7 +143,19 @@ abstract class AbstractAugmented implements Augmented
             $handle,
             $fieldtype,
             $this->data
-        ))->setInvokableDetails($method, $proxy, $methodTarget);
+        ))->setInvokableDetails($method, $this);
+    }
+
+    protected function wrapDataMethodInvokable(string $method, string $handle, $fieldtype = null)
+    {
+        $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
+
+        return (new InvokableValue(
+            null,
+            $handle,
+            $fieldtype,
+            $this->data
+        ))->setInvokableDetails($method, $this->data);
     }
 
     protected function wrapValue($value, $handle, $fieldtype = null)
