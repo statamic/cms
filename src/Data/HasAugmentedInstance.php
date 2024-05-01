@@ -103,7 +103,12 @@ trait HasAugmentedInstance
     {
         $value = $this->augmentedValue($method);
 
-        $value = $value instanceof Value ? $value->value() : $value;
+        if ($value instanceof Value) {
+            if ($value->isRelationship()) {
+                $value->field()->setConfig(array_merge($value->field()->config(), ['max_items' => null]));
+            }
+            $value = $value->value();
+        }
 
         if (Compare::isQueryBuilder($value)) {
             return $value;
