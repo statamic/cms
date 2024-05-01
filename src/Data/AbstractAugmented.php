@@ -13,6 +13,7 @@ abstract class AbstractAugmented implements Augmented
     protected $data;
     protected $blueprintFields;
     protected $relations = [];
+    private $fieldtype;
 
     public function __construct($data)
     {
@@ -47,7 +48,9 @@ abstract class AbstractAugmented implements Augmented
         $fields = $this->blueprintFields();
 
         $callback = function (Value $value) use ($key, $fields) {
-            $deferred = $this->get($key, $fields->get($key)?->fieldtype());
+            $this->fieldtype = $fields->get($key)?->fieldtype();
+            $deferred = $this->get($key);
+            $this->fieldtype = null;
 
             $value->setFieldtype($deferred->fieldtype());
             $value->setAugmentable($deferred->augmentable());
@@ -60,16 +63,16 @@ abstract class AbstractAugmented implements Augmented
 
     abstract public function keys();
 
-    public function get($handle, $fieldtype = null): Value
+    public function get($handle): Value
     {
         $method = Str::camel($handle);
 
         if ($this->methodExistsOnThisClass($method)) {
             $value = $this->wrapAugmentedMethodInvokable($method, $handle);
         } elseif (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
-            $value = $this->wrapDataMethodInvokable($method, $handle, $fieldtype);
+            $value = $this->wrapDataMethodInvokable($method, $handle);
         } else {
-            $value = $this->wrapDeferredValue($handle, $fieldtype);
+            $value = $this->wrapDeferredValue($handle);
         }
 
         return $value->resolve();
@@ -105,12 +108,12 @@ abstract class AbstractAugmented implements Augmented
         return $value;
     }
 
-    protected function wrapDeferredValue($handle, $fieldtype = null)
+    protected function wrapDeferredValue($handle)
     {
         return new Value(
             fn () => $this->getFromData($handle),
             $handle,
-            $this->fieldtype($handle, $fieldtype),
+            $this->fieldtype($handle),
             $this->data
         );
     }
@@ -125,29 +128,29 @@ abstract class AbstractAugmented implements Augmented
         );
     }
 
-    protected function wrapDataMethodInvokable(string $method, string $handle, $fieldtype = null)
+    protected function wrapDataMethodInvokable(string $method, string $handle)
     {
         return new Value(
             fn () => $this->data->$method(),
             $handle,
-            $this->fieldtype($handle, $fieldtype),
+            $this->fieldtype($handle),
             $this->data
         );
     }
 
-    protected function wrapValue($value, $handle, $fieldtype = null)
+    protected function wrapValue($value, $handle)
     {
         return new Value(
             $value,
             $handle,
-            $this->fieldtype($handle, $fieldtype),
+            $this->fieldtype($handle),
             $this->data
         );
     }
 
-    protected function fieldtype($handle, $fieldtype)
+    protected function fieldtype($handle)
     {
-        return $fieldtype ?? optional($this->blueprintFields()->get($handle))->fieldtype();
+        return $this->fieldtype ?? optional($this->blueprintFields()->get($handle))->fieldtype();
     }
 
     public function blueprintFields()
