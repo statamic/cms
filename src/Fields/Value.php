@@ -57,11 +57,9 @@ class Value implements IteratorAggregate, JsonSerializable
         $this->resolver = null;
 
         if ($value instanceof Value) {
-            //            $this->resolvedValueInstance = $value;
             $this->fieldtype = $value->fieldtype();
             $this->raw = $value->raw();
         } else {
-            //            $this->fieldtype = null;
             $this->raw = $value;
         }
     }
