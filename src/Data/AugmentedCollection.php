@@ -47,21 +47,10 @@ class AugmentedCollection extends Collection
         return $this;
     }
 
-    protected function requiresMaterialization($item)
-    {
-        return $item instanceof InvokableValue ||
-                $item instanceof DeferredValue ||
-                $item instanceof TransientValue;
-    }
-
     public function all()
     {
         return collect($this->items)->map(function ($item) {
-            if ($this->requiresMaterialization($item)) {
-                return $item->materialize();
-            }
-
-            return $item;
+            return $item instanceof Value ? $item->materialize() : $item;
         })->all();
     }
 
