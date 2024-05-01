@@ -52,7 +52,7 @@ class AugmentedPage extends AugmentedEntry
             });
     }
 
-    public function getFromData($key)
+    protected function getFromData($key)
     {
         if ($key === 'title') {
             return $this->page->title();
@@ -61,7 +61,7 @@ class AugmentedPage extends AugmentedEntry
         return $this->page->getSupplement($key) ?? $this->page->value($key);
     }
 
-    public function blueprintFields()
+    protected function blueprintFields()
     {
         if ($this->fieldsCache) {
             return $this->fieldsCache;

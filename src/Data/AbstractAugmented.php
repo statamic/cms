@@ -92,7 +92,7 @@ abstract class AbstractAugmented implements Augmented
         return method_exists($this, $method) && ! in_array($method, ['select', 'except']);
     }
 
-    public function getFromData($handle)
+    protected function getFromData($handle)
     {
         $value = method_exists($this->data, 'value') ? $this->data->value($handle) : $this->data->get($handle);
 

@@ -20,7 +20,7 @@ class AugmentedData extends AbstractAugmented
         return array_keys($this->array);
     }
 
-    public function getFromData($handle)
+    protected function getFromData($handle)
     {
         return $this->array[$handle] ?? null;
     }
