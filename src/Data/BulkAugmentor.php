@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\BulkAugmentable;
 
 class BulkAugmentor
@@ -19,6 +20,10 @@ class BulkAugmentor
         return 'Ref::'.get_class($item).spl_object_hash($item);
     }
 
+    /**
+     * @param  array<Augmentable>  $items
+     * @return $this
+     */
     public function augment($items)
     {
         $count = count($items);
