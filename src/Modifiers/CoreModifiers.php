@@ -488,7 +488,7 @@ class CoreModifiers extends Modifier
      */
     public function ddd($value)
     {
-        ddd(Dumper::materializeValues($value));
+        ddd(Dumper::resolveValues($value));
     }
 
     /**
@@ -496,7 +496,7 @@ class CoreModifiers extends Modifier
      */
     public function debug($value)
     {
-        debug(Dumper::materializeValues($value));
+        debug(Dumper::resolveValues($value));
     }
 
     /**

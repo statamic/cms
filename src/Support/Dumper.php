@@ -6,7 +6,7 @@ use Statamic\Fields\Value;
 
 class Dumper
 {
-    public static function materializeValues($values)
+    public static function resolveValues($values)
     {
         if ($values instanceof Value) {
             return $values;
@@ -15,7 +15,7 @@ class Dumper
         if (is_array($values)) {
             $values = collect($values)->mapWithKeys(function ($value, $key) {
                 if ($value instanceof Value) {
-                    $value = $value->materialize();
+                    $value = $value->resolve();
                 }
 
                 return [$key => $value];
@@ -27,12 +27,12 @@ class Dumper
 
     public static function dump($values)
     {
-        dump(self::materializeValues($values));
+        dump(self::resolveValues($values));
     }
 
     public static function dd($values)
     {
-        $values = self::materializeValues($values);
+        $values = self::resolveValues($values);
 
         function_exists('ddd') ? ddd($values) : dd($values);
     }

@@ -79,7 +79,7 @@ abstract class AbstractAugmented implements Augmented
             $value = $this->wrapDeferredValue($handle, $fieldtype);
         }
 
-        return $value->materialize();
+        return $value->resolve();
     }
 
     protected function filterKeys($keys)

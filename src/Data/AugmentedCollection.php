@@ -50,7 +50,7 @@ class AugmentedCollection extends Collection
     public function all()
     {
         return collect($this->items)->map(function ($item) {
-            return $item instanceof Value ? $item->materialize() : $item;
+            return $item instanceof Value ? $item->resolve() : $item;
         })->all();
     }
 

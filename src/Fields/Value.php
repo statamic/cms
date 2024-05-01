@@ -46,10 +46,10 @@ class Value implements IteratorAggregate, JsonSerializable
         return $this->raw;
     }
 
-    protected function resolve()
+    public function resolve()
     {
         if (! $this->resolver) {
-            return;
+            return $this;
         }
 
         $callback = $this->resolver;
@@ -62,22 +62,8 @@ class Value implements IteratorAggregate, JsonSerializable
         } else {
             $this->raw = $value;
         }
-    }
 
-    public function materialize()
-    {
-        $this->resolve();
-
-        return $this->toValue();
-    }
-
-    protected function toValue()
-    {
-        if (static::class === Value::class) {
-            return $this;
-        }
-
-        return new Value($this->raw, $this->handle, $this->fieldtype, $this->augmentable, $this->shallow);
+        return $this;
     }
 
     public function value()
