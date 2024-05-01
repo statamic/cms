@@ -62,11 +62,6 @@ abstract class AbstractAugmented implements Augmented
 
     abstract public function keys();
 
-    protected function adjustFieldtype($handle, $fieldtype)
-    {
-        return $fieldtype ?? $this->getFieldtype($handle);
-    }
-
     public function get($handle, $fieldtype = null): Value
     {
         $method = Str::camel($handle);
@@ -114,9 +109,12 @@ abstract class AbstractAugmented implements Augmented
 
     protected function wrapDeferredValue($handle, $fieldtype = null)
     {
-        $fieldtype = $this->adjustFieldtype($handle, $fieldtype);
-
-        return new Value(fn () => $this->getFromData($handle), $handle, $fieldtype, $this->data);
+        return new Value(
+            fn () => $this->getFromData($handle),
+            $handle,
+            $this->fieldtype($handle, $fieldtype),
+            $this->data
+        );
     }
 
     protected function wrapAugmentedMethodInvokable(string $method, string $handle, $fieldtype = null)
@@ -134,7 +132,7 @@ abstract class AbstractAugmented implements Augmented
         return new Value(
             fn () => $this->data->$method(),
             $handle,
-            $this->adjustFieldtype($handle, $fieldtype),
+            $this->fieldtype($handle, $fieldtype),
             $this->data
         );
     }
@@ -144,14 +142,14 @@ abstract class AbstractAugmented implements Augmented
         return new Value(
             $value,
             $handle,
-            $this->adjustFieldtype($handle, $fieldtype),
+            $this->fieldtype($handle, $fieldtype),
             $this->data
         );
     }
 
-    protected function getFieldtype($handle)
+    protected function fieldtype($handle, $fieldtype)
     {
-        return optional($this->blueprintFields()->get($handle))->fieldtype();
+        return $fieldtype ?? optional($this->blueprintFields()->get($handle))->fieldtype();
     }
 
     public function blueprintFields()
