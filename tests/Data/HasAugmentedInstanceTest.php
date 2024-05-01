@@ -20,9 +20,10 @@ class HasAugmentedInstanceTest extends TestCase
 
         $mock = $this->mock(Augmented::class);
         $mock->shouldReceive('withRelations')->with([])->andReturnSelf();
+        $mock->shouldReceive('withBlueprintFields')->with([])->andReturnSelf();
         $mock->shouldReceive('get')->with('foo')->once()->andReturn(new Value('bar'));
-        $mock->shouldReceive('select')->with(null, null)->times(2)->andReturn($augmentedCollection);
-        $mock->shouldReceive('select')->with(['one'], null)->times(2)->andReturn($filteredAugmentedCollection);
+        $mock->shouldReceive('select')->with(null)->times(2)->andReturn($augmentedCollection);
+        $mock->shouldReceive('select')->with(['one'])->times(2)->andReturn($filteredAugmentedCollection);
         $mock->shouldReceive('select')->with(['id', 'title', 'api_url'])->times(1)->andReturn($shallowFilteredAugmentedCollection);
 
         $thing = new class($mock)
@@ -98,7 +99,8 @@ class HasAugmentedInstanceTest extends TestCase
     {
         $mock = $this->mock(Augmented::class);
         $mock->shouldReceive('withRelations')->with([])->andReturnSelf();
-        $mock->shouldReceive('select')->with(['foo', 'bar'], null)->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
+        $mock->shouldReceive('withBlueprintFields')->with([])->andReturnSelf();
+        $mock->shouldReceive('select')->with(['foo', 'bar'])->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
 
         $thing = new class($mock)
         {
@@ -130,7 +132,8 @@ class HasAugmentedInstanceTest extends TestCase
     {
         $mock = $this->mock(Augmented::class);
         $mock->shouldReceive('withRelations')->with(['baz', 'qux'])->andReturnSelf();
-        $mock->shouldReceive('select')->with(null, null)->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
+        $mock->shouldReceive('withBlueprintFields')->with([])->andReturnSelf();
+        $mock->shouldReceive('select')->with(null)->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
 
         $thing = new class($mock)
         {

@@ -29,25 +29,23 @@ abstract class AbstractAugmented implements Augmented
         return $this->select(array_diff($this->keys(), Arr::wrap($keys)));
     }
 
-    public function select($keys = null, $fields = null)
+    public function select($keys = null)
     {
         $arr = [];
-
-        if (! $fields) {
-            $fields = $this->blueprintFields();
-        }
 
         $keys = $this->filterKeys(Arr::wrap($keys ?: $this->keys()));
 
         foreach ($keys as $key) {
-            $arr[$key] = $this->transientValue($key, $fields);
+            $arr[$key] = $this->transientValue($key);
         }
 
         return (new AugmentedCollection($arr))->withRelations($this->relations);
     }
 
-    private function transientValue($key, $fields)
+    private function transientValue($key)
     {
+        $fields = $this->blueprintFields();
+
         $callback = function (Value $value) use ($key, $fields) {
             $deferred = $this->get($key, $fields->get($key)?->fieldtype());
 
@@ -67,7 +65,7 @@ abstract class AbstractAugmented implements Augmented
         $method = Str::camel($handle);
 
         if ($this->methodExistsOnThisClass($method)) {
-            $value = $this->wrapAugmentedMethodInvokable($method, $handle, $fieldtype);
+            $value = $this->wrapAugmentedMethodInvokable($method, $handle);
         } elseif (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
             $value = $this->wrapDataMethodInvokable($method, $handle, $fieldtype);
         } else {
@@ -117,7 +115,7 @@ abstract class AbstractAugmented implements Augmented
         );
     }
 
-    protected function wrapAugmentedMethodInvokable(string $method, string $handle, $fieldtype = null)
+    protected function wrapAugmentedMethodInvokable(string $method, string $handle)
     {
         return new Value(
             fn () => $this->$method(),
@@ -161,6 +159,13 @@ abstract class AbstractAugmented implements Augmented
         }
 
         return $this->blueprintFields;
+    }
+
+    public function withBlueprintFields($fields)
+    {
+        $this->blueprintFields = $fields;
+
+        return $this;
     }
 
     public function withRelations($relations)

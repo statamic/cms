@@ -48,7 +48,7 @@ class BulkAugmentor
             $fields = $referenceFields[$reference];
             $keys = $referenceKeys[$reference];
 
-            $this->augmentedValues[$i] = $item->toDeferredAugmentedArray($keys, $fields);
+            $this->augmentedValues[$i] = $item->toDeferredAugmentedArrayUsingFields($keys, $fields);
         }
 
         return $this;
