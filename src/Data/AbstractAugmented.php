@@ -13,7 +13,6 @@ abstract class AbstractAugmented implements Augmented
     protected $data;
     protected $blueprintFields;
     protected $relations = [];
-    protected $isSelecting = false;
 
     public function __construct($data)
     {
@@ -40,13 +39,9 @@ abstract class AbstractAugmented implements Augmented
 
         $keys = $this->filterKeys(Arr::wrap($keys ?: $this->keys()));
 
-        $this->isSelecting = true;
-
         foreach ($keys as $key) {
             $arr[$key] = $this->transientValue($key, $fields);
         }
-
-        $this->isSelecting = false;
 
         return (new AugmentedCollection($arr))->withRelations($this->relations);
     }
@@ -69,7 +64,7 @@ abstract class AbstractAugmented implements Augmented
 
     protected function adjustFieldtype($handle, $fieldtype)
     {
-        if ($this->isSelecting || $fieldtype !== null) {
+        if ($fieldtype !== null) {
             return $fieldtype;
         }
 
@@ -88,13 +83,7 @@ abstract class AbstractAugmented implements Augmented
             $value = $this->wrapDeferredValue($handle, $fieldtype);
         }
 
-        // If someone is calling ->get() directly they probably
-        // don't want to remember to also ->materialize() it.
-        if (! $this->isSelecting) {
-            return $value->materialize();
-        }
-
-        return $value;
+        return $value->materialize();
     }
 
     protected function filterKeys($keys)
