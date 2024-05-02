@@ -1,5 +1,14 @@
 # Release Notes
 
+## 5.0.0-beta.1 (2024-05-02)
+
+### What's changed
+- Augmentation performance improvements. [#9636](https://github.com/statamic/cms/issues/9636) by @JohnathonKoster
+- Offline License Validation. [#9975](https://github.com/statamic/cms/issues/9975) by @duncanmcclean
+- Entry URI caching. [#9844](https://github.com/statamic/cms/issues/9844) by @jasonvarga
+
+
+
 ## 5.0.0-alpha.6 (2024-04-26)
 
 ### What's changed
