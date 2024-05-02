@@ -39,6 +39,10 @@ class RoutesTest extends TestCase
 
             Route::statamic('/route/with/placeholders/{foo}/{bar}/{baz}', 'test');
 
+            Route::statamic('/route/with/placeholders/closure/{foo}/{bar}/{baz}', 'test', function ($foo, $bar, $baz) {
+                return ['hello' => "$foo $bar $baz"];
+            });
+
             Route::statamic('/route-with-custom-layout', 'test', [
                 'layout' => 'custom-layout',
                 'hello' => 'world',
@@ -137,6 +141,17 @@ class RoutesTest extends TestCase
         $this->viewShouldReturnRaw('test', 'Hello {{ foo }} {{ bar }} {{ baz }}');
 
         $this->get('/route/with/placeholders/one/two/three')
+            ->assertOk()
+            ->assertSee('Hello one two three');
+    }
+
+    /** @test */
+    public function it_renders_a_view_with_placeholders_and_data_from_a_closure()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/route/with/placeholders/closure/one/two/three')
             ->assertOk()
             ->assertSee('Hello one two three');
     }
