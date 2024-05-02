@@ -78,7 +78,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     protected $withEvents = true;
     protected $template;
     protected $layout;
-    protected $augmentationReferenceKey;
+    private $augmentationReferenceKey;
     private $computedCallbackCache;
     private $siteCache;
 

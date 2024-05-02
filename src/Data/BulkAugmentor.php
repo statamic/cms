@@ -7,11 +7,11 @@ use Statamic\Contracts\Data\BulkAugmentable;
 
 class BulkAugmentor
 {
-    protected $isTree = false;
-    protected $originalValues = [];
-    protected $augmentedValues = [];
+    private $isTree = false;
+    private $originalValues = [];
+    private $augmentedValues = [];
 
-    protected function getAugmentationReference($item)
+    private function getAugmentationReference($item)
     {
         if ($item instanceof BulkAugmentable && $key = $item->getAugmentationReferenceKey()) {
             return $key;
@@ -20,11 +20,21 @@ class BulkAugmentor
         return 'Ref::'.get_class($item).spl_object_hash($item);
     }
 
+    public static function make($items)
+    {
+        return (new static)->augment($items);
+    }
+
+    public static function tree($tree)
+    {
+        return (new static)->augmentTree($tree);
+    }
+
     /**
      * @param  array<Augmentable>  $items
      * @return $this
      */
-    public function augment($items)
+    private function augment($items)
     {
         $count = count($items);
 
@@ -60,7 +70,7 @@ class BulkAugmentor
         return $this;
     }
 
-    public function augmentTree($tree)
+    private function augmentTree($tree)
     {
         $this->isTree = true;
 
@@ -94,7 +104,7 @@ class BulkAugmentor
         return collect($items);
     }
 
-    public function augmented()
+    public function toArray()
     {
         return $this->augmentedValues;
     }
