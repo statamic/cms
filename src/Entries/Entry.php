@@ -13,6 +13,7 @@ use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Data\BulkAugmentable;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\Entries\EntryRepository;
@@ -43,7 +44,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -53,7 +53,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
+class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
     use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
@@ -78,6 +78,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
+    private $augmentationReferenceKey;
     private $computedCallbackCache;
     private $siteCache;
 
@@ -90,6 +91,17 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     public function id($id = null)
     {
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
+    }
+
+    public function getBulkAugmentationReferenceKey(): ?string
+    {
+        if ($this->augmentationReferenceKey) {
+            return $this->augmentationReferenceKey;
+        }
+
+        $dataPart = implode('|', $this->data->keys()->sort()->all());
+
+        return $this->augmentationReferenceKey = 'Entry::'.$this->blueprint()->namespace().'::'.$dataPart;
     }
 
     public function locale($locale = null)

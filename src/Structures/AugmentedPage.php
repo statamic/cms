@@ -61,7 +61,7 @@ class AugmentedPage extends AugmentedEntry
         return $this->page->getSupplement($key) ?? $this->page->value($key);
     }
 
-    protected function blueprintFields()
+    public function blueprintFields()
     {
         if ($this->fieldsCache) {
             return $this->fieldsCache;

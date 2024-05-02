@@ -35,7 +35,8 @@ class AugmentedCollectionTest extends TestCase
         $value = m::mock(Value::class);
         // $value->shouldNotReceive('toArray');
         $value->shouldReceive('isRelationship')->andReturnFalse();
-        $value->shouldReceive('shallow')->once()->andReturnSelf();
+        $value->shouldReceive('shallow')->once()->andReturn($value);
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $c = new AugmentedCollection([$value]);
         $results = $c->withShallowNesting()->toArray();
 
@@ -47,6 +48,7 @@ class AugmentedCollectionTest extends TestCase
     {
         $value = m::mock(Value::class);
         $value->shouldReceive('isRelationship')->andReturnFalse();
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $value->shouldNotReceive('toArray');
         $value->shouldNotReceive('shallow');
         $c = new AugmentedCollection([$value]);
@@ -119,9 +121,11 @@ class AugmentedCollectionTest extends TestCase
         $item1 = m::mock(Value::class);
         $item1->shouldReceive('value')->never();
         $item1->shouldReceive('isRelationship')->andReturnFalse();
+        $item1->shouldReceive('resolve')->andReturnSelf();
         $item2 = m::mock(Value::class);
         $item2->shouldReceive('value')->never();
         $item2->shouldReceive('isRelationship')->andReturnFalse();
+        $item2->shouldReceive('resolve')->andReturnSelf();
 
         $c = new AugmentedCollection([$item1, $item2, 'baz']);
 
@@ -136,6 +140,7 @@ class AugmentedCollectionTest extends TestCase
     public function it_json_serializes()
     {
         $value = m::mock(Value::class);
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $value->shouldReceive('jsonSerialize')->once()->andReturn('value json serialized');
 
         $c = new AugmentedCollection([
@@ -161,6 +166,7 @@ class AugmentedCollectionTest extends TestCase
     public function augmentables_get_shallow_augmented_when_json_serializing_with_flag()
     {
         $value = m::mock(Value::class);
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $value->shouldReceive('jsonSerialize')->once()->andReturn('value json serialized');
 
         $c = new AugmentedCollection([

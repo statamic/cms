@@ -14,6 +14,7 @@ use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
 
 class Value implements IteratorAggregate, JsonSerializable
 {
+    private $resolver;
     protected $raw;
     protected $handle;
     protected $fieldtype;
@@ -22,7 +23,12 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function __construct($value, $handle = null, $fieldtype = null, $augmentable = null, $shallow = false)
     {
-        $this->raw = $value;
+        if ($value instanceof \Closure) {
+            $this->resolver = $value;
+        } else {
+            $this->raw = $value;
+        }
+
         $this->handle = $handle;
         $this->fieldtype = $fieldtype;
         $this->augmentable = $augmentable;
@@ -35,11 +41,35 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function raw()
     {
+        $this->resolve();
+
         return $this->raw;
+    }
+
+    public function resolve()
+    {
+        if (! $this->resolver) {
+            return $this;
+        }
+
+        $callback = $this->resolver;
+        $value = $callback($this);
+        $this->resolver = null;
+
+        if ($value instanceof Value) {
+            $this->fieldtype = $value->fieldtype();
+            $this->raw = $value->raw();
+        } else {
+            $this->raw = $value;
+        }
+
+        return $this;
     }
 
     public function value()
     {
+        $this->resolve();
+
         $raw = $this->raw;
 
         if (! $this->fieldtype) {
@@ -122,12 +152,24 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function fieldtype()
     {
+        $this->resolve();
+
         return $this->fieldtype;
+    }
+
+    public function setFieldtype($fieldtype)
+    {
+        $this->fieldtype = $fieldtype;
     }
 
     public function augmentable()
     {
         return $this->augmentable;
+    }
+
+    public function setAugmentable($augmentable)
+    {
+        $this->augmentable = $augmentable;
     }
 
     public function handle()
@@ -137,11 +179,22 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function shallow()
     {
+        $this->resolve();
+
         return new static($this->raw, $this->handle, $this->fieldtype, $this->augmentable, true);
     }
 
     public function isRelationship(): bool
     {
+        $this->resolve();
+
         return optional($this->fieldtype)->isRelationship() ?? false;
+    }
+
+    public function __serialize(): array
+    {
+        $this->resolve();
+
+        return get_object_vars($this);
     }
 }
