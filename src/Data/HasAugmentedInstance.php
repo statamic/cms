@@ -55,7 +55,7 @@ trait HasAugmentedInstance
         return $this->toShallowAugmentedCollection()->all();
     }
 
-    public function augmented()
+    public function augmented(): Augmented
     {
         return $this->runHooks('augmented', $this->newAugmentedInstance());
     }
