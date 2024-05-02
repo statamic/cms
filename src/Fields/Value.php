@@ -190,4 +190,11 @@ class Value implements IteratorAggregate, JsonSerializable
 
         return optional($this->fieldtype)->isRelationship() ?? false;
     }
+
+    public function __serialize(): array
+    {
+        $this->resolve();
+
+        return get_object_vars($this);
+    }
 }
