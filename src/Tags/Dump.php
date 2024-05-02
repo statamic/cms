@@ -11,7 +11,9 @@ class Dump extends Tags
      */
     public function index()
     {
-        Dumper::dump($this->context->except(['__env', 'app'])->sortKeys()->all());
+        $values = $this->context->except(['__env', 'app'])->sortKeys()->all();
+
+        dump(Dumper::resolve($values));
     }
 
     /**
@@ -19,6 +21,8 @@ class Dump extends Tags
      */
     public function wildcard($var)
     {
-        Dumper::dump($this->context->value($var));
+        $values = $this->context->value($var);
+
+        dump(Dumper::resolve($values));
     }
 }

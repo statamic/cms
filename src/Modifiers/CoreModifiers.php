@@ -488,7 +488,7 @@ class CoreModifiers extends Modifier
      */
     public function ddd($value)
     {
-        ddd(Dumper::resolveValues($value));
+        ddd(Dumper::resolve($value));
     }
 
     /**
@@ -496,7 +496,7 @@ class CoreModifiers extends Modifier
      */
     public function debug($value)
     {
-        debug(Dumper::resolveValues($value));
+        debug(Dumper::resolve($value));
     }
 
     /**
@@ -545,7 +545,7 @@ class CoreModifiers extends Modifier
      */
     public function dd($value)
     {
-        Dumper::dd($value);
+        dd(Dumper::resolve($value));
     }
 
     /**
@@ -553,7 +553,7 @@ class CoreModifiers extends Modifier
      */
     public function dump($value)
     {
-        Dumper::dump($value);
+        dump(Dumper::resolve($value));
     }
 
     /**
