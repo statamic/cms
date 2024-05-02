@@ -1,5 +1,22 @@
 # Release Notes
 
+## 4.57.3 (2024-05-02)
+
+### What's improved
+- German translations. [#9957](https://github.com/statamic/cms/issues/9957) by @helloDanuk
+
+### What's fixed
+- Fix Starter Kit installation on Windows. [#9968](https://github.com/statamic/cms/issues/9968) by @JohnathonKoster
+- Fix `starter-kit:install` with custom branch when branch has slash. [#9978](https://github.com/statamic/cms/issues/9978) by @jesseleite
+- Fix first child redirects when using array syntax. [#9965](https://github.com/statamic/cms/issues/9965) by @jasonvarga
+- Fix wrong permission used for configuring navs. [#9961](https://github.com/statamic/cms/issues/9961) by @simonolog
+- Fix `DataReferenceUpdater` when field data from array is null. [#9954](https://github.com/statamic/cms/issues/9954) by @duncanmcclean
+- Fix dated collection listing when time is enabled. [#9951](https://github.com/statamic/cms/issues/9951) by @jacksleight
+- Fix route parameters in Statamic routes with closures. [#9953](https://github.com/statamic/cms/issues/9953) by @arthurperton
+- Fake composer installs in make command tests. [#9955](https://github.com/statamic/cms/issues/9955) by @jasonvarga
+
+
+
 ## 4.57.2 (2024-04-23)
 
 ### What's fixed
