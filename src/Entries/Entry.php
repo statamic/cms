@@ -93,7 +93,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
     }
 
-    public function getAugmentationReferenceKey(): ?string
+    public function getBulkAugmentationReferenceKey(): ?string
     {
         if ($this->augmentationReferenceKey) {
             return $this->augmentationReferenceKey;

@@ -4,5 +4,5 @@ namespace Statamic\Contracts\Data;
 
 interface BulkAugmentable
 {
-    public function getAugmentationReferenceKey(): ?string;
+    public function getBulkAugmentationReferenceKey(): ?string;
 }

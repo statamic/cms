@@ -13,7 +13,7 @@ class BulkAugmentor
 
     private function getAugmentationReference($item)
     {
-        if ($item instanceof BulkAugmentable && $key = $item->getAugmentationReferenceKey()) {
+        if ($item instanceof BulkAugmentable && $key = $item->getBulkAugmentationReferenceKey()) {
             return $key;
         }
 

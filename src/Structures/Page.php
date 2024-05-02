@@ -54,7 +54,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
         $this->supplements = collect();
     }
 
-    public function getAugmentationReferenceKey(): ?string
+    public function getBulkAugmentationReferenceKey(): ?string
     {
         if ($this->setAugmentationReferenceKey) {
             return $this->augmentationReferenceKey;
@@ -63,7 +63,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
         $this->setAugmentationReferenceKey = true;
 
         if ($entry = $this->entry()) {
-            return $this->augmentationReferenceKey = 'Page::'.$entry->getAugmentationReferenceKey();
+            return $this->augmentationReferenceKey = 'Page::'.$entry->getBulkAugmentationReferenceKey();
         }
 
         return $this->augmentationReferenceKey = 'Page::';
