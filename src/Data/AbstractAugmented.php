@@ -78,12 +78,12 @@ abstract class AbstractAugmented implements Augmented
         return $value->resolve();
     }
 
-    protected function filterKeys($keys)
+    private function filterKeys($keys)
     {
         return array_diff($keys, $this->excludedKeys());
     }
 
-    protected function excludedKeys()
+    private function excludedKeys()
     {
         return Statamic::isApiRoute()
             ? config('statamic.api.excluded_keys', [])
@@ -108,7 +108,7 @@ abstract class AbstractAugmented implements Augmented
         return $value;
     }
 
-    protected function wrapDeferredValue($handle)
+    private function wrapDeferredValue($handle)
     {
         return new Value(
             fn () => $this->getFromData($handle),
@@ -118,7 +118,7 @@ abstract class AbstractAugmented implements Augmented
         );
     }
 
-    protected function wrapAugmentedMethodInvokable(string $method, string $handle)
+    private function wrapAugmentedMethodInvokable(string $method, string $handle)
     {
         return new Value(
             fn () => $this->$method(),
@@ -128,7 +128,7 @@ abstract class AbstractAugmented implements Augmented
         );
     }
 
-    protected function wrapDataMethodInvokable(string $method, string $handle)
+    private function wrapDataMethodInvokable(string $method, string $handle)
     {
         return new Value(
             fn () => $this->data->$method(),
@@ -148,7 +148,7 @@ abstract class AbstractAugmented implements Augmented
         );
     }
 
-    protected function fieldtype($handle)
+    private function fieldtype($handle)
     {
         return $this->fieldtype ?? optional($this->blueprintFields()->get($handle))->fieldtype();
     }
