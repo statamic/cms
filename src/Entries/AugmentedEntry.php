@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use Statamic\Data\AbstractAugmented;
 use Statamic\Facades\Collection;
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 
 class AugmentedEntry extends AbstractAugmented
@@ -69,9 +70,14 @@ class AugmentedEntry extends AbstractAugmented
         return true;
     }
 
+    protected function url()
+    {
+        return URL::normalizeTrailingSlashes($this->data->url());
+    }
+
     protected function permalink()
     {
-        return $this->data->absoluteUrl();
+        return URL::normalizeTrailingSlashes($this->data->absoluteUrl());
     }
 
     protected function parent()
