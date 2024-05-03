@@ -76,8 +76,8 @@ class Value implements IteratorAggregate, JsonSerializable
             return $raw;
         }
 
-        if (! $raw && ($default = $this->fieldtype->field()?->defaultValue())) {
-            $raw = $default;
+        if ($raw === null) {
+            $raw = $this->fieldtype->field()?->defaultValue() ?? null;
         }
 
         $value = $this->shallow
