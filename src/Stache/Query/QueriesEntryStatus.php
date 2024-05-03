@@ -22,8 +22,7 @@ trait QueriesEntryStatus
 
         return $this->where(fn ($query) => $this
             ->getCollectionsForStatusQuery()
-            ->each(fn ($collection) => $query->orWhere(fn ($q) => $this->addCollectionStatusLogicToQuery($q, $status,
-                $collection))));
+            ->each(fn ($collection) => $query->orWhere(fn ($q) => $this->addCollectionStatusLogicToQuery($q, $status, $collection))));
     }
 
     private function addCollectionStatusLogicToQuery($query, $status, $collection): void
