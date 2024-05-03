@@ -143,22 +143,6 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         });
     }
 
-    public function prepareForFakeQuery(): array
-    {
-        $data = parent::prepareForFakeQuery();
-
-        if (! empty($this->collections)) {
-            $data['wheres'] = Arr::prepend($data['wheres'], [
-                'type' => 'In',
-                'column' => 'collection',
-                'values' => $this->collections,
-                'boolean' => 'and',
-            ]);
-        }
-
-        return $data;
-    }
-
     private function ensureCollectionsAreQueriedForStatusQuery(): void
     {
         // If the collections property isn't empty, it means the user has explicitly
@@ -199,5 +183,21 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         // applicable collections. By this point, there should be where clauses on the collection column.
 
         return collect($this->collections)->map(fn ($handle) => Collection::find($handle));
+    }
+
+    public function prepareForFakeQuery(): array
+    {
+        $data = parent::prepareForFakeQuery();
+
+        if (! empty($this->collections)) {
+            $data['wheres'] = Arr::prepend($data['wheres'], [
+                'type' => 'In',
+                'column' => 'collection',
+                'values' => $this->collections,
+                'boolean' => 'and',
+            ]);
+        }
+
+        return $data;
     }
 }
