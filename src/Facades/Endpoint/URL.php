@@ -14,7 +14,33 @@ use Statamic\Support\Str;
  */
 class URL
 {
+    private static $enforceTrailingSlashes = false;
     private static $externalUriCache = [];
+
+    /**
+     * Enforce trailing slashes service provider helper.
+     */
+    public function enforceTrailingSlashes()
+    {
+        static::$enforceTrailingSlashes = true;
+    }
+
+    /**
+     * Normalize trailing slashes (trims by default, but can be enforced onto end).
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function normalizeTrailingSlashes($url)
+    {
+        if ($url === '/') {
+            return $url;
+        }
+
+        return static::$enforceTrailingSlashes
+            ? Str::ensureRight($url, '/')
+            : rtrim($url, '/');
+    }
 
     /**
      * Removes occurrences of "//" in a $path (except when part of a protocol)
