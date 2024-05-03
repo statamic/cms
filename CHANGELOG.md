@@ -1,5 +1,15 @@
 # Release Notes
 
+## 5.0.0-beta.2 (2024-05-03)
+
+### What's changed
+- Prevent falsey values from returning blueprint defaults. [#9990](https://github.com/statamic/cms/issues/9990) by @JohnathonKoster
+- Extract whereSite query method to trait. [#9991](https://github.com/statamic/cms/issues/9991) by @jasonvarga
+- Multi site config help text. [#9986](https://github.com/statamic/cms/issues/9986) by @jackmcdade
+- Improve the fake sql config code comment. [#9985](https://github.com/statamic/cms/issues/9985) by @jackmcdade
+
+
+
 ## 5.0.0-beta.1 (2024-05-02)
 
 ### What's changed
