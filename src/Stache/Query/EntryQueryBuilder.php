@@ -11,9 +11,7 @@ use Statamic\Support\Arr;
 
 class EntryQueryBuilder extends Builder implements QueryBuilder
 {
-    use QueriesTaxonomizedEntries;
-
-    private const STATUSES = ['published', 'draft', 'scheduled', 'expired'];
+    use QueriesEntryStatus, QueriesTaxonomizedEntries;
 
     protected $collections = [];
 
@@ -68,39 +66,6 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return empty($this->wheres)
             ? $this->getKeysFromCollections($collections)
             : $this->getKeysFromCollectionsWithWheres($collections, $this->wheres);
-    }
-
-    private function addCollectionWheres(): void
-    {
-        $this->collections = $this->getCollectionWheres();
-    }
-
-    private function getCollectionWheres(): array
-    {
-        // If the collections property isn't empty, it means the user has explicitly
-        // queried for them. In that case, we'll use them and skip the auto-detection.
-        if (! empty($this->collections)) {
-            return $this->collections;
-        }
-
-        // Otherwise, we'll detect them by looking at where clauses targeting the "id" column.
-        $ids = collect($this->wheres)->where('column', 'id')->flatMap(fn ($where) => $where['values'] ?? [$where['value']]);
-
-        // If no IDs were queried, fall back to all collections.
-        if ($ids->isEmpty()) {
-            return Collection::handles()->all();
-        }
-
-        return Blink::once('entry-to-collection-map', function () {
-            return Collection::handles()
-                ->flatMap(fn ($collection) => $this->getWhereColumnKeysFromStore($collection, ['column' => 'collectionHandle']))
-                ->keys()
-                ->mapWithKeys(function ($value) {
-                    [$collection, $id] = explode('::', $value);
-
-                    return [$id => $collection];
-                });
-        })->only($ids->all())->unique()->values()->all();
     }
 
     protected function getKeysFromCollections($collections)
@@ -178,71 +143,6 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         });
     }
 
-    public function whereStatus(string $status)
-    {
-        $this->addCollectionWheres();
-
-        if (! in_array($status, self::STATUSES)) {
-            throw new \Exception("Invalid status [$status]");
-        }
-
-        if ($status === 'draft') {
-            return $this->where('published', false);
-        }
-
-        $this->where('published', true);
-
-        return $this->where(fn ($query) => $this
-            ->getCollectionsForStatus()
-            ->each(fn ($collection) => $query->orWhere(fn ($q) => $this->addCollectionStatusLogicToQuery($q, $status, $collection))));
-    }
-
-    private function getCollectionsForStatus()
-    {
-        // Since we have to add nested queries for each collection, if collections have been provided,
-        // we'll use those to avoid the need for adding unnecessary query clauses.
-
-        if (empty($this->collections)) {
-            return Collection::all();
-        }
-
-        return collect($this->collections)->map(fn ($handle) => Collection::find($handle));
-    }
-
-    private function addCollectionStatusLogicToQuery($query, $status, $collection)
-    {
-        // Using collectionHandle instead of collection because we intercept collection
-        // and put it on a property. In this case we actually want the indexed value.
-        // We can probably refactor this elsewhere later.
-        $query->where('collectionHandle', $collection->handle());
-
-        if ($collection->futureDateBehavior() === 'public' && $collection->pastDateBehavior() === 'public') {
-            if ($status === 'scheduled' || $status === 'expired') {
-                $query->where('date', 'invalid'); // intentionally trigger no results.
-            }
-        }
-
-        if ($collection->futureDateBehavior() === 'private') {
-            $status === 'scheduled'
-                ? $query->where('date', '>', now())
-                : $query->where('date', '<', now());
-
-            if ($status === 'expired') {
-                $query->where('date', 'invalid'); // intentionally trigger no results.
-            }
-        }
-
-        if ($collection->pastDateBehavior() === 'private') {
-            $status === 'expired'
-                ? $query->where('date', '<', now())
-                : $query->where('date', '>', now());
-
-            if ($status === 'scheduled') {
-                $query->where('date', 'invalid'); // intentionally trigger no results.
-            }
-        }
-    }
-
     public function prepareForFakeQuery(): array
     {
         $data = parent::prepareForFakeQuery();
@@ -257,5 +157,47 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         return $data;
+    }
+
+    private function ensureCollectionsAreQueriedForStatusQuery(): void
+    {
+        // If the collections property isn't empty, it means the user has explicitly
+        // queried for them. In that case, we'll use them and skip the auto-detection.
+        if (! empty($this->collections)) {
+            return;
+        }
+
+        // Otherwise, we'll detect them by looking at where clauses targeting the "id" column.
+        $ids = collect($this->wheres)->where('column', 'id')->flatMap(fn ($where) => $where['values'] ?? [$where['value']]);
+
+        // If no IDs were queried, fall back to all collections.
+        $this->collections = $ids->isEmpty()
+            ? Collection::handles()->all()
+            : Blink::once('entry-to-collection-map', function () {
+                return Collection::handles()
+                    ->flatMap(fn ($collection) => $this->getWhereColumnKeysFromStore($collection, ['column' => 'collectionHandle']))
+                    ->keys()
+                    ->mapWithKeys(function ($value) {
+                        [$collection, $id] = explode('::', $value);
+
+                        return [$id => $collection];
+                    });
+            })->only($ids->all())->unique()->values()->all();
+    }
+
+    protected function addCollectionWhereToStatusQuery($query, $collection): void
+    {
+        // Using collectionHandle instead of collection because we intercept collection
+        // and put it on a property. In this case we actually want the indexed value.
+        // We can probably refactor this elsewhere later.
+        $query->where('collectionHandle', $collection);
+    }
+
+    protected function getCollectionsForStatusQuery(): \Illuminate\Support\Collection
+    {
+        // Since we have to add nested queries for each collection, we only want to add clauses for the
+        // applicable collections. By this point, there should be where clauses on the collection column.
+
+        return collect($this->collections)->map(fn ($handle) => Collection::find($handle));
     }
 }
