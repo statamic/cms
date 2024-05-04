@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.0.0-beta.3 (2024-05-04)
+
+### What's changed
+- Fix 404s due to entry uri caching changes. [#9998](https://github.com/statamic/cms/issues/9998) by @jasonvarga
+- Fix please command `--help` listing. [#9977](https://github.com/statamic/cms/issues/9977) by @jesseleite
+
+
+
 ## 5.0.0-beta.2 (2024-05-03)
 
 ### What's changed
