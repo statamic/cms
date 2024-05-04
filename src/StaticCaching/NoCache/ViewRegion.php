@@ -2,8 +2,6 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
-use Statamic\Support\Str;
-
 class ViewRegion extends Region
 {
     protected $view;
@@ -13,7 +11,7 @@ class ViewRegion extends Region
         $this->session = $session;
         $this->view = $view;
         $this->context = $this->filterContext($context);
-        $this->key = Str::random(32);
+        $this->key = sha1($view).$session->getRegionId();
     }
 
     public function key(): string
