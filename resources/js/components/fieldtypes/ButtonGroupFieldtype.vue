@@ -53,7 +53,7 @@ export default {
     methods: {
 
         setupResizeObserver() {
-            this.resizeObserver = new ResizeObserver(entries => {
+            this.resizeObserver = new ResizeObserver(() => {
                 this.handleWrappingOfNode(this.$refs.buttonGroup);
             });
             this.resizeObserver.observe(this.$refs.buttonGroup);
