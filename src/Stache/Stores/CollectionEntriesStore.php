@@ -225,28 +225,19 @@ class CollectionEntriesStore extends ChildStore
         $item->writeFile($path);
     }
 
-    protected function cacheItem($item)
-    {
-        $key = $this->getItemKey($item);
-
-        $cacheKey = $this->getItemCacheKey($key);
-
-        Cache::forever($cacheKey, ['entry' => $item, 'uri' => $item->uri()]);
-    }
-
     protected function getCachedItem($key)
     {
         $cacheKey = $this->getItemCacheKey($key);
 
-        if (! $cache = Cache::get($cacheKey)) {
+        if (! $entry = Cache::get($cacheKey)) {
             return null;
         }
 
-        if ($this->shouldBlinkEntryUris && $cache['uri']) {
-            Blink::store('entry-uris')->put($cache['entry']->id(), $cache['uri']);
+        if ($this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->get($entry->id()))) {
+            Blink::store('entry-uris')->put($entry->id(), $uri);
         }
 
-        return $cache['entry'];
+        return $entry;
     }
 
     public function withoutBlinkingEntryUris($callback)
