@@ -233,7 +233,7 @@ class CollectionEntriesStore extends ChildStore
             return null;
         }
 
-        if ($this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->get($entry->id()))) {
+        if ($this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
             Blink::store('entry-uris')->put($entry->id(), $uri);
         }
 
