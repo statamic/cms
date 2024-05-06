@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
+use Statamic\Eloquent\Entries\EntryQueryBuilder as Builder;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Term;
@@ -31,7 +32,7 @@ class TaxonomyTermEntriesController extends ApiController
     {
         $this->abortIfDisabled();
 
-        $term = Term::find($taxonomy.'::'.$term);
+        $term = Term::find($taxonomy . '::' . $term);
 
         throw_unless($term, new NotFoundHttpException);
 
@@ -39,9 +40,11 @@ class TaxonomyTermEntriesController extends ApiController
 
         $this->allowedCollections = $this->allowedCollections();
 
-        foreach ($this->allowedCollections as $collection) {
-            $query->where('collection', $collection);
-        }
+        $query->where(function (Builder $query) {
+            foreach ($this->allowedCollections as $collection) {
+                $query->orWhere('collection', $collection);
+            }
+        });
 
         $with = $this->getRelationshipFieldsFromCollections($taxonomy);
 
