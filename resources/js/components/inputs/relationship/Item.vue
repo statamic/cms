@@ -79,8 +79,8 @@ export default {
 
             let isAlreadyEditing = Object.entries(this.$store.state.publish)
                 .filter(([key, value]) => {
-                    return this.item.blueprint
-                        ? value.blueprint.handle === this.item.blueprint
+                    return this.item.reference
+                        ? value.reference === this.item.reference
                         : true;
                 })
                 .filter(([key, value]) => value.values.id === this.item.id)

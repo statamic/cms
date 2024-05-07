@@ -10,10 +10,10 @@ class Term extends JsonResource
     {
         $data = [
             'id' => $this->resource->id(),
+            'reference' => $this->resource->reference(),
             'title' => $this->resource->value('title'),
             'permalink' => $this->resource->absoluteUrl(),
             'edit_url' => $this->resource->editUrl(),
-            'blueprint' => $this->resource->blueprint()->handle(),
         ];
 
         return ['data' => $data];
