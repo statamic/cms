@@ -116,6 +116,8 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function shouldParseAntlers()
     {
+        $this->resolve();
+
         return $this->fieldtype && $this->fieldtype->config('antlers');
     }
 
@@ -147,6 +149,8 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function field()
     {
+        $this->resolve();
+
         return $this->fieldtype->field();
     }
 

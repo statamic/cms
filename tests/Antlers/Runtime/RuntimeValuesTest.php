@@ -2,9 +2,12 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Entries\Entry;
+use Statamic\Facades;
 use Statamic\Facades\Collection;
+use Statamic\Facades\GlobalSet;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
@@ -62,5 +65,24 @@ onetwo
 EXPECTED;
 
         $this->assertSame($expected, $content);
+    }
+
+    public function test_fieldtype_information_is_resolved_when_augmenting()
+    {
+        // https://github.com/statamic/cms/issues/10001
+
+        $blueprint = Facades\Blueprint::makeFromFields([
+            'the_text' => ['type' => 'text', 'antlers' => true],
+        ]);
+
+        BlueprintRepository::shouldReceive('find')->with('globals.the_global')->andReturn($blueprint);
+
+        $global = GlobalSet::make('the_global');
+        $variables = $global->makeLocalization('en');
+
+        $variables->set('the_text', 'The Value');
+        $theText = $variables->toDeferredAugmentedArray()['the_text'];
+
+        $this->assertTrue($theText->shouldParseAntlers());
     }
 }
