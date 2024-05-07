@@ -13,6 +13,7 @@ class Term extends JsonResource
             'title' => $this->resource->value('title'),
             'permalink' => $this->resource->absoluteUrl(),
             'edit_url' => $this->resource->editUrl(),
+            'blueprint' => $this->resource->blueprint()->handle(),
         ];
 
         return ['data' => $data];

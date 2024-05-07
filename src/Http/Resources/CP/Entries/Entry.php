@@ -20,6 +20,7 @@ class Entry extends JsonResource
                 'title' => $this->resource->collection()->title(),
                 'handle' => $this->resource->collection()->handle(),
             ],
+            'blueprint' => $this->resource->blueprint()->handle(),
         ];
 
         return ['data' => $data];
