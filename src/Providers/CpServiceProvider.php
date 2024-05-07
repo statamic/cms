@@ -11,7 +11,6 @@ use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
 use Statamic\Facades\User;
 use Statamic\Fieldtypes\Sets;
-use Statamic\Http\Middleware\CP\AddVaryHeaderToResponse;
 use Statamic\Http\View\Composers\CustomLogoComposer;
 use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Http\View\Composers\JavascriptComposer;
