@@ -135,7 +135,7 @@ export default {
 
         editConfirmed() {
             if (! this.handle) {
-                this.handle = this.$slugify(this.display, '_');
+                this.handle = snake_case(this.display)
             }
 
             this.$emit('updated', {

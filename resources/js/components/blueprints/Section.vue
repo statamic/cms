@@ -196,7 +196,7 @@ export default {
 
         editConfirmed() {
             if (! this.editingSection.handle) {
-                this.editingSection.handle = this.$slugify(this.editingSection.display, '_');
+                this.editingSection.handle = snake_case(this.editingSection.display)
             }
 
             this.$emit('updated', {...this.section, ...this.editingSection});
