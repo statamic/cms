@@ -196,7 +196,7 @@ export default {
 
         editConfirmed() {
             if (! this.editingSection.handle) {
-                this.editingSection.handle = Statamic.$slug.separatedBy('_').create(this.editingSection.display)
+                this.editingSection.handle = snake_case(this.editingSection.display)
             }
 
             this.$emit('updated', {...this.section, ...this.editingSection});

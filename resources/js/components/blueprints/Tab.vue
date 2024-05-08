@@ -135,7 +135,7 @@ export default {
 
         editConfirmed() {
             if (! this.handle) {
-                this.handle = Statamic.$slug.separatedBy('_').create(this.display)
+                this.handle = snake_case(this.display)
             }
 
             this.$emit('updated', {
