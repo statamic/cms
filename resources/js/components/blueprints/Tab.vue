@@ -135,7 +135,7 @@ export default {
 
         editConfirmed() {
             if (! this.handle) {
-                this.handle = this.$slugify(this.display, '_');
+                this.handle = Statamic.$slug.separatedBy('_').create(this.display)
             }
 
             this.$emit('updated', {

@@ -196,7 +196,7 @@ export default {
 
         editConfirmed() {
             if (! this.editingSection.handle) {
-                this.editingSection.handle = this.$slugify(this.editingSection.display, '_');
+                this.editingSection.handle = Statamic.$slug.separatedBy('_').create(this.editingSection.display)
             }
 
             this.$emit('updated', {...this.section, ...this.editingSection});
