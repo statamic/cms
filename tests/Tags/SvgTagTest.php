@@ -4,6 +4,8 @@ namespace Tests\Tags;
 
 use Illuminate\Support\Facades\File;
 use Statamic\Facades\Parse;
+use Statamic\Tags\Svg;
+use Stringy\StaticStringy;
 use Tests\TestCase;
 
 class SvgTagTest extends TestCase
@@ -78,6 +80,31 @@ SVG);
         File::put(resource_path('xmltag.svg'), $svg);
 
         $this->assertEquals($svg, $this->tag('{{ svg src="xmltag" }}'));
+    }
+
+    /** @test */
+    public function sanitization_can_be_disabled()
+    {
+        $rawSvg = StaticStringy::collapseWhitespace(<<<'SVG'
+<svg>
+    <path onload="loadxss" onclick="clickxss" />
+    <script>alert("xss")</script>
+    <foreignObject/>
+    <mesh/>
+</svg>
+SVG);
+        File::put(resource_path('xss.svg'), $rawSvg);
+
+        Svg::disableSanitization();
+
+        $this->assertEquals($rawSvg, $this->tag('{{ svg src="xss" }}'));
+
+        // If it's globally disabled, you can still opt into it per-tag.
+        $this->assertEquals('<svg><path/></svg>', $this->tag('{{ svg src="xss" sanitize="true" }}'));
+
+        Svg::enableSanitization();
+
+        $this->assertEquals('<svg><path/></svg>', $this->tag('{{ svg src="xss" }}'));
     }
 
     /** @test */
