@@ -134,6 +134,10 @@ export default {
         },
 
         editConfirmed() {
+            if (! this.handle) {
+                this.handle = this.$slugify(this.display, '_');
+            }
+
             this.$emit('updated', {
                 ...this.tab,
                 handle: this.handle,
@@ -141,6 +145,7 @@ export default {
                 instructions: this.instructions,
                 icon: this.icon,
             });
+
             this.editing = false;
         },
 

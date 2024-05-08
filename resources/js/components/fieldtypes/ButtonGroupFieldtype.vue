@@ -1,6 +1,6 @@
 <template>
     <div class="button-group-fieldtype-wrapper" :class="{'inline-mode': config.inline}">
-        <div class="btn-group">
+        <div class="btn-group" ref="buttonGroup">
             <button class="btn px-4"
                 v-for="(option, $index) in options"
                 :key="$index"
@@ -18,9 +18,24 @@
 
 <script>
 import HasInputOptions from './HasInputOptions.js'
+import ResizeObserver from 'resize-observer-polyfill';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
+
+    data() {
+        return {
+            resizeObserver: null,
+        }
+    },
+
+    mounted() {
+        this.setupResizeObserver();
+    },
+
+    beforeDestroy() {
+        this.resizeObserver.disconnect();
+    },
 
     computed: {
         options() {
@@ -36,6 +51,25 @@ export default {
     },
 
     methods: {
+
+        setupResizeObserver() {
+            this.resizeObserver = new ResizeObserver(() => {
+                this.handleWrappingOfNode(this.$refs.buttonGroup);
+            });
+            this.resizeObserver.observe(this.$refs.buttonGroup);
+        },
+
+        handleWrappingOfNode(node) {
+            const lastEl = node.lastChild;
+
+            if (!lastEl) return;
+
+            node.classList.remove('btn-vertical');
+
+            if(lastEl.offsetTop > node.clientTop) {
+                node.classList.add('btn-vertical');
+            }
+        },
 
         focus() {
             this.$refs.button[0].focus();

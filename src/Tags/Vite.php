@@ -52,6 +52,24 @@ class Vite extends Tags
             ->asset($src);
     }
 
+    /**
+     * The {{ vite:content }} tag.
+     *
+     * @return string
+     */
+    public function content()
+    {
+        if (! $src = $this->params->get('src')) {
+            throw new \Exception('Please provide a source file.');
+        }
+
+        $directory = $this->params->get('directory', 'build');
+
+        return $this->vite()
+            ->useBuildDirectory($directory)
+            ->content($src);
+    }
+
     private function vite()
     {
         return clone app(LaravelVite::class);

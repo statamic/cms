@@ -7,7 +7,7 @@
     ":count set|:count sets": ":count jeu|:count jeux",
     ":count word|:count words": ":count mot|:count mots",
     ":count\/:max selected": ":count sélectionnés \/:max",
-    ":count\/:total characters": "count caractères \/:total",
+    ":count\/:total characters": "count caractères :count\/:total",
     ":file uploaded": ":file téléchargé",
     ":start-:end of :total": ":start-:end sur :total",
     ":title Field": "Champ :title",

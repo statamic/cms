@@ -195,6 +195,10 @@ export default {
         },
 
         editConfirmed() {
+            if (! this.editingSection.handle) {
+                this.editingSection.handle = this.$slugify(this.editingSection.display, '_');
+            }
+
             this.$emit('updated', {...this.section, ...this.editingSection});
             this.editingSection = false;
         },
