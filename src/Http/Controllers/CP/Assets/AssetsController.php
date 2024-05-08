@@ -72,7 +72,7 @@ class AssetsController extends CpController
 
         $fileValidation = ['file', new AllowedFile];
 
-        if ($maxSize = $container->maxSize() > 0) {
+        if (($maxSize = $container->maxSize()) > 0) {
             $fileValidation[] = 'max:'.$maxSize;
         }
 
