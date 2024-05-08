@@ -1,9 +1,10 @@
 /* Vertical alignment of btn groups when overflowing
   ========================================================================== */
 
-.btn-group:not(.btn-vertical) {
+.button-group-fieldtype-wrapper .btn-group:not(.btn-vertical) {
     @apply flex-wrap;
 }
+
 .btn-group.btn-vertical {
     @apply flex-col items-stretch justify-start p-0 h-auto;
 
