@@ -1,6 +1,6 @@
 # Release Notes
 
-## 4.57.1 (2024-05-08)
+## 4.58.1 (2024-05-08)
 
 ### What's improved
 - French translations. [#10017](https://github.com/statamic/cms/issues/10017) by @PatrickJunod
