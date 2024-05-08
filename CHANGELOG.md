@@ -1,5 +1,19 @@
 # Release Notes
 
+## 4.57.1 (2024-05-08)
+
+### What's improved
+- French translations. [#10017](https://github.com/statamic/cms/issues/10017) by @PatrickJunod
+
+### What's new
+- Fix queue worker state issue around assets. [#9690](https://github.com/statamic/cms/issues/9690) by @aerni
+- Fix button group wrapping on non-fieldtype buttons. [#10021](https://github.com/statamic/cms/issues/10021) by @PatrickJunod
+- Fix child URIs being outdated when parent slug changes. [#9454](https://github.com/statamic/cms/issues/9454) by @jacksleight
+- Fix Eloquent ordering when using `lazy()` or `chunk()`. [#9956](https://github.com/statamic/cms/issues/9956) by @helloiamlukas
+- Fix recursive editing check. [#10012](https://github.com/statamic/cms/issues/10012) by @duncanmcclean
+
+
+
 ## 4.58.0 (2024-05-07)
 
 ### What's new
