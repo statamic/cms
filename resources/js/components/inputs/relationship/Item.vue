@@ -77,16 +77,7 @@ export default {
             if (! this.editable) return;
             if (this.item.invalid) return;
 
-            let isAlreadyEditing = Object.entries(this.$store.state.publish)
-                .filter(([key, value]) => {
-                    return this.item.reference
-                        ? value.reference === this.item.reference
-                        : true;
-                })
-                .filter(([key, value]) => value.values.id === this.item.id)
-                .length > 0;
-
-            if (isAlreadyEditing) {
+            if (this.item.reference && Object.entries(this.$store.state.publish).find(([key, value]) => value.reference === this.item.reference)) {
                 this.$toast.error(__("You're already editing this item."));
                 return;
             }
