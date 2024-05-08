@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.0.0-beta.4 (2024-05-07)
+
+### What's changed
+- Prevent excessive nocache cache growth. [#9999](https://github.com/statamic/cms/issues/9999) by @JohnathonKoster
+- Ensures values are resolved when checking Antlers parsing settings. [#10003](https://github.com/statamic/cms/issues/10003) by @JohnathonKoster
+
+
+
 ## 5.0.0-beta.3 (2024-05-04)
 
 ### What's changed
