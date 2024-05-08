@@ -1,5 +1,24 @@
 # Release Notes
 
+## 4.58.0 (2024-05-07)
+
+### What's new
+- Add Vite content tag. [#9973](https://github.com/statamic/cms/issues/9973) by @jimblue
+- Include `alt` field in shallow augmented assets. [#10013](https://github.com/statamic/cms/issues/10013) by @duncanmcclean
+
+### What's improved
+- French translations. [#10015](https://github.com/statamic/cms/issues/10015) by @duncanmcclean
+
+### What's fixed
+- Fix ButtonGroup from overflowing. [#10000](https://github.com/statamic/cms/issues/10000) by @PatrickJunod
+- Fix docblock on `Parse` facade's `template` method. [#10008](https://github.com/statamic/cms/issues/10008) by @duncanmcclean
+- Ensure blueprint tabs & sections always have handles. [#10014](https://github.com/statamic/cms/issues/10014) by @duncanmcclean
+- Fix JSON being returned when using the back button sometimes. [#10016](https://github.com/statamic/cms/issues/10016) by @duncanmcclean
+- Fix fullscreen button in Group Fieldtype. [#10009](https://github.com/statamic/cms/issues/10009) by @duncanmcclean
+- Remove clear button of readonly date field. [#9993](https://github.com/statamic/cms/issues/9993) by @PatrickJunod
+
+
+
 ## 4.57.3 (2024-05-02)
 
 ### What's improved
