@@ -234,15 +234,27 @@ class Fieldset
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (FieldsetDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && FieldsetDeleting::dispatch($this) === false) {
             return false;
         }
 
         FieldsetRepository::delete($this);
 
-        FieldsetDeleted::dispatch($this);
+        if ($withEvents) {
+            FieldsetDeleted::dispatch($this);
+        }
 
         return true;
     }

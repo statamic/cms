@@ -2,13 +2,13 @@
 
 namespace Tests\Console\Commands;
 
-use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
 use Tests\TestCase;
 
 class MakeAddonTest extends TestCase
 {
-    use Concerns\CleansUpGeneratedPaths;
+    use Concerns\CleansUpGeneratedPaths,
+        Concerns\FakesComposerInstalls;
 
     private $files;
 
@@ -19,6 +19,7 @@ class MakeAddonTest extends TestCase
         $this->markTestSkippedInWindows();
 
         $this->files = app(Filesystem::class);
+        $this->fakeSuccessfulComposerRequire();
     }
 
     public function tearDown(): void
@@ -91,8 +92,6 @@ class MakeAddonTest extends TestCase
     /** @test */
     public function it_can_generate_with_a_fieldtype()
     {
-        $this->fakeSuccessfulComposerInstall();
-
         $this->assertFileDoesNotExist(base_path('addons/hasselhoff/knight-rider'));
 
         $this->makeAddon('hasselhoff/knight-rider', ['--fieldtype' => true]);
@@ -115,8 +114,6 @@ class MakeAddonTest extends TestCase
     /** @test */
     public function it_can_make_an_addon_with_everything_including_the_kitchen_sink()
     {
-        $this->fakeSuccessfulComposerInstall();
-
         $path = base_path('addons/ford/san-holo');
 
         $this->assertFileDoesNotExist($path);
@@ -142,10 +139,5 @@ class MakeAddonTest extends TestCase
             'addon' => $addon,
             '--no-interaction' => true,
         ], $options));
-    }
-
-    private function fakeSuccessfulComposerInstall()
-    {
-        Composer::shouldReceive('withoutQueue', 'throwOnFailure', 'require')->andReturnSelf();
     }
 }

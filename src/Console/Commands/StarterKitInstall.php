@@ -41,7 +41,9 @@ class StarterKitInstall extends Command
      */
     public function handle()
     {
-        if ($this->validationFails($package = $this->getPackage(), new ComposerPackage)) {
+        [$package, $branch] = $this->getPackageAndBranch();
+
+        if ($this->validationFails($package, new ComposerPackage)) {
             return;
         }
 
@@ -56,6 +58,7 @@ class StarterKitInstall extends Command
         }
 
         $installer = StarterKitInstaller::package($package, $this, $licenseManager)
+            ->branch($branch)
             ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
@@ -85,13 +88,21 @@ class StarterKitInstall extends Command
     }
 
     /**
-     * Get composer package.
+     * Get composer package (and optional branch).
      *
      * @return string
      */
-    protected function getPackage()
+    protected function getPackageAndBranch()
     {
-        return $this->argument('package') ?: $this->ask('Package');
+        $package = $this->argument('package') ?: $this->ask('Package');
+
+        $parts = explode(':', $package);
+
+        if (count($parts) === 1) {
+            $parts[] = null;
+        }
+
+        return $parts;
     }
 
     /**

@@ -1,5 +1,124 @@
 # Release Notes
 
+## 4.58.0 (2024-05-07)
+
+### What's new
+- Add Vite content tag. [#9973](https://github.com/statamic/cms/issues/9973) by @jimblue
+- Include `alt` field in shallow augmented assets. [#10013](https://github.com/statamic/cms/issues/10013) by @duncanmcclean
+
+### What's improved
+- French translations. [#10015](https://github.com/statamic/cms/issues/10015) by @duncanmcclean
+
+### What's fixed
+- Fix ButtonGroup from overflowing. [#10000](https://github.com/statamic/cms/issues/10000) by @PatrickJunod
+- Fix docblock on `Parse` facade's `template` method. [#10008](https://github.com/statamic/cms/issues/10008) by @duncanmcclean
+- Ensure blueprint tabs & sections always have handles. [#10014](https://github.com/statamic/cms/issues/10014) by @duncanmcclean
+- Fix JSON being returned when using the back button sometimes. [#10016](https://github.com/statamic/cms/issues/10016) by @duncanmcclean
+- Fix fullscreen button in Group Fieldtype. [#10009](https://github.com/statamic/cms/issues/10009) by @duncanmcclean
+- Remove clear button of readonly date field. [#9993](https://github.com/statamic/cms/issues/9993) by @PatrickJunod
+
+
+
+## 4.57.3 (2024-05-02)
+
+### What's improved
+- German translations. [#9957](https://github.com/statamic/cms/issues/9957) by @helloDanuk
+
+### What's fixed
+- Fix Starter Kit installation on Windows. [#9968](https://github.com/statamic/cms/issues/9968) by @JohnathonKoster
+- Fix `starter-kit:install` with custom branch when branch has slash. [#9978](https://github.com/statamic/cms/issues/9978) by @jesseleite
+- Fix first child redirects when using array syntax. [#9965](https://github.com/statamic/cms/issues/9965) by @jasonvarga
+- Fix wrong permission used for configuring navs. [#9961](https://github.com/statamic/cms/issues/9961) by @simonolog
+- Fix `DataReferenceUpdater` when field data from array is null. [#9954](https://github.com/statamic/cms/issues/9954) by @duncanmcclean
+- Fix dated collection listing when time is enabled. [#9951](https://github.com/statamic/cms/issues/9951) by @jacksleight
+- Fix route parameters in Statamic routes with closures. [#9953](https://github.com/statamic/cms/issues/9953) by @arthurperton
+- Fake composer installs in make command tests. [#9955](https://github.com/statamic/cms/issues/9955) by @jasonvarga
+
+
+
+## 4.57.2 (2024-04-23)
+
+### What's fixed
+- Fix missing composer binary (starter kits couldn't install). [#9950](https://github.com/statamic/cms/issues/9950) by @duncanmcclean
+
+
+
+## 4.57.1 (2024-04-22)
+
+### What's improved
+- French translations. [#9939](https://github.com/statamic/cms/issues/9939) by @ebeauchamps
+
+### What's fixed
+- Require composer/semver instead of composer/composer. [#9947](https://github.com/statamic/cms/issues/9947) by @jasonvarga
+- Fix `DimensionsRule` for Livewire. [#9927](https://github.com/statamic/cms/issues/9927) by @aerni
+- Fix Blade compiler error. [#9946](https://github.com/statamic/cms/issues/9946) by @duncanmcclean
+- Prevent passing HTML to the Video fieldtype. [#9944](https://github.com/statamic/cms/issues/9944) by @duncanmcclean
+- Fix missing OAuth controller argument. [#9942](https://github.com/statamic/cms/issues/9942) by @simonolog
+
+
+
+## 4.57.0 (2024-04-17)
+
+### What's new
+- Add deleteQuietly methods. [#9666](https://github.com/statamic/cms/issues/9666) by @ryanmitchell
+- Support using closures for Statamic route data. [#9868](https://github.com/statamic/cms/issues/9868) by @arthurperton
+
+### What's fixed
+- Fix single unpublished entries in listing column. [#9917](https://github.com/statamic/cms/issues/9917) by @jacksleight
+- Prevent computed fields from being sortable in listing tables. [#9916](https://github.com/statamic/cms/issues/9916) by @duncanmcclean
+- Fix Grid styles messing up row-controls of nested fields. [#9910](https://github.com/statamic/cms/issues/9910) by @duncanmcclean
+- Fix icons color. [#9895](https://github.com/statamic/cms/issues/9895) by @peimn
+- Fix Nova icon not displaying in Icon Fieldtype. [#9906](https://github.com/statamic/cms/issues/9906) by @duncanmcclean
+- Add title fallback for roles & groups. [#9907](https://github.com/statamic/cms/issues/9907) by @duncanmcclean
+- Fix Bard scrolling editor/page on link insert. [#9886](https://github.com/statamic/cms/issues/9886) by @jacksleight
+- Hash API cache keys the key to handle long route and query parameters. [#9858](https://github.com/statamic/cms/issues/9858) by @Smef
+- Fix regression on bard/replicator group set previews. [#9901](https://github.com/statamic/cms/issues/9901) by @caseydwyer
+- Fix arrow direction in fav creator for RTL. [#9897](https://github.com/statamic/cms/issues/9897) by @peimn
+- Fixes for asset/term reference updater strictness. [#9878](https://github.com/statamic/cms/issues/9878) by @jesseleite
+- Add `date` to reserved fields for form blueprints. [#9872](https://github.com/statamic/cms/issues/9872) by @duncanmcclean
+- Fix tables in Bard not saving updates. [#9867](https://github.com/statamic/cms/issues/9867) by @jacksleight
+- Add tailwind safelist with horizontal margins and padding. [#9864](https://github.com/statamic/cms/issues/9864) by @jasonvarga
+- Fix PHPUnit deprecations. [#9912](https://github.com/statamic/cms/issues/9912) by @jasonvarga
+
+
+
+## 4.56.1 (2024-04-09)
+
+### What's fixed
+- Fix max depth validation on "Parent" field when collection has no max depth set. [#9850](https://github.com/statamic/cms/issues/9850) by @duncanmcclean
+- Update URIs for mounted collection entries only if slug on mounted entry changed. [#9851](https://github.com/statamic/cms/issues/9851) by @marcorieser
+
+
+
+## 4.56.0 (2024-04-08)
+
+### What's new
+- Bard hooks. [#9823](https://github.com/statamic/cms/issues/9823) by @jacksleight
+- Ability to disable SVG sanitization on upload. [#9839](https://github.com/statamic/cms/issues/9839) by @duncanmcclean
+- Add Edit Blueprint link to form page dropdown. [#9840](https://github.com/statamic/cms/issues/9840) by @jacksleight
+- Track Laravel version in the Outpost. [#9820](https://github.com/statamic/cms/issues/9820) by @jasonvarga
+
+### What's fixed
+- Prevent recursive editing via relationship fieldtype. [#9841](https://github.com/statamic/cms/issues/9841) by @duncanmcclean
+- Improve array fieldtype validation for dynamically keyed fields. [#9834](https://github.com/statamic/cms/issues/9834) by @jesseleite
+- Fix overlapping set group & set name in Safari. [#9837](https://github.com/statamic/cms/issues/9837) by @duncanmcclean
+- Arr::wrap in/notIn values. [#9833](https://github.com/statamic/cms/issues/9833) by @ryanmitchell
+- Fix filter preset issues. [#9826](https://github.com/statamic/cms/issues/9826) by @duncanmcclean
+- Ensure redirects work for localized entries. [#9819](https://github.com/statamic/cms/issues/9819) by @duncanmcclean
+- Fix OAuth login when using independent auth guards. [#9816](https://github.com/statamic/cms/issues/9816) by @duncanmcclean
+- Fix icons in preference save options. [#9827](https://github.com/statamic/cms/issues/9827) by @duncanmcclean
+- Prevent "Permanently added the ECDSA host key for IP address" from being logged as a Git error. [#9828](https://github.com/statamic/cms/issues/9828) by @duncanmcclean
+- Fix deleted sets breaking Bard & Replicator. [#9818](https://github.com/statamic/cms/issues/9818) by @duncanmcclean
+- Prevent overwriting filter views. [#9792](https://github.com/statamic/cms/issues/9792) by @duncanmcclean
+- Fix serializing entries when `slug` property is a closure. [#9791](https://github.com/statamic/cms/issues/9791) by @duncanmcclean
+- Use the configured Git binary in commands. [#9793](https://github.com/statamic/cms/issues/9793) by @duncanmcclean
+- Enforce max depth when validating entry parent. [#9799](https://github.com/statamic/cms/issues/9799) by @duncanmcclean
+- Fix new lines not working in user activation email. [#9798](https://github.com/statamic/cms/issues/9798) by @duncanmcclean
+- Hide "Create Entry" button when all collection blueprints are hidden. [#9744](https://github.com/statamic/cms/issues/9744) by @duncanmcclean
+- Bump vite from 4.5.2 to 4.5.3 [#9821](https://github.com/statamic/cms/issues/9821) by @dependabot
+
+
+
 ## 4.55.0 (2024-03-27)
 
 ### What's new

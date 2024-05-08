@@ -636,13 +636,28 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     }
 
     /**
+     * Delete quietly without firing events.
+     *
+     * @return bool
+     */
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
+    /**
      * Delete the asset.
      *
      * @return $this
      */
     public function delete()
     {
-        if (AssetDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && AssetDeleting::dispatch($this) === false) {
             return false;
         }
 
@@ -653,7 +668,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $this->clearCaches();
 
-        AssetDeleted::dispatch($this);
+        if ($withEvents) {
+            AssetDeleted::dispatch($this);
+        }
 
         return $this;
     }
@@ -1046,7 +1063,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function shallowAugmentedArrayKeys()
     {
-        return ['id', 'url', 'permalink', 'api_url'];
+        return ['id', 'url', 'permalink', 'api_url', 'alt'];
     }
 
     protected function defaultAugmentedRelations()
