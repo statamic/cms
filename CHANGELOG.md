@@ -1,5 +1,16 @@
 # Release Notes
 
+## 5.0.0 (2024-05-09)
+
+### What's new
+- Official 5.0 release! 🎉
+
+### What's fixed
+- Allow opting out of svg tag sanitization [#10020](https://github.com/statamic/cms/issues/10020) by @jasonvarga
+- Use `Statamic.$slug` helper instead of `$slugify` [#10018](https://github.com/statamic/cms/issues/10018) by @duncanmcclean
+
+
+
 ## 5.0.0-beta.4 (2024-05-07)
 
 ### What's changed
