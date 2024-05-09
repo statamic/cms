@@ -5,7 +5,7 @@
 ### What's improved
 - French translations. [#10017](https://github.com/statamic/cms/issues/10017) by @PatrickJunod
 
-### What's new
+### What's fixed
 - Fix queue worker state issue around assets. [#9690](https://github.com/statamic/cms/issues/9690) by @aerni
 - Fix button group wrapping on non-fieldtype buttons. [#10021](https://github.com/statamic/cms/issues/10021) by @PatrickJunod
 - Fix child URIs being outdated when parent slug changes. [#9454](https://github.com/statamic/cms/issues/9454) by @jacksleight
