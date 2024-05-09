@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.0.1 (2024-05-09)
+
+### What's fixed
+- Fix Eloquent User `notifications` conflict. [#10024](https://github.com/statamic/cms/issues/10024) by @duncanmcclean
+- Fix EloquentQueryBuilder orderby bug. [#10023](https://github.com/statamic/cms/issues/10023) by @duncanmcclean
+
+
+
 ## 5.0.0 (2024-05-09)
 
 ### What's new
