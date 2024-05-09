@@ -19,4 +19,9 @@ class ItemQueryBuilder extends IteratorBuilder
     {
         return $this->items;
     }
+
+    public function whereStatus($status)
+    {
+        return $this->where('status', $status);
+    }
 }

@@ -581,6 +581,11 @@ class SimpleEntryObject implements Arrayable
         ];
     }
 
+    public function toDeferredAugmentedArray()
+    {
+        return $this->toAugmentedArray();
+    }
+
     public function toArray()
     {
         return $this->toAugmentedArray();

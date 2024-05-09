@@ -7,20 +7,15 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Query\Builder as LaravelQueryBuilder;
 use JsonSerializable;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Fields\Value;
+use Tests\TestCase;
 
 class AugmentedCollectionTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        m::close();
-    }
-
     /** @test */
     public function it_calls_toArray_on_each_item()
     {
@@ -40,7 +35,8 @@ class AugmentedCollectionTest extends TestCase
         $value = m::mock(Value::class);
         // $value->shouldNotReceive('toArray');
         $value->shouldReceive('isRelationship')->andReturnFalse();
-        $value->shouldReceive('shallow')->once()->andReturnSelf();
+        $value->shouldReceive('shallow')->once()->andReturn($value);
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $c = new AugmentedCollection([$value]);
         $results = $c->withShallowNesting()->toArray();
 
@@ -52,6 +48,7 @@ class AugmentedCollectionTest extends TestCase
     {
         $value = m::mock(Value::class);
         $value->shouldReceive('isRelationship')->andReturnFalse();
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $value->shouldNotReceive('toArray');
         $value->shouldNotReceive('shallow');
         $c = new AugmentedCollection([$value]);
@@ -124,9 +121,11 @@ class AugmentedCollectionTest extends TestCase
         $item1 = m::mock(Value::class);
         $item1->shouldReceive('value')->never();
         $item1->shouldReceive('isRelationship')->andReturnFalse();
+        $item1->shouldReceive('resolve')->andReturnSelf();
         $item2 = m::mock(Value::class);
         $item2->shouldReceive('value')->never();
         $item2->shouldReceive('isRelationship')->andReturnFalse();
+        $item2->shouldReceive('resolve')->andReturnSelf();
 
         $c = new AugmentedCollection([$item1, $item2, 'baz']);
 
@@ -141,13 +140,14 @@ class AugmentedCollectionTest extends TestCase
     public function it_json_serializes()
     {
         $value = m::mock(Value::class);
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $value->shouldReceive('jsonSerialize')->once()->andReturn('value json serialized');
 
         $c = new AugmentedCollection([
             new TestArrayableObject,
             new TestJsonableObject,
             new TestJsonSerializeObject,
-            $augmentable = new TestAugmentableObject,
+            $augmentable = new TestAugmentableObject(['foo' => 'bar']),
             'baz',
             $value,
         ]);
@@ -156,7 +156,7 @@ class AugmentedCollectionTest extends TestCase
             ['foo' => 'bar'],
             ['foo' => 'bar'],
             ['foo' => 'bar'],
-            $augmentable,
+            ['foo' => 'bar'],
             'baz',
             'value json serialized',
         ], $c->jsonSerialize());
@@ -166,13 +166,14 @@ class AugmentedCollectionTest extends TestCase
     public function augmentables_get_shallow_augmented_when_json_serializing_with_flag()
     {
         $value = m::mock(Value::class);
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $value->shouldReceive('jsonSerialize')->once()->andReturn('value json serialized');
 
         $c = new AugmentedCollection([
             new TestArrayableObject,
             new TestJsonableObject,
             new TestJsonSerializeObject,
-            new TestAugmentableObject,
+            new TestAugmentableObject(['foo' => 'bar']),
             'baz',
             $value,
         ]);
@@ -216,6 +217,16 @@ class TestJsonSerializeObject implements JsonSerializable
 class TestAugmentableObject implements Augmentable
 {
     use HasAugmentedData;
+
+    public function __construct(private $data)
+    {
+
+    }
+
+    public function augmentedArrayData()
+    {
+        return $this->data;
+    }
 
     public function toShallowAugmentedArray()
     {

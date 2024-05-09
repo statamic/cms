@@ -30,12 +30,9 @@ class UpdateAssetReferencesTest extends TestCase
             'root' => __DIR__.'/tmp',
         ]]);
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
         ]);
 
         $this->container = tap(Facades\AssetContainer::make()->handle('test_container')->disk('test'))->save();
@@ -296,6 +293,34 @@ class UpdateAssetReferencesTest extends TestCase
 
         $this->assertEquals(['hoff-new.jpg'], $entry->fresh()->get('avatar'));
         $this->assertEquals('surfboard.jpg', $entry->fresh()->get('products'));
+    }
+
+    /** @test */
+    public function it_updates_multi_assets_fields_even_when_existing_field_value_is_null()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'pics',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'pics' => null,
+        ]))->save();
+
+        $this->assertNull($entry->get('pics'));
+
+        $this->assetNorris->path('content/norris.jpg')->save();
+
+        $this->assertNull($entry->fresh()->get('pics'));
     }
 
     /** @test */
