@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\Support\Str;
@@ -34,11 +35,16 @@ class LoginController extends CpController
     {
         $data = [
             'title' => __('Log in'),
+            'webAuthnEnabled' => $webAuthnEnabled = config('statamic.webauthn.enabled'),
             'oauth' => $enabled = OAuth::enabled(),
             'emailLoginEnabled' => $enabled ? config('statamic.oauth.email_login_enabled') : true,
-            'providers' => $enabled ? OAuth::providers() : [],
+            'providers' => OAuth::enabled() ? OAuth::providers() : [],
             'referer' => $this->getReferrer($request),
             'hasError' => $this->hasError(),
+            'webauthnRoutes' => [
+                'options' => route('statamic.cp.webauthn.verify-options'),
+                'verify' => route('statamic.cp.webauthn.verify'),
+            ],
         ];
 
         $view = view('statamic::auth.login', $data);
@@ -56,6 +62,8 @@ class LoginController extends CpController
             $this->username() => 'required|string',
             'password' => 'required|string',
         ]);
+
+        $this->checkPasskeyEnforcement($request);
 
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
@@ -158,5 +166,18 @@ class LoginController extends CpController
                 __('statamic::validation.required'),
             ]);
         };
+    }
+
+    private function checkPasskeyEnforcement(Request $request)
+    {
+        if (config('statamic.webauthn.enabled', false) && ! config('statamic.webauthn.allow_password_login_with_passkey', true)) {
+            if ($user = User::findByEmail($request->get($this->username()))) {
+                if ($user->passkeys()->isNotEmpty()) {
+                    throw ValidationException::withMessages([
+                        $this->username() => [trans('statamic::messages.password_passkeys_only')],
+                    ]);
+                }
+            }
+        }
     }
 }

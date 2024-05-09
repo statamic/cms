@@ -5,6 +5,7 @@ namespace Statamic\Auth\Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
+use Statamic\Contracts\Auth\Passkey as PasskeyContract;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\UserNotFoundException;
 use Statamic\Facades\Blink;
@@ -14,6 +15,7 @@ class UserRepository extends BaseRepository
     protected $config;
     protected $roleRepository = RoleRepository::class;
     protected $userGroupRepository = UserGroupRepository::class;
+    protected $passkeyRepository = PasskeyRepository::class;
 
     public function __construct($config)
     {
@@ -111,6 +113,7 @@ class UserRepository extends BaseRepository
     {
         return [
             UserContract::class => User::class,
+            PasskeyContract::class => Passkey::class,
         ];
     }
 

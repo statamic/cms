@@ -33,6 +33,7 @@
         "symfony/yaml": "^6.0 || ^7.0",
         "ueberdosis/tiptap-php": "^1.1",
         "voku/portable-ascii": "^2.0",
+        "web-auth/webauthn-lib": "^4.7",
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {

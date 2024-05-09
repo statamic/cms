@@ -3,6 +3,7 @@
 namespace Tests\Auth;
 
 use Illuminate\Support\Facades\Hash;
+use Statamic\Auth\File\Passkey;
 use Statamic\Auth\File\User;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
@@ -120,5 +121,49 @@ class FileUserTest extends TestCase
 
         // Doing it a second time should give the same result but without multiple calls.
         $this->assertEquals($expectedPermissions, $user->permissions()->all());
+    }
+
+    /** @test */
+    public function it_saves_a_passkey()
+    {
+        $user = $this->createPermissible();
+        $user->save();
+
+        $this->assertCount(0, $user->passkeys());
+
+        $passkey = (new Passkey)
+            ->id('testing')
+            ->data([
+                'foo' => 'bar',
+            ])
+            ->user($user);
+
+        $passkey->save();
+
+        $this->assertCount(1, $user->passkeys());
+        $this->assertSame($user->passkeys()->first(), $passkey);
+    }
+
+    /** @test */
+    public function it_deletes_a_passkey()
+    {
+        $user = $this->createPermissible();
+        $user->save();
+
+        $passkey = (new Passkey)
+            ->id('testing')
+            ->data([
+                'foo' => 'bar',
+            ])
+            ->user($user);
+
+        $passkey->save();
+
+        $this->assertCount(1, $user->passkeys());
+        $this->assertSame($user->passkeys()->first(), $passkey);
+
+        $passkey->delete();
+
+        $this->assertCount(0, $user->fresh()->passkeys());
     }
 }

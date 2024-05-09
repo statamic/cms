@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Statamic\Auth\Eloquent\Passkey;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
@@ -301,5 +302,49 @@ class EloquentUserTest extends TestCase
 
         $this->assertFalse($user->super);
         $this->assertFalse($user->model()->super);
+    }
+
+    /** @test */
+    public function it_saves_a_passkey()
+    {
+        $user = $this->makeUser();
+        $user->save();
+
+        $this->assertCount(0, $user->passkeys());
+
+        $passkey = (new Passkey)
+            ->id('testing')
+            ->data([
+                'foo' => 'bar',
+            ])
+            ->user($user);
+
+        $passkey->save();
+
+        $this->assertCount(1, $user->passkeys());
+        $this->assertSame($user->passkeys()->first()->id(), $passkey->id());
+    }
+
+    /** @test */
+    public function it_deletes_a_passkey()
+    {
+        $user = $this->makeUser();
+        $user->save();
+
+        $passkey = (new Passkey)
+            ->id('testing')
+            ->data([
+                'foo' => 'bar',
+            ])
+            ->user($user);
+
+        $passkey->save();
+
+        $this->assertCount(1, $user->passkeys());
+        $this->assertSame($user->passkeys()->first()->id(), $passkey->id());
+
+        $passkey->delete();
+
+        $this->assertCount(0, Facades\User::find($user->id())->passkeys());
     }
 }
