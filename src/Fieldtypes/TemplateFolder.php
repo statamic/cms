@@ -2,6 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
+use FilesystemIterator;
+use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Statamic\Support\Str;
@@ -21,12 +23,24 @@ class TemplateFolder extends Relationship
         return collect(config('view.paths'))
             ->flatMap(function ($path) {
                 $directories = collect();
-                $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+                $filter = ['.git', 'node_modules'];
+
+                $iterator = new RecursiveIteratorIterator(
+                    new RecursiveCallbackFilterIterator(
+                        new RecursiveDirectoryIterator(
+                            $path,
+                            FilesystemIterator::SKIP_DOTS
+
+                        ),
+                        function ($fileInfo, $key, $iterator) use ($filter) {
+                            return ! $iterator->isLink() && $fileInfo->isDir() && ! in_array($fileInfo->getBaseName(), $filter);
+                        }
+                    ),
+                    RecursiveIteratorIterator::SELF_FIRST
+                );
 
                 foreach ($iterator as $file) {
-                    if ($file->isDir() && ! $iterator->isDot() && ! $iterator->isLink()) {
-                        $directories->push(Str::replaceFirst($path.DIRECTORY_SEPARATOR, '', $file->getPathname()));
-                    }
+                    $directories->push(Str::replaceFirst($path.DIRECTORY_SEPARATOR, '', $file->getPathname()));
                 }
 
                 return $directories->filter()->values();

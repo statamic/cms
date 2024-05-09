@@ -2,6 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\API;
 
+use FilesystemIterator;
+use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Statamic\Http\Controllers\CP\CpController;
@@ -14,7 +16,19 @@ class TemplatesController extends CpController
         return collect(config('view.paths'))
             ->flatMap(function ($path) {
                 $views = collect();
-                $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
+                $filter = ['.git', 'node_modules'];
+
+                $iterator = new RecursiveIteratorIterator(
+                    new RecursiveCallbackFilterIterator(
+                        new RecursiveDirectoryIterator(
+                            $path,
+                            FilesystemIterator::SKIP_DOTS
+                        ),
+                        function ($fileInfo, $key, $iterator) use ($filter) {
+                            return $fileInfo->isFile() || ! in_array($fileInfo->getBaseName(), $filter);
+                        }
+                    )
+                );
 
                 foreach ($iterator as $file) {
                     if ($file->isFile()) {
