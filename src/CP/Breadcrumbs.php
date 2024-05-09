@@ -45,6 +45,7 @@ class Breadcrumbs implements Arrayable, JsonSerializable
         }
 
         $arrow = Statamic::cpDirection() === 'ltr' ? ' ‹ ' : ' › ';
+
         return $crumbs->reverse()->join($arrow);
     }
 }

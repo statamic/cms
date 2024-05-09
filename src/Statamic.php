@@ -339,6 +339,7 @@ class Statamic
     public static function crumb(...$values)
     {
         $arrow = Statamic::cpDirection() === 'ltr' ? ' ‹ ' : ' › ';
+
         return implode($arrow, array_map(fn ($str) => Statamic::trans($str), $values));
     }
 
