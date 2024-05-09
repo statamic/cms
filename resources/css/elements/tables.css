@@ -36,8 +36,13 @@
 	@apply rtl:text-right ltr:text-left text-gray-700 outline-none max-w-full w-full;
 	overflow-x: auto;
 
+    &.phpinfo {
+        text-align: left;
+        direction: ltr;
+    }
+
     thead {
-		@apply bg-gray-100 text-xs text-gray-700 text-gray-900;
+		@apply bg-gray-100 text-xs text-gray-900;
 
 		tr {
 			@apply border-b;
