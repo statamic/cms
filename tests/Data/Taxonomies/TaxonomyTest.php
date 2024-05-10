@@ -394,11 +394,11 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_gets_and_sets_the_routes()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         // A taxonomy with no sites uses the default site.
         $taxonomy = new Taxonomy;
@@ -436,11 +436,11 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_sets_all_the_routes_identically()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         $taxonomy = (new Taxonomy)->sites(['en', 'fr']);
 
