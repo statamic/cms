@@ -552,7 +552,7 @@ export default {
                 this.isWorkingCopy = true;
                 if (this.isBase) {
                     const arrow = this.direction === 'ltr' ? '‹' : '›';
-                    document.title = `${this.title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} Statamic`;
+                    document.title = `${this.title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
                 }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
