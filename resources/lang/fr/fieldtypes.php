@@ -90,6 +90,7 @@ return [
     'grid.config.reorderable' => 'Activez cette option pour autoriser la réorganisation des rangées.',
     'grid.title' => 'Grid',
     'group.config.fields' => 'Configurez les champs qui seront nichés au sein de ce groupe.',
+    'group.title' => 'Groupe',
     'hidden.title' => 'Hidden',
     'html.config.html_instruct' => 'Gère le HTML à afficher dans le formulaire de publication.',
     'html.title' => 'HTML',

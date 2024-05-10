@@ -1,6 +1,5 @@
 <?php
 
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -33,10 +32,10 @@ class UpdateTermTest extends TestCase
     /** @test */
     public function it_denies_access_if_you_dont_have_site_permission()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr'],
-        ]]);
+        ]);
         $this->setTestRoles(['test' => ['access cp', 'edit tags terms']]);
         $user = tap(User::make()->assignRole('test'))->save();
 

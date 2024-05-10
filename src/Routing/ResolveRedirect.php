@@ -6,6 +6,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\Site;
+use Statamic\Fields\Values;
 use Statamic\Structures\Page;
 use Statamic\Support\Str;
 
@@ -35,8 +36,17 @@ class ResolveRedirect
             return null;
         }
 
+        if (is_array($redirect)) {
+            $redirect = $redirect['url'];
+        }
+
         if ($redirect === '@child') {
             return $this->firstChild($parent);
+        }
+
+        if ($redirect instanceof Values) {
+            // Assume it's a `group` fieldtype with a `url` subfield.
+            return $redirect->url->value();
         }
 
         if (Str::startsWith($redirect, 'entry::')) {

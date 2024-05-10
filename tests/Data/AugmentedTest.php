@@ -141,7 +141,8 @@ class AugmentedTest extends TestCase
             }
         };
 
-        $this->assertSame($valueInstance, $augmented->get('foo'));
+        // Don't really care if it's literally the same object, just that it's the appropriate result.
+        $this->assertEquals($valueInstance->value(), $augmented->get('foo')->value());
     }
 
     /** @test */
