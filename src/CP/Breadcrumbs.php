@@ -4,6 +4,7 @@ namespace Statamic\CP;
 
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
+use Statamic\Statamic;
 
 class Breadcrumbs implements Arrayable, JsonSerializable
 {
@@ -43,6 +44,8 @@ class Breadcrumbs implements Arrayable, JsonSerializable
             $crumbs->push(__($title));
         }
 
-        return $crumbs->reverse()->join(' ‹ ');
+        $arrow = Statamic::cpDirection() === 'ltr' ? ' ‹ ' : ' › ';
+
+        return $crumbs->reverse()->join($arrow);
     }
 }
