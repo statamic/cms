@@ -218,7 +218,7 @@ export default {
 
             // When reordering, we *need* a site, since mixing them up would be awkward.
             // If we're dealing with multiple sites, it's possible the user "cleared"
-            // the site filter so we'll want to fall back to the initial site.
+            // the site filter, so we'll want to fall back to the initial site.
             this.setSiteFilter(this.currentSite || this.initialSite);
 
             this.page = 1;
