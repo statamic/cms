@@ -404,6 +404,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return Arr::get($this->contents, 'title', Str::humanize(Str::of($this->handle)->after('::')->afterLast('.')));
     }
 
+    public function translatedTitle()
+    {
+        return __($this->title());
+    }
+
     public function isNamespaced(): bool
     {
         return Facades\Blueprint::getAdditionalNamespaces()->has($this->namespace);
