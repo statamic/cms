@@ -687,15 +687,15 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->createDummyCollectionAndEntries();
 
-        Entry::find(1)
+        Entry::find('id-1')
             ->merge([
-                'entries_field' => 2,
+                'entries_field' => 'id-2',
             ])
             ->save();
 
-        Entry::find(3)
+        Entry::find('id-3')
             ->merge([
-                'entries_field' => 1,
+                'entries_field' => 'id-1',
             ])
             ->save();
 
@@ -729,15 +729,15 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->createDummyCollectionAndEntries();
 
-        Entry::find(1)
+        Entry::find('id-1')
             ->merge([
-                'entries_field' => [2, 1],
+                'entries_field' => ['id-2', 'id-1'],
             ])
             ->save();
 
-        Entry::find(3)
+        Entry::find('id-3')
             ->merge([
-                'entries_field' => [1, 2],
+                'entries_field' => ['id-1', 'id-2'],
             ])
             ->save();
 
@@ -771,15 +771,15 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->createDummyCollectionAndEntries();
 
-        Entry::find(1)
+        Entry::find('id-1')
             ->merge([
-                'entries_field' => [2, 1],
+                'entries_field' => ['id-2', 'id-1'],
             ])
             ->save();
 
-        Entry::find(3)
+        Entry::find('id-3')
             ->merge([
-                'entries_field' => [1, 2],
+                'entries_field' => ['id-1', 'id-2'],
             ])
             ->save();
 
