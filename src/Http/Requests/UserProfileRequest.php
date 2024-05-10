@@ -62,10 +62,12 @@ class UserProfileRequest extends FormRequest
         $this->submittedValues = $this->valuesWithoutAssetFields($fields);
         $this->blueprintFields = $fields->addValues($this->submittedValues);
 
+        $userId = User::current()->id();
+
         return $this->blueprintFields
             ->validator()
-            ->withRules(['email' => ['required', 'email', new UniqueUserValue(except: $user->id())]])
-            ->withReplacements(['id' => User::current()->id()])
+            ->withRules(['email' => ['required', 'email', new UniqueUserValue(except: $userId)]])
+            ->withReplacements(['id' => $userId])
             ->validator();
     }
 
