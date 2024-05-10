@@ -24,8 +24,8 @@
 
     @foreach ($phpinfo as $section => $items)
         <h2 class="mt-8 mb-2 font-bold text-lg" dir="ltr">{{ $section }}</h2>
-        <div class="card p-0">
-            <table class="data-table phpinfo">
+        <div class="card p-0" dir="ltr">
+            <table class="data-table ltr:text-left">
                 @foreach ($items as $name => $value)
                 <tr>
                     <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ $name }}</th>
