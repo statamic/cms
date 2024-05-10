@@ -9,6 +9,7 @@ use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Rules\UniqueUserValue;
 
 class UserProfileRequest extends FormRequest
 {
@@ -63,11 +64,8 @@ class UserProfileRequest extends FormRequest
 
         return $this->blueprintFields
             ->validator()
-            ->withRules([
-                'email' => ['required', 'email', 'unique_user_value:{id}'],
-            ])->withReplacements([
-                'id' => User::current()->id(),
-            ])
+            ->withRules(['email' => ['required', 'email', new UniqueUserValue(except: $user->id())]])
+            ->withReplacements(['id' => User::current()->id()])
             ->validator();
     }
 
