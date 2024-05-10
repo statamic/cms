@@ -64,11 +64,6 @@ class Manifest extends PackageManifest
             'autoload' => $autoload,
             'provider' => $provider,
 
-            // autoload from folders
-            'folderCache' => [
-                'tags' => $this->autoloadFilesFromFolder($directory, $autoload, $namespace, 'Tags', \Statamic\Tags\Tags::class),
-            ],
-
             // Local data for marketplace GUI?
             'name' => $statamic['name'] ?? Arr::last($providerParts),
             'url' => $statamic['url'] ?? null,
@@ -82,26 +77,5 @@ class Manifest extends PackageManifest
     public function addons()
     {
         return collect($this->getManifest());
-    }
-
-    protected function autoloadFilesFromFolder($directory, $autoload, $namespace, $folder, $requiredClass)
-    {
-        $path = $directory.$autoload.'/'.$folder;
-
-        if (! app()['files']->exists($path)) {
-            return [];
-        }
-
-        $autoloadable = [];
-
-        foreach (app()['files']->files($path) as $file) {
-            $class = $file->getBasename('.php');
-            $fqcn = $namespace.'\\'.str_replace('/', '\\', $folder).'\\'.$class;
-            if (is_subclass_of($fqcn, $requiredClass)) {
-                $autoloadable[] = $fqcn;
-            }
-        }
-
-        return $autoloadable;
     }
 }
