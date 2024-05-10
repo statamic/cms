@@ -8,7 +8,6 @@ use Rebing\GraphQL\GraphQLController;
 use Statamic\Contracts\GraphQL\ResponseCache;
 use Statamic\GraphQL\ResponseCache\DefaultCache;
 use Statamic\GraphQL\ResponseCache\NullCache;
-use Statamic\Http\Middleware\API\SwapExceptionHandler;
 use Statamic\Http\Middleware\HandleToken;
 use Statamic\Http\Middleware\RequireStatamicPro;
 
@@ -50,9 +49,7 @@ class ServiceProvider extends LaravelProvider
 
     private function disableGraphqlRoutes()
     {
-        $key = $this->isLegacyRebingGraphql() ? 'graphql.routes' : 'graphql.route';
-
-        config([$key => false]);
+        config(['graphql.route' => false]);
     }
 
     private function addMiddleware()
@@ -60,7 +57,6 @@ class ServiceProvider extends LaravelProvider
         collect($this->app['router']->getRoutes()->getRoutes())
             ->filter(fn ($route) => $route->getAction()['uses'] === GraphQLController::class.'@query')
             ->each(fn ($route) => $route->middleware([
-                SwapExceptionHandler::class,
                 RequireStatamicPro::class,
                 HandleToken::class,
             ]));
@@ -74,10 +70,5 @@ class ServiceProvider extends LaravelProvider
     private function setDefaultSchema()
     {
         config(['graphql.schemas.default' => DefaultSchema::class]);
-    }
-
-    protected function isLegacyRebingGraphql()
-    {
-        return class_exists('\Rebing\GraphQL\Support\ResolveInfoFieldsAndArguments');
     }
 }

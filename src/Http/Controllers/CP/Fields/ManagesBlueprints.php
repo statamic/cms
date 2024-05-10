@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Statamic\Exceptions\DuplicateFieldException;
+use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\FieldTransformer;
@@ -33,7 +34,7 @@ trait ManagesBlueprints
     private function setBlueprintContents(Request $request, Blueprint $blueprint)
     {
         $tabs = collect($request->tabs)->mapWithKeys(function ($tab) {
-            return [array_pull($tab, 'handle') => [
+            return [Arr::pull($tab, 'handle') => [
                 'display' => $tab['display'],
                 'sections' => $this->tabSections($tab['sections']),
             ]];
@@ -47,6 +48,17 @@ trait ManagesBlueprints
             ])));
 
         return $blueprint;
+    }
+
+    private function validateRecursion($blueprint)
+    {
+        try {
+            $blueprint->fields();
+        } catch (FieldsetRecursionException $exception) {
+            throw ValidationException::withMessages([
+                'tabs' => __('statamic::validation.fieldset_imported_recursively', ['handle' => $exception->getFieldset()]),
+            ]);
+        }
     }
 
     private function validateUniqueHandles($blueprint)
@@ -74,6 +86,8 @@ trait ManagesBlueprints
     private function updateBlueprint($request, $blueprint)
     {
         $this->setBlueprintContents($request, $blueprint);
+
+        $this->validateRecursion($blueprint);
 
         $this->validateUniqueHandles($blueprint);
 

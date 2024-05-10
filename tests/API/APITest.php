@@ -44,7 +44,7 @@ class APITest extends TestCase
         }
     }
 
-    public function entryNotFoundProvider()
+    public static function entryNotFoundProvider()
     {
         return [
             'valid entry id' => ['/api/collections/pages/entries/about', true],
@@ -53,7 +53,7 @@ class APITest extends TestCase
         ];
     }
 
-    public function exampleFilters()
+    public static function exampleFiltersProvider()
     {
         return [['status:is'], ['published:is'], ['title:is']];
     }
@@ -61,7 +61,7 @@ class APITest extends TestCase
     /**
      * @test
      *
-     * @dataProvider exampleFilters
+     * @dataProvider exampleFiltersProvider
      */
     public function it_cannot_filter_entries_by_default($filter)
     {
@@ -97,6 +97,46 @@ class APITest extends TestCase
         $this->assertEndpointSuccessful('/api/collections/pages/entries/about');
         $this->assertEndpointNotFound('/api/collections/pages/entries/dance');
         $this->assertEndpointNotFound('/api/collections/pages/entries/nectar');
+    }
+
+    /** @test */
+    public function it_filters_out_future_entries_from_future_private_collection()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('test')->dated(true)
+            ->pastDateBehavior('public')
+            ->futureDateBehavior('private')
+            ->save();
+
+        Facades\Entry::make()->collection('test')->id('a')->published(true)->date(now()->addDay())->save();
+        Facades\Entry::make()->collection('test')->id('b')->published(false)->date(now()->addDay())->save();
+        Facades\Entry::make()->collection('test')->id('c')->published(true)->date(now()->subDay())->save();
+        Facades\Entry::make()->collection('test')->id('d')->published(false)->date(now()->subDay())->save();
+
+        $response = $this->get('/api/collections/test/entries')->assertSuccessful();
+        $this->assertCount(1, $response->getData()->data);
+        $response->assertJsonPath('data.0.id', 'c');
+    }
+
+    /** @test */
+    public function it_filters_out_past_entries_from_past_private_collection()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('test')->dated(true)
+            ->pastDateBehavior('private')
+            ->futureDateBehavior('public')
+            ->save();
+
+        Facades\Entry::make()->collection('test')->id('a')->published(true)->date(now()->addDay())->save();
+        Facades\Entry::make()->collection('test')->id('b')->published(false)->date(now()->addDay())->save();
+        Facades\Entry::make()->collection('test')->id('c')->published(true)->date(now()->subDay())->save();
+        Facades\Entry::make()->collection('test')->id('d')->published(false)->date(now()->subDay())->save();
+
+        $response = $this->get('/api/collections/test/entries')->assertSuccessful();
+        $this->assertCount(1, $response->getData()->data);
+        $response->assertJsonPath('data.0.id', 'a');
     }
 
     /** @test */
@@ -416,7 +456,7 @@ class APITest extends TestCase
         ]);
     }
 
-    public function userPasswordFilterProvider()
+    public static function userPasswordFilterProvider()
     {
         return collect([
             'password',
@@ -449,7 +489,7 @@ class APITest extends TestCase
         }
     }
 
-    public function termNotFoundProvider()
+    public static function termNotFoundProvider()
     {
         return [
             'valid term id' => ['/api/taxonomies/tags/terms/test', true],

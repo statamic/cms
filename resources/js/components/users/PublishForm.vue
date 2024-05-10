@@ -6,8 +6,8 @@
             <breadcrumb :url="cp_url('users')" :title="__('Users')" />
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
-                    <dropdown-list class="mr-4">
-                        <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
+                    <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint">
+                        <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
                         <li class="divider" />
                         <data-list-inline-actions
                             :item="id"
@@ -22,7 +22,7 @@
                         v-if="canEditPassword"
                         :save-url="actions.password"
                         :requires-current-password="requiresCurrentPassword"
-                        class="mr-4"
+                        class="rtl:ml-4 ltr:mr-4"
                     />
 
                     <button
@@ -142,6 +142,7 @@ export default {
                     this.error = message;
                     this.errors = errors;
                     this.$toast.error(message);
+                    this.$reveal.invalid();
                 } else {
                     this.$toast.error(__('Something went wrong'));
                 }

@@ -17,6 +17,7 @@
         :max-depth="{{ $nav->maxDepth() ?? 'Infinity' }}"
         :expects-root="{{ $str::bool($expectsRoot) }}"
         :blueprint="{{ json_encode($blueprint) }}"
+        :can-edit="{{ Statamic\Support\Str::bool($user->can('edit', $nav)) }}"
     >
         <template #twirldown>
             @can('edit', $nav)

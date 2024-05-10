@@ -5,6 +5,10 @@ namespace Tests;
 use Illuminate\Testing\Assert as IlluminateAssert;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
+use Statamic\Facades\Config;
+use Statamic\Facades\File;
+use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -12,6 +16,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
+    protected $fakeStacheDirectory = __DIR__.'/__fixtures__/dev-null';
 
     protected function setUp(): void
     {
@@ -36,6 +41,15 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         $this->addGqlMacros();
+
+        // We changed the default sites setup but the tests assume defaults like the following.
+        File::put(resource_path('sites.yaml'), YAML::dump([
+            'en' => [
+                'name' => 'English',
+                'url' => 'http://localhost/',
+                'locale' => 'en_US',
+            ],
+        ]));
     }
 
     public function tearDown(): void
@@ -70,23 +84,16 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $configs = [
             'assets', 'cp', 'forms', 'routes', 'static_caching',
-            'sites', 'stache', 'system', 'users',
+            'stache', 'system', 'users',
         ];
 
         foreach ($configs as $config) {
-            $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
+            $app['config']->set("statamic.$config", require (__DIR__."/../config/{$config}.php"));
         }
     }
 
     protected function getEnvironmentSetUp($app)
     {
-        // We changed the default sites setup but the tests assume defaults like the following.
-        $app['config']->set('statamic.sites', [
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
-            ],
-        ]);
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.users.repository', 'file');
@@ -105,6 +112,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
         $app['config']->set('statamic.stache.stores.nav-trees.directory', __DIR__.'/__fixtures__/content/structures/navigation');
         $app['config']->set('statamic.stache.stores.collection-trees.directory', __DIR__.'/__fixtures__/content/structures/collections');
+        $app['config']->set('statamic.stache.stores.form-submissions.directory', __DIR__.'/__fixtures__/content/submissions');
 
         $app['config']->set('statamic.api.enabled', true);
         $app['config']->set('statamic.graphql.enabled', true);
@@ -123,11 +131,18 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('view.paths', $viewPaths);
     }
 
-    public static function assertEquals($expected, $actual, string $message = '', float $delta = 0.0, int $maxDepth = 10, bool $canonicalize = false, bool $ignoreCase = false): void
+    protected function setSites($sites)
     {
-        $args = static::normalizeArgsForWindows(func_get_args());
+        Site::setSites($sites);
 
-        parent::assertEquals(...$args);
+        Config::set('statamic.system.multisite', Site::hasMultiple());
+    }
+
+    protected function setSiteValue($site, $key, $value)
+    {
+        Site::setSiteValue($site, $key, $value);
+
+        Config::set('statamic.system.multisite', Site::hasMultiple());
     }
 
     protected function assertEveryItem($items, $callback)
@@ -221,5 +236,18 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
             return $this;
         });
+    }
+
+    public function __call($name, $arguments)
+    {
+        if ($name == 'assertStringEqualsStringIgnoringLineEndings') {
+            return Assert::assertThat(
+                $arguments[1],
+                new StringEqualsStringIgnoringLineEndings($arguments[0]),
+                $arguments[2] ?? ''
+            );
+        }
+
+        throw new \BadMethodCallException("Method [$name] does not exist.");
     }
 }

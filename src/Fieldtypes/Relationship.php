@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource as Resource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\CP\Column;
+use Statamic\Facades\Scope;
 use Statamic\Fields\Fieldtype;
 
 abstract class Relationship extends Fieldtype
@@ -327,8 +328,8 @@ abstract class Relationship extends Fieldtype
     protected function applyIndexQueryScopes($query, $params)
     {
         collect(Arr::wrap($this->config('query_scopes')))
-            ->map(fn ($handle) => app('statamic.scopes')->get($handle))
+            ->map(fn ($handle) => Scope::find($handle))
             ->filter()
-            ->each(fn ($class) => app($class)->apply($query, $params));
+            ->each(fn ($scope) => $scope->apply($query, $params));
     }
 }

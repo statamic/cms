@@ -5,6 +5,7 @@ namespace Statamic;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Laravel\Nova\Nova;
@@ -15,6 +16,7 @@ use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
+use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
 use Stringy\StaticStringy;
 
@@ -25,6 +27,7 @@ class Statamic
 
     protected static $scripts = [];
     protected static $externalScripts = [];
+    protected static $inlineScripts = [];
     protected static $styles = [];
     protected static $externalStyles = [];
     protected static $vites = [];
@@ -47,17 +50,7 @@ class Statamic
 
     public static function enablePro()
     {
-        $path = config_path('statamic/editions.php');
-
-        $contents = File::get($path);
-
-        if (! Str::contains($contents, "'pro' => false,")) {
-            throw new \Exception('Could not reliably update the config file.');
-        }
-
-        $contents = str_replace("'pro' => false,", "'pro' => true,", $contents);
-
-        File::put($path, $contents);
+        Artisan::call('statamic:pro:enable', ['--update-config' => true]);
     }
 
     public static function availableScripts(Request $request)
@@ -82,6 +75,18 @@ class Statamic
         static::$externalScripts[] = $url;
 
         return new static;
+    }
+
+    public static function inlineScript($html)
+    {
+        static::$inlineScripts[] = $html;
+
+        return new static;
+    }
+
+    public static function availableInlineScripts(Request $request)
+    {
+        return static::$inlineScripts;
     }
 
     public static function availableStyles(Request $request)
@@ -204,7 +209,7 @@ class Statamic
             return false;
         }
 
-        return starts_with(request()->path(), config('statamic.api.route'));
+        return Str::startsWith(request()->path(), config('statamic.api.route'));
     }
 
     public static function apiRoute($route, $params = [])
@@ -436,16 +441,26 @@ class Statamic
             // In case a file without any version will be passed,
             // a random version number will be created.
             if (! Str::contains($path, '?v=')) {
-                $version = str_random();
+                $version = Str::random();
 
                 // Add the file extension if not provided.
-                $path = str_finish($path, ".{$extension}");
+                $path = Str::finish($path, ".{$extension}");
 
                 // Add the version to the path.
-                $path = str_finish($path, "?v={$version}");
+                $path = Str::finish($path, "?v={$version}");
             }
 
             return $path;
         });
+    }
+
+    public static function cpLocale(): string
+    {
+        return config('app.locale');
+    }
+
+    public static function cpDirection()
+    {
+        return TextDirection::of(static::cpLocale());
     }
 }

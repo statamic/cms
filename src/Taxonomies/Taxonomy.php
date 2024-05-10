@@ -14,6 +14,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Events\TaxonomyCreated;
 use Statamic\Events\TaxonomyCreating;
 use Statamic\Events\TaxonomyDeleted;
+use Statamic\Events\TaxonomyDeleting;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
@@ -233,13 +234,29 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return true;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && TaxonomyDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->queryTerms()->get()->each->delete();
 
         Facades\Taxonomy::delete($this);
 
-        TaxonomyDeleted::dispatch($this);
+        if ($withEvents) {
+            TaxonomyDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -262,7 +279,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             'layout' => $this->layout,
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $data['sites'] = $this->sites;
         }
 
@@ -281,7 +298,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                if (! Site::hasMultiple() || ! $sites) {
+                if (! Site::multiEnabled() || ! $sites) {
                     $sites = [Site::default()->handle()];
                 }
 
@@ -512,5 +529,15 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
                 'refresh' => $target['refresh'],
             ];
         })->filter()->values()->all();
+    }
+
+    public function hasCustomTemplate()
+    {
+        return $this->template !== null;
+    }
+
+    public function hasCustomTermTemplate()
+    {
+        return $this->termTemplate !== null;
     }
 }

@@ -14,6 +14,7 @@ use Statamic\Events\UserRegistering;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Exceptions\UnauthorizedHttpException;
 use Statamic\Facades\User;
+use Statamic\Rules\UniqueUserValue;
 
 class UserController extends Controller
 {
@@ -63,7 +64,7 @@ class UserController extends Controller
         $fields = $fields->addValues($values);
 
         $fieldRules = $fields->validator()->withRules([
-            'email' => ['required', 'email', 'unique_user_value'],
+            'email' => ['required', 'email', new UniqueUserValue],
             'password' => ['required', 'confirmed', Password::default()],
         ])->rules();
 
@@ -83,7 +84,7 @@ class UserController extends Controller
             ->data($values);
 
         if ($roles = config('statamic.users.new_user_roles')) {
-            $user->roles($roles);
+            $user->explicitRoles($roles);
         }
 
         if ($groups = config('statamic.users.new_user_groups')) {
@@ -124,11 +125,9 @@ class UserController extends Controller
         try {
             $fields
                 ->validator()
-                ->withRules([
-                    'email' => ['required', 'email', 'unique_user_value:{id}'],
-                ])->withReplacements([
-                    'id' => $user->id(),
-                ])->validate();
+                ->withRules(['email' => ['required', 'email', new UniqueUserValue(except: $user->id())]])
+                ->withReplacements(['id' => $user->id()])
+                ->validate();
         } catch (ValidationException $e) {
             return $this->userProfileFailure($e->validator->errors());
         }

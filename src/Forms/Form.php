@@ -7,17 +7,19 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Contracts\Forms\SubmissionQueryBuilder;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormCreated;
 use Statamic\Events\FormCreating;
 use Statamic\Events\FormDeleted;
+use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
-use Statamic\Facades\Folder;
 use Statamic\Facades\Form as FormFacade;
+use Statamic\Facades\FormSubmission;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Forms\Exporters\Exporter;
@@ -215,16 +217,34 @@ class Form implements Arrayable, Augmentable, FormContract
         }
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     /**
      * Delete form and associated submissions.
      */
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && FormDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->submissions()->each->delete();
 
         File::delete($this->path());
 
-        FormDeleted::dispatch($this);
+        if ($withEvents) {
+            FormDeleted::dispatch($this);
+        }
+
+        return true;
     }
 
     /**
@@ -288,13 +308,12 @@ class Form implements Arrayable, Augmentable, FormContract
      */
     public function submissions()
     {
-        $path = config('statamic.forms.submissions').'/'.$this->handle();
+        return FormSubmission::whereForm($this->handle());
+    }
 
-        return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
-            return $this->makeSubmission()
-                ->id(pathinfo($file)['filename'])
-                ->data(YAML::parse(File::get($file)));
-        });
+    public function querySubmissions(): SubmissionQueryBuilder
+    {
+        return FormSubmission::query()->where('form', $this->handle());
     }
 
     /**
@@ -305,9 +324,7 @@ class Form implements Arrayable, Augmentable, FormContract
      */
     public function submission($id)
     {
-        return $this->submissions()->filter(function ($submission) use ($id) {
-            return $submission->id() === $id;
-        })->first();
+        return FormSubmission::find($id);
     }
 
     /**
@@ -317,7 +334,7 @@ class Form implements Arrayable, Augmentable, FormContract
      */
     public function makeSubmission()
     {
-        $submission = app(Submission::class);
+        $submission = FormSubmission::make();
 
         $submission->form($this);
 
@@ -367,7 +384,7 @@ class Form implements Arrayable, Augmentable, FormContract
     public function hasFiles()
     {
         return $this->fields()->filter(function ($field) {
-            return $field->fieldtype()->handle() === 'assets';
+            return in_array($field->fieldtype()->handle(), ['assets', 'files']);
         })->isNotEmpty();
     }
 
