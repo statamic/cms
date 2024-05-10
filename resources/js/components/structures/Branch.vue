@@ -11,6 +11,7 @@
                 <a
                     @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
+                    :href="page.edit_url"
                     v-text="title" />
 
                 <span v-if="showSlugs" class="rtl:mr-2 ltr:ml-2 font-mono text-gray-700 text-2xs pt-px">
