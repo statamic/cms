@@ -67,7 +67,7 @@
 
 <style>
     .group-fieldtype-button-wrapper {
-        @apply flex justify-end absolute top-5 sm:top-7 rtl:left-0 ltr:right-0 @md:right-4 @lg:right-6;
+        @apply flex rtl:left-6 ltr:right-6 absolute top-5 sm:top-7;
     }
 
     .replicator-set .group-fieldtype-button-wrapper {

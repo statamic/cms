@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,22 +41,31 @@ class HalfMeasureStaticCachingTest extends TestCase
             'with' => [
                 'title' => 'The About Page',
                 'content' => 'This is the about page.',
+                'headers' => [
+                    'foo' => 'bar',
+                    'alfa' => ['bravo', 'charlie'],
+                ],
             ],
         ]);
 
-        $this
+        $response = $this
             ->get('/about')
             ->assertOk()
             ->assertSee('<h1>The About Page</h1> <p>This is the about page.</p>', false);
+        $this->assertEquals(['bar'], $response->headers->all('foo'));
+        $this->assertEquals(['bravo', 'charlie'], $response->headers->all('alfa'));
 
         $page
             ->set('content', 'Updated content')
+            ->set('headers', ['foo' => 'updated', 'alfa' => ['updated1', 'updated2']])
             ->saveQuietly(); // Save quietly to prevent the invalidator from clearing the statically cached page.
 
-        $this
+        $response = $this
             ->get('/about')
             ->assertOk()
             ->assertSee('<h1>The About Page</h1> <p>This is the about page.</p>', false);
+        $this->assertEquals(['bar'], $response->headers->all('foo'));
+        $this->assertEquals(['bravo', 'charlie'], $response->headers->all('alfa'));
     }
 
     /** @test */

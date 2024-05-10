@@ -13,8 +13,10 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class CollectionsController extends CpController
@@ -187,7 +189,7 @@ class CollectionsController extends CpController
 
         $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
+            'handle' => ['nullable', new Handle],
         ]);
 
         $handle = $request->handle ?? Str::snake($request->title);
@@ -202,7 +204,7 @@ class CollectionsController extends CpController
             ->pastDateBehavior('public')
             ->futureDateBehavior('private');
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $collection->sites([Site::selected()->handle()]);
         }
 
@@ -236,15 +238,15 @@ class CollectionsController extends CpController
             ->mount($values['mount'] ?? null)
             ->revisionsEnabled($values['revisions'] ?? false)
             ->taxonomies($values['taxonomies'] ?? [])
-            ->futureDateBehavior(array_get($values, 'future_date_behavior'))
-            ->pastDateBehavior(array_get($values, 'past_date_behavior'))
-            ->mount(array_get($values, 'mount'))
-            ->propagate(array_get($values, 'propagate'))
+            ->futureDateBehavior(Arr::get($values, 'future_date_behavior'))
+            ->pastDateBehavior(Arr::get($values, 'past_date_behavior'))
+            ->mount(Arr::get($values, 'mount'))
+            ->propagate(Arr::get($values, 'propagate'))
             ->titleFormats($values['title_formats'])
             ->requiresSlugs($values['require_slugs'])
             ->previewTargets($values['preview_targets']);
 
-        if ($sites = array_get($values, 'sites')) {
+        if ($sites = Arr::get($values, 'sites')) {
             $collection
                 ->sites($sites)
                 ->originBehavior($values['origin_behavior']);
@@ -473,7 +475,7 @@ class CollectionsController extends CpController
             ];
         }
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $fields['sites'] = [
                 'display' => __('Sites'),
                 'fields' => [
@@ -583,7 +585,7 @@ class CollectionsController extends CpController
 
     protected function ensureCollectionIsAvailableOnSite($collection, $site)
     {
-        if (Site::hasMultiple() && ! $collection->sites()->contains($site->handle())) {
+        if (Site::multiEnabled() && ! $collection->sites()->contains($site->handle())) {
             return redirect(cp_route('collections.index'))->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
     }

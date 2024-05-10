@@ -9,7 +9,7 @@ trait FakesContent
 {
     protected function createPage($slug, $attributes = [])
     {
-        $this->makeCollection()->save();
+        $this->makeCollection()?->save();
 
         return tap($this->makePage($slug, $attributes))->save();
     }
@@ -25,6 +25,10 @@ trait FakesContent
 
     protected function makeCollection()
     {
+        if (Collection::find('pages')) {
+            return;
+        }
+
         return Collection::make('pages')
             ->routes('{slug}')
             ->template('default');

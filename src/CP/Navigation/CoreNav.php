@@ -36,6 +36,7 @@ class CoreNav
             ->makeContentSection()
             ->makeFieldsSection()
             ->makeToolsSection()
+            ->makeSettingsSection()
             ->makeUsersSection();
     }
 
@@ -208,7 +209,7 @@ class CoreNav
                 ->can('resolve duplicate ids');
         }
 
-        $this->makeUtilitiesSection();
+        $this->makeUtilitiesItems();
 
         if (config('statamic.graphql.enabled') && Statamic::pro()) {
             Nav::tools('GraphQL')
@@ -221,7 +222,12 @@ class CoreNav
         return $this;
     }
 
-    protected function makeUtilitiesSection()
+    /**
+     * Make utilities items.
+     *
+     * @return $this
+     */
+    protected function makeUtilitiesItems()
     {
         $utilities = Utility::authorized()->sortBy->navTitle()->map(function ($utility) {
             return Nav::item($utility->navTitle())->url($utility->url());
@@ -233,6 +239,29 @@ class CoreNav
                 ->icon('/settings-slider')
                 ->children($utilities);
         }
+
+        return $this;
+    }
+
+    /**
+     * Make settings section items.
+     *
+     * @return $this
+     */
+    protected function makeSettingsSection()
+    {
+        Nav::settings(Site::multiEnabled() ? 'Sites' : 'Site')
+            ->route('sites.edit')
+            ->icon('/sites')
+            ->can('configure sites');
+
+        Nav::settings('Preferences')
+            ->route('preferences.index')
+            ->icon('/settings')
+            ->children([
+                Nav::item('General')->route('preferences.index'),
+                Nav::item('CP Nav')->route('preferences.nav.index'),
+            ]);
 
         return $this;
     }

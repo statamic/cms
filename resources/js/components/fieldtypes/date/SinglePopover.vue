@@ -32,7 +32,7 @@
                             @focus="$emit('focus', $event.target)"
                             @blur="$emit('blur')"
                         />
-                        <button @click="clear" type="button" title="Clear" aria-label="Clear" class="cursor-pointer px-2 hover:text-blue-500">
+                        <button v-if="!isReadOnly" @click="clear" type="button" title="Clear" aria-label="Clear" class="cursor-pointer px-2 hover:text-blue-500">
                             <span>×</span>
                         </button>
                     </div>

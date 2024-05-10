@@ -15,6 +15,9 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\AssetsMeta::class,
         Commands\GlideClear::class,
         Commands\Install::class,
+        Commands\InstallCollaboration::class,
+        Commands\InstallEloquentDriver::class,
+        Commands\InstallSsg::class,
         Commands\FlatCamp::class,
         Commands\LicenseSet::class,
         Commands\MakeAction::class,
@@ -55,8 +58,10 @@ class ConsoleServiceProvider extends ServiceProvider
             $artisan->resolveCommands($this->commands);
         });
 
+        $file = version_compare($this->app->version(), '11', '<') ? 'please-l10.stub' : 'please.stub';
+
         $this->publishes([
-            __DIR__.'/../Console/Please/please.stub' => base_path('please'),
+            __DIR__.'/../Console/Please/'.$file => base_path('please'),
         ], 'statamic');
     }
 }

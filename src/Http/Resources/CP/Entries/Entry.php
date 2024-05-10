@@ -10,6 +10,7 @@ class Entry extends JsonResource
     {
         $data = [
             'id' => $this->resource->id(),
+            'reference' => $this->resource->reference(),
             'title' => $this->resource->value('title'),
             'permalink' => $this->resource->absoluteUrl(),
             'published' => $this->resource->published(),

@@ -3,6 +3,7 @@
 namespace Tests\Stache\Repositories;
 
 use Statamic\Contracts\Globals\Variables;
+use Statamic\Exceptions\GlobalVariablesNotFoundException;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Globals\VariablesCollection;
@@ -33,10 +34,10 @@ class GlobalVariablesRepositoryTest extends TestCase
 
     private function setUpMultiSite()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr/'],
-        ]]);
+        ]);
         $stache = (new Stache)->sites(['en', 'fr']);
         $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/globals-multisite';
@@ -309,5 +310,27 @@ YAML;
         $this->assertNotNull($this->globalRepo->find('new'));
         $this->assertFileDoesNotExist($this->directory.'/en/new.yaml');
         @unlink($this->directory.'/new.yaml');
+    }
+
+    /** @test */
+    public function test_find_or_fail_gets_global()
+    {
+        $this->setUpSingleSite();
+
+        $var = $this->repo->findOrFail('global::en');
+
+        $this->assertInstanceOf(Variables::class, $var);
+        $this->assertEquals('General', $var->title());
+    }
+
+    /** @test */
+    public function test_find_or_fail_throws_exception_when_global_does_not_exist()
+    {
+        $this->setUpSingleSite();
+
+        $this->expectException(GlobalVariablesNotFoundException::class);
+        $this->expectExceptionMessage('Global Variables [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }
