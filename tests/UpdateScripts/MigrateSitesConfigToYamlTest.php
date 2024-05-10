@@ -225,6 +225,41 @@ CONFIG);
     }
 
     /** @test */
+    public function it_warns_when_it_detects_other_non_whitelisted_env_calls()
+    {
+        File::put(config_path('statamic/sites.php'), <<<'CONFIG'
+<?php
+
+return [
+    'sites' => [
+        'default' => [
+            'name' => env('CUSTOM_NAME'),
+            'url' => env('CUSTOM_URL'),
+            'locale' => 'en_US',
+        ],
+    ],
+];
+CONFIG);
+
+        $script = $this->migrateSitesConfig();
+
+        $this->assertMultisiteEnabledConfigIs(false);
+
+        $this->assertSitesYamlHas([
+            'default' => [
+                'name' => null,
+                'url' => null,
+                'locale' => 'en_US',
+            ],
+        ]);
+
+        $this->assertCount(0, $script->console()->getErrors());
+        $this->assertCount(1, $warnings = $script->console()->getWarnings());
+        $this->assertStringContainsString('CUSTOM_NAME', $warnings->first());
+        $this->assertStringContainsString('CUSTOM_URL', $warnings->first());
+    }
+
+    /** @test */
     public function it_can_append_multisite_config_to_bottom_if_the_nicer_str_replace_fails()
     {
         // For example, maybe they removed their comment blocks from their system.php config for some reason...
@@ -325,12 +360,14 @@ CONFIG);
 
     private function migrateSitesConfig()
     {
-        $this->runUpdateScript(MigrateSitesConfigToYaml::class);
+        $script = $this->runUpdateScript(MigrateSitesConfigToYaml::class);
 
         $this->assertFileDoesNotExist(config_path('statamic/sites.php'));
         $this->assertNull(config('statamic.sites.sites'));
 
         $this->assertFileExists(resource_path('sites.yaml'));
+
+        return $script;
     }
 
     private function assertMultisiteEnabledConfigIs($boolean)
