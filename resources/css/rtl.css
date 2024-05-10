@@ -12,7 +12,7 @@
         margin-right: calc(.75rem * calc(1 - var(--tw-space-x-reverse)))!important;
     }
 
-    input[name='url'], input[name$='[url]'], input[id$='.locale.field_locale'], input[id$='.lang.field_lang'] {
+    input[name='url'] {
         direction: ltr;
     }
 
