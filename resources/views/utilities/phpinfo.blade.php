@@ -13,8 +13,8 @@
         <h1>{{ __('PHP Info') }}</h1>
     </header>
 
-    <div class="card p-0">
-        <table class="data-table phpinfo">
+    <div class="card p-0" dir="ltr">
+        <table class="data-table ltr:text-left">
             <tr>
                 <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('PHP Version') }}</th>
                 <td>{{ PHP_VERSION }}</td>
