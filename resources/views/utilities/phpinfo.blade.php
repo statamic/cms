@@ -14,7 +14,7 @@
     </header>
 
     <div class="card p-0">
-        <table class="data-table">
+        <table class="data-table phpinfo">
             <tr>
                 <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('PHP Version') }}</th>
                 <td>{{ PHP_VERSION }}</td>
