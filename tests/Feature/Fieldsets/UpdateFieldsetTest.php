@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Fieldsets;
 
+use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Facades;
 use Statamic\Facades\Fieldset as FieldsetRepository;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldset;
 use Tests\Fakes\FakeFieldsetRepository;
 use Tests\FakesRoles;
@@ -44,6 +46,7 @@ class UpdateFieldsetTest extends TestCase
     public function fieldset_gets_saved()
     {
         $this->withoutExceptionHandling();
+        FieldRepository::shouldReceive('find')->with('somefieldset.somefield')->andReturn(new Field('somefield', []));
         $user = tap(Facades\User::make()->makeSuper())->save();
         $fieldset = (new Fieldset)->setHandle('test')->setContents([
             'title' => 'Test',

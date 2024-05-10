@@ -13,7 +13,8 @@ class RoleTest extends TestCase
     public function it_gets_and_sets_the_title()
     {
         $role = new Role;
-        $this->assertNull($role->title());
+        $role->handle('testing');
+        $this->assertEquals('Testing', $role->title());
 
         $return = $role->title('Test');
 

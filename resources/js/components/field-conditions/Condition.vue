@@ -28,12 +28,12 @@
             :value="condition.operator"
             :options="operatorOptions"
             :placeholder="false"
-            class="md:ml-4"
+            class="rtl:md:mr-4 ltr:md:ml-4"
             @input="operatorSelected" />
 
         <toggle-input
             v-if="showValueToggle"
-            class="ml-4"
+            class="rtl:mr-4 ltr:ml-4"
             :value="condition.value === 'true'"
             @input="valueUpdated" />
 
@@ -41,7 +41,7 @@
             v-else-if="showValueDropdown"
             ref="valueSelect"
             :value="condition.value"
-            class="ml-4 w-full md:w-52 mb-2 md:mb-0"
+            class="rtl:mr-4 ltr:ml-4 w-full md:w-52 mb-2 md:mb-0"
             :options="valueOptions"
             :placeholder="__('Option')"
             :taggable="false"
@@ -57,10 +57,10 @@
         <text-input
             v-else
             :value="condition.value"
-            class="ml-4"
+            class="rtl:mr-4 ltr:ml-4"
             @input="valueUpdated" />
 
-        <button @click="remove" class="btn-close ml-2 group">
+        <button @click="remove" class="btn-close rtl:mr-2 ltr:ml-2 group">
             <svg-icon name="micro/trash" class="w-4 h-4 group-hover:text-red-500" />
         </button>
     </div>

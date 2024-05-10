@@ -234,9 +234,19 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return true;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (TaxonomyDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && TaxonomyDeleting::dispatch($this) === false) {
             return false;
         }
 
@@ -244,7 +254,9 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
         Facades\Taxonomy::delete($this);
 
-        TaxonomyDeleted::dispatch($this);
+        if ($withEvents) {
+            TaxonomyDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -267,7 +279,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             'layout' => $this->layout,
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $data['sites'] = $this->sites;
         }
 
@@ -286,7 +298,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                if (! Site::hasMultiple() || ! $sites) {
+                if (! Site::multiEnabled() || ! $sites) {
                     $sites = [Site::default()->handle()];
                 }
 

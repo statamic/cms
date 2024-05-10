@@ -16,8 +16,10 @@ use Statamic\Facades\Form as FormAPI;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Facades\Nav as NavAPI;
 use Statamic\Facades\Role as RoleAPI;
+use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
 use Statamic\Statamic;
@@ -34,6 +36,7 @@ class CoreNav
             ->makeContentSection()
             ->makeFieldsSection()
             ->makeToolsSection()
+            ->makeSettingsSection()
             ->makeUsersSection();
     }
 
@@ -65,11 +68,20 @@ class CoreNav
             ->icon('/content-writing')
             ->can('index', Collection::class)
             ->children(function () {
-                return CollectionAPI::all()->sortBy->title()->map(function ($collection) {
-                    return Nav::item($collection->title())
-                        ->url($collection->showUrl())
-                        ->can('view', $collection);
-                });
+                return CollectionAPI::all()->sortBy->title()
+                    ->filter(function ($collection) {
+                        return User::current()->can('configure collections')
+                            || $collection->sites()->contains(Site::selected()->handle());
+                    })
+                    ->map(function ($collection) {
+                        return Nav::item($collection->title())
+                            ->url(
+                                $collection->sites()->contains(Site::selected()->handle())
+                                    ? $collection->showUrl()
+                                    : $collection->editUrl()
+                            )
+                            ->can('view', $collection);
+                    });
             });
 
         Nav::content('Navigation')
@@ -77,11 +89,20 @@ class CoreNav
             ->icon('/hierarchy-files')
             ->can('index', NavContract::class)
             ->children(function () {
-                return NavAPI::all()->sortBy->title()->map(function ($nav) {
-                    return Nav::item($nav->title())
-                        ->url($nav->showUrl())
-                        ->can('view', $nav);
-                });
+                return NavAPI::all()->sortBy->title()
+                    ->filter(function ($nav) {
+                        return User::current()->can('configure navs')
+                            || $nav->sites()->contains(Site::selected()->handle());
+                    })
+                    ->map(function ($nav) {
+                        return Nav::item($nav->title())
+                            ->url(
+                                $nav->sites()->contains(Site::selected()->handle())
+                                    ? $nav->showUrl()
+                                    : $nav->editUrl()
+                            )
+                            ->can('view', $nav);
+                    });
             });
 
         Nav::content('Taxonomies')
@@ -113,13 +134,18 @@ class CoreNav
             ->icon('/earth')
             ->can('index', GlobalSet::class)
             ->children(function () {
-                return GlobalSetAPI::all()->sortBy->title()->map(function ($globalSet) {
-                    $localized = $globalSet->inSelectedSite();
+                return GlobalSetAPI::all()->sortBy->title()
+                    ->filter(function ($globalSet) {
+                        return User::current()->can('configure globals')
+                            || ! is_null($globalSet->inSelectedSite());
+                    })
+                    ->map(function ($globalSet) {
+                        $localized = $globalSet->inSelectedSite();
 
-                    return Nav::item($globalSet->title())
-                        ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
-                        ->can('view', $globalSet);
-                })->filter();
+                        return Nav::item($globalSet->title())
+                            ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
+                            ->can('view', $globalSet);
+                    })->filter();
             });
 
         return $this;
@@ -183,7 +209,7 @@ class CoreNav
                 ->can('resolve duplicate ids');
         }
 
-        $this->makeUtilitiesSection();
+        $this->makeUtilitiesItems();
 
         if (config('statamic.graphql.enabled') && Statamic::pro()) {
             Nav::tools('GraphQL')
@@ -196,7 +222,12 @@ class CoreNav
         return $this;
     }
 
-    protected function makeUtilitiesSection()
+    /**
+     * Make utilities items.
+     *
+     * @return $this
+     */
+    protected function makeUtilitiesItems()
     {
         $utilities = Utility::authorized()->sortBy->navTitle()->map(function ($utility) {
             return Nav::item($utility->navTitle())->url($utility->url());
@@ -208,6 +239,29 @@ class CoreNav
                 ->icon('/settings-slider')
                 ->children($utilities);
         }
+
+        return $this;
+    }
+
+    /**
+     * Make settings section items.
+     *
+     * @return $this
+     */
+    protected function makeSettingsSection()
+    {
+        Nav::settings(Site::multiEnabled() ? 'Sites' : 'Site')
+            ->route('sites.edit')
+            ->icon('/sites')
+            ->can('configure sites');
+
+        Nav::settings('Preferences')
+            ->route('preferences.index')
+            ->icon('/settings')
+            ->children([
+                Nav::item('General')->route('preferences.index'),
+                Nav::item('CP Nav')->route('preferences.nav.index'),
+            ]);
 
         return $this;
     }
