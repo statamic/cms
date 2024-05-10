@@ -37,7 +37,8 @@ class Breadcrumbs implements Arrayable, JsonSerializable
 
     public function title($title = null)
     {
-        $crumbs = $this->crumbs->map->text;
+        $new_crumbs = $this->crumbs->map(fn ($v) => ['text' => __($v['text']), 'url' => $v['url']]);
+        $crumbs = $new_crumbs->map->text;
 
         if ($title) {
             $crumbs->push(__($title));
