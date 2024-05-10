@@ -10,6 +10,9 @@ use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\StarterKits\Installer as StarterKitInstaller;
 use Statamic\StarterKits\LicenseManager as StarterKitLicenseManager;
 
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\text;
+
 class StarterKitInstall extends Command
 {
     use RunsInPlease, ValidatesInput;
@@ -41,7 +44,9 @@ class StarterKitInstall extends Command
      */
     public function handle()
     {
-        if ($this->validationFails($package = $this->getPackage(), new ComposerPackage)) {
+        [$package, $branch] = $this->getPackageAndBranch();
+
+        if ($this->validationFails($package, new ComposerPackage)) {
             return;
         }
 
@@ -56,10 +61,12 @@ class StarterKitInstall extends Command
         }
 
         $installer = StarterKitInstaller::package($package, $this, $licenseManager)
+            ->branch($branch)
             ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
-            ->withUser($cleared && $this->input->isInteractive() && ! $this->option('cli-install'))
+            ->isInteractive($isInteractive = $this->input->isInteractive())
+            ->withUser($cleared && $isInteractive && ! $this->option('cli-install'))
             ->usingSubProcess($this->option('cli-install'))
             ->force($this->option('force'));
 
@@ -81,17 +88,25 @@ class StarterKitInstall extends Command
             $this->comment('composer global update statamic/cli'.PHP_EOL);
         }
 
-        $this->info("Starter kit [$package] was successfully installed.");
+        $this->components->info("Starter kit [$package] was successfully installed.");
     }
 
     /**
-     * Get composer package.
+     * Get composer package (and optional branch).
      *
      * @return string
      */
-    protected function getPackage()
+    protected function getPackageAndBranch()
     {
-        return $this->argument('package') ?: $this->ask('Package');
+        $package = $this->argument('package') ?: text('Package');
+
+        $parts = explode(':', $package);
+
+        if (count($parts) === 1) {
+            $parts[] = null;
+        }
+
+        return $parts;
     }
 
     /**
@@ -104,7 +119,7 @@ class StarterKitInstall extends Command
         if ($this->option('clear-site')) {
             return true;
         } elseif ($this->input->isInteractive()) {
-            return $this->confirm('Clear site first?', false);
+            return confirm('Clear site first?', false);
         }
 
         return false;

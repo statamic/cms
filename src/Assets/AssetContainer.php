@@ -13,6 +13,7 @@ use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerDeleted;
+use Statamic\Events\AssetContainerDeleting;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
@@ -262,6 +263,13 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     /**
      * Delete the container.
      *
@@ -269,9 +277,18 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && AssetContainerDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\AssetContainer::delete($this);
 
-        AssetContainerDeleted::dispatch($this);
+        if ($withEvents) {
+            AssetContainerDeleted::dispatch($this);
+        }
 
         return true;
     }

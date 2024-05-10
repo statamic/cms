@@ -87,7 +87,7 @@ class StatamicTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider formatsWithTime
+     * @dataProvider formatsWithTimeProvider
      **/
     public function it_doesnt_append_time_if_system_date_format_already_has_time_in_it($format)
     {
@@ -107,7 +107,7 @@ class StatamicTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider formatsWithTime
+     * @dataProvider formatsWithTimeProvider
      **/
     public function it_doesnt_append_time_if_cp_date_format_already_has_time_in_it($format)
     {
@@ -128,7 +128,7 @@ class StatamicTest extends TestCase
         $this->assertInstanceOf(\Statamic\Modifiers\Modify::class, Statamic::modify('some_value'));
     }
 
-    public function formatsWithTime()
+    public static function formatsWithTimeProvider()
     {
         return [
             '12-hour without leading zeros' => ['g'],
@@ -159,6 +159,7 @@ class StatamicTest extends TestCase
             'terms' => \Statamic\Stache\Query\TermQueryBuilder::class,
             'assets' => \Statamic\Assets\QueryBuilder::class,
             'users' => \Statamic\Stache\Query\UserQueryBuilder::class,
+            'form-submissions' => \Statamic\Stache\Query\SubmissionQueryBuilder::class,
         ];
 
         foreach ($aliases as $alias => $class) {
@@ -270,7 +271,7 @@ class StatamicTest extends TestCase
         $this->assertEquals($expected, Statamic::cpAssetUrl($url));
     }
 
-    public function cpAssetUrlProvider()
+    public static function cpAssetUrlProvider()
     {
         return [
             'slash' => ['/foo/bar.jpg', 'http://test-asset-url.com/vendor/statamic/cp/foo/bar.jpg'],
@@ -290,7 +291,7 @@ class StatamicTest extends TestCase
         $this->assertEquals($expected, Statamic::vendorPackageAssetUrl(...$arguments));
     }
 
-    public function vendorPackageAssetUrlProvider()
+    public static function vendorPackageAssetUrlProvider()
     {
         return [
             'package' => [['package', 'cp.js'], 'http://test-asset-url.com/vendor/package/cp.js'],

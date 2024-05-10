@@ -32,6 +32,22 @@ class ProviderTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_config()
+    {
+        $this->assertEquals([], (new Provider('test'))->config());
+
+        $this->assertEquals(['foo' => 'bar'], (new Provider('test', ['foo' => 'bar']))->config());
+    }
+
+    /** @test */
+    public function it_gets_the_label_through_the_config()
+    {
+        $this->assertEquals('Test', (new Provider('test'))->label());
+
+        $this->assertEquals('Foo Bar', (new Provider('test', ['label' => 'Foo Bar']))->label());
+    }
+
+    /** @test */
     public function it_gets_user_data()
     {
         $data = $this->provider()->userData($this->socialite());

@@ -16,7 +16,7 @@
     }
 
 .page-move {
-        @apply w-6 border-r rounded-l;
+        @apply w-6 rtl:border-l ltr:border-r rtl:rounded-r ltr:rounded-l;
         cursor: grab;
         background-color: hsla(210, 30%, 95%, .5);
         background-image: url('../../svg/icons/light/drag-dots.svg');
@@ -28,7 +28,7 @@
 
     .page-root {
         background-color: hsla(210, 30%, 95%, .5);
-        @apply flex w-6 rounded-l items-center border-r;
+        @apply flex w-6 rtl:rounded-r ltr:rounded-l items-center rtl:border-l ltr:border-r;
     }
 }
 

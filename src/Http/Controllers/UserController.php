@@ -56,7 +56,7 @@ class UserController extends Controller
             ->data($request->processedValues());
 
         if ($roles = config('statamic.users.new_user_roles')) {
-            $user->roles($roles);
+            $user->explicitRoles($roles);
         }
 
         if ($groups = config('statamic.users.new_user_groups')) {
@@ -91,6 +91,7 @@ class UserController extends Controller
         if ($request->email) {
             $user->email($request->email);
         }
+
         foreach ($request->processedValues() as $key => $value) {
             $user->set($key, $value);
         }

@@ -17,7 +17,7 @@ class PatternTest extends TestCase
         $this->assertEquals($expected, Pattern::sqlLikeQuote($string));
     }
 
-    public function likeProvider()
+    public static function likeProvider()
     {
         return collect([
             'foo' => 'foo',
@@ -41,7 +41,7 @@ class PatternTest extends TestCase
         $this->assertEquals($expected, Pattern::sqlLikeToRegex($string));
     }
 
-    public function likeRegexProvider()
+    public static function likeRegexProvider()
     {
         return collect([
             'foo' => '^foo$',

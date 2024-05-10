@@ -87,6 +87,15 @@ export function utf8btoa(stringToEncode) {
     return btoa(utf8String);
 }
 
+export function utf8atob(stringToDecode) {
+    // Decode from base64 to UTF-8 byte representation
+    const utf8String = atob(stringToDecode);
+
+    // Convert the UTF-8 byte representation back to a regular string
+    return decodeURIComponent(utf8String.split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+}
+
 export function uniqid() {
     return uid();
 }
@@ -107,4 +116,25 @@ export function escapeHtml(string) {
 
 export function replicatorPreviewHtml(html) {
     return new PreviewHtml(html);
+}
+
+export function closestVm(el, name) {
+    let parent = el;
+    while (parent) {
+        if (parent.__vue__) break;
+        parent = parent.parentElement;
+    }
+    let vm = parent.__vue__;
+    while (vm !== vm.$root) {
+        if (!name || name === vm.$options.name) return vm;
+        vm = vm.$parent;
+    }
+}
+
+export function str_slug(string) {
+    return Statamic.$slug.create(string);
+}
+
+export function snake_case(string) {
+    return Statamic.$slug.separatedBy('_').create(string);
 }

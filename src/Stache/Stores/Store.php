@@ -12,6 +12,7 @@ use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 abstract class Store
 {
@@ -22,7 +23,6 @@ abstract class Store
     protected $storeIndexes = [];
     protected $usedIndexes;
     protected $fileChangesHandled = false;
-    protected $traverseRecursively = true;
     protected $paths;
     protected $fileItems;
     protected $shouldCacheFileItems = false;
@@ -35,7 +35,7 @@ abstract class Store
             return $this->directory;
         }
 
-        $this->directory = str_finish(Path::tidy($directory), '/');
+        $this->directory = Str::finish(Path::tidy($directory), '/');
 
         return $this;
     }
@@ -90,6 +90,8 @@ abstract class Store
     }
 
     abstract public function getItem($key);
+
+    abstract public function getItemValues($keys, $valueIndex, $keyIndex);
 
     public function indexUsage()
     {
@@ -181,7 +183,7 @@ abstract class Store
         $existing = collect(Cache::get($cacheKey, []));
 
         // Get the files and timestamps from the filesystem right now.
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this, $this->traverseRecursively);
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         // Cache the files and timestamps, ready for comparisons on the next request.
         // We'll do it now since there are multiple early returns coming up.
@@ -293,7 +295,7 @@ abstract class Store
             return $this->paths = collect($paths);
         }
 
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this, $this->traverseRecursively);
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         $fileItems = $files->map(function ($timestamp, $path) {
             return [

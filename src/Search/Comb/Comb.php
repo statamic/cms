@@ -379,7 +379,7 @@ class Comb
      */
     private function preformat($raw_query)
     {
-        return trim(mb_ereg_replace("[^\w\d\-\.:+\s@&’'‘]", '', $raw_query));
+        return trim(mb_ereg_replace("[^\w\d\-\.:+\s\\\/@&’'‘]", '', $raw_query));
     }
 
     /**
@@ -934,10 +934,10 @@ class Comb
         $output = [];
 
         if (! is_array($words)) {
-            $output = str_singular($words);
+            $output = Str::singular($words);
         } else {
             foreach ($words as $word) {
-                array_push($output, str_singular($word));
+                array_push($output, Str::singular($word));
             }
         }
 
