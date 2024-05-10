@@ -558,7 +558,7 @@ export default {
 
         runAfterSaveHook(response) {
             // Once the save request has completed, we want to run the "after" hook.
-            // Devs can do what they need, and we'll wait for them, but they can't cancel anything.
+            // Devs can do what they need and we'll wait for them, but they can't cancel anything.
             Statamic.$hooks
                 .run('entry.saved', {
                     collection: this.collectionHandle,
