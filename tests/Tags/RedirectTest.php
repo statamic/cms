@@ -6,7 +6,6 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Parse;
-use Statamic\Facades\Site;
 use Tests\TestCase;
 
 class RedirectTest extends TestCase
@@ -15,10 +14,10 @@ class RedirectTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr'],
-        ]]);
+        ]);
     }
 
     protected function resolveApplicationConfiguration($app)

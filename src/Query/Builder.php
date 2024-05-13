@@ -15,9 +15,12 @@ use Statamic\Exceptions\MultipleRecordsFoundException;
 use Statamic\Exceptions\RecordsNotFoundException;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
+use Statamic\Query\Concerns\FakesQueries;
 
 abstract class Builder implements Contract
 {
+    use FakesQueries;
+
     protected $columns;
     protected $limit;
     protected $offset = 0;
@@ -618,6 +621,23 @@ abstract class Builder implements Contract
     abstract public function count();
 
     abstract public function get($columns = ['*']);
+
+    protected function onceWithColumns($columns, $callback)
+    {
+        $original = $this->columns;
+
+        if (is_null($original)) {
+            $this->columns = $columns;
+        }
+
+        $result = $callback();
+
+        $this->columns = $original;
+
+        return $result;
+    }
+
+    abstract public function pluck($column, $key = null);
 
     public function when($value, $callback, $default = null)
     {

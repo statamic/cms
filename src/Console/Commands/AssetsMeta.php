@@ -3,9 +3,12 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+
+use function Laravel\Prompts\progress;
 
 class AssetsMeta extends Command
 {
@@ -19,18 +22,22 @@ class AssetsMeta extends Command
     {
         $assets = $this->getAssets();
 
-        $bar = $this->output->createProgressBar($assets->count());
+        if ($assets->isEmpty()) {
+            return $this->components->warn("There's no metadata to generate. You don't have any assets.");
+        }
 
-        $assets->each(function ($asset) use ($bar) {
-            $asset->hydrate();
-            $asset->save();
-            $bar->advance();
-        });
+        progress(
+            label: 'Generating asset metadata...',
+            steps: $assets,
+            callback: function ($asset, $progress) {
+                $asset->hydrate();
+                $asset->save();
+                $progress->advance();
+            },
+            hint: 'This may take a while if you have a lot of assets.'
+        );
 
-        $bar->finish();
-
-        $this->line('');
-        $this->info('Asset metadata generated');
+        $this->components->info("Generated metadata for {$assets->count()} ".Str::plural('asset', $assets->count()).'.');
     }
 
     /**

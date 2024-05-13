@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Archetype\Facades\PHPFile;
 use PhpParser\BuilderFactory;
 use Statamic\Console\RunsInPlease;
+use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class MakeFieldtype extends GeneratorCommand
@@ -75,8 +76,14 @@ class MakeFieldtype extends GeneratorCommand
         if ($addon = $this->argument('addon')) {
             $this->wireUpAddonJs($addon);
         } else {
-            $this->line("Your {$this->typeLower} Vue component awaits: <comment>{$relativePath}</comment>");
-            $this->comment("Don't forget to import and register your Fieldtype component in resources/js/addon.js");
+            $this->components->info("Fieldtype Vue component [{$relativePath}] created successfully.");
+
+            $this->components->bulletList([
+                "Don't forget to import and register your fieldtype's Vue component in resources/js/addon.js",
+                'For more information, see the documentation: <comment>https://statamic.dev/fieldtypes#vue-components</comment>',
+            ]);
+
+            $this->newLine();
         }
     }
 
@@ -97,7 +104,7 @@ class MakeFieldtype extends GeneratorCommand
         $component = $this->files->get($this->getStub('fieldtype.vue.stub'));
 
         $component = str_replace('DummyName', $name, $component);
-        $component = str_replace('dummy_name', snake_case($name), $component);
+        $component = str_replace('dummy_name', Str::snake($name), $component);
 
         return $component;
     }
