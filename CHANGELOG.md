@@ -1,5 +1,22 @@
 # Release Notes
 
+## 5.0.2 (2024-05-10)
+
+### What's fixed
+- Warnings are output when `env()` calls are detected in site config update script [#10044](https://github.com/statamic/cms/issues/10044) by @jesseleite
+- Fix translations within title tag breadcrumbs [#10039](https://github.com/statamic/cms/issues/10039) by @peimn
+- Fix page tree branches not being openable in new tabs [#10041](https://github.com/statamic/cms/issues/10041) by @duncanmcclean
+- Fix some RTL issues [#10029](https://github.com/statamic/cms/issues/10029) by @peimn
+- Fix some translations in collection & taxonomy controllers [#10038](https://github.com/statamic/cms/issues/10038) by @peimn
+- Fix translation command compatibility [#10037](https://github.com/statamic/cms/issues/10037) by @ryanmitchell
+- Fix missing overflow styling on form submissions table [#10036](https://github.com/statamic/cms/issues/10036) by @duncanmcclean
+- Fix `is_external_url` modifier with link fields [#10027](https://github.com/statamic/cms/issues/10027) by @duncanmcclean
+- Dutch translations [#10042](https://github.com/statamic/cms/issues/10042) by @robdekort
+- Persian translations [#10035](https://github.com/statamic/cms/issues/10035) by @peimn
+- French translations [#10032](https://github.com/statamic/cms/issues/10032) by @PatrickJunod
+
+
+
 ## 5.0.1 (2024-05-09)
 
 ### What's fixed
