@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Statamic\Support\Str;
 
 class TemplateFolder extends Relationship
 {
@@ -24,7 +25,7 @@ class TemplateFolder extends Relationship
 
                 foreach ($iterator as $file) {
                     if ($file->isDir() && ! $iterator->isDot() && ! $iterator->isLink()) {
-                        $directories->push(str_replace_first($path.DIRECTORY_SEPARATOR, '', $file->getPathname()));
+                        $directories->push(Str::replaceFirst($path.DIRECTORY_SEPARATOR, '', $file->getPathname()));
                     }
                 }
 

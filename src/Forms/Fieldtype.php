@@ -32,6 +32,17 @@ class Fieldtype extends Relationship
                 'default' => 1,
                 'instructions' => __('statamic::fieldtypes.form.config.max_items'),
             ],
+            'mode' => [
+                'display' => __('UI Mode'),
+                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                'type' => 'radio',
+                'default' => 'default',
+                'options' => [
+                    'default' => __('Stack Selector'),
+                    'select' => __('Select Dropdown'),
+                    'typeahead' => __('Typeahead Field'),
+                ],
+            ],
             'query_scopes' => [
                 'display' => __('Query Scopes'),
                 'instructions' => __('statamic::fieldtypes.form.config.query_scopes'),

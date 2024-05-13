@@ -31,12 +31,13 @@ class AddonsDiscover extends Command
      */
     public function handle(Manifest $manifest)
     {
+        $this->newLine();
         $manifest->build();
 
-        foreach (array_keys($manifest->manifest) as $package) {
-            $this->line("Discovered Addon: <info>{$package}</info>");
-        }
+        $this->components->info('Discovering addons.');
 
-        $this->info('Addon manifest generated successfully.');
+        foreach (array_keys($manifest->manifest) as $package) {
+            $this->components->task("Discovered Addon: <info>{$package}</info>");
+        }
     }
 }

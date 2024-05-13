@@ -66,7 +66,7 @@ class TreeTest extends TestCase
     /** @test */
     public function it_gets_the_show_url_from_the_structure()
     {
-        Site::shouldReceive('hasMultiple')->once()->andReturnFalse();
+        Site::shouldReceive('multiEnabled')->once()->andReturnFalse();
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('showUrl')->with([])->once()->andReturn('/show-url');
 
@@ -80,7 +80,7 @@ class TreeTest extends TestCase
     /** @test */
     public function it_gets_the_show_url_with_the_site_query_param_when_there_are_multiple_sites()
     {
-        Site::shouldReceive('hasMultiple')->once()->andReturnTrue();
+        Site::shouldReceive('multiEnabled')->once()->andReturnTrue();
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('showUrl')->with(['site' => 'the-locale'])->once()->andReturn('/show-url');
 
@@ -99,7 +99,7 @@ class TreeTest extends TestCase
         $parent = $tree->parent();
 
         $this->assertInstanceOf(Page::class, $parent);
-        $this->assertEquals(Entry::find('pages-home'), $parent->entry());
+        $this->assertEquals(Entry::find('pages-home')->id(), $parent->entry()->id());
     }
 
     /** @test */

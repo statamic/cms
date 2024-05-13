@@ -558,4 +558,19 @@ class FieldsetTest extends TestCase
         FieldsetRepository::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(FieldsetDeleted::class);
     }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $fieldset = (new Fieldset)->setHandle('test');
+
+        $return = $fieldset->deleteQuietly();
+
+        Event::assertNotDispatched(FieldsetDeleting::class);
+        Event::assertNotDispatched(FieldsetDeleted::class);
+
+        $this->assertTrue($return);
+    }
 }

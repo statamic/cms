@@ -5,6 +5,7 @@ namespace Statamic\Stache\Repositories;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\NavigationRepository as RepositoryContract;
+use Statamic\Exceptions\NavigationNotFoundException;
 use Statamic\Stache\Stache;
 
 class NavigationRepository implements RepositoryContract
@@ -33,6 +34,17 @@ class NavigationRepository implements RepositoryContract
     public function findByHandle($handle): ?Nav
     {
         return $this->store->getItem($handle);
+    }
+
+    public function findOrFail($id): Nav
+    {
+        $nav = $this->find($id);
+
+        if (! $nav) {
+            throw new NavigationNotFoundException($id);
+        }
+
+        return $nav;
     }
 
     public function save(Nav $nav)

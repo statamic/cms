@@ -46,11 +46,11 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_gets_and_sets_the_routes()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         // A collection with no sites uses the default site.
         $collection = new Collection;
@@ -88,11 +88,11 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_sets_all_the_routes_identically()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         $collection = (new Collection)->sites(['en', 'fr']);
 
@@ -112,11 +112,11 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_gets_and_sets_the_title_formats()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         // A collection with no sites uses the default site.
         $collection = new Collection;
@@ -159,11 +159,11 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_sets_all_the_title_formats_identically()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         $collection = (new Collection)->sites(['en', 'fr']);
 
@@ -226,10 +226,10 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_gets_and_sets_the_sites_it_can_be_used_in_when_using_multiple_sites()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
-        ]]);
+        ]);
 
         $collection = new Collection;
 
@@ -329,6 +329,8 @@ class CollectionTest extends TestCase
         $this->assertEquals($blueprintOne, $collection->entryBlueprint('one'));
         $this->assertEquals($blueprintTwo, $collection->entryBlueprint('two'));
         $this->assertNull($collection->entryBlueprint('three'));
+
+        $this->assertTrue($collection->hasVisibleEntryBlueprint());
     }
 
     /** @test */
@@ -351,6 +353,27 @@ class CollectionTest extends TestCase
 
         // But assert that it can still get a specific blueprint for editing the blueprint, etc.
         $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+
+        $this->assertTrue($collection->hasVisibleEntryBlueprint());
+    }
+
+    /** @test */
+    public function it_gets_first_entry_blueprint_when_they_are_all_hidden()
+    {
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'apple' => $blueprintOne = (new Blueprint)->setHandle('apple')->setHidden(true),
+            'berry' => $blueprintTwo = (new Blueprint)->setHandle('berry')->setHidden(true),
+            'cherry' => $blueprintThree = (new Blueprint)->setHandle('cherry')->setHidden(true),
+        ]));
+
+        $blueprints = $collection->entryBlueprints();
+
+        $this->assertCount(3, $blueprints);
+        $this->assertEquals($blueprintOne, $collection->entryBlueprint());
+        $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+        $this->assertFalse($collection->hasVisibleEntryBlueprint());
     }
 
     /** @test */
@@ -434,10 +457,10 @@ class CollectionTest extends TestCase
         $this->assertNull($datedAndOrdered->customSortDirection());
 
         $alpha->structureContents(['max_depth' => 99]);
-        $this->assertEquals('title', $alpha->sortField());
+        $this->assertEquals('order', $alpha->sortField());
         $this->assertEquals('asc', $alpha->sortDirection());
         $dated->structureContents(['max_depth' => 99]);
-        $this->assertEquals('date', $dated->sortField());
+        $this->assertEquals('order', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
         // Custom sort field and direction should override any other logic.
@@ -477,11 +500,24 @@ class CollectionTest extends TestCase
         Facades\Collection::shouldReceive('save')->with($collection)->once();
         Facades\Collection::shouldReceive('handleExists')->with('test')->once();
         Facades\Blink::shouldReceive('forget')->with('collection-handles')->once();
+        Facades\Blink::shouldReceive('forget')->with('mounted-collections')->once();
         Facades\Blink::shouldReceive('flushStartingWith')->with('collection-test')->once();
 
         $return = $collection->save();
 
         $this->assertEquals($collection, $return);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->saveQuietly();
+
+        Event::assertNotDispatched(CollectionSaved::class);
+        Event::assertNotDispatched(CollectionSaving::class);
     }
 
     /** @test */
@@ -937,13 +973,10 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_cannot_view_collections_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection1 = tap(Facades\Collection::make('has_some_french')->sites(['en', 'fr', 'de']))->save();
@@ -997,5 +1030,20 @@ class CollectionTest extends TestCase
         $this->assertFalse($return);
         Facades\Collection::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(CollectionDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $collection = Facades\Collection::make('test')->save();
+
+        $return = $collection->deleteQuietly();
+
+        Event::assertNotDispatched(CollectionDeleting::class);
+        Event::assertNotDispatched(CollectionDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

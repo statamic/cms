@@ -117,4 +117,9 @@ class LicenseManager
     {
         $this->outpost->clearCachedResponse();
     }
+
+    public function usingLicenseKeyFile()
+    {
+        return $this->outpost->usingLicenseKeyFile();
+    }
 }

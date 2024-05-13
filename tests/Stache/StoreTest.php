@@ -94,6 +94,10 @@ class TestStore extends Store
     {
     }
 
+    public function getItemValues($keys, $valueIndex, $keyIndex)
+    {
+    }
+
     public function key()
     {
         return 'test-store';

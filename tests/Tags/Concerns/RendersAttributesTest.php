@@ -65,7 +65,7 @@ class RendersAttributesTest extends TestCase
                 'src' => 'avatar.jpg',
                 'name' => 'Han',
             ])
-            ->renderAttributesFromParams(['src', 'name']);
+            ->renderAttributesFromParams(except: ['src', 'name']);
 
         $this->assertEquals('class="m-0 mb-2"', $output);
 
