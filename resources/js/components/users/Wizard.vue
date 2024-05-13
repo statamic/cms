@@ -257,7 +257,7 @@ export default {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
         },
         direction() {
-            return this.$config.get('direction', 'rtl');
+            return this.$config.get('direction', 'ltr');
         },
     },
 

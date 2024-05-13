@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\AssetContainer;
+use Statamic\Support\Str;
 
 class AssetFolder extends Relationship
 {
@@ -26,7 +27,7 @@ class AssetFolder extends Relationship
             })
             ->prepend(['id' => '/', 'title' => '/'])
             ->when($request->search, function ($folders, $search) {
-                return $folders->filter(fn ($folder) => str_contains($folder['title'], $search));
+                return $folders->filter(fn ($folder) => Str::contains($folder['title'], $search));
             })
             ->values();
     }

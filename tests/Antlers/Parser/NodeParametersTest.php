@@ -24,7 +24,7 @@ class NodeParametersTest extends ParserTestCase
     public function test_at_params_can_be_supplied()
     {
         $template = <<<'EOT'
-{{ form:create test="test-value" @submit.prevent="sendForm()" }}
+{{ form:create test="test-value" attr:@submit.prevent="sendForm()" }}
 EOT;
 
         $nodes = $this->parseNodes($template);
@@ -42,7 +42,7 @@ EOT;
         $this->assertSame('test', $param1->name);
         $this->assertSame('test-value', $param1->value);
 
-        $this->assertSame('@submit.prevent', $param2->name);
+        $this->assertSame('attr:@submit.prevent', $param2->name);
         $this->assertSame('sendForm()', $param2->value);
     }
 
@@ -252,7 +252,7 @@ EOT;
         $this->assertSame('FINAL_LITERAL</figure>', $nodes[2]->content);
 
         $template = <<<'EOT'
- <div class="list-of-classes">     {{ partial src="svg/" values="{{ article_icon_color:key }} {{ article_icon_size:key }}" }}FINAL_LITERAL </div> 
+ <div class="list-of-classes">     {{ partial src="svg/" values="{{ article_icon_color:key }} {{ article_icon_size:key }}" }}FINAL_LITERAL </div>
 EOT;
 
         $nodes = $this->parseNodes($template);
@@ -263,7 +263,7 @@ EOT;
         $this->assertInstanceOf(LiteralNode::class, $nodes[2]);
 
         $this->assertSame(' <div class="list-of-classes">     ', $nodes[0]->content);
-        $this->assertSame('FINAL_LITERAL </div> ', $nodes[2]->content);
+        $this->assertSame('FINAL_LITERAL </div>', $nodes[2]->content);
     }
 
     public function test_shorthand_variable_syntax()
@@ -327,5 +327,43 @@ EOT;
         $this->assertFalse($nodes[0]->parameters[2]->isVariableReference);
         $this->assertTrue($nodes[0]->parameters[3]->isVariableReference);
         $this->assertFalse($nodes[0]->parameters[4]->isVariableReference);
+    }
+
+    public function test_curly_braces_inside_a_parameter_can_be_ignored_entirely()
+    {
+        $template = <<<'EOT'
+{{ form \x-data="{ open: false }" \attr:x-bind="..." \x-init="() => { open = true }" x-show="open" }}
+EOT;
+
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
+
+        /** @var AntlersNode $antlersNode */
+        $antlersNode = $nodes[0];
+
+        $this->assertTrue($antlersNode->hasParameters);
+        $this->assertCount(4, $antlersNode->parameters);
+
+        $pXData = $antlersNode->parameters[0];
+        $this->assertSame('x-data', $pXData->name);
+        $this->assertSame('\x-data', $pXData->originalName);
+        $this->assertSame('{ open: false }', $pXData->value);
+
+        $pXBind = $antlersNode->parameters[1];
+        $this->assertSame('attr:x-bind', $pXBind->name);
+        $this->assertSame('\attr:x-bind', $pXBind->originalName);
+        $this->assertSame('...', $pXBind->value);
+
+        $pXInit = $antlersNode->parameters[2];
+        $this->assertSame('x-init', $pXInit->name);
+        $this->assertSame('\x-init', $pXInit->originalName);
+        $this->assertSame('() => { open = true }', $pXInit->value);
+
+        $pXShow = $antlersNode->parameters[3];
+        $this->assertSame('x-show', $pXShow->name);
+        $this->assertSame('x-show', $pXShow->originalName);
+        $this->assertSame('open', $pXShow->value);
     }
 }

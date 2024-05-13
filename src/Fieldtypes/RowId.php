@@ -2,11 +2,13 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Support\Str;
+
 class RowId
 {
     public function generate()
     {
-        return str_random(8);
+        return Str::random(8);
     }
 
     public function handle(): string

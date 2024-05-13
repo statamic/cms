@@ -10,13 +10,13 @@
                 <span v-pre>{{ __($title) }}</span>
             </a>
         </h2>
-        @can('create', ['Statamic\Contracts\Entries\Entry', $collection])
+        @if($canCreate)
         <create-entry-button
             button-class="btn-primary"
             url="{{ $collection->createEntryUrl(Site::selected()) }}"
             :blueprints="{{ $blueprints->toJson() }}"
             text="{{ $button }}"></create-entry-button>
-        @endcan
+        @endif
     </div>
     <collection-widget
         collection="{{ $collection->handle() }}"

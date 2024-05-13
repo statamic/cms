@@ -4,7 +4,6 @@ namespace Tests\Data\Structures;
 
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\CollectionTreeDiff;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -67,10 +66,10 @@ class CollectionTreeTest extends TestCase
     /** @test */
     public function it_gets_the_path_when_using_multisite()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'one' => ['locale' => 'en_US', 'url' => '/one'],
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
-        ]]);
+        ]);
 
         $collection = Collection::make('pages')->structureContents(['root' => true]);
         Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);

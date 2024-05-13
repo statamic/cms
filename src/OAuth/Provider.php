@@ -13,9 +13,6 @@ use Statamic\Support\Str;
 
 class Provider
 {
-    /** @deprecated */
-    protected $label;
-
     protected $userCallback;
     protected $userDataCallback;
 
@@ -50,7 +47,7 @@ class Provider
     public function findOrCreateUser($socialite): StatamicUser
     {
         if (
-            ($user = User::findByOAuthId($this->name, $socialite->getId())) ||
+            ($user = User::findByOAuthId($this, $socialite->getId())) ||
             ($user = User::findByEmail($socialite->getEmail()))
         ) {
             return $this->mergeUser($user, $socialite);
@@ -125,15 +122,9 @@ class Provider
         return route('statamic.oauth.login', $this->name);
     }
 
-    public function label($label = null)
+    public function label()
     {
-        if (func_num_args() === 0) {
-            return $this->label ?? $this->config['label'] ?? Str::title($this->name);
-        }
-
-        $this->label = $label;
-
-        return $this;
+        return $this->config['label'] ?? Str::title($this->name);
     }
 
     public function config()

@@ -34,6 +34,7 @@ use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Assets\DimensionsRule;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -991,7 +992,53 @@ class AssetTest extends TestCase
             'path/to',
             'path/to/another-asset.txt',
         ], $container->contents()->cached()->keys()->all());
+        Event::assertDispatched(AssetDeleting::class);
         Event::assertDispatched(AssetDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('path/to/asset.txt', '');
+        $disk->put('path/to/another-asset.txt', '');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = (new Asset)->container($container)->path('path/to/asset.txt');
+        $disk->assertExists('path/to/asset.txt');
+        $this->assertEquals([
+            'path/to/another-asset.txt',
+            'path/to/asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'path/to/asset.txt' => [],
+            'path/to/another-asset.txt' => [],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+
+        $return = $asset->deleteQuietly();
+
+        $this->assertEquals($asset, $return);
+        $disk->assertMissing('path/to/asset.txt');
+        $this->assertEquals([
+            'path/to/another-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'path/to/another-asset.txt' => [],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/another-asset.txt',
+        ], $container->contents()->cached()->keys()->all());
+        Event::assertNotDispatched(AssetDeleting::class);
+        Event::assertNotDispatched(AssetDeleted::class);
     }
 
     /** @test */
@@ -1438,6 +1485,15 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_passes_the_dimensions_validation()
+    {
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60);
+        $validDimensions = (new DimensionsRule(['max_width=10']))->passes('Image', [$file]);
+
+        $this->assertFalse($validDimensions);
+    }
+
+    /** @test */
     public function it_gets_dimensions_for_svgs()
     {
         Storage::fake('test')->put('foo/image.svg', '<svg width="30" height="60"></svg>');
@@ -1814,6 +1870,30 @@ class AssetTest extends TestCase
         $this->assertStringNotContainsString('<script', $asset->contents());
         $this->assertStringNotContainsString('Bad stuff could go in here.', $asset->contents());
         $this->assertStringNotContainsString('</script>', $asset->contents());
+    }
+
+    /** @test */
+    public function it_does_not_sanitizes_svgs_on_upload_when_behaviour_is_disabled()
+    {
+        Event::fake();
+
+        config()->set('statamic.assets.svg_sanitization_on_upload', false);
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.svg');
+
+        $return = $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"><script type="text/javascript">alert(`Bad stuff could go in here.`);</script></svg>'));
+
+        $this->assertEquals($asset, $return);
+        Storage::disk('test')->assertExists('path/to/asset.svg');
+        $this->assertEquals('path/to/asset.svg', $asset->path());
+
+        // Ensure the inline scripts were stripped out.
+        $this->assertStringContainsString('<script', $asset->contents());
+        $this->assertStringContainsString('Bad stuff could go in here.', $asset->contents());
+        $this->assertStringContainsString('</script>', $asset->contents());
     }
 
     public static function nonGlideableFileExtensionsProvider()
