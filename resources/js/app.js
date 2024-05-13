@@ -238,32 +238,6 @@ Statamic.app({
             this.$echo.start();
         }
 
-        // Set moment locale
-        window.moment.locale(Statamic.$config.get('locale'));
-        Vue.moment.locale(Statamic.$config.get('locale'));
-        Vue.prototype.$moment.locale(Statamic.$config.get('locale'));
-        const momentLocalSpec = {
-            relativeTime: {
-                future: __('moment.future'),
-                past: __('moment.past'),
-                s: __('moment.s'),
-                ss: __('moment.ss'),
-                m: __('moment.m'),
-                mm: __('moment.mm'),
-                h: __('moment.h'),
-                hh: __('moment.hh'),
-                d: __('moment.d'),
-                dd: __('moment.dd'),
-                M: __('moment.M'),
-                MM: __('moment.MM'),
-                y: __('moment.y'),
-                yy: __('moment.yy'),
-            }
-        };
-        window.moment.updateLocale(Statamic.$config.get('locale'), momentLocalSpec);
-        Vue.moment.updateLocale(Statamic.$config.get('locale'), momentLocalSpec);
-        Vue.prototype.$moment.updateLocale(Statamic.$config.get('locale'), momentLocalSpec);
-
         this.fixAutofocus();
 
         this.showBanner = Statamic.$config.get('hasLicenseBanner');
@@ -292,6 +266,32 @@ Statamic.app({
                     .forEach(img => img.src = url);
             });
         });
+
+        // Set moment locale
+        window.moment.locale(Statamic.$config.get('locale'));
+        Vue.moment.locale(Statamic.$config.get('locale'));
+        Vue.prototype.$moment.locale(Statamic.$config.get('locale'));
+        const momentLocalSpec = {
+            relativeTime: {
+                future: __('moment.future'),
+                past: __('moment.past'),
+                s: __('moment.s'),
+                ss: __('moment.ss'),
+                m: __('moment.m'),
+                mm: __('moment.mm'),
+                h: __('moment.h'),
+                hh: __('moment.hh'),
+                d: __('moment.d'),
+                dd: __('moment.dd'),
+                M: __('moment.M'),
+                MM: __('moment.MM'),
+                y: __('moment.y'),
+                yy: __('moment.yy'),
+            }
+        };
+        window.moment.updateLocale(Statamic.$config.get('locale'), momentLocalSpec);
+        Vue.moment.updateLocale(Statamic.$config.get('locale'), momentLocalSpec);
+        Vue.prototype.$moment.updateLocale(Statamic.$config.get('locale'), momentLocalSpec);
     },
 
     methods: {
