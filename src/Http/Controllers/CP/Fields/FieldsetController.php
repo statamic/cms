@@ -8,6 +8,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -74,6 +75,8 @@ class FieldsetController extends CpController
     {
         $fieldset = Facades\Fieldset::find($fieldset);
 
+        $fieldset->validateRecursion();
+
         $vue = [
             'title' => $fieldset->title(),
             'handle' => $fieldset->handle(),
@@ -102,7 +105,11 @@ class FieldsetController extends CpController
             'fields' => collect($request->fields)->map(function ($field) {
                 return FieldTransformer::fromVue($field);
             })->all(),
-        ]))->save();
+        ]));
+
+        $fieldset->validateRecursion();
+
+        $fieldset->save();
 
         return response('', 204);
     }
@@ -115,8 +122,8 @@ class FieldsetController extends CpController
     public function store(Request $request)
     {
         $request->validate([
-            'title' => ['required'],
-            'handle' => ['required', 'regex:/^[a-zA-Z0-9._-]+$/'],
+            'title' => 'required',
+            'handle' => ['required', new Handle],
         ]);
 
         if (Facades\Fieldset::find($request->handle)) {

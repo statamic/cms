@@ -92,7 +92,7 @@ class Str
         $string = $language ? static::ascii($string, $language) : $string;
 
         // Statamic is a-OK with underscores in slugs.
-        $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
+        $string = str_replace('_', $placeholder = strtolower(Str::random(16)), $string);
 
         $slug = IlluminateStr::slug($string, $separator, $language, $dictionary);
 
@@ -139,29 +139,23 @@ class Str
     public static function fileSizeForHumans($bytes, $decimals = 2)
     {
         if ($bytes >= 1073741824) {
-            $bytes = number_format($bytes / 1073741824, $decimals).' GB';
+            return trans('statamic::messages.units.GB', ['count' => number_format($bytes / 1073741824, $decimals)]);
         } elseif ($bytes >= 1048576) {
-            $bytes = number_format($bytes / 1048576, $decimals).' MB';
+            return trans('statamic::messages.units.MB', ['count' => number_format($bytes / 1048576, $decimals)]);
         } elseif ($bytes >= 1024) {
-            $bytes = number_format($bytes / 1024, $decimals).' KB';
-        } elseif ($bytes > 1) {
-            $bytes = $bytes.' B';
-        } elseif ($bytes == 1) {
-            $bytes = $bytes.' B';
-        } else {
-            $bytes = '0 B';
+            return trans('statamic::messages.units.KB', ['count' => number_format($bytes / 1024, $decimals)]);
         }
 
-        return $bytes;
+        return trans('statamic::messages.units.B', ['count' => $bytes]);
     }
 
     public static function timeForHumans($ms)
     {
         if ($ms < 1000) {
-            return $ms.'ms';
+            return trans('statamic::messages.units.ms', ['count' => $ms]);
         }
 
-        return round($ms / 1000, 2).'s';
+        return trans('statamic::messages.units.s', ['count' => round($ms / 1000, 2)]);
     }
 
     /**
@@ -285,6 +279,25 @@ class Str
         return IlluminateStr::reverse(StaticStringy::safeTruncate(IlluminateStr::reverse($string), $length, $substring));
     }
 
+    public static function removeRight($string, $cap)
+    {
+        if (str_ends_with($string, $cap)) {
+            return mb_substr($string, 0, mb_strlen($string) - mb_strlen($cap));
+        }
+
+        return $string;
+    }
+
+    public static function ensureLeft($string, $start)
+    {
+        return IlluminateStr::start($string, $start);
+    }
+
+    public static function ensureRight($string, $cap)
+    {
+        return IlluminateStr::finish($string, $cap);
+    }
+
     /**
      * Implicitly defer all other method calls to either \Stringy\StaticStringy or \Illuminate\Support\Str.
      *
@@ -296,12 +309,12 @@ class Str
     {
         $deferToStringy = [
             'append', 'at', 'camelize', 'chars', 'collapseWhitespace', 'containsAny', 'count', 'countSubstr',
-            'dasherize', 'delimit', 'endsWithAny', 'ensureLeft', 'ensureRight', 'first', 'getEncoding', 'getIterator',
+            'dasherize', 'delimit', 'endsWithAny', 'first', 'getEncoding', 'getIterator',
             'hasLowerCase', 'hasUpperCase', 'htmlDecode', 'htmlEncode', 'humanize', 'indexOf', 'indexOfLast', 'insert',
             'isAlpha', 'isAlphanumeric', 'isBase64', 'isBlank', 'isHexadecimal', 'isLowerCase', 'isSerialized',
             'isUpperCase', 'last', 'lines', 'longestCommonPrefix', 'longestCommonSubstring', 'longestCommonSuffix',
             'lowerCaseFirst', 'offsetExists', 'offsetGet', 'offsetSet', 'offsetUnset', 'pad', 'prepend', 'regexReplace',
-            'removeLeft', 'removeRight', 'safeTruncate', 'shuffle', 'slice', 'slugify', 'split', 'startsWithAny',
+            'removeLeft', 'safeTruncate', 'shuffle', 'slice', 'slugify', 'split', 'startsWithAny',
             'stripWhitespace', 'surround', 'swapCase', 'tidy', 'titleize', 'toAscii', 'toBoolean', 'toLowerCase',
             'toSpaces', 'toTabs', 'toTitleCase', 'toUpperCase', 'trim', 'trimLeft', 'trimRight', 'truncate',
             'underscored', 'upperCamelize', 'upperCaseFirst',

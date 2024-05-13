@@ -29,7 +29,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         \Statamic\StaticCaching\ServiceProvider::class,
         \Statamic\Revisions\ServiceProvider::class,
         CpServiceProvider::class,
-        ValidationServiceProvider::class,
         RouteServiceProvider::class,
         BroadcastServiceProvider::class,
         \Statamic\API\ServiceProvider::class,

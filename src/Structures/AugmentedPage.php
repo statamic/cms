@@ -9,6 +9,8 @@ class AugmentedPage extends AugmentedEntry
 {
     protected $page;
     protected $hasEntry = false;
+    private $cachedKeys;
+    private $fieldsCache;
 
     public function __construct($page)
     {
@@ -24,6 +26,10 @@ class AugmentedPage extends AugmentedEntry
 
     public function keys()
     {
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
+        }
+
         $keys = collect($this->hasEntry
             ? parent::keys()
             : ['title', 'url', 'uri', 'permalink', 'id']);
@@ -35,7 +41,7 @@ class AugmentedPage extends AugmentedEntry
 
         $keys = Statamic::isApiRoute() ? $this->apiKeys($keys) : $keys;
 
-        return $keys->unique()->sort()->values()->all();
+        return $this->cachedKeys = $keys->unique()->sort()->values()->all();
     }
 
     private function apiKeys($keys)
@@ -55,8 +61,12 @@ class AugmentedPage extends AugmentedEntry
         return $this->page->getSupplement($key) ?? $this->page->value($key);
     }
 
-    protected function blueprintFields()
+    public function blueprintFields()
     {
+        if ($this->fieldsCache) {
+            return $this->fieldsCache;
+        }
+
         $fields = ($pageBlueprint = $this->page->blueprint())
             ? $pageBlueprint->fields()->all()
             : collect();
@@ -66,7 +76,7 @@ class AugmentedPage extends AugmentedEntry
             $fields = $entryFields->merge($fields);
         }
 
-        return $fields;
+        return $this->fieldsCache = $fields;
     }
 
     protected function id()

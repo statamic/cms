@@ -17,7 +17,7 @@
             <div class="set-picker-header p-3 border-b text-xs flex items-center">
                 <input ref="search" type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="showSearch" v-model="search" />
                 <div v-if="showGroupBreadcrumb" class="flex items-center text-gray-700 font-medium">
-                    <button @click="unselectGroup" class=" hover:text-gray-900 ml-2.5 rounded">
+                    <button @click="unselectGroup" class=" hover:text-gray-900 rtl:mr-2.5 ltr:ml-2.5 rounded">
                         {{ __('Groups') }}
                     </button>
                     <svg-icon name="micro/chevron-right" class="w-4 h-4" />
@@ -27,7 +27,7 @@
             <div class="p-1 max-h-[21rem] overflow-auto">
                 <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <svg-icon :name="groupIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2 text-gray-800" />
+                        <svg-icon :name="groupIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white border border-gray-600 rtl:ml-2 ltr:mr-2 p-2 text-gray-800" />
                         <div class="flex-1">
                             <div class="text-md font-medium text-gray-800 truncate w-52">{{ __(item.display || item.handle) }}</div>
                             <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ __(item.instructions) }}</div>
@@ -35,7 +35,7 @@
                         <svg-icon name="micro/chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
                     </div>
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <svg-icon :name="setIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2 text-gray-800" />
+                        <svg-icon :name="setIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white border border-gray-600 rtl:ml-2 ltr:mr-2 p-2 text-gray-800" />
                         <div class="flex-1">
                             <div class="text-md font-medium text-gray-800 truncate w-52">{{ __(item.display || item.handle) }}</div>
                             <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ __(item.instructions) }}</div>

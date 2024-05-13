@@ -9,7 +9,6 @@ use Mockery;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Globals\Variables;
@@ -25,12 +24,12 @@ class VariablesTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'a' => ['url' => '/', 'locale' => 'en'],
             'b' => ['url' => '/b/', 'locale' => 'fr'],
             'c' => ['url' => '/b/', 'locale' => 'fr'],
             'd' => ['url' => '/d/', 'locale' => 'fr'],
-        ]]);
+        ]);
     }
 
     /** @test */
@@ -281,7 +280,7 @@ EOT;
         $this->assertSame($builder, $variables->foo());
     }
 
-    public function queryBuilderProvider()
+    public static function queryBuilderProvider()
     {
         return [
             'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],

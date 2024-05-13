@@ -25,7 +25,7 @@ body:
       label: Environment
       description: |
         Details about your environment. Versions of Statamic, PHP, Laravel, any addons that are installed, etc.
-        (Go ahead and just paste the output of the `php please support:details` command.)    
+        (Go ahead and just paste the output of the `php please support:details` command.)
       render: yaml # the format of the command is close to yaml and gets highlighted nicely
     validations:
       required: true
@@ -40,15 +40,6 @@ body:
         - Other (please explain)
     validations:
       required: true
-  - type: dropdown
-    attributes:
-      label: Antlers Parser
-      description: If using 3.3+, which Antlers Parser are you using?
-      options:
-        - Runtime (default)
-        - Regex (legacy)
-    validations:
-      required: false
   - type: textarea
     attributes:
       label: Additional details

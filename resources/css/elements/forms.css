@@ -76,15 +76,19 @@ input.input-text-minimal:read-only,
     }
 
     .input-text:not(:first-child) {
-        @apply rounded-l-none border-l-0;
+        @apply rtl:rounded-r-none ltr:rounded-l-none rtl:border-r-0 ltr:border-l-0;
     }
 
     .input-text:not(:last-child) {
-        @apply rounded-r-none border-r-0;
+        @apply rtl:rounded-l-none ltr:rounded-r-none rtl:border-l-0 ltr:border-r-0;
+    }
+
+    .input-text[dir='ltr']:not(:last-child) {
+        @apply rtl:rounded-r rtl:border-r;
     }
 
     .input-group-prepend, .input-group-append, .input-group-item {
-        @apply rounded-l px-2 border text-sm text-gray-800 select-none;
+        @apply rtl:rounded-r ltr:rounded-l px-2 border text-sm text-gray-800 select-none;
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;
         box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
@@ -104,7 +108,7 @@ input.input-text-minimal:read-only,
     }
 
     .input-group-item {
-        @apply rounded-l-none -mx-px;
+        @apply rtl:rounded-r-none ltr:rounded-l-none -mx-px;
     }
 
     button.input-group-item:hover:not(:disabled),
@@ -118,13 +122,13 @@ input.input-text-minimal:read-only,
     }
 
     .input-group-append {
-        @apply rounded-l-none border-r-0; /*  Rounded on the right side */
-        &:last-child { @apply rounded-r border-r; }
+        @apply rtl:rounded-r-none ltr:rounded-l-none rtl:border-l-0 ltr:border-r-0; /*  Rounded on the right side */
+        &:last-child { @apply rtl:rounded-l ltr:rounded-r rtl:border-l ltr:border-r; }
     }
 
     > *:last-child[class*="input-group-"],
     > *:last-child [class*="input-group-"] {
-        @apply rounded-r;
+        @apply rtl:rounded-l ltr:rounded-r;
     }
 
 }
@@ -151,7 +155,7 @@ input.input-text-minimal:read-only,
     }
 
     input {
-        @apply leading-normal mr-1;
+        @apply leading-normal rtl:ml-1 ltr:mr-1;
     }
 
     label {
@@ -164,7 +168,7 @@ input.input-text-minimal:read-only,
     @apply flex items-center flex-wrap;
 
     .option {
-        @apply mr-4 mb-3;
+        @apply rtl:ml-4 ltr:mr-4 mb-3;
         &:first-child {
             @apply mt-3;
         }
@@ -185,14 +189,14 @@ input.input-text-minimal:read-only,
     @apply rounded relative;
 
     select {
-        @apply text-sm text-gray-800 shadow-button cursor-pointer block w-full h-full text-left relative max-w-full;
+        @apply text-sm text-gray-800 shadow-button cursor-pointer block w-full h-full rtl:text-right ltr:text-left relative max-w-full;
         @apply select-none rounded leading-normal align-middle whitespace-nowrap appearance-none subpixel-antialiased;
 
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;
         height: 2.375rem; /*  38px */
         letter-spacing: -0.01em;
-        padding: .475rem 1.75rem .475rem .75rem;
+        padding: .475rem 1.75rem .475rem .75rem ; [dir="rtl"] & { padding: .475rem .75rem .475rem 1.75rem ; }
 
         &:hover:not(:disabled), &:active:not(:disabled) {
             background: linear-gradient(180deg, #f9fafb, #f4f6f8);
@@ -201,7 +205,7 @@ input.input-text-minimal:read-only,
     }
 
     .select-input-toggle {
-        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-900;
+        @apply pointer-events-none absolute inset-y-0 rtl:left-0 ltr:right-0 flex items-center px-2 text-gray-900;
 
         svg {
             @apply fill-current h-4 w-4;
@@ -215,7 +219,7 @@ label .required {
     font-style: normal;
 
     + .localizable-icon {
-        margin-left: 5px;
+        margin-left: 5px ; [dir="rtl"] & { margin-right: 5px ; margin-left: 0 ; }
     }
 }
 

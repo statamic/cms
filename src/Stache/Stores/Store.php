@@ -12,6 +12,7 @@ use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 abstract class Store
 {
@@ -34,7 +35,7 @@ abstract class Store
             return $this->directory;
         }
 
-        $this->directory = str_finish(Path::tidy($directory), '/');
+        $this->directory = Str::finish(Path::tidy($directory), '/');
 
         return $this;
     }
@@ -89,6 +90,8 @@ abstract class Store
     }
 
     abstract public function getItem($key);
+
+    abstract public function getItemValues($keys, $valueIndex, $keyIndex);
 
     public function indexUsage()
     {

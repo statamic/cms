@@ -34,8 +34,8 @@
                         <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
 
                         <div class="flex space-x-2 mt-2">
-                            <button class="btn btn-sm ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
-                            <button class="btn btn-sm ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
+                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
+                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
                     </div>
@@ -127,6 +127,7 @@ export default {
             listingKey: 'terms',
             preferencesPrefix: `taxonomies.${this.taxonomy}`,
             requestUrl: cp_url(`taxonomies/${this.taxonomy}/terms`),
+            pushQuery: true,
         }
     },
 

@@ -34,12 +34,12 @@
     }
 
     &.loading-basic {
-        text-align: left;
+        @apply ltr:text-left rtl:text-right;
         padding: 0;
 
         .icon {
             display: inline-block;
-            margin: -2px 5px 0 0;
+            margin: -2px 5px 0 0 ; [dir="rtl"] & { margin: -2px 0 0 5px ; }
         }
     }
 }
@@ -67,7 +67,7 @@
     i {
         position: relative;
         top: -1px;
-        margin-right: 10px;
+        margin-right: 10px ; [dir="rtl"] & { margin-left: 10px ; margin-right: 0 ; }
     }
 }
 
@@ -89,4 +89,8 @@
 [v-cloak],
 [x-cloak] {
     display: none
+}
+
+.-max-h-screen-px {
+    max-height: calc(100vh - 1px) !important;
 }
