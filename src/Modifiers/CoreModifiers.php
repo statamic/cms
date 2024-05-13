@@ -26,6 +26,7 @@ use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
@@ -1263,6 +1264,10 @@ class CoreModifiers extends Modifier
      */
     public function isExternalUrl($value)
     {
+        if ($value instanceof ArrayableLink) {
+            $value = $value->value();
+        }
+
         return Str::isUrl($value) && URL::isExternal($value);
     }
 

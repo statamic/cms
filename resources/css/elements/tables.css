@@ -37,7 +37,7 @@
 	overflow-x: auto;
 
     thead {
-		@apply bg-gray-100 text-xs text-gray-700 text-gray-900;
+		@apply bg-gray-100 text-xs text-gray-900;
 
 		tr {
 			@apply border-b;

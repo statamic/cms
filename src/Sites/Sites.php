@@ -173,6 +173,7 @@ class Sites
                     'instructions' => __('statamic::messages.site_configure_url_instructions'),
                     'required' => true,
                     'width' => 33,
+                    'direction' => 'ltr',
                 ],
             ],
             [
@@ -182,6 +183,7 @@ class Sites
                     'instructions' => __('statamic::messages.site_configure_locale_instructions'),
                     'required' => true,
                     'width' => 33,
+                    'direction' => 'ltr',
                 ],
             ],
             [
@@ -190,6 +192,7 @@ class Sites
                     'type' => 'text',
                     'instructions' => __('statamic::messages.site_configure_lang_instructions'),
                     'width' => 33,
+                    'direction' => 'ltr',
                 ],
             ],
             [

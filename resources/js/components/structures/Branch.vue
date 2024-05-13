@@ -9,8 +9,9 @@
                 <div class="little-dot rtl:ml-2 ltr:mr-2" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
                 <svg-icon name="home-page" class="rtl:ml-2 ltr:mr-2 h-4 w-4 text-gray-800" v-if="isRoot" v-tooltip="__('This is the root page')" />
                 <a
-                    @click="$emit('edit', $event)"
+                    @click.prevent="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
+                    :href="page.edit_url"
                     v-text="title" />
 
                 <span v-if="showSlugs" class="rtl:mr-2 ltr:ml-2 font-mono text-gray-700 text-2xs pt-px">
