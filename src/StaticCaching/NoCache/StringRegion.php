@@ -13,7 +13,7 @@ class StringRegion extends Region
         $this->content = $content;
         $this->context = $this->filterContext($context);
         $this->extension = $extension;
-        $this->key = sha1($content.str_random());
+        $this->key = sha1($content).$session->getRegionId();
     }
 
     public function key(): string

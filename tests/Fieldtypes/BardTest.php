@@ -421,7 +421,7 @@ class BardTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
+        $this->assertEquals($expected, $this->bard()->preProcess($data));
     }
 
     /** @test */
@@ -535,7 +535,7 @@ class BardTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals($expected, json_decode($bard->preProcess($data), true));
+        $this->assertEquals($expected, $bard->preProcess($data));
     }
 
     /** @test */
@@ -571,7 +571,7 @@ class BardTest extends TestCase
             ],
         ]));
 
-        $this->assertEquals($expected, json_decode($bard->preProcess($data), true));
+        $this->assertEquals($expected, $bard->preProcess($data));
     }
 
     /** @test */
@@ -579,25 +579,25 @@ class BardTest extends TestCase
     {
         // When a Bard field is emptied and submitted, it's not actually null, it's a single empty paragraph.
         $bard = new Bard;
-        $this->assertNull($bard->process('[{"type":"paragraph"}]'));
+        $this->assertNull($bard->process([['type' => 'paragraph']]));
 
         // When it is actually null (eg. when it was not in the front matter to begin with, and was never touched), it's an empty array.
-        $this->assertNull($bard->process('[]'));
+        $this->assertNull($bard->process([]));
     }
 
     /** @test */
     public function it_removes_empty_nodes()
     {
-        $content = '[
-            {"type":"paragraph"},
-            {"type":"heading"},
-            {"type":"paragraph", "content": "foo"},
-            {"type":"heading"},
-            {"type":"paragraph"},
-            {"type":"heading", "content": "foo"},
-            {"type":"paragraph"},
-            {"type":"heading"}
-        ]';
+        $content = [
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading', 'content' => 'foo'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+        ];
 
         $containsAllEmptyNodes = $this->bard(['remove_empty_nodes' => false])->process($content);
 
@@ -819,11 +819,11 @@ EOT;
     /** @test */
     public function it_doesnt_convert_statamic_asset_urls_when_saving_as_html()
     {
-        $content = '[
-            {"type":"text","text":"one","marks":[{"type":"link","attrs":{"target":"_blank","href":"http://google.com"}}]},
-            {"type":"text","text":"two","marks":[{"type":"link","attrs":{"href":"entry::8e4b4e60-5dfb-47b0-a2d7-a904d64aeb80"}}]},
-            {"type":"text","text":"three","marks":[{"type":"link","attrs":{"target":"_blank","href":"statamic://asset::assets::myst.jpeg"}}]}
-        ]';
+        $content = [
+            ['type' => 'text', 'text' => 'one', 'marks' => [['type' => 'link', 'attrs' => ['target' => '_blank', 'href' => 'http://google.com']]]],
+            ['type' => 'text', 'text' => 'two', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'entry::8e4b4e60-5dfb-47b0-a2d7-a904d64aeb80']]]],
+            ['type' => 'text', 'text' => 'three', 'marks' => [['type' => 'link', 'attrs' => ['target' => '_blank', 'href' => 'statamic://asset::assets::myst.jpeg']]]],
+        ];
 
         $expected = <<<'EOT'
 <a target="_blank" href="http://google.com">one</a><a href="entry::8e4b4e60-5dfb-47b0-a2d7-a904d64aeb80">two</a><a target="_blank" href="statamic://asset::assets::myst.jpeg">three</a>
@@ -911,7 +911,12 @@ EOT;
     /** @test */
     public function it_processes_inline_value()
     {
-        $data = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+        $data = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
 
         $expected = [
             ['type' => 'text', 'text' => 'This is inline text.'],
@@ -927,7 +932,12 @@ EOT;
             ['type' => 'text', 'text' => 'This is inline text.'],
         ];
 
-        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
 
         $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
     }
@@ -939,7 +949,12 @@ EOT;
             ['type' => 'text', 'text' => 'This is inline text.'],
         ];
 
-        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
 
         $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
     }
@@ -962,7 +977,12 @@ EOT;
             ],
         ];
 
-        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is block text."}]}]';
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'text', 'text' => 'This is block text.'],
+            ],
+        ]];
 
         $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
     }
@@ -1088,7 +1108,7 @@ EOT;
             ],
         ];
 
-        $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
+        $this->assertEquals($expected, $this->bard()->preProcess($data));
     }
 
     /**
@@ -1164,7 +1184,7 @@ EOT;
         $this->assertEquals('test.0.words', $value[0]['words']);
         $this->assertEquals('test.1.words', $value[1]['words']);
 
-        $value = json_decode($field->preProcess()->value(), true);
+        $value = $field->preProcess()->value();
         $this->assertEquals('test.0.words', $value[0]['attrs']['values']['words']);
         $this->assertEquals('test.1.words', $value[1]['attrs']['values']['words']);
 
@@ -1177,7 +1197,7 @@ EOT;
                     ],
                 ],
             ]),
-        ]))->setValue(json_encode([
+        ]))->setValue([
             [
                 'type' => 'set',
                 'attrs' => [
@@ -1198,7 +1218,7 @@ EOT;
                     ],
                 ],
             ],
-        ]));
+        ]);
 
         $value = $field->process()->value();
         $this->assertEquals('test.0.words', $value[0]['attrs']['values']['words']);
@@ -1220,9 +1240,71 @@ EOT;
             ['text' => 'I have no type'],
         ];
 
-        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+        $expected = [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'This is inline text.']]]];
 
         $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
+    }
+
+    /** @test */
+    public function it_calls_hooks()
+    {
+        Bard::hook('augment', function ($payload, $next) {
+            return $next(array_reverse($payload));
+        });
+        Bard::hook('process', function ($payload, $next) {
+            return $next(array_reverse($payload));
+        });
+        Bard::hook('pre-process', function ($payload, $next) {
+            return $next(array_reverse($payload));
+        });
+        Bard::hook('pre-process-index', function ($payload, $next) {
+            return $next(array_reverse($payload));
+        });
+        Bard::hook('pre-process-validatable', function ($payload, $next) {
+            return $next(array_reverse($payload));
+        });
+        Bard::hook('preload', function ($payload, $next) {
+            return $next(array_merge($payload, [
+                'customData' => 'some custom data',
+            ]));
+        });
+        Bard::hook('extra-rules', function ($payload, $next) {
+            return $next(array_merge($payload, [
+                'custom_field' => ['required'],
+            ]));
+        });
+        Bard::hook('extra-validation-attributes', function ($payload, $next) {
+            return $next(array_merge($payload, [
+                'custom_field' => 'Custom Field',
+            ]));
+        });
+
+        $bard = $this->bard(['sets' => null]);
+
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'First'],
+                ],
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Second'],
+                ],
+            ],
+        ];
+        $expectedData = array_reverse($data);
+        $expectedHtml = '<p>Second</p><p>First</p>';
+
+        $this->assertEquals($expectedHtml, $bard->augment($data));
+        $this->assertEquals($expectedData, $bard->process($data));
+        $this->assertEquals($expectedData, $bard->preProcess($data));
+        $this->assertEquals($expectedHtml, $bard->preProcessIndex($data));
+        $this->assertArrayHasKey('customData', $bard->preload($data));
+        $this->assertArrayHasKey('custom_field', $bard->extraRules($data));
+        $this->assertArrayHasKey('custom_field', $bard->extraValidationAttributes($data));
     }
 
     private function bard($config = [])

@@ -10,8 +10,8 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Role;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Structures\CollectionStructure;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -45,10 +45,10 @@ class UpdateEntryTest extends TestCase
     /** @test */
     public function it_denies_access_if_you_dont_have_site_permission()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
-        ]]);
+        ]);
 
         [$user, $collection] = $this->seedUserAndCollection();
         $collection->sites(['en', 'fr'])->save();
@@ -125,9 +125,7 @@ class UpdateEntryTest extends TestCase
      */
     public function slug_is_not_required_and_will_get_created_from_the_submitted_title_and_correct_language_if_slug_is_in_the_blueprint_and_the_submitted_slug_was_empty($lang, $expectedSlug)
     {
-        Site::setConfig(['sites' => [
-            'en' => array_merge(config('statamic.sites.sites.en'), ['lang' => $lang]),
-        ]]);
+        $this->setSiteValue('en', 'lang', $lang);
 
         [$user, $collection] = $this->seedUserAndCollection();
 
@@ -272,10 +270,10 @@ class UpdateEntryTest extends TestCase
     /** @test */
     public function auto_title_only_gets_saved_on_localization_when_different_from_origin()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr/'],
-        ]]);
+        ]);
 
         [$user, $collection] = $this->seedUserAndCollection();
         $collection->sites(['en', 'fr']);
@@ -365,6 +363,70 @@ class UpdateEntryTest extends TestCase
     public function user_without_permission_to_manage_publish_state_cannot_change_publish_status()
     {
         $this->markTestIncomplete();
+    }
+
+    /** @test */
+    public function validates_max_depth()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $structure = (new CollectionStructure)->maxDepth(2)->expectsRoot(true);
+        $collection->structure($structure)->save();
+
+        EntryFactory::collection('test')->id('home')->slug('home')->data(['title' => 'Home', 'foo' => 'bar'])->create();
+        EntryFactory::collection('test')->id('about')->slug('about')->data(['title' => 'About', 'foo' => 'baz'])->create();
+        EntryFactory::collection('test')->id('team')->slug('team')->data(['title' => 'Team'])->create();
+
+        $entry = EntryFactory::collection($collection)
+            ->id('existing-entry')
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'home'],
+            ['entry' => 'about', 'children' => [
+                ['entry' => 'team'],
+            ]],
+            ['entry' => 'existing-entry'],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Existing Entry', 'slug' => 'existing-entry', 'parent' => ['team']]) // This would make it 3 levels deep, so it should fail.
+            ->assertUnprocessable();
+    }
+
+    /** @test */
+    public function does_not_validate_max_depth_when_collection_max_depth_is_null()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $structure = (new CollectionStructure)->expectsRoot(true);
+        $collection->structure($structure)->save();
+
+        EntryFactory::collection('test')->id('home')->slug('home')->data(['title' => 'Home', 'foo' => 'bar'])->create();
+        EntryFactory::collection('test')->id('about')->slug('about')->data(['title' => 'About', 'foo' => 'baz'])->create();
+        EntryFactory::collection('test')->id('team')->slug('team')->data(['title' => 'Team'])->create();
+
+        $entry = EntryFactory::collection($collection)
+            ->id('existing-entry')
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'home'],
+            ['entry' => 'about', 'children' => [
+                ['entry' => 'team'],
+            ]],
+            ['entry' => 'existing-entry'],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Existing Entry', 'slug' => 'existing-entry', 'parent' => ['team']]) // Since we have no max depth set, this should be fine.
+            ->assertOk();
     }
 
     private function seedUserAndCollection()
