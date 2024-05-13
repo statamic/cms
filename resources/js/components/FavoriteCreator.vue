@@ -29,7 +29,7 @@ export default {
 
     data() {
         return {
-            name: document.title.replace(` ${this.$config.get('direction', 'ltr') === 'ltr' ? '‹' : '›'} Statamic`, ''),
+            name: document.title.replace(` ${this.$config.get('direction', 'ltr') === 'ltr' ? '‹' : '›'} ${__('Statamic')}`, ''),
             currentUrl: this.$config.get('urlPath')
         }
     },
