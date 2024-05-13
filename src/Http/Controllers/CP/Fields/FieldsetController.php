@@ -123,7 +123,7 @@ class FieldsetController extends CpController
     {
         $request->validate([
             'title' => 'required',
-            'handle' => ['required', new Handle],
+            'handle' => ['required', 'regex:/^[a-zA-Z0-9._-]+$/'],
         ]);
 
         if (Facades\Fieldset::find($request->handle)) {
