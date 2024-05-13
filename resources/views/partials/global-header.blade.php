@@ -11,7 +11,7 @@
                     <img src="{{ $customLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="white-label-logo">
                 @else
                     @cp_svg('statamic-wordmark', 'w-24')
-                    @if (Statamic::pro())<span class="font-bold text-4xs align-top">{{ __('PRO') }}</span>@endif
+                    @if (Statamic::pro())<span class="font-bold text-4xs align-top uppercase">{{ __('Pro') }}</span>@endif
                 @endif
             </div>
         </a>
