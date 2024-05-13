@@ -60,7 +60,7 @@ class TermReferenceUpdater extends DataReferenceUpdater
                     && in_array($this->taxonomy, Arr::wrap($field->get('taxonomies')));
             })
             ->each(function ($field) use ($dottedPrefix) {
-                $field->get('max_items') === 1
+                $this->hasStringValue($field, $dottedPrefix)
                     ? $this->updateStringValue($field, $dottedPrefix)
                     : $this->updateArrayValue($field, $dottedPrefix);
             });
@@ -85,7 +85,7 @@ class TermReferenceUpdater extends DataReferenceUpdater
                     && count(Arr::wrap($field->get('taxonomies'))) === 0;
             })
             ->each(function ($field) use ($dottedPrefix) {
-                $field->get('max_items') === 1
+                $this->hasStringValue($field, $dottedPrefix)
                     ? $this->updateStringValue($field, $dottedPrefix)
                     : $this->updateArrayValue($field, $dottedPrefix);
             });

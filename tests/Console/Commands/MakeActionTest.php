@@ -8,7 +8,8 @@ use Tests\TestCase;
 
 class MakeActionTest extends TestCase
 {
-    use Concerns\CleansUpGeneratedPaths;
+    use Concerns\CleansUpGeneratedPaths,
+        Concerns\FakesComposerInstalls;
 
     private $files;
 
@@ -17,6 +18,7 @@ class MakeActionTest extends TestCase
         parent::setUp();
 
         $this->files = app(Filesystem::class);
+        $this->fakeSuccessfulComposerRequire();
     }
 
     public function tearDown(): void

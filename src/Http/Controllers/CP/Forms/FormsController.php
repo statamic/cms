@@ -8,8 +8,10 @@ use Statamic\CP\Column;
 use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Support\Str;
 
 class FormsController extends CpController
@@ -30,11 +32,13 @@ class FormsController extends CpController
             ->map(function ($form) {
                 return [
                     'id' => $form->handle(),
-                    'title' => $form->title(),
+                    'title' => __($form->title()),
                     'submissions' => $form->submissions()->count(),
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
                     'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
+                    'can_edit' => User::current()->can('edit', $form),
+                    'can_edit_blueprint' => User::current()->can('configure form fields', $form),
                     'actions' => Action::for($form),
                 ];
             })
@@ -69,7 +73,15 @@ class FormsController extends CpController
             ->rejectUnlisted()
             ->values();
 
-        return view('statamic::forms.show', compact('form', 'columns'));
+        $viewData = [
+            'form' => $form,
+            'columns' => $columns,
+            'filters' => Scope::filters('form-submissions', [
+                'form' => $form->handle(),
+            ]),
+        ];
+
+        return view('statamic::forms.show', $viewData);
     }
 
     /**
@@ -119,7 +131,7 @@ class FormsController extends CpController
 
         $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
+            'handle' => ['nullable', new Handle],
         ]);
 
         $handle = $request->handle ?? Str::snake($request->title);
@@ -141,7 +153,7 @@ class FormsController extends CpController
 
         $values = [
             'handle' => $form->handle(),
-            'title' => $form->title(),
+            'title' => __($form->title()),
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
             'email' => $form->email(),

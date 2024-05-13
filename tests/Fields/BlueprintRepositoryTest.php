@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Illuminate\Support\Collection;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
@@ -292,5 +293,44 @@ EOT;
 
         $this->assertInstanceOf(Collection::class, $all);
         $this->assertCount(0, $all);
+    }
+
+    /** @test */
+    public function it_sets_the_namespace_when_passed_when_making()
+    {
+        $blueprint = $this->repo->make('test::handle');
+
+        $this->assertSame($blueprint->namespace(), 'test');
+        $this->assertSame($blueprint->handle(), 'handle');
+    }
+
+    /** @test */
+    public function it_gets_a_blueprint_using_find_or_fail()
+    {
+        $contents = <<<'EOT'
+title: Test
+tabs:
+  main:
+    fields:
+      - one
+      - two
+EOT;
+
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturn($contents);
+
+        $blueprint = $this->repo->findOrFail('test');
+
+        $this->assertInstanceOf(Blueprint::class, $blueprint);
+        $this->assertEquals('test', $blueprint->handle());
+    }
+
+    /** @test */
+    public function find_or_fail_throws_exception_when_blueprint_does_not_exist()
+    {
+        $this->expectException(BlueprintNotFoundException::class);
+        $this->expectExceptionMessage('Blueprint [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }

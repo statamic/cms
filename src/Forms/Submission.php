@@ -6,21 +6,26 @@ use Carbon\Carbon;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
+use Statamic\Facades\Asset;
 use Statamic\Facades\File;
-use Statamic\Facades\YAML;
+use Statamic\Facades\FormSubmission;
+use Statamic\Facades\Stache;
 use Statamic\Forms\Uploaders\AssetsUploader;
-use Statamic\Support\Arr;
+use Statamic\Forms\Uploaders\FilesUploader;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Submission implements Augmentable, SubmissionContract
 {
-    use ContainsData, FluentlyGetsAndSets, HasAugmentedData;
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, TracksQueriedColumns, TracksQueriedRelations;
 
     /**
      * @var string
@@ -120,7 +125,11 @@ class Submission implements Augmentable, SubmissionContract
     public function uploadFiles($uploadedFiles)
     {
         return collect($uploadedFiles)->map(function ($files, $handle) {
-            return AssetsUploader::field($this->fields()->get($handle))->upload($files);
+            $field = $this->fields()->get($handle);
+
+            return $field['type'] === 'files'
+                ? FilesUploader::field($field)->upload($files)
+                : AssetsUploader::field($field)->upload($files);
         })->all();
     }
 
@@ -161,7 +170,7 @@ class Submission implements Augmentable, SubmissionContract
             }
         }
 
-        File::put($this->getPath(), YAML::dump(Arr::removeNullValues($this->data()->all())));
+        FormSubmission::save($this);
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -176,14 +185,28 @@ class Submission implements Augmentable, SubmissionContract
         }
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     /**
      * Delete this submission.
      */
     public function delete()
     {
-        File::delete($this->getPath());
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
 
-        SubmissionDeleted::dispatch($this);
+        FormSubmission::delete($this);
+
+        if ($withEvents) {
+            SubmissionDeleted::dispatch($this);
+        }
+
+        return true;
     }
 
     /**
@@ -193,7 +216,16 @@ class Submission implements Augmentable, SubmissionContract
      */
     public function getPath()
     {
-        return config('statamic.forms.submissions').'/'.$this->form()->handle().'/'.$this->id().'.yaml';
+        return $this->path();
+    }
+
+    public function path()
+    {
+        return vsprintf('%s/%s/%s.yaml', [
+            rtrim(Stache::store('form-submissions')->directory(), '/'),
+            $this->form()->handle(),
+            $this->id(),
+        ]);
     }
 
     /**
@@ -229,6 +261,11 @@ class Submission implements Augmentable, SubmissionContract
     public function blueprint()
     {
         return $this->form->blueprint();
+    }
+
+    public function fileData()
+    {
+        return $this->data()->all();
     }
 
     public function __get($key)

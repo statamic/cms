@@ -78,7 +78,7 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->bcc);
     }
 
-    public function singleAddressProvider()
+    public static function singleAddressProvider()
     {
         return [
             'single email' => ['foo@bar.com', [
@@ -102,9 +102,9 @@ class EmailTest extends TestCase
         ];
     }
 
-    public function multipleAddressProvider()
+    public static function multipleAddressProvider()
     {
-        return array_merge($this->singleAddressProvider(), [
+        return array_merge(static::singleAddressProvider(), [
             'multiple emails' => ['foo@bar.com, baz@qux.com', [
                 ['address' => 'foo@bar.com', 'name' => null],
                 ['address' => 'baz@qux.com', 'name' => null],
@@ -234,11 +234,11 @@ class EmailTest extends TestCase
     /** @test */
     public function the_sites_locale_gets_used_on_the_mailable()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'one' => ['locale' => 'en_US', 'url' => '/one'],
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
             'three' => ['locale' => 'de_CH', 'lang' => 'de_CH', 'url' => '/three'],
-        ]]);
+        ]);
 
         $makeEmail = function ($site) {
             $submission = Mockery::mock(Submission::class);

@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
+use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
-use Statamic\Validation\AllowedFile;
 
 class FrontendFormRequest extends FormRequest
 {
@@ -61,6 +61,7 @@ class FrontendFormRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         if ($this->ajax()) {
+
             $errors = $validator->errors();
 
             $response = response([
@@ -109,15 +110,18 @@ class FrontendFormRequest extends FormRequest
     {
         // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
         return $fields->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets' && $this->hasFile($field->handle()))
+            ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files']) && $this->hasFile($field->handle()))
             ->map(fn ($field) => Arr::wrap($this->file($field->handle())))
             ->all();
     }
 
     public function validateResolved()
     {
-        $site = Site::findByUrl(URL::previous()) ?? Site::default();
+        // If this was submitted from a front-end form, we want to use the appropriate language
+        // for the translation messages. If there's no previous url, it was likely submitted
+        // directly in a headless format. In that case, we'll just use the default lang.
+        $site = ($previousUrl = session()->previousUrl()) ? Site::findByUrl($previousUrl) : null;
 
-        return $this->withLocale($site->lang(), fn () => parent::validateResolved());
+        return $this->withLocale($site?->lang(), fn () => parent::validateResolved());
     }
 }

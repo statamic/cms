@@ -14,9 +14,15 @@ use Statamic\Facades\Stache;
 
 class NavTree extends Tree implements TreeContract
 {
+    private $structureCache;
+
     public function structure()
     {
-        return Blink::once('nav-tree-structure-'.$this->handle(), function () {
+        if ($this->structureCache) {
+            return $this->structureCache;
+        }
+
+        return $this->structureCache = Blink::once('nav-tree-structure-'.$this->handle(), function () {
             return Nav::findByHandle($this->handle());
         });
     }
@@ -25,7 +31,7 @@ class NavTree extends Tree implements TreeContract
     {
         $path = Stache::store('nav-trees')->directory();
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $path .= $this->locale().'/';
         }
 

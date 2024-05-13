@@ -226,4 +226,19 @@ class FormTest extends TestCase
         Form::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(FormDeleted::class);
     }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $form = Form::make('contact_us');
+
+        $return = $form->deleteQuietly();
+
+        Event::assertNotDispatched(FormDeleting::class);
+        Event::assertNotDispatched(FormDeleted::class);
+
+        $this->assertTrue($return);
+    }
 }

@@ -5,7 +5,8 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Stache;
-use Wilderborn\Partyline\Facade as Partyline;
+
+use function Laravel\Prompts\spin;
 
 class StacheWarm extends Command
 {
@@ -16,12 +17,8 @@ class StacheWarm extends Command
 
     public function handle()
     {
-        Partyline::bind($this);
+        spin(callback: fn () => Stache::warm(), message: 'Warming the Stache...');
 
-        $this->line('Please wait. This may take a while if you have a lot of content.');
-
-        Stache::warm();
-
-        $this->info('You have poured oil over the Stache and polished it until it shines. It is warm and ready');
+        $this->components->info('You have poured oil over the Stache and polished it until it shines. It is warm and ready');
     }
 }
