@@ -28,12 +28,11 @@ class FieldTransformer
     {
         $fieldtype = FieldtypeRepository::find($submitted['fieldtype'] ?? $submitted['config']['type']);
 
-        $defaultConfig = Field::commonFieldOptions()->all()
-            ->merge($fieldtype->configFields()->all())
-            ->map->defaultValue()->filter();
+        $fields = Field::commonFieldOptions()->all()
+            ->merge($fieldtype->configFields()->all());
 
         $field = collect($submitted['config'])
-            ->reject(function ($value, $key) use ($defaultConfig) {
+            ->reject(function ($value, $key) use ($fields) {
                 if (in_array($key, ['isNew', 'icon', 'duplicate'])) {
                     return true;
                 }
@@ -46,7 +45,11 @@ class FieldTransformer
                     return true;
                 }
 
-                return $defaultConfig->has($key) && $defaultConfig->get($key) === $value;
+                if (! $field = $fields->get($key)) {
+                    return false;
+                }
+
+                return $field->defaultValue() === $value;
             })
             ->map(function ($value, $key) {
                 if ($key === 'sets') {
