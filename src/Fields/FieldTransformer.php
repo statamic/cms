@@ -91,7 +91,6 @@ class FieldTransformer
 
                 return $value;
             })
-            ->filter()
             ->sortBy(function ($value, $key) {
                 // Push sets & fields to the end of the config.
                 if ($key === 'sets' || $key === 'fields') {
@@ -104,7 +103,7 @@ class FieldTransformer
 
         return array_filter([
             'handle' => $submitted['handle'],
-            'field' => $field,
+            'field' => Arr::removeNullValues($field),
         ]);
     }
 
