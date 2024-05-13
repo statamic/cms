@@ -27,13 +27,10 @@ class SitesTest extends TestCase
     {
         parent::setUp();
 
-        $this->sites = new Sites([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['url' => 'http://test.com/'],
-                'fr' => ['url' => 'http://fr.test.com/'],
-                'de' => ['url' => 'http://test.com/de/'],
-            ],
+        $this->sites = (new Sites)->setSites([
+            'en' => ['url' => 'http://test.com/'],
+            'fr' => ['url' => 'http://fr.test.com/'],
+            'de' => ['url' => 'http://test.com/de/'],
         ]);
     }
 
@@ -62,7 +59,7 @@ class SitesTest extends TestCase
 
         $this->actingAs(tap(User::make()->assignRole('test'))->save());
 
-        \Statamic\Facades\Site::shouldReceive('hasMultiple')->andReturnTrue();
+        \Statamic\Facades\Site::shouldReceive('multiEnabled')->andReturnTrue();
 
         tap($this->sites->authorized(), function ($sites) {
             $this->assertInstanceOf(Collection::class, $sites);
@@ -93,6 +90,14 @@ class SitesTest extends TestCase
 
     /** @test */
     public function can_change_specific_config_items()
+    {
+        $this->sites->setSiteValue('en', 'url', 'http://foobar.com/');
+
+        $this->assertEquals('http://foobar.com', $this->sites->get('en')->url());
+    }
+
+    /** @test */
+    public function can_change_specific_config_items_the_legacy_deprecated_way()
     {
         $this->sites->setConfig('sites.en.url', 'http://foobar.com/');
 
@@ -172,12 +177,9 @@ class SitesTest extends TestCase
     /** @test */
     public function gets_site_from_url_when_using_relative_urls()
     {
-        $sites = new Sites([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['url' => '/'],
-                'fr' => ['url' => '/fr/'],
-            ],
+        $sites = (new Sites)->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
         ]);
 
         $this->assertEquals('en', $sites->findByUrl('http://absolute-url-resolved-from-request.com/something')->handle());

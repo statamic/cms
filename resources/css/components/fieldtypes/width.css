@@ -9,18 +9,18 @@
     }
 
     .field-width-notch {
-        @apply relative border border-gray-400 border-l-0 flex-1;
+        @apply relative border border-gray-400 rtl:border-r-0 ltr:border-l-0 flex-1;
 
         &:first-of-type {
-            @apply border-l rounded-l-sm;
+            @apply rtl:border-r ltr:border-l rtl:rounded-r-sm ltr:rounded-l-sm;
         }
 
         &.filled {
-            @apply border-gray-400 border-r-0 pr-px bg-white -my-px;
+            @apply border-gray-400 rtl:border-l-0 ltr:border-r-0 rtl:pl-px ltr:pr-px bg-white -my-px;
         }
 
         &.selected {
-            @apply border-r rounded-r-sm;
+            @apply rtl:border-l ltr:border-r rtl:rounded-l-sm ltr:rounded-r-sm;
         }
     }
 }
@@ -34,7 +34,7 @@
     .field-width-notch {
         @apply bg-gray-200 border-r-gray-400 border-y-gray-500;
         &:last-child {
-            @apply border-r-gray-500 rounded-r-sm;
+            @apply border-r-gray-500 rtl:rounded-l-sm ltr:rounded-r-sm;
         }
 
         &.filled {

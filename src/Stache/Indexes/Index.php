@@ -131,9 +131,15 @@ abstract class Index
 
     public function cacheKey()
     {
+        $replacements = ['::', '->'];
+
+        if (windows_os()) {
+            $replacements[1] = '-]';
+        }
+
         return vsprintf('stache::indexes::%s::%s', [
             $this->store->key(),
-            str_replace(['.', '/'], ['::', '->'], $this->name),
+            str_replace(['.', '/'], $replacements, $this->name),
         ]);
     }
 

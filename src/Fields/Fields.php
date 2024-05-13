@@ -16,15 +16,16 @@ class Fields
     protected $fields;
     protected $parent;
     protected $parentField;
+    protected $parentIndex;
     protected $filled = [];
     protected $withValidatableValues = false;
     protected $withComputedValues = false;
 
-    public function __construct($items = [], $parent = null, $parentField = null)
+    public function __construct($items = [], $parent = null, $parentField = null, $parentIndex = null)
     {
         $this
             ->setParent($parent)
-            ->setParentField($parentField)
+            ->setParentField($parentField, $parentIndex)
             ->setItems($items);
     }
 
@@ -59,12 +60,13 @@ class Fields
         return $this;
     }
 
-    public function setParentField($field)
+    public function setParentField($field, $index = null)
     {
         $this->parentField = $field;
+        $this->parentIndex = $index;
 
         if ($this->fields) {
-            $this->fields->each(fn ($f) => $f->setParentField($field));
+            $this->fields->each(fn ($f) => $f->setParentField($field, $index));
         }
 
         return $this;
@@ -115,7 +117,7 @@ class Fields
     {
         return (new static)
             ->setParent($this->parent)
-            ->setParentField($this->parentField)
+            ->setParentField($this->parentField, $this->parentIndex)
             ->setItems($this->items)
             ->setFields($this->fields)
             ->setFilled($this->filled);
@@ -245,7 +247,7 @@ class Fields
     {
         return (new Field($handle, $config))
             ->setParent($this->parent)
-            ->setParentField($this->parentField);
+            ->setParentField($this->parentField, $this->parentIndex);
     }
 
     private function getReferencedField(array $config): Field
@@ -254,18 +256,23 @@ class Fields
             throw new \Exception("Field {$config['field']} not found.");
         }
 
-        if ($overrides = array_get($config, 'config')) {
+        if ($overrides = Arr::get($config, 'config')) {
             $field->setConfig(array_merge($field->config(), $overrides));
         }
 
-        return $field->setParent($this->parent)->setHandle($config['handle']);
+        return $field
+            ->setParent($this->parent)
+            ->setParentField($this->parentField, $this->parentIndex)
+            ->setHandle($config['handle']);
     }
 
     private function getImportedFields(array $config): array
     {
+        $recursion = tap(app(FieldsetRecursionStack::class))->push($config['import']);
+
         $blink = 'blueprint-imported-fields-'.md5(json_encode($config));
 
-        return Blink::once($blink, function () use ($config) {
+        $imported = Blink::once($blink, function () use ($config) {
             if (! $fieldset = FieldsetRepository::find($config['import'])) {
                 throw new FieldsetNotFoundException($config['import']);
             }
@@ -278,7 +285,7 @@ class Fields
                 });
             }
 
-            if ($prefix = array_get($config, 'prefix')) {
+            if ($prefix = Arr::get($config, 'prefix')) {
                 $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
                     $field = clone $field;
                     $handle = $prefix.$field->handle();
@@ -289,7 +296,15 @@ class Fields
             }
 
             return $fields;
-        })->each->setParent($this->parent)->all();
+        })->each(function ($field) {
+            $field
+                ->setParent($this->parent)
+                ->setParentField($this->parentField, $this->parentIndex);
+        })->all();
+
+        $recursion->pop();
+
+        return $imported;
     }
 
     public function meta()

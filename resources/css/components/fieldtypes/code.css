@@ -1,6 +1,14 @@
+.code-fieldtype-container {
+    direction: ltr;
+}
+
 .code-fieldtype-toolbar {
     @apply bg-white shadow-none rounded-t border border-b-0 text-sm flex flex-wrap items-center justify-end gap-2;
     padding: 4px 8px;
+
+    [dir='rtl'] & {
+        direction: rtl;
+    }
 }
 
 .code-fieldtype-toolbar select {

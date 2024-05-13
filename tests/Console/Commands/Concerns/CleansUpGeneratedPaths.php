@@ -17,6 +17,7 @@ trait CleansUpGeneratedPaths
             base_path('app/Tags'),
             base_path('app/Widgets'),
             resource_path('js/components'),
+            base_path('vendor'),
         ];
 
         foreach ($dirs as $dir) {
