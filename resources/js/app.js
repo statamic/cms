@@ -273,20 +273,20 @@ Statamic.app({
         Vue.prototype.$moment.locale(Statamic.$config.get('locale'));
         const momentLocalSpec = {
             relativeTime: {
-                future: __('moment.future'),
-                past: __('moment.past'),
-                s: __('moment.s'),
-                ss: __('moment.ss'),
-                m: __('moment.m'),
-                mm: __('moment.mm'),
-                h: __('moment.h'),
-                hh: __('moment.hh'),
-                d: __('moment.d'),
-                dd: __('moment.dd'),
-                M: __('moment.M'),
-                MM: __('moment.MM'),
-                y: __('moment.y'),
-                yy: __('moment.yy'),
+                future: __('moment.relativeTime.future'),
+                past: __('moment.relativeTime.past'),
+                s: __('moment.relativeTime.s'),
+                ss: __('moment.relativeTime.ss'),
+                m: __('moment.relativeTime.m'),
+                mm: __('moment.relativeTime.mm'),
+                h: __('moment.relativeTime.h'),
+                hh: __('moment.relativeTime.hh'),
+                d: __('moment.relativeTime.d'),
+                dd: __('moment.relativeTime.dd'),
+                M: __('moment.relativeTime.M'),
+                MM: __('moment.relativeTime.MM'),
+                y: __('moment.relativeTime.y'),
+                yy: __('moment.relativeTime.yy'),
             }
         };
         window.moment.updateLocale(Statamic.$config.get('locale'), momentLocalSpec);
