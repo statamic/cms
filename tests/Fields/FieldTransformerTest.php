@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Statamic\Fields\FieldTransformer;
+use Statamic\Fields\Fieldtype;
 use Tests\TestCase;
 
 class FieldTransformerTest extends TestCase
@@ -68,15 +69,30 @@ class FieldTransformerTest extends TestCase
     /** @test */
     public function it_removes_redundant_config_options()
     {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function configFieldItems(): array
+            {
+                return [
+                    'input_type' => ['type' => 'text', 'default' => 'text'],
+                    'character_limit' => ['type' => 'integer', 'default' => null],
+                    'max_items' => ['type' => 'integer', 'default' => 1, 'force_in_config' => true],
+                ];
+            }
+        };
+        $fieldtype::register();
+
         $fromVue = FieldTransformer::fromVue([
-            'fieldtype' => 'text',
+            'fieldtype' => 'test',
             'handle' => 'test',
             'type' => 'inline',
             'config' => [
                 // Fieldtype config options
                 'input_type' => 'text', // The default.
-                'icon' => 'text', // The default.
                 'character_limit' => 100, // This one has been changed.
+                'max_items' => 1, // Even though it matches the default, it has been flagged to be explicitly kept.
                 'foo' => 'bar', // Manually added by user.
 
                 // Common field options
@@ -88,6 +104,7 @@ class FieldTransformerTest extends TestCase
         $this->assertEquals([
             'character_limit' => 100,
             'listable' => true,
+            'max_items' => 1,
             'foo' => 'bar',
         ], $fromVue['field']);
     }
