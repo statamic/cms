@@ -33,7 +33,7 @@ class FieldTransformer
 
         $field = collect($submitted['config'])
             ->reject(function ($value, $key) use ($fields) {
-                if (in_array($key, ['isNew', 'icon', 'duplicate'])) {
+                if (in_array($key, ['isNew', 'icon'])) {
                     return true;
                 }
 
