@@ -16,7 +16,14 @@ class EntryRevisionsController extends CpController
             ->revisions()
             ->reverse()
             ->prepend($this->workingCopy($entry))
-            ->filter();
+            ->filter()
+            ->each(function ($revision) use ($collection, $entry) {
+                $revision->attribute('item_url', cp_route('collections.entries.revisions.show', [
+                    'collection' => $collection,
+                    'entry' => $entry->id(),
+                    'revision' => $revision->id(),
+                ]));
+            });
 
         // The first non manually created revision would be considered the "current"
         // version. It's what corresponds to what's in the content directory.
