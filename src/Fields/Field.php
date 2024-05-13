@@ -551,6 +551,6 @@ class Field implements Arrayable
             ],
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 
-        return new Fields($fields);
+        return new ConfigFields($fields);
     }
 }

@@ -49,6 +49,10 @@ class FieldTransformer
                     return false;
                 }
 
+                if ($field->mustRemainInConfig()) {
+                    return false;
+                }
+
                 return $field->defaultValue() === $value;
             })
             ->map(function ($value, $key) {
