@@ -4,10 +4,13 @@ namespace Tests\Fields;
 
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\FieldTransformer;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class FieldTransformerTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     protected function configToVue($config)
     {
         return FieldTransformer::toVue(['handle' => 'test', 'field' => $config])['config'];
