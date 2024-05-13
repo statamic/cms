@@ -8,6 +8,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetCreating;
 use Statamic\Events\GlobalSetDeleted;
+use Statamic\Events\GlobalSetDeleting;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades;
@@ -126,13 +127,29 @@ class GlobalSet implements Contract
             ->each->delete();
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && GlobalSetDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         $this->localizations()->each->delete();
 
         Facades\GlobalSet::delete($this);
 
-        GlobalSetDeleted::dispatch($this);
+        if ($withEvents) {
+            GlobalSetDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -143,7 +160,7 @@ class GlobalSet implements Contract
             'title' => $this->title(),
         ];
 
-        if (! Site::hasMultiple() && ($variables = $this->in(Site::default()->handle()))) {
+        if (! Site::multiEnabled() && ($variables = $this->in(Site::default()->handle()))) {
             $data['data'] = Arr::removeNullValues(
                 $variables->data()->all()
             );

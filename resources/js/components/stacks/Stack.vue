@@ -3,13 +3,13 @@
     <v-portal :to="portal" :order="depth" target-class="stack">
         <div class="stack-container"
             :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-2 shadow-lg': full }"
-            :style="{ left: `${leftOffset}px` }"
+            :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
         >
             <transition name="stack-overlay-fade">
-                <div class="stack-overlay" v-if="visible" :style="{ left: `-${leftOffset}px` }" />
+                <div class="stack-overlay" v-if="visible" :style="direction === 'ltr' ? { left: `-${leftOffset}px` } : { right: `-${leftOffset}px` }" />
             </transition>
 
-            <div class="stack-hit-area" :style="{ left: `-${offset}px` }" @click="clickedHitArea" @mouseenter="mouseEnterHitArea" @mouseout="mouseOutHitArea" />
+            <div class="stack-hit-area" :style="direction === 'ltr' ? { left: `-${offset}px` } : { right: `-${offset}px` }" @click="clickedHitArea" @mouseenter="mouseEnterHitArea" @mouseout="mouseOutHitArea" />
 
             <transition name="stack-slide">
                 <div class="stack-content" v-if="visible">
@@ -96,6 +96,10 @@ export default {
 
         isTopStack() {
             return this.$stacks.count() === this.depth;
+        },
+
+        direction() {
+            return this.$config.get('direction', 'ltr');
         }
 
     },
@@ -118,16 +122,25 @@ export default {
     methods: {
 
         clickedHitArea() {
+            if (!this.visible) {
+                return;
+            }
             this.$events.$emit(`stacks.hit-area-clicked`, this.depth - 1);
+            this.$events.$emit(`stacks.${this.depth - 1}.hit-area-mouseout`);
         },
 
         mouseEnterHitArea() {
+            if (!this.visible) {
+                return;
+            }
             this.$events.$emit(`stacks.${this.depth - 1}.hit-area-mouseenter`);
         },
 
         mouseOutHitArea() {
+            if (!this.visible) {
+                return;
+            }
             this.$events.$emit(`stacks.${this.depth - 1}.hit-area-mouseout`);
-
         },
 
         runCloseCallback() {

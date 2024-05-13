@@ -4,6 +4,8 @@ namespace Statamic\Stache\Repositories;
 
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
+use Statamic\Exceptions\TaxonomyNotFoundException;
+use Statamic\Exceptions\TermNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
@@ -32,11 +34,19 @@ class TermRepository implements RepositoryContract
 
     public function whereTaxonomy(string $handle): TermCollection
     {
+        if (! Taxonomy::find($handle)) {
+            throw new TaxonomyNotFoundException($handle);
+        }
+
         return $this->query()->where('taxonomy', $handle)->get();
     }
 
     public function whereInTaxonomy(array $handles): TermCollection
     {
+        collect($handles)
+            ->reject(fn ($taxonomy) => Taxonomy::find($taxonomy))
+            ->each(fn ($taxonomy) => throw new TaxonomyNotFoundException($taxonomy));
+
         return $this->query()->whereIn('taxonomy', $handles)->get();
     }
 
@@ -45,7 +55,7 @@ class TermRepository implements RepositoryContract
         return $this->query()->where('id', $id)->first();
     }
 
-    public function findByUri(string $uri, string $site = null): ?Term
+    public function findByUri(string $uri, ?string $site = null): ?Term
     {
         $site = $site ?? $this->stache->sites()->first();
 
@@ -91,6 +101,17 @@ class TermRepository implements RepositoryContract
         return $term->collection($collection);
     }
 
+    public function findOrFail($id): Term
+    {
+        $term = $this->find($id);
+
+        if (! $term) {
+            throw new TermNotFoundException($id);
+        }
+
+        return $term;
+    }
+
     public function save($term)
     {
         $this->store
@@ -112,7 +133,7 @@ class TermRepository implements RepositoryContract
         return new TermQueryBuilder($this->store);
     }
 
-    public function make(string $slug = null): Term
+    public function make(?string $slug = null): Term
     {
         return app(Term::class)->slug($slug);
     }

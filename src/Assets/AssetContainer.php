@@ -13,6 +13,7 @@ use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerDeleted;
+use Statamic\Events\AssetContainerDeleting;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
@@ -173,25 +174,37 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      *
      * @return \Statamic\Fields\Blueprint
      */
-    public function blueprint()
+    public function blueprint($asset = null)
     {
-        if (Blink::has($blink = 'asset-container-blueprint-'.$this->handle())) {
-            return Blink::get($blink);
+        $blueprint = $this->getBaseBlueprint();
+
+        $blueprint->setParent($asset ?? $this);
+
+        // Only dispatch the event when there's no asset.
+        // When there is an asset, the event is dispatched from the asset.
+        if (! $asset) {
+            Blink::once(
+                'asset-container-assetcontainerblueprintfound-'.$this->handle(),
+                fn () => AssetContainerBlueprintFound::dispatch($blueprint, $this)
+            );
         }
 
-        $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
-            'alt' => [
-                'type' => 'text',
-                'display' => __('Alt Text'),
-                'instructions' => __('Description of the image'),
-            ],
-        ])->setHandle($this->handle())->setNamespace('assets');
-
-        Blink::put($blink, $blueprint);
-
-        AssetContainerBlueprintFound::dispatch($blueprint, $this);
-
         return $blueprint;
+    }
+
+    private function getBaseBlueprint()
+    {
+        $blink = 'asset-container-blueprint-'.$this->handle();
+
+        return Blink::once($blink, function () {
+            return Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
+                'alt' => [
+                    'type' => 'text',
+                    'display' => __('Alt Text'),
+                    'instructions' => __('Description of the image'),
+                ],
+            ])->setHandle($this->handle())->setNamespace('assets');
+        });
     }
 
     public function afterSave($callback)
@@ -250,6 +263,13 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     /**
      * Delete the container.
      *
@@ -257,9 +277,18 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && AssetContainerDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\AssetContainer::delete($this);
 
-        AssetContainerDeleted::dispatch($this);
+        if ($withEvents) {
+            AssetContainerDeleted::dispatch($this);
+        }
 
         return true;
     }

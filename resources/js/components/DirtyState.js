@@ -29,8 +29,7 @@ const vm = new Vue({
         },
 
         remove(name) {
-            const i = this.names.indexOf(name);
-            this.names.splice(i, 1);
+            this.names = this.names.filter(n => n !== name);
         },
 
         enableWarning() {

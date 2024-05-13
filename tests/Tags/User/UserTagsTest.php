@@ -4,6 +4,7 @@ namespace Tests\Tags\User;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Statamic\Facades\Parse;
+use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\FakesUserGroups;
@@ -16,9 +17,9 @@ class UserTagsTest extends TestCase
         FakesUserGroups,
         PreventSavingStacheItemsToDisk;
 
-    private function tag($tag)
+    private function tag($tag, $params = [])
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, $params);
     }
 
     /** @test */
@@ -68,6 +69,10 @@ class UserTagsTest extends TestCase
         // Test if user is assigned any of these roles
         $this->assertEquals('yes', $this->tag('{{ user:is role="webmaster|admin" }}yes{{ /user:is }}'));
         $this->assertEquals('', $this->tag('{{ user:isnt role="webmaster|admin" }}yes{{ /user:isnt }}'));
+
+        // test if it handles the value of a user_roles tag
+        $this->assertEquals('yes', $this->tag('{{ user:is :roles="roles" }}yes{{ /user:is }}', ['roles' => Role::all()]));
+        $this->assertEquals('', $this->tag('{{ user:isnt :roles="roles" }}yes{{ /user:isnt }}', ['roles' => Role::all()]));
     }
 
     /** @test */

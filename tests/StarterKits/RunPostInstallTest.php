@@ -79,7 +79,7 @@ class RunPostInstallTest extends TestCase
             ->artisan('statamic:starter-kit:run-post-install', [
                 'package' => 'statamic/cool-runnings',
             ])
-            ->expectsOutput('Cannot find post-install hook for [statamic/cool-runnings].')
+            ->expectsOutputToContain('Cannot find post-install hook for [statamic/cool-runnings].')
             ->assertExitCode(1);
 
         $this->assertFalse(Blink::has('post-install-hook-run'));
@@ -97,7 +97,7 @@ class RunPostInstallTest extends TestCase
             ->artisan('statamic:starter-kit:run-post-install', [
                 'package' => 'statamic/non-existent',
             ])
-            ->expectsOutput('Cannot find starter kit [statamic/non-existent] in vendor.')
+            ->expectsOutputToContain('Cannot find starter kit [statamic/non-existent] in vendor.')
             ->assertExitCode(1);
 
         $this->assertFalse(Blink::has('post-install-hook-run'));

@@ -5,11 +5,18 @@ namespace Statamic\Fields;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
+use Statamic\Events\FieldsetDeleting;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
+use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
+use Statamic\Facades\Taxonomy;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Fieldset
@@ -53,7 +60,7 @@ class Fieldset
 
     public function setContents(array $contents)
     {
-        $fields = array_get($contents, 'fields', []);
+        $fields = Arr::get($contents, 'fields', []);
 
         // Support legacy syntax
         if (! empty($fields) && array_keys($fields)[0] !== 0) {
@@ -79,9 +86,17 @@ class Fieldset
         return $this->contents['title'] ?? Str::humanize(Str::of($this->handle)->after('::')->afterLast('.'));
     }
 
+    /**
+     * @throws FieldsetRecursionException
+     */
+    public function validateRecursion()
+    {
+        $this->fields();
+    }
+
     public function fields(): Fields
     {
-        $fields = array_get($this->contents, 'fields', []);
+        $fields = Arr::get($this->contents, 'fields', []);
 
         return new Fields($fields);
     }
@@ -109,6 +124,68 @@ class Fieldset
     public function deleteUrl()
     {
         return cp_route('fieldsets.destroy', $this->handle());
+    }
+
+    public function importedBy(): array
+    {
+        $blueprints = collect([
+            ...Collection::all()->flatMap->entryBlueprints(),
+            ...Taxonomy::all()->flatMap->termBlueprints(),
+            ...GlobalSet::all()->map->blueprint(),
+            ...AssetContainer::all()->map->blueprint(),
+            ...Blueprint::in('')->values(),
+        ])->filter()->filter(function (Blueprint $blueprint) {
+            return collect($blueprint->contents()['tabs'])
+                ->pluck('sections')
+                ->flatten(1)
+                ->pluck('fields')
+                ->flatten(1)
+                ->filter(fn ($field) => $field && $this->fieldImportsFieldset($field))
+                ->isNotEmpty();
+        })->values();
+
+        $fieldsets = \Statamic\Facades\Fieldset::all()
+            ->filter(fn (Fieldset $fieldset) => isset($fieldset->contents()['fields']))
+            ->filter(function (Fieldset $fieldset) {
+                return collect($fieldset->contents()['fields'])
+                    ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                    ->isNotEmpty();
+            })
+            ->values();
+
+        return ['blueprints' => $blueprints, 'fieldsets' => $fieldsets];
+    }
+
+    private function fieldImportsFieldset(array $field): bool
+    {
+        if (isset($field['import'])) {
+            return $field['import'] === $this->handle();
+        }
+
+        if (is_string($field['field'])) {
+            return Str::before($field['field'], '.') === $this->handle();
+        }
+
+        if (isset($field['field']['fields'])) {
+            return collect($field['field']['fields'])
+                ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                ->isNotEmpty();
+        }
+
+        if (isset($field['field']['sets'])) {
+            return collect($field['field']['sets'])
+                ->filter(fn ($setGroup) => isset($setGroup['sets']))
+                ->filter(function ($setGroup) {
+                    return collect($setGroup['sets'])->filter(function ($set) {
+                        return collect($set['fields'])
+                            ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                            ->isNotEmpty();
+                    })->isNotEmpty();
+                })
+                ->isNotEmpty();
+        }
+
+        return false;
     }
 
     public function isDeletable()
@@ -167,11 +244,27 @@ class Fieldset
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && FieldsetDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         FieldsetRepository::delete($this);
 
-        FieldsetDeleted::dispatch($this);
+        if ($withEvents) {
+            FieldsetDeleted::dispatch($this);
+        }
 
         return true;
     }

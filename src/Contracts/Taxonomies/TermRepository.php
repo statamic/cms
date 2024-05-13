@@ -14,7 +14,9 @@ interface TermRepository
 
     public function findByUri(string $uri);
 
-    public function make(string $slug = null);
+    public function findOrFail($id);
+
+    public function make(?string $slug = null);
 
     public function query();
 

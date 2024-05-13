@@ -19,6 +19,7 @@ use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Events\GlobalVariablesCreated;
 use Statamic\Events\GlobalVariablesCreating;
 use Statamic\Events\GlobalVariablesDeleted;
+use Statamic\Events\GlobalVariablesDeleting;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Events\GlobalVariablesSaving;
 use Statamic\Facades;
@@ -76,7 +77,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
     {
         return vsprintf('%s/%s%s.%s', [
             rtrim(Stache::store('global-variables')->directory(), '/'),
-            Site::hasMultiple() ? $this->locale().'/' : '',
+            Site::multiEnabled() ? $this->locale().'/' : '',
             $this->handle(),
             'yaml',
         ]);
@@ -96,7 +97,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
     {
         $params = [$this->handle()];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $params['site'] = $this->locale();
         }
 
@@ -154,11 +155,27 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && GlobalVariablesDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\GlobalVariables::delete($this);
 
-        GlobalVariablesDeleted::dispatch($this);
+        if ($withEvents) {
+            GlobalVariablesDeleted::dispatch($this);
+        }
 
         return true;
     }

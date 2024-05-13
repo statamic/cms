@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
+use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -70,7 +71,7 @@ class FileCacher extends AbstractCacher
     }
 
     /**
-     * @return string
+     * @return Page
      */
     public function getCachedPage(Request $request)
     {
@@ -82,7 +83,7 @@ class FileCacher extends AbstractCacher
             Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
         }
 
-        return File::get($path);
+        return new Page(File::get($path));
     }
 
     public function hasCachedPage(Request $request)
@@ -206,7 +207,7 @@ class FileCacher extends AbstractCacher
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            url: window.location.href,
+            url: window.location.href.split('#')[0],
             sections: Object.keys(map)
         })
     })
@@ -237,7 +238,7 @@ class FileCacher extends AbstractCacher
             window.livewireScriptConfig.csrf = data.csrf
         }
 
-        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
+        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));
     });
 })();
 EOT;

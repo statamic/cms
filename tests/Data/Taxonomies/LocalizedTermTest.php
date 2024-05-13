@@ -145,7 +145,7 @@ class LocalizedTermTest extends TestCase
         $this->assertSame($builder, $localized->foo());
     }
 
-    public function queryBuilderProvider()
+    public static function queryBuilderProvider()
     {
         return [
             'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],

@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Entries\Collection;
 use Statamic\Fields\Field;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
@@ -13,13 +14,15 @@ use Statamic\Tags\Tags;
 use Statamic\Taxonomies\TermCollection;
 use Statamic\View\Antlers\Language\Exceptions\AntlersException;
 use Statamic\View\Cascade;
-use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
+use Tests\Antlers\Fixtures\Addon\Tags\VarTestTags as VarTest;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class ConditionLogicTest extends ParserTestCase
 {
     use FakesViews;
+    use PreventSavingStacheItemsToDisk;
 
     public function test_negation_following_or_is_evaluated()
     {
@@ -810,5 +813,27 @@ EOT
         );
 
         $this->assertSame('Yes', trim($this->renderString($template, ['code_field' => $value], true)));
+    }
+
+    public function test_conditions_with_objects_inside_interpolations_dont_trigger_string_errors()
+    {
+        $collection = Collection::make('blog')->routes('{slug}')->save();
+
+        $template = <<<'EOT'
+{{ if items | where('collection', {collection}) }}
+Yes
+{{ /if }}
+EOT;
+
+        $data = [
+            'items' => [
+                [
+                    'collection' => 'blog',
+                ],
+            ],
+            'collection' => $collection,
+        ];
+
+        $this->assertSame('Yes', trim($this->renderString($template, $data, true)));
     }
 }

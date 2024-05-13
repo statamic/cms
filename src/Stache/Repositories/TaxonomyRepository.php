@@ -5,6 +5,7 @@ namespace Statamic\Stache\Repositories;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\TaxonomyRepository as RepositoryContract;
+use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Facades;
 use Statamic\Stache\Stache;
 use Statamic\Support\Str;
@@ -27,6 +28,17 @@ class TaxonomyRepository implements RepositoryContract
     public function find($id): ?Taxonomy
     {
         return $this->findByHandle($id);
+    }
+
+    public function findOrFail($id): Taxonomy
+    {
+        $taxonomy = $this->find($id);
+
+        if (! $taxonomy) {
+            throw new TaxonomyNotFoundException($id);
+        }
+
+        return $taxonomy;
     }
 
     public function handles(): Collection
@@ -54,12 +66,12 @@ class TaxonomyRepository implements RepositoryContract
         $this->store->delete($taxonomy);
     }
 
-    public function make(string $handle = null): Taxonomy
+    public function make(?string $handle = null): Taxonomy
     {
         return app(Taxonomy::class)->handle($handle);
     }
 
-    public function findByUri(string $uri, string $site = null): ?Taxonomy
+    public function findByUri(string $uri, ?string $site = null): ?Taxonomy
     {
         $collection = Facades\Collection::all()
             ->first(function ($collection) use ($uri, $site) {

@@ -151,6 +151,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Assets::class,
         Tags\Cache::class,
         Tags\Can::class,
+        Tags\Children::class,
         Tags\Collection\Collection::class,
         Tags\Cookie::class,
         Tags\Dd::class,
@@ -229,6 +230,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddDefaultPreferencesToGitConfig::class,
         Updates\AddConfigureFormFieldsPermission::class,
         Updates\AddSitePermissions::class,
+        Updates\UseClassBasedStatamicUniqueRules::class,
+        Updates\MigrateSitesConfigToYaml::class,
     ];
 
     public function register()
@@ -237,6 +240,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerAddonManifest();
         $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
+        $this->app->instance('statamic.hooks', collect());
     }
 
     protected function registerAddonManifest()

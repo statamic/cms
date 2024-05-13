@@ -7,12 +7,13 @@ use Facades\Statamic\Routing\ResolveRedirect;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
+use Statamic\Facades\Entry;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -151,10 +152,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_subdirectory_based_site_is_displayed()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -166,10 +167,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_subdirectory_based_site_is_displayed_with_ending_slash()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -181,10 +182,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_domain_site_is_displayed()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -196,10 +197,10 @@ class FrontendTest extends TestCase
     /** @test */
     public function home_page_on_second_domain_site_is_displayed_with_ending_slash()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -644,10 +645,10 @@ class FrontendTest extends TestCase
     {
         app('translator')->addNamespace('test', __DIR__.'/__fixtures__/lang');
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<p>{{ trans key="test::messages.hello" }}</p>');
@@ -664,7 +665,7 @@ class FrontendTest extends TestCase
     public function it_sets_the_carbon_to_string_format()
     {
         config(['statamic.system.date_format' => 'd/m/Y']);
-        Carbon::setTestNow('October 21st, 2022');
+        Date::setTestNow('October 21st, 2022');
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<p>{{ now }}</p>');
         $this->makeCollection()->save();
@@ -690,10 +691,10 @@ class FrontendTest extends TestCase
         $frLocale = setlocale(LC_TIME, 0);
         setlocale(LC_TIME, $originalLocale);
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en', 'lang' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale, 'lang' => 'fr'],
-        ]]);
+        ]);
 
         (new class extends Tags
         {
@@ -737,8 +738,8 @@ class FrontendTest extends TestCase
     private function assertDefaultCarbonFormat()
     {
         $this->assertEquals(
-            Carbon::now()->format(Carbon::DEFAULT_TO_STRING_FORMAT),
-            (string) Carbon::now(),
+            Date::now()->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+            (string) Date::now(),
             'Carbon was not formatted using the default format.'
         );
     }
@@ -816,7 +817,7 @@ class FrontendTest extends TestCase
         }
     }
 
-    public function redirectProvider()
+    public static function redirectProvider()
     {
         return [
             'valid redirect' => [
@@ -843,7 +844,7 @@ class FrontendTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider redirectProviderNoBlueprint
+     * @dataProvider redirectProviderNoBlueprintProvider
      */
     public function redirect_is_followed_when_no_field_is_present_in_blueprint(
         $dataValue,
@@ -880,7 +881,7 @@ class FrontendTest extends TestCase
         }
     }
 
-    public function redirectProviderNoBlueprint()
+    public static function redirectProviderNoBlueprintProvider()
     {
         return [
             'valid redirect' => [
@@ -907,6 +908,97 @@ class FrontendTest extends TestCase
                 null,                  // and not redirect
             ],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function redirect_is_followed_when_value_is_inherited_from_origin()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        $blueprint = Blueprint::makeFromFields([
+            'redirect' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'url', 'field' => ['type' => 'link']],
+                    ['handle' => 'status', 'field' => ['type' => 'radio', 'options' => [301, 302]]],
+                ],
+            ]]);
+        Blueprint::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
+
+        Collection::make('pages')->sites(['en', 'fr'])->routes(['en' => '{slug}', 'fr' => '{slug}'])->save();
+
+        $entry = tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
+                ],
+            ],
+        ]))->save();
+        tap($entry->makeLocalization('fr'))->save();
+
+        $response = $this->get('/fr/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
+    }
+
+    /**
+     * @test
+     */
+    public function redirect_http_status_is_applied_when_present_in_blueprint()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'redirect' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'url', 'field' => ['type' => 'link']],
+                    ['handle' => 'status', 'field' => ['type' => 'radio', 'options' => [301, 302]]],
+                ],
+            ]]);
+        Blueprint::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
+
+        tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
+                ],
+            ],
+        ]))->save();
+
+        $response = $this->get('/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
+    }
+
+    /**
+     * @test
+     */
+    public function redirect_http_status_is_applied_when_missing_from_blueprint()
+    {
+        tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
+                ],
+            ],
+        ]))->save();
+
+        $response = $this->get('/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
     }
 
     /** @test */

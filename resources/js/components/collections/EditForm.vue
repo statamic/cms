@@ -9,6 +9,7 @@
         :values="values"
         :meta="meta"
         :errors="errors"
+        :site="site"
         @updated="values = $event"
     >
         <div slot-scope="{ setFieldValue, setFieldMeta }">
@@ -85,6 +86,12 @@ export default {
             this.submit();
         });
     },
+
+    computed: {
+        site() {
+            return this.$config.get('selectedSite');
+        }
+    }
 
 }
 </script>
