@@ -46,7 +46,7 @@ class FieldTransformer
                     return true;
                 }
 
-                if ($submitted['fieldtype'] === 'assets' && $key === 'container') {
+                if (isset($submitted['fieldtype']) && $submitted['fieldtype'] === 'assets' && $key === 'container') {
                     return false;
                 }
 
