@@ -2,6 +2,7 @@
 
 namespace Tests\Fields;
 
+use Statamic\Facades\AssetContainer;
 use Statamic\Fields\FieldTransformer;
 use Tests\TestCase;
 
@@ -89,6 +90,29 @@ class FieldTransformerTest extends TestCase
             'character_limit' => 100,
             'listable' => true,
             'foo' => 'bar',
+        ], $fromVue['field']);
+    }
+
+    /** @test */
+    public function it_doesnt_remove_container_config_option_from_assets_field()
+    {
+        AssetContainer::make('assets')->save();
+
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'assets',
+            'handle' => 'test',
+            'type' => 'inline',
+            'config' => [
+                'mode' => 'list',  // The default.
+                'icon' => 'assets', // The default.
+                'foo' => 'bar', // Manually added by user.
+                'container' => 'assets', // The default, but it shouldn't get removed.
+            ],
+        ]);
+
+        $this->assertEquals([
+            'foo' => 'bar',
+            'container' => 'assets',
         ], $fromVue['field']);
     }
 

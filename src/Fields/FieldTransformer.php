@@ -33,7 +33,7 @@ class FieldTransformer
             ->map->defaultValue()->filter();
 
         $field = collect($submitted['config'])
-            ->reject(function ($value, $key) use ($defaultConfig) {
+            ->reject(function ($value, $key) use ($submitted, $defaultConfig) {
                 if (in_array($key, ['isNew', 'icon', 'duplicate'])) {
                     return true;
                 }
@@ -44,6 +44,10 @@ class FieldTransformer
 
                 if ($key === 'localizable' && $value === false && ! Site::multiEnabled()) {
                     return true;
+                }
+
+                if ($submitted['fieldtype'] === 'assets' && $key === 'container') {
+                    return false;
                 }
 
                 return $defaultConfig->has($key) && $defaultConfig->get($key) === $value;
