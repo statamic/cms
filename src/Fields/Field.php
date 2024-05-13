@@ -477,6 +477,10 @@ class Field implements Arrayable
                 'instructions' => __('statamic::messages.fields_display_instructions'),
                 'type' => 'field_display',
             ],
+            'hide_display' => [
+                'type' => 'toggle',
+                'visibility' => 'hidden',
+            ],
             'handle' => [
                 'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
