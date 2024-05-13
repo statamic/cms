@@ -2,12 +2,16 @@
 
 namespace Tests\Fields;
 
+use Statamic\Facades\AssetContainer;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class FieldTransformerTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     protected function configToVue($config)
     {
         return FieldTransformer::toVue(['handle' => 'test', 'field' => $config])['config'];
@@ -290,5 +294,76 @@ class FieldTransformerTest extends TestCase
                 ]],
             ],
         ], $fromVue);
+    }
+
+    /**
+     * @test
+     *
+     * @see https://github.com/statamic/cms/issues/10056
+     */
+    public function it_doesnt_remove_max_items_from_form_fieldtype()
+    {
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'form',
+            'handle' => 'test',
+            'type' => 'inline',
+            'config' => [
+                'foo' => 'bar',
+                'max_items' => 1,
+            ],
+        ]);
+
+        $this->assertEquals([
+            'foo' => 'bar',
+            'max_items' => 1,
+        ], $fromVue['field']);
+    }
+
+    /**
+     * @test
+     *
+     * @see https://github.com/statamic/cms/issues/10050
+     */
+    public function it_ensures_the_asset_container_is_saved_on_the_assets_fieldtype()
+    {
+        AssetContainer::make('test')->save();
+
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'assets',
+            'handle' => 'test',
+            'type' => 'inline',
+            'config' => [
+                'foo' => 'bar',
+                'container' => 'test',
+            ],
+        ]);
+
+        $this->assertEquals([
+            'foo' => 'bar',
+            'container' => 'test',
+        ], $fromVue['field']);
+    }
+
+    /**
+     * @test
+     *
+     * @see https://github.com/statamic/cms/issues/10040
+     */
+    public function it_saves_a_toggle_as_false_where_the_default_is_true()
+    {
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text',
+            'handle' => 'test',
+            'type' => 'inline',
+            'config' => [
+                'replicator_preview' => false,
+                'duplicate' => false,
+            ],
+        ]);
+
+        $this->assertEquals([
+            'replicator_preview' => false,
+            'duplicate' => false,
+        ], $fromVue['field']);
     }
 }
