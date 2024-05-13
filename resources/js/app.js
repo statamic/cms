@@ -267,31 +267,7 @@ Statamic.app({
             });
         });
 
-        // Set moment locale
-        window.moment.locale(Statamic.$config.get('locale'));
-        Vue.moment.locale(Statamic.$config.get('locale'));
-        Vue.prototype.$moment.locale(Statamic.$config.get('locale'));
-        const momentLocalSpec = {
-            relativeTime: {
-                future: __('moment.relativeTime.future'),
-                past: __('moment.relativeTime.past'),
-                s: __('moment.relativeTime.s'),
-                ss: __('moment.relativeTime.ss'),
-                m: __('moment.relativeTime.m'),
-                mm: __('moment.relativeTime.mm'),
-                h: __('moment.relativeTime.h'),
-                hh: __('moment.relativeTime.hh'),
-                d: __('moment.relativeTime.d'),
-                dd: __('moment.relativeTime.dd'),
-                M: __('moment.relativeTime.M'),
-                MM: __('moment.relativeTime.MM'),
-                y: __('moment.relativeTime.y'),
-                yy: __('moment.relativeTime.yy'),
-            }
-        };
-        window.moment.updateLocale(Statamic.$config.get('locale'), momentLocalSpec);
-        Vue.moment.updateLocale(Statamic.$config.get('locale'), momentLocalSpec);
-        Vue.prototype.$moment.updateLocale(Statamic.$config.get('locale'), momentLocalSpec);
+        this.setupMoment();
     },
 
     methods: {
@@ -327,6 +303,35 @@ Statamic.app({
                     inputs[0].focus();
                 }
             }, 100);
+        },
+
+        setupMoment() {
+            const locale = Statamic.$config.get('locale');
+            window.moment.locale(locale);
+            Vue.moment.locale(locale);
+            Vue.prototype.$moment.locale(locale);
+
+            const spec = {
+                relativeTime: {
+                    future: __('moment.relativeTime.future'),
+                    past: __('moment.relativeTime.past'),
+                    s: __('moment.relativeTime.s'),
+                    ss: __('moment.relativeTime.ss'),
+                    m: __('moment.relativeTime.m'),
+                    mm: __('moment.relativeTime.mm'),
+                    h: __('moment.relativeTime.h'),
+                    hh: __('moment.relativeTime.hh'),
+                    d: __('moment.relativeTime.d'),
+                    dd: __('moment.relativeTime.dd'),
+                    M: __('moment.relativeTime.M'),
+                    MM: __('moment.relativeTime.MM'),
+                    y: __('moment.relativeTime.y'),
+                    yy: __('moment.relativeTime.yy'),
+                }
+            };
+            window.moment.updateLocale(locale, spec);
+            Vue.moment.updateLocale(locale, spec);
+            Vue.prototype.$moment.updateLocale(locale, spec);
         }
     }
 
