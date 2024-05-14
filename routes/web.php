@@ -52,12 +52,12 @@ Route::name('statamic.')->group(function () {
     Route::prefix(config('statamic.routes.action'))
         ->post('nocache', NoCacheController::class)
         ->middleware(NoCacheLocalize::class)
-        ->withoutMiddleware('App\Http\Middleware\VerifyCsrfToken');
+        ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken']);
 
     if (OAuth::enabled()) {
         Route::get(config('statamic.oauth.routes.login'), [OAuthController::class, 'redirectToProvider'])->name('oauth.login');
         Route::match(['get', 'post'], config('statamic.oauth.routes.callback'), [OAuthController::class, 'handleProviderCallback'])
-            ->withoutMiddleware('App\Http\Middleware\VerifyCsrfToken')
+            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken'])
             ->name('oauth.callback');
     }
 });

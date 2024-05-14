@@ -1,5 +1,41 @@
 # Release Notes
 
+## 5.1.0 (2024-05-14)
+
+### What's new
+- Bard's default buttons can be configured [#10062](https://github.com/statamic/cms/issues/10062) by @ryanmitchell
+
+### What's fixed
+- Handle entries in Link field with `is_external_url` modifier [#10071](https://github.com/statamic/cms/issues/10071) by @ammonitedigital
+- Remove `submissions` key from `forms` config [#10066](https://github.com/statamic/cms/issues/10066) by @duncanmcclean
+- Prevent errors when viewing nav after collection has been deleted [#10049](https://github.com/statamic/cms/issues/10049) by @duncanmcclean
+- Prevent certain blueprint config keys getting stripped out [#10059](https://github.com/statamic/cms/issues/10059) by @jasonvarga
+- Fix `nocache` and OAuth routes for Laravel 11 apps [#10070](https://github.com/statamic/cms/issues/10070) by @duncanmcclean
+- Fix incorrect revision edit URLs [#10057](https://github.com/statamic/cms/issues/10057) by @duncanmcclean
+- Allow 'Statamic/Pro/Free' to be written using locale-specific characters [#10045](https://github.com/statamic/cms/issues/10045) by @peimn
+- Translate moment relative date statements [#10030](https://github.com/statamic/cms/issues/10030) by @peimn
+- Update `ajthinking/archetype` dependency so PHPUnit 11 can be used. [#10048](https://github.com/statamic/cms/issues/10048) by @duncanmcclean
+- German translations [#10058](https://github.com/statamic/cms/issues/10058) by @helloDanuk
+
+
+
+## 5.0.2 (2024-05-10)
+
+### What's fixed
+- Warnings are output when `env()` calls are detected in site config update script [#10044](https://github.com/statamic/cms/issues/10044) by @jesseleite
+- Fix translations within title tag breadcrumbs [#10039](https://github.com/statamic/cms/issues/10039) by @peimn
+- Fix page tree branches not being openable in new tabs [#10041](https://github.com/statamic/cms/issues/10041) by @duncanmcclean
+- Fix some RTL issues [#10029](https://github.com/statamic/cms/issues/10029) by @peimn
+- Fix some translations in collection & taxonomy controllers [#10038](https://github.com/statamic/cms/issues/10038) by @peimn
+- Fix translation command compatibility [#10037](https://github.com/statamic/cms/issues/10037) by @ryanmitchell
+- Fix missing overflow styling on form submissions table [#10036](https://github.com/statamic/cms/issues/10036) by @duncanmcclean
+- Fix `is_external_url` modifier with link fields [#10027](https://github.com/statamic/cms/issues/10027) by @duncanmcclean
+- Dutch translations [#10042](https://github.com/statamic/cms/issues/10042) by @robdekort
+- Persian translations [#10035](https://github.com/statamic/cms/issues/10035) by @peimn
+- French translations [#10032](https://github.com/statamic/cms/issues/10032) by @PatrickJunod
+
+
+
 ## 5.0.1 (2024-05-09)
 
 ### What's fixed
