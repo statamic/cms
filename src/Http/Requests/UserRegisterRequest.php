@@ -28,7 +28,7 @@ class UserRegisterRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         if ($this->isPrecognitive() || $this->wantsJson()) {
-            return (new ValidationException($validator))->errorBag($this->errorBag);
+            throw (new ValidationException($validator))->errorBag($this->errorBag);
         }
 
         if ($this->ajax()) {
