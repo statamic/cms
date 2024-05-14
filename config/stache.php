@@ -91,7 +91,7 @@ return [
 
         'form-submissions' => [
             'class' => Stores\SubmissionsStore::class,
-            'directory' => config('statamic.forms.submissions'),
+            'directory' => storage_path('forms'),
         ],
 
     ],
