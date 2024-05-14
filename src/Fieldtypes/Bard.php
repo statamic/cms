@@ -22,7 +22,7 @@ class Bard extends Replicator
 {
     use Concerns\ResolvesStatamicUrls, Hookable;
 
-    public static $defaultButtons = [
+    private static $defaultButtons = [
         'h2',
         'h3',
         'bold',
@@ -743,5 +743,10 @@ class Bard extends Replicator
     public function runAugmentHooks($value)
     {
         return $this->runHooks('augment', $value);
+    }
+
+    public static function setDefaultButtons(array $buttons): void
+    {
+        static::$defaultButtons = $buttons;
     }
 }
