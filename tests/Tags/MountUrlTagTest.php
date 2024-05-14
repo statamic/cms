@@ -17,10 +17,10 @@ class MountUrlTagTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::make('pages')->sites(['english', 'french'])->routes([
             'english' => 'pages/{slug}',

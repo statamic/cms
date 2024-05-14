@@ -40,4 +40,9 @@ class Users extends Tags
 
         return $query;
     }
+
+    protected function defaultOrderBy()
+    {
+        return config('statamic.users.sort_field', 'email').':'.config('statamic.users.sort_direction', 'asc');
+    }
 }

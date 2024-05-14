@@ -9,6 +9,7 @@ use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 
 class NavigationController extends CpController
@@ -18,7 +19,8 @@ class NavigationController extends CpController
         $this->authorize('index', NavContract::class, __('You are not authorized to view navs.'));
 
         $navs = Nav::all()->filter(function ($nav) {
-            return User::current()->can('view', $nav);
+            return User::current()->can('configure navs')
+                || ($nav->sites()->contains(Site::selected()->handle()) && User::current()->can('view', $nav));
         })->map(function ($structure) {
             return [
                 'id' => $structure->handle(),
@@ -27,6 +29,7 @@ class NavigationController extends CpController
                 'edit_url' => $structure->editUrl(),
                 'delete_url' => $structure->deleteUrl(),
                 'deleteable' => User::current()->can('delete', $structure),
+                'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
             ];
         })->values();
 
@@ -37,7 +40,7 @@ class NavigationController extends CpController
     {
         $nav = Nav::find($nav);
 
-        $this->authorize('edit', $nav, __('You are not authorized to configure navs.'));
+        $this->authorize('configure', $nav, __('You are not authorized to configure navs.'));
 
         $values = [
             'title' => $nav->title(),
@@ -151,7 +154,7 @@ class NavigationController extends CpController
 
         $values = $request->validate([
             'title' => 'required',
-            'handle' => 'required|alpha_dash',
+            'handle' => ['required', new Handle],
         ]);
 
         if (Nav::find($values['handle'])) {
@@ -221,7 +224,7 @@ class NavigationController extends CpController
             ],
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $contents['options']['fields']['sites'] = [
                 'display' => __('Sites'),
                 'type' => 'sites',

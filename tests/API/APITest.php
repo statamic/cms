@@ -100,6 +100,46 @@ class APITest extends TestCase
     }
 
     /** @test */
+    public function it_filters_out_future_entries_from_future_private_collection()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('test')->dated(true)
+            ->pastDateBehavior('public')
+            ->futureDateBehavior('private')
+            ->save();
+
+        Facades\Entry::make()->collection('test')->id('a')->published(true)->date(now()->addDay())->save();
+        Facades\Entry::make()->collection('test')->id('b')->published(false)->date(now()->addDay())->save();
+        Facades\Entry::make()->collection('test')->id('c')->published(true)->date(now()->subDay())->save();
+        Facades\Entry::make()->collection('test')->id('d')->published(false)->date(now()->subDay())->save();
+
+        $response = $this->get('/api/collections/test/entries')->assertSuccessful();
+        $this->assertCount(1, $response->getData()->data);
+        $response->assertJsonPath('data.0.id', 'c');
+    }
+
+    /** @test */
+    public function it_filters_out_past_entries_from_past_private_collection()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('test')->dated(true)
+            ->pastDateBehavior('private')
+            ->futureDateBehavior('public')
+            ->save();
+
+        Facades\Entry::make()->collection('test')->id('a')->published(true)->date(now()->addDay())->save();
+        Facades\Entry::make()->collection('test')->id('b')->published(false)->date(now()->addDay())->save();
+        Facades\Entry::make()->collection('test')->id('c')->published(true)->date(now()->subDay())->save();
+        Facades\Entry::make()->collection('test')->id('d')->published(false)->date(now()->subDay())->save();
+
+        $response = $this->get('/api/collections/test/entries')->assertSuccessful();
+        $this->assertCount(1, $response->getData()->data);
+        $response->assertJsonPath('data.0.id', 'a');
+    }
+
+    /** @test */
     public function it_can_filter_collection_entries_when_configuration_allows_for_it()
     {
         Facades\Config::set('statamic.api.resources.collections.pages', [

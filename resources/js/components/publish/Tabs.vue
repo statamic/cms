@@ -41,7 +41,7 @@
             <div class="fade-right" :class="{ 'mr-8': showHiddenTabsDropdown }" v-if="canScrollRight" />
 
 
-            <dropdown-list class="ml-2" v-cloak v-if="showHiddenTabsDropdown">
+            <dropdown-list class="rtl:mr-2 ltr:ml-2" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item
                     v-for="(tab, index) in mainTabs"
                     v-show="shouldShowInDropdown(index)"
@@ -63,6 +63,7 @@
                     :role="showTabs && 'tabpanel'"
                     :id="showTabs && tabPanelId(tab.handle)"
                     :aria-labelledby="showTabs && tabId(tab.handle)"
+                    :data-tab-handle="tab.handle"
                     tabindex="0"
                     :key="tab.handle"
                     v-for="tab in mainTabs"

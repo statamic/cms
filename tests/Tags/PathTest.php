@@ -13,10 +13,10 @@ class PathTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr'],
-        ]]);
+        ]);
     }
 
     private function tag($tag, $data = [])
@@ -26,7 +26,7 @@ class PathTest extends TestCase
 
     private function setSiteUrl($url)
     {
-        Site::setConfig(['sites' => ['en' => ['url' => $url]]]);
+        $this->setSiteValue('en', 'url', $url);
     }
 
     /** @test */

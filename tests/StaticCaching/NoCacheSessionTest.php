@@ -80,6 +80,8 @@ class NoCacheSessionTest extends TestCase
 
         // Testing that the cache key used is unique to the url.
         // The contents aren't really important.
+        Cache::shouldReceive('store')
+            ->andReturnSelf();
 
         Cache::shouldReceive('forever')
             ->with('nocache::session.'.md5('/'), Mockery::any())

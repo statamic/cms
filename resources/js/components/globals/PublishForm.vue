@@ -7,18 +7,18 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <div class="pt-px text-2xs text-gray-600 ml-4 flex" v-if="! canEdit">
-                    <svg-icon name="light/lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
+                <div class="pt-px text-2xs text-gray-600 rtl:mr-4 ltr:ml-4 flex" v-if="! canEdit">
+                    <svg-icon name="light/lock" class="w-4 rtl:ml-1 ltr:mr-1 -mt-1" /> {{ __('Read Only') }}
                 </div>
 
-                <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-2">
+                <dropdown-list v-if="canConfigure || canEditBlueprint" class="rtl:ml-2 ltr:mr-2">
                     <dropdown-item v-if="canConfigure" v-text="__('Configure')" :redirect="configureUrl" />
                     <dropdown-item v-if="canEditBlueprint" :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
                 </dropdown-list>
 
                 <site-selector
                     v-if="localizations.length > 1"
-                    class="mr-4"
+                    class="rtl:ml-4 ltr:mr-4"
                     :sites="localizations"
                     :value="site"
                     @input="localizationSelected"

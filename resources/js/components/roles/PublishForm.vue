@@ -92,7 +92,7 @@ export default {
 
     watch: {
         'title': function(display) {
-            this.handle = this.$slugify(display, '_');
+            this.handle = snake_case(display);
         }
     },
 
