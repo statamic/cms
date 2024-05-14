@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .nav-main {
-    @apply hidden select-none bg-white shadow h-screen absolute rtl:right-0 ltr:left-0 overflow-scroll w-56;
+    @apply hidden select-none bg-white dark:bg-dark-800 shadow dark:shadow-dark h-screen absolute rtl:right-0 ltr:left-0 overflow-scroll w-56;
     transition: all .3s;
 
     h6 { @apply mt-6; }
@@ -18,7 +18,7 @@
     }
 
     li a {
-        @apply p-0 flex items-center text-gray-800;
+        @apply p-0 flex items-center text-gray-800 dark:text-dark-150;
         transition: all .08s ease-in-out;
 
         &:hover {
@@ -31,10 +31,10 @@
     }
 
     li.current > a {
-        @apply text-gray-900 font-medium;
+        @apply text-gray-900 font-medium dark:text-dark-100;
 
         i {
-            @apply bg-white;
+            @apply bg-white dark:bg-dark-350;
         }
     }
 
@@ -63,7 +63,7 @@
 
 @screen md {
     .nav-main {
-        @apply fixed flex bg-transparent shadow-none overflow-auto rtl:border-l ltr:border-r;
+        @apply fixed flex bg-transparent shadow-none overflow-auto rtl:border-l ltr:border-r dark:border-dark-900;
         height: calc(100% - 52px);
         .showing-license-banner & {
             height: calc(100% - 120px);
@@ -80,7 +80,7 @@
     outline: none !important;
 
     &:hover {
-        @apply bg-gray-200;
+        @apply bg-gray-200 dark:bg-dark-500;
     }
 }
 

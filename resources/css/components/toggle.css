@@ -11,9 +11,9 @@
     }
 
     .inline-label {
-        @apply rtl:mr-2 ltr:ml-2 font-normal text-gray-700;
+        @apply rtl:mr-2 ltr:ml-2 font-normal text-gray-700 dark:text-dark-175;
         a {
-            @apply text-gray-800 underline;
+            @apply text-gray-800 dark:text-dark-150 underline;
             &:hover {
                 @apply text-blue;
             }
@@ -27,7 +27,7 @@
 }
 
 .toggle-container {
-    @apply bg-white cursor-pointer relative border shrink-0;
+    @apply bg-white dark:bg-dark-700 cursor-pointer relative border dark:border-dark-900 shrink-0;
     height: 22px;
     width: 46px;
     border-radius: 20px;
@@ -61,6 +61,10 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, .4);
     outline: none;
     transition: box-shadow 0.1s, background-color 0.2s ease-in-out;
+
+    .dark & {
+        background: theme(colors.dark.500);
+    }
 }
 
 .toggle-knob:hover {

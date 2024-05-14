@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .card {
-    @apply shadow bg-white rounded-md p-2;
+    @apply shadow bg-white rounded-md p-2 dark:bg-dark-600 dark:shadow-dark;
 }
 
 @screen md {

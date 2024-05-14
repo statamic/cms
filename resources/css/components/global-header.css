@@ -3,8 +3,16 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow rtl:pl-4 ltr:pr-4 h-13 items-center flex relative w-full;
+    @apply bg-white dark:bg-dark-600 shadow dark:shadow-dark rtl:pl-4 ltr:pr-4 h-13 items-center flex relative w-full;
     z-index: 3; /* The search focus overlay sits underneath using z-index 2. */
+
+    .dark & {
+        .logo {
+            path {
+                fill: theme(colors.dark.100) !important;
+            }
+        }
+    }
 }
 
 /* Responsive Wangjangling
@@ -17,11 +25,11 @@
 /* Search
    ========================================================================== */
 .global-search {
-    @apply rounded-md px-2 hidden py-0 flex items-center relative border;
+    @apply rounded-md px-2 hidden py-0 flex items-center relative border dark:border-dark-300;
     transition: .12s ease-out;
 
     .search-input {
-        @apply text-sm w-full max-w-full;
+        @apply text-sm w-full max-w-full dark:bg-dark-600 dark:text-dark-150;
         padding-left: 5px ;
         padding-right: 20px ; [dir="rtl"] & { padding-left: 20px ; padding-right: 5px ; }
         height: 32px;

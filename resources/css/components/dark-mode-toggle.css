@@ -1,0 +1,95 @@
+/* ==========================================================================
+   DARK MODE TOGGLE
+   ========================================================================== */
+
+label.dark-mode-toggle {
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    direction: ltr;
+
+    .toggle-checkbox {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    .toggle-slot {
+        position: relative;
+        height: 2em;
+        width: 4em;
+        border: 1px solid #e4e7ec;
+        border-radius: 2em;
+        background-color: white;
+        transition: background-color 250ms;
+    }
+
+    .toggle-checkbox:checked ~ .toggle-slot {
+        background-color: #374151;
+        border: 1px solid #09192a;
+    }
+
+    .toggle-button {
+        transform: translate(0.4em, 0.35em);
+        position: absolute;
+        height: 1.2em;
+        width: 1.2em;
+        border-radius: 50%;
+        background-color: #ffeccf;
+        box-shadow: inset 0 0 0 1px #ffbb52;
+        transition: background-color 250ms, border-color 250ms, transform 500ms cubic-bezier(0.26, 2, 0.46, 0.71);
+    }
+
+    .toggle-checkbox:checked ~ .toggle-slot .toggle-button {
+        background-color: #485367;
+        box-shadow: inset 0 0 0 1px rgba(5 21 37 / 37%);
+        transform: translate(2.15em, 0.35em);
+    }
+
+    .sun-icon {
+        position: absolute;
+        height: 1.2em;
+        width: 1.2em;
+        color: #ffbb52;
+    }
+
+    .sun-icon-wrapper {
+        position: absolute;
+        height: 1.2em;
+        width: 1.2em;
+        opacity: 1;
+        transform: translate(2.2em, 0.3em) rotate(15deg);
+        transform-origin: 50% 50%;
+        transition: opacity 150ms, transform 500ms cubic-bezier(0.26, 2, 0.46, 0.71);
+    }
+
+    .toggle-checkbox:checked ~ .toggle-slot .sun-icon-wrapper {
+        opacity: 0;
+        transform: translate(3em, 2em) rotate(0deg);
+    }
+
+    .moon-icon {
+        position: absolute;
+        height: 1.2em;
+        width: 1.2em;
+        color: white;
+    }
+
+    .moon-icon-wrapper {
+        position: absolute;
+        height: 1.2em;
+        width: 1.2em;
+        opacity: 0;
+        transform: translate(2em, 0.2em) rotate(0deg);
+        transform-origin: 50% 50%;
+        transition: opacity 150ms, transform 500ms cubic-bezier(0.26, 2.5, 0.46, 0.71);
+    }
+
+    .toggle-checkbox:checked ~ .toggle-slot .moon-icon-wrapper {
+        opacity: 1;
+        transform: translate(0.4em, 0.3em) rotate(-15deg);
+    }
+}
