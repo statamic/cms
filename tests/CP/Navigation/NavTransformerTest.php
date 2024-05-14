@@ -1033,6 +1033,7 @@ class NavTransformerTest extends TestCase
             ['display_original' => 'Fields'],
             ['display_original' => 'Tools'],
             ['display_original' => 'Content'],
+            ['display_original' => 'Settings'],
             ['display_original' => 'Users'],
         ]);
 
@@ -1042,7 +1043,7 @@ class NavTransformerTest extends TestCase
                 'top_level' => '@inherit',
                 'fields' => '@inherit',
                 'tools' => '@inherit',
-                // 'Content' and 'Users' sections are omitted because they are redundant in this case
+                // 'Content', 'Settings', and 'Users' sections are omitted because they are redundant in this case
             ],
         ];
 

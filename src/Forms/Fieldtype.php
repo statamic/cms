@@ -31,6 +31,7 @@ class Fieldtype extends Relationship
                 'display' => __('Max Items'),
                 'default' => 1,
                 'instructions' => __('statamic::fieldtypes.form.config.max_items'),
+                'force_in_config' => true,
             ],
             'mode' => [
                 'display' => __('UI Mode'),
