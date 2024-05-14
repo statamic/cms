@@ -659,6 +659,52 @@ EOT;
         $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
     }
 
+    /** @test */
+    public function it_parses_branch_from_package_param_when_installing()
+    {
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings([
+            'package' => 'statamic/cool-runnings:dev-custom-branch',
+        ]);
+
+        // Ensure `Composer::requireDev()` gets called with `package:branch`
+        $this->assertEquals(Blink::get('composer-require-dev-package'), 'statamic/cool-runnings');
+        $this->assertEquals(Blink::get('composer-require-dev-branch'), 'dev-custom-branch');
+
+        // But ensure the rest of the installer handles parsed `package` without branch messing things up
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    /** @test */
+    public function it_installs_branch_with_slash_without_failing_package_validation()
+    {
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings([
+            'package' => 'statamic/cool-runnings:dev-feature/custom-branch',
+        ]);
+
+        // Ensure `Composer::requireDev()` gets called with `package:branch`
+        $this->assertEquals(Blink::get('composer-require-dev-package'), 'statamic/cool-runnings');
+        $this->assertEquals(Blink::get('composer-require-dev-branch'), 'dev-feature/custom-branch');
+
+        // But ensure the rest of the installer handles parsed `package` without branch messing things up
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
     private function kitRepoPath($path = null)
     {
         return collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/');

@@ -20,7 +20,7 @@
             @blur="$emit('blur')"
         />
 
-        <td class="row-controls" v-if="!grid.isReadOnly && (canAddRows || canDelete)">
+        <td class="grid-row-controls row-controls" v-if="!grid.isReadOnly && (canAddRows || canDelete)">
             <dropdown-list>
                 <dropdown-item :text="__('Duplicate Row')" @click="$emit('duplicate', index)" v-if="canAddRows" />
                 <dropdown-item v-if="canDelete" :text="__('Delete Row')" class="warning" @click="$emit('removed', index)" />

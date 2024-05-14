@@ -3,8 +3,8 @@
 namespace Statamic\Console\Please;
 
 use Illuminate\Console\Application as ConsoleApplication;
-use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 class Application extends ConsoleApplication
@@ -44,12 +44,10 @@ class Application extends ConsoleApplication
     /**
      * Finds a command by name or alias.  If doesn't exist, resolve deferred artisan commands and try again.
      *
-     * @param  string  $name
-     * @return \Illuminate\Console\Command
      *
      * @throws CommandNotFoundException
      */
-    public function find($name)
+    public function find(string $name): Command
     {
         try {
             return parent::find($name);
@@ -63,10 +61,22 @@ class Application extends ConsoleApplication
     /**
      * Resolve deferred commands.
      */
-    protected function resolveDeferredCommands()
+    public function resolveDeferredCommands()
     {
         foreach ($this->deferredCommands as $command) {
             $this->add($command);
         }
+    }
+
+    public static function rebindKernel(): void
+    {
+        if (! class_exists('App\Console\Kernel')) {
+            require_once __DIR__.'/app-kernel.php';
+        }
+
+        app()->singleton(
+            \Illuminate\Contracts\Console\Kernel::class,
+            \Statamic\Console\Please\Kernel::class
+        );
     }
 }

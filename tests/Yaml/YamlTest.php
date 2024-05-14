@@ -3,6 +3,8 @@
 namespace Tests\Yaml;
 
 use Exception;
+use Illuminate\Support\Facades\Facade;
+use Mockery;
 use Statamic\Facades\YAML;
 use Statamic\Yaml\ParseException;
 use Statamic\Yaml\Yaml as StatamicYaml;
@@ -21,7 +23,7 @@ class YamlTest extends TestCase
             'array' => ['one', 'two'],
         ];
 
-        $symfonyYaml = $this->mock(SymfonyYaml::class)
+        $symfonyYaml = Mockery::mock(SymfonyYaml::class)
             ->shouldReceive('dump')
             ->with($array, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
             ->once()
@@ -29,6 +31,7 @@ class YamlTest extends TestCase
             ->getMock();
 
         $this->app->instance(StatamicYaml::class, new StatamicYaml($symfonyYaml));
+        Facade::clearResolvedInstance(StatamicYaml::class);
 
         $this->assertEquals('some properly dumped yaml from symfony', YAML::dump($array));
     }
@@ -43,7 +46,7 @@ foo: bar
 some content
 EOT;
 
-        $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], 'some content'));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar'], 'some content'));
     }
 
     /** @test */
@@ -93,7 +96,7 @@ foo: bar
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
     /** @test */
@@ -106,7 +109,7 @@ foo: bar
 some content
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], 'some content'));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], 'some content'));
     }
 
     /** @test */
@@ -121,7 +124,7 @@ content:
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], ['baz' => 'qux']));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
     /** @test */
@@ -135,7 +138,7 @@ content: {  }
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], []));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], []));
     }
 
     /** @test */
@@ -148,8 +151,8 @@ foo: bar
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], null));
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], null));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
     /**
@@ -167,7 +170,7 @@ EOT;
         // We mock symfony because the multiline character is different depending on the version installed.
         // It will be | on early versions. It will be |- on later versions.
         // The |- character means trim trailing newlines, and is the default when dumping multiline strings.
-        $symfonyYaml = $this->mock(SymfonyYaml::class)
+        $symfonyYaml = Mockery::mock(SymfonyYaml::class)
             ->shouldReceive('dump')
             ->with($array, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
             ->once()
@@ -175,6 +178,7 @@ EOT;
             ->getMock();
 
         $this->app->instance(StatamicYaml::class, new StatamicYaml($symfonyYaml));
+        Facade::clearResolvedInstance(StatamicYaml::class);
 
         // Without the bug fix, the --- would come immediately after the "second line". Like this:
         // baz: |-
@@ -188,7 +192,7 @@ $symfonyDumpedYaml
 content
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter($array, 'content'));
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter($array, 'content'));
     }
 
     /** @test */

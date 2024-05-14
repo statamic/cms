@@ -11,9 +11,13 @@ use Statamic\Statamic;
 
 class Marketplace
 {
-    public function package($package, $version = null)
+    public function package($package, $version = null, $edition = null)
     {
         $uri = "packages/$package/$version";
+
+        if ($edition) {
+            $uri .= "?edition=$edition";
+        }
 
         return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
             try {

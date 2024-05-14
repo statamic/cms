@@ -20,12 +20,12 @@
 
         <div class="flex border-t">
             <button
-                class="p-2 hover:bg-gray-100 rounded-bl text-xs flex-1"
+                class="p-2 hover:bg-gray-100 rtl:rounded-br ltr:rounded-bl text-xs flex-1"
                 v-text="__('Clear')"
                 @click="resetAll"
             />
             <button
-                class="p-2 hover:bg-gray-100 flex-1 rounded-br border-l text-xs"
+                class="p-2 hover:bg-gray-100 flex-1 rtl:rounded-bl ltr:rounded-br rtl:border-r ltr:border-l text-xs"
                 v-text="__('Close')"
                 @click="$emit('closed')"
             />

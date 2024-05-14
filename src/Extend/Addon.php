@@ -2,7 +2,7 @@
 
 namespace Statamic\Extend;
 
-use Composer\Package\Version\VersionParser;
+use Composer\Semver\VersionParser;
 use Facades\Statamic\Licensing\LicenseManager;
 use ReflectionClass;
 use Statamic\Facades\File;

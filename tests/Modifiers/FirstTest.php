@@ -17,7 +17,7 @@ class FirstTest extends TestCase
         $this->assertEquals($expected, $this->modify('Testing', $arg));
     }
 
-    public function stringProvider()
+    public static function stringProvider()
     {
         return [
             [1, 'T'],
@@ -35,7 +35,7 @@ class FirstTest extends TestCase
         $this->assertEquals($expected, $this->modify($value));
     }
 
-    public function arrayProvider()
+    public static function arrayProvider()
     {
         return [
             'list' => [

@@ -65,21 +65,21 @@ trait ManagesPreferences
         $options->put('default', [
             'label' => __('Default'),
             'url' => cp_route('preferences.default.update'),
-            'icon' => 'earth',
+            'icon' => 'light/earth',
         ]);
 
         Role::all()->each(function ($role) use (&$options) {
             $options->put($role->handle(), [
                 'label' => $role->title(),
                 'url' => cp_route('preferences.role.update', $role->handle()),
-                'icon' => 'shield-key',
+                'icon' => 'light/shield-key',
             ]);
         });
 
         $options->put('user', [
             'label' => __('My Preferences'),
             'url' => cp_route('preferences.user.update'),
-            'icon' => 'user',
+            'icon' => 'light/user',
         ]);
 
         $options->forget($this->ignoreSaveAsOption());

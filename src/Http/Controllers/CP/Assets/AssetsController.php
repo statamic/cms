@@ -11,7 +11,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
-use Statamic\Validation\AllowedFile;
+use Statamic\Rules\AllowedFile;
 
 class AssetsController extends CpController
 {
@@ -93,16 +93,5 @@ class AssetsController extends CpController
         // TODO: Auth
 
         return $asset->download();
-    }
-
-    public function destroy($asset)
-    {
-        $asset = Asset::find(base64_decode($asset));
-
-        // TODO: Auth
-
-        $asset->delete();
-
-        return response('', 204);
     }
 }
