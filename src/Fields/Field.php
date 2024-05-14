@@ -486,6 +486,7 @@ class Field implements Arrayable
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
                 'type' => 'slug',
                 'from' => 'display',
+                'async' => false,
                 'separator' => '_',
                 'validate' => [
                     'required',
