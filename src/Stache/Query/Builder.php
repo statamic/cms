@@ -5,6 +5,7 @@ namespace Statamic\Stache\Query;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
+use Statamic\Support\Arr;
 
 abstract class Builder extends BaseBuilder
 {
@@ -41,7 +42,7 @@ abstract class Builder extends BaseBuilder
 
     public function get($columns = ['*'])
     {
-        return $this->onceWithColumns($columns, fn () => $this->withFakeQueryLogging(function () {
+        return $this->onceWithColumns(Arr::wrap($columns), fn () => $this->withFakeQueryLogging(function () {
             $items = $this->getItems($this->resolveKeys());
 
             $items->each(fn ($item) => $item
