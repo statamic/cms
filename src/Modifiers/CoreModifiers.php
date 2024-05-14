@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Compare;
@@ -1266,6 +1267,10 @@ class CoreModifiers extends Modifier
     {
         if ($value instanceof ArrayableLink) {
             $value = $value->value();
+        }
+
+        if ($value instanceof Entry) {
+            $value = $value->absoluteUrl();
         }
 
         return Str::isUrl($value) && URL::isExternal($value);
