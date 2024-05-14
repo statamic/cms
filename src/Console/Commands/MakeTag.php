@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Archetype\Facades\PHPFile;
 use PhpParser\BuilderFactory;
 use Statamic\Console\RunsInPlease;
+use Statamic\Support\Str;
 
 class MakeTag extends GeneratorCommand
 {
@@ -82,7 +83,7 @@ class MakeTag extends GeneratorCommand
     {
         $class = parent::buildClass($name);
 
-        $class = str_replace('dummy_tag', snake_case($this->getNameInput()), $class);
+        $class = str_replace('dummy_tag', Str::snake($this->getNameInput()), $class);
 
         return $class;
     }

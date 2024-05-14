@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Site;
@@ -74,7 +75,7 @@ abstract class AbstractCacher implements Cacher
      */
     protected function normalizeContent($content)
     {
-        if ($content instanceof Response) {
+        if ($content instanceof Response || $content instanceof JsonResponse) {
             $content = $content->content();
         }
 

@@ -71,7 +71,7 @@ class ImageGeneratorTest extends TestCase
 
         $expectedCacheManifest = [$manipulationCacheKey];
         $expectedPathPrefix = 'containers/test_container';
-        $expectedPath = "{$expectedPathPrefix}/foo/hoff.jpg/{$md5}.jpg";
+        $expectedPath = "{$expectedPathPrefix}/foo/hoff.jpg/{$md5}/hoff.jpg";
 
         $this->assertEquals($manifestCacheKey, ImageGenerator::assetCacheManifestKey($asset));
         $this->assertEquals($expectedPathPrefix, ImageGenerator::assetCachePathPrefix($asset));
@@ -152,7 +152,7 @@ class ImageGeneratorTest extends TestCase
         // way it does. It will not include the fit parameter since it's not an asset.
         $md5 = $this->getGlideMd5($imagePath, $userParams);
 
-        $expectedPath = "paths/testimages/foo/hoff.jpg/{$md5}.jpg";
+        $expectedPath = "paths/testimages/foo/hoff.jpg/{$md5}/hoff.jpg";
 
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
@@ -200,7 +200,7 @@ class ImageGeneratorTest extends TestCase
         // While writing this test I noticed that we don't include the domain in the
         // cache path, so the same file path on two different domains will conflict.
         // TODO: Fix this.
-        $expectedPath = "http/foo/hoff.jpg/{$md5}.jpg";
+        $expectedPath = "http/foo/hoff.jpg/{$md5}/hoff.jpg";
 
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());

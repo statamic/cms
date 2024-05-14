@@ -5,6 +5,16 @@ module.exports = {
         './resources/**/*.{html,js,vue,blade.php}',
         './tests/**/*.{html,vue,blade.php}'
     ],
+    safelist: [
+        {
+            pattern: /m[l|r]-(?:[0-9]|10|11|12|14|16)$/,
+            variants: ['md', 'lg', 'xl']
+        },
+        {
+            pattern: /p[x|y]-(?:[0-9]|10|11|12|14|16)$/,
+            variants: ['md', 'lg', 'xl']
+        },
+    ],
     theme: {
         colors: {
             transparent: 'transparent',

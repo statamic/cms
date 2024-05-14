@@ -134,6 +134,10 @@ export default {
         },
 
         editConfirmed() {
+            if (! this.handle) {
+                this.handle = snake_case(this.display)
+            }
+
             this.$emit('updated', {
                 ...this.tab,
                 handle: this.handle,
@@ -141,6 +145,7 @@ export default {
                 instructions: this.instructions,
                 icon: this.icon,
             });
+
             this.editing = false;
         },
 
@@ -152,7 +157,7 @@ export default {
 
         fieldUpdated(handle, value) {
             if (handle === 'display' && this.handleSyncedWithDisplay) {
-                this.handle = this.$slugify(value, '_');
+                this.handle = snake_case(value);
             }
 
             if (handle === 'handle') {

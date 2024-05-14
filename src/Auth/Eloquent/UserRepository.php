@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Exceptions\UserNotFoundException;
 use Statamic\Facades\Blink;
 
 class UserRepository extends BaseRepository
@@ -46,6 +47,17 @@ class UserRepository extends BaseRepository
         }
 
         return $this->make()->model($model);
+    }
+
+    public function findOrFail($id): UserContract
+    {
+        $user = $this->find($id);
+
+        if (! $user) {
+            throw new UserNotFoundException($id);
+        }
+
+        return $user;
     }
 
     public function model($method, ...$args)

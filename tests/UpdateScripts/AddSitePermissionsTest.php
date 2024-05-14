@@ -3,7 +3,6 @@
 namespace Tests\UpdateScripts;
 
 use Statamic\Facades\Role;
-use Statamic\Facades\Site;
 use Statamic\UpdateScripts\AddSitePermissions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -22,10 +21,10 @@ class AddSitePermissionsTest extends TestCase
     /** @test */
     public function it_can_add_site_permissions()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'first' => ['name' => 'First Site', 'locale' => 'en_US', 'url' => '/'],
             'second' => ['name' => 'Second Site', 'locale' => 'en_US', 'url' => '/second'],
-        ]]);
+        ]);
 
         Role::make()
             ->title('Webmaster')

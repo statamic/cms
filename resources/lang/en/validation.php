@@ -142,7 +142,7 @@ return [
     'unique' => 'This value has already been taken.',
     'uploaded' => 'Failed to upload.',
     'uppercase' => 'Must be uppercase.',
-    'url' => 'Format is invalid.',
+    'url' => 'Must be a valid URL.',
     'uuid' => 'Must be a valid UUID.',
 
     /*
@@ -154,7 +154,11 @@ return [
     |
     */
 
+    'arr_fieldtype' => 'This is invalid.',
+    'handle' => 'Must contain only lowercase letters and numbers with underscores as separators.',
+    'slug' => 'Must contain only letters and numbers with dashes or underscores as separators.',
     'code_fieldtype_rulers' => 'This is invalid.',
+    'composer_package' => 'Must be a valid composer package name (eg. hasselhoff/kung-fury).',
     'date_fieldtype_date_required' => 'Date is required.',
     'date_fieldtype_end_date_invalid' => 'Not a valid end date.',
     'date_fieldtype_end_date_required' => 'End date is required.',
@@ -164,11 +168,14 @@ return [
     'date_fieldtype_time_required' => 'Time is required.',
     'duplicate_field_handle' => 'A field with a handle of :handle already exists.',
     'duplicate_uri' => 'Duplicate URI :value',
+    'email_available' => 'A user with this email already exists.',
+    'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',
     'one_site_without_origin' => 'At least one site must not have an origin.',
     'options_require_keys' => 'All options must have keys.',
     'origin_cannot_be_disabled' => 'Cannot select a disabled origin.',
     'parent_cannot_be_itself' => 'Cannot be its own parent.',
     'parent_causes_root_children' => 'This would cause the root page to have children.',
+    'parent_exceeds_max_depth' => 'This would exceed the maximum depth.',
     'reserved' => 'This is a reserved word.',
     'reserved_field_handle' => 'Field with a handle of :handle is a reserved word.',
     'unique_entry_value' => 'This value has already been taken.',

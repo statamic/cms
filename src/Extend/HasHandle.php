@@ -3,6 +3,7 @@
 namespace Statamic\Extend;
 
 use ReflectionClass;
+use Statamic\Support\Str;
 
 trait HasHandle
 {
@@ -16,6 +17,6 @@ trait HasHandle
 
         $class = (new ReflectionClass(static::class))->getShortName();
 
-        return snake_case($class);
+        return Str::snake($class);
     }
 }
