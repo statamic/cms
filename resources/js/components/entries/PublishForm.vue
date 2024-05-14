@@ -519,7 +519,8 @@ export default {
 
         title(title) {
             if (this.isBase) {
-                document.title = title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
+                const arrow = this.direction === 'ltr' ? '‹' : '›';
+                document.title = `${title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
             }
         },
 
@@ -575,10 +576,6 @@ export default {
                 }
                 this.title = response.data.data.title;
                 this.isWorkingCopy = true;
-                if (this.isBase) {
-                    const arrow = this.direction === 'ltr' ? '‹' : '›';
-                    document.title = `${this.title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
-                }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
