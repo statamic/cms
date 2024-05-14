@@ -11,6 +11,10 @@ class ParameterNode extends AbstractNode
 
     public $isVariableReference = false;
 
+    public $containsEscapedContent = false;
+
+    public $originalName = '';
+
     public $name = '';
 
     public $value = '';

@@ -5,6 +5,7 @@ namespace Statamic\Auth\Protect\Protectors\Password;
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
 use Statamic\Auth\Protect\Protectors\Protector;
 use Statamic\Exceptions\ForbiddenHttpException;
+use Statamic\Support\Arr;
 
 class PasswordProtector extends Protector
 {
@@ -15,7 +16,7 @@ class PasswordProtector extends Protector
      */
     public function protect()
     {
-        if (empty(array_get($this->config, 'allowed', []))) {
+        if (empty(Arr::get($this->config, 'allowed', []))) {
             throw new ForbiddenHttpException();
         }
 

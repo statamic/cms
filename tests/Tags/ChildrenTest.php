@@ -6,7 +6,6 @@ use Facades\Tests\Factories\EntryFactory;
 use Mockery;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Parse;
-use Statamic\Facades\Site;
 use Statamic\Tags\Children;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -21,10 +20,10 @@ class ChildrenTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
-        ]]);
+        ]);
     }
 
     private function tag($tag, $data = [])

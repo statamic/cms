@@ -34,7 +34,7 @@ class Stats extends Command
             ->addOption('type', null, InputOption::VALUE_OPTIONAL, 'Either "string" or "key"');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $counts = collect();
 

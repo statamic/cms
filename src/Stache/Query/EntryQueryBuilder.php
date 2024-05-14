@@ -5,12 +5,15 @@ namespace Statamic\Stache\Query;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Collection;
+use Statamic\Support\Arr;
 
 class EntryQueryBuilder extends Builder implements QueryBuilder
 {
-    use QueriesTaxonomizedEntries;
+    use QueriesEntryStatus, QueriesTaxonomizedEntries;
 
-    protected $collections;
+    protected $collections = [];
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -18,6 +21,10 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             $this->collections[] = $operator;
 
             return $this;
+        }
+
+        if ($column === 'status') {
+            trigger_error('Filtering by status is deprecated. Use whereStatus() instead.', E_USER_DEPRECATED);
         }
 
         return parent::where($column, $operator, $value, $boolean);
@@ -29,6 +36,10 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             $this->collections = array_merge($this->collections ?? [], $values);
 
             return $this;
+        }
+
+        if ($column === 'status') {
+            trigger_error('Filtering by status is deprecated. Use whereStatus() instead.', E_USER_DEPRECATED);
         }
 
         return parent::whereIn($column, $values, $boolean);
@@ -130,5 +141,63 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return collect($collections)->flatMap(function ($collection) use ($column) {
             return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
         });
+    }
+
+    private function ensureCollectionsAreQueriedForStatusQuery(): void
+    {
+        // If the collections property isn't empty, it means the user has explicitly
+        // queried for them. In that case, we'll use them and skip the auto-detection.
+        if (! empty($this->collections)) {
+            return;
+        }
+
+        // Otherwise, we'll detect them by looking at where clauses targeting the "id" column.
+        $ids = collect($this->wheres)->where('column', 'id')->flatMap(fn ($where) => $where['values'] ?? [$where['value']]);
+
+        // If no IDs were queried, fall back to all collections.
+        $this->collections = $ids->isEmpty()
+            ? Collection::handles()->all()
+            : Blink::once('entry-to-collection-map', function () {
+                return Collection::handles()
+                    ->flatMap(fn ($collection) => $this->getWhereColumnKeysFromStore($collection, ['column' => 'collectionHandle']))
+                    ->keys()
+                    ->mapWithKeys(function ($value) {
+                        [$collection, $id] = explode('::', $value);
+
+                        return [$id => $collection];
+                    });
+            })->only($ids->all())->unique()->values()->all();
+    }
+
+    protected function addCollectionWhereToStatusQuery($query, $collection): void
+    {
+        // Using collectionHandle instead of collection because we intercept collection
+        // and put it on a property. In this case we actually want the indexed value.
+        // We can probably refactor this elsewhere later.
+        $query->where('collectionHandle', $collection);
+    }
+
+    protected function getCollectionsForStatusQuery(): \Illuminate\Support\Collection
+    {
+        // Since we have to add nested queries for each collection, we only want to add clauses for the
+        // applicable collections. By this point, there should be where clauses on the collection column.
+
+        return collect($this->collections)->map(fn ($handle) => Collection::find($handle));
+    }
+
+    public function prepareForFakeQuery(): array
+    {
+        $data = parent::prepareForFakeQuery();
+
+        if (! empty($this->collections)) {
+            $data['wheres'] = Arr::prepend($data['wheres'], [
+                'type' => 'In',
+                'column' => 'collection',
+                'values' => $this->collections,
+                'boolean' => 'and',
+            ]);
+        }
+
+        return $data;
     }
 }

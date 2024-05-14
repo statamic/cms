@@ -17,7 +17,11 @@
                 <div class="w-full md:w-1/2">
                     <h1 class="mb-8">{{ __('Licensing') }}</h1>
                     <p class="text-gray-700 leading-normal mb-8 text-lg antialiased">
-                        {{ __('statamic::messages.outpost_issue_try_later') }}
+                        @if ($usingLicenseKeyFile)
+                            {{ __('statamic::messages.outpost_license_key_error') }}
+                        @else
+                            {{ __('statamic::messages.outpost_issue_try_later') }}
+                        @endif
                     </p>
                     <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
                 </div>
@@ -72,7 +76,7 @@
                 <tr>
                     <td class="w-64 font-bold">
                         <span class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-500' }} rtl:ml-2 ltr:mr-2"></span>
-                        Statamic @if ($statamic->pro())<span class="text-pink">Pro</span>@else Free @endif
+                        {{ __('Statamic') }} @if ($statamic->pro())<span class="text-pink">{{ __('Pro') }}</span>@else {{ __('Free') }} @endif
                     </td>
                     <td>{{ $statamic->version() }}</td>
                     <td class="rtl:text-left ltr:text-right text-red-500">{{ $statamic->invalidReason() }}</td>
