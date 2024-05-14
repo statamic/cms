@@ -13,12 +13,10 @@ class IndexManagerTest extends TestCase
     /** @test */
     public function it_gets_indexes()
     {
-        Site::setConfig([
-            'sites' => [
-                'en' => ['url' => '/'],
-                'fr' => ['url' => '/fr/'],
-                'de' => ['url' => '/de/'],
-            ],
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
+            'de' => ['url' => '/de/'],
         ]);
 
         config(['statamic.search.indexes' => [

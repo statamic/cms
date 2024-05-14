@@ -24,6 +24,7 @@ class CoreNavTest extends TestCase
             'Content' => ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'],
             'Fields' => ['Blueprints', 'Fieldsets'],
             'Tools' => ['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL'],
+            'Settings' => ['Site', 'Preferences'],
             'Users' => ['Users', 'Groups', 'Permissions'],
         ]);
 
@@ -35,17 +36,33 @@ class CoreNavTest extends TestCase
         $this->assertEquals($expected->get('Content'), $nav->get('Content')->map->display()->all());
         $this->assertEquals($expected->get('Fields'), $nav->get('Fields')->map->display()->all());
         $this->assertEquals($expected->get('Tools'), $nav->get('Tools')->map->display()->all());
+        $this->assertEquals($expected->get('Settings'), $nav->get('Settings')->map->display()->all());
         $this->assertEquals($expected->get('Users'), $nav->get('Users')->map->display()->all());
+    }
+
+    /** @test */
+    public function it_builds_plural_sites_item_when_multisite_is_enabled()
+    {
+        Facades\Config::set('statamic.system.multisite', true);
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $nav = $this->build();
+
+        $this->assertEquals(
+            ['Sites', 'Preferences'],
+            $nav->get('Settings')->map->display()->all()
+        );
     }
 
     /** @test */
     public function it_doesnt_build_collection_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Facades\Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
-        ]]);
+        ]);
 
         Facades\Collection::make('has_some_french')->sites(['en', 'fr', 'de'])->save();
         Facades\Collection::make('has_no_french')->sites(['en', 'de'])->save();
@@ -79,11 +96,11 @@ class CoreNavTest extends TestCase
     /** @test */
     public function it_doesnt_build_navigation_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Facades\Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
-        ]]);
+        ]);
 
         $nav1 = tap(Facades\Nav::make()->handle('has_some_french'))->save();
         $nav1->makeTree('en')->save();
@@ -125,11 +142,11 @@ class CoreNavTest extends TestCase
     /** @test */
     public function it_doesnt_build_taxonomy_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Facades\Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
-        ]]);
+        ]);
 
         Facades\Taxonomy::make('has_some_french')->sites(['en', 'fr', 'de'])->save();
         Facades\Taxonomy::make('has_no_french')->sites(['en', 'de'])->save();
@@ -163,11 +180,11 @@ class CoreNavTest extends TestCase
     /** @test */
     public function it_doesnt_build_globals_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Facades\Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
-        ]]);
+        ]);
 
         $set1 = Facades\GlobalSet::make('has_some_french');
         $set1->addLocalization($set1->makeLocalization('en'));

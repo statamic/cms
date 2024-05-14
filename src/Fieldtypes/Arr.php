@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Closure;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\ArrayType;
@@ -80,5 +81,24 @@ class Arr extends Fieldtype
     public function toGqlType()
     {
         return GraphQL::type(ArrayType::NAME);
+    }
+
+    public function rules(): array
+    {
+        if ($this->isKeyed()) {
+            return [];
+        }
+
+        return [function ($handle, $value, Closure $fail) {
+            $values = collect($value);
+
+            if ($values->has('null')) {
+                $fail('statamic::validation.arr_fieldtype')->translate();
+            }
+
+            if ($values->count() !== $values->reject(fn ($v) => is_null($v))->count()) {
+                $fail('statamic::validation.arr_fieldtype')->translate();
+            }
+        }];
     }
 }

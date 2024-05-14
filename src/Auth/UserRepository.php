@@ -64,6 +64,7 @@ abstract class UserRepository implements RepositoryContract
 
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
             'name' => ['type' => 'text', 'display' => __('Name'), 'listable' => true],
+            'email' => ['type' => 'text', 'input_type' => 'email', 'display' => __('Email Address'), 'listable' => true],
         ])->setHandle('user');
 
         $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => __('Email Address'), 'listable' => true]);
@@ -83,10 +84,10 @@ abstract class UserRepository implements RepositoryContract
         return $blueprint;
     }
 
-    public function findByOAuthId(string $provider, string $id): ?User
+    public function findByOAuthId(Provider $provider, string $id): ?User
     {
         return $this->find(
-            (new Provider($provider))->getUserId($id)
+            $provider->getUserId($id)
         );
     }
 }

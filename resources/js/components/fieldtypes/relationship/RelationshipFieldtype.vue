@@ -92,9 +92,11 @@ export default {
         },
 
         site() {
-            if (! this.storeName) return this.$config.get('selectedSite');
+            if (this.storeName) {
+                return this.$store.state.publish[this.storeName].site || this.$config.get('selectedSite');
+            }
 
-            return this.$store.state.publish[this.storeName].site;
+            return this.$config.get('selectedSite');
         },
 
         canEdit() {

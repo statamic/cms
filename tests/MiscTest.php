@@ -4,7 +4,6 @@ namespace Tests;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
 use Statamic\View\View;
 
@@ -22,10 +21,10 @@ class MiscTest extends TestCase
      **/
     public function locales_tag_doesnt_ruin_future_tag_pairs($withParameter)
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
             'de' => ['url' => 'http://localhost/de/', 'locale' => 'de', 'name' => 'German'],
-        ]]);
+        ]);
 
         $blueprint = Blueprint::makeFromFields(['related_entries' => ['type' => 'entries']]);
         Blueprint::shouldReceive('in')->with('collections/test')->andReturn(collect([$blueprint]));
@@ -59,7 +58,7 @@ EOT;
         $this->assertEquals($expected, View::make('test')->cascadeContent($a)->render());
     }
 
-    public function localesTagTestProvider()
+    public static function localesTagTestProvider()
     {
         return [
             'without parameter' => [false],

@@ -600,4 +600,34 @@ class AssetQueryBuilderTest extends TestCase
             'f.jpg',
         ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
     }
+
+    /** @test */
+    public function values_can_be_plucked()
+    {
+        $this->assertEquals([
+            'test::a.jpg' => 'a.jpg',
+            'test::b.txt' => 'b.txt',
+            'test::c.txt' => 'c.txt',
+            'test::d.jpg' => 'd.jpg',
+            'test::e.jpg' => 'e.jpg',
+            'test::f.jpg' => 'f.jpg',
+        ], $this->container->queryAssets()->pluck('path', 'id')->all());
+
+        $this->assertEquals([
+            'a.jpg',
+            'b.txt',
+            'c.txt',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], $this->container->queryAssets()->pluck('path')->all());
+
+        // Assert only queried values are plucked.
+        $this->assertSame([
+            'a.jpg',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], $this->container->queryAssets()->where('extension', 'jpg')->pluck('path')->all());
+    }
 }
