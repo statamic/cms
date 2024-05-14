@@ -7,6 +7,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class GlobalsStore extends BasicStore
@@ -29,15 +30,15 @@ class GlobalsStore extends BasicStore
     {
         // The global sets themselves should only exist in the root
         // (ie. no slashes in the filename)
-        $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
+        $filename = Str::after(Path::tidy($file->getPathName()), $this->directory);
 
         return substr_count($filename, '/') === 0 && $file->getExtension() === 'yaml';
     }
 
     public function makeItemFromFile($path, $contents)
     {
-        $relative = str_after($path, $this->directory);
-        $handle = str_before($relative, '.yaml');
+        $relative = Str::after($path, $this->directory);
+        $handle = Str::before($relative, '.yaml');
 
         $data = YAML::file($path)->parse();
 

@@ -20,6 +20,8 @@ class Session
 
     protected $url;
 
+    private $regionCount = 0;
+
     public function __construct($url)
     {
         $this->url = $url;
@@ -53,6 +55,13 @@ class Session
         }
 
         throw new RegionNotFound($key);
+    }
+
+    public function getRegionId(): string
+    {
+        $this->regionCount += 1;
+
+        return md5($this->url.$this->regionCount);
     }
 
     public function pushRegion($contents, $context, $extension): StringRegion

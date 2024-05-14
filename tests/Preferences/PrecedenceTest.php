@@ -92,7 +92,7 @@ class PrecedenceTest extends TestCase
             'pleb' => Role::make()->permissions('super')->preferences(['alpha' => 'bar', 'charlie' => 'charlie']),
         ]);
 
-        $this->actingAs(User::make()->roles(['author', 'pleb']));
+        $this->actingAs(User::make()->explicitRoles(['author', 'pleb']));
 
         $expected = [
             'alpha' => 'foo', // This should be `foo`, because the `author` role is set first

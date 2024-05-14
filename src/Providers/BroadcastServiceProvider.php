@@ -17,24 +17,41 @@ class BroadcastServiceProvider extends ServiceProvider
 
     protected function variables()
     {
-        return [
-            'enabled' => true,
-            'endpoint' => $this->authEndpoint(),
-            'pusher' => [
+        $options = [];
+
+        if (config('broadcasting.default') === 'pusher') {
+            $options = [
+                'broadcaster' => 'pusher',
                 'key' => config('broadcasting.connections.pusher.key'),
                 'cluster' => config('broadcasting.connections.pusher.options.cluster'),
                 'encrypted' => config('broadcasting.connections.pusher.options.encrypted'),
-                'scheme' => config('broadcasting.connections.pusher.options.scheme'),
-                'host' => config('broadcasting.connections.pusher.options.host'),
-                'port' => config('broadcasting.connections.pusher.options.port'),
-            ],
+            ];
+        }
+
+        if (config('broadcasting.default') === 'reverb') {
+            $options = [
+                'broadcaster' => 'reverb',
+                'key' => config('broadcasting.connections.reverb.key'),
+                'wsHost' => config('broadcasting.connections.reverb.options.host'),
+                'wsPort' => config('broadcasting.connections.reverb.options.port', 80),
+                'wssPort' => config('broadcasting.connections.reverb.options.port', 443),
+                'forceTLS' => config('broadcasting.connections.reverb.options.useTLS'),
+                'enabledTransports' => ['ws', 'wss'],
+            ];
+        }
+
+        return [
+            'enabled' => true,
+            'endpoint' => $this->authEndpoint(),
+            'connection' => config('broadcasting.default'),
+            'options' => $options,
         ];
     }
 
     protected function enabled()
     {
         return in_array(
-            \App\Providers\BroadcastServiceProvider::class,
+            \Illuminate\Broadcasting\BroadcastServiceProvider::class,
             array_keys($this->app->getLoadedProviders())
         );
     }

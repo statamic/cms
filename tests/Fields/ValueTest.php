@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Statamic\Facades\Blueprint;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Tests\TestCase;
@@ -152,6 +153,66 @@ class ValueTest extends TestCase
         ], null, $fieldtype);
 
         $this->assertEquals('{"foo":"BAR!","baz":{"id":"123","title":"Title for 123"},"qux":[{"id":"456","title":"Title for 456"},{"id":"789","title":"Title for 789"}]}', json_encode($value));
+    }
+
+    /** @test */
+    public function it_uses_the_default_value()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public function augment($value)
+            {
+                return $value.'!';
+            }
+        };
+
+        $fieldtype->setField(new Field('search_engine_url', ['default' => 'https://google.com']));
+
+        tap(new Value(null, null, $fieldtype), function ($value) {
+            $this->assertNull($value->raw());
+            $this->assertEquals('https://google.com!', $value->value());
+        });
+
+        tap(new Value('foo', null, $fieldtype), function ($value) {
+            $this->assertEquals('foo', $value->raw());
+            $this->assertEquals('foo!', $value->value());
+        });
+    }
+
+    /** @test */
+    public function it_does_not_use_the_default_when_returning_falsey_values()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public function augment($value)
+            {
+                return $value;
+            }
+        };
+
+        $fieldtype->setField(new Field('the_handle', ['default' => true]));
+
+        tap(new Value(false, null, $fieldtype), function ($value) {
+            $this->assertSame(false, $value->value());
+        });
+    }
+
+    /** @test */
+    public function falsey_values_can_be_used_as_the_default()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public function augment($value)
+            {
+                return $value;
+            }
+        };
+
+        $fieldtype->setField(new Field('the_handle', ['default' => false]));
+
+        tap(new Value(null, null, $fieldtype), function ($value) {
+            $this->assertSame(false, $value->value());
+        });
     }
 }
 

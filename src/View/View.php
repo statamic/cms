@@ -2,6 +2,7 @@
 
 namespace Statamic\View;
 
+use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Statamic\Facades\Cascade;
 use Statamic\Support\Arr;
@@ -101,6 +102,13 @@ class View
             GlobalRuntimeState::$containsLayout = false;
             GlobalRuntimeState::$shareVariablesTemplateTrigger = '';
 
+            $factory = app('view');
+
+            // Put the sections back. The ->render() will have flushed the sections.
+            Cascade::sections()->each(function ($content, $section) use ($factory) {
+                $factory->startSection($section, new HtmlString((string) $content));
+            });
+
             $contents = view($this->layoutViewName(), array_merge($cascade, GlobalRuntimeState::$layoutVariables, [
                 'template_content' => $contents,
             ]));
@@ -114,10 +122,8 @@ class View
 
         $renderedContents = $contents->render();
 
-        if (config('statamic.antlers.version') == 'runtime') {
-            $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
-            $renderedContents = StackReplacementManager::processReplacements($renderedContents);
-        }
+        $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
+        $renderedContents = StackReplacementManager::processReplacements($renderedContents);
 
         return $renderedContents;
     }
