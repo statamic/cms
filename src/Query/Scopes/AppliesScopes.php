@@ -2,6 +2,7 @@
 
 namespace Statamic\Query\Scopes;
 
+use Statamic\Support\Str;
 use Statamic\Facades\Scope;
 use Statamic\Tags\Parameters;
 
@@ -10,7 +11,7 @@ trait AppliesScopes
     public function applyScope($method, Parameters|array $context = [])
     {
         // Throw an exception if the scope doesn't exist.
-        if (! $scope = Scope::find(snake_case($method))) {
+        if (! $scope = Scope::find(Str::snake($method))) {
             throw new \Exception("The [$method] scope does not exist.");
         }
 
