@@ -20,12 +20,14 @@ use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
 {
     use EnhancesCommands;
+    use Hookable;
     use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
@@ -44,7 +46,7 @@ class StaticWarm extends Command
     public function handle()
     {
         if (! config('statamic.static_caching.strategy')) {
-            $this->error('Static caching is not enabled.');
+            $this->components->error('Static caching is not enabled.');
 
             return 1;
         }
@@ -52,7 +54,7 @@ class StaticWarm extends Command
         $this->shouldQueue = $this->option('queue');
 
         if ($this->shouldQueue && config('queue.default') === 'sync') {
-            $this->error('The queue connection is set to "sync". Queueing will be disabled.');
+            $this->components->error('The queue connection is set to "sync". Queueing will be disabled.');
             $this->shouldQueue = false;
         }
 
@@ -60,10 +62,10 @@ class StaticWarm extends Command
 
         $this->warm();
 
-        $this->output->newLine();
-        $this->info($this->shouldQueue
-            ? 'All requests to warm the static cache have been added to the queue.'
-            : 'The static cache has been warmed.'
+        $this->components->info(
+            $this->shouldQueue
+                ? 'All requests to warm the static cache have been added to the queue.'
+                : 'The static cache has been warmed.'
         );
 
         return 0;
@@ -116,7 +118,7 @@ class StaticWarm extends Command
 
     public function outputSuccessLine(Response $response, $index): void
     {
-        $this->checkLine($this->getRelativeUri($index));
+        $this->components->twoColumnDetail($this->getRelativeUri($index), '<info>✓ Cached</info>');
     }
 
     public function outputFailureLine($exception, $index): void
@@ -135,7 +137,7 @@ class StaticWarm extends Command
             $message = $exception->getMessage();
         }
 
-        $this->crossLine("$uri → <fg=cyan>$message</fg=cyan>");
+        $this->components->twoColumnDetail($uri, "<fg=cyan>$message</fg=cyan>");
     }
 
     private function getRelativeUri(int $index): string
@@ -163,6 +165,7 @@ class StaticWarm extends Command
             ->merge($this->taxonomyUris())
             ->merge($this->termUris())
             ->merge($this->customRouteUris())
+            ->merge($this->additionalUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
                 return $cacher->isExcluded($uri);
@@ -278,5 +281,16 @@ class StaticWarm extends Command
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Custom routes");
 
         return $routes;
+    }
+
+    protected function additionalUris(): Collection
+    {
+        $this->line('[ ] Additional...');
+
+        $uris = $this->runHooks('additional', collect());
+
+        $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Additional");
+
+        return $uris->map(fn ($uri) => URL::makeAbsolute($uri));
     }
 }

@@ -141,6 +141,7 @@ export default {
         return {
             preferencesPrefix: 'users',
             requestUrl: cp_url('users'),
+            pushQuery: true,
         }
     },
 

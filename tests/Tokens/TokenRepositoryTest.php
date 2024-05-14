@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\File;
-use Statamic\Tokens\TokenRepository;
+use Statamic\Tokens\FileTokenRepository;
 use Tests\TestCase;
 
 class TokenRepositoryTest extends TestCase
@@ -18,7 +18,7 @@ class TokenRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->tokens = new TokenRepository;
+        $this->tokens = new FileTokenRepository;
     }
 
     /** @test */

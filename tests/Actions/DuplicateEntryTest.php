@@ -79,10 +79,10 @@ class DuplicateEntryTest extends TestCase
         $collection = Collection::make('test');
 
         if ($isMultisite) {
-            Site::setConfig(['sites' => [
+            $this->setSites([
                 'en' => ['url' => '/', 'locale' => 'en'],
                 'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-            ]]);
+            ]);
 
             $collection->sites(['en', 'fr']);
         }
@@ -141,11 +141,11 @@ class DuplicateEntryTest extends TestCase
         $collection = Collection::make('test');
 
         if ($isMultisite) {
-            Site::setConfig(['sites' => [
+            $this->setSites([
                 'en' => ['url' => '/', 'locale' => 'en'],
                 'fr' => ['url' => '/fr/', 'locale' => 'fr'],
                 'de' => ['url' => '/de/', 'locale' => 'de'],
-            ]]);
+            ]);
 
             $collection->sites(['en', 'fr', 'de']);
         }
@@ -226,12 +226,12 @@ class DuplicateEntryTest extends TestCase
     /** @test */
     public function it_duplicates_an_entry_with_localizations()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
             'de' => ['url' => 'http://domain.com/de/', 'locale' => 'de'], // Add additional site that the entry doesn't exist in, to ensure it doesn't get duplicated into it.
             'es' => ['url' => 'http://domain.com/es/', 'locale' => 'es'],
-        ]]);
+        ]);
 
         Collection::make('test')->sites(['en', 'fr', 'de', 'es'])->save();
 
@@ -265,12 +265,12 @@ class DuplicateEntryTest extends TestCase
     /** @test */
     public function it_duplicates_an_entry_with_nested_localizations()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
             'fr_ca' => ['url' => 'http://domain.com/fr-ca/', 'locale' => 'fr_CA'],
             'es' => ['url' => 'http://domain.com/es/', 'locale' => 'es'],
-        ]]);
+        ]);
 
         Collection::make('test')->sites(['en', 'fr', 'fr_ca', 'es'])->save();
 
@@ -315,11 +315,11 @@ class DuplicateEntryTest extends TestCase
     /** @test */
     public function it_only_duplicates_authorized_localizations()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
             'es' => ['url' => 'http://domain.com/es/', 'locale' => 'es'],
-        ]]);
+        ]);
 
         Collection::make('test')->sites(['en', 'fr', 'es'])->save();
 
@@ -359,12 +359,12 @@ class DuplicateEntryTest extends TestCase
     {
         // 🤯
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
             'fr_ca' => ['url' => 'http://domain.com/fr-ca/', 'locale' => 'fr_CA'],
             'es' => ['url' => 'http://domain.com/es/', 'locale' => 'es'],
-        ]]);
+        ]);
 
         Collection::make('test')->sites(['en', 'fr', 'fr_ca', 'es'])->save();
 
@@ -408,10 +408,10 @@ class DuplicateEntryTest extends TestCase
     /** @test */
     public function it_duplicates_an_entry_from_a_non_default_site()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::make('test')->sites(['en', 'fr'])->save();
 
@@ -440,10 +440,10 @@ class DuplicateEntryTest extends TestCase
     /** @test */
     public function if_an_entry_has_an_origin_it_duplicates_the_root_origin()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::make('test')->sites(['en', 'fr'])->save();
 
@@ -473,10 +473,10 @@ class DuplicateEntryTest extends TestCase
     /** @test */
     public function if_an_entry_has_an_origin_and_the_root_origin_is_also_selected_it_only_duplicates_the_root_origin()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::make('test')->sites(['en', 'fr'])->save();
 

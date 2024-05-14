@@ -9,7 +9,6 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -79,10 +78,10 @@ GQL;
     {
         $this->createEntries();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::find('events')->routes('/events/{slug}')->sites(['en', 'fr'])->save();
 
@@ -761,7 +760,7 @@ GQL;
     }
 
     /** @test */
-    public function it_only_shows_published_entries_by_default()
+    public function it_filters_out_drafts_by_default()
     {
         FilterAuthorizer::shouldReceive('allowedForSubResources')
             ->andReturn(['published', 'status']);
@@ -869,6 +868,83 @@ GQL;
             ->assertGqlOk()
             ->assertExactJson(['data' => ['entries' => ['data' => [
                 ['id' => '1', 'title' => 'Standard Blog Post'],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_filters_out_future_entries_from_future_private_collection()
+    {
+        $default = Blueprint::makeFromFields([]);
+        BlueprintRepository::shouldReceive('find')->with('default')->andReturn($default);
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->andReturn(['published', 'status']);
+
+        Collection::make('test')->dated(true)
+            ->pastDateBehavior('public')
+            ->futureDateBehavior('private')
+            ->save();
+
+        Entry::make()->collection('test')->id('a')->published(true)->date(now()->addDay())->save();
+        Entry::make()->collection('test')->id('b')->published(false)->date(now()->addDay())->save();
+        Entry::make()->collection('test')->id('c')->published(true)->date(now()->subDay())->save();
+        Entry::make()->collection('test')->id('d')->published(false)->date(now()->subDay())->save();
+
+        $query = <<<'GQL'
+{
+    entries {
+        data {
+            id
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => 'c'],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_filters_out_past_entries_from_past_private_collection()
+    {
+
+        $default = Blueprint::makeFromFields([]);
+        BlueprintRepository::shouldReceive('find')->with('default')->andReturn($default);
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->andReturn(['published', 'status']);
+
+        Collection::make('test')->dated(true)
+            ->pastDateBehavior('private')
+            ->futureDateBehavior('public')
+            ->save();
+
+        Entry::make()->collection('test')->id('a')->published(true)->date(now()->addDay())->save();
+        Entry::make()->collection('test')->id('b')->published(false)->date(now()->addDay())->save();
+        Entry::make()->collection('test')->id('c')->published(true)->date(now()->subDay())->save();
+        Entry::make()->collection('test')->id('d')->published(false)->date(now()->subDay())->save();
+
+        $query = <<<'GQL'
+{
+    entries {
+        data {
+            id
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => 'a'],
             ]]]]);
     }
 }
