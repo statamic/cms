@@ -92,6 +92,12 @@ class MigrateSitesConfigToYaml extends UpdateScript
         // Convert `env('APP_URL')` references
         $config = preg_replace('/env\([\'"]APP_URL[\'"]\)/', '\'{{ config:app:url }}\'', $config);
 
+        // Warn if any other `env()` calls are detected, so that user can handle them manually
+        if (preg_match_all('/env\([\'"]([^\'"]+)[\'"]/', $config, $matches)) {
+            $this->console->warn('The following .env vars were referenced in your sites.php config: '.collect($matches[1])->implode(', '));
+            $this->console->line('If you wish for these values to remain dynamic, please refactor to use `{{ config:... }}`.');
+        }
+
         return $config;
     }
 
