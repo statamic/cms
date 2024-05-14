@@ -49,9 +49,7 @@ class ServiceProvider extends LaravelProvider
 
     private function disableGraphqlRoutes()
     {
-        $key = $this->isLegacyRebingGraphql() ? 'graphql.routes' : 'graphql.route';
-
-        config([$key => false]);
+        config(['graphql.route' => false]);
     }
 
     private function addMiddleware()
@@ -72,10 +70,5 @@ class ServiceProvider extends LaravelProvider
     private function setDefaultSchema()
     {
         config(['graphql.schemas.default' => DefaultSchema::class]);
-    }
-
-    protected function isLegacyRebingGraphql()
-    {
-        return class_exists('\Rebing\GraphQL\Support\ResolveInfoFieldsAndArguments');
     }
 }

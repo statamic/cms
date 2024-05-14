@@ -4,6 +4,7 @@ namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Assets\AssetContainer;
+use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades;
 use Statamic\Stache\Repositories\AssetContainerRepository;
 use Statamic\Stache\Stache;
@@ -74,5 +75,23 @@ class AssetContainerRepositoryTest extends TestCase
         $this->assertEquals($container, $item);
         $this->assertTrue(file_exists($this->directory.'/new.yaml'));
         @unlink($this->directory.'/new.yaml');
+    }
+
+    /** @test */
+    public function test_find_or_fail_gets_container()
+    {
+        $container = $this->repo->findOrFail('main');
+
+        $this->assertInstanceOf(AssetContainer::class, $container);
+        $this->assertEquals('Main Assets', $container->title());
+    }
+
+    /** @test */
+    public function test_find_or_fail_throws_exception_when_container_does_not_exist()
+    {
+        $this->expectException(AssetContainerNotFoundException::class);
+        $this->expectExceptionMessage('Asset Container [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }

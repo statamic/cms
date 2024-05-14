@@ -12,20 +12,20 @@
         </h1>
 
         @can('configure fields')
-            <dropdown-list class="mr-2">
+            <dropdown-list class="rtl:ml-2 ltr:mr-2">
                 <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('users.blueprint.edit') }}"></dropdown-item>
             </dropdown-list>
         @endcan
 
         @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Auth\User'))
-            <a href="{{ cp_route('users.create') }}" class="btn-primary ml-4">{{ __('Create User') }}</a>
+            <a href="{{ cp_route('users.create') }}" class="btn-primary rtl:mr-4 ltr:ml-4">{{ __('Create User') }}</a>
         @endif
     </header>
 
     <user-listing
         listing-key="users"
-        initial-sort-column="email"
-        initial-sort-direction="asc"
+        initial-sort-column="{{ config('statamic.users.sort_field', 'email') }}"
+        initial-sort-direction="{{ config('statamic.users.sort_direction', 'asc') }}"
         :filters="{{ $filters->toJson() }}"
         action-url="{{ cp_route('users.actions.run') }}"
     ></user-listing>

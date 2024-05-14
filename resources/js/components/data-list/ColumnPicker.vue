@@ -18,12 +18,12 @@
 
                 <div class="flex grow min-h-0 rounded-t-md bg-gray-100">
                     <!-- Available Columns -->
-                    <div class="outline-none text-left w-1/2 border-r flex flex-col">
+                    <div class="outline-none rtl:text-right ltr:text-left w-1/2 rtl:border-l ltr:border-r flex flex-col">
                         <header v-text="__('Available Columns')" class="border-b py-2 px-3 text-sm bg-white font-medium"/>
                         <div class="flex flex-1 flex-col space-y-1 py-2 px-3 select-none shadow-inner overflow-y-scroll">
                             <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field" v-if="hiddenColumns.length">
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="checkbox" class="mr-2" v-model="column.visible" @change="columnToggled(column) "/>
+                                    <input type="checkbox" class="rtl:ml-2 ltr:mr-2" v-model="column.visible" @change="columnToggled(column) "/>
                                     {{ __(column.label) }}
                                 </label>
                             </div>
@@ -32,7 +32,7 @@
 
                     <!-- Displayed Columns -->
                     <div class="w-1/2 flex flex-col">
-                        <header v-text="__('Displayed Columns')" class="border-b px-3 py-2 text-sm bg-white rounded-tl-md font-medium flex-none"/>
+                        <header v-text="__('Displayed Columns')" class="border-b px-3 py-2 text-sm bg-white rtl:rounded-tr-md ltr:rounded-tl-md font-medium flex-none"/>
                         <div class="grow overflow-y-scroll shadow-inner">
                             <sortable-list
                                 v-model="selectedColumns"
@@ -46,8 +46,8 @@
                                 <div class="space-y-1 px-3 p-3 select-none">
                                     <div class="item sortable cursor-grab" v-for="column in selectedColumns" :key="column.field" tabindex="-1">
                                         <div class="item-move py-1">&nbsp;</div>
-                                        <div class="flex flex-1 ml-2 items-center p-0">
-                                            <input type="checkbox" class="mr-2" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
+                                        <div class="flex flex-1 rtl:mr-2 ltr:ml-2 items-center p-0">
+                                            <input type="checkbox" class="rtl:ml-2 ltr:mr-2" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
                                             {{ __(column.label) }}
                                         </div>
                                     </div>
@@ -59,7 +59,7 @@
 
                 <footer class="px-3 py-2 border-t flex items-center justify-end" v-if="preferencesKey">
                     <button class="btn" v-text="__('Reset')" @click="reset" :disabled="saving" />
-                    <button class="ml-3 btn-primary" v-text="__('Save')" @click="save" :disabled="saving" />
+                    <button class="rtl:mr-3 ltr:ml-3 btn-primary" v-text="__('Save')" @click="save" :disabled="saving" />
                 </footer>
 
             </div>

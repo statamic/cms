@@ -47,10 +47,10 @@ class EntryTest extends TestCase
     /** @test */
     public function it_sets_and_gets_the_locale()
     {
-        Facades\Site::setConfig(['sites' => [
+        $this->setSites([
             'foo' => [],
             'bar' => [],
-        ]]);
+        ]);
 
         $entry = new Entry;
         $this->assertEquals('foo', $entry->locale()); // defaults to the default site.
@@ -64,9 +64,9 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_site()
     {
-        config(['statamic.sites.sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US'],
-        ]]);
+        ]);
 
         $entry = (new Entry)->locale('en');
 
@@ -90,10 +90,10 @@ class EntryTest extends TestCase
     /** @test */
     public function the_slug_gets_slugified()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'url' => '/'],
             'da' => ['locale' => 'da_DK', 'url' => '/da/'],
-        ]]);
+        ]);
 
         $entry = new Entry;
         $entry->slug('foo bar æøå');
@@ -144,6 +144,18 @@ class EntryTest extends TestCase
 
         // Ensure that the temporary null slug is reset back the actual one for subsequent calls.
         $this->assertEquals('the-slug', $entry->slug());
+    }
+
+    /** @test */
+    public function it_resolves_the_slug_when_serializing()
+    {
+        $entry = new Entry;
+        $entry->slug(fn () => 'the-slug');
+
+        // This would throw an exception if the slug remained an unresolved closure.
+        $serialized = serialize($entry);
+
+        $this->assertEquals('the-slug', unserialize($serialized)->slug());
     }
 
     /** @test */
@@ -507,11 +519,11 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_url_from_the_collection()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr_FR'],
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
-        ]]);
+        ]);
 
         $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
@@ -618,20 +630,22 @@ class EntryTest extends TestCase
         $this->assertNull($entry->url());
     }
 
-    /** @test */
-    public function it_gets_urls_for_first_child_redirects()
+    /**
+     * @test
+     *
+     * @dataProvider firstChildRedirectProvider
+     */
+    public function it_gets_urls_for_first_child_redirects($value)
     {
-        \Event::fake(); // Don't invalidate static cache etc when saving entries.
-
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
-        ]]);
+        ]);
 
         $collection = tap((new Collection)->handle('pages')->routes('{parent_uri}/{slug}'))->save();
 
-        $parent = tap((new Entry)->id('1')->locale('en')->collection($collection)->slug('parent')->set('redirect', '@child'))->save();
+        $parent = tap((new Entry)->id('1')->locale('en')->collection($collection)->slug('parent')->set('redirect', $value))->save();
         $child = tap((new Entry)->id('2')->locale('en')->collection($collection)->slug('child'))->save();
-        $noChildren = tap((new Entry)->id('3')->locale('en')->collection($collection)->slug('nochildren')->set('redirect', '@child'))->save();
+        $noChildren = tap((new Entry)->id('3')->locale('en')->collection($collection)->slug('nochildren')->set('redirect', $value))->save();
 
         $collection->structureContents([
             'expects_root' => false, // irrelevant. just can't pass an empty array at the moment.
@@ -670,6 +684,14 @@ class EntryTest extends TestCase
         $this->assertEquals('http://domain.com/nochildren', $noChildren->absoluteUrl());
         $this->assertEquals('http://domain.com/nochildren', $noChildren->absoluteUrlWithoutRedirect());
         $this->assertEquals(404, $noChildren->redirectUrl());
+    }
+
+    public static function firstChildRedirectProvider()
+    {
+        return [
+            'string' => ['@child'],
+            'array' => [['url' => '@child']],
+        ];
     }
 
     /** @test */
@@ -855,9 +877,9 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_path_and_excludes_locale_when_theres_a_single_site()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
-        ]]);
+        ]);
 
         $collection = tap(Facades\Collection::make('blog')->dated(true))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
@@ -869,10 +891,10 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_path_and_includes_locale_when_theres_multiple_sites()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR'],
-        ]]);
+        ]);
 
         $collection = tap(Facades\Collection::make('blog')->dated(true))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
@@ -1351,8 +1373,11 @@ class EntryTest extends TestCase
         $mock->shouldReceive('store')->with('structure-uris')->once()->andReturn(
             $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
         );
-        $mock->shouldReceive('store')->with('structure-entries')->once()->andReturn(
-            $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
+        $mock->shouldReceive('store')->with('structure-entries')->twice()->andReturn(
+            tap($this->mock(\Spatie\Blink\Blink::class), function ($m) {
+                $m->shouldReceive('forget')->with('a')->once();
+                $m->shouldReceive('put')->once();
+            })
         );
 
         $entry->save();
@@ -1397,14 +1422,11 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection = (new Collection)
@@ -1463,13 +1485,10 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection = (new Collection)
@@ -1494,13 +1513,10 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection = (new Collection)
@@ -1524,14 +1540,11 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection = (new Collection)
@@ -1579,13 +1592,10 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
         ]);
 
         $collection = (new Collection)
@@ -1966,6 +1976,21 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $entry = EntryFactory::collection('test')->create();
+
+        $return = $entry->deleteQuietly();
+
+        Event::assertNotDispatched(EntryDeleting::class);
+        Event::assertNotDispatched(EntryDeleted::class);
+
+        $this->assertTrue($return);
+    }
+
+    /** @test */
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         Facades\Entry::spy();
@@ -2000,11 +2025,12 @@ class EntryTest extends TestCase
     public function it_deletes_descendants()
     {
         Event::fake();
-        config(['statamic.sites.sites' => [
-            'en' => [],
-            'fr' => [],
-            'de' => [],
-        ]]);
+
+        $this->setSites([
+            'en' => ['locale' => 'en'],
+            'fr' => ['locale' => 'fr'],
+            'de' => ['locale' => 'de'],
+        ]);
 
         $entry = EntryFactory::collection('test')->locale('en')->id('1')->create();
         $localization = EntryFactory::collection('test')->locale('fr')->id('2')->origin('1')->create();
@@ -2020,17 +2046,50 @@ class EntryTest extends TestCase
         $this->assertCount(1, Facades\Entry::all());
         $this->assertCount(0, $entry->descendants());
         $this->assertCount(0, $localization->descendants());
+
+        Event::assertDispatched(EntryDeleting::class);
+        Event::assertDispatched(EntryDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_descendants_quietly()
+    {
+        Event::fake();
+        config(['statamic.sites.sites' => [
+            'en' => [],
+            'fr' => [],
+            'de' => [],
+        ]]);
+
+        $entry = EntryFactory::collection('test')->locale('en')->id('1')->create();
+        $localization = EntryFactory::collection('test')->locale('fr')->id('2')->origin('1')->create();
+        $deeperLocalization = EntryFactory::collection('test')->locale('de')->id('3')->origin('2')->create();
+
+        $this->assertCount(3, Facades\Entry::all());
+        $this->assertCount(2, $entry->descendants());
+        $this->assertCount(1, $localization->descendants());
+
+        $return = $entry->deleteDescendants(withEvents: false);
+
+        $this->assertTrue($return);
+        $this->assertCount(1, Facades\Entry::all());
+        $this->assertCount(0, $entry->descendants());
+        $this->assertCount(0, $localization->descendants());
+
+        Event::assertNotDispatched(EntryDeleting::class);
+        Event::assertNotDispatched(EntryDeleted::class);
     }
 
     /** @test */
     public function it_detaches_localizations()
     {
         Event::fake();
-        config(['statamic.sites.sites' => [
-            'en' => [],
-            'fr' => [],
-            'fr_ca' => [],
-        ]]);
+
+        $this->setSites([
+            'en' => ['locale' => 'en'],
+            'fr' => ['locale' => 'fr'],
+            'fr_ca' => ['locale' => 'fr_ca'],
+        ]);
 
         $english = EntryFactory::collection('test')->locale('en')->id('en')->data([
             'title' => 'English',
@@ -2181,11 +2240,11 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_preview_targets()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr_FR'],
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
-        ]]);
+        ]);
 
         $collection = (new Collection)->dated(true)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
@@ -2253,16 +2312,87 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
     }
 
+    /**
+     * @test
+     */
+    public function it_has_a_dirty_state()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $entry = tap((new Entry)->collection($collection)->locale('en')->id('en')->data([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ]))->save();
+
+        $this->assertFalse($entry->isDirty());
+        $this->assertFalse($entry->isDirty('title'));
+        $this->assertFalse($entry->isDirty('food'));
+        $this->assertFalse($entry->isDirty(['title']));
+        $this->assertFalse($entry->isDirty(['food']));
+        $this->assertFalse($entry->isDirty(['title', 'food']));
+        $this->assertTrue($entry->isClean());
+        $this->assertTrue($entry->isClean('title'));
+        $this->assertTrue($entry->isClean('food'));
+        $this->assertTrue($entry->isClean(['title']));
+        $this->assertTrue($entry->isClean(['food']));
+        $this->assertTrue($entry->isClean(['title', 'food']));
+
+        $entry->merge(['title' => 'French']);
+
+        $this->assertTrue($entry->isDirty());
+        $this->assertTrue($entry->isDirty('title'));
+        $this->assertFalse($entry->isDirty('food'));
+        $this->assertTrue($entry->isDirty(['title']));
+        $this->assertFalse($entry->isDirty(['food']));
+        $this->assertTrue($entry->isDirty(['title', 'food']));
+        $this->assertFalse($entry->isClean());
+        $this->assertFalse($entry->isClean('title'));
+        $this->assertTrue($entry->isClean('food'));
+        $this->assertFalse($entry->isClean(['title']));
+        $this->assertTrue($entry->isClean(['food']));
+        $this->assertFalse($entry->isClean(['title', 'food']));
+    }
+
+    /** @test */
+    public function it_syncs_original_at_the_right_time()
+    {
+        $eventsHandled = 0;
+
+        Event::listen(function (EntryCreating $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+        Event::listen(function (EntrySaving $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+        Event::listen(function (EntryCreated $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+        Event::listen(function (EntrySaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->entry->isDirty());
+        });
+
+        $collection = (new Collection)->handle('pages')->save();
+        $entry = (new Entry)->id('a')->collection($collection);
+        $entry->save();
+
+        $this->assertFalse($entry->isDirty());
+        $this->assertEquals(4, $eventsHandled);
+    }
+
     /** @test */
     public function it_gets_all_descendants()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
             'fr_CA' => ['locale' => 'fr_CA', 'url' => '/fr-ca/'],
             'de' => ['locale' => 'de_DE', 'url' => '/de/'],
             'it' => ['local' => 'it_IT', 'url' => '/it/'],
-        ]]);
+        ]);
 
         $one = EntryFactory::collection('test')->id('1')->locale('en')->create();
         $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
@@ -2279,13 +2409,13 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_direct_descendants()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
             'fr_CA' => ['locale' => 'fr_CA', 'url' => '/fr-ca/'],
             'de' => ['locale' => 'de_DE', 'url' => '/de/'],
             'it' => ['local' => 'it_IT', 'url' => '/it/'],
-        ]]);
+        ]);
 
         $one = EntryFactory::collection('test')->id(1)->locale('en')->create();
         $two = EntryFactory::collection('test')->id(2)->origin(1)->locale('fr')->create();
@@ -2302,12 +2432,12 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_ancestors()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
             'fr_CA' => ['locale' => 'fr_CA', 'url' => '/fr-ca/'],
             'de' => ['locale' => 'de_DE', 'url' => '/de/'],
-        ]]);
+        ]);
 
         $one = EntryFactory::collection('test')->id('1')->locale('en')->create();
         $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
@@ -2330,13 +2460,10 @@ class EntryTest extends TestCase
         config(['cache.default' => 'file']);
         Cache::clear();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
         ]);
 
         $one = EntryFactory::collection('test')->id('1')->locale('en')->data(['foo' => 'root'])->create();
@@ -2392,14 +2519,11 @@ class EntryTest extends TestCase
     /** @test */
     public function initially_saved_entry_gets_put_into_events()
     {
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
-                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => '/es/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
+            'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => '/es/'],
         ]);
 
         // Bunch of localizations of the same entry.
