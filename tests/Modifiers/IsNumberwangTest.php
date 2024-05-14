@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class IsNumberwangTest extends TestCase
 {
-    public function numbers(): array
+    public static function numbersProvider(): array
     {
         return [
             [true, 1],
@@ -28,7 +28,7 @@ class IsNumberwangTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider numbers
+     * @dataProvider numbersProvider
      */
     public function is_it_or_is_not_numberwang($expected, $input): void
     {

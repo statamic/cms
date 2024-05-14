@@ -21,7 +21,7 @@ class UserProvider implements UserProviderContract
     }
 
     /**
-     * Retrieve a user by by their unique identifier and "remember me" token.
+     * Retrieve a user by their unique identifier and "remember me" token.
      *
      * @param  mixed  $identifier
      * @param  string  $token
@@ -66,5 +66,14 @@ class UserProvider implements UserProviderContract
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
         return Hash::check($credentials['password'], $user->getAuthPassword());
+    }
+
+    public function rehashPasswordIfRequired(Authenticatable $user, array $credentials, bool $force = false)
+    {
+        if (! Hash::needsRehash($user->getAuthPassword()) && ! $force) {
+            return;
+        }
+
+        $user->password($credentials['password'])->save();
     }
 }

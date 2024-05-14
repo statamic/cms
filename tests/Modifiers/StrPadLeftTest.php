@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class StrPadLeftTest extends TestCase
 {
-    public function paddington(): array
+    public static function padProvider(): array
     {
         return [
             'pads_5_tilde' => ['~test', 'test', [5, '~']],
@@ -19,7 +19,7 @@ class StrPadLeftTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider paddington
+     * @dataProvider padProvider
      */
     public function it_pads_a_string(string $expected, string $input, array $params): void
     {

@@ -5,7 +5,6 @@ namespace Tests\Tags;
 use Illuminate\Support\Facades\Event;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Parse;
-use Statamic\Facades\Site;
 use Statamic\Fields\Value;
 use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -46,11 +45,11 @@ EOT;
 
         Event::fake();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => '/en', 'name' => 'English', 'locale' => 'en_US'],
             'french' => ['url' => '/fr', 'name' => 'French', 'locale' => 'fr_FR'],
             'espanol' => ['url' => '/es', 'name' => 'Spanish', 'locale' => 'es_ES'],
-        ]]);
+        ]);
 
         Collection::make('test')
             ->routes('{id}')
@@ -447,6 +446,38 @@ HTML;
         $this->assertEquals(
             '',
             $this->tag('{{ locales }}you should not see this{{ /locales }}', ['id' => $value])
+        );
+    }
+
+    /** @test */
+    public function it_prefers_page_id_over_id()
+    {
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('english')
+            ->id('1')
+            ->data(['title' => 'hello'])
+            ->create();
+
+        $this->assertEquals(
+            '<hello>',
+            $this->tag('{{ locales }}<{{ title }}>{{ /locales }}', ['page' => ['id' => '1']])
+        );
+    }
+
+    /** @test */
+    public function it_prefers_id_param_over_page_id()
+    {
+        (new EntryFactory)
+            ->collection('test')
+            ->locale('english')
+            ->id('1')
+            ->data(['title' => 'hello'])
+            ->create();
+
+        $this->assertEquals(
+            '<hello>',
+            $this->tag('{{ locales id="1" }}<{{ title }}>{{ /locales }}', ['page' => ['id' => '7']])
         );
     }
 }

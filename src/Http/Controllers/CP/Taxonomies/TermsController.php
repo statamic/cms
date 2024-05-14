@@ -14,6 +14,8 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Http\Resources\CP\Taxonomies\Terms;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Rules\Slug;
+use Statamic\Rules\UniqueTermValue;
 
 class TermsController extends CpController
 {
@@ -166,7 +168,11 @@ class TermsController extends CpController
 
         $fields->validate([
             'title' => 'required',
-            'slug' => 'required|alpha_dash|unique_term_value:'.$taxonomy->handle().','.$term->id().','.$site->handle(),
+            'slug' => [
+                'required',
+                new Slug,
+                new UniqueTermValue(taxonomy: $taxonomy->handle(), except: $term->id(), site: $site->handle()),
+            ],
         ]);
 
         $values = $fields->process()->values();
@@ -265,7 +271,7 @@ class TermsController extends CpController
 
         $fields->validate([
             'title' => 'required',
-            'slug' => 'required|unique_term_value:'.$taxonomy->handle().',null,'.$site->handle(),
+            'slug' => ['required', new UniqueTermValue(taxonomy: $taxonomy->handle(), site: $site->handle())],
         ]);
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);

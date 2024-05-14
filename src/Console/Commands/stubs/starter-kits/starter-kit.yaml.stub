@@ -5,8 +5,7 @@
 #   - resources/blueprints
 #   - resources/css/site.css
 #   - resources/views
-#   - public/assets
-#   - public/css
+#   - public/build
 #   - package.json
 #   - tailwind.config.js
-#   - webpack.mix.js
+#   - vite.config.js
