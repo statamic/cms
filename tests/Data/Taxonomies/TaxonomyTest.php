@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Events\TaxonomyCreated;
 use Statamic\Events\TaxonomyCreating;
+use Statamic\Events\TaxonomyDeleted;
+use Statamic\Events\TaxonomyDeleting;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
@@ -17,7 +19,6 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
-use Statamic\Support\Arr;
 use Statamic\Taxonomies\Taxonomy;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -101,6 +102,7 @@ class TaxonomyTest extends TestCase
                 ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
 
         $blueprint = $taxonomy->termBlueprint();
         $this->assertNotEquals($default, $blueprint);
@@ -153,9 +155,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_gets_the_url_when_the_site_is_using_a_subdirectory()
     {
-        $config = config('statamic.sites');
-        Arr::set($config, 'sites.en.url', '/subdirectory/');
-        Site::setConfig($config);
+        $this->setSiteValue('en', 'url', '/subdirectory/');
 
         $taxonomy = (new Taxonomy)->handle('tags');
 
@@ -433,13 +433,10 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $taxonomy1 = tap(Facades\Taxonomy::make('has_some_french')->sites(['en', 'fr', 'de']))->save();
@@ -462,11 +459,59 @@ class TaxonomyTest extends TestCase
         $this->assertFalse($user->can('view', $taxonomy3));
     }
 
-    public function additionalPreviewTargetProvider()
+    public static function additionalPreviewTargetProvider()
     {
         return [
             'through object' => [false],
             'through facade' => [true],
         ];
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Facades\Taxonomy::make('test'))->save();
+
+        $taxonomy->delete();
+
+        Event::assertDispatched(TaxonomyDeleting::class, function ($event) use ($taxonomy) {
+            return $event->taxonomy === $taxonomy;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Taxonomy::spy();
+        Event::fake([TaxonomyDeleted::class]);
+
+        Event::listen(TaxonomyDeleting::class, function () {
+            return false;
+        });
+
+        $taxonomy = new Taxonomy('test');
+
+        $return = $taxonomy->delete();
+
+        $this->assertFalse($return);
+        Facades\Taxonomy::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(TaxonomyDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Facades\Taxonomy::make('test'))->save();
+
+        $return = $taxonomy->deleteQuietly();
+
+        Event::assertNotDispatched(TaxonomyDeleting::class);
+        Event::assertNotDispatched(TaxonomyDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

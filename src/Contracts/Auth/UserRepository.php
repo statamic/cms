@@ -3,6 +3,7 @@
 namespace Statamic\Contracts\Auth;
 
 use Statamic\Auth\UserCollection;
+use Statamic\OAuth\Provider;
 
 interface UserRepository
 {
@@ -14,7 +15,9 @@ interface UserRepository
 
     public function findByEmail(string $email): ?User;
 
-    public function findByOAuthId(string $provider, string $id): ?User;
+    public function findByOAuthId(Provider $provider, string $id): ?User;
+
+    public function findOrFail($id): User;
 
     public function current(): ?User;
 

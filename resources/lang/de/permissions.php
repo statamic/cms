@@ -6,6 +6,8 @@ return [
     'group_cp' => 'Control Panel',
     'access_cp' => 'Zugriff aufs Control Panel',
     'access_cp_desc' => 'Erteilt Zugriff aufs Control Panel. Garantiert aber nicht, dass darin etwas getan werden kann.',
+    'configure_sites' => 'Websites konfigurieren',
+    'configure_sites_desc' => 'Ermöglicht die Konfiguration von Websites, wenn Multi-Site aktiviert ist.',
     'configure_fields' => 'Felder konfigurieren',
     'configure_fields_desc' => 'Ermöglicht das Bearbeiten von Blueprints, Fieldsets und den dazugehörigen Feldern.',
     'configure_addons' => 'Addons konfigurieren',

@@ -8,7 +8,6 @@ use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -80,9 +79,7 @@ class StoreEntryTest extends TestCase
      */
     public function slug_is_not_required_and_will_get_created_from_the_submitted_title_if_slug_is_in_blueprint_and_use_entry_language($lang, $expectedSlug)
     {
-        Site::setConfig(['sites' => [
-            'en' => array_merge(config('statamic.sites.sites.en'), ['lang' => $lang]),
-        ]]);
+        $this->setSiteValue('en', 'lang', $lang);
 
         [$user, $collection] = $this->seedUserAndCollection();
 
@@ -102,7 +99,7 @@ class StoreEntryTest extends TestCase
         $this->assertEquals($expectedSlug.'.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
-    public function multipleSlugLangsProvider()
+    public static function multipleSlugLangsProvider()
     {
         return [
             'English' => ['en', 'test-entry-aeoa'],

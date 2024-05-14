@@ -6,6 +6,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\FormCreated;
 use Statamic\Events\FormCreating;
+use Statamic\Events\FormDeleted;
+use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
 use Statamic\Facades\Form;
@@ -190,5 +192,53 @@ class FormTest extends TestCase
         $route = route('statamic.forms.submit', $form->handle());
 
         $this->assertEquals($route, $form->actionUrl());
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $form = Form::make('contact_us');
+
+        $form->delete();
+
+        Event::assertDispatched(FormDeleting::class, function ($event) use ($form) {
+            return $event->form === $form;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Form::spy();
+        Event::fake([FormDeleted::class]);
+
+        Event::listen(FormDeleting::class, function () {
+            return false;
+        });
+
+        $form = new \Statamic\Forms\Form('test');
+
+        $return = $form->delete();
+
+        $this->assertFalse($return);
+        Form::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(FormDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $form = Form::make('contact_us');
+
+        $return = $form->deleteQuietly();
+
+        Event::assertNotDispatched(FormDeleting::class);
+        Event::assertNotDispatched(FormDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

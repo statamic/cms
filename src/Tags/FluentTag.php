@@ -149,7 +149,7 @@ class FluentTag implements \ArrayAccess, \IteratorAggregate
      * Allow calls to tag params.
      *
      * @param  string  $param
-     * @param  array  $value
+     * @param  mixed  $value
      * @return $this
      */
     public function param($param, $value = true)

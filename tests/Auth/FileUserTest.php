@@ -90,16 +90,17 @@ class FileUserTest extends TestCase
 
         $userGroupRole->shouldReceive('id')->andReturn('usergrouprole');
         $userGroupRole->shouldReceive('handle')->andReturn('usergrouprole');
-        $userGroupRole->shouldReceive('permissions')->once()->andReturn(collect([
+        $userGroupRole->shouldReceive('permissions')->twice()->andReturn(collect([
             'permission one through user group',
             'permission two through user group',
         ]));
 
         $userGroup->shouldReceive('id')->andReturn('usergroup');
         $userGroup->shouldReceive('handle')->andReturn('usergroup');
-        $userGroup->shouldReceive('roles')->once()->andReturn(collect([$userGroupRole]));
+        $userGroup->shouldReceive('roles')->once()->andReturn(collect([$userGroupRole]))->times(4);
 
         Role::shouldReceive('find')->with('direct')->andReturn($directRole);
+        Role::shouldReceive('all')->andReturn(collect([$directRole])); // the stache calls this when getting a user. unrelated to test.
         UserGroup::shouldReceive('find')->with('usergroup')->andReturn($userGroup);
         Role::shouldReceive('all')->andReturn(collect([$directRole]));     // the stache calls this when getting a user. unrelated to test.
         UserGroup::shouldReceive('all')->andReturn(collect([$userGroup])); // the stache calls this when getting a user. unrelated to test.

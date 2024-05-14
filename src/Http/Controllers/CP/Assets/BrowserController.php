@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\FolderAssetsCollection;
@@ -115,8 +116,8 @@ class BrowserController extends CpController
     protected function applyQueryScopes($query, $params)
     {
         collect(Arr::wrap($params['queryScopes'] ?? null))
-            ->map(fn ($handle) => app('statamic.scopes')->get($handle))
+            ->map(fn ($handle) => Scope::find($handle))
             ->filter()
-            ->each(fn ($class) => app($class)->apply($query, $params));
+            ->each(fn ($scope) => $scope->apply($query, $params));
     }
 }

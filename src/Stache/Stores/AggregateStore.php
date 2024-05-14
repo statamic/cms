@@ -65,6 +65,18 @@ abstract class AggregateStore extends Store
         return $this->store($store)->getItem($id);
     }
 
+    public function getItemValues($keys, $valueIndex, $keyIndex)
+    {
+        return $keys
+            ->map(function ($key) {
+                [$store, $key] = explode('::', $key, 2);
+
+                return compact('store', 'key');
+            })
+            ->groupBy('store')
+            ->flatMap(fn ($items, $store) => $this->store($store)->getItemValues($items->map->key, $valueIndex, $keyIndex));
+    }
+
     public function clear()
     {
         $this->discoverStores()->each->clear();
