@@ -119,4 +119,53 @@ class HtmlTest extends TestCase
         $this->assertEquals('<a href="mailto:person@example.com" class="example-link">&lt;span&gt;First Name Last&lt;/span&gt;</a>', $result1);
         $this->assertEquals('<a href="mailto:person@example.com" class="example-link"><span>First Name Last</span></a>', $result2);
     }
+
+    /** @test */
+    public function it_sanitizes_string()
+    {
+        $this->assertEquals(
+            'Foobar &amp; Baz &lt; website &gt;',
+            Html::sanitize('Foobar & Baz < website >')
+        );
+    }
+
+    /** @test */
+    public function it_sanitizes_string_with_invalid_code_points()
+    {
+        $this->assertEquals(
+            'f�� bar',
+            Html::sanitize(mb_convert_encoding('føø bar', 'ISO-8859-1', 'UTF-8'))
+        );
+    }
+
+    /** @test */
+    public function it_does_not_sanitize_special_characters()
+    {
+        $this->assertEquals('你好', Html::sanitize('你好'));
+        $this->assertEquals('Brötchen', Html::sanitize('Brötchen'));
+    }
+
+    /** @test */
+    public function it_does_not_sanitize_null()
+    {
+        $this->assertEquals('', Html::sanitize(null));
+    }
+
+    /** @test */
+    public function it_sanitizes_with_double_encoding_by_default()
+    {
+        $this->assertEquals(
+            'Foobar &amp;amp; Baz &lt; website &gt;',
+            Html::sanitize('Foobar &amp; Baz < website >')
+        );
+    }
+
+    /** @test */
+    public function it_can_sanitize_without_double_encoding()
+    {
+        $this->assertEquals(
+            'Foobar &amp; Baz &lt; website &gt;',
+            Html::sanitize('Foobar &amp; Baz < website >', doubleEncode: false)
+        );
+    }
 }

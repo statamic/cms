@@ -42,6 +42,37 @@ abstract class BasicStore extends Store
         return $item;
     }
 
+    public function getItemValues($keys, $valueIndex, $keyIndex)
+    {
+        // This is for performance. There's no need to resolve anything
+        // else if we're looking for the keys. We have them already.
+        if ($valueIndex === 'id' && ! $keyIndex) {
+            return $keys;
+        }
+
+        $values = $this->getIndexedValues($valueIndex, $keys);
+
+        if (! $keyIndex) {
+            return $values->values();
+        }
+
+        $keyValues = $this->getIndexedValues($keyIndex, $keys);
+
+        return $keys->mapWithKeys(fn ($key) => [$keyValues[$key] => $values[$key]]);
+    }
+
+    private function getIndexedValues($name, $only)
+    {
+        // We don't want *all* the values in the index. We only want the requested keys. They are
+        // provided as an array of IDs. It's faster to do has() than contains() so we'll flip them.
+        $only = $only->flip();
+
+        return $this->resolveIndex($name)
+            ->load()
+            ->items()
+            ->filter(fn ($value, $key) => $only->has($key));
+    }
+
     protected function getCachedItem($key)
     {
         $cacheKey = $this->getItemCacheKey($key);

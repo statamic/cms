@@ -4,7 +4,6 @@ namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Entries\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -46,11 +45,11 @@ class ViewEntryListingTest extends TestCase
     /** @test */
     public function it_shows_only_entries_in_index_for_sites_user_can_access()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
-        ]]);
+        ]);
 
         $collection = tap(Collection::make('test'))->save();
 

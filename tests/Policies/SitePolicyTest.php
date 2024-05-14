@@ -15,10 +15,10 @@ class SitePolicyTest extends TestCase
     /** @test */
     public function site_is_viewable_with_permission()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'first' => ['name' => 'First', 'locale' => 'en_US', 'url' => '/'],
             'second' => ['name' => 'Second', 'locale' => 'en_US', 'url' => '/'],
-        ]]);
+        ]);
 
         $this->setTestRoles(['test' => [
             'access second site',
@@ -34,9 +34,9 @@ class SitePolicyTest extends TestCase
     /** @test */
     public function site_is_viewable_without_permission_if_theres_a_single_site()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'default' => ['name' => 'Default', 'locale' => 'en_US', 'url' => '/'],
-        ]]);
+        ]);
 
         $this->setTestRoles(['test' => [
             //

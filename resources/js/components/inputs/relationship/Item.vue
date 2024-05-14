@@ -13,7 +13,6 @@
                 v-tooltip.top="__('An item with this ID could not be found')"
                 v-text="__(item.title)" />
 
-
             <a v-if="!item.invalid && editable" @click.prevent="edit" v-text="__(item.title)" class="truncate" v-tooltip="item.title" :href="item.edit_url" />
 
             <div v-if="!item.invalid && !editable" v-text="__(item.title)" />
@@ -77,6 +76,12 @@ export default {
         edit() {
             if (! this.editable) return;
             if (this.item.invalid) return;
+
+            if (this.item.reference && Object.entries(this.$store.state.publish).find(([key, value]) => value.reference === this.item.reference)) {
+                this.$toast.error(__("You're already editing this item."));
+                return;
+            }
+
             this.isEditing = true;
         },
 

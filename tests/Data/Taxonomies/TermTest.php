@@ -269,11 +269,11 @@ class TermTest extends TestCase
     /** @test */
     public function it_gets_preview_targets()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
-        ]]);
+        ]);
 
         $taxonomy = tap(Taxonomy::make('tags')->sites(['en', 'fr', 'de']))->save();
 
@@ -463,5 +463,21 @@ class TermTest extends TestCase
         $this->assertFalse($return);
         Facades\Term::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(TermDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $return = $term->deleteQuietly();
+
+        Event::assertNotDispatched(TermDeleting::class);
+        Event::assertNotDispatched(TermDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

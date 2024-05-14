@@ -8,6 +8,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 
 class AssetContainersController extends CpController
 {
@@ -192,7 +193,7 @@ class AssetContainersController extends CpController
             $fields['name']['fields']['handle'] = [
                 'type' => 'slug',
                 'display' => __('Handle'),
-                'validate' => 'required|alpha_dash',
+                'validate' => ['required', new Handle],
                 'separator' => '_',
                 'instructions' => __('statamic::messages.asset_container_handle_instructions'),
             ];

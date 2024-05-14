@@ -147,6 +147,14 @@ EOT;
         $this->simulateLoggableErrorOutput('remote: Resolving deltas: 0% (0/6)\nremote: Resolving deltas: 16% (1/6)\nremote: Resolving deltas: 33% (2/6)\nremote: Resolving deltas: 50% (3/6)\nremote: Resolving deltas: 66% (4/6)\nremote: Resolving deltas: 83% (5/6)\nremote: Resolving deltas: 100% (6/6)\nremote: Resolving deltas: 100% (6/6), completed with 5 local objects.');
     }
 
+    /** @test */
+    public function it_doesnt_log_added_host_key_to_known_hosts_as_error_output()
+    {
+        Log::shouldReceive('error')->never();
+
+        $this->simulateLoggableErrorOutput("Permanently added the ECDSA host key for IP address '127.0.0.1' to the list of known hosts.");
+    }
+
     private function showLastCommit($path)
     {
         return Process::create($path)->run('git show');

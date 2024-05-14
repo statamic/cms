@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Validator;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Rules\UniqueTermValue;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -21,12 +22,12 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value']
+            ['slug' => new UniqueTermValue]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'baz'],
-            ['slug' => 'unique_term_value']
+            ['slug' => new UniqueTermValue]
         )->passes());
     }
 
@@ -41,12 +42,12 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value:taxonomy-one']
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one')]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'bar'],
-            ['slug' => 'unique_term_value:taxonomy-one']
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one')]
         )->passes());
     }
 
@@ -60,22 +61,22 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value:taxonomy-one,'.$term->id()]
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one', except: $term->id())]
         )->passes());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value:taxonomy-one,456']
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one', except: 456)]
         )->fails());
     }
 
     /** @test */
     public function it_passes_when_theres_a_duplicate_term_value_in_a_different_site()
     {
-        \Statamic\Facades\Site::setConfig(['sites' => [
+        $this->setSites([
             'site-one' => ['url' => '/'],
             'site-two' => ['url' => '/'],
-        ]]);
+        ]);
 
         Taxonomy::make('taxonomy-one')->save();
 
@@ -84,12 +85,12 @@ class UniqueTermValueTest extends TestCase
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value:taxonomy-one,null,site-one']
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one', site: 'site-one')]
         )->fails());
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
-            ['slug' => 'unique_term_value:taxonomy-one,null,site-two']
+            ['slug' => new UniqueTermValue(taxonomy: 'taxonomy-one', site: 'site-two')]
         )->passes());
     }
 }
