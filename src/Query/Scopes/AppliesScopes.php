@@ -32,7 +32,7 @@ trait AppliesScopes
     public function canApplyScope($method): bool
     {
         // If the scope doesn't exist, return false.
-        if (! $scope = Scope::find(snake_case($method))) {
+        if (! $scope = Scope::find(Str::snake($method))) {
             return false;
         }
 
