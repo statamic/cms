@@ -8,7 +8,6 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
-use Statamic\Facades\Site;
 use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -271,10 +270,10 @@ GQL;
     /** @test */
     public function it_queries_an_entry_in_a_specific_site()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::find('events')->routes('/events/{slug}')->sites(['en', 'fr'])->save();
 

@@ -5,6 +5,7 @@ namespace Statamic\Stache\Repositories;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Assets\AssetContainerRepository as RepositoryContract;
+use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Stache\Stache;
 
 class AssetContainerRepository implements RepositoryContract
@@ -31,6 +32,17 @@ class AssetContainerRepository implements RepositoryContract
     public function findByHandle(string $handle): ?AssetContainer
     {
         return $this->store->getItem($handle);
+    }
+
+    public function findOrFail($id): AssetContainer
+    {
+        $container = $this->find($id);
+
+        if (! $container) {
+            throw new AssetContainerNotFoundException($id);
+        }
+
+        return $container;
     }
 
     public function make(?string $handle = null): AssetContainer

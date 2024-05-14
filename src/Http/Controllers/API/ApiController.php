@@ -102,7 +102,7 @@ class ApiController extends Controller
                 } elseif ($value === 'false') {
                     $value = false;
                 } elseif (is_numeric($value)) {
-                    $value = str_contains($value, '.') ? (float) $value : (int) $value;
+                    $value = Str::contains($value, '.') ? (float) $value : (int) $value;
                 }
 
                 if (Str::contains($filter, ':')) {

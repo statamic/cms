@@ -123,7 +123,7 @@ class FileCollection extends Collection
             foreach ($sorts as $sort) {
                 $bits = explode(':', $sort);
                 $sort_by = $bits[0];
-                $sort_dir = array_get($bits, 1);
+                $sort_dir = Arr::get($bits, 1);
 
                 [$one, $two] = $this->getSortableValues($sort_by, $a, $b);
 
@@ -200,8 +200,8 @@ class FileCollection extends Collection
             $data[] = [
                 'file' => URL::format($path), // Todo: This will only work when using the local file adapter
                 'filename' => $pathinfo['filename'],
-                'extension' => array_get($pathinfo, 'extension'),
-                'basename' => array_get($pathinfo, 'basename'),
+                'extension' => Arr::get($pathinfo, 'extension'),
+                'basename' => Arr::get($pathinfo, 'basename'),
                 'size' => File::sizeHuman($path),
                 'size_bytes' => $size,
                 'size_kilobytes' => $kb,
