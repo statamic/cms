@@ -1267,7 +1267,7 @@ class CoreModifiers extends Modifier
         if ($value instanceof ArrayableLink) {
             $value = $value->url();
         }
-        
+
         return Str::isUrl($value) && URL::isExternal($value);
     }
 
