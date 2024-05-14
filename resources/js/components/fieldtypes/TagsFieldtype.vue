@@ -4,7 +4,7 @@
         :name="name"
         :clearable="config.clearable"
         :close-on-select="false"
-        :options="options"
+        :options="config.options"
         :disabled="config.disabled || isReadOnly"
         :multiple="true"
         :placeholder="__(config.placeholder)"
@@ -70,12 +70,6 @@ export default {
     },
 
     mixins: [Fieldtype, HasInputOptions],
-
-    computed: {
-        options() {
-            return this.normalizeInputOptions(this.config.options);
-        },
-    },
 
     methods: {
         focus() {
