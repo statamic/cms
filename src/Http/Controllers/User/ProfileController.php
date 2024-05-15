@@ -24,14 +24,13 @@ class ProfileController
         return $this->userProfileSuccess();
     }
 
-    public function userProfileSuccess(bool $silentFailure = false)
+    public function userProfileSuccess()
     {
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
 
         if (request()->ajax() || request()->wantsJson()) {
             return response([
                 'success' => true,
-                'user_updated' => ! $silentFailure,
                 'redirect' => $response->getTargetUrl(),
             ]);
         }
