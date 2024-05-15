@@ -7,7 +7,7 @@ use Statamic\Http\Requests\UserProfileRequest;
 
 class ProfileController
 {
-    public function profile(UserProfileRequest $request)
+    public function __invoke(UserProfileRequest $request)
     {
         $user = User::current();
 

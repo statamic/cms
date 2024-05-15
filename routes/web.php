@@ -34,9 +34,9 @@ Route::name('statamic.')->group(function () {
 
             Route::group(['middleware' => [HandlePrecognitiveRequests::class]], function () {
                 Route::post('login', [LoginController::class, 'login'])->name('login');
-                Route::post('register', [RegisterController::class, 'register'])->name('register');
-                Route::post('profile', [ProfileController::class, 'profile'])->name('profile');
-                Route::post('password', [PasswordController::class, 'password'])->name('password');
+                Route::post('register', RegisterController::class)->name('register');
+                Route::post('profile', ProfileController::class)->name('profile');
+                Route::post('password', PasswordController::class)->name('password');
             });
 
             Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');

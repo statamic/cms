@@ -7,7 +7,7 @@ use Statamic\Http\Requests\UserPasswordRequest;
 
 class PasswordController
 {
-    public function password(UserPasswordRequest $request)
+    public function __invoke(UserPasswordRequest $request)
     {
         $user = User::current();
 

@@ -14,7 +14,7 @@ use Statamic\Support\Arr;
 
 class RegisterController
 {
-    public function register(UserRegisterRequest $request)
+    public function __invoke(UserRegisterRequest $request)
     {
         $user = User::make()
             ->email($request->email)
