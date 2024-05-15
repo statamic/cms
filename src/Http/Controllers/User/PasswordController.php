@@ -18,14 +18,13 @@ class PasswordController
         return $this->userPasswordSuccess();
     }
 
-    public function userPasswordSuccess(bool $silentFailure = false)
+    public function userPasswordSuccess()
     {
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
 
         if (request()->ajax() || request()->wantsJson()) {
             return response([
                 'success' => true,
-                'password_updated' => ! $silentFailure,
                 'redirect' => $response->getTargetUrl(),
             ]);
         }
