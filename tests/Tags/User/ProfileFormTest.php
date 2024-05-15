@@ -328,10 +328,10 @@ EOT
 
         $response = $this
             ->withPrecognition()
-            ->post('/!/auth/profile', [
+            ->postJson('/!/auth/profile', [
                 'some' => 'thing',
             ]);
 
-        $response->assertSuccessfulPrecognition();
+        $response->assertStatus(422);
     }
 }

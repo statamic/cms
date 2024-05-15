@@ -236,13 +236,12 @@ EOT
 
         $response = $this
             ->withPrecognition()
-            ->post('/!/auth/login', [
+            ->postJson('/!/auth/login', [
                 'token' => 'test-token',
                 'email' => 'san@holo.com',
-                'password' => 'wrong',
                 '_error_redirect' => '/login-error',
             ]);
 
-        $response->assertSuccessfulPrecognition();
+        $response->assertStatus(422);
     }
 }

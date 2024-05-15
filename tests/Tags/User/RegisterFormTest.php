@@ -473,10 +473,10 @@ EOT
 
         $response = $this
             ->withPrecognition()
-            ->post('/!/auth/register', [
+            ->postJson('/!/auth/register', [
                 'password_confirmation' => 'no',
             ]);
 
-        $response->assertSuccessfulPrecognition();
+        $response->assertStatus(422);
     }
 }

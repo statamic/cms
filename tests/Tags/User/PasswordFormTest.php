@@ -305,12 +305,12 @@ EOT
 
         $response = $this
             ->withPrecognition()
-            ->post('/!/auth/password', [
+            ->postJson('/!/auth/password', [
                 'current_password' => 'wrongpassword',
                 'password' => 'newpassword',
                 'password_confirmation' => 'newpassword',
             ]);
 
-        $response->assertSuccessfulPrecognition();
+        $response->assertStatus(422);
     }
 }

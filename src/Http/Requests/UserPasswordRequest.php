@@ -31,7 +31,7 @@ class UserPasswordRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         if ($this->isPrecognitive() || $this->wantsJson()) {
-            return (new ValidationException($validator))->errorBag($this->errorBag);
+            return parent::failedValidation($validator);
         }
 
         if ($this->ajax()) {
