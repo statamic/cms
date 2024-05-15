@@ -12,7 +12,7 @@ use Statamic\Http\Controllers\FrontendController;
 use Statamic\Http\Controllers\OAuthController;
 use Statamic\Http\Controllers\PhoneHomeController;
 use Statamic\Http\Controllers\ResetPasswordController;
-use Statamic\Http\Controllers\UserController;
+use Statamic\Http\Controllers\User\UserController;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
 use Statamic\Statamic;

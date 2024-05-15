@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Controllers;
+namespace Statamic\Http\Controllers\User;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +11,7 @@ use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\User;
+use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
 use Statamic\Http\Requests\UserPasswordRequest;
 use Statamic\Http\Requests\UserProfileRequest;
