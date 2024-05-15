@@ -297,8 +297,6 @@ EOT
     {
         if (! method_exists($this, 'withPrecognition')) {
             $this->markTestSkipped();
-
-            return;
         }
 
         $this->actingAs(User::make()->password('mypassword')->save());
