@@ -5,7 +5,6 @@ namespace Statamic\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
@@ -59,22 +58,20 @@ class UserRegisterRequest extends FormRequest
     public function validator()
     {
         $blueprint = User::blueprint();
+        $blueprint->ensureField('password', ['display' => __('Password')]);
+        $blueprint->ensureField('password_confirmation', ['display' => __('Password Confirmation')]);
 
         $fields = $blueprint->fields();
         $this->submittedValues = $this->valuesWithoutAssetFields($fields);
         $this->blueprintFields = $fields->addValues($this->submittedValues);
 
-        $fieldRules = $this->blueprintFields
+        return $this->blueprintFields
             ->validator()
             ->withRules([
                 'email' => ['required', 'email', new UniqueUserValue],
                 'password' => ['required', 'confirmed', Password::default()],
             ])
-            ->rules();
-
-        // should this not return ->validator() from fieldrules?
-        // tests would need updated to expect labels instead of handles
-        return ValidatorFacade::make($this->submittedValues, $fieldRules);
+            ->validator();
     }
 
     public function validateResolved()

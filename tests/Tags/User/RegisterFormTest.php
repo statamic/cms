@@ -139,8 +139,8 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The email field is required.',
-            'The password field is required.',
+            'The Email Address field is required.',
+            'The Password field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -191,8 +191,8 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            trans('validation.min.string', ['attribute' => 'password', 'min' => 8]), // 'The password must be at least 8 characters.',
-            trans('validation.required', ['attribute' => 'age']), // 'The age field is required.',
+            trans('validation.min.string', ['attribute' => 'Password', 'min' => 8]), // 'The password must be at least 8 characters.',
+            trans('validation.required', ['attribute' => 'Over 18 years of age?']), // 'The age field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -311,8 +311,8 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The email field is required.',
-            'The password field is required.',
+            'The Email Address field is required.',
+            'The Password field is required.',
         ];
 
         $this->assertEmpty($success[1]);
