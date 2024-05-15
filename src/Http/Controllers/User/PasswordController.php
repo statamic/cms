@@ -15,10 +15,10 @@ class PasswordController
 
         $user->save();
 
-        return $this->userPasswordSuccess();
+        return $this->successulResponse();
     }
 
-    public function userPasswordSuccess()
+    private function successulResponse()
     {
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
 
