@@ -8,7 +8,6 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
 use Statamic\Http\Requests\UserPasswordRequest;
-use Statamic\Http\Requests\UserProfileRequest;
 
 class UserController extends Controller
 {
@@ -40,23 +39,6 @@ class UserController extends Controller
         return redirect(request()->get('redirect', '/'));
     }
 
-    public function profile(UserProfileRequest $request)
-    {
-        $user = User::current();
-
-        if ($request->email) {
-            $user->email($request->email);
-        }
-
-        foreach ($request->processedValues() as $key => $value) {
-            $user->set($key, $value);
-        }
-
-        $user->save();
-
-        return $this->userProfileSuccess();
-    }
-
     public function password(UserPasswordRequest $request)
     {
         $user = User::current();
@@ -71,23 +53,6 @@ class UserController extends Controller
     public function username()
     {
         return 'email';
-    }
-
-    private function userProfileSuccess(bool $silentFailure = false)
-    {
-        $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
-
-        if (request()->ajax() || request()->wantsJson()) {
-            return response([
-                'success' => true,
-                'user_updated' => ! $silentFailure,
-                'redirect' => $response->getTargetUrl(),
-            ]);
-        }
-
-        session()->flash('user.profile.success', __('Update successful.'));
-
-        return $response;
     }
 
     private function userPasswordSuccess(bool $silentFailure = false)

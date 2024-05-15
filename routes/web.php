@@ -12,6 +12,7 @@ use Statamic\Http\Controllers\FrontendController;
 use Statamic\Http\Controllers\OAuthController;
 use Statamic\Http\Controllers\PhoneHomeController;
 use Statamic\Http\Controllers\ResetPasswordController;
+use Statamic\Http\Controllers\User\ProfileController;
 use Statamic\Http\Controllers\User\RegisterController;
 use Statamic\Http\Controllers\User\UserController;
 use Statamic\Http\Middleware\AuthGuard;
@@ -33,7 +34,7 @@ Route::name('statamic.')->group(function () {
             Route::group(['middleware' => [HandlePrecognitiveRequests::class]], function () {
                 Route::post('login', [UserController::class, 'login'])->name('login');
                 Route::post('register', [RegisterController::class, 'register'])->name('register');
-                Route::post('profile', [UserController::class, 'profile'])->name('profile');
+                Route::post('profile', [ProfileController::class, 'profile'])->name('profile');
                 Route::post('password', [UserController::class, 'password'])->name('password');
             });
 
