@@ -22,13 +22,20 @@ trait QueriesEntryStatus
 
         return $this->where(fn ($query) => $this
             ->getCollectionsForStatusQuery()
-            ->filter(fn ($collection) => $collection->dated())
             ->each(fn ($collection) => $query->orWhere(fn ($q) => $this->addCollectionStatusLogicToQuery($q, $status, $collection))));
     }
 
     private function addCollectionStatusLogicToQuery($query, $status, $collection): void
     {
         $this->addCollectionWhereToStatusQuery($query, $collection->handle());
+
+        if (! $collection->dated()) {
+            if ($status !== 'published') {
+                $query->where('date', 'invalid'); // intentionally trigger no results.
+            }
+
+            return;
+        }
 
         if ($collection->futureDateBehavior() === 'public' && $collection->pastDateBehavior() === 'public') {
             if ($status === 'scheduled' || $status === 'expired') {
