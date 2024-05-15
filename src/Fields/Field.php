@@ -367,7 +367,6 @@ class Field implements Arrayable
     {
         $defaultValues = Field::commonFieldOptions()->all()
             ->merge($this->fieldtype()->configFields()->all())
-            ->filter(fn (ConfigField $configField) => $configField->get('default'))
             ->map(fn (ConfigField $configField) => $configField->get('default'))
             ->all();
 
