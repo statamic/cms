@@ -373,6 +373,7 @@ class Field implements Arrayable
 
         return array_merge($defaultValues, $this->config, [
             'handle' => $this->handle,
+            'type' => $this->type(),
             'width' => $this->config['width'] ?? 100,
         ]);
     }
