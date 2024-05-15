@@ -36,9 +36,9 @@ class RegisterController
 
             throw_if(UserRegistering::dispatch($user) === false, new SilentFormFailureException);
         } catch (ValidationException $e) {
-            return $this->userRegistrationFailure($e);
+            return $this->failureResponse($e);
         } catch (SilentFormFailureException $e) {
-            return $this->userRegistrationSuccess(true);
+            return $this->successfulResponse(true);
         }
 
         $user->save();
@@ -47,10 +47,10 @@ class RegisterController
 
         Auth::login($user);
 
-        return $this->userRegistrationSuccess();
+        return $this->successfulResponse();
     }
 
-    public function userRegistrationSuccess(bool $silentFailure = false)
+    private function successfulResponse(bool $silentFailure = false)
     {
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
 
@@ -68,7 +68,7 @@ class RegisterController
         return $response;
     }
 
-    public function userRegistrationFailure($validator)
+    private function failureResponse($validator)
     {
         $errors = $validator->errors();
 
