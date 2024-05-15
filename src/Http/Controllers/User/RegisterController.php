@@ -38,7 +38,7 @@ class RegisterController
         } catch (ValidationException $e) {
             return $this->failureResponse($e);
         } catch (SilentFormFailureException $e) {
-            return $this->successfulResponse(true);
+            return $this->successfulResponse(silentFailure: true);
         }
 
         $user->save();
