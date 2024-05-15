@@ -1,5 +1,17 @@
 # Release Notes
 
+## 5.2.0 (2024-05-15)
+
+### What's new
+- Ability to opt out of async slug behavior, and opt out in field settings [#10075](https://github.com/statamic/cms/issues/10075) by @jasonvarga
+
+### What's fixed
+- Bring back support for archetype v1 [#10087](https://github.com/statamic/cms/issues/10087) by @jasonvarga
+- Wrap columns in query builder [#10076](https://github.com/statamic/cms/issues/10076) by @jasonvarga
+- Dutch translations [#10085](https://github.com/statamic/cms/issues/10085) by @dnwjn
+
+
+
 ## 5.1.0 (2024-05-14)
 
 ### What's new
