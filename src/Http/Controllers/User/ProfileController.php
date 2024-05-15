@@ -21,10 +21,10 @@ class ProfileController
 
         $user->save();
 
-        return $this->userProfileSuccess();
+        return $this->successfulResponse();
     }
 
-    public function userProfileSuccess()
+    private function successfulResponse()
     {
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
 
