@@ -7,7 +7,7 @@ use Statamic\Auth\ThrottlesLogins;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
 
-class UserController extends Controller
+class LoginController extends Controller
 {
     use ThrottlesLogins;
 
