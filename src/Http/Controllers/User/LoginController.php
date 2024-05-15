@@ -37,7 +37,7 @@ class LoginController extends Controller
         return redirect(request()->get('redirect', '/'));
     }
 
-    public function username()
+    protected function username()
     {
         return 'email';
     }
