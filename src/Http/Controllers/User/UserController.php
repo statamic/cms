@@ -21,8 +21,6 @@ class UserController extends Controller
 {
     use ThrottlesLogins;
 
-    private $request;
-
     public function login(UserLoginRequest $request)
     {
         if ($this->hasTooManyLoginAttempts($request)) {
