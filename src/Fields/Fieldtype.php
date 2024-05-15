@@ -253,15 +253,6 @@ abstract class Fieldtype implements Arrayable
         return new ConfigFields($fields);
     }
 
-    public function defaultConfigValues(): array
-    {
-        return Field::commonFieldOptions()->all()
-            ->merge($this->configFields()->all())
-            ->filter(fn (ConfigField $configField) => $configField->get('default'))
-            ->map(fn (ConfigField $configField) => $configField->get('default'))
-            ->all();
-    }
-
     protected function configFieldItems(): array
     {
         return $this->configFields;
