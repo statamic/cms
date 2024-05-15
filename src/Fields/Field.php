@@ -365,12 +365,12 @@ class Field implements Arrayable
 
     public function toArray()
     {
-        $defaultValues = Field::commonFieldOptions()->all()
+        $defaults = Field::commonFieldOptions()->all()
             ->merge($this->fieldtype()->configFields()->all())
             ->map->defaultValue()
             ->all();
 
-        return array_merge($defaultValues, $this->config, [
+        return array_merge($defaults, $this->config, [
             'handle' => $this->handle,
             'type' => $this->type(),
             'width' => $this->config['width'] ?? 100,
