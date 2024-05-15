@@ -4,10 +4,8 @@ namespace Statamic\Http\Controllers\User;
 
 use Illuminate\Support\Facades\Auth;
 use Statamic\Auth\ThrottlesLogins;
-use Statamic\Facades\User;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
-use Statamic\Http\Requests\UserPasswordRequest;
 
 class UserController extends Controller
 {
@@ -39,36 +37,8 @@ class UserController extends Controller
         return redirect(request()->get('redirect', '/'));
     }
 
-    public function password(UserPasswordRequest $request)
-    {
-        $user = User::current();
-
-        $user->password($request->password);
-
-        $user->save();
-
-        return $this->userPasswordSuccess();
-    }
-
     public function username()
     {
         return 'email';
-    }
-
-    private function userPasswordSuccess(bool $silentFailure = false)
-    {
-        $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
-
-        if (request()->ajax() || request()->wantsJson()) {
-            return response([
-                'success' => true,
-                'password_updated' => ! $silentFailure,
-                'redirect' => $response->getTargetUrl(),
-            ]);
-        }
-
-        session()->flash('user.password.success', __('Change successful.'));
-
-        return $response;
     }
 }
