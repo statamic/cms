@@ -22,6 +22,7 @@ trait QueriesEntryStatus
 
         return $this->where(fn ($query) => $this
             ->getCollectionsForStatusQuery()
+            ->filter(fn ($collection) => $collection->dated())
             ->each(fn ($collection) => $query->orWhere(fn ($q) => $this->addCollectionStatusLogicToQuery($q, $status, $collection))));
     }
 
