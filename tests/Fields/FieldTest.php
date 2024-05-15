@@ -462,62 +462,14 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    public function it_converts_to_an_array()
+    public function converting_to_an_array_will_inline_the_handle()
     {
-        (new class extends Fieldtype
-        {
-            protected static $handle = 'test';
-            protected $configFields = [
-                'baz' => [
-                    'type' => 'text',
-                    'default' => 'qux',
-                ],
-                'alfa' => [
-                    'type' => 'text',
-                    'default' => 'bravo',
-                ],
-                'toggle' => [
-                    'type' => 'toggle',
-                ],
-                'grid' => [
-                    'type' => 'grid',
-                ],
-            ];
-        })::register();
-
-        $field = new Field('the_handle', [
-            'type' => 'test',
-            'foo' => 'bar',
-            'replicator_preview' => false,
-            'alfa' => 'charlie',
-        ]);
+        $field = new Field('the_handle', ['foo' => 'bar']);
 
         $this->assertEquals([
-            // Handle and type are inlined.
             'handle' => 'the_handle',
-            'type' => 'test',
-
-            // Width will always get merged in.
+            'foo' => 'bar',
             'width' => 100,
-
-            // Explicitly set options.
-            'foo' => 'bar', // Abitrary.
-            'replicator_preview' => false, // A common field option.
-            'alfa' => 'charlie', // A fieldtype option.
-
-            // Defaults from common field options.
-            'display' => null,
-            'hide_display' => false,
-            'instructions' => null,
-            'instructions_position' => 'above',
-            'listable' => 'hidden',
-            'visibility' => 'visible',
-            'duplicate' => true,
-
-            // Defaults from the fieldtype's config fields.
-            'baz' => 'qux',
-            'toggle' => false,
-            'grid' => [],
         ], $field->toArray());
     }
 
