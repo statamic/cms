@@ -12,7 +12,10 @@ use Statamic\Http\Controllers\FrontendController;
 use Statamic\Http\Controllers\OAuthController;
 use Statamic\Http\Controllers\PhoneHomeController;
 use Statamic\Http\Controllers\ResetPasswordController;
-use Statamic\Http\Controllers\UserController;
+use Statamic\Http\Controllers\User\LoginController;
+use Statamic\Http\Controllers\User\PasswordController;
+use Statamic\Http\Controllers\User\ProfileController;
+use Statamic\Http\Controllers\User\RegisterController;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
 use Statamic\Statamic;
@@ -27,13 +30,13 @@ Route::name('statamic.')->group(function () {
         Route::post('protect/password', [PasswordProtectController::class, 'store'])->name('protect.password.store');
 
         Route::group(['prefix' => 'auth', 'middleware' => [AuthGuard::class]], function () {
-            Route::get('logout', [UserController::class, 'logout'])->name('logout');
+            Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
             Route::group(['middleware' => [HandlePrecognitiveRequests::class]], function () {
-                Route::post('login', [UserController::class, 'login'])->name('login');
-                Route::post('register', [UserController::class, 'register'])->name('register');
-                Route::post('profile', [UserController::class, 'profile'])->name('profile');
-                Route::post('password', [UserController::class, 'password'])->name('password');
+                Route::post('login', [LoginController::class, 'login'])->name('login');
+                Route::post('register', RegisterController::class)->name('register');
+                Route::post('profile', ProfileController::class)->name('profile');
+                Route::post('password', PasswordController::class)->name('password');
             });
 
             Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
