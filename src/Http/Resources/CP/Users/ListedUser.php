@@ -9,7 +9,6 @@ use Statamic\Facades\User;
 class ListedUser extends JsonResource
 {
     protected $blueprint;
-
     protected $columns;
 
     public function blueprint($blueprint)
