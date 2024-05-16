@@ -133,7 +133,7 @@ export default {
 
     computed: {
         actionContext() {
-            return {taxonomy: this.taxonomy, view: 'list'};
+            return {taxonomy: this.taxonomy};
         },
     },
 

@@ -42,7 +42,7 @@ class ListedUser extends JsonResource
             'initials' => $this->initials(),
             'editable' => User::current()->can('edit', $this->resource),
             'deleteable' => User::current()->can('delete', $this->resource),
-            'actions' => Action::for($this->resource, ['view' => 'list']),
+            'actions' => Action::for($this->resource),
         ];
     }
 

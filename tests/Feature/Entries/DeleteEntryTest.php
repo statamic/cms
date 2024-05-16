@@ -139,7 +139,7 @@ class DeleteEntryTest extends TestCase
     {
         return $this->postJson('/cp/collections/test/entries/actions', [
             'action' => 'delete',
-            'context' => ['collection' => 'test', 'view' => 'list'],
+            'context' => ['collection' => 'test'],
             'selections' => $ids,
             'values' => [],
         ]);

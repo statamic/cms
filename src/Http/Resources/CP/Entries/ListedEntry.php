@@ -47,7 +47,7 @@ class ListedEntry extends JsonResource
             'collection' => array_merge($entry->collection()->toArray(), ['dated' => $entry->collection()->dated()]),
             'viewable' => User::current()->can('view', $entry),
             'editable' => User::current()->can('edit', $entry),
-            'actions' => Action::for($entry, ['collection' => $collection->handle(), 'view' => 'list']),
+            'actions' => Action::for($entry, ['collection' => $collection->handle()]),
         ];
     }
 

@@ -24,7 +24,6 @@ class Folder extends JsonResource
             'actions' => Action::for($this->resource, [
                 'container' => $this->container()->handle(),
                 'folder' => $this->path(),
-                'view' => 'list',
             ]),
 
             $this->mergeWhen($this->withChildFolders, function () {

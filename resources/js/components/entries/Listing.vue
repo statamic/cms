@@ -145,7 +145,7 @@ export default {
 
     computed: {
         actionContext() {
-            return {collection: this.collection, view: 'list'};
+            return {collection: this.collection};
         },
     },
 

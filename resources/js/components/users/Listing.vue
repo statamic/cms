@@ -62,7 +62,6 @@
                     <data-list-bulk-actions
                         class="rounded"
                         :url="actionUrl"
-                        :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -152,11 +151,7 @@ export default {
             return {
                 group: this.group,
             }
-        },
-
-        actionContext() {
-            return {view: 'list'};
-        },
+        }
 
     }
 

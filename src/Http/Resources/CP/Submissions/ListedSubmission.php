@@ -36,7 +36,7 @@ class ListedSubmission extends JsonResource
             ])),
             'url' => cp_route('forms.submissions.show', [$form->handle(), $this->resource->id()]),
             'deleteable' => User::current()->can('delete', $this->resource),
-            'actions' => Action::for($this->resource, ['view' => 'list']),
+            'actions' => Action::for($this->resource),
         ];
     }
 

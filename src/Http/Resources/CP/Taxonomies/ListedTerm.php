@@ -46,7 +46,7 @@ class ListedTerm extends JsonResource
             'taxonomy' => $term->taxonomy()->toArray(),
             'viewable' => User::current()->can('view', $term),
             'editable' => User::current()->can('edit', $term),
-            'actions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'list']),
+            'actions' => Action::for($term, ['taxonomy' => $taxonomy->handle()]),
         ];
     }
 
