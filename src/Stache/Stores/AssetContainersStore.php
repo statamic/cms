@@ -24,6 +24,7 @@ class AssetContainersStore extends BasicStore
             ->allowMoving(array_get($data, 'allow_moving'))
             ->allowRenaming(array_get($data, 'allow_renaming'))
             ->allowUploads(array_get($data, 'allow_uploads'))
+            ->maxSize(array_get($data, 'max_size'))
             ->createFolders(array_get($data, 'create_folders'))
             ->sourcePreset(array_get($data, 'source_preset'))
             ->warmPresets(array_get($data, 'warm_presets'))

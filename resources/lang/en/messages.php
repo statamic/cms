@@ -9,6 +9,7 @@ return [
     'addon_list_loading_error' => 'Something went wrong while loading addons. Try again later.',
     'addon_uninstall_command' => 'To uninstall this addon, run the following command',
     'asset_container_allow_uploads_instructions' => 'When enabled will give users the ability upload files into this container.',
+    'asset_container_max_size_instructions' => 'The max allowable file size (in KB) for assets in this container.',
     'asset_container_blueprint_instructions' => 'Blueprints define additional custom fields available when editing assets.',
     'asset_container_create_folder_instructions' => 'When enabled will give users the ability to create folders in this container.',
     'asset_container_disk_instructions' => 'Filesystem disks specify where files are stored — either locally or in a remote location like Amazon S3. They can be configured in `config/filesystems.php`',

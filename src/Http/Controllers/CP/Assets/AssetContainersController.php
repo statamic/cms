@@ -28,6 +28,7 @@ class AssetContainersController extends CpController
                 'allow_moving' => $container->allowMoving(),
                 'allow_renaming' => $container->allowRenaming(),
                 'allow_uploads' => $container->allowUploads(),
+                'max_size' => $container->maxSize(),
                 'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
@@ -57,6 +58,7 @@ class AssetContainersController extends CpController
             'handle' => $container->handle(),
             'disk' => $container->diskHandle(),
             'allow_uploads' => $container->allowUploads(),
+            'max_size' => $container->maxSize(),
             'allow_downloading' => $container->allowDownloading(),
             'allow_renaming' => $container->allowRenaming(),
             'allow_moving' => $container->allowMoving(),
@@ -96,6 +98,7 @@ class AssetContainersController extends CpController
             ->allowRenaming($values['allow_renaming'])
             ->allowMoving($values['allow_moving'])
             ->allowUploads($values['allow_uploads'])
+            ->maxSize($values['max_size'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
@@ -144,6 +147,7 @@ class AssetContainersController extends CpController
             ->title($values['title'])
             ->disk($values['disk'])
             ->allowUploads($values['allow_uploads'])
+            ->maxSize($values['max_size'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
@@ -239,6 +243,11 @@ class AssetContainersController extends CpController
                         'display' => __('Allow Uploads'),
                         'instructions' => __('statamic::messages.asset_container_allow_uploads_instructions'),
                         'default' => true,
+                    ],
+                    'max_size' => [
+                        'type' => 'integer',
+                        'display' => __('Max Size'),
+                        'instructions' => __('statamic::messages.asset_container_max_size_instructions'),
                     ],
                     'create_folders' => [
                         'type' => 'toggle',

@@ -548,6 +548,19 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     }
 
     /**
+     * The max file size in KB you can upload into this container.
+     *
+     * @param  int|null  $allowUploads
+     * @return int|null|$this
+     */
+    public function maxSize($maxSize = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('maxSize')
+            ->args(func_get_args());
+    }
+
+    /**
      * The ability to create folders within this container.
      *
      * @param  bool|null  $createFolders
@@ -619,6 +632,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'disk' => $this->disk,
             'search_index' => $this->searchIndex,
             'allow_uploads' => $this->allowUploads,
+            'max_size' => $this->maxSize,
             'allow_downloading' => $this->allowDownloading,
             'allow_renaming' => $this->allowRenaming,
             'allow_moving' => $this->allowMoving,

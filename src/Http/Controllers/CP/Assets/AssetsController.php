@@ -66,13 +66,17 @@ class AssetsController extends CpController
 
     public function store(Request $request)
     {
-        $request->validate([
-            'container' => 'required',
-            'folder' => 'required',
-            'file' => ['file', new AllowedFile],
-        ]);
+        $request->validate(['container' => 'required']);
 
         $container = AssetContainer::find($request->container);
+
+        $fileValidation = ['file', new AllowedFile];
+
+        if (($maxSize = $container->maxSize()) > 0) {
+            $fileValidation[] = 'max:'.$maxSize;
+        }
+
+        $request->validate(['folder' => 'required', 'file' => $fileValidation]);
 
         abort_unless($container->allowUploads(), 403);
 
