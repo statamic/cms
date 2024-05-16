@@ -8,7 +8,7 @@ use Statamic\Facades\Term as Terms;
 
 class DuplicateTerm extends Action
 {
-    protected $newItems;
+    private $newItems;
 
     public static function title()
     {

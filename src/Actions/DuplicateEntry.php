@@ -10,7 +10,7 @@ use Statamic\Facades\User;
 
 class DuplicateEntry extends Action
 {
-    protected $newItems;
+    private $newItems;
 
     public static function title()
     {
