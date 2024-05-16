@@ -292,6 +292,7 @@ export default {
                 'reupload_asset',
                 'download_asset',
                 'delete',
+                'copy_asset_url',
             ].includes(action.handle));
         },
 
