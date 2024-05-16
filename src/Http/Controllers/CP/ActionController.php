@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP;
 use Illuminate\Http\Request;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
+use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class ActionController extends CpController
@@ -17,7 +18,7 @@ abstract class ActionController extends CpController
             'context' => 'sometimes',
         ]);
 
-        $context = $data['context'] ?? ['view' => 'list'];
+        $context = $data['context'] ?? [];
 
         $items = $this->getSelectedItems(collect($data['selections']), $context);
 
@@ -49,7 +50,7 @@ abstract class ActionController extends CpController
 
         $response = $response ?: [];
 
-        if ($context['view'] === 'form') {
+        if (Arr::get($context, 'view') === 'form') {
             $response['data'] = $this->getItemData($items->first(), $context);
         }
 
