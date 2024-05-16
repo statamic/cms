@@ -17,7 +17,7 @@ class EntryActionController extends ActionController
         });
     }
 
-    protected function getItemData($entry, $context)
+    protected function getItemData($entry, $context): array
     {
         $blueprint = $entry->blueprint();
 

@@ -15,7 +15,7 @@ class UserActionController extends ActionController
         });
     }
 
-    protected function getItemData($user, $context)
+    protected function getItemData($user, $context): array
     {
         $blueprint = $user->blueprint();
 

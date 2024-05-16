@@ -15,7 +15,7 @@ class TermActionController extends ActionController
         })->filter();
     }
 
-    protected function getItemData($term, $context)
+    protected function getItemData($term, $context): array
     {
         $blueprint = $term->blueprint();
 
