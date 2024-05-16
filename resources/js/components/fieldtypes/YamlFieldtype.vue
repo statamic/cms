@@ -1,6 +1,6 @@
 <template>
     <div class="yaml-fieldtype-container relative">
-        <div v-text="'yaml'" class="absolute top-2 z-10 right-3 text-gray-600 text-xs uppercase tracking-wider"></div>
+        <div class="code-mode">YAML</div>
         <div ref="codemirror"></div>
     </div>
 </template>
