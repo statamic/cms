@@ -11,7 +11,7 @@
         white-space: nowrap;
 
         &:hover {
-            @apply bg-blue dark:bg-dark-blue-200 text-white;
+            @apply bg-blue dark:bg-dark-600 text-white;
         }
 
         .icon {
