@@ -68,13 +68,10 @@ class Delete extends Action
         switch (true) {
             case $item instanceof Contracts\Entries\Entry:
                 return cp_route('collections.show', $item->collection()->handle());
-                break;
             case $item instanceof Contracts\Taxonomies\Term:
                 return cp_route('taxonomies.show', $item->taxonomy()->handle());
-                break;
             case $item instanceof Contracts\Auth\User:
                 return cp_route('users.index');
-                break;
         }
     }
 }
