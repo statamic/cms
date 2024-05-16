@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
 
 class AssetContainersStore extends BasicStore
 {

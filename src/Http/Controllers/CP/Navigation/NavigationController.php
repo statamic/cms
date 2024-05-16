@@ -9,6 +9,7 @@ use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 
 class NavigationController extends CpController
@@ -153,7 +154,7 @@ class NavigationController extends CpController
 
         $values = $request->validate([
             'title' => 'required',
-            'handle' => 'required|alpha_dash',
+            'handle' => ['required', new Handle],
         ]);
 
         if (Nav::find($values['handle'])) {
@@ -223,7 +224,7 @@ class NavigationController extends CpController
             ],
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $contents['options']['fields']['sites'] = [
                 'display' => __('Sites'),
                 'type' => 'sites',

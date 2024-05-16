@@ -82,6 +82,7 @@ export default {
                 localizedFields: _.clone(this.localizedFields),
                 site: this.site,
                 isRoot: this.isRoot,
+                reference: this.reference,
             };
 
             // If the store already exists, just reinitialize the state.
@@ -107,6 +108,7 @@ export default {
                     isRoot: initial.isRoot,
                     preloadedAssets: [],
                     autosaveInterval: null,
+                    reference: initial.reference,
                 },
                 mutations: {
                     setFieldValue(state, payload) {

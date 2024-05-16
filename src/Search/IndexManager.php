@@ -9,6 +9,7 @@ use Statamic\Search\Algolia\Index as AlgoliaIndex;
 use Statamic\Search\Comb\Index as CombIndex;
 use Statamic\Search\Null\NullIndex;
 use Statamic\Support\Manager;
+use Statamic\Support\Str;
 
 class IndexManager extends Manager
 {
@@ -87,7 +88,7 @@ class IndexManager extends Manager
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callLocalizedCustomCreator($config, $name, $locale);
         } else {
-            $driverMethod = 'create'.camel_case($config['driver']).'Driver';
+            $driverMethod = 'create'.Str::camel($config['driver']).'Driver';
 
             if (method_exists($this, $driverMethod)) {
                 return $this->{$driverMethod}($config, $name, $locale);
