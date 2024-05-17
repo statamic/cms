@@ -16,7 +16,7 @@
                 <li class="divider" />
                 <data-list-inline-actions
                     v-if="!isCreating"
-                    :item="id"
+                    :item="values.id"
                     :url="itemActionUrl"
                     :actions="itemActions"
                     @started="actionStarted"
@@ -495,10 +495,6 @@ export default {
                     value: localization.handle,
                     label: localization.name,
                 }));
-        },
-
-        id() {
-            return this.initialReference.split('::').pop();
         },
 
         direction() {
