@@ -12,7 +12,7 @@
                         <data-list-inline-actions
                             :item="values.id"
                             :url="itemActionUrl"
-                            :actions="itemActionsMenu"
+                            :actions="itemActions"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
@@ -105,11 +105,7 @@ export default {
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
-        },
-
-        itemActionsMenu() {
-            return this.itemActions.filter(action => !['assign_groups'].includes(action.handle));
-        },
+        }
 
     },
 
