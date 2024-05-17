@@ -18,7 +18,7 @@
                 <li class="divider" />
                 <data-list-inline-actions
                     v-if="!isCreating"
-                    :item="id"
+                    :item="values.id"
                     :url="itemActionUrl"
                     :actions="itemActions"
                     @started="actionStarted"
@@ -398,11 +398,7 @@ export default {
 
         afterSaveOption() {
             return this.getPreference('after_save');
-        },
-
-        id() {
-            return this.initialReference.split('::').slice(1, 3).join('::');
-        },
+        }
 
     },
 
