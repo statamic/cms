@@ -285,6 +285,9 @@ export default {
 
         actionsMenu()
         {
+            // We filter out the actions that are already in the toolbar.
+            // We don't want them to appear in the dropdown as well.
+            // If we filtered them out in PHP they wouldn't appear as buttons.
             return this.actions.filter(action => ![
                 'rename_asset',
                 'move_asset',
