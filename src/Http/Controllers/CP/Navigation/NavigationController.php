@@ -39,7 +39,7 @@ class NavigationController extends CpController
     {
         $nav = Nav::find($nav);
 
-        $this->authorize('edit', $nav, __('You are not authorized to configure navs.'));
+        $this->authorize('configure', $nav, __('You are not authorized to configure navs.'));
 
         $values = [
             'title' => $nav->title(),

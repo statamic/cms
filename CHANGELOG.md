@@ -1,5 +1,84 @@
 # Release Notes
 
+## 4.58.2 (2024-05-09)
+
+### What's fixed
+- Fix Eloquent User `notifications` conflict. [#10024](https://github.com/statamic/cms/issues/10024) by @duncanmcclean
+- Fix EloquentQueryBuilder orderby bug. [#10023](https://github.com/statamic/cms/issues/10023) by @duncanmcclean
+
+
+
+## 4.58.1 (2024-05-08)
+
+### What's improved
+- French translations. [#10017](https://github.com/statamic/cms/issues/10017) by @PatrickJunod
+
+### What's fixed
+- Fix queue worker state issue around assets. [#9690](https://github.com/statamic/cms/issues/9690) by @aerni
+- Fix button group wrapping on non-fieldtype buttons. [#10021](https://github.com/statamic/cms/issues/10021) by @PatrickJunod
+- Fix child URIs being outdated when parent slug changes. [#9454](https://github.com/statamic/cms/issues/9454) by @jacksleight
+- Fix Eloquent ordering when using `lazy()` or `chunk()`. [#9956](https://github.com/statamic/cms/issues/9956) by @helloiamlukas
+- Fix recursive editing check. [#10012](https://github.com/statamic/cms/issues/10012) by @duncanmcclean
+
+
+
+## 4.58.0 (2024-05-07)
+
+### What's new
+- Add Vite content tag. [#9973](https://github.com/statamic/cms/issues/9973) by @jimblue
+- Include `alt` field in shallow augmented assets. [#10013](https://github.com/statamic/cms/issues/10013) by @duncanmcclean
+
+### What's improved
+- French translations. [#10015](https://github.com/statamic/cms/issues/10015) by @duncanmcclean
+
+### What's fixed
+- Fix ButtonGroup from overflowing. [#10000](https://github.com/statamic/cms/issues/10000) by @PatrickJunod
+- Fix docblock on `Parse` facade's `template` method. [#10008](https://github.com/statamic/cms/issues/10008) by @duncanmcclean
+- Ensure blueprint tabs & sections always have handles. [#10014](https://github.com/statamic/cms/issues/10014) by @duncanmcclean
+- Fix JSON being returned when using the back button sometimes. [#10016](https://github.com/statamic/cms/issues/10016) by @duncanmcclean
+- Fix fullscreen button in Group Fieldtype. [#10009](https://github.com/statamic/cms/issues/10009) by @duncanmcclean
+- Remove clear button of readonly date field. [#9993](https://github.com/statamic/cms/issues/9993) by @PatrickJunod
+
+
+
+## 4.57.3 (2024-05-02)
+
+### What's improved
+- German translations. [#9957](https://github.com/statamic/cms/issues/9957) by @helloDanuk
+
+### What's fixed
+- Fix Starter Kit installation on Windows. [#9968](https://github.com/statamic/cms/issues/9968) by @JohnathonKoster
+- Fix `starter-kit:install` with custom branch when branch has slash. [#9978](https://github.com/statamic/cms/issues/9978) by @jesseleite
+- Fix first child redirects when using array syntax. [#9965](https://github.com/statamic/cms/issues/9965) by @jasonvarga
+- Fix wrong permission used for configuring navs. [#9961](https://github.com/statamic/cms/issues/9961) by @simonolog
+- Fix `DataReferenceUpdater` when field data from array is null. [#9954](https://github.com/statamic/cms/issues/9954) by @duncanmcclean
+- Fix dated collection listing when time is enabled. [#9951](https://github.com/statamic/cms/issues/9951) by @jacksleight
+- Fix route parameters in Statamic routes with closures. [#9953](https://github.com/statamic/cms/issues/9953) by @arthurperton
+- Fake composer installs in make command tests. [#9955](https://github.com/statamic/cms/issues/9955) by @jasonvarga
+
+
+
+## 4.57.2 (2024-04-23)
+
+### What's fixed
+- Fix missing composer binary (starter kits couldn't install). [#9950](https://github.com/statamic/cms/issues/9950) by @duncanmcclean
+
+
+
+## 4.57.1 (2024-04-22)
+
+### What's improved
+- French translations. [#9939](https://github.com/statamic/cms/issues/9939) by @ebeauchamps
+
+### What's fixed
+- Require composer/semver instead of composer/composer. [#9947](https://github.com/statamic/cms/issues/9947) by @jasonvarga
+- Fix `DimensionsRule` for Livewire. [#9927](https://github.com/statamic/cms/issues/9927) by @aerni
+- Fix Blade compiler error. [#9946](https://github.com/statamic/cms/issues/9946) by @duncanmcclean
+- Prevent passing HTML to the Video fieldtype. [#9944](https://github.com/statamic/cms/issues/9944) by @duncanmcclean
+- Fix missing OAuth controller argument. [#9942](https://github.com/statamic/cms/issues/9942) by @simonolog
+
+
+
 ## 4.57.0 (2024-04-17)
 
 ### What's new

@@ -294,7 +294,11 @@ class AssetContainerContents
             $this->add($dir);
         }
 
-        $this->all()->put($path, $metadata);
+        $files = $this->all()->put($path, $metadata);
+
+        if (Statamic::isWorker()) {
+            Cache::put($this->key(), $files, $this->ttl());
+        }
 
         $this->filteredFiles = null;
         $this->filteredDirectories = null;

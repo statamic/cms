@@ -77,9 +77,8 @@ export default {
             if (! this.editable) return;
             if (this.item.invalid) return;
 
-            if (Object.entries(this.$store.state.publish).find(([key, value]) => value.values.id === this.item.id)) {
+            if (this.item.reference && Object.entries(this.$store.state.publish).find(([key, value]) => value.reference === this.item.reference)) {
                 this.$toast.error(__("You're already editing this item."));
-
                 return;
             }
 
