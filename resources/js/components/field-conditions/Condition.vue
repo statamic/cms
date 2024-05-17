@@ -82,6 +82,10 @@ export default {
             type: Object,
             required: true
         },
+        conditions: {
+            type: Array,
+            required: true
+        },
         index: {
             type: Number,
             required: true
@@ -117,7 +121,7 @@ export default {
 
         fieldOptions() {
             return _(this.suggestableFields)
-                .reject(field => field.handle === this.config.handle || this.condition.field === field.handle)
+                .filter(field => this.conditions.filter(condition => condition.field === field.handle).length === 0)
                 .map(field => {
                     let display = field.config.display;
 
