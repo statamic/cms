@@ -18,7 +18,6 @@ use Statamic\Fieldtypes\Text;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Tiptap\Core\Node;
-use function RectorPrefix202405\React\Promise\all;
 
 class BardTest extends TestCase
 {
