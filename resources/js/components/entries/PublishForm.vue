@@ -819,6 +819,9 @@ export default {
                 this.title = response.data.title;
                 if (!this.revisionsEnabled) this.permalink = response.data.permalink;
                 this.values = this.resetValuesFromResponse(response.data.values);
+                this.initialPublished = response.data.published;
+                this.activeLocalization.published = response.data.published;
+                this.activeLocalization.status = response.data.status;
                 this.itemActions = response.data.itemActions;
             }
         },
