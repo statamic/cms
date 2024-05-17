@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Statamic\Facades\Action;
 use Statamic\Facades\Entry;
 use Statamic\Http\Controllers\CP\ActionController;
+use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class EntryActionController extends ActionController
 {
@@ -19,15 +20,15 @@ class EntryActionController extends ActionController
 
     protected function getItemData($entry, $context): array
     {
+        $entry = $entry->fresh();
+
         $blueprint = $entry->blueprint();
 
         [$values] = $this->extractFromFields($entry, $blueprint);
 
-        return [
-            'title' => $entry->value('title'),
-            'permalink' => $entry->absoluteUrl(),
-            'values' => array_merge($values, ['id' => $entry->id()]),
+        return array_merge((new EntryResource($entry))->resolve()['data'], [
+            'values' => $values,
             'itemActions' => Action::for($entry, $context),
-        ];
+        ]);
     }
 }
