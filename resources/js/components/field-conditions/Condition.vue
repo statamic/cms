@@ -123,7 +123,11 @@ export default {
             const conditions = this.conditions.map(condition => condition.field);
 
             return _(this.suggestableFields)
-                .reject(field => field.handle === this.config.handle || this.condition.field === field.handle || conditions.includes(field.handle))
+                .reject(field => {
+                    return field.handle === this.config.handle // Exclude the field you're adding a condition to.
+                        || this.condition.field === field.handle // Exclude the field being used in the current condition.
+                        || conditions.includes(field.handle); // Exclude fields already used in other conditions.
+                })
                 .map(field => {
                     let display = field.config.display;
 
