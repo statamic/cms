@@ -398,7 +398,7 @@ export default {
 
         afterSaveOption() {
             return this.getPreference('after_save');
-        }
+        },
 
     },
 
