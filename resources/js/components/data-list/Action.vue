@@ -95,7 +95,7 @@ export default {
         },
 
         showDirtyWarning() {
-            return this.isDirty && ! this.action.bypassesDirtyWarning;
+            return this.isDirty && this.action.dirtyWarningText && ! this.action.bypassesDirtyWarning;
         },
 
         runButtonText() {
