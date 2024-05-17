@@ -23,7 +23,8 @@ use Symfony\Component\Mailer\Exception\TransportException;
 
 class UsersController extends CpController
 {
-    use QueriesFilters;
+    use ExtractsFromUserFields,
+        QueriesFilters;
 
     /**
      * @var UserContract
@@ -321,21 +322,5 @@ class UsersController extends CpController
         $user->delete();
 
         return response('', 204);
-    }
-
-    protected function extractFromFields($user, $blueprint)
-    {
-        $values = $user->data()
-            ->merge($user->computedData())
-            ->merge(['email' => $user->email()]);
-
-        $fields = $blueprint
-            ->removeField('password')
-            ->removeField('password_confirmation')
-            ->fields()
-            ->addValues($values->all())
-            ->preProcess();
-
-        return [$fields->values()->all(), $fields->meta()->all()];
     }
 }

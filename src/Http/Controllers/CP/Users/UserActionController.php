@@ -8,6 +8,8 @@ use Statamic\Http\Controllers\CP\ActionController;
 
 class UserActionController extends ActionController
 {
+    use ExtractsFromUserFields;
+
     protected function getSelectedItems($items, $context)
     {
         return $items->map(function ($item) {
@@ -26,21 +28,5 @@ class UserActionController extends ActionController
             'values' => array_merge($values, ['id' => $user->id()]),
             'itemActions' => Action::for($user, $context),
         ];
-    }
-
-    protected function extractFromFields($user, $blueprint)
-    {
-        $values = $user->data()
-            ->merge($user->computedData())
-            ->merge(['email' => $user->email()]);
-
-        $fields = $blueprint
-            ->removeField('password')
-            ->removeField('password_confirmation')
-            ->fields()
-            ->addValues($values->all())
-            ->preProcess();
-
-        return [$fields->values()->all(), $fields->meta()->all()];
     }
 }
