@@ -19,6 +19,7 @@
                     :item="values.id"
                     :url="itemActionUrl"
                     :actions="itemActions"
+                    :is-dirty="isDirty"
                     @started="actionStarted"
                     @completed="actionCompleted"
                 />

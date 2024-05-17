@@ -108,6 +108,17 @@ abstract class Action implements Arrayable
         return null;
     }
 
+    public function dirtyWarningText()
+    {
+        /** @translation */
+        return "Any unsaved changes will not be reflected in this action's behavior.";
+    }
+
+    public function bypassesDirtyWarning(): bool
+    {
+        return false;
+    }
+
     public function toArray()
     {
         return [
@@ -117,6 +128,8 @@ abstract class Action implements Arrayable
             'buttonText' => $this->buttonText(),
             'confirmationText' => $this->confirmationText(),
             'warningText' => $this->warningText(),
+            'dirtyWarningText' => $this->dirtyWarningText(),
+            'bypassesDirtyWarning' => $this->bypassesDirtyWarning(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
             'values' => $this->fields()->preProcess()->values(),

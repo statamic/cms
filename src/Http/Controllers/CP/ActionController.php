@@ -39,7 +39,10 @@ abstract class ActionController extends CpController
         $response = $action->run($items, $values);
 
         if ($redirect = $action->redirect($items, $values)) {
-            return ['redirect' => $redirect];
+            return [
+                'redirect' => $redirect,
+                'bypassesDirtyWarning' => $action->bypassesDirtyWarning(),
+            ];
         } elseif ($download = $action->download($items, $values)) {
             return $download instanceof Response ? $download : response()->download($download);
         }

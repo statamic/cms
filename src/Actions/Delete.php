@@ -52,6 +52,11 @@ class Delete extends Action
         return 'Are you sure you want to delete this?|Are you sure you want to delete these :count items?';
     }
 
+    public function bypassesDirtyWarning(): bool
+    {
+        return true;
+    }
+
     public function run($items, $values)
     {
         $items->each->delete();

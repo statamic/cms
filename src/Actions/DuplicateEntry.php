@@ -50,6 +50,12 @@ class DuplicateEntry extends Action
         }
     }
 
+    public function dirtyWarningText()
+    {
+        /** @translation */
+        return 'Any unsaved changes will not be duplicated into the new entry.';
+    }
+
     public function run($items, $values)
     {
         $this->newItems = $items
