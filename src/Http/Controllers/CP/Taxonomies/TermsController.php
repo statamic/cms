@@ -20,7 +20,8 @@ use Statamic\Rules\UniqueTermValue;
 
 class TermsController extends CpController
 {
-    use QueriesFilters;
+    use ExtractsFromTermFields,
+        QueriesFilters;
 
     public function index(FilteredRequest $request, $taxonomy)
     {
@@ -320,27 +321,6 @@ class TermsController extends CpController
 
         return (new TermResource($term))
             ->additional(['saved' => $saved]);
-    }
-
-    protected function extractFromFields($term, $blueprint)
-    {
-        // The values should only be data merged with the origin data.
-        // We don't want injected taxonomy values, which $term->values() would have given us.
-        $values = $term->inDefaultLocale()->data()->merge(
-            $term->data()
-        );
-
-        $fields = $blueprint
-            ->fields()
-            ->addValues($values->all())
-            ->preProcess();
-
-        $values = $fields->values()->merge([
-            'title' => $term->value('title'),
-            'slug' => $term->slug(),
-        ]);
-
-        return [$values->all(), $fields->meta()];
     }
 
     protected function extractAssetsFromValues($values)
