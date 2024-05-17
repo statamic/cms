@@ -139,6 +139,7 @@ return [
     'globals_configure_handle_instructions' => 'Used to reference this global set on the frontend. It\'s non-trivial to change later.',
     'globals_configure_intro' => 'A global set is a group of variables available across all front-end pages.',
     'globals_configure_title_instructions' => 'We recommend a noun representing the set\'s contents. eg. "Brand" or "Company"',
+    'impersonate_action_confirmation' => 'You will be logged in as this user. You can return to your account using the avatar menu.',
     'licensing_config_cached_warning' => 'Any changes you make to your .env or config files will not be detected until you clear the cache. If you are seeing unexpected licensing results here, it may be because of this. You can use the <code>php artisan config:cache</code> command to regenerate the cache.',
     'licensing_error_invalid_domain' => 'Invalid domain',
     'licensing_error_invalid_edition' => 'License is for :edition edition',

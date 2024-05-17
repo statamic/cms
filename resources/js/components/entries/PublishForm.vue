@@ -13,6 +13,16 @@
 
             <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint">
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                <li class="divider" />
+                <data-list-inline-actions
+                    v-if="!isCreating"
+                    :item="values.id"
+                    :url="itemActionUrl"
+                    :actions="itemActions"
+                    :is-dirty="isDirty"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                />
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex rtl:ml-4 ltr:mr-4" v-if="readOnly">
@@ -297,12 +307,14 @@ import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
+import HasActions from '../publish/HasActions';
 
 export default {
 
     mixins: [
         HasPreferences,
         HasHiddenFields,
+        HasActions,
     ],
 
     components: {
@@ -496,7 +508,14 @@ export default {
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
-        }
+        },
+
+        title(title) {
+            if (this.isBase) {
+                const arrow = this.direction === 'ltr' ? '‹' : '›';
+                document.title = `${title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
+            }
+        },
 
     },
 
@@ -550,10 +569,6 @@ export default {
                 }
                 this.title = response.data.data.title;
                 this.isWorkingCopy = true;
-                if (this.isBase) {
-                    const arrow = this.direction === 'ltr' ? '‹' : '›';
-                    document.title = `${this.title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
-                }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
@@ -794,7 +809,20 @@ export default {
             }, this.autosaveInterval);
 
             this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
-        }
+        },
+
+        afterActionSuccessfullyCompleted(response) {
+            if (response.data) {
+                this.title = response.data.title;
+                if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                this.values = this.resetValuesFromResponse(response.data.values);
+                this.initialPublished = response.data.published;
+                this.activeLocalization.published = response.data.published;
+                this.activeLocalization.status = response.data.status;
+                this.itemActions = response.data.itemActions;
+            }
+        },
+
     },
 
     mounted() {

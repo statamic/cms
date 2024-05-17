@@ -64,6 +64,16 @@
                             <svg-icon name="trash" class="h-4" />
                             <span class="rtl:mr-2 ltr:ml-2 hidden @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
                         </button>
+
+                        <dropdown-list class="mr-4" v-if="actionsMenu.length">
+                            <data-list-inline-actions
+                                :item="id"
+                                :url="actionUrl"
+                                :actions="actionsMenu"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
+                        </dropdown-list>
                     </div>
 
                     <!-- Image Preview -->
@@ -271,7 +281,24 @@ export default {
         isToolbarVisible()
         {
             return ! this.readOnly && this.showToolbar;
-        }
+        },
+
+        actionsMenu()
+        {
+            // We filter out the actions that are already in the toolbar.
+            // We don't want them to appear in the dropdown as well.
+            // If we filtered them out in PHP they wouldn't appear as buttons.
+            return this.actions.filter(action => ![
+                'rename_asset',
+                'move_asset',
+                'replace_asset',
+                'reupload_asset',
+                'download_asset',
+                'delete',
+                'copy_asset_url',
+            ].includes(action.handle));
+        },
+
     },
 
     mounted() {

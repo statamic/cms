@@ -7,6 +7,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -156,6 +157,7 @@ class EntriesController extends CpController
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
+            'itemActions' => Action::for($entry, ['collection' => $collection->handle(), 'view' => 'form']),
         ];
 
         if ($request->wantsJson()) {
