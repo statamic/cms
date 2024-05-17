@@ -31,6 +31,7 @@
                 :index="index"
                 :config="config"
                 :condition="condition"
+                :conditions="conditions"
                 :key="condition._id"
                 :suggestable-fields="suggestableFields"
                 @updated="updated(index, $event)"
