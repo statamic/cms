@@ -13,6 +13,7 @@
                             :item="values.id"
                             :url="itemActionUrl"
                             :actions="itemActions"
+                            :is-dirty="isDirty"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
@@ -105,7 +106,11 @@ export default {
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
-        }
+        },
+
+        isDirty() {
+            return this.$dirty.has(this.publishContainer);
+        },
 
     },
 
