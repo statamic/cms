@@ -819,6 +819,7 @@ export default {
                 this.title = response.data.title;
                 if (!this.revisionsEnabled) this.permalink = response.data.permalink;
                 this.values = this.resetValuesFromResponse(response.data.values);
+                this.itemActions = response.data.itemActions;
             }
         },
 
