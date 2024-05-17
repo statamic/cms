@@ -126,7 +126,7 @@ export default {
 
     computed: {
         actionContext() {
-            return {form: this.form, view: 'list'};
+            return {form: this.form};
         },
     },
 
