@@ -120,8 +120,10 @@ export default {
         },
 
         fieldOptions() {
+            const conditions = this.conditions.map(condition => condition.field);
+
             return _(this.suggestableFields)
-                .filter(field => this.conditions.filter(condition => condition.field === field.handle).length === 0)
+                .reject(field => field.handle === this.config.handle || this.condition.field === field.handle || conditions.includes(field.handle))
                 .map(field => {
                     let display = field.config.display;
 
