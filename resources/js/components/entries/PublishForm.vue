@@ -18,7 +18,7 @@
                     v-if="!isCreating"
                     :item="id"
                     :url="itemActionUrl"
-                    :actions="itemActionsMenu"
+                    :actions="itemActions"
                     @started="actionStarted"
                     @completed="actionCompleted"
                 />
@@ -501,10 +501,6 @@ export default {
             return this.initialReference.split('::').pop();
         },
 
-        itemActionsMenu() {
-            return this.itemActions.filter(action => !['publish', 'unpublish'].includes(action.handle));
-        },
-        
         direction() {
             return this.$config.get('direction', 'ltr');
         },
