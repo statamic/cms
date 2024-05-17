@@ -10,7 +10,7 @@
                         <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
                         <li class="divider" />
                         <data-list-inline-actions
-                            :item="id"
+                            :item="values.id"
                             :url="itemActionUrl"
                             :actions="itemActionsMenu"
                             @started="actionStarted"
@@ -105,10 +105,6 @@ export default {
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
-        },
-
-        id() {
-            return this.initialReference.split('::').pop();
         },
 
         itemActionsMenu() {

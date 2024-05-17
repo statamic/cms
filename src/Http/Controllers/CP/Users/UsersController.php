@@ -241,7 +241,7 @@ class UsersController extends CpController
 
         $viewData = [
             'title' => $user->email(),
-            'values' => $values,
+            'values' => array_merge($values, ['id' => $user->id()]),
             'meta' => $meta,
             'blueprint' => $user->blueprint()->toPublishArray(),
             'reference' => $user->reference(),
@@ -268,7 +268,7 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
-        $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
+        $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->except('id'));
 
         $fields
             ->validator()
