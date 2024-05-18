@@ -12,7 +12,7 @@
     <div class="card p-4 content">
         <div class="flex flex-wrap">
         @foreach ($utilities as $utility)
-            <a href="{{ $utility->url() }}" class="w-full lg:w-1/2 p-4 md:flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+            <a href="{{ $utility->url() }}" class="w-full lg:w-1/2 p-4 md:flex items-start hover:bg-gray-200 dark:hover:bg-dark-575 border border-transparent dark:hover:border-dark-400 rounded-md group">
                 <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                     {!! $utility->icon() !!}
                 </div>

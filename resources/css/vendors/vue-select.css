@@ -26,7 +26,7 @@
 }
 
 .vs--disabled .vs__dropdown-toggle {
-	@apply bg-gray-200 dark:bg-dark-750;
+	@apply bg-gray-200 dark:bg-dark-550;
 }
 
 .v-select[dir=rtl] .vs__actions {
@@ -48,7 +48,8 @@
 }
 
 .vs__dropdown-toggle {
-	@apply appearance-none text-gray-800 dark:text-dark-150 w-full p-0 rounded flex items-center bg-gray-100 dark:bg-dark-550 shadow-inner border border-gray-500 dark:border-dark-800;
+	@apply appearance-none text-gray-800  w-full p-0 rounded flex items-center bg-gray-100 shadow-inner border border-gray-500;
+    @apply dark:text-dark-150 dark:bg-dark-650 dark:border-dark-900 dark:shadow-inner-dark;
     height: 2.375rem;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;

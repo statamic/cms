@@ -5,7 +5,7 @@
 }
 
 .bard-editor {
-    @apply text-gray-800 dark:text-dark-150 bg-gray-100 dark:bg-dark-800 shadow-inner p-0 relative rounded;
+    @apply text-gray-800 dark:text-dark-150 bg-gray-100 dark:bg-dark-650 shadow-inner p-0 relative rounded;
 }
 
 .bard-editor .ProseMirror {
@@ -39,7 +39,7 @@
 }
 
 .bard-fixed-toolbar {
-    @apply bg-white dark:bg-dark-500 shadow-none rounded-t border-b dark:border-dark-300 text-sm flex items-start justify-between p-1 z-5 top-0;
+    @apply bg-white dark:bg-dark-800 shadow-none rounded-t border-b dark:border-dark-900 text-sm flex items-start justify-between p-1 z-5 top-0;
 
     .bard-toolbar-button {
         @apply text-gray-800 dark:text-dark-150 rounded px-1 flex text-center justify-center items-center text-base h-8 w-8 m-0;

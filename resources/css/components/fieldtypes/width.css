@@ -9,14 +9,14 @@
     }
 
     .field-width-notch {
-        @apply relative border border-gray-400 dark:border-dark-200 rtl:border-r-0 ltr:border-l-0 flex-1;
+        @apply relative border border-gray-400 dark:border-dark-300 rtl:border-r-0 ltr:border-l-0 flex-1;
 
         &:first-of-type {
             @apply rtl:border-r ltr:border-l rtl:rounded-r-sm ltr:rounded-l-sm;
         }
 
         &.filled {
-            @apply border-gray-400 dark:border-dark-200 rtl:border-l-0 ltr:border-r-0 rtl:pl-px ltr:pr-px bg-white dark:bg-dark-575 -my-px;
+            @apply border-gray-400 dark:border-dark-400 rtl:border-l-0 ltr:border-r-0 rtl:pl-px ltr:pr-px bg-white dark:bg-dark-575 -my-px;
         }
 
         &.selected {

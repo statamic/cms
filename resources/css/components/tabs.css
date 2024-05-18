@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .tabs-container {
-    @apply w-full border-b dark:border-dark-900 text-md relative flex mb-6;
+    @apply w-full border-b dark:border-dark-500 text-md relative flex mb-6;
 
    .fade-left, .fade-right {
         @apply absolute w-4 inset-y-0 from-gray-300 dark:from-dark-800 pointer-events-none z-2;
@@ -38,7 +38,7 @@
         @apply ring-inset ring-2 ring-blue-500 dark:ring-dark-blue-100 outline-none rounded-t;
     }
     &.active {
-        @apply text-blue-500 dark:text-dark-blue-100 border-blue-500 dark:border-dark-blue-100;
+        @apply text-blue-500 dark:text-blue-400 border-blue-500 dark:border-blue-400;
     }
     &.has-error {
         @apply text-red-500;

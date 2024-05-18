@@ -37,7 +37,8 @@
 	overflow-x: auto;
 
     thead {
-		@apply bg-gray-100 dark:bg-dark-550 text-xs text-gray-900 dark:text-dark-100;
+		@apply bg-gray-100 text-xs text-gray-900;
+        @apply dark:bg-dark-700 dark:text-dark-100;
 
 		tr {
 			@apply border-b dark:border-dark-900;
@@ -91,7 +92,7 @@
 			}
 
             &:hover {
-                @apply bg-gray-100 dark:bg-dark-500;
+                @apply bg-gray-100 dark:bg-dark-575;
             }
 
             th {
@@ -249,22 +250,6 @@
     }
 }
 
-/* .data-table[data-size="sm"] {
-    thead th.checkbox-column,
-    thead th.actions-column,
-    tbody th.checkbox-column,
-    tbody th.actions-column {
-        position: static !important;
-        background: none !important;
-    }
-} */
-
-
-/* @screen md {
-	.data-table {
-		@apply w-full table;
-	}
-} */
 
 .data-list-header ~ .data-table {
     thead th {

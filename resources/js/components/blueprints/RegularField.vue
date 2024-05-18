@@ -2,7 +2,7 @@
 
     <div class="blueprint-section-field" :class="widthClass">
         <div class="blueprint-section-field-inner">
-            <div class="blueprint-drag-handle w-4 ltr:border-r rtl:border-l dark:border-dark-300"></div>
+            <div class="blueprint-drag-handle"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 rtl:pl-4 ltr:pr-4 py-2 rtl:pr-2 ltr:pl-2">
                     <svg-icon class="text-gray-800 dark:text-dark-150 rtl:ml-2 ltr:mr-2 h-4 w-4 flex-none" :name="field.icon.startsWith('<svg') ? field.icon : `light/${field.icon}`" v-tooltip="tooltipText" default="light/generic-field" />

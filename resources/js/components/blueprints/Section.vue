@@ -1,9 +1,9 @@
 <template>
 
     <div class="blueprint-section @container">
-        <div class="blueprint-section-card card p-0 h-full flex rounded-t flex-col">
+        <div class="blueprint-section-card card dark:bg-dark-800 p-0 h-full flex rounded-t flex-col">
 
-            <div class="bg-gray-200 dark:bg-dark-550 border-b dark:border-dark-900 text-sm flex rounded-t">
+            <div class="bg-gray-200 dark:bg-dark-600 border-b dark:border-none text-sm flex rounded-t">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 ltr:border-r rtl:border-l dark:border-dark-900"></div>
                 <div class="p-2 flex-1 flex items-center">
                     <a class="flex items-center flex-1 group" @click="edit">

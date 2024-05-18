@@ -15,8 +15,7 @@
 }
 
 .blueprint-drag-handle {
-    @apply flex-none;
-    cursor: move;
+    @apply flex-none w-4 ltr:border-r rtl:border-l dark:border-dark-500 cursor-move;
     background: rgba(0, 0, 0, 0.01) url('../../svg/icons/light/drag-dots.svg') 50% 50% no-repeat;
     background-size: 7px 17px;
 }
@@ -25,7 +24,8 @@
     @apply relative mb-2 px-1 z-10 outline-none text-sm;
 
     .blueprint-section-field-inner {
-        @apply relative border dark:border-dark-300 rounded bg-gray-200 dark:bg-dark-550 shadow-sm flex outline-none z-10;
+        @apply relative border rounded bg-gray-200 shadow-sm flex outline-none z-10;
+        @apply dark:border-none dark:shadow-dark dark:bg-dark-600
     }
 
     &.draggable-source--is-dragging {

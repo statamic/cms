@@ -45,7 +45,7 @@ a:not([class^="btn"]) {
     @apply text-gray-800 dark:text-dark-150 cursor-pointer;
 
     &:hover {
-        @apply text-blue dark:text-dark-blue-100;
+        @apply text-blue dark:text-blue-300;
     }
 }
 

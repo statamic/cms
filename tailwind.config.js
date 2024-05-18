@@ -129,6 +129,7 @@ module.exports = {
                 set: 'rgba(50,50,93,.15) 0 0 0 1px, rgba(50,50,93,.08) 0 2px 5px, rgba(0,0,0,.07) 0 1px 1.5px,rgba(0,0,0,.08) 0 1px 2px 0, transparent 0 0 0 0',
                 button: '0 1px 0 0 rgba(25,30,35,.05)',
                 inner: 'inset 0px 1px 1px 0px rgba(0,0,0,.05)',
+                'inner-dark': 'inset 0px 2px 1px 0px rgba(0,0,0,.15)',
                 dark: '0 20px 35px 0 rgba(22,22,22,.45), 0 10px 23px 0 rgba(23,23,23,.65), 0 0 0 1px rgba(85,87,89,.80)',
                 'dark-popover': '0 10px 17px 10px rgb(31 33 36 / 76%), 0 2px 1px 1px rgb(31 33 36 / 76%), 0 0 0 1px rgb(109 118 118 / 41%), 0 0 0 1px rgb(110 125 140 / 61%)',
                 'dark-set': 'rgba(0,0,0,.25) 0 0 0 1px, rgba(0,0,0,.08) 0 2px 5px, rgba(0,0,0,.17) 0 1px 1.5px,rgba(0,0,0,.18) 0 1px 2px 0, transparent 0 0 0 0',

@@ -6,7 +6,7 @@
         <p>{{ __('statamic::messages.getting_started_widget_intro') }}</p>
     </div>
     <div class="flex flex-wrap p-4">
-        <a href="https://statamic.dev" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+        <a href="https://statamic.dev" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-575 border border-transparent dark:hover:border-dark-400 rounded-md group">
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                 @cp_svg('icons/light/book-pages')
             </div>
@@ -16,7 +16,7 @@
             </div>
         </a>
         @if (!Statamic::pro())
-        <a href="https://statamic.dev/licensing" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+        <a href="https://statamic.dev/licensing" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-575 border border-transparent dark:hover:border-dark-400 rounded-md group">
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                 @cp_svg('icons/light/pro-ribbon')
             </div>
@@ -26,7 +26,7 @@
             </div>
         </a>
         @endif
-        <a href="{{ cp_route('collections.create') }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+        <a href="{{ cp_route('collections.create') }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-575 border border-transparent dark:hover:border-dark-400 rounded-md group">
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                 @cp_svg('icons/light/content-writing')
             </div>
@@ -35,7 +35,7 @@
                 <p>{{ __('statamic::messages.getting_started_widget_collections') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('blueprints.index') }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+        <a href="{{ cp_route('blueprints.index') }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-575 border border-transparent dark:hover:border-dark-400 rounded-md group">
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                 @cp_svg('icons/light/blueprints')
             </div>
@@ -44,7 +44,7 @@
                 <p>{{ __('statamic::messages.getting_started_widget_blueprints') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('navigation.create') }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+        <a href="{{ cp_route('navigation.create') }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-575 border border-transparent dark:hover:border-dark-400 rounded-md group">
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                 @cp_svg('icons/light/hierarchy-files')
             </div>
