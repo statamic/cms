@@ -75,10 +75,10 @@ svg {
 }
 
 .icon-header-avatar {
+    @apply rounded-full shadow overflow-hidden flex-shrink-0;
     height: 32px;
     width: 32px;
     line-height: 32px;
-    @apply rounded-full shadow overflow-hidden;
 }
 
 .icon-user-initials {

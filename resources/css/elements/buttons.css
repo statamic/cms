@@ -17,7 +17,8 @@ button {
     padding: .475rem 1.25rem;
 
     &:focus {
-        @apply ring-2 outline-none dark:outline-2 dark:outline-dark-blue-100;
+        /* @apply ring-2 outline-none dark:outline-2 dark:outline-dark-blue-100; */
+        @apply ring-2 outline-none;
     }
 
     &:disabled {
@@ -66,7 +67,7 @@ button {
     }
 
     &:disabled {
-        @apply text-gray-700 dark:text-dark-200 opacity-75;
+        @apply text-gray-700 dark:text-dark-400 opacity-75;
     }
 }
 

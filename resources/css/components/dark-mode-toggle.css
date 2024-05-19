@@ -3,10 +3,7 @@
    ========================================================================== */
 
 label.dark-mode-toggle {
-    margin: 0 10px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
+    @apply flex items-center cursor-pointer;
     direction: ltr;
 
     .toggle-checkbox {
