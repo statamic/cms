@@ -120,16 +120,10 @@ sup {
 }
 
 code {
-    @apply font-mono rounded;
+    @apply font-mono rounded text-[#c7254e] dark:text-blue-400 dark:bg-dark-700;
     padding: 2px 4px;
     font-size: 90%;
-    color: #c7254e;
     background-color: #f9f2f4;
-
-    .dark & {
-        color: theme(colors.red.500);
-        background-color: theme(colors.dark.700);
-    }
 }
 
 .help-block {
