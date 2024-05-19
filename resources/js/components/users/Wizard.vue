@@ -47,8 +47,8 @@
             <!-- Super Admin -->
              <div class="pb-10" v-if="canCreateSupers">
                 <div class="flex items-center">
-                    <toggle-input v-model="user.super" />
-                    <label class="font-bold rtl:mr-2 ltr:ml-2">{{ __('Super Admin') }}</label>
+                    <toggle-input v-model="user.super" id="super" />
+                    <label class="font-bold rtl:mr-2 ltr:ml-2" for="super">{{ __('Super Admin') }}</label>
                 </div>
                 <div class="text-2xs text-gray-600 mt-2 flex items-center">
                     <svg-icon name="info-circle" class="h-4 w-4 rtl:ml-1 ltr:mr-1 flex items-center mb-px"></svg-icon>
@@ -109,15 +109,16 @@
             <div class="max-w-lg mx-auto bg-gray-100 py-10 mb-20 border rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-4 pb-10">
-                    <label class="font-bold text-base mb-1" for="email">{{ __('Email Subject') }}</label>
-                    <input type="text" v-model="invitation.subject" class="input-text bg-white">
+                    <label class="font-bold text-base mb-1" for="invitation_subject">{{ __('Email Subject') }}</label>
+                    <input type="text" v-model="invitation.subject" class="input-text bg-white" id="invitation_subject">
                 </div>
 
                 <!-- Email Content -->
                 <div class="max-w-md mx-auto px-4">
-                    <label class="font-bold text-base mb-1" for="email">{{ __('Email Content') }}</label>
+                    <label class="font-bold text-base mb-1" for="invitation_message">{{ __('Email Content') }}</label>
                     <textarea
                         class="input-text min-h-40 p-4 bg-white"
+                        id="invitation_message"
                         v-model="invitation.message"
                         v-elastic
                     />
