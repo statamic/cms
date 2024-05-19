@@ -6,7 +6,7 @@
     @apply border dark:border-dark-900 rounded overflow-hidden relative;
 
     .markdown-toolbar {
-        @apply bg-white dark:bg-dark-550 shadow-none rounded-t border-b dark:border-dark-900 text-sm flex flex-wrap items-center justify-between;
+        @apply bg-white dark:bg-dark-700 shadow-none rounded-t border-b dark:border-dark-900 text-sm flex flex-wrap items-center justify-between;
         padding: 4px 8px;
     }
 
@@ -50,7 +50,7 @@
     }
 
     .CodeMirror {
-        @apply bg-gray-100 dark:bg-dark-800 shadow-inner h-auto font-mono leading-normal px-0 py-1 @md/markdown:p-3 text-xs dark:text-dark-150;
+        @apply bg-gray-100 dark:bg-dark-650 shadow-inner dark:shadow-inner-dark h-auto font-mono leading-normal px-0 py-1 @md/markdown:p-3 text-xs dark:text-dark-150;
         border-radius: 0 0 3px 3px;
 
         &:focus-within {

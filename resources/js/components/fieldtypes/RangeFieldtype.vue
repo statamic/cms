@@ -15,7 +15,7 @@
                 :id="fieldId"
                 class="flex-1 min-w-0"
             />
-            <div class="rounded border dark:border-dark-900 px-2 py-1 mx-2 bg-gray-100 dark:bg-dark-400">{{ val }}</div>
+            <div class="rounded border dark:border-dark-900 px-2 py-1 mx-2 bg-gray-100 dark:bg-dark-600 dark:shadow-inner-dark">{{ val }}</div>
             <div v-if="config.append" v-text="__(config.append)" />
         </div>
     </div>

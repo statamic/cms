@@ -375,12 +375,14 @@
     ========================================================================== */
 
   .cm-s-material.CodeMirror {
-    background-color: #263238;
+    background: #263238;
+    @apply dark:bg-dark-650;
     color: #EEFFFF;
   }
 
   .cm-s-material .CodeMirror-gutters {
     background: #263238;
+    @apply dark:bg-dark-650;
     color: #546E7A;
     border: none;
   }

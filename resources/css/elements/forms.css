@@ -25,7 +25,7 @@ select {
 
 .input-text {
     @apply appearance-none bg-gray-100 text-gray-800 border max-w-full w-full p-2 rounded shadow-inner placeholder:text-gray-600 text-md @lg:text-base;
-    @apply dark:bg-dark-650 dark:text-dark-150 dark:border-dark-200 dark:placeholder:text-dark-175 dark:shadow-inner-dark;
+    @apply dark:bg-dark-650 dark:text-dark-150 dark:border-dark-900 dark:placeholder:text-dark-175 dark:shadow-inner-dark;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
     &:focus, &:focus-within {
@@ -307,7 +307,7 @@ input[type="file"] {
 }
 
 .help-block {
-    @apply block mb-2 text-gray-700 dark:text-dark-200 text-xs;
+    @apply block mb-2 text-gray-700 dark:text-dark-150/70 text-xs;
     a {
         @apply text-gray-800 dark:text-dark-175 underline;
         &:hover {

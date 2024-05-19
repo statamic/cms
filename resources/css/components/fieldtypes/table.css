@@ -11,7 +11,7 @@
 
 .table-fieldtype-table thead {
     th {
-        @apply font-medium rtl:border-l ltr:border-r p-2 border-b dark:border-dark-900 z-10 bg-gray-200 dark:bg-dark-500 text-gray-900 dark:text-dark-100 text-sm;
+        @apply font-medium rtl:border-l ltr:border-r p-2 border-b dark:border-dark-900 z-10 bg-gray-200 dark:bg-dark-700 text-gray-900 dark:text-dark-150 text-sm;
         display: table-cell;
         position: sticky;
         top: -1px;
@@ -25,7 +25,8 @@
 }
 
 .table-fieldtype-table .input-text {
-    @apply bg-white dark:bg-dark-600 border-none rounded-none shadow-none outline-none text-sm;
+    @apply bg-white border-none rounded-none shadow-none outline-none text-sm;
+    @apply dark:bg-dark-650;
     &:focus {
         @apply shadow-inner bg-gray-100 dark:bg-dark-700 ring-0;
     }

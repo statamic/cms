@@ -24,7 +24,7 @@
                     <div class="input-group-prepend flex items-center">
                         <svg-icon name="light/calendar" class="w-4 h-4" />
                     </div>
-                    <div class="input-text border border-gray-500 dark:border-dark-200 rtl:border-r-0 ltr:border-l-0 flex items-center rtl:pl-0 ltr:pr-0" :class="{ 'read-only': isReadOnly }">
+                    <div class="input-text border border-gray-500 dark:border-dark-900 rtl:border-r-0 ltr:border-l-0 flex items-center rtl:pl-0 ltr:pr-0" :class="{ 'read-only': isReadOnly }">
                         <input
                             class="input-text-minimal p-0 bg-transparent leading-none"
                             :readonly="isReadOnly"

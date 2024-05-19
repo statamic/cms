@@ -17,7 +17,7 @@ button {
     padding: .475rem 1.25rem;
 
     &:focus {
-        @apply ring-2 outline-none;
+        @apply ring-2 outline-none dark:outline-2 dark:outline-dark-blue-100;
     }
 
     &:disabled {
