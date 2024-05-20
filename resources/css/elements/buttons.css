@@ -61,13 +61,14 @@ button {
         border-color: #aeb9c3 !important;
 
         .dark & {
+            @apply shadow-inner-dark;
             background: theme('colors.dark.400');
             border-color: theme(colors.dark.700) !important;
         }
     }
 
     &:disabled {
-        @apply text-gray-700 dark:text-dark-400 opacity-75;
+        @apply text-gray-700 dark:text-dark-200 opacity-75;
     }
 }
 
