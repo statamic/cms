@@ -15,6 +15,28 @@
     <link rel="shortcut icon" type="image/x-icon" href="{{ Statamic::cpViteAsset('img/favicon.ico') }}" sizes="16x16 32x32"/>
 @endif
 
+<script>
+    (function () {
+        const theme = '{{ $user->preferredTheme() }}';
+
+        const autoDark = (
+            localStorage.theme === 'dark' ||
+            ((!('theme' in localStorage) || localStorage.theme === 'auto') &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches)
+        );
+
+        if (theme === 'dark' || autoDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+            document.documentElement.classList.remove('auto');
+        } else if (theme === 'light' || !autoDark) {
+            document.documentElement.classList.add('light');
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.remove('auto');
+        }
+    })();
+</script>
+
 {{ Statamic::cpViteScripts() }}
 
 @if (Statamic::pro() && config('statamic.cp.custom_css_url'))

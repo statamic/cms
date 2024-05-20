@@ -44,23 +44,6 @@ export default {
             }
         }
     },
-    created: function() {
-        const autoDark = (
-            localStorage.theme === 'dark' ||
-            ((!('theme' in localStorage) || localStorage.theme === 'auto') &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches)
-        );
-
-        if (this.theme === 'dark' || autoDark) {
-            document.documentElement.classList.add('dark');
-            document.documentElement.classList.remove('light');
-            document.documentElement.classList.remove('auto');
-        } else if (this.theme === 'light' || !autoDark) {
-            document.documentElement.classList.add('light');
-            document.documentElement.classList.remove('dark');
-            document.documentElement.classList.remove('auto');
-        }
-    },
     methods: {
         setMode(mode) {
             this.mode = mode;
