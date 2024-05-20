@@ -4,6 +4,7 @@
         :name="name"
         :clearable="config.clearable"
         :close-on-select="false"
+        :options="config.options"
         :disabled="config.disabled || isReadOnly"
         :multiple="true"
         :placeholder="__(config.placeholder)"

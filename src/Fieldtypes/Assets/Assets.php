@@ -8,9 +8,11 @@ use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Scope;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -97,6 +99,11 @@ class Assets extends Fieldtype
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.assets.config.query_scopes'),
                         'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
                 ],
             ],
