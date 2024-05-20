@@ -18,11 +18,9 @@ class GetSite extends Tags
             throw new \Exception("Site [$handle] does not exist.");
         }
 
-        $data = $site->toAugmentedCollection();
-
-        return Str::contains($tag, ':')
-            ? $data->get(Str::after($tag, ':'))
-            : $data;
+        return (Str::contains($tag, ':') && ($var = Str::after($tag, ':')))
+            ? $site->$var
+            : $site;
     }
 
     /**
@@ -38,6 +36,6 @@ class GetSite extends Tags
             throw new \Exception("Site [$handle] does not exist.");
         }
 
-        return $site->toAugmentedCollection();
+        return $site;
     }
 }
