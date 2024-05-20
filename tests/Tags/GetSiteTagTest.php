@@ -44,7 +44,7 @@ class GetSiteTagTest extends TestCase
     /** @test */
     public function it_throws_exception_if_handle_is_missing()
     {
-        $this->expectExceptionMessage('Please set the handle of a site');
+        $this->expectExceptionMessage('A site handle is required.');
 
         Antlers::parse('{{ get_site }}{{ name }}{{ /get_site }}');
     }

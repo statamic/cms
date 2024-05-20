@@ -31,7 +31,7 @@ class GetSite extends Tags
     public function index()
     {
         if (! $handle = $this->params->get('handle')) {
-            throw new \Exception('Please set the handle of a site');
+            throw new \Exception('A site handle is required.');
         }
 
         if (! $site = Site::get($handle)) {
