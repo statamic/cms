@@ -1,5 +1,31 @@
 # Release Notes
 
+## 5.3.0 (2024-05-20)
+
+### What's new
+- Dark Mode [#10117](https://github.com/statamic/cms/issues/10117) by @peimn
+- Ability to run actions from publish forms [#6375](https://github.com/statamic/cms/issues/6375) by @jacksleight
+- Support Laravel precognition on user forms [#8924](https://github.com/statamic/cms/issues/8924) by @ryanmitchell
+
+### What's fixed
+- Fix issue returning some collections from tags [#10113](https://github.com/statamic/cms/issues/10113) by @JohnathonKoster
+- Fix augmentation issues for URL nav items [#10086](https://github.com/statamic/cms/issues/10086) by @duncanmcclean
+- Fix blueprints not being able to be manipulated more than once [#10061](https://github.com/statamic/cms/issues/10061) by @aerni
+- Pluralize user activation email message [#10118](https://github.com/statamic/cms/issues/10118) by @jasonvarga
+- Correct id and for pairs in user sign up Wizard [#10115](https://github.com/statamic/cms/issues/10115) by @martyf
+- Prevent configuring multiple conditions for the same field [#10110](https://github.com/statamic/cms/issues/10110) by @duncanmcclean
+- Respect the current site when returning a View [#10109](https://github.com/statamic/cms/issues/10109) by @aerni
+- Fix entry model not being updated when importing entries [#10107](https://github.com/statamic/cms/issues/10107) by @duncanmcclean
+- Sync entry form values after revision publish [#10095](https://github.com/statamic/cms/issues/10095) by @jacksleight
+- Fix querying by status on non-dated collections [#10099](https://github.com/statamic/cms/issues/10099) by @jasonvarga
+- Better performance when hydrating globals [#10096](https://github.com/statamic/cms/issues/10096) by @modrictin
+- Ensure correct exclusion of URLs in static:warm command [#10092](https://github.com/statamic/cms/issues/10092) by @aerni
+- Fix YAML fieldtype UI [#10097](https://github.com/statamic/cms/issues/10097) by @jackmcdade
+- Organize user controllers [#10093](https://github.com/statamic/cms/issues/10093) by @jasonvarga
+- Ensure default config values are available in form tag [#10088](https://github.com/statamic/cms/issues/10088) by @duncanmcclean
+
+
+
 ## 5.2.0 (2024-05-15)
 
 ### What's new
