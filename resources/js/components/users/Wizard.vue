@@ -221,7 +221,7 @@ export default {
             invitation: {
                 send: this.canSendInvitation,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
-                message: __('messages.user_wizard_invitation_body', { site: window.location.hostname, expiry: this.activationExpiry }),
+                message: __n('messages.user_wizard_invitation_body', this.activationExpiry, { site: window.location.hostname, expiry: this.activationExpiry }),
             },
             userExists: false,
             completed: false,
