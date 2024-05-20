@@ -55,6 +55,10 @@ button {
         }
     }
 
+    &:focus {
+        @apply ring-2 dark:ring-dark-blue-100;
+    }
+
     &.active, &.active:hover {
         box-shadow: inset 2px 2px 3px 0px rgba(25,30,35,.1);
         background: theme('colors.gray.400');
