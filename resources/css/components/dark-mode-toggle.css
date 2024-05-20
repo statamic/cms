@@ -26,9 +26,7 @@ label.dark-mode-toggle {
     }
 
     .toggle-checkbox:checked ~ .toggle-slot {
-        /* background-color: #374151; */
-        @apply bg-dark-650;
-        border: 1px solid #09192a;
+        @apply bg-dark-650 border-dark-800;
     }
 
     .toggle-button {

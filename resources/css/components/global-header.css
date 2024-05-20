@@ -15,8 +15,8 @@
     }
 
     .global-header-icon-button {
-        @apply h-7 w-7 block outline-none p-1.5 text-gray hover:text-gray-800;
-        @apply dark:text-dark-100 dark:hover:text-dark-100 dark:hover:bg-dark-800 rounded-full;
+        @apply h-7 w-7 block outline-none p-1 text-gray hover:text-gray-800 rounded-full hover:bg-gray-200 border border-transparent hover:border-gray-400;
+        @apply dark:text-dark-100 dark:hover:text-dark-100 dark:hover:bg-dark-800 dark:border-transparent  dark:hover:border-dark-900;
     }
 }
 
