@@ -13,6 +13,7 @@
         :taggable="true"
         :append-to-body="true"
         :value="value"
+        :dropdown-should-open="({ open }) => open && config.options.length > 0"
         @input="update"
         @search:focus="$emit('focus')"
         @search:blur="$emit('blur')">
