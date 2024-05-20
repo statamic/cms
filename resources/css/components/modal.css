@@ -6,7 +6,7 @@
 }
 
 .vm--modal {
-    @apply rounded-lg !important;
+    @apply rounded-lg dark:bg-dark-600 dark:shadow-dark !important;
 
     [dir='rtl'] & {
         direction: rtl;

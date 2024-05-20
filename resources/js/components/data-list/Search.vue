@@ -7,7 +7,7 @@
         @input="emitEvent"
         @keyup.esc="reset"
         autofocus
-        class="input-text flex-1 bg-white text-sm focus:border-blue-300 outline-0">
+        class="input-text flex-1 bg-white dark:bg-dark-600 text-sm focus:border-blue-300 dark:focus:border-dark-blue-125 outline-0">
 </template>
 
 <script>

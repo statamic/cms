@@ -15,7 +15,7 @@ class RuntimeValues
     {
         GlobalRuntimeState::$requiresRuntimeIsolation = true;
         try {
-            if ($augmentable instanceof Collection && $augmentable->count() && $augmentable[0] instanceof Augmentable) {
+            if ($augmentable instanceof Collection && $augmentable->first() instanceof Augmentable) {
                 $value = BulkAugmentor::make($augmentable)->toArray();
             } else {
                 $value = $augmentable->toDeferredAugmentedArray();
