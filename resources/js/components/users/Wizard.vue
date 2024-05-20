@@ -102,8 +102,8 @@
 
             <!-- Send Email? -->
             <div class="max-w-md mx-auto px-4 mb-6 flex items-center">
-                <toggle-input v-model="invitation.send" />
-                <label class="font-bold rtl:mr-2 ltr:ml-2">{{ __('Send Email Invitation') }}</label>
+                <toggle-input v-model="invitation.send" id="send_email_invitation" />
+                <label class="font-bold rtl:mr-2 ltr:ml-2" for="send_email_invitation">{{ __('Send Email Invitation') }}</label>
             </div>
 
             <div class="max-w-lg mx-auto bg-gray-100 py-10 mb-20 border rounded-lg " v-if="invitation.send">
@@ -143,12 +143,12 @@
                 <p class="mb-2" v-html="__('messages.user_wizard_invitation_share', { email: values.email })" />
             </div>
             <div class="max-w-md mx-auto px-4 pb-10">
-                <label class="font-bold text-base mb-1" for="email">{{ __('Activation URL') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" />
+                <label class="font-bold text-base mb-1" for="activation_url">{{ __('Activation URL') }}</label>
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" id="activation_url" />
             </div>
             <div class="max-w-md mx-auto px-4 pb-20">
                 <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="values.email" />
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="values.email" id="email" />
             </div>
         </div>
 
