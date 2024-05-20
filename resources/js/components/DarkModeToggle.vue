@@ -5,15 +5,15 @@
                     <svg-icon :name="icon"></svg-icon>
                 </button>
             </template>
-            <dropdown-item @click="setMode('light')" class="flex items-center space-x-2">
+            <dropdown-item @click="prefer('light')" class="flex items-center space-x-2">
                 <svg-icon name="regular/light-mode" class="h-4 w-4"></svg-icon>
                 <span>{{ __('Light') }}</span>
             </dropdown-item>
-            <dropdown-item @click="setMode('dark')" class="flex items-center space-x-2">
+            <dropdown-item @click="prefer('dark')" class="flex items-center space-x-2">
                 <svg-icon name="regular/dark-mode" class="h-4 w-4"></svg-icon>
                 <span>{{ __('Dark') }}</span>
             </dropdown-item>
-            <dropdown-item @click="setMode('auto')" class="flex items-center space-x-2">
+            <dropdown-item @click="prefer('auto')" class="flex items-center space-x-2">
                 <svg-icon name="regular/system" class="h-4 w-4"></svg-icon>
                 <span>{{ __('System') }}</span>
             </dropdown-item>
@@ -23,41 +23,51 @@
 <script>
 export default {
     props: {
-        theme: {
+        initial: {
             type: String,
             default: 'auto',
         }
     },
     data() {
         return {
-            mode: this.theme
+            preference: this.initial, // dark, light, auto
+            theme: null, // dark, light
         }
     },
     computed: {
         icon() {
-            if (this.mode === 'auto') {
+            if (this.preference === 'auto') {
                 return 'regular/system'
-            } else if (this.mode === 'dark') {
+            } else if (this.preference === 'dark') {
                 return 'regular/dark-mode'
             } else {
                 return 'regular/light-mode'
             }
         }
     },
-    methods: {
-        setMode(mode) {
-            this.mode = mode;
-
-            if (mode === 'dark' || (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
+    watch: {
+        preference: {
+            immediate: true,
+            handler(mode) {
+                this.theme = (mode === 'dark' || (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches))
+                    ? 'dark'
+                    : 'light';
             }
-
-            this.$preferences.set('theme', mode).then(response => {
-                this.$events.$emit('theme.saved');
-            });
         },
+        theme(theme) {
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+        }
+    },
+    created() {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (this.preference === 'auto') this.theme = e.matches ? 'dark' : 'light';
+        });
+    },
+    methods: {
+        prefer(mode) {
+            this.preference = mode;
+            this.$preferences.set('theme', mode).then(response => this.$events.$emit('theme.saved'));
+        }
     }
 }
 </script>

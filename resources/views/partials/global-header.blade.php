@@ -30,7 +30,7 @@
             </global-site-selector>
         @endif
 
-        <dark-mode-toggle theme="{{ $user->preferredTheme() }}"></dark-mode-toggle>
+        <dark-mode-toggle initial="{{ $user->preferredTheme() }}"></dark-mode-toggle>
 
         <favorite-creator class="hidden md:block"></favorite-creator>
 
