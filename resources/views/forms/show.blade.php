@@ -55,7 +55,7 @@
     <div class="metrics mb-6">
         @foreach($form->metrics() as $metric)
             <div class="card px-6">
-                <h3 class="mb-4 font-bold text-gray">{{ $metric->label() }}</h3>
+                <h3 class="mb-4 font-bold text-gray dark:text-dark-175">{{ $metric->label() }}</h3>
                 <div class="text-4xl">{{ $metric->result() }}</div>
             </div>
         @endforeach
@@ -71,7 +71,7 @@
         :filters="{{ $filters->toJson() }}"
         v-cloak
     >
-        <div slot="no-results" class="text-center border-2 border-dashed rounded-lg">
+        <div slot="no-results" class="text-center border-2 dark:border-dark-400 border-dashed rounded-lg">
             <div class="max-w-md mx-auto px-8 py-30">
                 @cp_svg('empty/form')
                 <h1 class="my-6">{{ __('No submissions') }}</h1>

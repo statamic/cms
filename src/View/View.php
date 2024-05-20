@@ -5,6 +5,7 @@ namespace Statamic\View;
 use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Statamic\Facades\Cascade;
+use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
@@ -189,6 +190,7 @@ class View
     {
         return $this->cascade = $this->cascade ?? Cascade::instance()
             ->withContent($this->cascadeContent)
+            ->withSite(Site::current())
             ->hydrate()
             ->toArray();
     }

@@ -314,4 +314,22 @@ EOT
             ->with('user')
             ->andReturn($blueprint);
     }
+
+    /** @test */
+    public function it_handles_precognitive_requests()
+    {
+        if (! method_exists($this, 'withPrecognition')) {
+            $this->markTestSkipped();
+        }
+
+        $this->actingAs(User::make()->save());
+
+        $response = $this
+            ->withPrecognition()
+            ->postJson('/!/auth/profile', [
+                'some' => 'thing',
+            ]);
+
+        $response->assertStatus(422);
+    }
 }

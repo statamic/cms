@@ -11,6 +11,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Entries\Entry;
 use Statamic\Events\BlueprintCreated;
 use Statamic\Events\BlueprintCreating;
 use Statamic\Events\BlueprintDeleted;
@@ -781,6 +782,29 @@ class BlueprintTest extends TestCase
             ],
         ]], $blueprint->contents());
         $this->assertEquals(['type' => 'textarea'], $blueprint->fields()->get('new')->config());
+    }
+
+    /** @test */
+    public function it_can_add_fields_multiple_times()
+    {
+        $blueprint = (new Blueprint)
+            ->setNamespace('collections/collection_one')
+            ->setHandle('blueprint_one');
+
+        $entry = (new Entry)
+            ->collection('collection_one')
+            ->blueprint($blueprint);
+
+        $blueprint->setParent($entry);
+
+        $blueprint->ensureFieldsInTab(['field_one' => ['type' => 'text']], 'tab_one');
+
+        $this->assertTrue($blueprint->hasField('field_one'));
+
+        $blueprint->ensureField('field_two', ['type' => 'textarea']);
+
+        $this->assertTrue($blueprint->hasField('field_two'));
+
     }
 
     /** @test */

@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-wrap items-center py-4 border-t">
+    <div class="flex flex-wrap items-center py-4 border-t dark:border-dark-900">
         <div v-if="index === 0" class="help-block" v-text="__('messages.field_conditions_field_instructions')" />
 
         <v-select
@@ -19,7 +19,7 @@
             <template slot="option" slot-scope="option">
                 <div class="flex items-center">
                     <span v-text="option.label" />
-                    <span v-text="option.value" class="font-mono text-2xs text-gray-500" :class="{ 'ml-2': option.label }" />
+                    <span v-text="option.value" class="font-mono text-2xs text-gray-500 dark:text-dark-150" :class="{ 'ml-2': option.label }" />
                 </div>
             </template>
         </v-select>
@@ -82,6 +82,10 @@ export default {
             type: Object,
             required: true
         },
+        conditions: {
+            type: Array,
+            required: true
+        },
         index: {
             type: Number,
             required: true
@@ -116,8 +120,14 @@ export default {
         },
 
         fieldOptions() {
+            const conditions = this.conditions.map(condition => condition.field);
+
             return _(this.suggestableFields)
-                .reject(field => field.handle === this.config.handle || this.condition.field === field.handle)
+                .reject(field => {
+                    return field.handle === this.config.handle // Exclude the field you're adding a condition to.
+                        || this.condition.field === field.handle // Exclude the field being used in the current condition.
+                        || conditions.includes(field.handle); // Exclude fields already used in other conditions.
+                })
                 .map(field => {
                     let display = field.config.display;
 

@@ -22,6 +22,20 @@ class Bard extends Replicator
 {
     use Concerns\ResolvesStatamicUrls, Hookable;
 
+    private static $defaultButtons = [
+        'h2',
+        'h3',
+        'bold',
+        'italic',
+        'unorderedlist',
+        'orderedlist',
+        'removeformat',
+        'quote',
+        'anchor',
+        'image',
+        'table',
+    ];
+
     protected $categories = ['text', 'structured'];
     protected $defaultValue = [];
     protected $rules = [];
@@ -38,19 +52,7 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
                         'type' => 'bard_buttons_setting',
                         'full_width_setting' => true,
-                        'default' => [
-                            'h2',
-                            'h3',
-                            'bold',
-                            'italic',
-                            'unorderedlist',
-                            'orderedlist',
-                            'removeformat',
-                            'quote',
-                            'anchor',
-                            'image',
-                            'table',
-                        ],
+                        'default' => static::$defaultButtons,
                     ],
                     'smart_typography' => [
                         'display' => __('Smart Typography'),
@@ -741,5 +743,10 @@ class Bard extends Replicator
     public function runAugmentHooks($value)
     {
         return $this->runHooks('augment', $value);
+    }
+
+    public static function setDefaultButtons(array $buttons): void
+    {
+        static::$defaultButtons = $buttons;
     }
 }

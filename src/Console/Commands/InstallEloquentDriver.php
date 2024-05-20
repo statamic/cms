@@ -289,7 +289,7 @@ class InstallEloquentDriver extends Command
                     File::put(
                         config_path('statamic/eloquent-driver.php'),
                         Str::of(File::get(config_path('statamic/eloquent-driver.php')))
-                            ->replace("'model'  => \Statamic\Eloquent\Entries\EntryModel::class", "'model'  => \Statamic\Eloquent\Entries\UuidEntryModel::class")
+                            ->replace("'model' => \Statamic\Eloquent\Entries\EntryModel::class", "'model' => \Statamic\Eloquent\Entries\UuidEntryModel::class")
                             ->__toString()
                     );
 

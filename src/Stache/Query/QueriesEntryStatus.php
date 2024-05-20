@@ -29,10 +29,12 @@ trait QueriesEntryStatus
     {
         $this->addCollectionWhereToStatusQuery($query, $collection->handle());
 
-        if ($collection->futureDateBehavior() === 'public' && $collection->pastDateBehavior() === 'public') {
+        if (! $collection->dated() || ($collection->futureDateBehavior() === 'public' && $collection->pastDateBehavior() === 'public')) {
             if ($status === 'scheduled' || $status === 'expired') {
                 $query->where('date', 'invalid'); // intentionally trigger no results.
             }
+
+            return;
         }
 
         if ($collection->futureDateBehavior() === 'private') {

@@ -1,8 +1,8 @@
 <template>
 
     <node-view-wrapper>
-        <div class="bard-set whitespace-normal my-6 rounded bg-white border shadow-md"
-            :class="{ 'border-blue-400': selected || withinSelection, 'has-error': hasError }"
+        <div class="bard-set whitespace-normal my-6 rounded bg-white dark:bg-dark-500 border dark:border-dark-900 shadow-md"
+            :class="{ 'border-blue-400 dark:border-dark-blue-100': selected || withinSelection, 'has-error': hasError }"
             contenteditable="false" @copy.stop @paste.stop @cut.stop
         >
             <div ref="content" hidden />
@@ -17,7 +17,7 @@
                         {{ display || config.handle }}
                     </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
-                        <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
+                        <svg-icon name="micro/circle-help" class="text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:hover:text-dark-100 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
                     </div>
                     <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
                         <div
