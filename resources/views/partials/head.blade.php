@@ -17,19 +17,9 @@
 
 <script>
     (function () {
-        const theme = '{{ $user->preferredTheme() }}';
-
-        const autoDark = (
-            localStorage.theme === 'dark' ||
-            ((!('theme' in localStorage) || localStorage.theme === 'auto') &&
-                window.matchMedia('(prefers-color-scheme: dark)').matches)
-        );
-
-        if (theme === 'dark' || autoDark) {
-            document.documentElement.classList.add('dark');
-        } else if (theme === 'light' || !autoDark) {
-            document.documentElement.classList.remove('dark');
-        }
+        let theme = '{{ $user->preferredTheme() }}';
+        if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+        if (theme === 'dark') document.documentElement.classList.add('dark');
     })();
 </script>
 

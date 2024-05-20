@@ -47,7 +47,6 @@ export default {
     methods: {
         setMode(mode) {
             this.mode = mode;
-            localStorage.theme = mode
 
             if (mode === 'dark' || (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
