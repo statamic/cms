@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-wrap items-center py-4 border-t">
+    <div class="flex flex-wrap items-center py-4 border-t dark:border-dark-900">
         <div v-if="index === 0" class="help-block" v-text="__('messages.field_conditions_field_instructions')" />
 
         <v-select
@@ -19,7 +19,7 @@
             <template slot="option" slot-scope="option">
                 <div class="flex items-center">
                     <span v-text="option.label" />
-                    <span v-text="option.value" class="font-mono text-2xs text-gray-500" :class="{ 'ml-2': option.label }" />
+                    <span v-text="option.value" class="font-mono text-2xs text-gray-500 dark:text-dark-150" :class="{ 'ml-2': option.label }" />
                 </div>
             </template>
         </v-select>

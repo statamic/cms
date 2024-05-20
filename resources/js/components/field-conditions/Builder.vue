@@ -38,7 +38,7 @@
                 @removed="remove(index)"
             />
 
-            <div class="border-t pt-6" v-if="hasConditions && isStandard">
+            <div class="border-t dark:border-dark-900 pt-6" v-if="hasConditions && isStandard">
                 <button
                     v-text="__('Add Condition')"
                     @click="add"

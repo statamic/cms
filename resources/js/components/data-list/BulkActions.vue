@@ -3,9 +3,9 @@
     <div v-if="showAlways || hasSelections" class="data-list-bulk-actions">
         <div class="input-group input-group-sm relative">
             <div class="input-group-prepend">
-                <div class="text-gray-700 hidden md:inline-block"
+                <div class="text-gray-700 dark:text-dark-175 hidden md:inline-block"
                     v-text="__n(`:count item selected|:count items selected`, selections.length)" />
-                <div class="text-gray-700 md:hidden" v-text="selections.length" />
+                <div class="text-gray-700 dark:text-dark-175 md:hidden" v-text="selections.length" />
             </div>
 
             <data-list-action

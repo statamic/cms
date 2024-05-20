@@ -66,7 +66,7 @@
                     </slot>
                 </td>
                 <td class="type-column" v-if="type">
-                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-1 py-px text-2xs uppercase bg-gray-200 text-gray">
+                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-1 py-px text-2xs uppercase bg-gray-200 dark:bg-dark-400 text-gray dark:text-dark-150">
                         <template v-if="type === 'entries'">{{ __(row.collection.title) }}</template>
                         <template v-if="type === 'terms'">{{ __(row.taxonomy.title) }}</template>
                     </span>

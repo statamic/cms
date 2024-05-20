@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply w-full bg-gray-300 relative;
+    @apply w-full bg-gray-300 relative dark:bg-dark-800;
 }
 
 #statamic {

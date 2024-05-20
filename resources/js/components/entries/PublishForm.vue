@@ -134,7 +134,7 @@
                                 <div
                                     v-if="!revisionsEnabled"
                                     class="flex items-center justify-between px-4 py-2"
-                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                    :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
                                 >
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
@@ -143,7 +143,7 @@
                                 <div
                                     v-if="revisionsEnabled && !isCreating"
                                     class="p-4"
-                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                    :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
                                 >
                                     <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
                                     <div class="mb-1 flex items-center" v-if="published">
@@ -171,14 +171,14 @@
                                         </button>
                                 </div>
 
-                                <div class="p-4 border-t" v-if="localizations.length > 1">
+                                <div class="p-4 border-t dark:border-dark-900" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-2" v-text="__('Sites')" />
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
                                         class="text-sm flex items-center -mx-4 px-4 py-2"
                                         :class="[
-                                            option.active ? 'bg-blue-100' : 'hover:bg-gray-200',
+                                            option.active ? 'bg-blue-100 dark:bg-dark-300' : 'hover:bg-gray-200 dark:hover:bg-dark-400',
                                             !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
                                         ]"
                                         @click="localizationSelected(option)"
@@ -196,9 +196,9 @@
                                                 class="rtl:mr-2 ltr:ml-2"
                                                 v-if="localizing && localizing.handle === option.handle" />
                                         </div>
-                                        <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
-                                        <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
-                                        <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
+                                        <div class="badge-sm bg-orange dark:bg-orange-dark" v-if="option.origin" v-text="__('Origin')" />
+                                        <div class="badge-sm bg-blue dark:bg-dark-blue-175" v-if="option.active" v-text="__('Active')" />
+                                        <div class="badge-sm bg-purple dark:bg-purple-dark" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                                     </div>
                                 </div>
                             </div>
