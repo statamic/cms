@@ -3,7 +3,7 @@
         ref="input"
         :name="name"
         :clearable="config.clearable"
-        :close-on-select="false"
+        :close-on-select="true"
         :options="config.options"
         :disabled="config.disabled || isReadOnly"
         :multiple="true"
@@ -13,6 +13,7 @@
         :taggable="true"
         :append-to-body="true"
         :value="value"
+        :dropdown-should-open="({ open }) => open && config.options.length > 0"
         @input="update"
         @search:focus="$emit('focus')"
         @search:blur="$emit('blur')">
