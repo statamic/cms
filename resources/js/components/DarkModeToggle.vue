@@ -66,7 +66,7 @@ export default {
     methods: {
         prefer(mode) {
             this.preference = mode;
-            this.$preferences.set('theme', mode);
+            this.$preferences.set('theme', mode === 'auto' ? null : mode);
         }
     }
 }
