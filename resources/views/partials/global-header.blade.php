@@ -35,32 +35,32 @@
         <favorite-creator class="hidden md:block"></favorite-creator>
 
         @if (Route::has('horizon.index') && \Laravel\Horizon\Horizon::check(request()))
-            <a class="hidden md:block global-header-icon-button" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
+            <a class="global-header-icon-button hidden md:block" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
                 @cp_svg('icons/regular/horizon')
             </a>
         @endif
 
         @if (Route::has('pulse') && (app()->environment('local') || $user->can('viewPulse')))
-            <a class="hidden md:block global-header-icon-button" href="{{ route('pulse') }}" target="_blank" v-tooltip="'Laravel Pulse'">
+            <a class="global-header-icon-button hidden md:block" href="{{ route('pulse') }}" target="_blank" v-tooltip="'Laravel Pulse'">
                 @cp_svg('icons/regular/pulse')
             </a>
         @endif
 
         @if (config('nova.path') && (app()->environment('local') || $user->can('viewNova')))
-            <a class="hidden md:block global-header-icon-button" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
+            <a class="global-header-icon-button hidden md:block" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
                 @cp_svg('icons/regular/nova')
             </a>
         @endif
 
         @if (Route::has('telescope') && \Laravel\Telescope\Telescope::check(request()))
-            <a class="hidden md:block global-header-icon-button" href="{{ route('telescope') }}" target="_blank" v-tooltip="'Laravel Telescope'">
+            <a class="global-header-icon-button hidden md:block" href="{{ route('telescope') }}" target="_blank" v-tooltip="'Laravel Telescope'">
                 @cp_svg('icons/regular/telescope')
             </a>
         @endif
 
         <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <button class="hidden md:block global-header-icon-button" v-tooltip="__('Useful Links')" aria-label="{{ __('View Useful Links') }}">
+                <button class="global-header-icon-button hidden md:block" v-tooltip="__('Useful Links')" aria-label="{{ __('View Useful Links') }}">
                     @cp_svg('icons/light/book-open')
                 </button>
             </template>
@@ -84,7 +84,7 @@
             </dropdown-item>
         </dropdown-list>
 
-        <a class="hidden md:block global-header-icon-button" href="{{ Statamic\Facades\Site::selected()->url() }}" target="_blank" v-tooltip="'{{ __('View Site') }}'" aria-label="{{ __('View Site') }}">
+        <a class="global-header-icon-button hidden md:block" href="{{ Statamic\Facades\Site::selected()->url() }}" target="_blank" v-tooltip="'{{ __('View Site') }}'" aria-label="{{ __('View Site') }}">
             @cp_svg('icons/light/browser-com')
         </a>
         <dropdown-list v-cloak>
