@@ -17,7 +17,7 @@
 
 <script>
     (function () {
-        let theme = '{{ $user->preferredTheme() }}';
+        let theme = '{{ $user?->preferredTheme() ?? "auto" }}';
         if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
         if (theme === 'dark') document.documentElement.classList.add('dark');
     })();
