@@ -3,7 +3,7 @@
         ref="input"
         :name="name"
         :clearable="config.clearable"
-        :close-on-select="false"
+        :close-on-select="true"
         :options="config.options"
         :disabled="config.disabled || isReadOnly"
         :multiple="true"
