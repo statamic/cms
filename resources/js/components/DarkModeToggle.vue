@@ -66,7 +66,7 @@ export default {
     methods: {
         prefer(mode) {
             this.preference = mode;
-            this.$preferences.set('theme', mode).then(response => this.$events.$emit('theme.saved'));
+            this.$preferences.set('theme', mode);
         }
     }
 }
