@@ -1,7 +1,7 @@
 <template>
     <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <button class="global-header-icon-button hidden md:block"" v-tooltip="__('Theme') ">
+                <button class="global-header-icon-button hidden md:block" v-tooltip="__('Theme') ">
                     <svg-icon :name="icon"></svg-icon>
                 </button>
             </template>
