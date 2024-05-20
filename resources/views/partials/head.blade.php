@@ -27,12 +27,8 @@
 
         if (theme === 'dark' || autoDark) {
             document.documentElement.classList.add('dark');
-            document.documentElement.classList.remove('light');
-            document.documentElement.classList.remove('auto');
         } else if (theme === 'light' || !autoDark) {
-            document.documentElement.classList.add('light');
             document.documentElement.classList.remove('dark');
-            document.documentElement.classList.remove('auto');
         }
     })();
 </script>

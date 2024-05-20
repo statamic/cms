@@ -51,12 +51,8 @@ export default {
 
             if (mode === 'dark' || (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
-                document.documentElement.classList.remove('light');
-                document.documentElement.classList.remove('auto');
             } else {
-                document.documentElement.classList.add('light');
                 document.documentElement.classList.remove('dark');
-                document.documentElement.classList.remove('auto');
             }
 
             this.$preferences.set('theme', mode).then(response => {
