@@ -2,185 +2,62 @@
 
 namespace Tests\Modifiers;
 
-use Statamic\Facades\Parse;
+use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class AttributeTest extends TestCase
 {
-    protected $data = [
-        'view' => [
-            'class_list' => 'text-pink-500 bg-ugly-200',
-        ],
-        'link_target' => '_blank',
-        'link_rel' => ' ',
-        'escape' => '{<!&>}',
-        'bool_true' => true,
-        'bool_false' => false,
-        'integer' => -1,
-        'float' => 1.5,
-        'array' => ['array' => ['will' => ['be handled' => 'as json']]],
-        'array_empty' => [],
-    ];
-
-    private function tag($tag, $data = [])
+    /**
+     * @test
+     *
+     * @dataProvider attributeProvider
+     */
+    public function it_converts_to_attribute($value, $expected)
     {
-        return (string) Parse::template($tag, $data);
+        $this->assertEquals($expected, $this->modify($value, 'foo'));
+    }
+
+    public static function attributeProvider()
+    {
+        return [
+            'string' => ['bar baz', ' foo="bar baz"'],
+            'entities' => ['{<!&>}', ' foo="{&lt;!&amp;&gt;}"'],
+            'integer' => [1, ' foo="1"'],
+            'integer > 1' => [2, ' foo="2"'],
+            'negative integer' => [-1, ' foo="-1"'],
+            'float' => [1.5, ' foo="1.5"'],
+            'empty string' => ['', ''],
+            'true' => [true, ' foo'],
+            'false' => [false, ''],
+            'array' => [['one' => ['two' => 'three']], ' foo="{&quot;one&quot;:{&quot;two&quot;:&quot;three&quot;}}"'],
+            'empty array' => [[], ''],
+            'collection' => [collect(['one' => 'two']), ' foo="{&quot;one&quot;:&quot;two&quot;}"'],
+            'empty collection' => [collect(), ''],
+            'object with __toString' => [new AttributeTestStringable, ' foo="Test"'],
+        ];
     }
 
     /** @test */
-    public function it_returns_the_attribute_when_view_value_is_not_empty()
+    public function it_throws_exception_without_argument()
     {
-        $template = <<<'EOT'
-{{ view:class_list | attribute:class }}
-EOT;
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Attribute name is required.');
 
-        $this->assertSame(
-            ' class="text-pink-500 bg-ugly-200"',
-            $this->tag($template, $this->data)
-        );
+        $this->modify('value', null);
     }
 
     /** @test */
-    public function it_returns_the_attribute_when_scoped_value_is_not_empty()
+    public function it_throws_exception_when_value_is_an_object_without_toString_method()
     {
-        $template = <<<'EOT'
-{{ link_target | attribute:target }}
-EOT;
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Object of class Tests\Modifiers\AttributeTestNotStringable could not be converted to string.');
 
-        $this->assertSame(
-            ' target="_blank"',
-            $this->tag($template, $this->data)
-        );
+        $this->modify(new AttributeTestNotStringable, 'foo');
     }
 
-    /** @test */
-    public function it_returns_the_attribute_with_escaped_chars()
+    private function modify($value, $attribute)
     {
-        $template = <<<'EOT'
-{{ escape | attribute:x-data }}
-EOT;
-
-        $this->assertSame(
-            ' x-data="{&lt;!&amp;&gt;}"',
-            $this->tag($template, $this->data)
-        );
-    }
-
-    /** @test */
-    public function it_returns_the_attribute_when_value_is_an_integer()
-    {
-        $template = <<<'EOT'
-{{ integer | attribute:tabIndex }}
-EOT;
-
-        $this->assertSame(
-            ' tabIndex="-1"',
-            $this->tag($template, $this->data)
-        );
-    }
-
-    /** @test */
-    public function it_returns_the_attribute_when_value_is_an_float()
-    {
-        $template = <<<'EOT'
-{{ float | attribute:ratio }}
-EOT;
-
-        $this->assertSame(
-            ' ratio="1.5"',
-            $this->tag($template, $this->data)
-        );
-    }
-
-    /** @test */
-    public function it_returns_an_empty_string_when_value_is_empty()
-    {
-        $template = <<<'EOT'
-{{ link_rel | attribute:rel }}
-EOT;
-
-        $this->assertSame(
-            '',
-            $this->tag($template, $this->data)
-        );
-    }
-
-    /** @test */
-    public function it_returns_the_attribute_alone_when_value_is_bool_true()
-    {
-        $template = <<<'EOT'
-{{ bool_true | attribute:required }}
-EOT;
-
-        $this->assertSame(
-            ' required',
-            $this->tag($template, $this->data)
-        );
-    }
-
-    /** @test */
-    public function it_returns_an_empty_string_when_value_is_bool_false()
-    {
-        $template = <<<'EOT'
-{{ bool_false | attribute:required }}
-EOT;
-
-        $this->assertSame(
-            '',
-            $this->tag($template, $this->data)
-        );
-    }
-
-    /** @test */
-    public function it_returns_an_json_string_when_value_is_an_array()
-    {
-        $template = <<<'EOT'
-{{ array | attribute:x-data }}
-EOT;
-
-        $this->assertSame(
-            ' x-data="{&quot;array&quot;:{&quot;will&quot;:{&quot;be handled&quot;:&quot;as json&quot;}}}"',
-            $this->tag($template, $this->data)
-        );
-    }
-
-    /** @test */
-    public function it_returns_an_empty_string_when_value_is_an_empty_array()
-    {
-        $template = <<<'EOT'
-{{ array_empty | attribute:x-data }}
-EOT;
-
-        $this->assertSame(
-            '',
-            $this->tag($template, $this->data)
-        );
-    }
-
-    /** @test */
-    public function it_returns_an_empty_string_when_value_is_an_object_without_toString_method()
-    {
-        $template = <<<'EOT'
-{{ object | attribute:data-req }}
-EOT;
-
-        $this->assertSame(
-            '',
-            $this->tag($template, ['object' => new AttributeTestNotStringable()])
-        );
-    }
-
-    /** @test */
-    public function it_returns_an_empty_string_when_value_is_an_object_with_toString_method()
-    {
-        $template = <<<'EOT'
-{{ object | attribute:data-req }}
-EOT;
-
-        $this->assertSame(
-            ' data-req="Test"',
-            $this->tag($template, ['object' => new AttributeTestStringable()])
-        );
+        return Modify::value($value)->attribute($attribute)->fetch();
     }
 }
 

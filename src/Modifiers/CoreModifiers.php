@@ -167,7 +167,11 @@ class CoreModifiers extends Modifier
     public function attribute($value, $params)
     {
         if (! $name = Arr::get($params, 0)) {
-            throw new \Exception('Attribute modifier requires the attribute name: {{ value | attribute:attribute-name }}');
+            throw new \Exception('Attribute name is required.');
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
         }
 
         if (\is_array($value)) {
@@ -183,11 +187,7 @@ class CoreModifiers extends Modifier
         }
 
         if (\is_object($value)) {
-            if (! method_exists($value, '__toString')) {
-                return '';
-            }
-
-            $value = $value->__toString();
+            $value = (string) $value;
         }
 
         $value = trim($value);
