@@ -49,8 +49,8 @@ class AttributeTest extends TestCase
     /** @test */
     public function it_throws_exception_when_value_is_an_object_without_toString_method()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Object of class Tests\Modifiers\AttributeTestNotStringable could not be converted to string.');
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Object of class Tests\Modifiers\AttributeTestNotStringable could not be converted to string');
 
         $this->modify(new AttributeTestNotStringable, 'foo');
     }
