@@ -2,7 +2,7 @@
     <table :data-size="relativeColumnsSize" ref="table" tabindex="0" class="data-table" :class="{ 'select-none' : shifting }" @keydown.shift="shiftDown" @keyup="clearShift">
         <thead v-if="allowBulkActions || visibleColumns.length > 1">
             <tr>
-                <th :class="{'checkbox-column': ! reorderable, 'handle-column': reorderable}" v-if="allowBulkActions || reorderable">
+                <th class="rounded-none" :class="{'checkbox-column': ! reorderable, 'handle-column': reorderable}" v-if="allowBulkActions || reorderable">
                     <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions && !singleSelect" />
                 </th>
                 <th
@@ -26,7 +26,7 @@
                     <template v-if="type === 'entries'">{{ __('Collection') }}</template>
                     <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
                 </th>
-                <th class="actions-column" />
+                <th class="actions-column rounded-none" />
             </tr>
         </thead>
         <sortable-list
