@@ -19,6 +19,7 @@
     "@tiptap/extension-bullet-list": "^2.0.2",
     "@tiptap/extension-character-count": "^2.0.2",
     "@tiptap/extension-code": "^2.0.2",
+    "@tiptap/extension-code-block": "^2.0.2",
     "@tiptap/extension-code-block-lowlight": "^2.0.2",
     "@tiptap/extension-document": "^2.0.2",
     "@tiptap/extension-dropcursor": "^2.0.2",

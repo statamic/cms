@@ -25,7 +25,7 @@
                 </div>
 
                 @if($emailLoginEnabled)
-                    <div class="text-center text-sm text-gray-700 py-6">&mdash; {{ __('or') }} &mdash;</div>
+                    <div class="text-center text-sm text-gray-700 dark:text-dark-175 py-6">&mdash; {{ __('or') }} &mdash;</div>
 
                     <div class="login-with-email" v-if="! showEmailLogin">
                         <a class="btn w-full" @click.prevent="showEmailLogin = true">
