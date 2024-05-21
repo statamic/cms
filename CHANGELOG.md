@@ -1,5 +1,31 @@
 # Release Notes
 
+## 5.4.0 (2024-05-21)
+
+### What's new
+- Add `get_site` tag [#9580](https://github.com/statamic/cms/issues/9580) by @aerni
+- Add support for a dark mode custom logo [#10123](https://github.com/statamic/cms/issues/10123) by @martyf
+- Attribute Modifier [#9796](https://github.com/statamic/cms/issues/9796) by @potsky
+- Available query scopes will show as options in field settings [#9933](https://github.com/statamic/cms/issues/9933) by @duncanmcclean
+
+### What's fixed
+- Prevent opening set picker when `max_sets` has been exceeded [#10133](https://github.com/statamic/cms/issues/10133) by @duncanmcclean
+- Remove unnecessary `overflow-scroll` on submission listing [#10148](https://github.com/statamic/cms/issues/10148) by @duncanmcclean
+- Reference git binary as a variable, rather than config setting [#10134](https://github.com/statamic/cms/issues/10134) by @duncanmcclean
+- Fix actions in assets, forms, and form submissions [#10132](https://github.com/statamic/cms/issues/10132) by @duncanmcclean
+- Fix 404 issues by reverting caching of site absolute url [#10135](https://github.com/statamic/cms/issues/10135) by @jasonvarga
+- Remove unnecessary rounded corners on th elements [#10146](https://github.com/statamic/cms/issues/10146) by @jackmcdade
+- Taggable fieldtype tweaks [#10121](https://github.com/statamic/cms/issues/10121) by @jasonvarga
+- Style the Dark Mode login [#10143](https://github.com/statamic/cms/issues/10143) by @jackmcdade
+- Fix dark mode license banner [#10147](https://github.com/statamic/cms/issues/10147) by @jackmcdade
+- Fix styling issues with Assets Grid & Assets Fieldtype [#10149](https://github.com/statamic/cms/issues/10149) by @duncanmcclean
+- Fix dark mode preference not being applied to login by saving to local storage [#10140](https://github.com/statamic/cms/issues/10140) by @jasonvarga
+- Fix light mode drag handle colors [#10144](https://github.com/statamic/cms/issues/10144) by @jackmcdade
+- Fix to add dark mode to Widget pagination background [#10122](https://github.com/statamic/cms/issues/10122) by @martyf
+- Fixing up some missed layout elements for dark mode outside the cp [#10151](https://github.com/statamic/cms/issues/10151) by @jackmcdade
+
+
+
 ## 5.3.0 (2024-05-20)
 
 ### What's new
