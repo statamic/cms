@@ -45,7 +45,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     private $absoluteUrl;
     private $absoluteUrlWithoutRedirect;
     private $blueprint;
-    private $routeData;
+    private ?array $routeData = null;
     private $status;
     private $structure;
 
@@ -215,7 +215,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
         }
 
         if (! $this->structure() instanceof CollectionStructure) {
-            return $uris[$this->reference] = $this->entry()->uri();
+            return $uris[$this->reference] = $this->entry()?->uri();
         }
 
         $parentUri = $this->parent && ! $this->parent->isRoot() ? $this->parent->uri() : '';
@@ -395,7 +395,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function in($site)
     {
         if ($this->reference && $this->referenceExists()) {
-            if (! $entry = $this->entry()->in($site)) {
+            if (! $entry = $this->entry()?->in($site)) {
                 return null;
             }
 
@@ -408,7 +408,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function site()
     {
         if ($this->reference && $this->referenceExists()) {
-            return $this->entry()->site();
+            return $this->entry()?->site();
         }
 
         return Site::current(); // TODO: Get it from the tree instead.
@@ -432,13 +432,13 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
         return $this->structure = $this->tree->structure();
     }
 
-    public function routeData()
+    public function routeData(): array
     {
-        if ($this->routeData !== null) {
-            return $this->routeData;
+        if ($this->routeData === null && $this->entry()) {
+            $this->routeData = $this->entry()->routeData();
         }
 
-        return $this->routeData = $this->entry()->routeData();
+        return $this->routeData ?? [];
     }
 
     public function published()
