@@ -34,11 +34,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v42
+        uses: tj-actions/changed-files@v44
         with:
           files: |
             config
@@ -79,7 +79,7 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        uses: nick-invision/retry@v2
+        uses: nick-invision/retry@v3
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           timeout_minutes: 5
@@ -104,11 +104,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v42
+        uses: tj-actions/changed-files@v44
         with:
           files: |
             **.{js,vue,ts}
@@ -123,7 +123,7 @@ jobs:
           echo "result=true" >> $env:GITHUB_OUTPUT
 
       - name: Use Node.js 16.13.0
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: 16.13.0
 
@@ -145,12 +145,13 @@ jobs:
     needs: [php-tests, js-tests]
     if: always()
     steps:
-      - uses: technote-space/workflow-conclusion-action@v1
+      - uses: technote-space/workflow-conclusion-action@v3
       - name: Send Slack notification
-        uses: 8398a7/action-slack@v2
+        uses: 8398a7/action-slack@v3
         if: env.WORKFLOW_CONCLUSION == 'failure' && github.event_name == 'schedule'
         with:
           status: failure
+          fields: repo,message,commit,author,action,eventName,ref,workflow
           author_name: ${{ github.actor }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
