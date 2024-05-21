@@ -15,9 +15,4 @@ class ActionController extends Controller
             return Asset::find($item);
         });
     }
-
-    protected function getItemData($asset, $context): array
-    {
-        return [];
-    }
 }
