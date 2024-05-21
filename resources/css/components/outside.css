@@ -33,8 +33,9 @@
    LOGIN SCREEN
    ========================================================================== */
 
-.auth-card {;
-   transition: .12s ease-out;
+.auth-card {
+    @apply p-6 mx-auto relative z-10 w-full;
+    transition: .12s ease-out;
 }
 
 .outside .white-label-logo {
