@@ -9,8 +9,6 @@ use Statamic\Http\Resources\API\AssetResource;
 
 class ActionController extends Controller
 {
-    use ExtractsFromAssetFields;
-
     protected static $key = 'asset-browser';
 
     protected function getSelectedItems($items, $context)
@@ -30,5 +28,17 @@ class ActionController extends Controller
             'values' => $values,
             'itemActions' => Action::for($asset, $context),
         ]);
+    }
+
+    private function extractFromFields($asset, $blueprint)
+    {
+        $values = $asset->data();
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($values->all())
+            ->preProcess();
+
+        return [$fields->values()->all(), $fields->meta()->all()];
     }
 }
