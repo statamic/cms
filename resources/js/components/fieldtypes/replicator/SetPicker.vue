@@ -4,7 +4,7 @@
         ref="popover"
         class="set-picker select-none"
         placement="bottom-start"
-        :disabled="!hasMultipleSets"
+        :disabled="!enabled || !hasMultipleSets"
         @opened="opened"
         @closed="closed"
         @click="triggerWasClicked"
@@ -55,7 +55,8 @@
 export default {
 
     props: {
-        sets: Array
+        sets: Array,
+        enabled: { type: Boolean, default: true },
     },
 
     data() {

@@ -81,15 +81,12 @@
                 >
                     <template v-slot:picker>
                         <add-set-button
-                            v-if="canAddSet"
                             class="between"
                             :groups="groupConfigs"
                             :sets="setConfigs"
                             :index="index"
                             :enabled="canAddSet"
                             @added="addSet" />
-
-                        <div v-else class="my-3 replicator-set-picker between"></div>
                     </template>
                 </replicator-set>
             </div>

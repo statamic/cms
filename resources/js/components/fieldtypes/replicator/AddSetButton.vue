@@ -1,7 +1,7 @@
 <template>
 
     <div class="replicator-set-picker">
-        <set-picker :sets="groups" @added="addSet">
+        <set-picker :enabled="enabled" :sets="groups" @added="addSet">
             <template #trigger>
                 <div class="replicator-set-picker-button-wrapper">
                     <button v-if="enabled" class="btn-round flex items-center justify-center" :class="{ 'h-5 w-5': ! last }" @click="addSetButtonClicked">
