@@ -3,8 +3,8 @@
    ========================================================================== */
 
 .auth-card {
-   @apply max-w-xs p-6 rounded shadow-lg;
-   transition: .12s ease-out;
+    @apply max-w-xs p-6 rounded shadow-lg;
+    transition: .12s ease-out;
 }
 
 .outside .white-label-logo {
@@ -33,6 +33,14 @@
                 inset rgba(108, 167, 234, .15) -3px 3px 25px,
                 inset rgba(241, 84, 106, .15) 3px -3px 25px;
         }
+
+        .dark & {
+            box-shadow: #2f2f35c9 0 12px 34px, #00000091 0 3px 4px, inset #00000000 -5px 5px 30px, inset #15131333 5px -5px 30px;
+
+            &:hover, &:focus-within {
+                box-shadow: #0c0c0db5 0 35px 78px, #0000007d 0 4px 5px, inset #00000012 -3px 3px 25px, inset #00000042 3px -3px 25px
+            }
+        }
     }
 
     .input-text {
@@ -43,10 +51,21 @@
         @apply text-shadow text-white border-0 rounded-md !important;
         background: linear-gradient(45deg, #f64f59, #c471ed) !important;
         box-shadow: 0 2px 5px rgba(246, 79, 89, 0.3) !important;
+
+        .dark & {
+            background: linear-gradient(45deg, #ac0e17d1, #660894) !important;
+            box-shadow: 0 2px 5px #141313c9 !important;
+        }
+
         &:hover {
             background: linear-gradient(45deg, #DA464F, #AD64D1) !important;
             color: #fff;
             box-shadow: 0 2px 5px rgba(246, 79, 89, 0.3) !important;
+
+            .dark & {
+                background: linear-gradient(45deg, #6f2328, #55246c) !important;
+                box-shadow: 0 2px 5px #000000e0 !important;
+            }
         }
     }
 

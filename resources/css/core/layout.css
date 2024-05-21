@@ -94,10 +94,23 @@ body > .draggable-mirror {
             fill: rgba(0,0,0,.25);
         }
     }
+
+    .dark & {
+        .logo {
+            path {
+                fill: theme('colors.dark.100') !important;
+            }
+        }
+    }
 }
 
- /*  Alternate rad mode for a more playful vibe */
+/* Alternate rad mode for a more playful vibe */
 .outside.rad-theme {
     background: #12c2e9;
     background: linear-gradient(45deg, #f64f59, #c471ed, #12c2e9);
+
+    .dark & {
+        background: #068ba8;
+        background: linear-gradient(45deg, #a2060f, #7708ae, #068ba8)
+    }
 }
