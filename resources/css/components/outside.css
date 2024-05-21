@@ -8,7 +8,7 @@
     }
 
     .logo svg {
-        @apply h-6 block mx-auto mb-20 mb-8 w-auto text-black/25 dark:text-white/60;
+        @apply h-6 block mx-auto mb-8 w-auto text-black/25 dark:text-white/60;
 
         .dark & {
             path {
