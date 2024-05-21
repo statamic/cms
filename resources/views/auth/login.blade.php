@@ -10,7 +10,7 @@
 
 <div class="max-w-xs rounded shadow-lg flex items-center justify-center relative mx-auto">
     <div class="outside-shadow absolute inset-0"></div>
-    <div class="card auth-card mx-auto relative z-10 w-full">
+    <div class="card auth-card">
         <login inline-template :show-email-login="!{{ $str::bool($oauth) }}" :has-error="{{ $str::bool(count($errors) > 0) }}">
         <div>
             @if ($oauth)
