@@ -32,6 +32,9 @@ export default defineConfig(({ mode }) => {
             alias: {
                 vue: 'vue/dist/vue.esm.js',
             }
+        },
+        test: {
+            environment: 'jsdom'
         }
     }
 });

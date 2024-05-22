@@ -1,5 +1,5 @@
+import { expect, test } from 'vitest'
 import Converter from '../components/field-conditions/Converter.js';
-global._ = require('underscore');
 
 const FieldConditionsConverter = new Converter;
 

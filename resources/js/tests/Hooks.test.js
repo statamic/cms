@@ -1,3 +1,4 @@
+import { expect, test, afterEach } from 'vitest'
 import Vue from 'vue';
 import Hooks from '../components/Hooks.js';
 const hooks = new Hooks;
