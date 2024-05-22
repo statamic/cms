@@ -125,14 +125,14 @@ jobs:
           echo "result=true" >> $GITHUB_OUTPUT
           echo "result=true" >> $env:GITHUB_OUTPUT
 
-      - name: Use Node.js 16.13.0
+      - name: Use Node.js 20.13.1
         uses: actions/setup-node@v4
         with:
-          node-version: 16.13.0
+          node-version: 20.13.1
 
       - name: Install required npm version
         if: steps.should-run-tests.outputs.result == 'true'
-        run: npm -g install npm@8.5.5
+        run: npm -g install npm@10.7.0
 
       - name: Install dependencies
         if: steps.should-run-tests.outputs.result == 'true'
