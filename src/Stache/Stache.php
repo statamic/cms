@@ -20,7 +20,7 @@ class Stache
     protected $lockFactory;
     protected $locks = [];
     protected $duplicates;
-    private ?string $indexBeingLoaded;
+    private ?string $indexBeingLoaded = null;
 
     public function __construct()
     {
