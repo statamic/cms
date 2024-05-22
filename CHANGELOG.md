@@ -1,5 +1,19 @@
 # Release Notes
 
+## 5.5.0 (2024-05-22)
+
+### What's new
+- Provide git binary var to commands array in config [#10154](https://github.com/statamic/cms/issues/10154) by @jesseleite
+- Abstract a super-btn component [#10153](https://github.com/statamic/cms/issues/10153) by @jackmcdade
+
+### What's fixed
+- More Dark Fixes [#10165](https://github.com/statamic/cms/issues/10165) by @jackmcdade
+- Fix routeData on null error [#10169](https://github.com/statamic/cms/issues/10169) by @jasonvarga
+- Run GitHub Actions workflows only once [#10156](https://github.com/statamic/cms/issues/10156) by @Jubeki
+- Update GitHub Actions workflow versions [#10136](https://github.com/statamic/cms/issues/10136) by @Jubeki
+
+
+
 ## 5.4.0 (2024-05-21)
 
 ### What's new
