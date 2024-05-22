@@ -1,8 +1,8 @@
-const fs = require('fs').promises
-const { compileTemplate } = require('@vue/compiler-sfc')
-const { optimize: optimizeSvg } = require('svgo')
+import { promises as fs } from 'fs'
+import { compileTemplate } from '@vue/compiler-sfc'
+import { optimize as optimizeSvg } from 'svgo'
 
-module.exports = function svgLoader (options = {}) {
+export default function svgLoader (options = {}) {
   const { svgoConfig, svgo, defaultImport } = options
 
   const svgRegex = /\.svg(\?(raw|component|skipsvgo))?$/
@@ -55,5 +55,3 @@ module.exports = function svgLoader (options = {}) {
     }
   }
 }
-
-module.exports.default = module.exports

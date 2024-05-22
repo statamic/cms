@@ -1,6 +1,9 @@
-const colors = require('tailwindcss/colors')
+import colors from 'tailwindcss/colors'
+import containerQueries from '@tailwindcss/container-queries'
+import typography from '@tailwindcss/typography'
 
-module.exports = {
+/** @type {import('tailwindcss').Config} */
+export default {
     darkMode: 'class',
     content: [
         './resources/**/*.{html,js,vue,blade.php}',
@@ -204,8 +207,8 @@ module.exports = {
         },
     },
     plugins: [
-        require('@tailwindcss/container-queries'),
-        require('@tailwindcss/typography'),
+        containerQueries,
+        typography,
     ],
     important: true,
 }
