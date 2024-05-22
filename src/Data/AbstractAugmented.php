@@ -57,7 +57,7 @@ abstract class AbstractAugmented implements Augmented
             $value->setAugmentable($deferred->augmentable());
 
             if ($deferred->raw() instanceof Carbon) {
-                $cpTimezone = config('statamic.cp.timezone');
+                $cpTimezone = config('statamic.system.client_timezone');
                 $appTimezone = config('app.timezone');
                 if ($cpTimezone && $cpTimezone !== $appTimezone) {
                     $deferred->raw()->setTimezone($cpTimezone);

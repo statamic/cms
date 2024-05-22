@@ -232,7 +232,7 @@ class Date extends Fieldtype
 
     private function convertTimezoneForSave(Carbon $date): Carbon
     {
-        $cpTimezone = config('statamic.cp.timezone');
+        $cpTimezone = config('statamic.system.client_timezone');
         $appTimezone = config('app.timezone');
         if (! $cpTimezone || $cpTimezone === $appTimezone) {
             return $date;
@@ -367,7 +367,7 @@ class Date extends Fieldtype
             $carbon = Carbon::parse($value);
         }
 
-        $cpTimezone = config('statamic.cp.timezone');
+        $cpTimezone = config('statamic.system.client_timezone');
         if ($convertTz && $cpTimezone && $cpTimezone !== config('app.timezone')) {
             $carbon->setTimezone($cpTimezone);
         }
