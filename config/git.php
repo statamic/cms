@@ -116,7 +116,7 @@ return [
     |
     */
 
-    'binary' => $binary = env('STATAMIC_GIT_BINARY', 'git'),
+    'binary' => env('STATAMIC_GIT_BINARY', 'git'),
 
     /*
     |--------------------------------------------------------------------------
@@ -132,8 +132,8 @@ return [
     */
 
     'commands' => [
-        $binary.' add {{ paths }}',
-        $binary.' -c "user.name={{ name }}" -c "user.email={{ email }}" commit -m "{{ message }}"',
+        '{{ git }} add {{ paths }}',
+        '{{ git }} -c "user.name={{ name }}" -c "user.email={{ email }}" commit -m "{{ message }}"',
     ],
 
     /*
