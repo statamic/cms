@@ -140,7 +140,7 @@ jobs:
 
       - name: Execute tests
         if: steps.should-run-tests.outputs.result == 'true'
-        run: npm run test
+        run: LARAVEL_BYPASS_ENV_CHECK=1 npm run test
 
   slack:
     name: Slack Notification
