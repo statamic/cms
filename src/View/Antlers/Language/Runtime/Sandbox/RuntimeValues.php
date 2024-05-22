@@ -3,6 +3,9 @@
 namespace Statamic\View\Antlers\Language\Runtime\Sandbox;
 
 use Exception;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\BulkAugmentor;
 use Statamic\Fields\Value;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
@@ -12,7 +15,11 @@ class RuntimeValues
     {
         GlobalRuntimeState::$requiresRuntimeIsolation = true;
         try {
-            $value = $augmentable->toAugmentedArray();
+            if ($augmentable instanceof Collection && $augmentable->first() instanceof Augmentable) {
+                $value = BulkAugmentor::make($augmentable)->toArray();
+            } else {
+                $value = $augmentable->toDeferredAugmentedArray();
+            }
         } catch (Exception $e) {
             throw $e;
         } finally {

@@ -42,6 +42,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     protected $ensuredFields = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    private $lastBlueprintHandle = null;
+
     private ?Columns $columns = null;
 
     public function setHandle(string $handle)
@@ -399,7 +401,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function title()
     {
-        return array_get($this->contents, 'title', Str::humanize(Str::of($this->handle)->after('::')->afterLast('.')));
+        return Arr::get($this->contents, 'title', Str::humanize(Str::of($this->handle)->after('::')->afterLast('.')));
     }
 
     public function isNamespaced(): bool
@@ -512,7 +514,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         $this->ensuredFields[$handle] = compact('handle', 'tab', 'prepend', 'config');
 
-        $this->resetFieldsCache();
+        $this->resetBlueprintCache()->resetFieldsCache();
 
         return $this;
     }
@@ -571,7 +573,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         Arr::pull($this->contents['tabs'], $handle);
 
-        return $this->resetFieldsCache();
+        return $this->resetBlueprintCache()->resetFieldsCache();
     }
 
     public function removeFieldFromTab($handle, $tab)
@@ -589,7 +591,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         // Pull it out.
         Arr::pull($this->contents['tabs'][$tab]['sections'][$sectionIndex]['fields'], $fieldKey);
 
-        return $this->resetFieldsCache();
+        return $this->resetBlueprintCache()->resetFieldsCache();
     }
 
     private function getTabFields($tab)
@@ -619,7 +621,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         // Merge in new field config.
         $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey]['field'] = array_merge($existingConfig, $config);
 
-        return $this->resetFieldsCache();
+        return $this->resetBlueprintCache()->resetFieldsCache();
     }
 
     public function validateUniqueHandles()
@@ -633,8 +635,25 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         }
     }
 
+    protected function resetBlueprintCache()
+    {
+        $this->lastBlueprintHandle = null;
+
+        return $this;
+    }
+
     protected function resetFieldsCache()
     {
+        if ($this->parent) {
+            $blueprint = (fn () => property_exists($this, 'blueprint') ? $this->blueprint : null)->call($this->parent);
+
+            if ($blueprint && $blueprint === $this->lastBlueprintHandle) {
+                return $this;
+            }
+
+            $this->lastBlueprintHandle = $blueprint;
+        }
+
         $this->fieldsCache = null;
 
         Blink::forget($this->contentsBlinkKey());

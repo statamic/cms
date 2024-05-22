@@ -1063,7 +1063,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function shallowAugmentedArrayKeys()
     {
-        return ['id', 'url', 'permalink', 'api_url'];
+        return ['id', 'url', 'permalink', 'api_url', 'alt'];
     }
 
     protected function defaultAugmentedRelations()

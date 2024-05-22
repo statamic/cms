@@ -6,7 +6,7 @@
                 <input type="text"
                     v-model="data"
                     class="input-text flex-1"
-                    :class="{ 'bg-white': !isReadOnly }"
+                    :class="{ 'bg-white dark:bg-dark-600': !isReadOnly }"
                     :id="fieldId"
                     :readonly="isReadOnly"
                     :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
@@ -15,7 +15,9 @@
             </div>
         </div>
 
-        <div class="video-preview-wrapper" v-if="isEmbeddable || isVideo">
+        <p v-if="isInvalid" class="text-red-500 mt-4">{{ __('statamic::validation.url') }}</p>
+
+        <div class="video-preview-wrapper" v-if="!isInvalid && (isEmbeddable || isVideo)">
             <div class="embed-video" v-if="isEmbeddable && canShowIframe">
                 <iframe :src="embedUrl" frameborder="0" allow="fullscreen"></iframe>
             </div>
@@ -87,6 +89,12 @@ export default {
 
         isEmbeddable() {
             return this.isUrl && this.data.includes('youtube') || this.data.includes('vimeo') || this.data.includes('youtu.be');
+        },
+
+        isInvalid() {
+            let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i)
+
+            return htmlRegex.test(this.data);
         },
 
         isUrl() {

@@ -159,6 +159,7 @@ return [
     'table.title' => 'Table',
     'taggable.title' => 'Taggable',
     'taggable.config.placeholder' => 'Type and press ↩ Enter',
+    'taggable.config.options' => 'Provide pre-defined tags that can be selected.',
     'taxonomies.title' => 'Taxonomies',
     'template.config.blueprint' => 'Adds a "map to blueprint" option. Learn more in the [documentation](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',
     'template.config.folder' => 'Only show templates in this folder.',

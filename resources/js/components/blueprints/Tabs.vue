@@ -280,7 +280,7 @@ export default {
             this.tabs.push({
                 _id: id,
                 display: this.newTabText,
-                handle: this.$slugify(this.newTabText, '_'),
+                handle: snake_case(this.newTabText),
                 instructions: null,
                 icon: null,
                 sections: []

@@ -33,11 +33,11 @@
                         >
                             <svg-icon
                                 name="expand-bold"
-                                class="h-3.5 px-0.5 text-gray-750 group-hover:text-black"
+                                class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175 group-hover:text-black dark:group-hover:text-dark-100"
                             />
                         </button>
                     </div>
-                    <div class="mb-4 border rounded shadow-sm replicator-set">
+                    <div class="mb-4 border dark:border-dark-900 rounded shadow-sm replicator-set">
                         <div class="replicator-set-body publish-fields @container">
                             <set-field
                                 v-for="field in fields"
@@ -67,7 +67,7 @@
 
 <style>
     .group-fieldtype-button-wrapper {
-        @apply flex justify-end absolute top-5 sm:top-7 rtl:left-0 ltr:right-0 @md:right-4 @lg:right-6;
+        @apply flex rtl:left-6 ltr:right-6 absolute top-5 sm:top-7;
     }
 
     .replicator-set .group-fieldtype-button-wrapper {

@@ -7,19 +7,20 @@
         <div class="flex items-center flex-1 p-2 rtl:mr-2 ltr:ml-2 text-xs leading-normal">
             <div class="flex items-center grow" @click="$emit('branch-clicked', page)">
                 <div class="little-dot rtl:ml-2 ltr:mr-2" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
-                <svg-icon name="home-page" class="rtl:ml-2 ltr:mr-2 h-4 w-4 text-gray-800" v-if="isRoot" v-tooltip="__('This is the root page')" />
+                <svg-icon name="home-page" class="rtl:ml-2 ltr:mr-2 h-4 w-4 text-gray-800 dark:text-dark-150" v-if="isRoot" v-tooltip="__('This is the root page')" />
                 <a
-                    @click="$emit('edit', $event)"
+                    @click.prevent="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
+                    :href="page.edit_url"
                     v-text="title" />
 
-                <span v-if="showSlugs" class="rtl:mr-2 ltr:ml-2 font-mono text-gray-700 text-2xs pt-px">
+                <span v-if="showSlugs" class="rtl:mr-2 ltr:ml-2 font-mono text-gray-700 dark:text-dark-175 text-2xs pt-px">
                     {{ isRoot ? '/' : page.slug }}
                 </span>
 
                 <button
                     v-if="hasChildren"
-                    class="p-2 text-gray-600 hover:text-gray-700 transition duration-100 outline-none flex"
+                    class="p-2 text-gray-600 dark:text-dark-175 hover:text-gray-700 dark:hover:text-dark-150 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >
@@ -37,7 +38,7 @@
             </div>
 
             <div class="rtl:pl-2 ltr:pr-2 flex items-center">
-                <div v-if="showBlueprint && page.entry_blueprint" v-text="__(page.entry_blueprint.title)" class="shrink text-4xs text-gray-600 uppercase ml-4" />
+                <div v-if="showBlueprint && page.entry_blueprint" v-text="__(page.entry_blueprint.title)" class="shrink text-4xs text-gray-600 dark:text-dark-175 uppercase ml-4" />
 
                 <slot name="branch-icon" :branch="page" />
 

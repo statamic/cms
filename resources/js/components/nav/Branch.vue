@@ -16,7 +16,7 @@
 
                 <button
                     v-if="hasChildren && !isSection"
-                    class="p-2 text-gray-600 hover:text-gray-700 transition duration-100 outline-none flex"
+                    class="p-2 text-gray-600 dark:text-dark-200 hover:text-gray-700 dark:hover:dark-text-150 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >

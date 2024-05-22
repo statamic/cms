@@ -4,6 +4,7 @@ namespace Statamic\Stache\Query;
 
 use Statamic\Facades;
 use Statamic\Facades\Collection;
+use Statamic\Support\Arr;
 use Statamic\Taxonomies\TermCollection;
 
 class TermQueryBuilder extends Builder
@@ -175,5 +176,30 @@ class TermQueryBuilder extends Builder
         });
 
         return $items;
+    }
+
+    public function prepareForFakeQuery(): array
+    {
+        $data = parent::prepareForFakeQuery();
+
+        if (! empty($this->taxonomies)) {
+            $data['wheres'] = Arr::prepend($data['wheres'], [
+                'type' => 'In',
+                'column' => 'taxonomy',
+                'values' => $this->taxonomies,
+                'boolean' => 'and',
+            ]);
+        }
+
+        if (! empty($this->collections)) {
+            $data['wheres'] = Arr::prepend($data['wheres'], [
+                'type' => 'In',
+                'column' => 'collection',
+                'values' => $this->collections,
+                'boolean' => 'and',
+            ]);
+        }
+
+        return $data;
     }
 }

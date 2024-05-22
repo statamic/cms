@@ -47,8 +47,8 @@
             <!-- Super Admin -->
              <div class="pb-10" v-if="canCreateSupers">
                 <div class="flex items-center">
-                    <toggle-input v-model="user.super" />
-                    <label class="font-bold rtl:mr-2 ltr:ml-2">{{ __('Super Admin') }}</label>
+                    <toggle-input v-model="user.super" id="super" />
+                    <label class="font-bold rtl:mr-2 ltr:ml-2" for="super">{{ __('Super Admin') }}</label>
                 </div>
                 <div class="text-2xs text-gray-600 mt-2 flex items-center">
                     <svg-icon name="info-circle" class="h-4 w-4 rtl:ml-1 ltr:mr-1 flex items-center mb-px"></svg-icon>
@@ -102,22 +102,23 @@
 
             <!-- Send Email? -->
             <div class="max-w-md mx-auto px-4 mb-6 flex items-center">
-                <toggle-input v-model="invitation.send" />
-                <label class="font-bold rtl:mr-2 ltr:ml-2">{{ __('Send Email Invitation') }}</label>
+                <toggle-input v-model="invitation.send" id="send_email_invitation" />
+                <label class="font-bold rtl:mr-2 ltr:ml-2" for="send_email_invitation">{{ __('Send Email Invitation') }}</label>
             </div>
 
             <div class="max-w-lg mx-auto bg-gray-100 py-10 mb-20 border rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-4 pb-10">
-                    <label class="font-bold text-base mb-1" for="email">{{ __('Email Subject') }}</label>
-                    <input type="text" v-model="invitation.subject" class="input-text bg-white">
+                    <label class="font-bold text-base mb-1" for="invitation_subject">{{ __('Email Subject') }}</label>
+                    <input type="text" v-model="invitation.subject" class="input-text bg-white" id="invitation_subject">
                 </div>
 
                 <!-- Email Content -->
                 <div class="max-w-md mx-auto px-4">
-                    <label class="font-bold text-base mb-1" for="email">{{ __('Email Content') }}</label>
+                    <label class="font-bold text-base mb-1" for="invitation_message">{{ __('Email Content') }}</label>
                     <textarea
                         class="input-text min-h-40 p-4 bg-white"
+                        id="invitation_message"
                         v-model="invitation.message"
                         v-elastic
                     />
@@ -142,12 +143,12 @@
                 <p class="mb-2" v-html="__('messages.user_wizard_invitation_share', { email: values.email })" />
             </div>
             <div class="max-w-md mx-auto px-4 pb-10">
-                <label class="font-bold text-base mb-1" for="email">{{ __('Activation URL') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" />
+                <label class="font-bold text-base mb-1" for="activation_url">{{ __('Activation URL') }}</label>
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" id="activation_url" />
             </div>
             <div class="max-w-md mx-auto px-4 pb-20">
                 <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="values.email" />
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="values.email" id="email" />
             </div>
         </div>
 
@@ -220,7 +221,7 @@ export default {
             invitation: {
                 send: this.canSendInvitation,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
-                message: __('messages.user_wizard_invitation_body', { site: window.location.hostname, expiry: this.activationExpiry }),
+                message: __n('messages.user_wizard_invitation_body', this.activationExpiry, { site: window.location.hostname, expiry: this.activationExpiry }),
             },
             userExists: false,
             completed: false,
@@ -257,7 +258,7 @@ export default {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
         },
         direction() {
-            return this.$config.get('direction', 'rtl');
+            return this.$config.get('direction', 'ltr');
         },
     },
 

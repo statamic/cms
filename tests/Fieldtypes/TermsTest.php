@@ -27,10 +27,10 @@ class TermsTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Facades\Collection::make('blog')->taxonomies(['tags'])->save();
         Facades\Taxonomy::make('tags')->sites(['en', 'fr'])->save();
