@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Carbon\Carbon;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Fields\Value;
 use Statamic\Statamic;
@@ -55,6 +56,13 @@ abstract class AbstractAugmented implements Augmented
             $value->setFieldtype($deferred->fieldtype());
             $value->setAugmentable($deferred->augmentable());
 
+            if ($deferred->raw() instanceof Carbon) {
+                $cpTimezone = config('statamic.cp.timezone');
+                $appTimezone = config('app.timezone');
+                if ($cpTimezone && $cpTimezone !== $appTimezone) {
+                    $deferred->raw()->setTimezone($cpTimezone);
+                }
+            }
             return $deferred->raw();
         };
 
