@@ -20,6 +20,7 @@ class Stache
     protected $lockFactory;
     protected $locks = [];
     protected $duplicates;
+    private ?string $indexBeingLoaded;
 
     public function __construct()
     {
@@ -203,5 +204,15 @@ class Stache
         }
 
         return $this->duplicates = (new Duplicates($this))->load();
+    }
+
+    public function setIndexBeingLoaded(?string $index): void
+    {
+        $this->indexBeingLoaded = $index;
+    }
+
+    public function indexBeingLoaded(): ?string
+    {
+        return $this->indexBeingLoaded;
     }
 }

@@ -13,6 +13,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes;
 use Statamic\Support\Arr;
@@ -233,7 +234,9 @@ class CollectionEntriesStore extends ChildStore
             return null;
         }
 
-        if ($this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
+        $isLoadingIds = Stache::indexBeingLoaded() === $this->key().'/id';
+
+        if (! $isLoadingIds && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
             Blink::store('entry-uris')->put($entry->id(), $uri);
         }
 

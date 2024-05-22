@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed|null buildDate()
  * @method static self disableUpdatingIndexes()
  * @method static bool shouldUpdateIndexes()
+ * @method static void setIndexBeingLoaded(string|null $index)
+ * @method static string|null indexBeingLoaded()
  *
  * @see \Statamic\Stache\Stache
  */

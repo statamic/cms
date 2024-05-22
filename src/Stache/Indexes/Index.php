@@ -65,6 +65,8 @@ abstract class Index
             return $this;
         }
 
+        Stache::setIndexBeingLoaded($this->store->key().'/'.$this->name);
+
         $this->loaded = true;
 
         if (Statamic::isWorker()) {
@@ -80,6 +82,8 @@ abstract class Index
         }
 
         $this->store->cacheIndexUsage($this);
+
+        Stache::setIndexBeingLoaded(null);
 
         return $this;
     }
