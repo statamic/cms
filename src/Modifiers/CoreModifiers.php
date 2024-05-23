@@ -786,7 +786,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Get the keys of an array.
-     * 
+     *
      * @return array
      */
     public function keys($value, $params)
@@ -796,7 +796,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Get the values of an array.
-     * 
+     *
      * @return array
      */
     public function values($value, $params)
