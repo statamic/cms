@@ -124,7 +124,7 @@ return [
     'date_fieldtype_date_required' => 'Eine Datumsangabe ist erforderlich.',
     'date_fieldtype_end_date_invalid' => 'Kein gültiges Enddatum.',
     'date_fieldtype_end_date_required' => 'Ein Enddatum ist erforderlich.',
-    'date_fieldtype_only_single_mode_allowed' => 'Wenn der Handle für dieses Feld «date» heisst, kann nur der Modus «Einzeln» gewählt werden.',
+    'date_fieldtype_only_single_mode_allowed' => 'Wenn der Handle für dieses Feld «date» heisst, kann nur der «Einzel»-Modus gewählt werden.',
     'date_fieldtype_start_date_invalid' => 'Kein gültiges Startdatum.',
     'date_fieldtype_start_date_required' => 'Ein Anfangsdatum ist erforderlich.',
     'date_fieldtype_time_required' => 'Eine Zeitangabe ist erforderlich.',
