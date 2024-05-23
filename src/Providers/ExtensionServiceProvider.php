@@ -166,6 +166,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Installed::class,
         Tags\Is::class,
         Tags\Iterate::class,
+        Tags\Js::class,
         Tags\Link::class,
         Tags\Locales::class,
         Tags\Markdown::class,
