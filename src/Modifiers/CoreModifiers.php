@@ -785,6 +785,26 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Get the keys of an array.
+     * 
+     * @return array
+     */
+    public function keys($value, $params)
+    {
+        return array_keys($value);
+    }
+
+    /**
+     * Get the values of an array.
+     * 
+     * @return array
+     */
+    public function values($value, $params)
+    {
+        return array_values($value);
+    }
+
+    /**
      * Get a Gravatar image URL from an email.
      *
      * @return string
