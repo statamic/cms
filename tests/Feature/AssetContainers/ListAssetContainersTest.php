@@ -46,6 +46,65 @@ class ListAssetContainersTest extends TestCase
             ->assertViewHas('containers', $this->containerArray());
     }
 
+    /** @test */
+    public function it_lists_container_by_order_specified()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view one assets', 'view two assets', 'view three assets']]);
+        $user = User::make()->assignRole('test')->save();
+        AssetContainer::make('one')->order(3)->save();
+        AssetContainer::make('two')->order(2)->save();
+        AssetContainer::make('three')->order(1)->save();
+
+        $this
+            ->actingAs($user)
+            ->getJson(cp_route('asset-containers.index'))
+            ->assertSuccessful()
+            ->assertJson([
+                [
+                    'id' => 'three',
+                    'title' => 'Three',
+                    'allow_downloading' => true,
+                    'allow_moving' => true,
+                    'allow_renaming' => true,
+                    'allow_uploads' => true,
+                    'create_folders' => true,
+                    'edit_url' => 'http://localhost/cp/asset-containers/three/edit',
+                    'delete_url' => 'http://localhost/cp/asset-containers/three',
+                    'blueprint_url' => 'http://localhost/cp/asset-containers/three/blueprint',
+                    'can_edit' => false,
+                    'can_delete' => false,
+                ],
+                [
+                    'id' => 'two',
+                    'title' => 'Two',
+                    'allow_downloading' => true,
+                    'allow_moving' => true,
+                    'allow_renaming' => true,
+                    'allow_uploads' => true,
+                    'create_folders' => true,
+                    'edit_url' => 'http://localhost/cp/asset-containers/two/edit',
+                    'delete_url' => 'http://localhost/cp/asset-containers/two',
+                    'blueprint_url' => 'http://localhost/cp/asset-containers/two/blueprint',
+                    'can_edit' => false,
+                    'can_delete' => false,
+                ],
+                [
+                    'id' => 'one',
+                    'title' => 'One',
+                    'allow_downloading' => true,
+                    'allow_moving' => true,
+                    'allow_renaming' => true,
+                    'allow_uploads' => true,
+                    'create_folders' => true,
+                    'edit_url' => 'http://localhost/cp/asset-containers/one/edit',
+                    'delete_url' => 'http://localhost/cp/asset-containers/one',
+                    'blueprint_url' => 'http://localhost/cp/asset-containers/one/blueprint',
+                    'can_edit' => false,
+                    'can_delete' => false,
+                ],
+            ]);
+    }
+
     public function containerArray()
     {
         return [

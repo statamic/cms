@@ -1064,4 +1064,16 @@ class AssetContainerTest extends TestCase
 
         return $container;
     }
+
+    /** @test */
+    public function it_gets_and_sets_the_order()
+    {
+        $container = new AssetContainer;
+        $this->assertSame(1, $container->order());
+
+        $return = $container->order(3);
+
+        $this->assertEquals($container, $return);
+        $this->assertSame(3, $container->order());
+    }
 }

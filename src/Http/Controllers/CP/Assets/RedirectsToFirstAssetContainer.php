@@ -9,7 +9,7 @@ trait RedirectsToFirstAssetContainer
 {
     public function redirectToFirstContainer()
     {
-        $containers = AssetContainer::all()->sortBy->title()->filter(function ($container) {
+        $containers = AssetContainer::all()->sortBy(fn ($container) => [$container->order(), $container->title()])->filter(function ($container) {
             return User::current()->can('view', $container);
         });
 
