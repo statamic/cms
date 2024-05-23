@@ -514,7 +514,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         $this->ensuredFields[$handle] = compact('handle', 'tab', 'prepend', 'config');
 
-        $this->resetFieldsCache();
+        $this->resetBlueprintCache()->resetFieldsCache();
 
         return $this;
     }
@@ -573,7 +573,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         Arr::pull($this->contents['tabs'], $handle);
 
-        return $this->resetFieldsCache();
+        return $this->resetBlueprintCache()->resetFieldsCache();
     }
 
     public function removeFieldFromTab($handle, $tab)
@@ -591,7 +591,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         // Pull it out.
         Arr::pull($this->contents['tabs'][$tab]['sections'][$sectionIndex]['fields'], $fieldKey);
 
-        return $this->resetFieldsCache();
+        return $this->resetBlueprintCache()->resetFieldsCache();
     }
 
     private function getTabFields($tab)
@@ -621,7 +621,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         // Merge in new field config.
         $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey]['field'] = array_merge($existingConfig, $config);
 
-        return $this->resetFieldsCache();
+        return $this->resetBlueprintCache()->resetFieldsCache();
     }
 
     public function validateUniqueHandles()
@@ -633,6 +633,13 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         if ($field = $handles->duplicates()->first()) {
             throw new DuplicateFieldException($field, $this);
         }
+    }
+
+    protected function resetBlueprintCache()
+    {
+        $this->lastBlueprintHandle = null;
+
+        return $this;
     }
 
     protected function resetFieldsCache()

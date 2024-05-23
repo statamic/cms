@@ -8,6 +8,8 @@ use Statamic\Facades\Term as Terms;
 
 class DuplicateTerm extends Action
 {
+    private $newItems;
+
     public static function title()
     {
         return __('Duplicate');
@@ -20,7 +22,7 @@ class DuplicateTerm extends Action
 
     public function run($items, $values)
     {
-        $items->each(function (Term $original) {
+        $this->newItems = $items->map(function (Term $original) {
             [$title, $slug] = $this->generateTitleAndSlug($original);
 
             $data = $original->data()
@@ -37,6 +39,8 @@ class DuplicateTerm extends Action
                 ->data($data);
 
             $term->save();
+
+            return $term;
         });
     }
 
@@ -71,5 +75,14 @@ class DuplicateTerm extends Action
     public function authorize($user, $item)
     {
         return $user->can('create', [Term::class, $item->taxonomy()]);
+    }
+
+    public function redirect($items, $values)
+    {
+        if ($this->context['view'] !== 'form') {
+            return;
+        }
+
+        return $this->newItems->first()->editUrl();
     }
 }

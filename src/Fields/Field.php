@@ -477,11 +477,16 @@ class Field implements Arrayable
                 'instructions' => __('statamic::messages.fields_display_instructions'),
                 'type' => 'field_display',
             ],
+            'hide_display' => [
+                'type' => 'toggle',
+                'visibility' => 'hidden',
+            ],
             'handle' => [
                 'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
                 'type' => 'slug',
                 'from' => 'display',
+                'async' => false,
                 'separator' => '_',
                 'validate' => [
                     'required',
@@ -551,6 +556,6 @@ class Field implements Arrayable
             ],
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 
-        return new Fields($fields);
+        return new ConfigFields($fields);
     }
 }

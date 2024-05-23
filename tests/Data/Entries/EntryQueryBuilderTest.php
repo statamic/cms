@@ -830,6 +830,12 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::collection('calendar')->id('calendar-past')->published(true)->date(now()->subDay())->create();
         EntryFactory::collection('calendar')->id('calendar-past-draft')->published(false)->date(now()->subDay())->create();
 
+        // Undated, but with customized date behavior. Nonsensical situation, but it can happen.
+        // See https://github.com/statamic/eloquent-driver/issues/288
+        Collection::make('undated')->dated(false)->futureDateBehavior('private')->pastDateBehavior('private')->save();
+        EntryFactory::collection('undated')->id('undated')->published(true)->create();
+        EntryFactory::collection('undated')->id('undated-draft')->published(false)->create();
+
         $this->assertEquals($expected, Entry::query()->whereStatus($status)->get()->map->id->all());
     }
 
@@ -844,6 +850,7 @@ class EntryQueryBuilderTest extends TestCase
                 'event-past-draft',
                 'calendar-future-draft',
                 'calendar-past-draft',
+                'undated-draft',
             ]],
             'published' => ['published', [
                 'page',
@@ -851,6 +858,7 @@ class EntryQueryBuilderTest extends TestCase
                 'event-future',
                 'calendar-future',
                 'calendar-past',
+                'undated',
             ]],
             'scheduled' => ['scheduled', [
                 'blog-future',

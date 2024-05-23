@@ -158,6 +158,7 @@ return [
     'slug.title' => 'Slug',
     'structures.title' => 'Structures',
     'table.title' => 'Table',
+    'taggable.config.options' => 'Fournit des balises pré-définies qui peuvent être sélectionnées.',
     'taggable.config.placeholder' => 'Saisissez et appuyez sur ↩ Entrée',
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Taxonomies',

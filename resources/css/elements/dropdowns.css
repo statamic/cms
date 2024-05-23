@@ -6,12 +6,12 @@
     @apply p-2;
 
     button, a {
-        @apply block w-full rtl:text-right ltr:text-left rounded-sm text-xs font-normal px-2 py-1 text-gray-800;
+        @apply block w-full rtl:text-right ltr:text-left rounded-sm text-xs font-normal px-2 py-1 text-gray-800 dark:text-dark-100;
         line-height: 1.4;
         white-space: nowrap;
 
         &:hover {
-            @apply bg-blue text-white;
+            @apply bg-blue dark:bg-dark-600 text-white;
         }
 
         .icon {
@@ -38,8 +38,14 @@
     }
 
     .divider {
-        @apply h-px bg-gray-400 overflow-hidden;
+        @apply h-px bg-gray-400 dark:bg-dark-900 overflow-hidden;
         margin: 6px -8px;
+        /* Hide dividers that come first, last or immediately after another (due to v-if) */
+        & + &,
+        &:first-child,
+        &:last-child {
+            display: none;
+        }
     }
 
     .align-left & {
