@@ -119,7 +119,6 @@ export default {
             if (this.metaChanging) return;
 
             this.update(url);
-
             this.updateMeta({...this.meta, initialUrl: url});
         },
 
