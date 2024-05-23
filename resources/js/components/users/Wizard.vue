@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-xl mx-auto rounded shadow bg-white">
+    <div class="max-w-xl mx-auto card">
         <div v-if="steps.length > 1" class="max-w-lg mx-auto pt-16 relative">
             <div class="wizard-steps">
                 <a class="step" :class="{'complete': currentStep >= index}" v-for="(step, index) in steps" @click="goToStep(index)">
@@ -106,18 +106,18 @@
                 <label class="font-bold rtl:mr-2 ltr:ml-2" for="send_email_invitation">{{ __('Send Email Invitation') }}</label>
             </div>
 
-            <div class="max-w-lg mx-auto bg-gray-100 py-10 mb-20 border rounded-lg " v-if="invitation.send">
+            <div class="max-w-lg mx-auto bg-gray-100 dark:bg-dark-650 py-10 mb-20 border dark:border-dark-900 rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-4 pb-10">
                     <label class="font-bold text-base mb-1" for="invitation_subject">{{ __('Email Subject') }}</label>
-                    <input type="text" v-model="invitation.subject" class="input-text bg-white" id="invitation_subject">
+                    <input type="text" v-model="invitation.subject" class="input-text bg-white dark:bg-dark-700" id="invitation_subject">
                 </div>
 
                 <!-- Email Content -->
                 <div class="max-w-md mx-auto px-4">
                     <label class="font-bold text-base mb-1" for="invitation_message">{{ __('Email Content') }}</label>
                     <textarea
-                        class="input-text min-h-40 p-4 bg-white"
+                        class="input-text min-h-40 p-4 bg-white dark:bg-dark-700"
                         id="invitation_message"
                         v-model="invitation.message"
                         v-elastic
@@ -152,7 +152,7 @@
             </div>
         </div>
 
-        <div class="border-t p-4">
+        <div class="border-t dark:border-dark-900 p-4">
             <div class="max-w-md mx-auto flex items-center justify-center">
                 <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="! completed && ! onFirstStep">
                     <span v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span> {{ __('Previous')}}

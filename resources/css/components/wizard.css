@@ -21,11 +21,11 @@
 
     .step.complete:before,
     .step.complete:after {
-        @apply bg-blue;
+        @apply bg-blue !important;
     }
 
     .ball {
-        @apply h-10 w-10 bg-gray-300 text-gray text-base rounded-full text-center z-10 mx-auto relative;
+        @apply h-10 w-10 bg-gray-300 dark:bg-dark-800 text-gray text-base rounded-full text-center z-10 mx-auto relative;
         line-height: 40px;
     }
 
@@ -39,6 +39,15 @@
         }
         .label {
             @apply text-blue;
+        }
+    }
+}
+
+.dark {
+    .wizard-steps {
+        .step:not(:first-child):before,
+        .step:not(:first-child):after {
+            @apply bg-dark-800;
         }
     }
 }
