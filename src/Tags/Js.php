@@ -2,8 +2,6 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tags;
-
 class Js extends Tags
 {
     /** @var \Statamic\Tags\Parameters */
@@ -37,7 +35,7 @@ class Js extends Tags
     public function render($name, $from)
     {
         return ($this->params->get('script', true) ? '<script>' : '')
-            . ($this->params->get('const', true) ? 'const' : 'let') . ' ' . $name . ' = ' . json_encode($from) . ';'
-            . ($this->params->get('script', true) ? '</script>' : '');
+            .($this->params->get('const', true) ? 'const' : 'let').' '.$name.' = '.json_encode($from).';'
+            .($this->params->get('script', true) ? '</script>' : '');
     }
 }
