@@ -787,21 +787,21 @@ class CoreModifiers extends Modifier
     /**
      * Get the keys of an array.
      *
-     * @return array
+     * @return array|Collection
      */
-    public function keys($value, $params)
+    public function keys($value)
     {
-        return array_keys($value);
+        return is_array($value) ? array_keys($value) : $value->keys();
     }
 
     /**
      * Get the values of an array.
      *
-     * @return array
+     * @return array|Collection
      */
-    public function values($value, $params)
+    public function values($value)
     {
-        return array_values($value);
+        return is_array($value) ? array_values($value) : $value->values();
     }
 
     /**
