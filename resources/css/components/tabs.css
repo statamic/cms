@@ -23,7 +23,7 @@
 }
 
 .tabs {
-    @apply flex space-x-2 overflow-hidden relative w-full max-w-full;
+    @apply flex space-x-2 rtl:space-x-reverse overflow-hidden relative w-full max-w-full;
     &-scrolled {
         @apply rtl:pr-0 ltr:pl-0 rtl:mr-0 ltr:ml-0;
     }

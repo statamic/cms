@@ -117,7 +117,7 @@
                 </label>
             </div>
 
-            <footer class="bg-gray-100 dark:bg-dark-575 rounded-b-md flex items-center justify-end space-x-3 font-normal p-2">
+            <footer class="bg-gray-100 dark:bg-dark-575 rounded-b-md flex items-center justify-end space-x-3 rtl:space-x-reverse font-normal p-2">
                 <button @click="$emit('canceled')" class="text-xs text-gray-600 dark:text-dark-175 hover:text-gray-800 dark:hover-text-dark-100">
                     {{ __('Cancel') }}
                 </button>
