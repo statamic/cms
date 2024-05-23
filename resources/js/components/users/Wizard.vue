@@ -13,7 +13,7 @@
         <div v-if="!completed && onUserInfoStep">
             <div class="max-w-md mx-auto px-4 py-16 text-center">
                 <h1 class="mb-6">{{ __('Create User') }}</h1>
-                <p class="text-gray" v-text="__('messages.user_wizard_intro')" />
+                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_intro')" />
             </div>
 
             <publish-container
@@ -41,7 +41,7 @@
         <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-4 pb-4">
             <div class="py-16 text-center">
                 <h1 class="mb-6">{{ __('Roles & Groups') }}</h1>
-                <p class="text-gray" v-text="__('messages.user_wizard_roles_groups_intro')" />
+                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_roles_groups_intro')" />
             </div>
 
             <!-- Super Admin -->
@@ -50,9 +50,9 @@
                     <toggle-input v-model="user.super" id="super" />
                     <label class="font-bold rtl:mr-2 ltr:ml-2" for="super">{{ __('Super Admin') }}</label>
                 </div>
-                <div class="text-2xs text-gray-600 mt-2 flex items-center">
-                    <svg-icon name="info-circle" class="h-4 w-4 rtl:ml-1 ltr:mr-1 flex items-center mb-px"></svg-icon>
-                    {{ __('messages.user_wizard_super_admin_instructions') }}
+                <div class="text-2xs text-gray-600 dark:text-dark-150 mt-2 flex items-center space-x-1">
+                    <svg-icon name="info-circle" class="h-4 w-4 flex items-center mb-px"></svg-icon>
+                    <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
                 </div>
             </div>
 
@@ -97,7 +97,7 @@
         <div v-if="!completed && onInvitationStep">
             <div class="max-w-md mx-auto px-4 py-16 text-center">
                 <h1 class="mb-6">{{ __('Invitation') }}</h1>
-                <p class="text-gray" v-text="__('messages.user_wizard_invitation_intro')" />
+                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_invitation_intro')" />
             </div>
 
             <!-- Send Email? -->
