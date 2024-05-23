@@ -706,13 +706,13 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Flattens a multi-dimensional collection into a single dimension.
+     * Flattens a multi-dimensional collection into a single or arbitrary dimension.
      *
      * @return array
      */
-    public function flatten($value)
+    public function flatten($value, $params)
     {
-        return collect($value)->flatten()->toArray();
+        return collect($value)->flatten(Arr::get($params, 0, INF))->toArray();
     }
 
     /**
