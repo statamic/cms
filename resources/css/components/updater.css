@@ -80,6 +80,7 @@
 			top: 7px;
 		    left: 4px ; [dir="rtl"] & { left: auto ; right: 4px ; }
 
+            .dark & { @apply bg-gray-300; }
 		}
 
 		.label {
@@ -90,14 +91,4 @@
 			line-height: 1;
 		}
 	}
-}
-
-.dark {
-    .update-release {
-        ul {
-            li:before {
-                @apply bg-gray-300;
-            }
-        }
-    }
 }
