@@ -78,7 +78,7 @@
 			width: 6px;
 			content: "";
 			top: 7px;
-		 left: 4px ; [dir="rtl"] & { left: auto ; right: 4px ; }
+		    left: 4px ; [dir="rtl"] & { left: auto ; right: 4px ; }
 
 		}
 
@@ -90,4 +90,14 @@
 			line-height: 1;
 		}
 	}
+}
+
+.dark {
+    .update-release {
+        ul {
+            li:before {
+                @apply bg-gray-300;
+            }
+        }
+    }
 }
