@@ -10,10 +10,10 @@ use Statamic\Entries\EntryCollection;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-class OnlyTest extends TestCase
+class SelectTest extends TestCase
 {
     /** @test */
-    public function it_gets_only_certain_values_from_array_of_items()
+    public function it_selects_certain_values_from_array_of_items()
     {
         $items = $this->items();
 
@@ -39,7 +39,7 @@ class OnlyTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_only_certain_values_from_collections_of_items()
+    public function it_selects_certain_values_from_collections_of_items()
     {
         $items = Collection::make($this->items());
 
@@ -65,7 +65,7 @@ class OnlyTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_only_certain_values_from_query_builder()
+    public function it_selects_certain_values_from_query_builder()
     {
         $builder = Mockery::mock(Builder::class);
         $builder->shouldReceive('get')->andReturn(Collection::make($this->items()));
@@ -92,7 +92,7 @@ class OnlyTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_only_certain_values_from_array_of_items_with_origins()
+    public function it_selects_certain_values_from_array_of_items_with_origins()
     {
         $items = $this->itemsWithOrigins();
 
@@ -122,7 +122,7 @@ class OnlyTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_only_certain_values_from_collections_of_items_with_origins()
+    public function it_selects_certain_values_from_collections_of_items_with_origins()
     {
         $items = EntryCollection::make($this->itemsWithOrigins());
 
@@ -152,7 +152,7 @@ class OnlyTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_only_certain_values_from_array_of_items_of_type_array()
+    public function it_selects_certain_values_from_array_of_items_of_type_array()
     {
         $items = $this->itemsOfTypeArray();
 
@@ -178,7 +178,7 @@ class OnlyTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_only_certain_values_from_collections_of_items_of_type_array()
+    public function it_selects_certain_values_from_collections_of_items_of_type_array()
     {
         $items = EntryCollection::make($this->itemsOfTypeArray());
 
@@ -204,7 +204,7 @@ class OnlyTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_only_certain_values_from_array_of_items_of_type_arrayaccess()
+    public function it_selects_certain_values_from_array_of_items_of_type_arrayaccess()
     {
         $items = $this->itemsOfTypeArrayAccess();
 
@@ -265,6 +265,6 @@ class OnlyTest extends TestCase
 
     private function modify($value, ...$keys)
     {
-        return Modify::value($value)->only(Arr::flatten($keys))->fetch();
+        return Modify::value($value)->select(Arr::flatten($keys))->fetch();
     }
 }

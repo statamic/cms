@@ -1755,13 +1755,13 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Gets certain values from a collection of items.
+     * Selects certain values from each item in a collection.
      *
      * @param  array|Collection  $value
      * @param  array  $params
      * @return array|Collection
      */
-    public function only($value, $params)
+    public function select($value, $params)
     {
         $keys = Arr::wrap($params);
 
