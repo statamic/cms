@@ -78,7 +78,7 @@
 			width: 6px;
 			content: "";
 			top: 7px;
-		left: 4px ; [dir="rtl"] & { left: auto ; right: 4px ; }
+		 left: 4px ; [dir="rtl"] & { left: auto ; right: 4px ; }
 
             .dark & { @apply bg-gray-300; }
 		}
