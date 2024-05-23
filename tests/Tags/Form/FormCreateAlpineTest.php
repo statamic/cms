@@ -451,6 +451,27 @@ EOT
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
 
         $this->assertStringContainsString($expected, $output);
+
+        $params = ['xdata' => ['extra' => 'no']];
+
+        $output = $this->tag('{{ form:contact js="alpine:my_form" :x-data="xdata" }}{{ /form:contact }}', $params);
+
+        $expectedXData = $this->jsonEncode([
+            'my_form' => [
+                'name' => null,
+                'email' => null,
+                'message' => null,
+                'fav_animals' => [],
+                'fav_colour' => null,
+                'fav_subject' => null,
+                'winnie' => null,
+                'extra' => 'no',
+            ],
+        ]);
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
+
+        $this->assertStringContainsString($expected, $output);
     }
 
     private function jsonEncode($data)

@@ -17,7 +17,7 @@ abstract class AbstractJsDriver implements JsDriver
      *
      * @param  array  $options
      */
-    public function __construct(Form $form, $options = [], ?Parameters $params)
+    public function __construct(Form $form, $options = [], ?Parameters $params = null)
     {
         $this->form = $form;
         $this->options = $options;
