@@ -785,26 +785,6 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the keys of an array.
-     *
-     * @return array|Collection
-     */
-    public function keys($value)
-    {
-        return is_array($value) ? array_keys($value) : $value->keys();
-    }
-
-    /**
-     * Get the values of an array.
-     *
-     * @return array|Collection
-     */
-    public function values($value)
-    {
-        return is_array($value) ? array_values($value) : $value->values();
-    }
-
-    /**
      * Get a Gravatar image URL from an email.
      *
      * @return string
@@ -1346,6 +1326,16 @@ class CoreModifiers extends Modifier
         $rekeyed = collect($value)->keyBy(fn ($item) => $item[$params[0]]);
 
         return is_array($value) ? $rekeyed->all() : $rekeyed;
+    }
+
+    /**
+     * Get the keys of an array.
+     *
+     * @return array|Collection
+     */
+    public function keys($value)
+    {
+        return is_array($value) ? array_keys($value) : $value->keys();
     }
 
     /**
@@ -2786,6 +2776,16 @@ class CoreModifiers extends Modifier
         ][$key] : -1;
 
         return parse_url($value, $component);
+    }
+
+    /**
+     * Get the values of an array.
+     *
+     * @return array|Collection
+     */
+    public function values($value)
+    {
+        return is_array($value) ? array_values($value) : $value->values();
     }
 
     /**
