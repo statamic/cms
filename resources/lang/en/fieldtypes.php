@@ -129,6 +129,7 @@ return [
     'range.config.step' => 'The minimum size between values.',
     'range.title' => 'Range',
     'relationship.config.mode' => 'Choose your preferred UI style.',
+    'replicator.config.button_label' => 'Add a label to the add set button.',
     'replicator.config.collapse' => 'The set collapsing behavior.',
     'replicator.config.collapse.accordion' => 'Only allow one set to be expanded at a time',
     'replicator.config.collapse.disabled' => 'All sets expanded by default',
