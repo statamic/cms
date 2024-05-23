@@ -5,45 +5,76 @@ namespace Tests\Modifiers;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @todo Add test with numeric indices
- */
 class FlattenTest extends TestCase
 {
-    /** @test */
-    public function it_flattens_a_multidimensional_array(): void
+    /**
+     * @test
+     *
+     * @dataProvider flattenProvider
+     */
+    public function it_flattens_an_array($depth, $expected): void
     {
         $input = [
-            'ingredients' => [
-                'spices' => ['garlic', 'cumin', 'ginger', 'turmeric', 'paprika', 'curry powder'],
-                'vegetables' => ['tomatoes', 'onion'],
-                'meat' => ['chicken'],
+            [
+                'foo',
+                [
+                    'bar',
+                    [
+                        'baz',
+                    ],
+                ],
             ],
+            'zap',
         ];
 
-        $expected = [
-            'garlic',
-            'cumin',
-            'ginger',
-            'turmeric',
-            'paprika',
-            'curry powder',
-            'tomatoes',
-            'onion',
-            'chicken',
-        ];
-
-        $modified = $this->modify($input);
+        $modified = $this->modify($input, $depth);
         $this->assertEquals($expected, $modified);
+    }
 
-        $expected = [
-            ['garlic', 'cumin', 'ginger', 'turmeric', 'paprika', 'curry powder'],
-            ['tomatoes', 'onion'],
-            ['chicken'],
+    public static function flattenProvider()
+    {
+        return [
+            'depth null' => [null, ['foo', 'bar', 'baz', 'zap']],
+            'depth 1' => [1, ['foo', ['bar', ['baz']], 'zap']],
+            'depth 2' => [2, ['foo', 'bar', ['baz'], 'zap']],
+            'depth 3' => [3, ['foo', 'bar', 'baz', 'zap']],
+            'depth 4' => [4, ['foo', 'bar', 'baz', 'zap']],
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider flattenWithKeysProvider
+     */
+    public function it_flattens_an_array_with_keys($depth, $expected): void
+    {
+        $input = [
+            [
+                'foo',
+                'alfa' => [
+                    'bar',
+                    'bravo' => [
+                        'baz',
+                    ],
+                ],
+            ],
+            'zap',
         ];
 
-        $modified = $this->modify($input, 1);
+        $modified = $this->modify($input, $depth);
         $this->assertEquals($expected, $modified);
+    }
+
+    public static function flattenWithKeysProvider()
+    {
+        return [
+            'depth null' => [null, ['foo', 'bar', 'baz', 'zap']],
+            'depth 1' => [1, ['foo', ['bar', 'bravo' => ['baz']], 'zap']],
+            'depth 2' => [2, ['foo', 'bar', ['baz'], 'zap']],
+            'depth 3' => [3, ['foo', 'bar', 'baz', 'zap']],
+            'depth 4' => [4, ['foo', 'bar', 'baz', 'zap']],
+        ];
     }
 
     private function modify(array $value, $param = null)
