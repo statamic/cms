@@ -2550,6 +2550,16 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts the data to a query string.
+     *
+     * @return string
+     */
+    public function toQuery($value)
+    {
+        return Arr::query($value);
+    }
+
+    /**
      * Converts each tab in the string to some number of spaces, as defined by
      * $param[0]. By default, each tab is converted to 4 consecutive spaces.
      *
