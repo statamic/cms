@@ -437,6 +437,10 @@ export default {
             return data_get(node, 'isSection', false);
         },
 
+        isParentItemNode(node) {
+            return ! this.isSectionNode(node) && ! this.isChildItemNode(node);
+        },
+
         isCustomSectionNode(node) {
             return this.isSectionNode(node) && data_get(node, 'manipulations.action') === '@create';
         },
