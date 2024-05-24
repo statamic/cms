@@ -304,6 +304,33 @@ EOT;
     }
 
     /** @test */
+    public function it_can_run_custom_commands_with_custom_git_binary()
+    {
+        $this->markTestSkippedInWindows();
+
+        $this->files->put($logFile = $this->basePath('temp/log.txt'), '');
+
+        Config::set('statamic.git.binary', 'the custom git binary');
+
+        Config::set('statamic.git.commands', [
+            'echo "{{ name }} committed using {{ git }}." >> '.$logFile,
+        ]);
+
+        Git::partialMock()
+            ->shouldReceive('groupTrackedContentPathsByRepo')
+            ->andReturn(collect([base_path('content') => collect(['foo'])]));
+
+        Git::commit();
+
+        $expectedLog = <<<'EOT'
+Spock committed using the custom git binary.
+
+EOT;
+
+        $this->assertEquals($expectedLog, $this->files->get($logFile));
+    }
+
+    /** @test */
     public function it_dispatches_commit_job()
     {
         Queue::fake();

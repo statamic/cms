@@ -11,7 +11,7 @@
                             <div class="inline-block cursor-pointer rounded m-0 p-[2px]">
                                 <div
                                     class="rounded-sm w-8 h-8"
-                                    :class="{ 'border': !value, 'cursor-not-allowed': isReadOnly }"
+                                    :class="{ 'border dark:border-dark-900': !value, 'cursor-not-allowed': isReadOnly }"
                                     :style="{ 'background-color': value }"
                                 />
                             </div>

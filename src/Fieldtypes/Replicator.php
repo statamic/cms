@@ -54,6 +54,12 @@ class Replicator extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
+                    'button_label' => [
+                        'display' => __('Add Set Label'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.button_label'),
+                        'type' => 'text',
+                        'default' => '',
+                    ],
                 ],
             ],
             [

@@ -162,6 +162,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::resource('revisions', EntryRevisionsController::class, [
                 'as' => 'collections.entries',
                 'only' => ['index', 'store', 'show'],
+            ])->names([
+                'index' => 'collections.entries.revisions.index',
+                'store' => 'collections.entries.revisions.store',
+                'show' => 'collections.entries.revisions.show',
             ]);
 
             Route::post('restore-revision', RestoreEntryRevisionController::class)->name('collections.entries.restore-revision');

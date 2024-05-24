@@ -26,6 +26,7 @@ use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
@@ -154,6 +155,48 @@ class CoreModifiers extends Modifier
     public function at($value, $params)
     {
         return Stringy::at($value, Arr::get($params, 0));
+    }
+
+    /**
+     * Returns an attribute ($params[0]) with its value when the given $value variable is not empty.
+     *
+     * @param  string  $value
+     * @param  array  $params
+     * @return string
+     */
+    public function attribute($value, $params)
+    {
+        if (! $name = Arr::get($params, 0)) {
+            throw new \Exception('Attribute name is required.');
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
+        if (\is_array($value)) {
+            if (empty($value)) {
+                return '';
+            }
+
+            $value = \json_encode($value);
+        }
+
+        if (\is_bool($value)) {
+            return $value ? ' '.$name : '';
+        }
+
+        if (\is_object($value)) {
+            $value = (string) $value;
+        }
+
+        $value = trim($value);
+
+        if ($value === '') {
+            return '';
+        }
+
+        return sprintf(' %s="%s"', $name, Html::entities($value));
     }
 
     /**
@@ -663,13 +706,13 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Flattens a multi-dimensional collection into a single dimension.
+     * Flattens a multi-dimensional collection into a single or arbitrary dimension.
      *
      * @return array
      */
-    public function flatten($value)
+    public function flatten($value, $params)
     {
-        return collect($value)->flatten()->toArray();
+        return collect($value)->flatten(Arr::get($params, 0, INF))->toArray();
     }
 
     /**
@@ -1263,6 +1306,10 @@ class CoreModifiers extends Modifier
      */
     public function isExternalUrl($value)
     {
+        if ($value instanceof ArrayableLink) {
+            $value = $value->url();
+        }
+
         return Str::isUrl($value) && URL::isExternal($value);
     }
 
@@ -1749,6 +1796,41 @@ class CoreModifiers extends Modifier
             }
 
             return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+        });
+
+        return $wasArray ? $items->all() : $items;
+    }
+
+    /**
+     * Selects certain values from each item in a collection.
+     *
+     * @param  array|Collection  $value
+     * @param  array  $params
+     * @return array|Collection
+     */
+    public function select($value, $params)
+    {
+        $keys = Arr::wrap($params);
+
+        if ($wasArray = is_array($value)) {
+            $value = collect($value);
+        }
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        $items = $value->map(function ($item) use ($keys) {
+            return collect($keys)->mapWithKeys(function ($key) use ($item) {
+                $value = null;
+                if (is_array($item) || $item instanceof ArrayAccess) {
+                    $value = Arr::get($item, $key);
+                } else {
+                    $value = method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+                }
+
+                return [$key => $value];
+            })->all();
         });
 
         return $wasArray ? $items->all() : $items;

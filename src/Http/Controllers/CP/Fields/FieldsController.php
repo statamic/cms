@@ -32,9 +32,7 @@ class FieldsController extends CpController
 
         $fieldtype = FieldtypeRepository::find($request->type);
 
-        $blueprint = $this
-            ->blueprint($fieldtype->configBlueprint())
-            ->ensureField('hide_display', ['type' => 'toggle', 'visibility' => 'hidden']);
+        $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
         $fields = $blueprint
             ->fields()
