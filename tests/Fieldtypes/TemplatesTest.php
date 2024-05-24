@@ -19,7 +19,7 @@ class TemplatesTest extends TestCase
 
         app('files')->makeDirectory($this->dir = __DIR__.'/templates-test-tmp');
 
-        $this->app['config']->set('view.paths', [$this->dir]);
+        $this->app['config']->set('view.paths', [$this->dir.'/views']);
     }
 
     public function tearDown(): void
@@ -61,11 +61,24 @@ class TemplatesTest extends TestCase
         ];
 
         foreach ($files as $path) {
-            File::put($this->dir.'/'.$path, '');
+            File::put($this->dir.'/views/'.$path, '');
         }
 
         // Empty directories should be ignored.
-        File::makeDirectory($this->dir.'/empty');
+        File::makeDirectory($this->dir.'/views/empty');
+
+        // Empty symlinked directories should be ignored.
+        File::makeDirectory($this->dir.'/empty-symlink-target');
+        app('files')->link($this->dir.'/empty-symlink-target', $this->dir.'/views/empty-symlink');
+
+        // Files in symlinked directories should be shown.
+        File::put($this->dir.'/symlink-target-dir/tango.html', '');
+        File::put($this->dir.'/symlink-target-dir/three/uniform.html', '');
+        app('files')->link($this->dir.'/symlink-target-dir', $this->dir.'/views/symlink-dir');
+
+        // Symlinked files should be shown.
+        File::put($this->dir.'/foo.html', '');
+        app('files')->link($this->dir.'/foo.html', $this->dir.'/views/victor.html');
 
         $this
             ->actingAs(User::make()->makeSuper()->save())
@@ -75,6 +88,9 @@ class TemplatesTest extends TestCase
                 'one/bravo',
                 'one/two/charlie',
                 'one/two/delta',
+                'symlink-dir/tango',
+                'symlink-dir/three/uniform',
+                'victor',
             ]);
     }
 }

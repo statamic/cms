@@ -17,7 +17,7 @@ class TemplateFolderTest extends TestCase
 
         app('files')->makeDirectory($this->dir = __DIR__.'/templates-test-tmp');
 
-        $this->app['config']->set('view.paths', [$this->dir]);
+        $this->app['config']->set('view.paths', [$this->dir.'/views']);
     }
 
     public function tearDown(): void
@@ -41,8 +41,13 @@ class TemplateFolderTest extends TestCase
 
         $this->assertEquals([
             'empty',
+            'empty-symlink',
+            'empty-symlink/three',
             'one',
             'one/two',
+            'symlink-dir',
+            'symlink-dir/five',
+            'symlink-dir/four',
         ], $actual);
     }
 
@@ -72,11 +77,24 @@ class TemplateFolderTest extends TestCase
         ];
 
         foreach ($files as $path) {
-            File::put($this->dir.'/'.$path, '');
+            File::put($this->dir.'/views/'.$path, '');
         }
 
         // Empty directories should also be shown.
-        File::makeDirectory($this->dir.'/empty');
+        File::makeDirectory($this->dir.'/views/empty');
+
+        // Symlinked directories (even empties) should be shown.
+        File::makeDirectory($this->dir.'/empty-symlink-target');
+        File::makeDirectory($this->dir.'/empty-symlink-target/three');
+        File::put($this->dir.'/symlink-target-dir/tango.html', '');
+        File::put($this->dir.'/symlink-target-dir/four/uniform.html', '');
+        File::makeDirectory($this->dir.'/symlink-target-dir/five');
+        app('files')->link($this->dir.'/empty-symlink-target', $this->dir.'/views/empty-symlink');
+        app('files')->link($this->dir.'/symlink-target-dir', $this->dir.'/views/symlink-dir');
+
+        // Symlinked files should not.
+        File::put($this->dir.'/foo.html', '');
+        app('files')->link($this->dir.'/foo.html', $this->dir.'/views/victor.html');
     }
 
     private function fieldtype()

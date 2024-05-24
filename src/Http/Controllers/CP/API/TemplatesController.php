@@ -15,7 +15,7 @@ class TemplatesController extends CpController
         return collect(config('view.paths'))->flatMap(function ($path) {
             return collect(new RecursiveIteratorIterator(
                 new RecursiveCallbackFilterIterator(
-                    new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS),
+                    new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS | RecursiveDirectoryIterator::FOLLOW_SYMLINKS),
                     fn ($file) => ! str_starts_with($file->getFilename(), '.') && ! in_array($file->getBaseName(), ['node_modules'])
                 )
             ))->map(fn ($file) => Str::of($file->getPathname())
