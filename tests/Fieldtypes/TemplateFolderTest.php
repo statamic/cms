@@ -3,14 +3,12 @@
 namespace Tests\Fieldtypes;
 
 use Statamic\Facades\File;
-use Statamic\Facades\User;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Fields\Field;
+use Statamic\Fieldtypes\TemplateFolder;
 use Tests\TestCase;
 
-class TemplatesTest extends TestCase
+class TemplateFolderTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
-
     private string $dir;
 
     public function setUp(): void
@@ -30,7 +28,25 @@ class TemplatesTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_a_list_of_templates()
+    public function it_returns_a_list_of_directories()
+    {
+        $this->createFiles();
+
+        $fieldtype = $this->fieldtype();
+
+        $items = $fieldtype->getIndexItems(request());
+
+        // A collection with identical id/title keys are returned but we're only really concerned about the content.
+        $actual = $items->map->id->all();
+
+        $this->assertEquals([
+            'empty',
+            'one',
+            'one/two',
+        ], $actual);
+    }
+
+    private function createFiles()
     {
         $files = [
             // Regular files, these should all be shown.
@@ -49,32 +65,26 @@ class TemplatesTest extends TestCase
             'one/node_modules/india.html',
             'one/two/node_modules/juliett.html',
 
-            // dot directories at any level should get filtered out
-            '.kilo/lima.html',
-            'one/.mike/november.html',
-            'one/two/.oscar/papa.html',
-
             // dotfiles at any level should get filtered out
-            '.quebec.html',
-            'one/.rome.html',
-            'one/two/.sierra.html',
+            '.kilo.html',
+            'one/.lima.html',
+            'one/two/.mike.html',
         ];
 
         foreach ($files as $path) {
             File::put($this->dir.'/'.$path, '');
         }
 
-        // Empty directories should be ignored.
+        // Empty directories should also be shown.
         File::makeDirectory($this->dir.'/empty');
+    }
 
-        $this
-            ->actingAs(User::make()->makeSuper()->save())
-            ->get(cp_route('api.templates.index'))
-            ->assertJson([
-                'alfa',
-                'one/bravo',
-                'one/two/charlie',
-                'one/two/delta',
-            ]);
+    private function fieldtype()
+    {
+        $field = new Field('test', array_merge([
+            'type' => 'template_folder',
+        ]));
+
+        return (new TemplateFolder)->setField($field);
     }
 }

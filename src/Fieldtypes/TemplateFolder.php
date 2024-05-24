@@ -20,32 +20,14 @@ class TemplateFolder extends Relationship
 
     public function getIndexItems($request)
     {
-        return collect(config('view.paths'))
-            ->flatMap(function ($path) {
-                $directories = collect();
-                $filter = ['.git', 'node_modules'];
-
-                $iterator = new RecursiveIteratorIterator(
-                    new RecursiveCallbackFilterIterator(
-                        new RecursiveDirectoryIterator(
-                            $path,
-                            FilesystemIterator::SKIP_DOTS
-
-                        ),
-                        function ($fileInfo, $key, $iterator) use ($filter) {
-                            return ! $iterator->isLink() && $fileInfo->isDir() && ! in_array($fileInfo->getBaseName(), $filter);
-                        }
-                    ),
-                    RecursiveIteratorIterator::SELF_FIRST
-                );
-
-                foreach ($iterator as $file) {
-                    $directories->push(Str::replaceFirst($path.DIRECTORY_SEPARATOR, '', $file->getPathname()));
-                }
-
-                return $directories->filter()->values();
-            })
-            ->map(fn ($folder) => ['id' => $folder, 'title' => $folder])
-            ->values();
+        return collect(config('view.paths'))->flatMap(function ($path) {
+            return collect(new RecursiveIteratorIterator(
+                new RecursiveCallbackFilterIterator(
+                    new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
+                    fn ($file) => $file->isDir() && ! str_starts_with($file->getFilename(), '.') && ! in_array($file->getBaseName(), ['node_modules'])
+                ),
+                RecursiveIteratorIterator::SELF_FIRST
+            ))->map(fn ($file) => Str::of($file->getPathname())->after($path.DIRECTORY_SEPARATOR));
+        })->map(fn ($folder) => ['id' => $folder, 'title' => $folder])->values();
     }
 }
