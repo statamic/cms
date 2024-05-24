@@ -441,6 +441,14 @@ export default {
             return ! this.isSectionNode(node) && ! this.isChildItemNode(node);
         },
 
+        isChildItemNode(node) {
+            if (data_get(node, 'parent.isRoot')) {
+                return false;
+            }
+
+            return ! this.isSectionNode(node.parent);
+        },
+
         isCustomSectionNode(node) {
             return this.isSectionNode(node) && data_get(node, 'manipulations.action') === '@create';
         },
@@ -451,14 +459,6 @@ export default {
             }
 
             return node;
-        },
-
-        isChildItemNode(node) {
-            if (data_get(node, 'parent.isRoot')) {
-                return false;
-            }
-
-            return ! this.isSectionNode(node.parent);
         },
 
         traverseTree(nodes, callback, parentPath = []) {
