@@ -231,7 +231,9 @@ class GlobalSet implements Contract
 
     private function freshLocalizations()
     {
-        return GlobalVariables::whereSet($this->handle())->keyBy->locale();
+        return GlobalVariables::whereSet($this->handle())
+            ->filter(fn ($localization) => $localization->site())
+            ->keyBy->locale();
     }
 
     public function editUrl()
