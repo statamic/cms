@@ -27,7 +27,7 @@ class TemplateFolder extends Relationship
                     fn ($file) => $file->isDir() && ! str_starts_with($file->getFilename(), '.') && ! in_array($file->getBaseName(), ['node_modules'])
                 ),
                 RecursiveIteratorIterator::SELF_FIRST
-            ))->map(fn ($file) => Str::of($file->getPathname())->after($path.DIRECTORY_SEPARATOR));
+            ))->map(fn ($file) => Str::of($file->getPathname())->after($path.DIRECTORY_SEPARATOR)->toString());
         })->map(fn ($folder) => ['id' => $folder, 'title' => $folder])->sort()->values();
     }
 }
