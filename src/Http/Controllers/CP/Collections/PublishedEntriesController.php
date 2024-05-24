@@ -13,23 +13,35 @@ class PublishedEntriesController extends CpController
     {
         $this->authorize('publish', $entry);
 
-        $entry = $entry->publish([
+        return $this->performAction($entry, 'publish', [
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
         ]);
-
-        return new EntryResource($entry);
     }
 
     public function destroy(Request $request, $collection, $entry)
     {
         $this->authorize('publish', $entry);
 
-        $entry = $entry->unpublish([
+        return $this->performAction($entry, 'unpublish', [
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
         ]);
+    }
 
-        return new EntryResource($entry);
+    protected function performAction($entry, string $action, array $options)
+    {
+        if (! method_exists($entry, $action)) {
+            return;
+        }
+
+        $entrySaved = $entry->$action($options);
+
+        if ($entrySaved) {
+            $entry = $entrySaved;
+            $entrySaved = true;
+        }
+
+        return (new EntryResource($entry))->additional(['saved' => $entrySaved]);
     }
 }
