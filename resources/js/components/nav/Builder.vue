@@ -176,7 +176,7 @@
         <item-editor
             v-if="creatingItem"
             :creating="true"
-            :is-child="isChildItemNode(creatingItem)"
+            :is-child="creatingItemIsChild"
             @closed="resetItemEditor"
             @updated="itemAdded"
         />
@@ -279,6 +279,7 @@ export default {
             changed: false,
             targetDataArray: null,
             creatingItem: false,
+            creatingItemIsChild: false,
             editingItem: false,
             creatingSection: false,
             editingSection: false,
@@ -484,6 +485,7 @@ export default {
         addItem(targetDataArray, parentItem) {
             this.targetDataArray = targetDataArray;
             this.creatingItem = true;
+            this.creatingItemIsChild = parentItem && this.isParentItemNode(parentItem);
         },
 
         addSection() {
@@ -685,6 +687,7 @@ export default {
         resetItemEditor() {
             this.editingItem = false;
             this.creatingItem = false;
+            this.creatingItemIsChild = false;
             this.targetDataArray = false;
         },
 
