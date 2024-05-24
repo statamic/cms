@@ -6,7 +6,7 @@ use Statamic\Modifiers\Modify;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class ToQueryTest extends TestCase
+class ToQsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -32,6 +32,6 @@ class ToQueryTest extends TestCase
 
     private function modify($value, $options = [])
     {
-        return Modify::value($value)->toQuery($options)->fetch();
+        return Modify::value($value)->toQs($options)->fetch();
     }
 }

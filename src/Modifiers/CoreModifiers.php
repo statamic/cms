@@ -2554,7 +2554,7 @@ class CoreModifiers extends Modifier
      *
      * @return string
      */
-    public function toQuery($value)
+    public function toQs($value)
     {
         return Arr::query($value);
     }
