@@ -1376,6 +1376,16 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Get the keys of an array.
+     *
+     * @return array|Collection
+     */
+    public function keys($value)
+    {
+        return is_array($value) ? array_keys($value) : $value->keys();
+    }
+
+    /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
      * @return string
@@ -2848,6 +2858,16 @@ class CoreModifiers extends Modifier
         ][$key] : -1;
 
         return parse_url($value, $component);
+    }
+
+    /**
+     * Get the values of an array.
+     *
+     * @return array|Collection
+     */
+    public function values($value)
+    {
+        return is_array($value) ? array_values($value) : $value->values();
     }
 
     /**
