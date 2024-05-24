@@ -37,6 +37,8 @@ abstract class ActionController extends CpController
 
         $response = $action->run($items, $values);
 
+        abort_unless($response !== false, 418, __('Action failed'));
+
         if ($redirect = $action->redirect($items, $values)) {
             return ['redirect' => $redirect];
         } elseif ($download = $action->download($items, $values)) {
