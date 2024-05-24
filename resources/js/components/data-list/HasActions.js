@@ -15,7 +15,12 @@ export default {
             this.$events.$emit('reset-action-modals');
 
             if (response.message !== false) {
-                this.$toast.success(response.message || __("Action completed"));
+                if (response.status === 'failed') {
+                    this.$toast.error(response.message || __("Action failed"));
+                }
+                else {
+                    this.$toast.success(response.message || __("Action completed"));
+                }
             }
 
             this.afterActionSuccessfullyCompleted();
