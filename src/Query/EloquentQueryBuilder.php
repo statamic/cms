@@ -516,8 +516,21 @@ abstract class EloquentQueryBuilder implements Builder
         }
     }
 
-    public function __sleep()
+    public function __serialize(): array
     {
-        return array_keys(Arr::except(get_object_vars($this), ['builder']));
+        $this->builder->getQuery()->connection = null;
+        $this->builder->getQuery()->grammar = null;
+
+        return get_object_vars($this);
+    }
+
+    public function __unserialize($data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->$key = $value;
+        }
+
+        $this->builder->getQuery()->connection = $this->builder->getModel()->getConnection();
+        $this->builder->getQuery()->grammar = $this->builder->getQuery()->connection->getQueryGrammar();
     }
 }
