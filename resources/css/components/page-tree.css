@@ -13,6 +13,10 @@
         }
     }
 
+    .tree-node-children {
+        @apply dark:mt-1;
+    }
+
     .draggable-placeholder-inner {
         border: 1px dashed #0088F8;
         background: rgba(0, 136, 249, 0.09);

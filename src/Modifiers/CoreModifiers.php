@@ -706,13 +706,13 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Flattens a multi-dimensional collection into a single dimension.
+     * Flattens a multi-dimensional collection into a single or arbitrary dimension.
      *
      * @return array
      */
-    public function flatten($value)
+    public function flatten($value, $params)
     {
-        return collect($value)->flatten()->toArray();
+        return collect($value)->flatten(Arr::get($params, 0, INF))->toArray();
     }
 
     /**
@@ -1376,6 +1376,16 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Get the keys of an array.
+     *
+     * @return array|Collection
+     */
+    public function keys($value)
+    {
+        return is_array($value) ? array_keys($value) : $value->keys();
+    }
+
+    /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
      * @return string
@@ -1796,6 +1806,41 @@ class CoreModifiers extends Modifier
             }
 
             return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+        });
+
+        return $wasArray ? $items->all() : $items;
+    }
+
+    /**
+     * Selects certain values from each item in a collection.
+     *
+     * @param  array|Collection  $value
+     * @param  array  $params
+     * @return array|Collection
+     */
+    public function select($value, $params)
+    {
+        $keys = Arr::wrap($params);
+
+        if ($wasArray = is_array($value)) {
+            $value = collect($value);
+        }
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        $items = $value->map(function ($item) use ($keys) {
+            return collect($keys)->mapWithKeys(function ($key) use ($item) {
+                $value = null;
+                if (is_array($item) || $item instanceof ArrayAccess) {
+                    $value = Arr::get($item, $key);
+                } else {
+                    $value = method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+                }
+
+                return [$key => $value];
+            })->all();
         });
 
         return $wasArray ? $items->all() : $items;
@@ -2813,6 +2858,16 @@ class CoreModifiers extends Modifier
         ][$key] : -1;
 
         return parse_url($value, $component);
+    }
+
+    /**
+     * Get the values of an array.
+     *
+     * @return array|Collection
+     */
+    public function values($value)
+    {
+        return is_array($value) ? array_values($value) : $value->values();
     }
 
     /**
