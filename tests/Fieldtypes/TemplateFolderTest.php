@@ -15,7 +15,7 @@ class TemplateFolderTest extends TestCase
     {
         parent::setUp();
 
-        app('files')->makeDirectory($this->dir = __DIR__.'/templates-test-tmp');
+        app('files')->makeDirectory($this->dir = __DIR__.'/templates-test-tmp', force: true);
 
         $this->app['config']->set('view.paths', [$this->dir.'/views']);
     }
