@@ -74,6 +74,10 @@
         .showing-license-banner & {
             height: calc(100% - 105px);
         }
+
+        .nav-closed & {
+            @apply border-0 shadow-none;
+        }
     }
 }
 
