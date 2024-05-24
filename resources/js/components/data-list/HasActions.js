@@ -6,21 +6,24 @@ export default {
             this.loading = true;
         },
 
-        actionCompleted(successful=null, response={}) {
+        actionCompleted(successful=null, response={}, resetUi=true) {
             this.loading = false;
 
-            if (successful === false) return;
+            if (resetUi) {
+                this.$events.$emit('clear-selections');
+                this.$events.$emit('reset-action-modals');
+            }
 
-            this.$events.$emit('clear-selections');
-            this.$events.$emit('reset-action-modals');
-
-            if (response.message !== false) {
-                if (response.status === 'failed') {
+            if (successful === false) {
+                if (response.message !== false) {
                     this.$toast.error(response.message || __("Action failed"));
                 }
-                else {
-                    this.$toast.success(response.message || __("Action completed"));
-                }
+
+                return;
+            }
+
+            if (response.message !== false) {
+                this.$toast.success(response.message || __("Action completed"));
             }
 
             this.afterActionSuccessfullyCompleted();

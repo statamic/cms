@@ -53,6 +53,12 @@ export default {
         handleActionSuccess(response) {
             response.data.text().then(data => {
                 data = JSON.parse(data);
+
+                if (data.status === 'failed') {
+                    this.$emit('completed', false, data);
+                    return;
+                }
+
                 if (data.redirect) {
                     if (data.bypassesDirtyWarning) this.$dirty.disableWarning();
                     window.location = data.redirect;
@@ -66,8 +72,7 @@ export default {
             response.data.text().then(data => {
                 data = JSON.parse(data);
                 if (response.status == 422) this.errors = data.errors;
-                this.$toast.error(data.message);
-                this.$emit('completed', false, data);
+                this.$emit('completed', false, data, false);
             });
         },
 
