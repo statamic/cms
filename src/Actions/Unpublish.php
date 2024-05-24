@@ -44,8 +44,10 @@ class Unpublish extends Action
 
     public function run($entries, $values)
     {
-        $entries->each(function ($entry) {
-            $entry->unpublish(['user' => User::current()]);
+        $failedActions = $entries->filter(function ($entry) {
+            return ! $entry->unpublish(['user' => User::current()]);
         });
+
+        return $failedActions->isEmpty();
     }
 }

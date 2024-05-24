@@ -49,8 +49,10 @@ class Publish extends Action
 
     public function run($entries, $values)
     {
-        $entries->each(function ($entry) {
-            $entry->publish(['user' => User::current()]);
+        $failedActions = $entries->filter(function ($entry) {
+            return ! $entry->publish(['user' => User::current()]);
         });
+
+        return $failedActions->isEmpty();
     }
 }
