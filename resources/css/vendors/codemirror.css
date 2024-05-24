@@ -109,18 +109,18 @@
   .cm-link {text-decoration: underline;}
   .cm-strikethrough {text-decoration: line-through;}
 
-  .cm-s-default .cm-keyword {color: #708;}
+  .cm-s-default .cm-keyword {color: #708; @apply dark:text-purple-dark;}
   .cm-s-default .cm-atom {color: #219;}
   .cm-s-default .cm-number {color: #164;}
-  .cm-s-default .cm-def {color: #00f;}
+  .cm-s-default .cm-def {color: #00f; @apply dark:text-blue-600;}
   .cm-s-default .cm-variable,
   .cm-s-default .cm-punctuation,
   .cm-s-default .cm-property,
   .cm-s-default .cm-operator {}
-  .cm-s-default .cm-variable-2 {color: #05a;}
-  .cm-s-default .cm-variable-3 {color: #085;}
-  .cm-s-default .cm-comment {color: #a50;}
-  .cm-s-default .cm-string {color: #a11;}
+  .cm-s-default .cm-variable-2 {color: #05a; @apply dark:text-blue-600;}
+  .cm-s-default .cm-variable-3 {color: #085; @apply dark:text-green-600;}
+  .cm-s-default .cm-comment {color: #a50; @apply dark:text-orange-dark;}
+  .cm-s-default .cm-string {color: #a11; @apply dark:text-red-500;}
   .cm-s-default .cm-string-2 {color: #f50;}
   .cm-s-default .cm-meta {color: #555;}
   .cm-s-default .cm-qualifier {color: #555;}
@@ -129,7 +129,7 @@
   .cm-s-default .cm-tag {color: #170;}
   .cm-s-default .cm-attribute {color: #00c;}
   .cm-s-default .cm-hr {color: #999;}
-  .cm-s-default .cm-link {color: #00c;}
+  .cm-s-default .cm-link {color: #00c; @apply dark:text-blue-500;}
 
   .cm-s-default .cm-error {color: #f00;}
   .cm-invalidchar {color: #f00;}
@@ -375,12 +375,14 @@
     ========================================================================== */
 
   .cm-s-material.CodeMirror {
-    background-color: #263238;
+    background: #263238;
+    @apply dark:bg-dark-650;
     color: #EEFFFF;
   }
 
   .cm-s-material .CodeMirror-gutters {
     background: #263238;
+    @apply dark:bg-dark-650;
     color: #546E7A;
     border: none;
   }

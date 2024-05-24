@@ -34,7 +34,7 @@
    ========================================================================== */
 
 .asset-table-listing {
-    @apply border rounded relative overflow-hidden;
+    @apply border dark:border-dark-900 rounded relative overflow-hidden;
 
 
     table {
@@ -45,7 +45,7 @@
     }
 
     tbody tr:not(:last-child) {
-        @apply border-b;
+        @apply border-b dark:border-dark-900;
     }
 
     tbody tr td {
@@ -84,7 +84,7 @@
   ========================================================================== */
 
 .asset-grid-listing {
-    @apply bg-white grid relative p-4 gap-4;
+    @apply bg-white dark:bg-dark-800 grid relative p-4 gap-4;
     grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
 }
 
@@ -93,7 +93,7 @@
    ========================================================================== */
 
 .asset-tile {
-    @apply bg-white relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded;
+    @apply bg-white dark:bg-dark-500 relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded dark:border-dark-200;
 
     .asset-thumb {
         @apply flex justify-center items-center w-full h-full rounded;
@@ -112,7 +112,7 @@
     }
 
     .asset-meta {
-        @apply border-t w-full text-2xs text-gray-700;
+        @apply border-t dark:border-dark-200 w-full text-2xs text-gray-700 dark:text-dark-100;
     }
 
     .asset-filename {
@@ -125,12 +125,12 @@
 }
 
 .asset-tile.selected {
-    @apply border-blue;
+    @apply border-blue dark:border-dark-blue-100;
     box-shadow: 0 0 0 1px theme('colors.blue.DEFAULT');
 }
 
 .asset-thumbnail {
-    @apply border border-white;
+    @apply border border-white dark:border-dark-950;
 }
 
 /* The Asset Editor

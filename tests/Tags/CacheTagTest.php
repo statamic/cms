@@ -227,12 +227,9 @@ EXP;
     {
         $template = '{{ cache scope="site" }}expensive{{ /cache }}';
 
-        Site::setConfig([
-            'default' => 'default',
-            'sites' => [
-                'default' => [],
-                'other' => [],
-            ],
+        $this->setSites([
+            'default' => [],
+            'other' => [],
         ]);
 
         Site::setCurrent('default');
@@ -257,12 +254,9 @@ EXP;
     {
         $template = '{{ cache scope="site" }}expensive{{ /cache }}';
 
-        Site::setConfig([
-            'default' => 'default',
-            'sites' => [
-                'default' => [],
-                'other' => [],
-            ],
+        $this->setSites([
+            'default' => [],
+            'other' => [],
         ]);
 
         Site::setCurrent('default');

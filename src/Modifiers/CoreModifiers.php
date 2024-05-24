@@ -26,7 +26,9 @@ use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Support\Arr;
+use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Stringy\StaticStringy as Stringy;
@@ -153,6 +155,48 @@ class CoreModifiers extends Modifier
     public function at($value, $params)
     {
         return Stringy::at($value, Arr::get($params, 0));
+    }
+
+    /**
+     * Returns an attribute ($params[0]) with its value when the given $value variable is not empty.
+     *
+     * @param  string  $value
+     * @param  array  $params
+     * @return string
+     */
+    public function attribute($value, $params)
+    {
+        if (! $name = Arr::get($params, 0)) {
+            throw new \Exception('Attribute name is required.');
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
+        if (\is_array($value)) {
+            if (empty($value)) {
+                return '';
+            }
+
+            $value = \json_encode($value);
+        }
+
+        if (\is_bool($value)) {
+            return $value ? ' '.$name : '';
+        }
+
+        if (\is_object($value)) {
+            $value = (string) $value;
+        }
+
+        $value = trim($value);
+
+        if ($value === '') {
+            return '';
+        }
+
+        return sprintf(' %s="%s"', $name, Html::entities($value));
     }
 
     /**
@@ -487,7 +531,7 @@ class CoreModifiers extends Modifier
      */
     public function ddd($value)
     {
-        ddd($value);
+        ddd(Dumper::resolve($value));
     }
 
     /**
@@ -495,7 +539,7 @@ class CoreModifiers extends Modifier
      */
     public function debug($value)
     {
-        debug($value);
+        debug(Dumper::resolve($value));
     }
 
     /**
@@ -544,7 +588,7 @@ class CoreModifiers extends Modifier
      */
     public function dd($value)
     {
-        function_exists('ddd') ? ddd($value) : dd($value);
+        dd(Dumper::resolve($value));
     }
 
     /**
@@ -552,7 +596,7 @@ class CoreModifiers extends Modifier
      */
     public function dump($value)
     {
-        dump($value);
+        dump(Dumper::resolve($value));
     }
 
     /**
@@ -662,13 +706,13 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Flattens a multi-dimensional collection into a single dimension.
+     * Flattens a multi-dimensional collection into a single or arbitrary dimension.
      *
      * @return array
      */
-    public function flatten($value)
+    public function flatten($value, $params)
     {
-        return collect($value)->flatten()->toArray();
+        return collect($value)->flatten(Arr::get($params, 0, INF))->toArray();
     }
 
     /**
@@ -767,7 +811,7 @@ class CoreModifiers extends Modifier
 
         // Convert the item to an array, since we'll want access to all the
         // available data. Then grab the requested variable from there.
-        $array = $item instanceof Augmentable ? $item->toAugmentedArray() : $item->toArray();
+        $array = $item instanceof Augmentable ? $item->toDeferredAugmentedArray() : $item->toArray();
 
         if ($arrayValue = Arr::get($array, $var)) {
             return $arrayValue;
@@ -800,13 +844,6 @@ class CoreModifiers extends Modifier
      */
     public function groupBy($value, $params)
     {
-        if (config('statamic.antlers.version') != 'runtime') {
-            // Workaround for https://github.com/statamic/cms/issues/3614
-            // At the moment this modifier only works properly when using the param syntax.
-            $params = implode(':', $params);
-            $params = explode('|', $params);
-        }
-
         $groupBy = $params[0];
 
         $groupLabels = [];
@@ -845,7 +882,7 @@ class CoreModifiers extends Modifier
     {
         // Make the array just from the params, so it only augments the values that might be needed.
         $keys = explode(':', $groupBy);
-        $context = $item->toAugmentedArray($keys);
+        $context = $item->toDeferredAugmentedArray($keys);
 
         return Antlers::parser()->getVariable($groupBy, $context);
     }
@@ -1269,6 +1306,10 @@ class CoreModifiers extends Modifier
      */
     public function isExternalUrl($value)
     {
+        if ($value instanceof ArrayableLink) {
+            $value = $value->url();
+        }
+
         return Str::isUrl($value) && URL::isExternal($value);
     }
 
@@ -1402,7 +1443,7 @@ class CoreModifiers extends Modifier
     public function link($value, $params)
     {
         $attributes = $this->buildAttributesFromParameters($params);
-        $title = array_pull($attributes, 'title', null);
+        $title = Arr::pull($attributes, 'title', null);
 
         return Html::link($value, $title, $attributes);
     }
@@ -1550,7 +1591,7 @@ class CoreModifiers extends Modifier
      */
     public function modifyDate($value, $params)
     {
-        return $this->carbon($value)->modify(Arr::get($params, 0));
+        return $this->carbon($value)->copy()->modify(Arr::get($params, 0));
     }
 
     /**
@@ -1761,6 +1802,41 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Selects certain values from each item in a collection.
+     *
+     * @param  array|Collection  $value
+     * @param  array  $params
+     * @return array|Collection
+     */
+    public function select($value, $params)
+    {
+        $keys = Arr::wrap($params);
+
+        if ($wasArray = is_array($value)) {
+            $value = collect($value);
+        }
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        $items = $value->map(function ($item) use ($keys) {
+            return collect($keys)->mapWithKeys(function ($key) use ($item) {
+                $value = null;
+                if (is_array($item) || $item instanceof ArrayAccess) {
+                    $value = Arr::get($item, $key);
+                } else {
+                    $value = method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+                }
+
+                return [$key => $value];
+            })->all();
+        });
+
+        return $wasArray ? $items->all() : $items;
+    }
+
+    /**
      * Get the plural form of an English word with access to $context.
      *
      * @param  string  $value
@@ -1794,7 +1870,7 @@ class CoreModifiers extends Modifier
             $value = $value->all();
         }
 
-        return array_random($value);
+        return Arr::random($value);
     }
 
     /**
@@ -2064,7 +2140,7 @@ class CoreModifiers extends Modifier
         }
 
         if ($value instanceof Collection) {
-            $value = $value->toAugmentedArray();
+            $value = $value->toDeferredAugmentedArray();
         }
 
         return Arr::addScope($value, $scope);
@@ -2185,18 +2261,16 @@ class CoreModifiers extends Modifier
      */
     public function shuffle($value, array $params)
     {
-        $seed = Arr::get($params, 0);
-
         if (Compare::isQueryBuilder($value)) {
             $value = $value->get();
         }
 
         if (is_array($value)) {
-            return collect($value)->shuffle($seed)->all();
+            return collect($value)->shuffle()->all();
         }
 
         if ($value instanceof Collection) {
-            return $value->shuffle($seed);
+            return $value->shuffle();
         }
 
         return Stringy::shuffle($value);
@@ -2552,10 +2626,6 @@ class CoreModifiers extends Modifier
 
         if (Compare::isQueryBuilder($value)) {
             $value = $value->get();
-        }
-
-        if ($value instanceof Collection || $value instanceof Augmentable) {
-            $value = $value->toAugmentedArray();
         }
 
         return json_encode($value, $options);

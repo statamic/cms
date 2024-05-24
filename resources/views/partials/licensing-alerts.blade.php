@@ -4,7 +4,9 @@
 @if ($licenses->requestFailed())
     <div class="p-2 w-full fixed bottom-0 z-20">
         <div class="py-3 px-4 text-sm w-full rounded-md bg-yellow border border-yellow-dark">
-        @if ($licenses->requestErrorCode() === 422)
+        @if ($licenses->usingLicenseKeyFile())
+            {{ __('statamic::messages.outpost_license_key_error') }}
+        @elseif ($licenses->requestErrorCode() === 422)
             {{ __('statamic::messages.outpost_error_422') }}
             {{ join(' ', $licenses->requestValidationErrors()->unique()) }}
         @elseif ($licenses->requestErrorCode() === 429)
@@ -20,7 +22,7 @@
         <div class="p-2 w-full fixed bottom-0 z-2" v-show="showBanner">
             <div class="
                 py-3 px-4 text-sm w-full rounded-md
-                @if ($licenses->isOnTestDomain()) bg-gray-800 text-gray-300 @endif
+                @if ($licenses->isOnTestDomain()) bg-gray-800 dark:bg-dark-500 text-gray-300 @endif
                 @if ($licenses->isOnPublicDomain()) bg-red-500 text-white @endif
             ">
                 @if ($licenses->isOnTestDomain())

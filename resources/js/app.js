@@ -67,6 +67,7 @@ Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
 Vue.prototype.$keys = Statamic.$keys;
 Vue.prototype.$reveal = Statamic.$reveal;
+Vue.prototype.$slug = Statamic.$slug;
 
 import Moment from 'moment';
 window.moment = Vue.moment = Vue.prototype.$moment = Moment;
@@ -99,6 +100,7 @@ import './components/Permission';
 
 import GlobalSearch from './components/GlobalSearch.vue';
 import GlobalSiteSelector from './components/GlobalSiteSelector.vue';
+import DarkModeToggle from './components/DarkModeToggle.vue';
 import Login from './components/login/login';
 import LoginModal from './components/login/LoginModal.vue';
 import BaseEntryCreateForm from './components/entries/BaseCreateForm.vue';
@@ -142,6 +144,7 @@ import AssetContainerEditForm from './components/asset-containers/EditForm.vue';
 import NavBuilder from './components/nav/Builder.vue';
 import Updater from './components/updater/Updater.vue';
 import PortalTargets from './components/portals/PortalTargets.vue';
+import SitesEditForm from './components/sites/EditForm.vue';
 
 
 Statamic.app({
@@ -154,6 +157,7 @@ Statamic.app({
     components: {
         GlobalSearch,
         GlobalSiteSelector,
+        DarkModeToggle,
         Login,
         LoginModal,
         BaseEntryCreateForm,
@@ -197,6 +201,7 @@ Statamic.app({
         NavBuilder,
         Updater,
         PortalTargets,
+        SitesEditForm,
     },
 
     data: {
@@ -235,11 +240,6 @@ Statamic.app({
             this.$echo.start();
         }
 
-        // Set moment locale
-        window.moment.locale(Statamic.$config.get('locale'));
-        Vue.moment.locale(Statamic.$config.get('locale'));
-        Vue.prototype.$moment.locale(Statamic.$config.get('locale'));
-
         this.fixAutofocus();
 
         this.showBanner = Statamic.$config.get('hasLicenseBanner');
@@ -268,6 +268,8 @@ Statamic.app({
                     .forEach(img => img.src = url);
             });
         });
+
+        this.setupMoment();
     },
 
     methods: {
@@ -303,6 +305,35 @@ Statamic.app({
                     inputs[0].focus();
                 }
             }, 100);
+        },
+
+        setupMoment() {
+            const locale = Statamic.$config.get('locale');
+            window.moment.locale(locale);
+            Vue.moment.locale(locale);
+            Vue.prototype.$moment.locale(locale);
+
+            const spec = {
+                relativeTime: {
+                    future: __('moment.relativeTime.future'),
+                    past: __('moment.relativeTime.past'),
+                    s: __('moment.relativeTime.s'),
+                    ss: __('moment.relativeTime.ss'),
+                    m: __('moment.relativeTime.m'),
+                    mm: __('moment.relativeTime.mm'),
+                    h: __('moment.relativeTime.h'),
+                    hh: __('moment.relativeTime.hh'),
+                    d: __('moment.relativeTime.d'),
+                    dd: __('moment.relativeTime.dd'),
+                    M: __('moment.relativeTime.M'),
+                    MM: __('moment.relativeTime.MM'),
+                    y: __('moment.relativeTime.y'),
+                    yy: __('moment.relativeTime.yy'),
+                }
+            };
+            window.moment.updateLocale(locale, spec);
+            Vue.moment.updateLocale(locale, spec);
+            Vue.prototype.$moment.updateLocale(locale, spec);
         }
     }
 

@@ -47,10 +47,10 @@ class EntryTest extends TestCase
     /** @test */
     public function it_sets_and_gets_the_locale()
     {
-        Facades\Site::setConfig(['sites' => [
+        $this->setSites([
             'foo' => [],
             'bar' => [],
-        ]]);
+        ]);
 
         $entry = new Entry;
         $this->assertEquals('foo', $entry->locale()); // defaults to the default site.
@@ -64,9 +64,9 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_site()
     {
-        config(['statamic.sites.sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US'],
-        ]]);
+        ]);
 
         $entry = (new Entry)->locale('en');
 
@@ -90,10 +90,10 @@ class EntryTest extends TestCase
     /** @test */
     public function the_slug_gets_slugified()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'url' => '/'],
             'da' => ['locale' => 'da_DK', 'url' => '/da/'],
-        ]]);
+        ]);
 
         $entry = new Entry;
         $entry->slug('foo bar æøå');
@@ -519,11 +519,11 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_url_from_the_collection()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr_FR'],
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
-        ]]);
+        ]);
 
         $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
@@ -637,11 +637,9 @@ class EntryTest extends TestCase
      */
     public function it_gets_urls_for_first_child_redirects($value)
     {
-        \Event::fake(); // Don't invalidate static cache etc when saving entries.
-
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
-        ]]);
+        ]);
 
         $collection = tap((new Collection)->handle('pages')->routes('{parent_uri}/{slug}'))->save();
 
@@ -879,9 +877,9 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_path_and_excludes_locale_when_theres_a_single_site()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
-        ]]);
+        ]);
 
         $collection = tap(Facades\Collection::make('blog')->dated(true))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
@@ -893,10 +891,10 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_path_and_includes_locale_when_theres_multiple_sites()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR'],
-        ]]);
+        ]);
 
         $collection = tap(Facades\Collection::make('blog')->dated(true))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
@@ -1375,8 +1373,11 @@ class EntryTest extends TestCase
         $mock->shouldReceive('store')->with('structure-uris')->once()->andReturn(
             $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
         );
-        $mock->shouldReceive('store')->with('structure-entries')->once()->andReturn(
-            $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
+        $mock->shouldReceive('store')->with('structure-entries')->twice()->andReturn(
+            tap($this->mock(\Spatie\Blink\Blink::class), function ($m) {
+                $m->shouldReceive('forget')->with('a')->once();
+                $m->shouldReceive('put')->once();
+            })
         );
 
         $entry->save();
@@ -1421,14 +1422,11 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection = (new Collection)
@@ -1487,13 +1485,10 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection = (new Collection)
@@ -1518,13 +1513,10 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection = (new Collection)
@@ -1548,14 +1540,11 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection = (new Collection)
@@ -1603,13 +1592,10 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
         ]);
 
         $collection = (new Collection)
@@ -2040,11 +2026,11 @@ class EntryTest extends TestCase
     {
         Event::fake();
 
-        config(['statamic.sites.sites' => [
-            'en' => [],
-            'fr' => [],
-            'de' => [],
-        ]]);
+        $this->setSites([
+            'en' => ['locale' => 'en'],
+            'fr' => ['locale' => 'fr'],
+            'de' => ['locale' => 'de'],
+        ]);
 
         $entry = EntryFactory::collection('test')->locale('en')->id('1')->create();
         $localization = EntryFactory::collection('test')->locale('fr')->id('2')->origin('1')->create();
@@ -2098,11 +2084,12 @@ class EntryTest extends TestCase
     public function it_detaches_localizations()
     {
         Event::fake();
-        config(['statamic.sites.sites' => [
-            'en' => [],
-            'fr' => [],
-            'fr_ca' => [],
-        ]]);
+
+        $this->setSites([
+            'en' => ['locale' => 'en'],
+            'fr' => ['locale' => 'fr'],
+            'fr_ca' => ['locale' => 'fr_ca'],
+        ]);
 
         $english = EntryFactory::collection('test')->locale('en')->id('en')->data([
             'title' => 'English',
@@ -2253,11 +2240,11 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_preview_targets()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr_FR'],
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
-        ]]);
+        ]);
 
         $collection = (new Collection)->dated(true)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
@@ -2399,13 +2386,13 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_all_descendants()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
             'fr_CA' => ['locale' => 'fr_CA', 'url' => '/fr-ca/'],
             'de' => ['locale' => 'de_DE', 'url' => '/de/'],
             'it' => ['local' => 'it_IT', 'url' => '/it/'],
-        ]]);
+        ]);
 
         $one = EntryFactory::collection('test')->id('1')->locale('en')->create();
         $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
@@ -2422,13 +2409,13 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_direct_descendants()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
             'fr_CA' => ['locale' => 'fr_CA', 'url' => '/fr-ca/'],
             'de' => ['locale' => 'de_DE', 'url' => '/de/'],
             'it' => ['local' => 'it_IT', 'url' => '/it/'],
-        ]]);
+        ]);
 
         $one = EntryFactory::collection('test')->id(1)->locale('en')->create();
         $two = EntryFactory::collection('test')->id(2)->origin(1)->locale('fr')->create();
@@ -2445,12 +2432,12 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_ancestors()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
             'fr_CA' => ['locale' => 'fr_CA', 'url' => '/fr-ca/'],
             'de' => ['locale' => 'de_DE', 'url' => '/de/'],
-        ]]);
+        ]);
 
         $one = EntryFactory::collection('test')->id('1')->locale('en')->create();
         $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
@@ -2473,13 +2460,10 @@ class EntryTest extends TestCase
         config(['cache.default' => 'file']);
         Cache::clear();
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
         ]);
 
         $one = EntryFactory::collection('test')->id('1')->locale('en')->data(['foo' => 'root'])->create();
@@ -2535,14 +2519,11 @@ class EntryTest extends TestCase
     /** @test */
     public function initially_saved_entry_gets_put_into_events()
     {
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
-                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => '/es/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
+            'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => '/es/'],
         ]);
 
         // Bunch of localizations of the same entry.

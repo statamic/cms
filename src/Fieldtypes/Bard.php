@@ -22,8 +22,22 @@ class Bard extends Replicator
 {
     use Concerns\ResolvesStatamicUrls, Hookable;
 
+    private static $defaultButtons = [
+        'h2',
+        'h3',
+        'bold',
+        'italic',
+        'unorderedlist',
+        'orderedlist',
+        'removeformat',
+        'quote',
+        'anchor',
+        'image',
+        'table',
+    ];
+
     protected $categories = ['text', 'structured'];
-    protected $defaultValue = '[]';
+    protected $defaultValue = [];
     protected $rules = [];
 
     protected function configFieldItems(): array
@@ -38,19 +52,7 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
                         'type' => 'bard_buttons_setting',
                         'full_width_setting' => true,
-                        'default' => [
-                            'h2',
-                            'h3',
-                            'bold',
-                            'italic',
-                            'unorderedlist',
-                            'orderedlist',
-                            'removeformat',
-                            'quote',
-                            'anchor',
-                            'image',
-                            'table',
-                        ],
+                        'default' => static::$defaultButtons,
                     ],
                     'smart_typography' => [
                         'display' => __('Smart Typography'),
@@ -258,8 +260,6 @@ class Bard extends Replicator
 
     public function process($value)
     {
-        $value = json_decode($value, true);
-
         $value = $this->removeEmptyNodes($value);
 
         if ($this->config('inline')) {
@@ -341,7 +341,7 @@ class Bard extends Replicator
     {
         $row['attrs']['values'] = parent::processRow($row['attrs']['values'], $index);
 
-        if (array_get($row, 'attrs.enabled', true) === true) {
+        if (Arr::get($row, 'attrs.enabled', true) === true) {
             unset($row['attrs']['enabled']);
         }
 
@@ -359,8 +359,8 @@ class Bard extends Replicator
             })->values()->all();
         }
 
-        if (empty($value) || $value === '[]') {
-            return '[]';
+        if (empty($value)) {
+            return [];
         }
 
         if (is_string($value)) {
@@ -396,9 +396,7 @@ class Bard extends Replicator
             return $this->preProcessRow($row, $i);
         })->all();
 
-        $value = $this->runHooks('pre-process', $value);
-
-        return json_encode($value);
+        return $this->runHooks('pre-process', $value);
     }
 
     protected function preProcessRow($row, $index)
@@ -552,7 +550,7 @@ class Bard extends Replicator
 
     public function preload()
     {
-        $value = json_decode($this->field->value(), true);
+        $value = $this->field->value();
 
         $existing = collect($value)->filter(function ($item) {
             return $item['type'] === 'set';
@@ -610,7 +608,7 @@ class Bard extends Replicator
             return $value;
         }
 
-        $value = json_decode($value ?? '[]', true);
+        $value = $value ?? [];
 
         $value = collect($value)->map(function ($item, $index) {
             if ($item['type'] !== 'set') {
@@ -745,5 +743,10 @@ class Bard extends Replicator
     public function runAugmentHooks($value)
     {
         return $this->runHooks('augment', $value);
+    }
+
+    public static function setDefaultButtons(array $buttons): void
+    {
+        static::$defaultButtons = $buttons;
     }
 }

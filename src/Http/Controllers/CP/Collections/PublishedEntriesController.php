@@ -9,6 +9,8 @@ use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class PublishedEntriesController extends CpController
 {
+    use ExtractsFromEntryFields;
+
     public function store(Request $request, $collection, $entry)
     {
         $this->authorize('publish', $entry);
@@ -42,6 +44,13 @@ class PublishedEntriesController extends CpController
             $entrySaved = true;
         }
 
-        return (new EntryResource($entry))->additional(['saved' => $entrySaved]);
+        [$values] = $this->extractFromFields($entry, $entry->blueprint());
+        $resource = (new EntryResource($entry->fresh()))->additional(['saved' => $entrySaved])->resolve();
+
+        return [
+            'data' => array_merge($resource['data'], [
+                'values' => $values,
+            ]),
+        ];
     }
 }

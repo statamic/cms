@@ -7,7 +7,7 @@
 }
 
 .focus-outline {
-    @apply border border-blue-300;
+    @apply border border-blue-300 dark:border-dark-blue-200;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0,125,255,.25);
 }
@@ -76,13 +76,18 @@
     background-image: linear-gradient(45deg, #EDF2F6 25%, transparent 25%), linear-gradient(-45deg, #EDF2F6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #EDF2F6 75%), linear-gradient(-45deg, transparent 75%, #EDF2F6 75%);
     background-size: 16px 16px;
     background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+
+    .dark & {
+        background-color: theme(colors.dark.600);
+        background-image: linear-gradient(45deg, theme(colors.dark.950) 25%, transparent 25%), linear-gradient(-45deg, theme(colors.dark.950) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, theme(colors.dark.950) 75%), linear-gradient(-45deg, transparent 75%, theme(colors.dark.950) 75%);
+    }
 }
 
 .clickable {
-    @apply text-gray-800 select-none cursor-pointer border bg-gradient-to-b from-white to-gray-100;
+    @apply text-gray-800 dark:text-dark-175 select-none cursor-pointer border dark:border-dark-800 bg-gradient-to-b from-white to-gray-100 dark:from-dark-550 dark:to-dark-600;
 
     &:hover {
-        @apply border-gray-500 from-white to-gray-200;
+        @apply border-gray-500 dark:border-dark-900 from-white to-gray-200 dark:from-dark-550 dark:to-dark-700;
     }
 }
 

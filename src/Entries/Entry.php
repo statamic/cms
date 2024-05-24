@@ -13,6 +13,7 @@ use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Data\BulkAugmentable;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\Entries\EntryRepository;
@@ -43,7 +44,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -53,7 +53,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
+class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
     use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
@@ -78,6 +78,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     protected $withEvents = true;
     protected $template;
     protected $layout;
+    private $augmentationReferenceKey;
+    private $computedCallbackCache;
+    private $siteCache;
 
     public function __construct()
     {
@@ -90,11 +93,24 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
     }
 
+    public function getBulkAugmentationReferenceKey(): ?string
+    {
+        if ($this->augmentationReferenceKey) {
+            return $this->augmentationReferenceKey;
+        }
+
+        $dataPart = implode('|', $this->data->keys()->sort()->all());
+
+        return $this->augmentationReferenceKey = 'Entry::'.$this->blueprint()->namespace().'::'.$dataPart;
+    }
+
     public function locale($locale = null)
     {
         return $this
             ->fluentlyGetOrSet('locale')
             ->setter(function ($locale) {
+                $this->siteCache = null;
+
                 return $locale instanceof \Statamic\Sites\Site ? $locale->handle() : $locale;
             })
             ->getter(function ($locale) {
@@ -105,7 +121,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function site()
     {
-        return Site::get($this->locale());
+        if ($this->siteCache) {
+            return $this->siteCache;
+        }
+
+        return $this->siteCache = Site::get($this->locale());
     }
 
     public function authors()
@@ -115,17 +135,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function collection($collection = null)
     {
-        return $this
-            ->fluentlyGetOrSet('collection')
-            ->setter(function ($collection) {
-                return $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
-            })
-            ->getter(function ($collection) {
-                return $collection ? Blink::once("collection-{$collection}", function () use ($collection) {
-                    return Collection::findByHandle($collection);
-                }) : null;
-            })
-            ->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->collection ? Blink::once("collection-{$this->collection}", function () {
+                return Collection::findByHandle($this->collection);
+            }) : null;
+        }
+
+        $this->computedCallbackCache = null;
+        $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
+
+        return $this;
     }
 
     public function blueprint($blueprint = null)
@@ -374,6 +393,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         Facades\Entry::save($this);
 
         if ($this->id()) {
+            Blink::store('entry-uris')->forget($this->id());
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
             Blink::forget($this->getOriginBlinkKey());
@@ -471,7 +491,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return vsprintf('%s/%s/%s%s%s.%s', [
             rtrim(Stache::store('entries')->directory(), '/'),
             $this->collectionHandle(),
-            Site::hasMultiple() ? $this->locale().'/' : '',
+            Site::multiEnabled() ? $this->locale().'/' : '',
             $prefix,
             $this->slug() ?? $this->id(),
             $this->fileExtension(),
@@ -892,15 +912,23 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function uri()
     {
+        if ($this->id() && Blink::store('entry-uris')->has($this->id())) {
+            return Blink::store('entry-uris')->get($this->id());
+        }
+
         if (! $this->route()) {
             return null;
         }
 
-        if ($structure = $this->structure()) {
-            return $structure->entryUri($this);
+        $uri = ($structure = $this->structure())
+            ? $structure->entryUri($this)
+            : $this->routableUri();
+
+        if ($uri && $this->id()) {
+            Blink::store('entry-uris')->put($this->id(), $uri);
         }
 
-        return $this->routableUri();
+        return $uri;
     }
 
     public function fileExtension()
@@ -1027,6 +1055,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             return $this->value('authors');
         }
 
+        // Reset the cached uri so it gets recalculated.
+        if ($field === 'uri') {
+            Blink::store('entry-uris')->forget($this->id());
+        }
+
         if (method_exists($this, $method = Str::camel($field))) {
             return $this->{$method}();
         }
@@ -1052,7 +1085,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     protected function getComputedCallbacks()
     {
-        return Facades\Collection::getComputedCallbacks($this->collection);
+        if ($this->computedCallbackCache) {
+            return $this->computedCallbackCache;
+        }
+
+        return $this->computedCallbackCache = Facades\Collection::getComputedCallbacks($this->collection);
     }
 
     public function __sleep()
@@ -1062,6 +1099,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             $this->slug = $slug($this);
         }
 
-        return array_keys(get_object_vars($this));
+        return array_keys(Arr::except(get_object_vars($this), ['cachedKeys', 'computedCallbackCache', 'siteCache', 'augmentationReferenceKey']));
     }
 }
