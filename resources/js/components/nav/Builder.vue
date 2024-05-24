@@ -96,7 +96,7 @@
                         <dropdown-item
                             v-if="vm.level < 2"
                             :text="__('Add Item')"
-                            @click="addItem(item.children)" />
+                            @click="addItem(item.children, item)" />
                         <dropdown-item
                             :text="__('Edit')"
                             @click="editingItem = item" />
@@ -146,7 +146,7 @@
                         <dropdown-item
                             v-if="vm.level < 3"
                             :text="__('Add Item')"
-                            @click="addItem(item.children)" />
+                            @click="addItem(item.children, item)" />
                         <dropdown-item
                             :text="__('Edit')"
                             @click="editItem(item)" />
@@ -477,7 +477,7 @@ export default {
             });
         },
 
-        addItem(targetDataArray) {
+        addItem(targetDataArray, parentItem) {
             this.targetDataArray = targetDataArray;
             this.creatingItem = true;
         },
