@@ -2,6 +2,7 @@
 
 namespace Statamic\Actions;
 
+use Exception;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\User;
 
@@ -53,6 +54,8 @@ class Publish extends Action
             return ! $entry->publish(['user' => User::current()]);
         });
 
-        return $failedActions->isEmpty();
+        if ($failedActions->isNotEmpty()) {
+            throw new Exception(__("Couldn't publish entry"));
+        }
     }
 }
