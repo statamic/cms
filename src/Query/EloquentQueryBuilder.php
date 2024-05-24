@@ -515,4 +515,9 @@ abstract class EloquentQueryBuilder implements Builder
             $this->orderBy($this->builder->getModel()->getQualifiedKeyName(), 'asc');
         }
     }
+
+    public function __sleep()
+    {
+        return array_keys(Arr::except(get_object_vars($this), ['builder']));
+    }
 }
