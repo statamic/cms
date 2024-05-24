@@ -252,12 +252,12 @@ class CoreNav
     {
         Nav::settings(Site::multiEnabled() ? 'Sites' : 'Site')
             ->route('sites.edit')
-            ->icon('/sites')
+            ->icon('sites')
             ->can('configure sites');
 
         Nav::settings('Preferences')
             ->route('preferences.index')
-            ->icon('/settings')
+            ->icon('settings')
             ->children([
                 Nav::item('General')->route('preferences.index'),
                 Nav::item('CP Nav')->route('preferences.nav.index'),
