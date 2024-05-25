@@ -265,6 +265,11 @@ class CoreModifiers extends Modifier
         if ($value instanceof Value) {
             $value = $value->raw();
         }
+
+        if (is_null($value)) {
+            return '';
+        }
+
         if (Arr::isAssoc($value)) {
             $value = [$value];
         }
