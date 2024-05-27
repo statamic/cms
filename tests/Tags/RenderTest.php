@@ -100,8 +100,8 @@ class RenderTest extends TestCase
         $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
+        $driver->shouldReceive('getUrl')->once()->andReturn('the-url');
         $driver->shouldReceive('getAttributes')->once()->andReturn([
-            'url' => 'the-url',
             'width' => 'the-width',
             'height' => 'the-height',
         ]);
@@ -126,8 +126,8 @@ class RenderTest extends TestCase
         $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
+        $driver->shouldReceive('getUrl')->once()->andReturn('the-url');
         $driver->shouldReceive('getAttributes')->once()->andReturn([
-            'url' => 'the-url',
             'width' => 'the-width',
             'height' => 'the-height',
         ]);
@@ -153,12 +153,11 @@ class RenderTest extends TestCase
         $driver->shouldReceive('setSource')->with('one.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('setSource')->with('two.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->twice()->andReturnSelf();
+        $driver->shouldReceive('getUrl')->twice()->andReturn('the-url', 'second-url');
         $driver->shouldReceive('getAttributes')->twice()->andReturn([
-            'url' => 'the-url',
             'width' => 'the-width',
             'height' => 'the-height',
         ], [
-            'url' => 'second-url',
             'width' => 'second-width',
             'height' => 'second-height',
         ]);
@@ -189,12 +188,11 @@ EOF;
         $driver->shouldReceive('setSource')->with('one.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('setSource')->with('two.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->twice()->andReturnSelf();
+        $driver->shouldReceive('getUrl')->twice()->andReturn('the-url', 'second-url');
         $driver->shouldReceive('getAttributes')->twice()->andReturn([
-            'url' => 'the-url',
             'width' => 'the-width',
             'height' => 'the-height',
         ], [
-            'url' => 'second-url',
             'width' => 'second-width',
             'height' => 'second-height',
         ]);

@@ -43,7 +43,9 @@ class Render extends Tags
             $source = $source->get();
         }
 
-        return collect($source)->map(fn ($source) => $this->driver()->setSource($source)->getAttributes());
+        return collect($source)->map(fn ($source) => array_merge([
+            'url' => ($driver = $this->driver()->setSource($source))->getUrl(),
+        ], $driver->getAttributes()));
     }
 
     public function batch()
