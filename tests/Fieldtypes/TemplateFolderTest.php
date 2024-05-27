@@ -89,12 +89,12 @@ class TemplateFolderTest extends TestCase
         File::put($this->dir.'/symlink-target-dir/tango.html', '');
         File::put($this->dir.'/symlink-target-dir/four/uniform.html', '');
         File::makeDirectory($this->dir.'/symlink-target-dir/five');
-        app('files')->link($this->dir.'/empty-symlink-target', $this->dir.'/views/empty-symlink');
-        app('files')->link($this->dir.'/symlink-target-dir', $this->dir.'/views/symlink-dir');
+        symlink($this->dir.'/empty-symlink-target', $this->dir.'/views/empty-symlink');
+        symlink($this->dir.'/symlink-target-dir', $this->dir.'/views/symlink-dir');
 
         // Symlinked files should not.
         File::put($this->dir.'/foo.html', '');
-        app('files')->link($this->dir.'/foo.html', $this->dir.'/views/victor.html');
+        symlink($this->dir.'/foo.html', $this->dir.'/views/victor.html');
     }
 
     private function fieldtype()
