@@ -110,4 +110,16 @@ class Manager
 
         return Glide::normalizeParameters($preset);
     }
+
+    public function driver()
+    {
+        // TODO: get it from the config. accept an argument to get a specific one.
+        // i.e. manager stuff.
+
+        return new Glide([
+            'driver' => 'glide',
+            'cache' => public_path('img'),
+            'url' => 'img',
+        ]);
+    }
 }
