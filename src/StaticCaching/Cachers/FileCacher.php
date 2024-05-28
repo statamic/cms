@@ -121,7 +121,7 @@ class FileCacher extends AbstractCacher
             ->getUrls($domain)
             ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
             ->each(function ($value, $key) use ($site, $domain) {
-                $this->writer->delete($this->getFilePath($value, $site));
+                $this->writer->delete($this->getFilePath($domain.$value, $site));
                 $this->forgetUrl($key, $domain);
             });
 
@@ -164,7 +164,7 @@ class FileCacher extends AbstractCacher
     public function getFilePath($url, $site = null)
     {
         $urlParts = parse_url($url);
-        $pathParts = pathinfo($urlParts['path'] ?? $url);
+        $pathParts = pathinfo($urlParts['path']);
         $slug = $pathParts['basename'];
         $query = $this->config('ignore_query_strings') ? '' : Arr::get($urlParts, 'query', '');
 
