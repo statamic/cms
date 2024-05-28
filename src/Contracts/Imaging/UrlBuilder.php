@@ -2,6 +2,10 @@
 
 namespace Statamic\Contracts\Imaging;
 
+/**
+ * @deprecated New image manipulation methods have been introduced.
+ * @see Manipulator
+ */
 interface UrlBuilder
 {
     /**

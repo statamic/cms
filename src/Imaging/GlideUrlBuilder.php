@@ -6,8 +6,13 @@ use Exception;
 use League\Glide\Urls\UrlBuilderFactory;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\URL;
+use Statamic\Imaging\Manipulators\GlideManipulator;
 use Statamic\Support\Str;
 
+/**
+ * @deprecated URL building is now done in dedicated manipulator classes.
+ * @see GlideManipulator
+ */
 class GlideUrlBuilder extends ImageUrlBuilder
 {
     /**

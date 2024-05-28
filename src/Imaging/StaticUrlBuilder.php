@@ -4,8 +4,13 @@ namespace Statamic\Imaging;
 
 use Statamic\Facades\Asset;
 use Statamic\Facades\URL;
+use Statamic\Imaging\Manipulators\GlideManipulator;
 use Statamic\Support\Str;
 
+/**
+ * @deprecated URL building is now done in dedicated manipulator classes.
+ * @see GlideManipulator
+ */
 class StaticUrlBuilder extends ImageUrlBuilder
 {
     /**

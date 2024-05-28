@@ -8,9 +8,14 @@ use Illuminate\Support\Facades\Storage;
 use League\Glide\ServerFactory;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
+use Statamic\Imaging\Manipulators\GlideManipulator;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 use Statamic\Support\Str;
 
+/**
+ * @deprecated Glide should be accessed through its manipulation class.
+ * @see GlideManipulator
+ */
 class GlideManager
 {
     private Closure $customHashCallable;
