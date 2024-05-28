@@ -49,7 +49,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $withEvents = true;
     protected $sortField;
     protected $sortDirection;
-    protected $order = 1;
+    protected $order;
 
     public function id($id = null)
     {
@@ -660,6 +660,9 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     {
         return $this
             ->fluentlyGetOrSet('order')
+            ->getter(function ($order) {
+                return $order ?? 1;
+            })
             ->args(func_get_args());
     }
 
