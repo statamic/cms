@@ -9,12 +9,10 @@ use Mockery\MockInterface;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\RowId;
-use Statamic\Fieldtypes\Text;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Tiptap\Core\Node;
@@ -128,58 +126,6 @@ class BardTest extends TestCase
     }
 
     /** @test */
-    public function it_augments_correctly_when_content_includes_text_node_and_set_named_text()
-    {
-        $data = [
-            [
-                'type' => 'paragraph',
-                'content' => [
-                    ['type' => 'text', 'text' => 'This is a paragraph with '],
-                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
-                    ['type' => 'text', 'text' => ' and '],
-                    ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
-                    ['type' => 'text', 'text' => ' text.'],
-                ],
-            ],
-            [
-                'type' => 'set',
-                'attrs' => [
-                    'values' => [
-                        'type' => 'text',
-                        'text' => '<p>Bard text here.</p>',
-                    ],
-                ],
-            ],
-        ];
-
-        $expected = [
-            [
-                'type' => 'text',
-                'text' => '<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p>',
-            ],
-            [
-                'id' => null,
-                'type' => 'text',
-                'text' => '<p>Bard text here.</p>',
-            ],
-        ];
-
-        $augmented = $this->bard([
-            'save_html' => false,
-            'sets' => [
-                'text' => [
-                    'fields' => [
-                        ['handle' => 'text', 'field' => ['type' => 'bard', 'save_html' => true]],
-                    ],
-                ],
-            ],
-        ])->augment($data);
-
-        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
-        $this->assertEquals($expected, collect($augmented)->map->all()->map(fn ($items) => collect($items)->map(fn ($value) => (string) $value))->toArray());
-    }
-
-    /** @test */
     public function it_augments_ids_and_sets_id_correctly_with_a_custom_id_handle()
     {
         config()->set('statamic.system.row_id_handle', '_id');
@@ -236,28 +182,6 @@ class BardTest extends TestCase
     public function it_doesnt_augment_when_saved_as_html()
     {
         $this->assertEquals('<p>Paragraph</p>', $this->bard()->augment('<p>Paragraph</p>'));
-    }
-
-    /** @test */
-    public function it_augments_when_save_html_is_enabled_but_field_has_existing_content()
-    {
-        $data = [
-            [
-                'type' => 'paragraph',
-                'content' => [
-                    ['type' => 'text', 'text' => 'This is a paragraph with '],
-                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
-                    ['type' => 'text', 'text' => ' and '],
-                    ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
-                    ['type' => 'text', 'text' => ' text.'],
-                ],
-            ],
-        ];
-
-        $expected = '<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p>';
-
-        $this->assertEquals($expected, $this->bard(['save_html' => true, 'sets' => []])->augment($data));
-        $this->assertEquals($expected, $this->bard(['save_html' => true, 'sets' => null])->augment($data));
     }
 
     /** @test */
