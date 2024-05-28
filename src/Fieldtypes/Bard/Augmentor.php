@@ -152,10 +152,6 @@ class Augmentor
         $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
 
         return $value->map(function ($set, $index) use ($augmentMethod) {
-            if ($set['type'] === 'text' && $set['text'] instanceof Value) {
-                return ['type' => 'text', 'text' => $set['text']->fieldtype()->{$augmentMethod}($set['text'])];
-            }
-
             if (! Arr::get($this->fieldtype->flattenedSetsConfig(), "{$set['type']}.fields")) {
                 return $set;
             }
