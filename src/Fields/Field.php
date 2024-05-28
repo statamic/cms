@@ -408,9 +408,14 @@ class Field implements Arrayable
 
         $fields = $fieldtype->configFields()->addValues($this->config);
 
-        return array_merge($this->config, $fields->preProcess()->values()->all(), [
-            'component' => $fieldtype->component(),
-        ]);
+        return array_merge(
+            self::commonFieldOptions()->all()->map->get('default')->all(),
+            $this->config,
+            $fields->preProcess()->values()->all(),
+            [
+                'component' => $fieldtype->component(),
+            ]
+        );
     }
 
     public function meta()
