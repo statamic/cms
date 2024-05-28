@@ -25,8 +25,14 @@ class Alpine extends AbstractJsDriver
      */
     public function addToFormAttributes()
     {
+        $extraData = $this->params->pull('x-data', []);
+
+        if (is_string($extraData)) {
+            $extraData = json_decode($extraData);
+        }
+
         return [
-            'x-data' => $this->renderAlpineXData($this->getInitialFormData(), $this->scope),
+            'x-data' => $this->renderAlpineXData(collect($this->getInitialFormData())->merge($extraData)->all(), $this->scope),
         ];
     }
 
