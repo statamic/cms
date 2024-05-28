@@ -9,7 +9,9 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Antlers;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class DefaultInvalidator implements Invalidator
 {
@@ -68,7 +70,10 @@ class DefaultInvalidator implements Invalidator
         });
 
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls")
+            $this->parseInvalidationRules(
+                Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"),
+                $entry->values()->merge(['parent_uri' => $entry->parent()?->uri()])->all()
+            )
         );
     }
 
@@ -122,5 +127,24 @@ class DefaultInvalidator implements Invalidator
             Arr::get($parsed, 'path', '/'),
             $parsed['scheme'].'://'.$parsed['host'],
         ];
+    }
+
+    private function parseInvalidationRules(array $rules, array $data): array
+    {
+        return collect($rules)
+            ->map(fn (string $rule) => $this->convertToAntlers($rule))
+            ->map(fn (string $rule) => (string) Antlers::parse($rule, $data))
+            ->all();
+    }
+
+    private function convertToAntlers(string $route): string
+    {
+        if (Str::contains($route, '{{')) {
+            return $route;
+        }
+
+        return preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
+            return "{{ {$match[1]} }}";
+        }, $route);
     }
 }

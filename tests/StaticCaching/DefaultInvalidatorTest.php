@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use Facades\Tests\Factories\EntryFactory;
 use Mockery;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
@@ -12,10 +13,13 @@ use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
+use Statamic\Structures\CollectionStructure;
+use Tests\TestCase;
 
-class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
+class DefaultInvalidatorTest extends TestCase
 {
     public function tearDown(): void
     {
@@ -110,6 +114,41 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
                     'urls' => [
                         '/blog/one',
                         '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    /** @test */
+    public function collection_urls_can_be_invalidated_by_an_entry_with_antlers_in_invalidation_rules()
+    {
+        $collection = tap(\Statamic\Facades\Collection::make('pages')->routes('{parent_uri}/{slug}')->structureContents(['root' => true]))->save();
+        EntryFactory::collection('pages')->id('home')->slug('home')->create();
+        EntryFactory::collection('pages')->id('about')->slug('about')->create();
+        $entry = EntryFactory::collection('pages')->id('team')->slug('team')->data(['test' => 'foo'])->create();
+
+        $collection->structureContents(['root' => true, 'slugs' => true])->save();
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'home'],
+            ['entry' => 'about', 'children' => [
+                ['entry' => 'team'],
+            ]],
+        ])->save();
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrl')->with('/about/team', 'http://localhost')->once();
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/about', '/test/foo']);
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'pages' => [
+                    'urls' => [
+                        '{parent_uri}',
+                        '/test/{test}',
                     ],
                 ],
             ],
