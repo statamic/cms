@@ -100,8 +100,10 @@ class DataResponse implements Responsable
 
     protected function handleDraft()
     {
-        if (! method_exists($this->data, 'published')) {
-            return $this;
+        if (!method_exists($this->data,'value') || !($raw = $this->data->value('redirect'))) {
+            if (!($raw = $this->data->get('redirect'))) {
+                return;
+            }
         }
 
         if ($this->data->published()) {
