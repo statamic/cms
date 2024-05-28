@@ -133,6 +133,11 @@ class SectionTest extends TestCase
                     'read_only' => false, // deprecated
                     'always_save' => false,
                     'autocomplete' => null,
+                    'hide_display' => null,
+                    'instructions_position' => 'above',
+                    'listable' => 'hidden',
+                    'replicator_preview' => true,
+                    'duplicate' => true,
                 ],
                 [
                     'handle' => 'two',
@@ -150,6 +155,11 @@ class SectionTest extends TestCase
                     'visibility' => 'visible',
                     'read_only' => false, // deprecated
                     'always_save' => false,
+                    'hide_display' => null,
+                    'instructions_position' => 'above',
+                    'listable' => 'hidden',
+                    'replicator_preview' => true,
+                    'duplicate' => true,
                 ],
             ],
         ], $section->toPublishArray());
