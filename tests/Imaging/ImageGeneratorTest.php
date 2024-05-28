@@ -22,6 +22,7 @@ use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+/** @deprecated */
 class ImageGeneratorTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
