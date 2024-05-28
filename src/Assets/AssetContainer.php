@@ -626,6 +626,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'create_folders' => $this->createFolders,
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
+            'order' => $this->order,
         ];
 
         $array = Arr::removeNullValues(array_merge($array, [
