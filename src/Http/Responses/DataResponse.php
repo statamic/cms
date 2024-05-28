@@ -102,7 +102,7 @@ class DataResponse implements Responsable
     {
         if (!method_exists($this->data,'value') || !($raw = $this->data->value('redirect'))) {
             if (!($raw = $this->data->get('redirect'))) {
-                return;
+                return $this;
             }
         }
 
