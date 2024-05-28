@@ -31,13 +31,14 @@
                 :index="index"
                 :config="config"
                 :condition="condition"
+                :conditions="conditions"
                 :key="condition._id"
                 :suggestable-fields="suggestableFields"
                 @updated="updated(index, $event)"
                 @removed="remove(index)"
             />
 
-            <div class="border-t pt-6" v-if="hasConditions && isStandard">
+            <div class="border-t dark:border-dark-900 pt-6" v-if="hasConditions && isStandard">
                 <button
                     v-text="__('Add Condition')"
                     @click="add"

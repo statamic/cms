@@ -36,6 +36,8 @@
         initial-listing-url="{{ cp_route('collections.show', $collection) }}"
         :preview-targets="{{ json_encode($previewTargets) }}"
         :autosave-interval="{{ json_encode($autosaveInterval) }}"
+        :initial-item-actions="{{ json_encode($itemActions) }}"
+        item-action-url="{{ cp_route('collections.entries.actions.run', $collection) }}"
     ></entry-publish-form>
 
 @endsection

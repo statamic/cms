@@ -52,8 +52,31 @@ class Delete extends Action
         return 'Are you sure you want to delete this?|Are you sure you want to delete these :count items?';
     }
 
+    public function bypassesDirtyWarning(): bool
+    {
+        return true;
+    }
+
     public function run($items, $values)
     {
         $items->each->delete();
+    }
+
+    public function redirect($items, $values)
+    {
+        if ($this->context['view'] !== 'form') {
+            return;
+        }
+
+        $item = $items->first();
+
+        switch (true) {
+            case $item instanceof Contracts\Entries\Entry:
+                return cp_route('collections.show', $item->collection()->handle());
+            case $item instanceof Contracts\Taxonomies\Term:
+                return cp_route('taxonomies.show', $item->taxonomy()->handle());
+            case $item instanceof Contracts\Auth\User:
+                return cp_route('users.index');
+        }
     }
 }

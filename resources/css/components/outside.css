@@ -1,10 +1,41 @@
+/* Outside the Control Panel
+  ========================================================================== */
+.outside {
+    @apply bg-gray-300 px-2 min-h-screen;
+
+    label {
+        @apply text-[#596498] dark:text-dark-175;
+    }
+
+    .logo svg {
+        @apply h-6 block mx-auto mb-20 mb-8 w-auto text-black/25 dark:text-white/60;
+    }
+}
+
+ /*  Alternate rad mode for a more playful vibe */
+.outside.rad-theme {
+    background: #12c2e9;
+    background: linear-gradient(45deg, #f64f59, #c471ed, #12c2e9);
+}
+
+.dark .outside.rad-theme {
+    background: #212223; background-image: radial-gradient(at 32.6% 91.5%, #142038 0px, transparent 50%),radial-gradient(at 87.4% 39.4%, #353945 0px, transparent 50%),radial-gradient(at 84.6% 52.5%, #171717 0px, transparent 50%);
+}
+
+.dark .outside-shadow {
+    background: conic-gradient(from 230.29deg at 51.63% 52.16%, rgb(36, 0, 255) 0deg, rgb(0, 135, 255) 67.5deg, rgb(108, 39, 157) 198.75deg, rgb(24, 38, 163) 251.25deg, rgb(54, 103, 196) 301.88deg, rgb(105, 30, 255) 360deg);
+    filter: blur(160px);
+    transform: translateZ(0px);
+    @apply absolute inset-0;
+}
+
 /* ==========================================================================
    LOGIN SCREEN
    ========================================================================== */
 
 .auth-card {
-   @apply max-w-xs p-6 rounded shadow-lg;
-   transition: .12s ease-out;
+    @apply p-6 mx-auto relative z-10 w-full;
+    transition: .12s ease-out;
 }
 
 .outside .white-label-logo {
@@ -17,7 +48,7 @@
 /* Rad Mode Stylez
   ========================================================================== */
 
-.outside.rad-theme {
+html:not(.dark) .outside.rad-theme {
     .auth-card {
         @apply rounded-lg;
         box-shadow:
@@ -34,6 +65,7 @@
                 inset rgba(241, 84, 106, .15) 3px -3px 25px;
         }
     }
+
 
     .input-text {
         @apply rounded-lg;
@@ -52,5 +84,14 @@
 
     .forgot-password-link {
         @apply text-white text-shadow;
+    }
+}
+
+.dark .outside.rad-theme {
+    .auth-card {
+        @apply shadow-dark;
+        &:hover {
+            @apply shadow-dark-lg;
+        }
     }
 }

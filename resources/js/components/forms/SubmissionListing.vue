@@ -15,8 +15,8 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card overflow-scroll p-0 relative">
-                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
+                <div class="card p-0 relative">
+                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
                         <data-list-filter-presets
                             ref="presets"
                             :active-preset="activePreset"

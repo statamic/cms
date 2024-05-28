@@ -15,6 +15,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes;
+use Statamic\Stache\Indexes\Index;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
@@ -233,7 +234,9 @@ class CollectionEntriesStore extends ChildStore
             return null;
         }
 
-        if ($this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
+        $isLoadingIds = Index::currentlyLoading() === $this->key().'/id';
+
+        if (! $isLoadingIds && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
             Blink::store('entry-uris')->put($entry->id(), $uri);
         }
 

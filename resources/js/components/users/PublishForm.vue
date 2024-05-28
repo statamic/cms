@@ -8,6 +8,15 @@
                 <h1 class="flex-1" v-text="title" />
                     <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint">
                         <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                        <li class="divider" />
+                        <data-list-inline-actions
+                            :item="values.id"
+                            :url="itemActionUrl"
+                            :actions="itemActions"
+                            :is-dirty="isDirty"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
                     </dropdown-list>
 
                     <change-password
@@ -55,11 +64,13 @@
 <script>
 import ChangePassword from './ChangePassword.vue';
 import HasHiddenFields from '../publish/HasHiddenFields';
+import HasActions from '../publish/HasActions';
 
 export default {
 
     mixins: [
         HasHiddenFields,
+        HasActions,
     ],
 
     components: {
@@ -95,7 +106,11 @@ export default {
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
-        }
+        },
+
+        isDirty() {
+            return this.$dirty.has(this.publishContainer);
+        },
 
     },
 
@@ -111,6 +126,7 @@ export default {
 
             this.$axios[this.method](this.actions.save, this.visibleValues).then(response => {
                 this.title = response.data.title;
+                this.values = this.resetValuesFromResponse(response.data.data.values);
                 if (!response.data.saved) {
                     return this.$toast.error(`Couldn't save user`)
                 }
@@ -128,7 +144,14 @@ export default {
                     this.$toast.error(__('Something went wrong'));
                 }
             });
-        }
+        },
+
+        afterActionSuccessfullyCompleted(response) {
+            if (response.data) {
+                this.title = response.data.title;
+                this.values = this.resetValuesFromResponse(response.data.values);
+            }
+        },
 
     },
 
