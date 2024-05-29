@@ -130,6 +130,7 @@ return [
     'range.config.step' => 'L’écart minimal entre deux valeurs.',
     'range.title' => 'Range',
     'relationship.config.mode' => 'Choisissez votre style d’interface utilisateur préféré.',
+    'replicator.config.button_label' => 'Ajouter une étiquette au bouton "Ajouter un ensemble"',
     'replicator.config.collapse' => 'Le comportement d’affichage des ensembles.',
     'replicator.config.collapse.accordion' => 'N’autoriser qu’un seul ensemble à être développé à la fois',
     'replicator.config.collapse.disabled' => 'Tous les ensembles développés par défaut',
