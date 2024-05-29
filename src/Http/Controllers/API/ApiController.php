@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\ResourceAuthorizer;
+use Illuminate\Http\Request;
 use Statamic\Exceptions\ApiValidationException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
@@ -21,10 +22,15 @@ class ApiController extends Controller
     /**
      * Abort if item is unpublished.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $item
      */
-    protected function abortIfUnpublished($item)
+    protected function abortIfUnpublished(Request $request, $item)
     {
+        if ($request->statamicToken()) {
+            return;
+        }
+
         throw_if($item->published() === false, new NotFoundHttpException);
     }
 
