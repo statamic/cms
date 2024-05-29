@@ -206,7 +206,7 @@ export default {
                 }
             } else {
                 if (status === 422) {
-                    msg = Object.values(response.errors)[0][0];
+                    msg = Object.values(response.errors)[0][0]; // ugly I know, but this gets the first error message when we don't know the key (might not be `file`)
                 }
             }
             upload.errorMessage = msg;
