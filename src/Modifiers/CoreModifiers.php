@@ -1817,41 +1817,6 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Selects certain values from each item in a collection.
-     *
-     * @param  array|Collection  $value
-     * @param  array  $params
-     * @return array|Collection
-     */
-    public function select($value, $params)
-    {
-        $keys = Arr::wrap($params);
-
-        if ($wasArray = is_array($value)) {
-            $value = collect($value);
-        }
-
-        if (Compare::isQueryBuilder($value)) {
-            $value = $value->get();
-        }
-
-        $items = $value->map(function ($item) use ($keys) {
-            return collect($keys)->mapWithKeys(function ($key) use ($item) {
-                $value = null;
-                if (is_array($item) || $item instanceof ArrayAccess) {
-                    $value = Arr::get($item, $key);
-                } else {
-                    $value = method_exists($item, 'value') ? $item->value($key) : $item->get($key);
-                }
-
-                return [$key => $value];
-            })->all();
-        });
-
-        return $wasArray ? $items->all() : $items;
-    }
-
-    /**
      * Get the plural form of an English word with access to $context.
      *
      * @param  string  $value
