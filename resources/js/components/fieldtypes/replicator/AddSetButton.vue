@@ -9,7 +9,7 @@
                         class="btn-round flex items-center justify-center"
                         :class="{
                             'h-5 w-5': ! last,
-                            'mr-2': label.length > 0,
+                            'mr-2': label?.length > 0,
                         }"
                         @click="addSetButtonClicked"
                     >
