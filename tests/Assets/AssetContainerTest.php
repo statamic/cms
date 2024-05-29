@@ -234,7 +234,7 @@ class AssetContainerTest extends TestCase
     public function it_gets_and_sets_the_validation_rules()
     {
         $container = new AssetContainer;
-        $this->assertNull($container->validation());
+        $this->assertEmpty($container->validation());
 
         $return = $container->validation(['max:5120']);
 
