@@ -50,6 +50,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $sortField;
     protected $sortDirection;
 
+    protected $validate;
+
     public function id($id = null)
     {
         // For files, the handle is the ID.
@@ -97,6 +99,11 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
                 return $title ?? ucfirst($this->handle);
             })
             ->args(func_get_args());
+    }
+
+    public function validate($validate = null)
+    {
+        return $this->fluentlyGetOrSet('validate')->args(func_get_args());
     }
 
     public function diskPath()
