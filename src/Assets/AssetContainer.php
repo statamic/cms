@@ -49,7 +49,6 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $withEvents = true;
     protected $sortField;
     protected $sortDirection;
-
     protected $validation;
 
     public function id($id = null)
