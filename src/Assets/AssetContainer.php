@@ -50,7 +50,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $sortField;
     protected $sortDirection;
 
-    protected $validate;
+    protected $validation;
 
     public function id($id = null)
     {
@@ -101,9 +101,15 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             ->args(func_get_args());
     }
 
-    public function validate($validate = null)
+    /**
+     * Get or set the validation rules.
+     *
+     * @param  null|array  $id
+     * @return array|null
+     */
+    public function validation($rules = null)
     {
-        return $this->fluentlyGetOrSet('validate')->args(func_get_args());
+        return $this->fluentlyGetOrSet('validation')->args(func_get_args());
     }
 
     public function diskPath()

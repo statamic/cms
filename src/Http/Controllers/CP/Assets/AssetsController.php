@@ -77,7 +77,7 @@ class AssetsController extends CpController
         $this->authorize('store', [AssetContract::class, $container]);
 
         $request->validate([
-            'file' => array_merge(['file', new AllowedFile], $container->validate()),
+            'file' => array_merge(['file', new AllowedFile], $container->validation()),
         ]);
 
         $file = $request->file('file');
