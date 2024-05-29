@@ -42,7 +42,7 @@ export default {
         index: Number,
         last: Boolean,
         enabled: { type: Boolean, default: true },
-        label: String,
+        label: { type: String, default: '' },
     },
 
     methods: {
