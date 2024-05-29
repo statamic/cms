@@ -42,7 +42,7 @@ class AssetsTest extends TestCase
         $provider = $this->makeProvider($locale, $config);
 
         // Check if it provides the expected assets.
-        $this->assertEquals($expected, $provider->provide()->map->filename()->all());
+        $this->assertEquals($expected, $provider->provide()->map->filename()->sort()->values()->all());
 
         // Check if the assets are contained by the provider or not.
         foreach (Asset::all() as $asset) {

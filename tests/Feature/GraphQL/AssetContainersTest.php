@@ -57,8 +57,8 @@ GQL;
             ->post('/graphql', ['query' => $query])
             ->assertGqlOk()
             ->assertExactJson(['data' => ['assetContainers' => [
-                ['handle' => 'public', 'title' => 'Public'],
                 ['handle' => 'private', 'title' => 'Private'],
+                ['handle' => 'public', 'title' => 'Public'],
             ]]]);
     }
 
