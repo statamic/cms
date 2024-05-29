@@ -1,11 +1,20 @@
 .page-tree {
 
+    .tree-node {
+        @apply dark:mb-1;
+    }
+
     .tree-node-inner {
         @apply relative text-xs bg-white shadow rounded;
+        @apply dark:bg-dark-600 dark:shadow-dark;
 
         &:hover {
-            @apply bg-gray-100;
+            @apply bg-gray-100 dark:bg-dark-650;
         }
+    }
+
+    .tree-node-children {
+        @apply dark:mt-1;
     }
 
     .draggable-placeholder-inner {
@@ -15,20 +24,24 @@
         * { display: none; }
     }
 
-.page-move {
-        @apply w-6 border-r rounded-l;
+    .page-move {
+        @apply w-6 rtl:border-l ltr:border-r rtl:rounded-r ltr:rounded-l dark:text-dark-175 dark:border-dark-900;
         cursor: grab;
         background-color: hsla(210, 30%, 95%, .5);
         background-image: url('../../svg/icons/light/drag-dots.svg');
         background-size: 7px 17px;
         background-position: center center;
         background-repeat: no-repeat;
-        &:hover { @apply bg-gray-300; }
+        &:hover { @apply bg-gray-300 dark:bg-dark-700; }
+
+        .dark & {
+            background-color: hsla(180, 1%, 18%, 0.5);
+        }
     }
 
     .page-root {
         background-color: hsla(210, 30%, 95%, .5);
-        @apply flex w-6 rounded-l items-center border-r;
+        @apply flex w-6 rtl:rounded-r ltr:rounded-l items-center rtl:border-l ltr:border-r dark:border-dark-900;
     }
 }
 

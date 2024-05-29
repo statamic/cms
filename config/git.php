@@ -103,6 +103,7 @@ return [
         resource_path('users'),
         resource_path('preferences.yaml'),
         storage_path('forms'),
+        public_path('assets'),
     ],
 
     /*
@@ -131,8 +132,8 @@ return [
     */
 
     'commands' => [
-        'git add {{ paths }}',
-        'git -c "user.name={{ name }}" -c "user.email={{ email }}" commit -m "{{ message }}"',
+        '{{ git }} add {{ paths }}',
+        '{{ git }} -c "user.name={{ name }}" -c "user.email={{ email }}" commit -m "{{ message }}"',
     ],
 
     /*

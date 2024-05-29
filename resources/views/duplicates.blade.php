@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', __('Duplicate IDs'))
 
@@ -25,7 +27,7 @@
                         <td class="font-mono text-xs">
                             {{ $path }}
                         </td>
-                        <td class="text-right text-2xs">
+                        <td class="rtl:text-left ltr:text-right text-2xs">
                             <form method="POST" action="{{ cp_route('duplicates.regenerate') }}">
                                 @csrf
                                 <input type="hidden" name="path" value="{{ $path }}" />

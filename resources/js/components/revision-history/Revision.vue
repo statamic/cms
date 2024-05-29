@@ -10,11 +10,11 @@
         <div v-if="revision.message" class="revision-item-note truncate" v-text="revision.message" />
 
         <div class="flex items-center">
-            <avatar v-if="revision.user" :user="revision.user" class="shrink-0 mr-2 w-6" />
+            <avatar v-if="revision.user" :user="revision.user" class="shrink-0 rtl:ml-2 ltr:mr-2 w-6" />
 
             <div class="revision-item-content w-full flex">
                 <div class="flex-1">
-                    <div class="revision-author text-gray-700 text-2xs">
+                    <div class="revision-author text-gray-700 dark:text-dark-150 text-2xs">
                         <template v-if="revision.user">{{ revision.user.name || revision.user.email }} &ndash;</template>
                         {{ date.toDate().toLocaleTimeString($config.get('locale').replace('_', '-'), { hour: 'numeric', minute: '2-digit' }) }}
                     </div>
@@ -36,7 +36,7 @@
                             :revision="revision"
                             :url="restoreUrl"
                             :reference="reference"
-                            class="ml-4" />
+                            class="rtl:mr-4 ltr:ml-4" />
                     </template>
                 </revision-preview>
             </div>

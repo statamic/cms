@@ -20,15 +20,15 @@
             </div>
             <div class="flex items-center text-sm justify-center mb-4">
                 <div class="flex items-center mx-4">
-                    <div class="mr-1">X</div>
+                    <div class="rtl:ml-1 ltr:mr-1">X</div>
                     <div class="value">{{ x }}<sup>%</sup></div>
                 </div>
                 <div class="flex items-center mx-4">
-                    <div class="mr-1">Y</div>
+                    <div class="rtl:ml-1 ltr:mr-1">Y</div>
                     <div class="value">{{ y }}<sup>%</sup></div>
                 </div>
                 <div class="flex items-center mx-4">
-                    <div class="mr-1">Z</div>
+                    <div class="rtl:ml-1 ltr:mr-1">Z</div>
                     <div class="value">{{ z }}</div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                     <button type="button" class="btn mb-2 btn-primary" @click="select">{{ __('Finish') }}</button>
                 </div>
             </div>
-            <h6 class="p-4 text-center bg-gray-300 rounded-b">{{ __('messages.focal_point_previews_are_examples') }}</h6>
+            <h6 class="p-4 text-center bg-gray-300 dark:bg-dark-550 rounded-b dark:border-dark-200">{{ __('messages.focal_point_previews_are_examples') }}</h6>
         </div>
         <div v-for="n in 9" :key="n"
              :class="`frame frame-${n}`">

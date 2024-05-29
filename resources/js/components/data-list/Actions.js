@@ -53,7 +53,10 @@ export default {
         handleActionSuccess(response) {
             response.data.text().then(data => {
                 data = JSON.parse(data);
-                if (data.redirect) window.location = data.redirect;
+                if (data.redirect) {
+                    if (data.bypassesDirtyWarning) this.$dirty.disableWarning();
+                    window.location = data.redirect;
+                }
                 if (data.callback) Statamic.$callbacks.call(data.callback[0], ...data.callback.slice(1));
                 this.$emit('completed', true, data);
             });

@@ -6,6 +6,7 @@ use Mockery;
 use Statamic\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Imaging\GlideImageManipulator;
+use Statamic\Support\Arr;
 use Tests\TestCase;
 
 class GlideImageManipulatorTest extends TestCase
@@ -51,7 +52,7 @@ class GlideImageManipulatorTest extends TestCase
         $this->assertArrayHasKey($param, $this->man->getParams());
     }
 
-    public function paramProvider()
+    public static function paramProvider()
     {
         return [
             'or' => ['or'],
@@ -111,7 +112,7 @@ class GlideImageManipulatorTest extends TestCase
         $this->assertArraySubset($expected, $this->man->getParams());
     }
 
-    public function aliasProvider()
+    public static function aliasProvider()
     {
         return [
             'width' => ['width', 10, ['w' => 10]],
@@ -137,7 +138,7 @@ class GlideImageManipulatorTest extends TestCase
         $this->man->fit('crop_focal');
 
         $this->assertArrayHasKey('fit', $this->man->getParams());
-        $this->assertEquals('crop-60-40', array_get($this->man->getParams(), 'fit'));
+        $this->assertEquals('crop-60-40', Arr::get($this->man->getParams(), 'fit'));
     }
 
     /** @test */
@@ -149,6 +150,6 @@ class GlideImageManipulatorTest extends TestCase
         $this->man->fit('crop_focal');
 
         $this->assertArrayHasKey('fit', $this->man->getParams());
-        $this->assertEquals('crop', array_get($this->man->getParams(), 'fit'));
+        $this->assertEquals('crop', Arr::get($this->man->getParams(), 'fit'));
     }
 }

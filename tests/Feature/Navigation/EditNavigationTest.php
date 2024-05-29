@@ -15,13 +15,13 @@ class EditNavigationTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    public function it_shows_the_edit_form_if_user_has_edit_permission()
+    public function it_shows_the_edit_form_if_user_has_configure_permission()
     {
         $nav = $this->createNav('foo');
         Nav::shouldReceive('all')->andReturn(collect([$nav]));
         Nav::shouldReceive('find')->andReturn($nav);
 
-        $this->setTestRoles(['test' => ['access cp', 'edit foo nav']]);
+        $this->setTestRoles(['test' => ['access cp', 'configure navs']]);
         $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
@@ -32,7 +32,7 @@ class EditNavigationTest extends TestCase
     }
 
     /** @test */
-    public function it_denies_access_if_user_doesnt_have_edit_permission()
+    public function it_denies_access_if_user_doesnt_have_configure_permission()
     {
         $nav = $this->createNav('foo');
         Nav::shouldReceive('all')->andReturn(collect([$nav]));

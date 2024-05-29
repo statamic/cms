@@ -80,7 +80,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals($expectedTitle, $fieldset->title());
     }
 
-    public function titleProvider()
+    public static function titleProvider()
     {
         return [
             'title' => ['test_fieldset', 'The Provided Title', 'The Provided Title'],
@@ -557,5 +557,20 @@ class FieldsetTest extends TestCase
         $this->assertFalse($return);
         FieldsetRepository::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(FieldsetDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $fieldset = (new Fieldset)->setHandle('test');
+
+        $return = $fieldset->deleteQuietly();
+
+        Event::assertNotDispatched(FieldsetDeleting::class);
+        Event::assertNotDispatched(FieldsetDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

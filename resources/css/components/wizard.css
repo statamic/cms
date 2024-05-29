@@ -8,29 +8,29 @@
     .step:not(:first-child):before {
         @apply absolute h-1 w-1/2 bg-gray-300;
         content: '';
-        left: 0;
+        left: 0 ; [dir="rtl"] & { left: auto ; right: 0 ; }
         top: 18px;
     }
 
     .step:not(:last-child):after {
         @apply absolute h-1 w-1/2 bg-gray-300;
         content: '';
-        left: 50%;
+        left: 50% ; [dir="rtl"] & { left: auto ; right: 50% ; }
         top: 18px;
     }
 
     .step.complete:before,
     .step.complete:after {
-        @apply bg-blue;
+        @apply bg-blue !important;
     }
 
     .ball {
-        @apply h-10 w-10 bg-gray-300 text-gray text-base rounded-full text-center z-10 mx-auto relative;
+        @apply h-10 w-10 bg-gray-300 dark:bg-dark-800 text-gray dark:text-dark-150 text-base rounded-full text-center z-10 mx-auto relative;
         line-height: 40px;
     }
 
     .label {
-        @apply text-xs mt-1 text-gray;
+        @apply text-xs mt-1 text-gray dark:text-dark-175;
     }
 
     .complete {
@@ -39,6 +39,15 @@
         }
         .label {
             @apply text-blue;
+        }
+    }
+}
+
+.dark {
+    .wizard-steps {
+        .step:not(:first-child):before,
+        .step:not(:first-child):after {
+            @apply bg-dark-800;
         }
     }
 }

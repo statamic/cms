@@ -97,6 +97,7 @@ class FormCreateAlpineTest extends FormTestCase
             'fav_animals' => [],
             'fav_colour' => null,
             'fav_subject' => null,
+            'winnie' => null,
         ]);
 
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
@@ -122,6 +123,7 @@ class FormCreateAlpineTest extends FormTestCase
             'fav_animals' => [],
             'fav_colour' => null,
             'fav_subject' => null,
+            'winnie' => null,
         ]);
 
         $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
@@ -142,6 +144,7 @@ class FormCreateAlpineTest extends FormTestCase
                 'fav_animals' => [],
                 'fav_colour' => null,
                 'fav_subject' => null,
+                'winnie' => null,
             ],
         ]);
 
@@ -170,6 +173,7 @@ class FormCreateAlpineTest extends FormTestCase
                 'fav_animals' => ['cat'],
                 'fav_colour' => null,
                 'fav_subject' => null,
+                'winnie' => null,
             ],
         ]);
 
@@ -194,7 +198,7 @@ class FormCreateAlpineTest extends FormTestCase
             ],
         ];
 
-        $expected = 'x-data="'.$this->jsonEncode(['favourite_animals' => []]).'"';
+        $expected = 'x-data="'.$this->jsonEncode(['favourite_animals' => [], 'winnie' => null]).'"';
 
         $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
     }
@@ -211,7 +215,7 @@ class FormCreateAlpineTest extends FormTestCase
             ],
         ];
 
-        $expected = 'x-data="'.$this->jsonEncode(['selfies' => []]).'"';
+        $expected = 'x-data="'.$this->jsonEncode(['selfies' => [], 'winnie' => null]).'"';
 
         $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
     }
@@ -424,6 +428,50 @@ EOT
 
         $this->assertFieldRendersHtml('<input type="text" name="custom" value="" x-model="custom">', $config, [], ['js' => 'alpine']);
         $this->assertFieldRendersHtml('<input type="text" name="custom" value="" x-model="my_form.custom">', $config, [], ['js' => 'alpine:my_form']);
+    }
+
+    /** @test */
+    public function it_merges_any_x_data_passed_to_the_tag()
+    {
+        $output = $this->tag('{{ form:contact js="alpine:my_form" \x-data=\'{"extra":"yes"}\' }}{{ /form:contact }}');
+
+        $expectedXData = $this->jsonEncode([
+            'my_form' => [
+                'name' => null,
+                'email' => null,
+                'message' => null,
+                'fav_animals' => [],
+                'fav_colour' => null,
+                'fav_subject' => null,
+                'winnie' => null,
+                'extra' => 'yes',
+            ],
+        ]);
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
+
+        $this->assertStringContainsString($expected, $output);
+
+        $params = ['xdata' => ['extra' => 'no']];
+
+        $output = $this->tag('{{ form:contact js="alpine:my_form" :x-data="xdata" }}{{ /form:contact }}', $params);
+
+        $expectedXData = $this->jsonEncode([
+            'my_form' => [
+                'name' => null,
+                'email' => null,
+                'message' => null,
+                'fav_animals' => [],
+                'fav_colour' => null,
+                'fav_subject' => null,
+                'winnie' => null,
+                'extra' => 'no',
+            ],
+        ]);
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
+
+        $this->assertStringContainsString($expected, $output);
     }
 
     private function jsonEncode($data)

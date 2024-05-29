@@ -13,7 +13,7 @@
             <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
-                    <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 mr-2 @md:mr-6" />
+                    <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 rtl:ml-2 ltr:mr-2 @md:mr-6" />
                     <span>{{ __('Drop to Upload') }}</span>
                 </div>
 
@@ -34,7 +34,7 @@
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                         tabindex="0">
-                        <svg-icon name="folder-image" class="w-4 h-4 text-gray-800"></svg-icon>
+                        <svg-icon name="folder-image" class="w-4 h-4 text-gray-800 dark:text-dark-150"></svg-icon>
                         {{ __('Browse') }}
                     </button>
 
@@ -67,7 +67,7 @@
                         :animate="false"
                         append-to="body"
                     >
-                        <div class="asset-grid-listing border rounded overflow-hidden rounded-t-none" ref="assets">
+                        <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden rounded-t-none" ref="assets">
                             <asset-tile
                                 v-for="asset in assets"
                                 :key="asset.id"
@@ -485,14 +485,6 @@ export default {
          */
         uploadFile() {
             this.$refs.uploader.browse();
-        },
-
-        getReplicatorPreviewText() {
-            return _.map(this.assets, (asset) => {
-                return asset.is_image ?
-                    `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
-                    : asset.basename;
-            }).join(', ');
         },
 
         idChanged(oldId, newId) {

@@ -31,7 +31,7 @@ class TimeTest extends TestCase
         $this->assertSame($expected, $this->fieldtype($config)->process($value));
     }
 
-    public function processProvider()
+    public static function processProvider()
     {
         return [
             'null' => [
@@ -62,57 +62,61 @@ class TimeTest extends TestCase
      *
      * @dataProvider validationProvider
      */
-    public function it_validates($config, $input, $expected)
+    public function it_validates($config, $input, $passes)
     {
         $field = $this->fieldtype($config)->field();
-        $messages = [];
+        $messages = collect();
 
         try {
             Validator::validate(['test' => $input], $field->rules(), [], $field->validationAttributes());
         } catch (ValidationException $e) {
-            $messages = $e->validator->errors()->all();
+            $messages = $e->validator->errors();
         }
 
-        $this->assertEquals($expected, $messages);
+        if ($passes) {
+            $this->assertCount(0, $messages);
+        } else {
+            $this->assertEquals(__('statamic::validation.time'), $messages->first());
+        }
     }
 
-    public function validationProvider()
+    public static function validationProvider()
     {
         return [
             'valid time' => [
                 [],
                 '14:00',
-                [],
+                true,
             ],
             'valid time with seconds' => [
                 ['seconds_enabled' => true],
                 '14:00:00',
-                [],
+                true,
             ],
             'invalid time format' => [
                 [],
                 'not formatted like a time',
-                ['Not a valid time.'],
+                false,
             ],
             '12 hour time' => [
                 [],
                 '1:00',
-                ['Not a valid time.'],
+                false,
             ],
             'invalid hour' => [
                 [],
                 '25:00',
-                ['Not a valid time.'],
+                false,
             ],
             'invalid minute' => [
                 [],
                 '14:65',
-                ['Not a valid time.'],
+                false,
             ],
             'invalid second' => [
                 ['seconds_enabled' => true],
                 '13:00:60',
-                ['Not a valid time.'],
+                false,
             ],
         ];
     }

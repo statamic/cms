@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class HasLowerCaseTest extends TestCase
 {
-    public function strings(): array
+    public static function stringsProvider(): array
     {
         return [
             'string_with_one_lowercase_char' => [true, "I DON'T KNOW WHAT WE'RE YELLINg ABOUT!"],
@@ -19,7 +19,7 @@ class HasLowerCaseTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider strings
+     * @dataProvider stringsProvider
      */
     public function it_returns_true_if_the_string_has_lowercase_char_false_if_does_not($expected, $input): void
     {
