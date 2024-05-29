@@ -65,6 +65,7 @@ class AssetContainersController extends CpController
             'source_preset' => $container->sourcePreset(),
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
+            'order' => $container->order() == 1 ? '' : $container->order(),
         ];
 
         $fields = ($blueprint = $this->formBlueprint($container))
@@ -99,7 +100,8 @@ class AssetContainersController extends CpController
             ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
-            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
+            ->order($values['order']);
 
         $container->save();
 
@@ -147,7 +149,8 @@ class AssetContainersController extends CpController
             ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
-            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
+            ->order($values['order']);
 
         $container->save();
 
@@ -297,6 +300,20 @@ class AssetContainersController extends CpController
                         'if' => [
                             'warm_intelligent' => false,
                         ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields = array_merge($fields, [
+            'display' => [
+                'display' => __('Display'),
+                'fields' => [
+                    'order' => [
+                        'type' => 'text',
+                        'display' => __('Order'),
+                        'instructions' => __('statamic::messages.asset_container_order_instructions'),
+                        'validate' => 'numeric',
                     ],
                 ],
             ],
