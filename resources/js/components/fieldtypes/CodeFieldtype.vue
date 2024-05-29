@@ -198,6 +198,10 @@ export default {
 
             this.codemirror.setOption('fullScreen', this.fullScreenMode);
 
+            if (this.fullScreenMode === false) {
+                document.documentElement.removeAttribute('style');
+            }
+
             // CodeMirror also needs to be manually refreshed when made visible in the DOM
             this.$events.$on('tab-switched', this.refresh);
         }
