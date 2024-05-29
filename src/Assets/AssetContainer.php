@@ -108,7 +108,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function validation($rules = null)
     {
-        return $this->fluentlyGetOrSet('validation')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('validation')
+            ->getter(fn ($rules) => $rules ?? [])
+            ->args(func_get_args());
     }
 
     public function diskPath()
