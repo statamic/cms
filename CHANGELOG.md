@@ -1,5 +1,16 @@
 # Release Notes
 
+## 5.6.1 (2024-05-29)
+
+### What's fixed
+- Revert `select` modifier. [#10218](https://github.com/statamic/cms/issues/10218) by @jasonvarga
+- Make label on Add Set button localizable [#10216](https://github.com/statamic/cms/issues/10216) by @duncanmcclean
+- Fix JavaScript length error from Add Set button label [#10217](https://github.com/statamic/cms/issues/10217) by @duncanmcclean
+- French translations [#10209](https://github.com/statamic/cms/issues/10209) by @ebeauchamps
+- Danish translations [#10214](https://github.com/statamic/cms/issues/10214) by @mortenebak
+
+
+
 ## 5.6.0 (2024-05-28)
 
 ### What's new
@@ -9,7 +20,7 @@
 - Add `keys` and `values` modifiers [#10185](https://github.com/statamic/cms/issues/10185) by @godismyjudge95
 - Add `merge` method to Eloquent User class [#10192](https://github.com/statamic/cms/issues/10192) by @duncanmcclean
 - Add `depth` parameter to `flatten` modifier [#10187](https://github.com/statamic/cms/issues/10187) by @godismyjudge95
-- Add `select` modifier [#10183](https://github.com/statamic/cms/issues/10183) by @godismyjudge95
+- ~Add `select` modifier~ (Reverted in 5.6.1) [#10183](https://github.com/statamic/cms/issues/10183) by @godismyjudge95
 - Replicator "add set" button label option [#9806](https://github.com/statamic/cms/issues/9806) by @godismyjudge95
 
 ### What's fixed
