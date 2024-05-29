@@ -53,6 +53,31 @@ class APITest extends TestCase
         ];
     }
 
+    /** @test */
+    public function it_handles_unpublished_entries()
+    {
+        Facades\Config::set('statamic.api.resources.collections', [
+            'pages' => [
+                'allowed_filters' => ['status'],
+            ],
+        ]);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Collection::make('articles')->save();
+
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(false)->save();
+
+        $this->get('/api/collections/pages/entries/about')->assertJson([
+            'message' => 'Not found.',
+        ]);
+
+        $this->get('/api/collections/pages/entries/about?draft=true')->assertJson([
+            'data' => [
+                'id' => 'about',
+            ],
+        ]);
+    }
+
     public static function exampleFiltersProvider()
     {
         return [['status:is'], ['published:is'], ['title:is']];
