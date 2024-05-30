@@ -22,7 +22,6 @@ class ApiController extends Controller
     /**
      * Abort if item is unpublished.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $item
      */
     protected function abortIfUnpublished(Request $request, $item)
