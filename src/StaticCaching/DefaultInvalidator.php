@@ -134,6 +134,7 @@ class DefaultInvalidator implements Invalidator
         return collect($rules)
             ->map(fn (string $rule) => $this->convertToAntlers($rule))
             ->map(fn (string $rule) => (string) Antlers::parse($rule, $data))
+            ->filter()
             ->all();
     }
 
