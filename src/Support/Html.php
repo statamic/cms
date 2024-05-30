@@ -222,10 +222,6 @@ class Html
         foreach (mb_str_split($value) as $letter) {
             $ordValue = mb_ord($letter);
 
-            if ($ordValue > 128) {
-                return $letter;
-            }
-
             // To properly obfuscate the value, we will randomly convert each letter to
             // its entity or hexadecimal representation, keeping a bot from sniffing
             // the randomly obfuscated letters out of the string on the responses.
