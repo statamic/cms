@@ -100,7 +100,10 @@ class DefaultInvalidator implements Invalidator
     protected function invalidateNavUrls($nav)
     {
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "navigation.{$nav->handle()}.urls")
+            $this->parseInvalidationRules(
+                Arr::get($this->rules, "navigation.{$nav->handle()}.urls"),
+                $nav->toAugmentedCollection()->toArray()
+            )
         );
     }
 

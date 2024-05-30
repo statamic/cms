@@ -248,11 +248,16 @@ class DefaultInvalidatorTest extends TestCase
     public function navigation_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two', '/test/foo', '/purple']);
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -261,6 +266,9 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '/one',
                         '/two',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
