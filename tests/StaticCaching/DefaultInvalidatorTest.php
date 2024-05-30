@@ -98,7 +98,7 @@ class DefaultInvalidatorTest extends TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two', '/my/test', '/test/foo', '/purple']);
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -111,7 +111,9 @@ class DefaultInvalidatorTest extends TestCase
                 ->andReturnSelf()
                 ->shouldReceive('merge')
                 ->andReturn(collect([
-                    'parent_uri' => null,
+                    'parent_uri' => '/my/test',
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
                 ]));
         });
 
@@ -121,39 +123,6 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '/blog/one',
                         '/blog/two',
-                    ],
-                ],
-            ],
-        ]);
-
-        $this->assertNull($invalidator->invalidate($entry));
-    }
-
-    /** @test */
-    public function collection_urls_can_be_invalidated_by_an_entry_with_antlers_in_invalidation_rules()
-    {
-        $collection = tap(\Statamic\Facades\Collection::make('pages')->routes('{parent_uri}/{slug}')->structureContents(['root' => true]))->save();
-        EntryFactory::collection('pages')->id('home')->slug('home')->create();
-        EntryFactory::collection('pages')->id('about')->slug('about')->create();
-        $entry = EntryFactory::collection('pages')->id('team')->slug('team')->data(['test' => 'foo', 'favourite_color' => 'purple'])->create();
-
-        $collection->structureContents(['root' => true, 'slugs' => true])->save();
-        $collection->structure()->in('en')->tree([
-            ['entry' => 'home'],
-            ['entry' => 'about', 'children' => [
-                ['entry' => 'team'],
-            ]],
-        ])->save();
-
-        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('/about/team', 'http://localhost')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/about', '/test/foo', '/purple']);
-        });
-
-        $invalidator = new Invalidator($cacher, [
-            'collections' => [
-                'pages' => [
-                    'urls' => [
                         '{parent_uri}',
                         '/test/{test}',
                         '{{ if favourite_color == "purple" }}/purple{{ /if }}',
