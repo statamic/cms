@@ -21,6 +21,7 @@ return [
     'asset_container_title_instructions' => 'Usually a plural noun, like Images or Documents',
     'asset_container_warm_intelligent_instructions' => 'Generate appropriate presets on upload.',
     'asset_container_warm_presets_instructions' => 'Specify which presets to generate on upload.',
+    'asset_container_validation_rules_instructions' => 'Add any file validation rules.',
     'asset_folders_directory_instructions' => 'We recommend avoiding spaces and special characters to keep URLs clean.',
     'asset_replace_confirmation' => 'References to this asset within content will be updated to the asset you select below.',
     'asset_reupload_confirmation' => 'Are you sure you want to reupload this asset?',
