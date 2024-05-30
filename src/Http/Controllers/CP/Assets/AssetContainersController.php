@@ -75,7 +75,7 @@ class AssetContainersController extends CpController
 
         return view('statamic::assets.containers.edit', [
             'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values()->merge(['rules' => $container->validation()]),
+            'values' => $fields->values(),
             'meta' => $fields->meta(),
             'container' => $container,
         ]);
