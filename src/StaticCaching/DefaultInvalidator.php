@@ -110,7 +110,10 @@ class DefaultInvalidator implements Invalidator
     protected function invalidateGlobalUrls($set)
     {
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "globals.{$set->handle()}.urls")
+            $this->parseInvalidationRules(
+                Arr::get($this->rules, "globals.{$set->handle()}.urls"),
+                $set->toAugmentedCollection()->toArray()
+            )
         );
     }
 
