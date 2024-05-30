@@ -4,12 +4,10 @@ namespace Tests\API;
 
 use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Token;
 use Statamic\Facades\User;
-use Statamic\Tokens\Handlers\LivePreview as Handler;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
