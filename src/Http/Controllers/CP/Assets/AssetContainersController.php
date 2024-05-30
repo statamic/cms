@@ -74,7 +74,7 @@ class AssetContainersController extends CpController
 
         return view('statamic::assets.containers.edit', [
             'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
+            'values' => $fields->values()->merge(['rules' => $container->validation()]),
             'meta' => $fields->meta(),
             'container' => $container,
         ]);
@@ -99,7 +99,8 @@ class AssetContainersController extends CpController
             ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
-            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
+            ->validation($request->get('rules'));
 
         $container->save();
 
