@@ -107,10 +107,12 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('parent')->andReturnNull();
-            $m->shouldReceive('toAugmentedCollection')->andReturnSelf()
-                ->shouldReceive('withShallowNesting')->andReturnSelf()
-                ->shouldReceive('merge')->andReturnSelf()
-                ->shouldReceive('toArray')->andReturn(['parent_uri' => null]);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect([
+                    'parent_uri' => null,
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -178,10 +180,12 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
             $m->shouldReceive('parent')->andReturnNull();
-            $m->shouldReceive('toAugmentedCollection')->andReturnSelf()
-                ->shouldReceive('withShallowNesting')->andReturnSelf()
-                ->shouldReceive('merge')->andReturnSelf()
-                ->shouldReceive('toArray')->andReturn(['parent_uri' => null]);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect([
+                    'parent_uri' => null,
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -219,8 +223,6 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('taxonomy')->andReturn($taxonomy);
             $m->shouldReceive('collection')->andReturn($m);
             $m->shouldReceive('toAugmentedCollection')
-                ->andReturnSelf()
-                ->shouldReceive('withShallowNesting')
                 ->andReturn(collect([
                     'test' => 'foo',
                     'favourite_color' => 'purple',
