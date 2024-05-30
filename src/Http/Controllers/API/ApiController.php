@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\ApiValidationException;
@@ -30,7 +31,10 @@ class ApiController extends Controller
             return;
         }
 
-        if (in_array('status', $this->allowedFilters()) && $request->boolean('draft')) {
+        if (
+            $request->boolean('draft')
+            && in_array('status', FilterAuthorizer::allowedForSubResources('api', 'collections', $item->collectionHandle()))
+        ) {
             return;
         }
 
