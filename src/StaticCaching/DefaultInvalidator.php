@@ -72,7 +72,7 @@ class DefaultInvalidator implements Invalidator
         $this->cacher->invalidateUrls(
             $this->parseInvalidationRules(
                 Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"),
-                $entry->toAugmentedCollection()->withShallowNesting()->merge(['parent_uri' => $entry->parent()?->uri()])->toArray()
+                $entry->toAugmentedCollection()->merge(['parent_uri' => $entry->parent()?->uri()])->toArray()
             )
         );
     }
@@ -92,7 +92,7 @@ class DefaultInvalidator implements Invalidator
         $this->cacher->invalidateUrls(
             $this->parseInvalidationRules(
                 Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"),
-                $term->toAugmentedCollection()->withShallowNesting()->toArray()
+                $term->toAugmentedCollection()->toArray()
             )
         );
     }
