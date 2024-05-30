@@ -106,6 +106,11 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('toAugmentedCollection')->andReturnSelf()
+                ->shouldReceive('withShallowNesting')->andReturnSelf()
+                ->shouldReceive('merge')->andReturnSelf()
+                ->shouldReceive('toArray')->andReturn(['parent_uri' => null]);
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -170,6 +175,11 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('toAugmentedCollection')->andReturnSelf()
+                ->shouldReceive('withShallowNesting')->andReturnSelf()
+                ->shouldReceive('merge')->andReturnSelf()
+                ->shouldReceive('toArray')->andReturn(['parent_uri' => null]);
         });
 
         $invalidator = new Invalidator($cacher, [
