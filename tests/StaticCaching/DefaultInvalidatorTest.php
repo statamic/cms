@@ -2,7 +2,6 @@
 
 namespace Tests\StaticCaching;
 
-use Facades\Tests\Factories\EntryFactory;
 use Mockery;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
