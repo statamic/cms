@@ -72,7 +72,7 @@ class DefaultInvalidator implements Invalidator
         $this->cacher->invalidateUrls(
             $this->parseInvalidationRules(
                 Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"),
-                $entry->values()->merge(['parent_uri' => $entry->parent()?->uri()])->all()
+                $entry->toAugmentedCollection()->withShallowNesting()->merge(['parent_uri' => $entry->parent()?->uri()])->toArray()
             )
         );
     }
