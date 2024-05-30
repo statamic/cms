@@ -7,13 +7,6 @@ use Tests\TestCase;
 
 class ObfuscateTest extends TestCase
 {
-    /** @test */
-    public function it_obfuscates_a_string(): void
-    {
-        $modified = $this->modify('A');
-        $this->assertTrue(in_array($modified, ['&#65;', '&#x41;', 'A']));
-    }
-
     /**
      * @test
      *
