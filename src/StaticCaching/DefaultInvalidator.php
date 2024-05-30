@@ -71,7 +71,7 @@ class DefaultInvalidator implements Invalidator
 
         $this->cacher->invalidateUrls(
             $this->parseInvalidationRules(
-                Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"),
+                Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls", []),
                 $entry->toAugmentedCollection()->merge(['parent_uri' => $entry->parent()?->uri()])->toArray()
             )
         );
@@ -91,7 +91,7 @@ class DefaultInvalidator implements Invalidator
 
         $this->cacher->invalidateUrls(
             $this->parseInvalidationRules(
-                Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"),
+                Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls", []),
                 $term->toAugmentedCollection()->toArray()
             )
         );
@@ -101,7 +101,7 @@ class DefaultInvalidator implements Invalidator
     {
         $this->cacher->invalidateUrls(
             $this->parseInvalidationRules(
-                Arr::get($this->rules, "navigation.{$nav->handle()}.urls"),
+                Arr::get($this->rules, "navigation.{$nav->handle()}.urls", []),
                 $nav->toAugmentedCollection()->toArray()
             )
         );
@@ -111,7 +111,7 @@ class DefaultInvalidator implements Invalidator
     {
         $this->cacher->invalidateUrls(
             $this->parseInvalidationRules(
-                Arr::get($this->rules, "globals.{$set->handle()}.urls"),
+                Arr::get($this->rules, "globals.{$set->handle()}.urls", []),
                 $set->toAugmentedCollection()->toArray()
             )
         );
