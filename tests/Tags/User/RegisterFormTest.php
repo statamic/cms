@@ -4,7 +4,9 @@ namespace Tests\Tags\User;
 
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
+use Statamic\Facades\Role;
 use Statamic\Facades\User;
+use Statamic\Facades\UserGroup;
 use Statamic\Statamic;
 use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -337,6 +339,35 @@ EOT
 
         $this->assertStringContainsString($expectedRedirect, $output);
         $this->assertStringContainsString($expectedErrorRedirect, $output);
+    }
+
+    /** @test */
+    public function it_ensures_some_fields_arent_saved()
+    {
+        UserGroup::make('client')->title('Client')->save();
+        Role::make('admin')->title('Admin')->save();
+
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        $this
+            ->post('/!/auth/register', [
+                'email' => 'san@holo.com',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
+                'groups' => ['client'],
+                'roles' => ['admin'],
+                'super' => true,
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $user = User::findByEmail('san@holo.com');
+
+        $this->assertEquals($user->groups()->count(), 0);
+        $this->assertEquals($user->roles()->count(), 0);
+        $this->assertNull($user->get('super'));
+        $this->assertNull($user->get('password_confirmation'));
     }
 
     private function useCustomBlueprint()
