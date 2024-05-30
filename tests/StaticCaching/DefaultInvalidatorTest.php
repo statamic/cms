@@ -204,7 +204,7 @@ class DefaultInvalidatorTest extends TestCase
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://test.com')->once();
             $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/tags/one', '/tags/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/tags/one', '/tags/two', '/test/foo', '/purple']);
         });
 
         $collection = Mockery::mock(Collection::class);
@@ -218,6 +218,13 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('taxonomyHandle')->andReturn('tags');
             $m->shouldReceive('taxonomy')->andReturn($taxonomy);
             $m->shouldReceive('collection')->andReturn($m);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('withShallowNesting')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -226,6 +233,9 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '/tags/one',
                         '/tags/two',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],

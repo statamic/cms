@@ -90,7 +90,10 @@ class DefaultInvalidator implements Invalidator
         }
 
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls")
+            $this->parseInvalidationRules(
+                Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"),
+                $term->toAugmentedCollection()->withShallowNesting()->toArray()
+            )
         );
     }
 
