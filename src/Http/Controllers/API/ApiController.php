@@ -31,8 +31,7 @@ class ApiController extends Controller
             return;
         }
 
-        // todo: we should also be checking that allowed_filters contains 'status'
-        if ($request->boolean('draft')) {
+        if (in_array('status', $this->allowedFilters()) && $request->boolean('draft')) {
             return;
         }
 
