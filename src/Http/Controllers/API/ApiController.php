@@ -30,7 +30,7 @@ class ApiController extends Controller
             return;
         }
 
-        if (in_array('status', $this->allowedFilters()) && $request->boolean('draft')) {
+        if ($request->boolean('draft') && in_array('status', $this->allowedFilters())) {
             return;
         }
 
