@@ -65,6 +65,7 @@ class AssetContainersController extends CpController
             'source_preset' => $container->sourcePreset(),
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
+            'validation' => $container->validation(),
         ];
 
         $fields = ($blueprint = $this->formBlueprint($container))
@@ -100,7 +101,7 @@ class AssetContainersController extends CpController
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
-            ->validation($request->get('rules'));
+            ->validation($values['validation'] ?? null);
 
         $container->save();
 
@@ -266,6 +267,11 @@ class AssetContainersController extends CpController
                         'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
                         'default' => true,
                     ],
+                    'validation' => [
+                        'type' => 'taggable',
+                        'display' => __('Validation Rules'),
+                        'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
+                    ],
                 ],
             ],
         ]);
@@ -316,7 +322,7 @@ class AssetContainersController extends CpController
 
     private function expandedGlidePresetLabel($handle, $params)
     {
-        $separator = '<span class="hidden-outside text-gray-500">-</span>';
+        $separator = '<span class="text-gray-500 hidden-outside">-</span>';
 
         $params = collect($params)
             ->map(function ($value, $param) {
