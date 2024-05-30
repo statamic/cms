@@ -39,6 +39,7 @@ class CollectionEntriesController extends ApiController
         $this->abortIfDisabled();
 
         $entry = Entry::find($handle);
+        $this->collectionHandle = $entry?->collectionHandle();
 
         $this->abortIfInvalid($entry, $collection);
         $this->abortIfUnpublished($request, $entry);
