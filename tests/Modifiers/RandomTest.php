@@ -24,10 +24,12 @@ class RandomTest extends TestCase
 
     public static function inputsProvider()
     {
+        $range = range(1, 5000);
+
         return [
-            'array' => [range('a', 'z')],
-            'collection' => [collect(range('a', 'z'))],
-            'query builder' => [Mockery::mock(Builder::class)->shouldReceive('get')->andReturn(collect(range('a', 'z')))->getMock()],
+            'array' => [$range],
+            'collection' => [collect($range)],
+            'query builder' => [Mockery::mock(Builder::class)->shouldReceive('get')->andReturn(collect($range))->getMock()],
         ];
     }
 
