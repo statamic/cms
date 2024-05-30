@@ -313,7 +313,7 @@ class Terms extends Relationship
 
             throw_if(! $taxonomy, new TaxonomyNotFoundException($taxonomyHandle));
 
-            if (! $user->can('create', [TermContract::class, $taxonomy])) {
+            if (! $user?->can('create', [TermContract::class, $taxonomy])) {
                 return null;
             }
 
