@@ -133,7 +133,7 @@ class DefaultInvalidatorTest extends TestCase
         $collection = tap(\Statamic\Facades\Collection::make('pages')->routes('{parent_uri}/{slug}')->structureContents(['root' => true]))->save();
         EntryFactory::collection('pages')->id('home')->slug('home')->create();
         EntryFactory::collection('pages')->id('about')->slug('about')->create();
-        $entry = EntryFactory::collection('pages')->id('team')->slug('team')->data(['test' => 'foo'])->create();
+        $entry = EntryFactory::collection('pages')->id('team')->slug('team')->data(['test' => 'foo', 'favourite_color' => 'purple'])->create();
 
         $collection->structureContents(['root' => true, 'slugs' => true])->save();
         $collection->structure()->in('en')->tree([
@@ -145,7 +145,7 @@ class DefaultInvalidatorTest extends TestCase
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/about/team', 'http://localhost')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/about', '/test/foo']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/about', '/test/foo', '/purple']);
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -154,6 +154,8 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '{parent_uri}',
                         '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
