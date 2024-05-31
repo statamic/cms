@@ -316,8 +316,7 @@ abstract class Fieldtype implements Arrayable
         }
 
         $config = $this->configFields()->all()
-            ->map->get('default')
-            ->filter()
+            ->map->defaultValue()
             ->merge($this->field->config());
 
         return $key
