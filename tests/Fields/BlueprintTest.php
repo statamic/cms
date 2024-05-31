@@ -830,6 +830,15 @@ class BlueprintTest extends TestCase
     /** @test */
     public function it_ensures_a_field_has_config()
     {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'the_field',
+                    'field' => ['type' => 'text', 'do_not_touch_other_config' => true],
+                ],
+            ]])
+        );
+
         $blueprint = (new Blueprint)->setContents(['tabs' => [
             'tab_one' => [
                 'sections' => [
@@ -852,11 +861,19 @@ class BlueprintTest extends TestCase
                             ['handle' => 'content', 'field' => ['type' => 'text']],
                         ],
                     ],
+                    [
+                        'fields' => [
+                            ['handle' => 'the_field', 'field' => 'the_partial.the_field', 'config' => ['type' => 'text', 'do_not_touch_other_config' => true]],
+                        ],
+                    ],
                 ],
             ],
         ]]);
 
-        $fields = $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only'])->fields();
+        $fields = $blueprint
+            ->ensureFieldHasConfig('author', ['visibility' => 'read_only'])
+            ->ensureFieldHasConfig('the_field', ['visibility' => 'read_only'])
+            ->fields();
 
         $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
         $this->assertEquals(['type' => 'text'], $fields->get('content')->config());
@@ -868,6 +885,7 @@ class BlueprintTest extends TestCase
         ];
 
         $this->assertEquals($expectedConfig, $fields->get('author')->config());
+        $this->assertEquals($expectedConfig, $fields->get('the_field')->config());
     }
 
     // todo: duplicate or tweak above test but make the target field not in the first section.

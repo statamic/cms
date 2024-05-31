@@ -72,7 +72,11 @@
         @apply fixed flex bg-transparent shadow-none overflow-auto rtl:border-l ltr:border-r dark:border-dark-900;
         height: calc(100% - 52px);
         .showing-license-banner & {
-            height: calc(100% - 120px);
+            height: calc(100% - 105px);
+        }
+
+        .nav-closed & {
+            @apply border-0 shadow-none;
         }
     }
 }

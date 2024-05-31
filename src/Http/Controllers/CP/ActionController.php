@@ -76,5 +76,8 @@ abstract class ActionController extends CpController
 
     abstract protected function getSelectedItems($items, $context);
 
-    abstract protected function getItemData($item, $context): array;
+    protected function getItemData($item, $context): array
+    {
+        return [];
+    }
 }

@@ -14,6 +14,7 @@ use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\LiteralReplacementManager;
 use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\Events\ViewRendered;
+use Statamic\View\Interop\Stacks;
 
 class View
 {
@@ -88,8 +89,9 @@ class View
     public function render(): string
     {
         $cascade = $this->gatherData();
+        $usingLayout = $this->shouldUseLayout();
 
-        if ($this->shouldUseLayout()) {
+        if ($usingLayout) {
             GlobalRuntimeState::$containsLayout = true;
             $contents = view($this->templateViewName(), $cascade);
 
@@ -110,6 +112,8 @@ class View
                 $factory->startSection($section, new HtmlString((string) $content));
             });
 
+            Stacks::restoreStacks();
+
             $contents = view($this->layoutViewName(), array_merge($cascade, GlobalRuntimeState::$layoutVariables, [
                 'template_content' => $contents,
             ]));
@@ -121,7 +125,15 @@ class View
 
         ViewRendered::dispatch($this);
 
+        if ($usingLayout) {
+            GlobalRuntimeState::$renderingLayout = true;
+        }
+
         $renderedContents = $contents->render();
+
+        if ($usingLayout) {
+            GlobalRuntimeState::$renderingLayout = false;
+        }
 
         $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
         $renderedContents = StackReplacementManager::processReplacements($renderedContents);

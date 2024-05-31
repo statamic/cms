@@ -26,12 +26,12 @@
 @import "components/focal-point";
 @import "components/global-header";
 @import "components/items";
-@import "components/login";
 @import "components/metrics";
 @import "components/modal";
 @import "components/nav-main";
 @import "components/nav-mobile";
 @import "components/notifications";
+@import "components/outside";
 @import "components/page-tree";
 @import "components/pagination";
 @import "components/popover";

@@ -93,7 +93,7 @@
    ========================================================================== */
 
 .asset-tile {
-    @apply bg-white dark:bg-dark-500 relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded border-dark-200;
+    @apply bg-white dark:bg-dark-500 relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded dark:border-dark-200;
 
     .asset-thumb {
         @apply flex justify-center items-center w-full h-full rounded;
