@@ -83,9 +83,6 @@ EOT;
     /** @test */
     public function it_renders_a_nav_with_selected_fields()
     {
-        // At the moment we are only concerned with the tag not erroring.
-        // Todo: write a test that _actually_ tests for the select="" param working as expected.
-
         $this->createCollectionAndNav();
 
         $template = '{{ nav:test select="title" }}{{ *recursive children* }}{{ /nav:test }}';
