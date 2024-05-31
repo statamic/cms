@@ -10,7 +10,6 @@ class BulkAugmentor
     private $isTree = false;
     private $originalValues = [];
     private $augmentedValues = [];
-
     private $keyResolver;
 
     private function getAugmentationReference($item)
