@@ -106,6 +106,40 @@ GQL;
     }
 
     /** @test */
+    public function it_queries_all_terms_in_a_specific_site()
+    {
+        $this->createTaxonomies()->createTerms()->createBlueprints();
+
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::find('tags')->sites(['en', 'fr'])->save();
+
+        Term::find('tags::alpha')->in('fr')->data(['title' => 'Le Alpha'])->save();
+
+        $query = <<<'GQL'
+{
+    terms(site: "fr") {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['terms' => ['data' => [
+                ['id' => 'tags::alpha', 'title' => 'Le Alpha'],
+            ]]]]);
+    }
+
+    /** @test */
     public function it_queries_only_terms_on_allowed_sub_resources()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();

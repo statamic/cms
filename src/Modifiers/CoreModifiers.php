@@ -265,6 +265,11 @@ class CoreModifiers extends Modifier
         if ($value instanceof Value) {
             $value = $value->raw();
         }
+
+        if (is_null($value)) {
+            return '';
+        }
+
         if (Arr::isAssoc($value)) {
             $value = [$value];
         }
@@ -706,13 +711,13 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Flattens a multi-dimensional collection into a single dimension.
+     * Flattens a multi-dimensional collection into a single or arbitrary dimension.
      *
      * @return array
      */
-    public function flatten($value)
+    public function flatten($value, $params)
     {
-        return collect($value)->flatten()->toArray();
+        return collect($value)->flatten(Arr::get($params, 0, INF))->toArray();
     }
 
     /**
@@ -1373,6 +1378,16 @@ class CoreModifiers extends Modifier
         $rekeyed = collect($value)->keyBy(fn ($item) => $item[$params[0]]);
 
         return is_array($value) ? $rekeyed->all() : $rekeyed;
+    }
+
+    /**
+     * Get the keys of an array.
+     *
+     * @return array|Collection
+     */
+    public function keys($value)
+    {
+        return is_array($value) ? array_keys($value) : $value->keys();
     }
 
     /**
@@ -2597,6 +2612,16 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Converts the data to a query string.
+     *
+     * @return string
+     */
+    public function toQs($value)
+    {
+        return Arr::query($value);
+    }
+
+    /**
      * Converts each tab in the string to some number of spaces, as defined by
      * $param[0]. By default, each tab is converted to 4 consecutive spaces.
      *
@@ -2813,6 +2838,16 @@ class CoreModifiers extends Modifier
         ][$key] : -1;
 
         return parse_url($value, $component);
+    }
+
+    /**
+     * Get the values of an array.
+     *
+     * @return array|Collection
+     */
+    public function values($value)
+    {
+        return is_array($value) ? array_values($value) : $value->values();
     }
 
     /**

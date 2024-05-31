@@ -628,7 +628,9 @@ export default {
             const i = this.selectedAssets.indexOf(id);
             this.$refs.browser.focus()
 
-            if (i != -1) {
+            if (this.maxFiles === 1) {
+                this.selectedAssets = [id];
+            } else if (i != -1) {
                 this.selectedAssets.splice(i, 1);
             } else if (! this.reachedSelectionLimit) {
                 if ($event.shiftKey && this.lastItemClicked !== null) {

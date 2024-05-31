@@ -81,6 +81,12 @@ class BardTextTest extends TestCase
         $this->assertEquals($expected, $this->modify($data));
     }
 
+    /** @test */
+    public function it_handles_null()
+    {
+        $this->assertEquals('', $this->modify(null));
+    }
+
     public function modify($arr, ...$args)
     {
         return Modify::value($arr)->bard_text($args)->fetch();
