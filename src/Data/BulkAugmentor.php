@@ -11,6 +11,8 @@ class BulkAugmentor
     private $originalValues = [];
     private $augmentedValues = [];
 
+    private $keyResolver;
+
     private function getAugmentationReference($item)
     {
         if ($item instanceof BulkAugmentable && $key = $item->getBulkAugmentationReferenceKey()) {
@@ -20,14 +22,21 @@ class BulkAugmentor
         return 'Ref::'.get_class($item).spl_object_hash($item);
     }
 
-    public static function make($items)
+    public static function make($items, $keyResolver = null)
     {
-        return (new static)->augment($items);
+        return (new static)->resolveKeysWith($keyResolver)->augment($items);
     }
 
-    public static function tree($tree)
+    public static function tree($tree, $keyResolver = null)
     {
-        return (new static)->augmentTree($tree);
+        return (new static)->resolveKeysWith($keyResolver)->augmentTree($tree);
+    }
+
+    public function resolveKeysWith($callback)
+    {
+        $this->keyResolver = $callback;
+
+        return $this;
     }
 
     /**
@@ -49,12 +58,24 @@ class BulkAugmentor
                 $this->originalValues[$i] = $item;
             }
 
-            if (array_key_exists($reference, $referenceKeys)) {
+            if (array_key_exists($reference, $referenceKeys) && $this->keyResolver === null) {
                 continue;
             }
 
             $augmented = $item->augmented();
-            $referenceKeys[$reference] = $augmented->keys();
+
+            if ($this->keyResolver) {
+                $keys = call_user_func($this->keyResolver, $augmented);
+
+                if ($keys === null) {
+                    $keys = $augmented->keys();
+                }
+
+                $referenceKeys[$reference] = $keys;
+            } else {
+                $referenceKeys[$reference] = $augmented->keys();
+            }
+
             $referenceFields[$reference] = $augmented->blueprintFields();
         }
 

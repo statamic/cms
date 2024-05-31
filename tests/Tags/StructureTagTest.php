@@ -382,6 +382,23 @@ EOT;
         $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2]', $result);
     }
 
+    /** @test */
+    public function it_limits_fields_using_select()
+    {
+        $this->createCollectionAndNav();
+
+        $template = '{{ nav:test select="title" }}<title:{{ title }}><nav_title:{{ nav_title }}>{{ *recursive children* }}{{ /nav:test }}';
+
+        $result = (string) Antlers::parse($template);
+
+        // The nav_title should always be empty since we did not select it.
+        $expected = <<<'EXP'
+<title:One><nav_title:><title:One One><nav_title:><title:URL and title><nav_title:><title:Two><nav_title:><title:Three><nav_title:><title:Three One><nav_title:><title:Three Two><nav_title:><title:Title only><nav_title:><title:URL only><nav_title:>
+EXP;
+
+        $this->assertSame($expected, $result);
+    }
+
     private function makeNav($tree)
     {
         $nav = Nav::make('test');
