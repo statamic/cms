@@ -19,7 +19,7 @@ jobs:
         php: [8.3]
         laravel: [11.*]
         stability: [prefer-stable]
-        os: [windows-latest]
+        os: [ubuntu-latest]
 #        include:
 #          - os: windows-latest
 #            php: 8.3
@@ -78,7 +78,7 @@ jobs:
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, fileinfo
+#          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, fileinfo
           coverage: none
 
       - name: Install dependencies
