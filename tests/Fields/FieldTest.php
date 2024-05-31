@@ -339,11 +339,6 @@ class FieldTest extends TestCase
             'component' => 'example',
             'a_config_field_with_pre_processing' => 'foo preprocessed',
             'a_config_field_without_pre_processing' => 'foo',
-            'hide_display' => null,
-            'instructions_position' => 'above',
-            'listable' => 'hidden',
-            'replicator_preview' => true,
-            'duplicate' => true,
         ], $field->toPublishArray());
     }
 

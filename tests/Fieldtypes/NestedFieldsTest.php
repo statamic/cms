@@ -71,23 +71,18 @@ class NestedFieldsTest extends TestCase
 
         $this->assertSame([
             [
-                'display' => 'Test Image Field',
-                'hide_display' => null,
-                'handle' => 'image',
-                'instructions' => 'Some instructions',
-                'instructions_position' => 'above',
-                'listable' => 'hidden',
-                'visibility' => 'visible',
-                'replicator_preview' => true,
-                'duplicate' => true,
                 'type' => 'assets',
                 'max_files' => 2,
                 'container' => 'main',
                 'foo' => 'bar',
+                'display' => 'Test Image Field',
+                'instructions' => 'Some instructions',
                 'validate' => 'required',
                 'component' => 'assets',
+                'handle' => 'image',
                 'prefix' => null,
                 'required' => true,
+                'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
             ],
