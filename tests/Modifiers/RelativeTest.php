@@ -11,7 +11,9 @@ class RelativeTest extends TestCase
     /** @test */
     public function it_converts_a_date_to_relative()
     {
-        $date = new Carbon('today -1 month');
+        Carbon::setTestNow('2024-06-30');
+
+        $date = new Carbon('2024-05-30');
 
         $this->assertEquals('1 month ago', $this->modify($date));
     }
@@ -19,7 +21,9 @@ class RelativeTest extends TestCase
     /** @test */
     public function it_converts_a_date_to_relative_without_modifiers()
     {
-        $date = new Carbon('today -1 month');
+        Carbon::setTestNow('2024-06-30');
+
+        $date = new Carbon('2024-05-30');
 
         $this->assertEquals('1 month', $this->modify($date, true));
         $this->assertEquals('1 month', $this->modify($date, 'true'));
