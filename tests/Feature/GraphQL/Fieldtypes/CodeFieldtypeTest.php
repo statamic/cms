@@ -11,11 +11,11 @@ class CodeFieldtypeTest extends FieldtypeTestCase
         $this->createEntryWithFields([
             'filled' => [
                 'value' => 'bar',
-                'field' => ['type' => 'code', 'mode_selectable' => false],
+                'field' => ['type' => 'code'],
             ],
             'undefined' => [
                 'value' => null,
-                'field' => ['type' => 'code', 'mode_selectable' => false],
+                'field' => ['type' => 'code'],
             ],
             'selectable_string' => [
                 'value' => 'bar',
