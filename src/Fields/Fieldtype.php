@@ -320,7 +320,7 @@ abstract class Fieldtype implements Arrayable
             ->merge($this->field->config());
 
         return $key
-            ? $config->get($key, $fallback)
+            ? ($config->get($key) ?? $fallback)
             : $config->all();
     }
 
