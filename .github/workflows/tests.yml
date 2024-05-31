@@ -78,7 +78,7 @@ jobs:
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           php-version: ${{ matrix.php }}
-          extensions: fileinfo, pdo, sqlite
+          extensions: fileinfo, pdo, sqlite, gd
           coverage: none
 
       - name: Install dependencies
