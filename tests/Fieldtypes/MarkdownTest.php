@@ -123,7 +123,7 @@ second line</p>
 EOT;
 
         $default = $this->fieldtype();
-        $this->assertEqualsTrimmed($withoutBreaks, $default->augment($value));
+        $this->assertEqualsTrimmed($withBreaks, $default->augment($value));
 
         $enabled = $this->fieldtype(['automatic_line_breaks' => true]);
         $this->assertEqualsTrimmed($withBreaks, $enabled->augment($value));
@@ -156,12 +156,12 @@ EOT;
 
         $expected = <<<'EOT'
 <h1>Actual asset...</h1>
-<p><a href="/assets/foo/hoff.jpg">link</a>
-<img src="/assets/foo/hoff.jpg" alt="" />
+<p><a href="/assets/foo/hoff.jpg">link</a><br />
+<img src="/assets/foo/hoff.jpg" alt="" /><br />
 <img src="/assets/foo/hoff.jpg" alt="Asset" /></p>
 <h1>Non-existent asset...</h1>
-<p><a href="">link</a>
-<img src="" alt="" />
+<p><a href="">link</a><br />
+<img src="" alt="" /><br />
 <a href="">Asset Link</a></p>
 
 EOT;

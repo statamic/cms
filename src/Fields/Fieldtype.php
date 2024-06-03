@@ -315,9 +315,13 @@ abstract class Fieldtype implements Arrayable
             return $fallback;
         }
 
+        $config = $this->configFields()->all()
+            ->map->defaultValue()
+            ->merge($this->field->config());
+
         return $key
-            ? $this->field->get($key, $fallback)
-            : $this->field->config();
+            ? ($config->get($key) ?? $fallback)
+            : $config->all();
     }
 
     public function preload()
