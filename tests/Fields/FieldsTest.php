@@ -427,7 +427,7 @@ class FieldsTest extends TestCase
                 'read_only' => false, // deprecated
                 'always_save' => false,
                 'autocomplete' => null,
-                'hide_display' => null,
+                'hide_display' => false,
                 'instructions_position' => 'above',
                 'listable' => 'hidden',
                 'replicator_preview' => true,
@@ -449,7 +449,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
-                'hide_display' => null,
+                'hide_display' => false,
                 'instructions_position' => 'above',
                 'listable' => 'hidden',
                 'replicator_preview' => true,
@@ -513,7 +513,7 @@ class FieldsTest extends TestCase
                 'read_only' => false, // deprecated
                 'always_save' => false,
                 'autocomplete' => null,
-                'hide_display' => null,
+                'hide_display' => false,
                 'instructions_position' => 'above',
                 'listable' => 'hidden',
                 'replicator_preview' => true,
@@ -538,7 +538,7 @@ class FieldsTest extends TestCase
                 'read_only' => false, // deprecated
                 'always_save' => false,
                 'autocomplete' => null,
-                'hide_display' => null,
+                'hide_display' => false,
                 'instructions_position' => 'above',
                 'listable' => 'hidden',
                 'replicator_preview' => true,

@@ -15,6 +15,8 @@ class NestedFieldsTest extends TestCase
     /** @test */
     public function it_preprocesses_each_value_when_used_for_config()
     {
+        FieldtypeRepository::partialMock();
+
         FieldtypeRepository::shouldReceive('find')
             ->with('assets')
             ->andReturn(new class extends Fieldtype
@@ -72,7 +74,7 @@ class NestedFieldsTest extends TestCase
         $this->assertSame([
             [
                 'display' => 'Test Image Field',
-                'hide_display' => null,
+                'hide_display' => false,
                 'handle' => 'image',
                 'instructions' => 'Some instructions',
                 'instructions_position' => 'above',
