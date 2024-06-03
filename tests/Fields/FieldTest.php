@@ -285,6 +285,8 @@ class FieldTest extends TestCase
     /** @test */
     public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
+        FieldtypeRepository::partialMock();
+
         FieldtypeRepository::shouldReceive('find')
             ->with('example')
             ->andReturn(new class extends Fieldtype
@@ -329,7 +331,7 @@ class FieldTest extends TestCase
 
         $this->assertSame([
             'display' => 'Test Field',
-            'hide_display' => null,
+            'hide_display' => false,
             'handle' => 'test',
             'instructions' => 'Test instructions',
             'instructions_position' => 'below',
