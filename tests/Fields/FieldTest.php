@@ -327,26 +327,26 @@ class FieldTest extends TestCase
             'a_config_field_without_pre_processing' => 'foo',
         ]);
 
-        $this->assertEquals([
-            'handle' => 'test',
-            'prefix' => null,
-            'type' => 'example',
+        $this->assertSame([
             'display' => 'Test Field',
-            'instructions' => 'Test instructions',
-            'required' => true,
-            'validate' => 'required',
-            'visibility' => 'visible',
-            'read_only' => false, // deprecated
-            'always_save' => false,
-            'component' => 'example',
-            'a_config_field_with_pre_processing' => 'foo preprocessed',
-            'a_config_field_without_pre_processing' => 'foo',
-            'foo' => 'bar',
             'hide_display' => null,
+            'handle' => 'test',
+            'instructions' => 'Test instructions',
             'instructions_position' => 'below',
             'listable' => 'hidden',
+            'visibility' => 'visible',
             'replicator_preview' => true,
             'duplicate' => true,
+            'type' => 'example',
+            'validate' => 'required',
+            'foo' => 'bar',
+            'a_config_field_with_pre_processing' => 'foo preprocessed',
+            'a_config_field_without_pre_processing' => 'foo',
+            'component' => 'example',
+            'prefix' => null,
+            'required' => true,
+            'read_only' => false, // deprecated
+            'always_save' => false,
         ], $field->toPublishArray());
     }
 
