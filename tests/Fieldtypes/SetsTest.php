@@ -298,45 +298,45 @@ class SetsTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             [
-                'handle' => 'main',
                 'sets' => [
                     [
-                        'id' => 'one',
-                        'handle' => 'one',
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
                         'fields' => [
                             [
                                 'display' => 'Field One',
+                                'hide_display' => false,
                                 'handle' => 'field_one',
+                                'instructions' => null,
+                                'instructions_position' => 'above',
+                                'listable' => 'hidden',
+                                'visibility' => 'visible',
+                                'replicator_preview' => true,
+                                'duplicate' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
                                 'placeholder' => null,
                                 'default' => null,
                                 'character_limit' => 0,
+                                'autocomplete' => null,
                                 'prepend' => null,
                                 'append' => null,
                                 'antlers' => false,
                                 'component' => 'text',
                                 'prefix' => null,
-                                'instructions' => null,
                                 'required' => false,
-                                'visibility' => 'visible',
                                 'read_only' => false,
                                 'always_save' => false,
-                                'autocomplete' => null,
-                                'hide_display' => null,
-                                'instructions_position' => 'above',
-                                'listable' => 'hidden',
-                                'replicator_preview' => true,
-                                'duplicate' => true,
                             ],
                         ],
+                        'handle' => 'one',
+                        'id' => 'one',
                     ],
                 ],
+                'handle' => 'main',
             ],
         ], $field->preProcess()->value());
     }
