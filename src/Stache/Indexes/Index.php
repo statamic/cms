@@ -12,6 +12,7 @@ abstract class Index
     protected $name;
     protected $items = [];
     protected $loaded = false;
+    private static ?string $currentlyLoading = null;
 
     public function __construct($store, $name)
     {
@@ -65,6 +66,8 @@ abstract class Index
             return $this;
         }
 
+        static::$currentlyLoading = $this->store->key().'/'.$this->name;
+
         $this->loaded = true;
 
         if (Statamic::isWorker()) {
@@ -80,6 +83,8 @@ abstract class Index
         }
 
         $this->store->cacheIndexUsage($this);
+
+        static::$currentlyLoading = null;
 
         return $this;
     }
@@ -149,5 +154,10 @@ abstract class Index
         $this->items = null;
 
         Cache::forget($this->cacheKey());
+    }
+
+    public static function currentlyLoading()
+    {
+        return static::$currentlyLoading;
     }
 }

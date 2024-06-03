@@ -4,7 +4,7 @@
         <dropdown-list :disabled="creatables.length === 1">
             <template #trigger>
                 <button
-                    class="text-button text-blue hover:text-gray-800 rtl:ml-6 ltr:mr-6 flex items-center outline-none"
+                    class="text-button text-blue dark:text-dark-blue-100 hover:text-gray-800 dark:hover:text-dark-100 rtl:ml-6 ltr:mr-6 flex items-center outline-none"
                     @click="create"
                 >
                     <svg-icon name="light/content-writing" class="rtl:ml-1 ltr:mr-1 h-4 w-4 flex items-center"></svg-icon>

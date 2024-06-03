@@ -317,7 +317,7 @@ export default {
         },
 
         direction() {
-            return this.$config.get('direction', 'rtl');
+            return this.$config.get('direction', 'ltr');
         },
 
     },

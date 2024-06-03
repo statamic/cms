@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply w-full bg-gray-300 relative;
+    @apply w-full bg-gray-300 relative dark:bg-dark-800;
 }
 
 #statamic {
@@ -77,27 +77,4 @@ a {
 /* Mirrors that have been appended to the body should appear on top of everything. (Portals are 4) */
 body > .draggable-mirror {
     z-index: 5;
-}
-
-/* Outside the Control Panel
-  ========================================================================== */
-.outside {
-    @apply bg-gray-300 px-2 min-h-screen;
-
-    label {
-        color: #596498;
-    }
-
-    .logo svg {
-        @apply h-6 block mx-auto mb-20 mb-8 w-auto;
-        path {
-            fill: rgba(0,0,0,.25);
-        }
-    }
-}
-
- /*  Alternate rad mode for a more playful vibe */
-.outside.rad-theme {
-    background: #12c2e9;
-    background: linear-gradient(45deg, #f64f59, #c471ed, #12c2e9);
 }

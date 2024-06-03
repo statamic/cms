@@ -56,6 +56,12 @@ class Replicator extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
+                    'button_label' => [
+                        'display' => __('Add Set Label'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.button_label'),
+                        'type' => 'text',
+                        'default' => '',
+                    ],
                 ],
             ],
             [
@@ -187,7 +193,7 @@ class Replicator extends Fieldtype
     protected function performAugmentation($values, $shallow)
     {
         return collect($values)->reject(function ($set, $key) {
-            return array_get($set, 'enabled', true) === false;
+            return Arr::get($set, 'enabled', true) === false;
         })->map(function ($set, $index) use ($shallow) {
             if (! Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields")) {
                 return $set;

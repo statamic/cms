@@ -5,6 +5,8 @@ namespace Statamic\Sites;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Support\Str;
+use Statamic\Support\TextDirection;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 
 class Site implements Augmentable
 {
@@ -12,11 +14,13 @@ class Site implements Augmentable
 
     protected $handle;
     protected $config;
+    protected $rawConfig;
 
     public function __construct($handle, $config)
     {
         $this->handle = $handle;
-        $this->config = $config;
+        $this->config = $this->resolveAntlers($config);
+        $this->rawConfig = $config;
     }
 
     public function handle()
@@ -57,7 +61,7 @@ class Site implements Augmentable
 
     public function direction()
     {
-        return $this->config['direction'] ?? 'ltr';
+        return TextDirection::of($this->lang());
     }
 
     public function attributes()
@@ -85,6 +89,36 @@ class Site implements Augmentable
         return $path === '' ? '/' : $path;
     }
 
+    public function set($key, $value)
+    {
+        $this->config[$key] = $this->resolveAntlersValue($value);
+        $this->rawConfig[$key] = $value;
+
+        if ($key === 'url') {
+            $this->absoluteUrlCache = null;
+        }
+
+        return $this;
+    }
+
+    public function resolveAntlers($config)
+    {
+        return collect($config)
+            ->map(fn ($value) => $this->resolveAntlersValue($value))
+            ->all();
+    }
+
+    protected function resolveAntlersValue($value)
+    {
+        if (is_array($value)) {
+            return collect($value)
+                ->map(fn ($element) => $this->resolveAntlersValue($element))
+                ->all();
+        }
+
+        return (string) app(RuntimeParser::class)->parse($value, ['config' => config()->all()]);
+    }
+
     private function removePath($url)
     {
         $parsed = parse_url($url);
@@ -105,6 +139,11 @@ class Site implements Augmentable
             'direction' => $this->direction(),
             'attributes' => $this->attributes(),
         ];
+    }
+
+    public function rawConfig()
+    {
+        return $this->rawConfig;
     }
 
     public function __toString()

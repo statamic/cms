@@ -114,7 +114,6 @@ return [
     'markdown.config.table_of_contents' => 'به‌طور خودکار جدول محتوایی در بالای صفحه قرار می‌گیرد که فهرستی از ارجاعات به تیترهای محتوا می‌باشد.',
     'markdown.title' => 'مارک‌دان',
     'nav.title' => 'فهرست',
-    'navs.title' => 'فهرست',
     'picker.category.controls.description' => 'فیلدهایی که گزینه‌های قابل انتخاب یا دکمه‌هایی را ارائه می‌دهند که بسته به تعریفشان کاری را انجام می‌دهند.',
     'picker.category.media.description' => 'فیلدهایی که تصاویر، ویدیوها یا رسانه‌های دیگر را ذخیره می‌کنند.',
     'picker.category.number.description' => 'فیلدهایی که اعداد را ذخیره می‌کنند.',

@@ -291,4 +291,24 @@ EOT
         $this->assertStringContainsString($expectedRedirect, $output);
         $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
+
+    /** @test */
+    public function it_handles_precognitive_requests()
+    {
+        if (! method_exists($this, 'withPrecognition')) {
+            $this->markTestSkipped();
+        }
+
+        $this->actingAs(User::make()->password('mypassword')->save());
+
+        $response = $this
+            ->withPrecognition()
+            ->postJson('/!/auth/password', [
+                'current_password' => 'wrongpassword',
+                'password' => 'newpassword',
+                'password_confirmation' => 'newpassword',
+            ]);
+
+        $response->assertStatus(422);
+    }
 }

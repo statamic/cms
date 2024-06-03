@@ -38,22 +38,29 @@ class MakeAddonTest extends TestCase
 
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/README.md'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/.gitignore'));
+        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/phpunit.xml'));
 
         $this->assertFileExists($composerJson = base_path('addons/hasselhoff/knight-rider/composer.json'));
         $this->assertStringContainsString('"Hasselhoff\\\KnightRider\\\": "src"', $this->files->get($composerJson));
 
         $this->assertFileExists($provider = base_path('addons/hasselhoff/knight-rider/src/ServiceProvider.php'));
         $this->assertStringContainsString('namespace Hasselhoff\KnightRider;', $this->files->get($provider));
+
+        $this->assertFileExists($testCase = base_path('addons/hasselhoff/knight-rider/tests/TestCase.php'));
+        $this->assertStringContainsString('namespace Hasselhoff\KnightRider\Tests;', $this->files->get($testCase));
+
+        $this->assertFileExists($exampleTest = base_path('addons/hasselhoff/knight-rider/tests/ExampleTest.php'));
+        $this->assertStringContainsString('namespace Hasselhoff\KnightRider\Tests;', $this->files->get($exampleTest));
     }
 
     /** @test */
     public function it_cannot_make_addon_with_invalid_composer_package_name()
     {
         $this->artisan('statamic:make:addon', ['addon' => 'deaths-tar-vulnerability'])
-            ->expectsOutput('Please enter a valid composer package name (eg. hasselhoff/kung-fury).');
+            ->expectsOutputToContain(trans('statamic::validation.composer_package'));
 
         $this->artisan('statamic:make:addon', ['addon' => 'some/path/deaths-tar-vulnerability'])
-            ->expectsOutput('Please enter a valid composer package name (eg. hasselhoff/kung-fury).');
+            ->expectsOutputToContain(trans('statamic::validation.composer_package'));
 
         $this->assertFileDoesNotExist(base_path('addons/erso/deaths-tar-vulnerability'));
     }
@@ -69,7 +76,7 @@ class MakeAddonTest extends TestCase
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
 
         $this->artisan('statamic:make:addon', ['addon' => 'erso/deaths-tar-vulnerability'])
-            ->expectsOutput('Addon already exists!');
+            ->expectsOutputToContain('Addon already exists!');
 
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
     }

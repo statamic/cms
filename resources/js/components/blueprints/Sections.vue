@@ -110,7 +110,7 @@ export default {
                 display: this.newSectionText,
                 instructions: null,
                 icon: null,
-                handle: this.$slugify(this.newSectionText, '_'),
+                handle: snake_case(this.newSectionText),
                 fields: []
             };
 

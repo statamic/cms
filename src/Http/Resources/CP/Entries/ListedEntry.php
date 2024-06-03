@@ -54,14 +54,13 @@ class ListedEntry extends JsonResource
     {
         return $this->columns->mapWithKeys(function ($column) use ($extra) {
             $key = $column->field;
+            $field = $this->blueprint->field($key);
 
             if ($key === 'site') {
                 $value = $this->resource->locale();
             } else {
-                $value = $extra[$key] ?? $this->resource->value($key);
+                $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();
             }
-
-            $field = $this->blueprint->field($key);
 
             if (! $field) {
                 return [$key => $value];
