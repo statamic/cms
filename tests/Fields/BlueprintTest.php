@@ -469,6 +469,7 @@ class BlueprintTest extends TestCase
                                     'instructions' => 'Two instructions',
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
+                                    'sortable' => true,
                                     'visibility' => 'visible',
                                     'replicator_preview' => true,
                                     'duplicate' => true,
