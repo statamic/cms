@@ -106,7 +106,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      * @param  null|array  $rules
      * @return array
      */
-    public function validation($rules = null)
+    public function validationRules($rules = null)
     {
         return $this
             ->fluentlyGetOrSet('validation')

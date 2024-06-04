@@ -65,7 +65,7 @@ class AssetContainersController extends CpController
             'source_preset' => $container->sourcePreset(),
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
-            'validation' => $container->validation(),
+            'validation' => $container->validationRules(),
         ];
 
         $fields = ($blueprint = $this->formBlueprint($container))
@@ -101,7 +101,7 @@ class AssetContainersController extends CpController
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
-            ->validation($values['validation'] ?? null);
+            ->validationRules($values['validation'] ?? null);
 
         $container->save();
 

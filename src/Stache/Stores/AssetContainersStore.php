@@ -31,6 +31,6 @@ class AssetContainersStore extends BasicStore
             ->searchIndex(Arr::get($data, 'search_index'))
             ->sortField(Arr::get($data, 'sort_by'))
             ->sortDirection(Arr::get($data, 'sort_dir'))
-            ->validation(Arr::get($data, 'validate'));
+            ->validationRules(Arr::get($data, 'validate'));
     }
 }

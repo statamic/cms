@@ -234,12 +234,12 @@ class AssetContainerTest extends TestCase
     public function it_gets_and_sets_the_validation_rules()
     {
         $container = new AssetContainer;
-        $this->assertEmpty($container->validation());
+        $this->assertEmpty($container->validationRules());
 
-        $return = $container->validation(['max:5120']);
+        $return = $container->validationRules(['max:5120']);
 
         $this->assertEquals($container, $return);
-        $this->assertEquals(['max:5120'], $container->validation());
+        $this->assertEquals(['max:5120'], $container->validationRules());
     }
 
     /** @test */
@@ -296,7 +296,7 @@ class AssetContainerTest extends TestCase
 
         $container
             ->handle('test')
-            ->validation(['max:10'])
+            ->validationRules(['max:10'])
             ->save();
 
         $return = Facades\AssetContainer::find('test');

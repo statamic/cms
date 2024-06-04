@@ -97,7 +97,7 @@ class StoreAssetTest extends TestCase
     public function it_doesnt_upload_when_validation_fails()
     {
 
-        $this->container->validation(['extensions:png'])->save();
+        $this->container->validationRules(['extensions:png'])->save();
 
         $this
             ->actingAs($this->userWithPermission())
