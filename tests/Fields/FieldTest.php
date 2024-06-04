@@ -285,6 +285,8 @@ class FieldTest extends TestCase
     /** @test */
     public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
+        FieldtypeRepository::partialMock();
+
         FieldtypeRepository::shouldReceive('find')
             ->with('example')
             ->andReturn(new class extends Fieldtype
@@ -320,25 +322,33 @@ class FieldTest extends TestCase
             'type' => 'example',
             'display' => 'Test Field',
             'instructions' => 'Test instructions',
+            'instructions_position' => 'below',
             'validate' => 'required',
+            'foo' => 'bar',
             'a_config_field_with_pre_processing' => 'foo',
             'a_config_field_without_pre_processing' => 'foo',
         ]);
 
-        $this->assertEquals([
-            'handle' => 'test',
-            'prefix' => null,
-            'type' => 'example',
+        $this->assertSame([
             'display' => 'Test Field',
+            'hide_display' => false,
+            'handle' => 'test',
             'instructions' => 'Test instructions',
-            'required' => true,
-            'validate' => 'required',
+            'instructions_position' => 'below',
+            'listable' => 'hidden',
             'visibility' => 'visible',
-            'read_only' => false, // deprecated
-            'always_save' => false,
-            'component' => 'example',
+            'replicator_preview' => true,
+            'duplicate' => true,
+            'type' => 'example',
+            'validate' => 'required',
+            'foo' => 'bar',
             'a_config_field_with_pre_processing' => 'foo preprocessed',
             'a_config_field_without_pre_processing' => 'foo',
+            'component' => 'example',
+            'prefix' => null,
+            'required' => true,
+            'read_only' => false, // deprecated
+            'always_save' => false,
         ], $field->toPublishArray());
     }
 

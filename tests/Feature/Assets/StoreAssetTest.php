@@ -93,6 +93,18 @@ class StoreAssetTest extends TestCase
             ])->assertStatus(422);
     }
 
+    /** @test */
+    public function it_doesnt_upload_when_validation_fails()
+    {
+
+        $this->container->validationRules(['extensions:png'])->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->submit()
+            ->assertStatus(422);
+    }
+
     private function submit($overrides = [])
     {
         return $this->postJson(cp_route('assets.store'), $this->validPayload($overrides));
