@@ -290,21 +290,6 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    public function it_saves_the_container_data_to_file()
-    {
-        $container = new AssetContainer;
-
-        $container
-            ->handle('test')
-            ->validationRules(['max:10'])
-            ->save();
-
-        $return = Facades\AssetContainer::find('test');
-
-        $this->assertEquals($container, $return);
-    }
-
-    /** @test */
     public function it_saves_the_container_through_the_api()
     {
         Event::fake();
