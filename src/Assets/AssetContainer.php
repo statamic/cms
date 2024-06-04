@@ -103,8 +103,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     /**
      * Get or set the validation rules.
      *
-     * @param  null|array  $id
-     * @return array|null
+     * @param  null|array  $rules
+     * @return array
      */
     public function validation($rules = null)
     {

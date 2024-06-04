@@ -106,7 +106,7 @@ interface AssetContainer
      * Get or set the validation rules.
      *
      * @param  null|array  $rules
-     * @return array|null
+     * @return array
      */
     // public function validation($rules = null);
 }
