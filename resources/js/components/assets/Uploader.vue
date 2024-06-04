@@ -186,7 +186,7 @@ export default {
 
                 response.status === 200
                     ? this.handleUploadSuccess(id, json)
-                    : this.handleUploadError(id, status, json);
+                    : this.handleUploadError(id, response.status, json);
             });
         },
 
@@ -203,6 +203,10 @@ export default {
                     msg = __('Upload failed. The file is larger than is allowed by your server.');
                 } else {
                     msg = __('Upload failed. The file might be larger than is allowed by your server.');
+                }
+            } else {
+                if (status === 422) {
+                    msg = Object.values(response.errors)[0][0]; // Get first validation message.
                 }
             }
             upload.errorMessage = msg;
