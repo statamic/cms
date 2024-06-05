@@ -3,6 +3,8 @@
 namespace Tests\Tags;
 
 use Mockery;
+use Statamic\Assets\Asset;
+use Statamic\Assets\AssetContainer;
 use Statamic\Contracts\Imaging\Manipulator;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Image;
@@ -111,6 +113,36 @@ class RenderTest extends TestCase
             }}{{ url }},{{ width }},{{ height }}{{ /render }}';
 
         $output = $this->parse($template, ['img' => 'test.jpg']);
+
+        $this->assertEquals('the-url,the-width,the-height', $output);
+    }
+
+    /** @test */
+    public function when_using_a_tag_pair_it_will_include_variables_via_asset_object()
+    {
+        // {{ render :src="img" w="100" }}
+        //     {{ url }}, {{ width }}, etc
+        // {{ /render }}
+
+        $asset = new Asset;
+        $asset->container((new AssetContainer)->handle('main'));
+        $asset->path('img/foo.jpg');
+
+        $driver = Mockery::mock(Manipulator::class);
+        $driver->shouldReceive('setSource')->with($asset)->once()->andReturnSelf();
+        $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
+        $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
+        $driver->shouldReceive('getUrl')->once()->andReturn('the-url');
+        $driver->shouldReceive('getAttributes')->once()->andReturn([
+            'width' => 'the-width',
+            'height' => 'the-height',
+        ]);
+        Image::shouldReceive('driver')->once()->andReturn($driver);
+
+        $template = '{{ render :src="img" w="100" h="150" foo="ignore"
+            }}{{ url }},{{ width }},{{ height }}{{ /render }}';
+
+        $output = $this->parse($template, ['img' => $asset]);
 
         $this->assertEquals('the-url,the-width,the-height', $output);
     }

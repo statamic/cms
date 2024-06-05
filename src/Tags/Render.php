@@ -43,6 +43,10 @@ class Render extends Tags
             $source = $source->get();
         }
 
+        if (! is_iterable($source)) {
+            $source = [$source];
+        }
+
         return collect($source)->map(fn ($source) => array_merge([
             'url' => ($driver = $this->driver()->setSource($source))->getUrl(),
         ], $driver->getAttributes()));
