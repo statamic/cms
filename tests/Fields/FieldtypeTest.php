@@ -500,6 +500,12 @@ class FieldtypeTest extends TestCase
     /** @test */
     public function it_gets_a_config_value()
     {
+        (new class extends Fieldtype
+        {
+            protected static $handle = 'fieldtype_with_array_default';
+            protected $defaultValue = [];
+        })::register();
+
         $field = new Field('test', [
             'foo' => 'bar', // doesn't exist as a config field
             'alfa' => 'overridden', // doesn't have a default
@@ -517,7 +523,7 @@ class FieldtypeTest extends TestCase
             'delta' => false, // No default set
             'echo' => true, // Default set
             'foxtrot' => false, // Default set
-            // Files fields (has default of empty array)
+            // Test fields (has default of empty array)
             'golf' => [], // No default set
             'hotel' => ['hotel!'], // Default set
         ], $fieldtype->config());
@@ -595,10 +601,10 @@ class TestFieldtypeWithConfigFields extends Fieldtype
             'default' => false,
         ],
         'golf' => [
-            'type' => 'files',
+            'type' => 'fieldtype_with_array_default',
         ],
         'hotel' => [
-            'type' => 'files',
+            'type' => 'fieldtype_with_array_default',
             'default' => ['hotel!'],
         ],
     ];
