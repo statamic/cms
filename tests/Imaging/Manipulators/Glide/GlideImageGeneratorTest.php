@@ -32,7 +32,7 @@ class GlideImageGeneratorTest extends TestCase
     {
         parent::setUp();
 
-        $this->manipulator = new Glide([
+        $this->manipulator = new GlideManipulator([
             'cache' => public_path('img'),
         ]);
 
@@ -46,8 +46,8 @@ class GlideImageGeneratorTest extends TestCase
 
         $manifestCacheKey = 'asset::test_container::foo/hoff.jpg';
         $manipulationCacheKey = 'asset::test_container::foo/hoff.jpg::4dbc41d8e3ba1ccd302641e509b48768';
-        $this->assertNull(GlideManipulator::cacheStore()->get($manifestCacheKey));
-        $this->assertNull(GlideManipulator::cacheStore()->get($manipulationCacheKey));
+        $this->assertNull(Glide::cacheStore()->get($manifestCacheKey));
+        $this->assertNull(Glide::cacheStore()->get($manipulationCacheKey));
 
         Storage::fake('test');
         $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
@@ -84,8 +84,8 @@ class GlideImageGeneratorTest extends TestCase
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
         $this->assertContains($expectedPath, $paths);
-        $this->assertEquals($expectedCacheManifest, GlideManipulator::cacheStore()->get($manifestCacheKey));
-        $this->assertEquals($expectedPath, GlideManipulator::cacheStore()->get($manipulationCacheKey));
+        $this->assertEquals($expectedCacheManifest, Glide::cacheStore()->get($manifestCacheKey));
+        $this->assertEquals($expectedPath, Glide::cacheStore()->get($manipulationCacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
@@ -95,7 +95,7 @@ class GlideImageGeneratorTest extends TestCase
         Event::fake();
 
         $manifestCacheKey = 'asset::test_container::foo/hoff.jpg';
-        $this->assertNull(GlideManipulator::cacheStore()->get($manifestCacheKey));
+        $this->assertNull(Glide::cacheStore()->get($manifestCacheKey));
 
         Storage::fake('test');
         $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
@@ -117,7 +117,7 @@ class GlideImageGeneratorTest extends TestCase
 
         Event::assertDispatchedTimes(GlideImageGenerated::class, 2);
 
-        $this->assertCount(2, $manifest = GlideManipulator::cacheStore()->get($manifestCacheKey));
+        $this->assertCount(2, $manifest = Glide::cacheStore()->get($manifestCacheKey));
         $this->assertCount(2, $this->generatedImagePaths());
 
         foreach ($manifest as $cacheKey) {
@@ -131,7 +131,7 @@ class GlideImageGeneratorTest extends TestCase
         Event::fake();
 
         $cacheKey = 'path::testimages/foo/hoff.jpg::4dbc41d8e3ba1ccd302641e509b48768';
-        $this->assertNull(GlideManipulator::cacheStore()->get($cacheKey));
+        $this->assertNull(Glide::cacheStore()->get($cacheKey));
 
         $this->assertCount(0, $this->generatedImagePaths());
 
@@ -163,7 +163,7 @@ class GlideImageGeneratorTest extends TestCase
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
         $this->assertContains($expectedPath, $paths);
-        $this->assertEquals($expectedPath, GlideManipulator::cacheStore()->get($cacheKey));
+        $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
@@ -173,7 +173,7 @@ class GlideImageGeneratorTest extends TestCase
         Event::fake();
 
         $cacheKey = 'url::https://example.com/foo/hoff.jpg::4dbc41d8e3ba1ccd302641e509b48768';
-        $this->assertNull(GlideManipulator::cacheStore()->get($cacheKey));
+        $this->assertNull(Glide::cacheStore()->get($cacheKey));
 
         $this->assertCount(0, $this->generatedImagePaths());
 
@@ -211,7 +211,7 @@ class GlideImageGeneratorTest extends TestCase
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
         $this->assertContains($expectedPath, $paths);
-        $this->assertEquals($expectedPath, GlideManipulator::cacheStore()->get($cacheKey));
+        $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
@@ -318,7 +318,7 @@ class GlideImageGeneratorTest extends TestCase
 
     private function clearGlideCache()
     {
-        GlideManipulator::cacheStore()->flush();
+        Glide::cacheStore()->flush();
         File::delete($this->glideCachePath());
     }
 
