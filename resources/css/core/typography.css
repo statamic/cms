@@ -77,7 +77,6 @@ a:not([class^="btn"]) {
 
     pre {
         background-color: #f9f2f4;
-        word-wrap: normal;
         overflow: auto;
         @apply p-2;
 
