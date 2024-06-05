@@ -4,6 +4,7 @@ namespace Statamic\Imaging;
 
 use Statamic\Contracts\Imaging\ImageManipulator;
 use Statamic\Facades\Glide;
+use Statamic\Imaging\Manipulators\GlideManipulator;
 use Statamic\Support\Arr;
 
 class Manager
@@ -116,7 +117,7 @@ class Manager
         // TODO: get it from the config. accept an argument to get a specific one.
         // i.e. manager stuff.
 
-        return new Glide([
+        return new GlideManipulator([
             'driver' => 'glide',
             'cache' => public_path('img'),
             'url' => 'img',
