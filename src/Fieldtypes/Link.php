@@ -172,7 +172,7 @@ class Link extends Fieldtype
 
     private function showAssetOption()
     {
-        return $this->config('container') !== null;
+        return ! empty($this->config('container'));
     }
 
     public function toGqlType()
