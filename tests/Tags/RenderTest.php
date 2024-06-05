@@ -314,6 +314,19 @@ EOF;
         ];
     }
 
+    /** @test */
+    public function it_can_use_a_specific_manipulator()
+    {
+        $driver = Mockery::mock(Manipulator::class);
+        $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
+        $driver->shouldReceive('setParams')->with(['w' => '100'])->once()->andReturnSelf();
+        $driver->shouldReceive('getUrl')->andReturn('the-url');
+        Image::shouldReceive('driver')->with('imgix')->once()->andReturn($driver);
+
+        $this->assertEquals('the-url', $this->parse('{{ render :src="img" w="100" using="imgix" }}', ['img' => 'test.jpg']));
+    }
+
     private function parse($string, $data = [])
     {
         return (string) Antlers::parse($string, $data);

@@ -88,7 +88,7 @@ class Render extends Tags
 
     private function driver(): Manipulator
     {
-        $driver = Image::driver();
+        $driver = Image::driver($this->params->get('using'));
 
         $allowed = $driver->getAvailableParams();
 
