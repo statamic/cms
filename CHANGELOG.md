@@ -1,5 +1,17 @@
 # Release Notes
 
+## 5.7.1 (2024-06-05)
+
+### What's fixed
+- Fix tiny top left border radius on collection widget [#10266](https://github.com/statamic/cms/issues/10266) by @duncanmcclean
+- Prevent text in overflowing code blocks in the Control Panel [#10269](https://github.com/statamic/cms/issues/10269) by @rob
+- Fix status not being visible in collection widget [#10267](https://github.com/statamic/cms/issues/10267) by @duncanmcclean
+- Fix failed slug validation when slug contains underscores [#10265](https://github.com/statamic/cms/issues/10265) by @o1y
+- Fix unnecessary array default fieldtype values [#10272](https://github.com/statamic/cms/issues/10272) by @duncanmcclean
+- French translations [#10261](https://github.com/statamic/cms/issues/10261) by @ebeauchamps
+
+
+
 ## 5.7.0 (2024-06-04)
 
 ### What's new
