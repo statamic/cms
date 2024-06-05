@@ -418,3 +418,18 @@ table.control {
         @apply rounded bg-gray-100 dark:bg-dark-700 border dark:border-dark-900 px-1 inline-block text-2xs line-clamp-1 mb-1;
     }
 }
+
+/* Widgets
+  ========================================================================== */
+
+.widget .data-table {
+    tbody {
+        tr {
+            &:first-child {
+                td:first-child, th:first-child {
+                    @apply rtl:rounded-tr-none ltr:rounded-tl-none;
+                }
+            }
+        }
+    }
+}
