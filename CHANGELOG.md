@@ -1,5 +1,85 @@
 # Release Notes
 
+## 5.7.0 (2024-06-04)
+
+### What's new
+- Validation may be added to asset containers for file uploads [#10227](https://github.com/statamic/cms/issues/10227) by @edalzell
+- Allow overriding `statusIcons` property in relationship fieldtype [#10253](https://github.com/statamic/cms/issues/10253) by @duncanmcclean
+
+### What's fixed
+- Merge defaults into field publish arrays [#10246](https://github.com/statamic/cms/issues/10246) by @jasonvarga
+- Merge config field defaults into field config [#10139](https://github.com/statamic/cms/issues/10139) by @duncanmcclean
+- Fix dark mode entry and navigation deletion modals [#10254](https://github.com/statamic/cms/issues/10254) by @aaronbushnell
+- Fix broken docs URLs; rename docs URL redirect to permalink [#10249](https://github.com/statamic/cms/issues/10249) by @rob
+- Localize field titles in collection filter [#10250](https://github.com/statamic/cms/issues/10250) by @robdekort
+- Only run parent code in `Revisable` trait when item is an entry [#10245](https://github.com/statamic/cms/issues/10245) by @duncanmcclean
+- Make `select` field values in entry tables localizable [#10241](https://github.com/statamic/cms/issues/10241) by @robdekort
+- Fix styling of "Live Preview" and "Visit URL" buttons on terms publish form [#10237](https://github.com/statamic/cms/issues/10237) by @duncanmcclean
+- Use multibyte methods for obfuscate [#10201](https://github.com/statamic/cms/issues/10201) by @lakkes-ra
+- Ensure `prose`-based strong tag is readable in dark mode [#10236](https://github.com/statamic/cms/issues/10236) by @aaronbushnell
+- Fix relative modifier test [#10242](https://github.com/statamic/cms/issues/10242) by @jasonvarga
+- Decrease the failure rate of RandomTest [#10238](https://github.com/statamic/cms/issues/10238) by @jasonvarga
+- Address slow Windows GitHub actions [#10243](https://github.com/statamic/cms/issues/10243) by @jasonvarga
+- Danish translations [#10231](https://github.com/statamic/cms/issues/10231) by @mortenebak
+- Norwegian translations [#10248](https://github.com/statamic/cms/issues/10248) by @espenlg
+
+
+
+## 5.6.2 (2024-05-30)
+
+### What's fixed
+- Prevent user registration form saving `password_confirmation` [#10228](https://github.com/statamic/cms/issues/10228) by @ryanmitchell
+- Fix needing to deselect an asset to reselect when using max_files 1 [#10225](https://github.com/statamic/cms/issues/10225) by @jackmcdade
+- Allow long bard/replicator set names to wrap [#10223](https://github.com/statamic/cms/issues/10223) by @jackmcdade
+- Fix Code fieldtype not removing the overflow hidden style on body when closing Fullscreen Mode [#10221](https://github.com/statamic/cms/issues/10221) by @jackmcdade
+
+
+## 5.6.1 (2024-05-29)
+
+### What's fixed
+- Revert `select` modifier. [#10218](https://github.com/statamic/cms/issues/10218) by @jasonvarga
+- Make label on Add Set button localizable [#10216](https://github.com/statamic/cms/issues/10216) by @duncanmcclean
+- Fix JavaScript length error from Add Set button label [#10217](https://github.com/statamic/cms/issues/10217) by @duncanmcclean
+- French translations [#10209](https://github.com/statamic/cms/issues/10209) by @ebeauchamps
+- Danish translations [#10214](https://github.com/statamic/cms/issues/10214) by @mortenebak
+
+
+
+## 5.6.0 (2024-05-28)
+
+### What's new
+- Allow extra `x-data` to be passed to alpine forms [#10174](https://github.com/statamic/cms/issues/10174) by @ryanmitchell
+- Add `to_qs` modifier [#10196](https://github.com/statamic/cms/issues/10196) by @godismyjudge95
+- Add `site` filter to TermsQuery [#10131](https://github.com/statamic/cms/issues/10131) by @arcs-
+- Add `keys` and `values` modifiers [#10185](https://github.com/statamic/cms/issues/10185) by @godismyjudge95
+- Add `merge` method to Eloquent User class [#10192](https://github.com/statamic/cms/issues/10192) by @duncanmcclean
+- Add `depth` parameter to `flatten` modifier [#10187](https://github.com/statamic/cms/issues/10187) by @godismyjudge95
+- ~Add `select` modifier~ (Reverted in 5.6.1) [#10183](https://github.com/statamic/cms/issues/10183) by @godismyjudge95
+- Replicator "add set" button label option [#9806](https://github.com/statamic/cms/issues/9806) by @godismyjudge95
+
+### What's fixed
+- Static caching file path fallback [#9306](https://github.com/statamic/cms/issues/9306) by @royduin
+- Fix error when augmenting Bard fields [#10104](https://github.com/statamic/cms/issues/10104) by @duncanmcclean
+- Fix `ensureFieldHasConfig` for imported fields [#9243](https://github.com/statamic/cms/issues/9243) by @aerni
+- Allows Antlers & Blade stacks to be used interchangeably [#10200](https://github.com/statamic/cms/issues/10200) by @JohnathonKoster
+- Fix error when serializing eloquent query builders [#10189](https://github.com/statamic/cms/issues/10189) by @duncanmcclean
+- Fix `@see` in docblock on `FormSubmission` facade [#10197](https://github.com/statamic/cms/issues/10197) by @duncanmcclean
+- Maintain order of views after renaming [#10193](https://github.com/statamic/cms/issues/10193) by @duncanmcclean
+- Filter out global set variables associated to deleted sites [#10195](https://github.com/statamic/cms/issues/10195) by @duncanmcclean
+- Prevent some folders from listing in template fieldtype [#10031](https://github.com/statamic/cms/issues/10031) by @peimn
+- Handle `null` in `bardText` modifier [#10199](https://github.com/statamic/cms/issues/10199) by @edalzell
+- Fix border and shadow in closed nav [#10186](https://github.com/statamic/cms/issues/10186) by @peimn
+- Fix link fieldtype state [#10182](https://github.com/statamic/cms/issues/10182) by @jasonvarga
+- Fix Dark Mode Tree Node margins. [#10179](https://github.com/statamic/cms/issues/10179) by @jackmcdade
+- Fix wrong dark mode colors in the updater [#10178](https://github.com/statamic/cms/issues/10178) by @jackmcdade
+- Add dark mode to new User Wizard [#10171](https://github.com/statamic/cms/issues/10171) by @martyf
+- Fix dark mode for Set Picker [#10173](https://github.com/statamic/cms/issues/10173) by @martyf
+- Add dark mode support for list items [#10172](https://github.com/statamic/cms/issues/10172) by @martyf
+- German translations [#10175](https://github.com/statamic/cms/issues/10175) by @helloDanuk
+- French translations [#10170](https://github.com/statamic/cms/issues/10170) by @ebeauchamps
+
+
+
 ## 5.5.0 (2024-05-22)
 
 ### What's new

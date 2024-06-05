@@ -231,6 +231,18 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_the_validation_rules()
+    {
+        $container = new AssetContainer;
+        $this->assertEmpty($container->validationRules());
+
+        $return = $container->validationRules(['max:5120']);
+
+        $this->assertEquals($container, $return);
+        $this->assertEquals(['max:5120'], $container->validationRules());
+    }
+
+    /** @test */
     public function it_gets_and_sets_glide_source_preset_for_upload_processing()
     {
         $container = new AssetContainer;

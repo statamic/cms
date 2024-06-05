@@ -66,6 +66,7 @@ class AssetContainersController extends CpController
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
             'order' => $container->order() == 1 ? '' : $container->order(),
+            'validation' => $container->validationRules(),
         ];
 
         $fields = ($blueprint = $this->formBlueprint($container))
@@ -101,7 +102,8 @@ class AssetContainersController extends CpController
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
-            ->order($values['order']);
+            ->order($values['order'])
+            ->validationRules($values['validation'] ?? null);
 
         $container->save();
 
@@ -267,6 +269,11 @@ class AssetContainersController extends CpController
                         'display' => __('Allow Downloading'),
                         'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
                         'default' => true,
+                    ],
+                    'validation' => [
+                        'type' => 'taggable',
+                        'display' => __('Validation Rules'),
+                        'instructions' => __('statamic::messages.asset_container_validation_rules_instructions'),
                     ],
                 ],
             ],

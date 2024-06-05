@@ -50,6 +50,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $sortField;
     protected $sortDirection;
     protected $order;
+    protected $validation;
 
     public function id($id = null)
     {
@@ -97,6 +98,20 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             ->getter(function ($title) {
                 return $title ?? ucfirst($this->handle);
             })
+            ->args(func_get_args());
+    }
+
+    /**
+     * Get or set the validation rules.
+     *
+     * @param  null|array  $rules
+     * @return array
+     */
+    public function validationRules($rules = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('validation')
+            ->getter(fn ($rules) => $rules ?? [])
             ->args(func_get_args());
     }
 
@@ -627,6 +642,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
             'order' => $this->order,
+            'validate' => $this->validation,
         ];
 
         $array = Arr::removeNullValues(array_merge($array, [
