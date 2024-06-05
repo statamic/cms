@@ -528,7 +528,7 @@ class FieldtypeTest extends TestCase
         $this->assertEquals(false, $fieldtype->config('delta'));
         $this->assertEquals(true, $fieldtype->config('echo'));
         $this->assertEquals(false, $fieldtype->config('foxtrot'));
-        $this->assertEquals([], $fieldtype->config('golf'));
+        $this->assertNull($fieldtype->config('golf'));
         $this->assertEquals(['hotel!'], $fieldtype->config('hotel'));
         $this->assertNull($fieldtype->config('unknown'));
         $this->assertEquals('fallback', $fieldtype->config('unknown', 'fallback'));
