@@ -3,8 +3,9 @@
 namespace Statamic\Imaging;
 
 use Statamic\Contracts\Imaging\ImageManipulator;
+use Statamic\Contracts\Imaging\Manipulator;
 use Statamic\Facades\Glide;
-use Statamic\Imaging\Manipulators\GlideManipulator;
+use Statamic\Imaging\Manipulators\Manager as ManipulationManager;
 use Statamic\Support\Arr;
 
 class Manager
@@ -112,15 +113,8 @@ class Manager
         return Glide::normalizeParameters($preset);
     }
 
-    public function driver()
+    public function driver(?string $name = null): Manipulator
     {
-        // TODO: get it from the config. accept an argument to get a specific one.
-        // i.e. manager stuff.
-
-        return new GlideManipulator([
-            'driver' => 'glide',
-            'cache' => public_path('img'),
-            'url' => 'img',
-        ]);
+        return app(ManipulationManager::class)->manipulator($name);
     }
 }
