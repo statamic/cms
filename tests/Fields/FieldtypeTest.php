@@ -518,7 +518,7 @@ class FieldtypeTest extends TestCase
             'echo' => true, // Default set
             'foxtrot' => false, // Default set
             // Files fields (has default of empty array)
-            'golf' => [], // No default set
+            'golf' => null, // No default set
             'hotel' => ['hotel!'], // Default set
         ], $fieldtype->config());
         $this->assertEquals('bar', $fieldtype->config('foo'));
