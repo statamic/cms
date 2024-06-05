@@ -86,7 +86,7 @@ class ManagerTest extends TestCase
     {
         $manipulator = \Mockery::mock(Manipulator::class);
 
-        $this->mock(ManipulationManager::class, fn ($m) => $m->shouldReceive('driver')->with(null)->andReturn($manipulator));
+        $this->mock(ManipulationManager::class, fn ($m) => $m->shouldReceive('manipulator')->with(null)->andReturn($manipulator));
 
         $this->assertEquals($manipulator, $this->manager->driver());
     }
@@ -96,7 +96,7 @@ class ManagerTest extends TestCase
     {
         $manipulator = \Mockery::mock(Manipulator::class);
 
-        $this->mock(ManipulationManager::class, fn ($m) => $m->shouldReceive('driver')->with('foo')->andReturn($manipulator));
+        $this->mock(ManipulationManager::class, fn ($m) => $m->shouldReceive('manipulator')->with('foo')->andReturn($manipulator));
 
         $this->assertEquals($manipulator, $this->manager->driver('foo'));
     }
