@@ -2,6 +2,7 @@
 
 namespace Tests\Imaging\Manipulators;
 
+use Facades\Statamic\Imaging\Attributes;
 use Mockery;
 use Mockery\Mock;
 use Statamic\Assets\Asset;
@@ -185,6 +186,96 @@ class GlideManipulatorTest extends TestCase
             ['/img', '/img/foo.jpg'],
             ['img/', '/img/foo.jpg'],
         ];
+    }
+
+    /** @test */
+    public function it_gets_attributes_for_path()
+    {
+        $this->generator->shouldReceive('generateByPath')
+            ->with('/foo bar.jpg', ['w' => 100])
+            ->andReturn('the-path-for-path');
+
+        $manipulator = $this->manipulator->setSource('/foo bar.jpg')->setParams(['w' => 100]);
+
+        Attributes::shouldReceive('from')
+            ->with($manipulator->getCacheDisk(), 'the-path-for-path')
+            ->once()
+            ->andReturn(['test' => 'a']);
+
+        $this->assertEquals(['test' => 'a'], $manipulator->getAttributes());
+    }
+
+    /** @test */
+    public function it_gets_attributes_for_absolute_url()
+    {
+        $this->generator->shouldReceive('generateByUrl')
+            ->with('http://example.com/external.jpg', ['w' => 100])
+            ->andReturn('the-path-for-external');
+
+        $manipulator = $this->manipulator->setSource('http://example.com/external.jpg')->setParams(['w' => 100]);
+
+        Attributes::shouldReceive('from')
+            ->with($manipulator->getCacheDisk(), 'the-path-for-external')
+            ->once()
+            ->andReturn(['test' => 'b']);
+
+        $this->assertEquals(['test' => 'b'], $manipulator->getAttributes());
+    }
+
+    /** @test */
+    public function it_gets_attributes_for_asset()
+    {
+        $asset = new Asset;
+        $asset->container((new AssetContainer)->handle('main'));
+        $asset->path('img/foo.jpg');
+
+        $this->generator->shouldReceive('generateByAsset')
+            ->with($asset, ['w' => 100])
+            ->andReturn('the-path-for-asset');
+
+        $manipulator = $this->manipulator->setSource($asset)->setParams(['w' => 100]);
+
+        Attributes::shouldReceive('from')
+            ->with($manipulator->getCacheDisk(), 'the-path-for-asset')
+            ->once()
+            ->andReturn(['test' => 'c']);
+
+        $this->assertEquals(['test' => 'c'], $manipulator->getAttributes());
+    }
+
+    /** @test */
+    public function it_gets_attributes_for_asset_id()
+    {
+        $asset = new Asset;
+        $asset->container((new AssetContainer)->handle('main'));
+        $asset->path('img/foo.jpg');
+
+        Assets::shouldReceive('findOrFail')->with('main::img/foo.jpg')->andReturn($asset);
+
+        $this->generator->shouldReceive('generateByAsset')
+            ->with($asset, ['w' => 100])
+            ->andReturn('the-path-for-id');
+
+        $manipulator = $this->manipulator->setSource('main::img/foo.jpg')->setParams(['w' => 100]);
+
+        Attributes::shouldReceive('from')
+            ->with($manipulator->getCacheDisk(), 'the-path-for-id')
+            ->once()
+            ->andReturn(['test' => 'd']);
+
+        $this->assertEquals(['test' => 'd'], $manipulator->getAttributes());
+    }
+
+    /** @test */
+    public function it_throws_exception_when_getting_attributes_with_invalid_asset_id()
+    {
+        $this->expectException(AssetNotFoundException::class);
+
+        $asset = new Asset;
+        $asset->container((new AssetContainer)->handle('main'));
+        $asset->path('img/foo.jpg');
+
+        $this->manipulator->setSource('main::unknown.jpg')->setParams(['w' => 100])->getAttributes();
     }
 
     public function it_can_mark_with_asset()

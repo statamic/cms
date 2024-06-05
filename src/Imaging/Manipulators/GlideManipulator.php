@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging\Manipulators;
 
+use Facades\Statamic\Imaging\Attributes;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\Server;
@@ -12,6 +13,7 @@ use Statamic\Imaging\Manipulators\Glide\ImageGenerator;
 class GlideManipulator extends Manipulator
 {
     private ImageGenerator $generator;
+    private ?Filesystem $cacheDisk = null;
 
     public function __construct(private array $config = [])
     {
@@ -74,11 +76,7 @@ class GlideManipulator extends Manipulator
 
     public function getAttributes(): array
     {
-        // generate the image
-
-        // use the image :: attributes to get from that generated image
-
-        // return the attributes. dont include url.
+        return Attributes::from($this->getCacheDisk(), $this->generate());
     }
 
     public function getGenerator(): ImageGenerator
@@ -125,15 +123,21 @@ class GlideManipulator extends Manipulator
             throw new \Exception('Glide cache is not defined.');
         }
 
+        if ($this->cacheDisk) {
+            return $this->cacheDisk;
+        }
+
         try {
-            return Storage::disk($cache);
+            $disk = Storage::disk($cache);
         } catch (\InvalidArgumentException $e) {
-            return Storage::build([
+            $disk = Storage::build([
                 'driver' => 'local',
                 'root' => $cache,
                 'visibility' => 'public',
             ]);
         }
+
+        return $this->cacheDisk = $disk;
     }
 
     private function getCachePathCallable()
