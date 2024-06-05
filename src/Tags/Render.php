@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Contracts\Imaging\Manipulator;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Image;
 
@@ -82,7 +83,7 @@ class Render extends Tags
         return $this->dataUrl();
     }
 
-    private function driver()
+    private function driver(): Manipulator
     {
         $driver = Image::driver();
 
