@@ -25,16 +25,16 @@ abstract class Manipulator implements Contract
         return $this;
     }
 
-    protected function getSourceType()
+    protected function getSourceType(): SourceType
     {
         if ($this->source instanceof Asset) {
-            return 'asset';
+            return SourceType::Asset;
         } elseif (Str::startsWith($this->source, ['http://', 'https://'])) {
-            return 'url';
+            return SourceType::Url;
         } elseif (Str::contains($this->source, '::')) {
-            return 'id';
+            return SourceType::AssetId;
         }
 
-        return 'path';
+        return SourceType::Path;
     }
 }

@@ -110,10 +110,10 @@ class GlideManipulator extends Manipulator
     private function generate(): string
     {
         return match ($this->getSourceType()) {
-            'path' => $this->getGenerator()->generateByPath($this->source, $this->params),
-            'url' => $this->getGenerator()->generateByUrl($this->source, $this->params),
-            'asset' => $this->getGenerator()->generateByAsset($this->source, $this->params),
-            'id' => $this->getGenerator()->generateByAsset(Asset::findOrFail($this->source), $this->params),
+            SourceType::Path => $this->getGenerator()->generateByPath($this->source, $this->params),
+            SourceType::Url => $this->getGenerator()->generateByUrl($this->source, $this->params),
+            SourceType::Asset => $this->getGenerator()->generateByAsset($this->source, $this->params),
+            SourceType::AssetId => $this->getGenerator()->generateByAsset(Asset::findOrFail($this->source), $this->params),
         };
     }
 
