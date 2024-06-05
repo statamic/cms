@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Imaging\Manipulator;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Image;
@@ -48,9 +49,11 @@ class Render extends Tags
             $source = [$source];
         }
 
-        return collect($source)->map(fn ($source) => array_merge([
+        return collect($source)->map(fn ($source) => [
+            ...($source instanceof Augmentable ? $source->toAugmentedArray() : []),
             'url' => ($driver = $this->driver()->setSource($source))->getUrl(),
-        ], $driver->getAttributes()));
+            ...$driver->getAttributes(),
+        ]);
     }
 
     public function batch()

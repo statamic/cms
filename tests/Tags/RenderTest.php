@@ -2,11 +2,12 @@
 
 namespace Tests\Tags;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Mockery;
-use Statamic\Assets\Asset;
-use Statamic\Assets\AssetContainer;
 use Statamic\Contracts\Imaging\Manipulator;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Image;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -124,9 +125,11 @@ class RenderTest extends TestCase
         //     {{ url }}, {{ width }}, etc
         // {{ /render }}
 
-        $asset = new Asset;
-        $asset->container((new AssetContainer)->handle('main'));
-        $asset->path('img/foo.jpg');
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('foo.jpg', 30, 60); // creates a 723 byte image
+        Storage::disk('test')->putFileAs('img', $file, 'foo.jpg');
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $asset = tap($container->makeAsset('img/foo.jpg')->data(['foo' => 'bar']))->save();
 
         $driver = Mockery::mock(Manipulator::class);
         $driver->shouldReceive('setSource')->with($asset)->once()->andReturnSelf();
@@ -140,11 +143,11 @@ class RenderTest extends TestCase
         Image::shouldReceive('driver')->once()->andReturn($driver);
 
         $template = '{{ render :src="img" w="100" h="150" foo="ignore"
-            }}{{ url }},{{ width }},{{ height }}{{ /render }}';
+            }}{{ url }},{{ width }},{{ height }},{{ foo }}{{ /render }}';
 
         $output = $this->parse($template, ['img' => $asset]);
 
-        $this->assertEquals('the-url,the-width,the-height', $output);
+        $this->assertEquals('the-url,the-width,the-height,bar', $output);
     }
 
     /** @test */
