@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.7.2 (2024-06-06)
+
+### What's fixed
+- Prevent adding content to Blade stacks twice [#10271](https://github.com/statamic/cms/issues/10271) by @JohnathonKoster
+- Fix publish form actions permission check [#10274](https://github.com/statamic/cms/issues/10274) by @jacksleight
+
+
+
 ## 5.7.1 (2024-06-05)
 
 ### What's fixed
