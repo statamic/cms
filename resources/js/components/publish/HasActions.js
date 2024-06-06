@@ -1,7 +1,7 @@
 export default {
 
     props: {
-        initialItemActions: Array,
+        initialItemActions: { type: Array, default: () => [] },
         itemActionUrl: String,
     },
 
