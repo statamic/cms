@@ -2,10 +2,13 @@
 
 namespace Statamic\Actions;
 
+use Statamic\Actions\Concerns\DeletesItems;
 use Statamic\Contracts;
 
 class Delete extends Action
 {
+    use DeletesItems;
+
     protected $dangerous = true;
 
     public static function title()
@@ -59,7 +62,7 @@ class Delete extends Action
 
     public function run($items, $values)
     {
-        $items->each->delete();
+        return $this->deleteItems($items);
     }
 
     public function redirect($items, $values)

@@ -50,6 +50,7 @@ class Unpublish extends Action
         });
 
         if ($failedActions->isNotEmpty()) {
+            /** @translation */
             throw new Exception(__("Couldn't unpublish entry"));
         }
     }

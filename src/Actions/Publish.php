@@ -55,6 +55,7 @@ class Publish extends Action
         });
 
         if ($failedActions->isNotEmpty()) {
+            /** @translation */
             throw new Exception(__("Couldn't publish entry"));
         }
     }

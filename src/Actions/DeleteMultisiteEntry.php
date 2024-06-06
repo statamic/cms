@@ -2,11 +2,14 @@
 
 namespace Statamic\Actions;
 
+use Statamic\Actions\Concerns\DeletesItems;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Statamic;
 
 class DeleteMultisiteEntry extends Delete
 {
+    use DeletesItems;
+
     public function visibleTo($item)
     {
         if (! ($item instanceof Entry && $item->collection()->sites()->count() > 1)) {
@@ -48,6 +51,6 @@ class DeleteMultisiteEntry extends Delete
             $items->each->deleteDescendants();
         }
 
-        $items->each->delete();
+        return $this->deleteItems($items);
     }
 }
