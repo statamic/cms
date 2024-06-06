@@ -36,13 +36,13 @@ abstract class ActionController extends CpController
         abort_unless($unauthorized->isEmpty(), 403, __('You are not authorized to run this action.'));
 
         $values = $action->fields()->addValues($request->all())->process()->values()->all();
-        $status = 'successful';
+        $successful = true;
 
         try {
             $response = $action->run($items, $values);
         } catch (Exception $e) {
             $response = empty($e->getMessage()) ? __('Action failed') : $e->getMessage();
-            $status = 'failed';
+            $successful = false;
         }
 
         if ($redirect = $action->redirect($items, $values)) {
@@ -55,13 +55,11 @@ abstract class ActionController extends CpController
         }
 
         if (is_string($response)) {
-            $response = [
-                'message' => $response,
-                'status' => $status,
-            ];
+            $response = ['message' => $response];
         }
 
         $response = $response ?: [];
+        $response['successful'] = $successful;
 
         if (Arr::get($context, 'view') === 'form') {
             $response['data'] = $this->getItemData($items->first(), $context);
