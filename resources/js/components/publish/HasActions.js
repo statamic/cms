@@ -1,3 +1,5 @@
+import { computed } from "vue";
+
 export default {
 
     props: {
@@ -9,6 +11,14 @@ export default {
         return {
             itemActions: this.initialItemActions,
         }
+    },
+
+    computed: { 
+
+        hasItemActions() {
+            return this.itemActions.length > 0;
+        },
+
     },
 
     methods: {
