@@ -24,6 +24,14 @@ class ViewFieldsetListingTest extends TestCase
             'baz::baz' => $this->createFieldset('baz::baz'),
         ]));
 
+        Facades\Fieldset::shouldReceive('overriddenNamespacedFieldsetPath')
+            ->with('baz::foo')
+            ->andReturn('/fieldsets/vendor/baz/foo.yaml');
+
+        Facades\Fieldset::shouldReceive('overriddenNamespacedFieldsetPath')
+            ->with('baz::bar')
+            ->andReturn('/fieldsets/vendor/baz/bar.yaml');
+
         // Custom policy to allow fieldsets to demonstrate how certain fieldset can be restricted
         app()->bind(\Statamic\Policies\FieldsetPolicy::class, function () {
             return new class extends \Statamic\Policies\FieldsetPolicy
@@ -53,7 +61,9 @@ class ViewFieldsetListingTest extends TestCase
                         'fields' => 0,
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
+                        'reset_url' => 'http://localhost/cp/fields/fieldsets/foo/reset',
                         'is_deletable' => true,
+                        'is_resetable' => false,
                         'imported_by' => collect(),
                     ],
                     [
@@ -63,7 +73,9 @@ class ViewFieldsetListingTest extends TestCase
                         'fields' => 0,
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/bar/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/bar',
+                        'reset_url' => 'http://localhost/cp/fields/fieldsets/bar/reset',
                         'is_deletable' => true,
+                        'is_resetable' => false,
                         'imported_by' => collect(),
                     ],
                 ]),
@@ -75,7 +87,9 @@ class ViewFieldsetListingTest extends TestCase
                         'fields' => 0,
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::foo/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::foo',
+                        'reset_url' => 'http://localhost/cp/fields/fieldsets/baz::foo/reset',
                         'is_deletable' => false,
+                        'is_resetable' => false,
                         'imported_by' => collect(),
                     ],
                     [
@@ -85,7 +99,9 @@ class ViewFieldsetListingTest extends TestCase
                         'fields' => 0,
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
+                        'reset_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/reset',
                         'is_deletable' => false,
+                        'is_resetable' => false,
                         'imported_by' => collect(),
                     ],
                 ]),
