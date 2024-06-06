@@ -29,6 +29,10 @@ class MountUrl extends Tags
             return;
         }
 
-        return $collection->url(Site::current()->handle());
+        $site = $this->params->get('site') ?? Site::current()->handle();
+
+        return $site == Site::current()->handle()
+            ? $collection->url($site)
+            : $collection->absoluteUrl($site);
     }
 }
