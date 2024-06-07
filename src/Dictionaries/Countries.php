@@ -14,8 +14,6 @@ class Countries extends Dictionary
      */
     public function all(): array
     {
-//        return $this->getCountries()->pluck('name', 'iso3')->all();
-
         return $this->getCountries()->mapWithKeys(function ($country) {
             return [$country['iso3'] => "{$country['emoji']} {$country['name']}"];
         })->all();
