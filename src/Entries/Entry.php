@@ -559,7 +559,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     return null;
                 }
 
-                $date = $date ?? $this->lastModified();
+                $date = $date ?? optional($this->origin())->date() ?? $this->lastModified();
 
                 if (! $this->hasTime()) {
                     $date->startOfDay();
