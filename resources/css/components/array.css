@@ -44,8 +44,7 @@
     tr:last-child th {
         @apply rtl:rounded-br ltr:rounded-bl;
     }
-    tr:last-child td:last-child,
-    tr:last-child .input-minimal {
+    tr:last-child td:last-child {
         @apply rtl:rounded-bl ltr:rounded-br;
     }
 
