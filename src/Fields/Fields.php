@@ -149,7 +149,11 @@ class Fields
 
     public function toPublishArray()
     {
-        return $this->fields->values()->map->toPublishArray()->all();
+        $blink = md5(json_encode($this->fields));
+
+        return Blink::once($blink, function () {
+            return $this->fields->values()->map->toPublishArray()->all();
+        });
     }
 
     public function addValues(array $values)
