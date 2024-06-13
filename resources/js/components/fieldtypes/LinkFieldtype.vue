@@ -70,6 +70,7 @@ export default {
         mailValue() {
             return this.email ? `mailto:${this.email}` : null;
         },
+
         entryValue() {
             return this.selectedEntries.length
                 ? `entry::${this.selectedEntries[0]}`

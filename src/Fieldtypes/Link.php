@@ -51,18 +51,6 @@ class Link extends Fieldtype
         );
     }
 
-        public function process($data)
-    {
-        return $data;
-    }
-
-    public function preProcess($data)
-    {
-        return $data;
-    }
-
-
-
     public function preload()
     {
         $value = $this->field->value();
