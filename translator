@@ -47,6 +47,8 @@ $additionalStrings = [
     'All rights reserved.',
     'The given data was invalid.',
     'Protected Page',
+    'Lang',
+    'Filename'
 ];
 
 // Additional keys to be translated that aren't picked up by the scanner.
