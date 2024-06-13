@@ -102,7 +102,7 @@
 <script>
 import uniqid from 'uniqid';
 import reduce from 'underscore/modules/reduce';
-import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';
+import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-3';
 import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
@@ -144,7 +144,7 @@ import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
-import { lowlight } from 'lowlight/lib/common.js';
+// import { lowlight } from 'lowlight/lib/common.js';
 import 'highlight.js/styles/github.css';
 
 export default {
@@ -365,13 +365,13 @@ export default {
 
         json(json, oldJson) {
             if (!this.mounted) return;
-                        
+
             if (json === oldJson) return;
 
             this.updateDebounced(json);
         },
 
-        value(value, oldValue) {    
+        value(value, oldValue) {
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 

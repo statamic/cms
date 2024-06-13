@@ -1,7 +1,5 @@
 <template>
-
     <div>
-
         <modal :show="show" class="modal-login" :shake="hasErrors">
             <template slot="header">
                 {{ __('Log in to continue') }}
@@ -18,9 +16,7 @@
                 <button @click.prevent="submit" class="btn-primary">{{ __('Submit') }}</button>
             </template>
         </modal>
-
     </div>
-
 </template>
 
 <script>
@@ -37,8 +33,9 @@ export default {
     },
 
     mounted() {
+        // TODO TEST THIS PLEASE
         this.$http.get(cp_url('auth/token')).success(response => {
-            Vue.http.headers.common['X-CSRF-TOKEN'] = response;
+            this.$http.headers.common['X-CSRF-TOKEN'] = response;
         });
 
         this.$refs.password.focus();

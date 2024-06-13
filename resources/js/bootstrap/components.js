@@ -40,8 +40,6 @@ import CollectionWidget from '../components/entries/Widget.vue';
 import SvgIcon from '../components/SvgIcon.vue';
 import FileIcon from '../components/FileIcon.vue';
 import LoadingGraphic from '../components/LoadingGraphic.vue';
-import DropdownList from '../components/DropdownList.vue';
-import DropdownItem from '../components/DropdownItem.vue';
 import ValidationErrors from '../components/ValidationErrors.vue';
 import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
@@ -54,8 +52,6 @@ import Portal from '../components/portals/Portal.vue';
 import PermissionTree from '../components/roles/PermissionTree.vue';
 import Modal from '../components/Modal.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
-import FavoriteCreator from '../components/FavoriteCreator.vue';
-import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
@@ -136,8 +132,6 @@ Vue.component('role-permission-tree', PermissionTree);
 // Modals
 Vue.component('modal', Modal);
 Vue.component('confirmation-modal', ConfirmationModal);
-Vue.component('favorite-creator', FavoriteCreator);
-Vue.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
 Vue.component('resource-deleter', ResourceDeleter);
 
 Vue.component('stack', Stack);

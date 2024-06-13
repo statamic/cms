@@ -23,12 +23,12 @@
 </template>
 
 <script>
-import { mixin as clickaway } from 'vue-clickaway';
+
 import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom';
 
 export default {
 
-    mixins: [ clickaway ],
+
 
     props: {
         autoclose: {

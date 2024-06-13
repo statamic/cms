@@ -1,45 +1,51 @@
-export default {
+import { createStore } from 'vuex';
 
-    namespaced: true,
+export const store = createStore({
+    modules: {
+        statamic: {
+            namespaced: true,
 
-    state: {
-        windowWidth: null,
-        fieldtypes: null,
-        composer: {},
-        config: {},
-        conditions: {},
-    },
+            state: {
+                windowWidth: null,
+                fieldtypes: null,
+                composer: {},
+                config: {},
+                conditions: {},
+            },
 
-    mutations: {
+            mutations: {
+                windowWidth(state, width) {
+                    state.windowWidth = width;
+                },
 
-        windowWidth(state, width) {
-            state.windowWidth = width;
+                fieldtypes(state, fieldtypes) {
+                    state.fieldtypes = fieldtypes;
+                },
+
+                composer(state, composer) {
+                    state.composer = composer;
+                },
+
+                config(state, config) {
+
+                    state.config = config;
+                },
+
+                configValue(state, payload) {
+                    state.config[payload.key] = payload.value;
+                },
+
+                preferences(state, preferences) {
+                    state.config.user.preferences = preferences;
+                },
+
+                condition(state, payload) {
+                    state.conditions[payload.name] = payload.condition;
+                }
+            },
         },
-
-        fieldtypes(state, fieldtypes) {
-            state.fieldtypes = fieldtypes;
-        },
-
-        composer(state, composer) {
-            state.composer = composer;
-        },
-
-        config(state, config) {
-            state.config = config;
-        },
-
-        configValue(state, payload) {
-            state.config[payload.key] = payload.value;
-        },
-
-        preferences(state, preferences) {
-            state.config.user.preferences = preferences;
-        },
-
-        condition(state, payload) {
-            state.conditions[payload.name] = payload.condition;
+        publish: {
+            namespaced: true
         }
-
     }
-
-};
+});

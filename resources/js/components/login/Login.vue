@@ -1,0 +1,23 @@
+<template>
+    <slot v-bind="$props" foo="bar"></slot>
+</template>
+
+<script>
+    export default {
+        props: {
+            showEmailLogin: {
+                default: false
+            },
+            hasError: {
+                default: false
+            }
+        },
+
+        mounted() {
+            if (this.hasError) {
+                this.$el.parentElement.parentElement.classList.add('animation-shake');
+            }
+        }
+    };
+
+</script>

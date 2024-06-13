@@ -1,7 +1,7 @@
 import Binding from './Binding';
 import GlobalBinding from './GlobalBinding';
 
-export default class Keys {
+class Keys {
     constructor() {
         this.bindings = {};
         this.globals = {};
@@ -19,3 +19,5 @@ export default class Keys {
         return new GlobalBinding(this.globals).bind(bindings, callback);
     }
 }
+
+export default Keys;

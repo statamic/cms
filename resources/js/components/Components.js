@@ -2,13 +2,13 @@ import uniqid from 'uniqid';
 import Component from './Component';
 
 class Components {
-
     constructor(root) {
         this.$root = root;
     }
 
     register(name, component) {
-        Vue.component(name, component);
+        console.log(name);
+        // Vue.component(name, component);
     }
 
     append(name, { props }) {
