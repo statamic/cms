@@ -53,6 +53,7 @@ class FlatCamp extends Command
         'I just want to bake shop & wrap. - Mug',
         'The drone must have tried flying to its last home point. Florida. - Jack',
         'And then you sniff like a rabbit, like this. - Conrad',
+        'I came to Flat Camp, and I picked up smoking. - Colin',
     ];
 
     public function handle()
