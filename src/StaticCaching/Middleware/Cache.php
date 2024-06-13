@@ -139,7 +139,7 @@ class Cache
             return false;
         }
 
-        if ($response->getStatusCode() !== 200 || $response->getContent() == '') {
+        if (! in_array($response->getStatusCode(), [200, 404]) || $response->getContent() == '') {
             return false;
         }
 

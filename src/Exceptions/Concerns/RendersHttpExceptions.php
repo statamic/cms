@@ -2,8 +2,10 @@
 
 namespace Statamic\Exceptions\Concerns;
 
+use Illuminate\Http\Response;
 use Statamic\Facades\Cascade;
 use Statamic\Statamic;
+use Statamic\StaticCaching\Cacher;
 use Statamic\View\View;
 
 trait RendersHttpExceptions
@@ -16,6 +18,10 @@ trait RendersHttpExceptions
 
         if (Statamic::isApiRoute()) {
             return response()->json(['message' => $this->getApiMessage()], $this->getStatusCode());
+        }
+
+        if ($cached = $this->getCached404()) {
+            return $cached;
         }
 
         if (view()->exists('errors.'.$this->getStatusCode())) {
@@ -52,5 +58,23 @@ trait RendersHttpExceptions
     public function getApiMessage()
     {
         return $this->getMessage();
+    }
+
+    private function getCached404(): ?Response
+    {
+        if ($this->getStatusCode() !== 404) {
+            return null;
+        }
+
+        $cacher = app(Cacher::class);
+
+        $request = request();
+        //        $request->setUrl('404');
+
+        if (! $cacher->hasCachedPage($request)) {
+            return null;
+        }
+
+        return $cacher->getCachedPage($request)->toResponse($request);
     }
 }
