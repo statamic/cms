@@ -51,6 +51,18 @@ class Link extends Fieldtype
         );
     }
 
+        public function process($data)
+    {
+        return $data;
+    }
+
+    public function preProcess($data)
+    {
+        return $data;
+    }
+
+
+
     public function preload()
     {
         $value = $this->field->value();
@@ -61,13 +73,16 @@ class Link extends Fieldtype
 
         $selectedAsset = $value && Str::startsWith($value, 'asset::') ? Str::after($value, 'asset::') : null;
 
-        $url = ($value !== '@child' && ! $selectedEntry && ! $selectedAsset) ? $value : null;
+        $mailUrl = $value && Str::startsWith($value, 'mailto:') ? Str::after($value, 'mailto:') : null;
+
+        $url = ($value !== '@child' && ! $selectedEntry && ! $selectedAsset && ! $mailUrl) ? $value : null;
 
         $entryFieldtype = $this->nestedEntriesFieldtype($selectedEntry);
 
         $assetFieldtype = $showAssetOption ? $this->nestedAssetsFieldtype($selectedAsset) : null;
 
         return [
+            'initialMail' => $mailUrl,
             'initialUrl' => $url,
             'initialSelectedEntries' => $selectedEntry ? [$selectedEntry] : [],
             'initialSelectedAssets' => $selectedAsset ? [$selectedAsset] : [],
@@ -93,6 +108,8 @@ class Link extends Fieldtype
 
         if ($value === '@child') {
             return 'first-child';
+        } elseif (Str::startsWith($value, 'mailto:')) {
+            return 'mail';
         } elseif ($entry) {
             return 'entry';
         } elseif ($asset) {
