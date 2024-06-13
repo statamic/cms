@@ -175,7 +175,9 @@ class ImgixManipulator extends Manipulator
 
     public function getUrl(): string
     {
-        return $this->getBuilder()->createURL($this->getSourcePath(), $this->params);
+        $url = $this->getBuilder()->createURL($this->getSourcePath(), $this->params);
+
+        return (string) str($url)->replace('bg-remove=1', 'bg-remove=true');
     }
 
     private function getBuilder(): UrlBuilder
