@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Replacers;
 
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
@@ -78,8 +79,12 @@ class NoCacheReplacer implements Replacer
         $contents = $response->getContent();
 
         if ($cacher->shouldOutputJs()) {
-            $js = $cacher->getNocacheJs();
-            $contents = str_replace('</body>', '<script type="text/javascript">'.$js.'</script></body>', $contents);
+            $firstLink = Str::position($contents, '<link');
+            $firstScript = Str::position($contents, '<script');
+            $insertBefore = min($firstLink, $firstScript);
+            $js = "<script type=\"text/javascript\">{$cacher->getNocacheJs()}</script>";
+
+            $contents = Str::substrReplace($contents, $js, $insertBefore, 0);
         }
 
         $contents = str_replace('NOCACHE_PLACEHOLDER', $cacher->getNocachePlaceholder(), $contents);
