@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Stores;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Stache;
 use Statamic\Stache\Exceptions\DuplicateKeyException;
 

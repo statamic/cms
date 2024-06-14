@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Indexes;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Stache;
 use Statamic\Statamic;
 

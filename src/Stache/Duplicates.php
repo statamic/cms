@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\AggregateStore;
 use Statamic\Stache\Stores\Store;
 
