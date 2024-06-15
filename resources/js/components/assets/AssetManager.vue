@@ -1,31 +1,26 @@
 <template>
-
     <div class="asset-manager">
-
         <div class="flex items-center mb-6">
             <h1 class="flex-1">{{ __(container.title) }}</h1>
 
             <dropdown-list v-if="container.can_edit || container.can_delete" class="rtl:mr-4 ltr:ml-4">
-                <dropdown-item
-                    v-if="container.can_edit"
-                    v-text="__('Edit Container')"
-                    :redirect="container.edit_url">
+                <dropdown-item v-if="container.can_edit" :redirect="container.edit_url">
+                    {{ __('Edit Container') }}
                 </dropdown-item>
-                <dropdown-item
-                    v-text="__('Edit Blueprint')"
-                    :redirect="container.blueprint_url">
+                <dropdown-item :redirect="container.blueprint_url">
+                    {{ __('Edit Blueprint') }}
                 </dropdown-item>
                 <dropdown-item
                     v-if="container.can_delete"
-                    v-text="__('Delete Container')"
                     class="warning"
                     @click="$refs.deleter.confirm()"
                 >
+                    {{ __('Delete Container') }}
                     <resource-deleter
                         ref="deleter"
                         :resource-title="__(container.title)"
-                        :route="container.delete_url">
-                    </resource-deleter>
+                        :route="container.delete_url"
+                    />
                 </dropdown-item>
             </dropdown-list>
 
@@ -42,10 +37,9 @@
             @navigated="navigate"
             @selections-updated="updateSelections"
             @asset-doubleclicked="editAsset"
-            @edit-asset="editAsset" />
-
+            @edit-asset="editAsset"
+        />
     </div>
-
 </template>
 
 <script>

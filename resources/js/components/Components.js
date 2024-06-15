@@ -2,15 +2,15 @@ import uniqid from 'uniqid';
 import Component from './Component';
 
 class Components {
-
     constructor(root) {
         this.$root = root;
     }
 
     register(name, component) {
-        Vue.component(name, component);
+        this.$root.component(name, component)
     }
 
+    // @todo(jelleroorda): check if this still works
     append(name, { props }) {
         const id = `appended-${uniqid()}`;
         const component = new Component(id, name, props);
@@ -33,6 +33,7 @@ class Components {
 
         if (appended) {
             const index = _.indexOf(this.$root.appendedComponents, appended);
+
             this.$root.appendedComponents.splice(index, 1);
         }
     }

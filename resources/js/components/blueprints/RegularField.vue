@@ -97,8 +97,10 @@ export default {
         },
 
         labelText() {
+            console.error('@todo(jelleroorda): fix')
+
             return this.field.config.display
-                || Vue.options.filters.titleize(Vue.options.filters.deslugify(this.field.handle));
+                // @todo(jelleroorda): || Vue.options.filters.titleize(Vue.options.filters.deslugify(this.field.handle));
         },
 
         width: {

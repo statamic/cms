@@ -1,8 +1,8 @@
 import { defineConfig, loadEnv } from 'vite';
 import laravel from 'laravel-vite-plugin';
-import vue from '@vitejs/plugin-vue2';
+import vue from '@vitejs/plugin-vue';
 import inject from '@rollup/plugin-inject';
-import svgLoader from './vite-svg-loader';
+import svgLoader from 'vite-svg-loader';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
@@ -28,10 +28,17 @@ export default defineConfig(({ mode }) => {
                 include: 'resources/js/**'
             })
         ],
+
         resolve: {
             alias: {
-                vue: 'vue/dist/vue.esm.js',
-            }
-        }
+                'vue': 'vue/dist/vue.esm-bundler.js',
+            },
+        },
+
+        optimizeDeps: {
+            include: [
+                'vue',
+            ],
+        },
     }
 });

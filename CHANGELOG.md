@@ -1,12 +1,5 @@
 # Release Notes
 
-## 5.7.3 (2024-06-13)
-
-### What's fixed
-- Improve performance of nested imported fieldsets [#10280](https://github.com/statamic/cms/issues/10280) by @riasvdv
-
-
-
 ## 5.7.2 (2024-06-06)
 
 ### What's fixed

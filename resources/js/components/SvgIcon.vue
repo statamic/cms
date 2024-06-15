@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, markRaw } from 'vue';
 import { data_get } from  '../bootstrap/globals.js'
 
 export default {
@@ -21,12 +21,12 @@ export default {
     },
 
     mounted() {
-        this.icon = this.evaluateIcon();
+        this.icon = markRaw(this.evaluateIcon());
     },
 
     watch: {
         name() {
-            this.icon = this.evaluateIcon();
+            this.icon = markRaw(this.evaluateIcon());
         }
     },
 

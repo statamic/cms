@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { NodeViewWrapper } from '@tiptap/vue-2';
+import { NodeViewWrapper } from '@tiptap/vue-3';
 import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';

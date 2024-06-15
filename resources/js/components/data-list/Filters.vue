@@ -4,7 +4,7 @@
 
             <!-- Field filter (requires custom selection UI) -->
             <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
-                <template slot="trigger">
+                <template #trigger>
                     <button class="filter-badge filter-badge-control rtl:ml-2 ltr:mr-2 mb-2" @click="resetFilterPopover">
                         {{ fieldFilter.title }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
@@ -18,7 +18,7 @@
                                 :config="fieldFilter"
                                 :values="activeFilters.fields || {}"
                                 :badges="fieldFilterBadges"
-                                @changed="$emit('changed', {handle: 'fields', values: $event})"
+                                @changed="$emit('changed', { handle: 'fields', values: $event })"
                                 @cleared="creating = false"
                                 @closed="closePopover"
                             />
@@ -29,7 +29,7 @@
 
             <!-- Standard pinned filters -->
             <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-start" :stop-propagation="false">
-                <template slot="trigger">
+                <template #trigger>
                     <button class="filter-badge filter-badge-control rtl:ml-2 ltr:mr-2 mb-2">
                         {{ filter.title }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
@@ -41,7 +41,7 @@
                             :key="filter.handle"
                             :filter="filter"
                             :values="activeFilters[filter.handle]"
-                            @changed="$emit('changed', {handle: filter.handle, values: $event})"
+                            @changed="$emit('changed', { handle: filter.handle, values: $event })"
                             @closed="closePopover"
                         />
                     </div>
@@ -50,7 +50,7 @@
 
             <!-- Standard unpinned filters -->
             <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
-                <template slot="trigger">
+                <template #trigger>
                     <button class="filter-badge filter-badge-control rtl:ml-2 ltr:mr-2 mb-2" @click="resetFilterPopover">
                         {{ __('Filter') }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
@@ -75,7 +75,7 @@
                                 :key="filter.handle"
                                 :filter="filter"
                                 :values="activeFilters[filter.handle]"
-                                @changed="$emit('changed', {handle: filter.handle, values: $event})"
+                                @changed="$emit('changed', { handle: filter.handle, values: $event })"
                                 @cleared="creating = false"
                                 @closed="closePopover"
                             />
@@ -85,26 +85,25 @@
             </popover>
 
             <!-- Active filter badges -->
-            <div class="filter-badge rtl:ml-2 ltr:mr-2 mb-2" v-for="(badge, handle) in fieldFilterBadges">
+            <div class="filter-badge rtl:ml-2 ltr:mr-2 mb-2" v-for="(badge, handle) in fieldFilterBadges" :key="handle">
                 <span>{{ badge }}</span>
                 <button @click="removeFieldFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
             </div>
-            <div class="filter-badge rtl:ml-2 ltr:mr-2 mb-2" v-for="(badge, handle) in standardBadges">
+            <div class="filter-badge rtl:ml-2 ltr:mr-2 mb-2" v-for="(badge, handle) in standardBadges" :key="handle">
                 <span>{{ badge }}</span>
                 <button @click="removeStandardFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
             </div>
 
         </div>
     </div>
-
 </template>
 
 <script>
+import { ref, computed, inject, watch } from 'vue';
 import DataListFilter from './Filter.vue';
 import FieldFilter from './FieldFilter.vue';
 
 export default {
-
     components: {
         DataListFilter,
         FieldFilter,
@@ -126,175 +125,207 @@ export default {
         isSearching: Boolean,
     },
 
-    data() {
-        return {
-            filtering: false,
-            creating: false,
-            saving: false,
-            deleting: false,
-            savingPresetName: null,
-            presets: [],
-        }
-    },
+    setup(props, { emit }) {
+        const filtering = ref(false);
+        const creating = ref(false);
+        const saving = ref(false);
+        const deleting = ref(false);
+        const savingPresetName = ref(null);
+        const presets = ref([]);
+        const sharedState = inject('sharedState');
 
-    inject: ['sharedState'],
+        watch(
+            () => props.activePresetPayload,
+            (preset) => {
+                savingPresetName.value = preset.display || null;
+            },
+            { deep: true }
+        );
 
-    watch: {
-        activePresetPayload: {
-            deep: true,
-            handler(preset) {
-                this.savingPresetName = preset.display || null;
-            }
-        }
-    },
+        const fieldFilter = computed(() => {
+            return props.filters.find((filter) => filter.handle === 'fields');
+        });
 
-    computed: {
+        const standardFilters = computed(() => {
+            return props.filters.filter((filter) => filter.handle !== 'fields');
+        });
 
-        fieldFilter() {
-            return this.filters.find(filter => filter.handle === 'fields');
-        },
+        const pinnedFilters = computed(() => {
+            return standardFilters.value.filter((filter) => filter.pinned);
+        });
 
-        standardFilters() {
-            return this.filters.filter(filter => filter.handle !== 'fields');
-        },
+        const unpinnedFilters = computed(() => {
+            return standardFilters.value.filter((filter) => !filter.pinned);
+        });
 
-        pinnedFilters() {
-            return this.standardFilters.filter(filter => filter.pinned);
-        },
+        const creatingFilter = computed(() => {
+            return _.find(unpinnedFilters.value, (filter) => filter.handle === creating.value);
+        });
 
-        unpinnedFilters() {
-            return this.standardFilters.filter(filter => ! filter.pinned);
-        },
-
-        creatingFilter() {
-            return _.find(this.unpinnedFilters, filter => filter.handle === this.creating);
-        },
-
-        creatingFilterHeader() {
-            let text = data_get(this.creatingFilter, 'title', 'Filter where');
-
+        const creatingFilterHeader = computed(() => {
+            let text = data_get(creatingFilter.value, 'title', 'Filter where');
             return __(text) + ':';
-        },
+        });
 
-        showUnpinnedFilterSelection() {
-            return ! this.creating;
-        },
+        const showUnpinnedFilterSelection = computed(() => {
+            return !creating.value;
+        });
 
-        fieldFilterBadges() {
-            return data_get(this.activeFilterBadges, 'fields', {});
-        },
+        const fieldFilterBadges = computed(() => {
+            return data_get(props.activeFilterBadges, 'fields', {});
+        });
 
-        standardBadges() {
-            return _.omit(this.activeFilterBadges, 'fields');
-        },
+        const standardBadges = computed(() => {
+            return _.omit(props.activeFilterBadges, 'fields');
+        });
 
-        isFiltering() {
-            return ! _.isEmpty(this.activeFilters) || this.searchQuery || this.activePreset;
-        },
+        const isFiltering = computed(() => {
+            return !_.isEmpty(props.activeFilters) || props.searchQuery || props.activePreset;
+        });
 
-        isDirty() {
-            if (! this.isFiltering) return false;
+        const isDirty = computed(() => {
+            if (!isFiltering.value) return false;
 
-            if (this.activePreset) {
-                return this.activePresetPayload.query != this.searchQuery
-                    || ! _.isEqual(this.activePresetPayload.filters || {}, this.activeFilters);
+            if (props.activePreset) {
+                return (
+                    props.activePresetPayload.query != props.searchQuery ||
+                    !_.isEqual(props.activePresetPayload.filters || {}, props.activeFilters)
+                );
             }
 
             return true;
-        },
+        });
 
-        canSave() {
-            return this.savesPresets && this.isDirty && this.preferencesPrefix;
-        },
+        const canSave = computed(() => {
+            return props.savesPresets && isDirty.value && props.preferencesPrefix;
+        });
 
-        savingPresetHandle() {
-            return snake_case(this.savingPresetName);
-        },
+        const savingPresetHandle = computed(() => {
+            return snake_case(savingPresetName.value);
+        });
 
-        isUpdatingPreset() {
-            return this.savingPresetHandle === this.activePreset;
-        },
+        const isUpdatingPreset = computed(() => {
+            return savingPresetHandle.value === props.activePreset;
+        });
 
-        preferencesKey() {
-            let handle = this.savingPresetHandle || this.activePreset;
+        const preferencesKey = computed(() => {
+            let handle = savingPresetHandle.value || props.activePreset;
 
-            if (! this.preferencesPrefix || ! handle) return null;
+            if (!props.preferencesPrefix || !handle) return null;
 
-            return `${this.preferencesPrefix}.filters.${handle}`;
-        },
+            return `${props.preferencesPrefix}.filters.${handle}`;
+        });
 
-        preferencesPayload() {
-            if (! this.savingPresetName) return null;
+        const preferencesPayload = computed(() => {
+            if (!savingPresetName.value) return null;
 
             let payload = {
-                display: this.savingPresetName
+                display: savingPresetName.value,
             };
 
-            if (this.searchQuery) payload.query = this.searchQuery;
-            if (this.activeCount) payload.filters = clone(this.activeFilters);
+            if (props.searchQuery) payload.query = props.searchQuery;
+            if (props.activeCount) payload.filters = clone(props.activeFilters);
 
             return payload;
-        },
+        });
 
-    },
+        const resetFilterPopover = () => {
+            creating.value = false;
 
-    methods: {
+            setTimeout(() => {
+                if (this.$refs.fieldFilter) {
+                    this.$refs.fieldFilter.resetInitialValues();
+                }
+            }, 100); // wait for popover to appear
+        };
 
-        resetFilterPopover() {
-            this.creating = false;
+        const fieldFilterClosed = () => {
+            if (this.$refs.fieldFilter) {
+                this.$refs.fieldFilter.popoverClosed();
+            }
+        };
 
-            setTimeout(() => this.$refs.fieldFilter?.resetInitialValues(), 100); // wait for popover to appear
-        },
-
-        fieldFilterClosed() {
-            this.$refs.fieldFilter.popoverClosed();
-        },
-
-        removeFieldFilter(handle) {
-            let fields = clone(this.activeFilters.fields);
-
+        const removeFieldFilter = (handle) => {
+            let fields = clone(props.activeFilters.fields);
             delete fields[handle];
+            emit('changed', { handle: 'fields', values: fields });
+        };
 
-            this.$emit('changed', {handle: 'fields', values: fields});
-        },
+        const removeStandardFilter = (handle) => {
+            emit('changed', { handle: handle, values: null });
+        };
 
-        removeStandardFilter(handle) {
-            this.$emit('changed', {handle: handle, values: null});
-        },
+        const save = () => {
+            if (!canSave.value || !preferencesPayload.value) return;
 
-        save() {
-            if (! this.canSave || ! this.preferencesPayload) return;
+            saving.value = true;
 
-            this.saving = true;
-
-            this.$preferences.set(this.preferencesKey, this.preferencesPayload)
-                .then(response => {
-                    this.$refs.savePopover.close();
-                    this.$emit('saved', this.savingPresetHandle);
-                    this.$toast.success(this.isUpdatingPreset ? __('Filter preset updated') : __('Filter preset saved'));
-                    this.savingPresetName = null;
-                    this.saving = false;
+            this.$preferences
+                .set(preferencesKey.value, preferencesPayload.value)
+                .then((response) => {
+                    if (this.$refs.savePopover) {
+                        this.$refs.savePopover.close();
+                    }
+                    emit('saved', savingPresetHandle.value);
+                    this.$toast.success(
+                        isUpdatingPreset.value ? __('Filter preset updated') : __('Filter preset saved')
+                    );
+                    savingPresetName.value = null;
+                    saving.value = false;
                 })
-                .catch(error => {
-                    this.$toast.error(this.isUpdatingPreset ? __('Unable to update filter preset') : __('Unable to save filter preset'));
-                    this.saving = false;
+                .catch((error) => {
+                    this.$toast.error(
+                        isUpdatingPreset.value ? __('Unable to update filter preset') : __('Unable to save filter preset')
+                    );
+                    saving.value = false;
                 });
-        },
+        };
 
-        remove() {
-            this.$preferences.remove(this.preferencesKey)
-                .then(response => {
-                    this.$emit('deleted', this.activePreset);
+        const remove = () => {
+            this.$preferences
+                .remove(preferencesKey.value)
+                .then((response) => {
+                    emit('deleted', props.activePreset);
                     this.$toast.success(__('Filter preset deleted'));
-                    this.deleting = false;
+                    deleting.value = false;
                 })
-                .catch(error => {
+                .catch((error) => {
                     this.$toast.error(__('Unable to delete filter preset'));
-                    this.deleting = false;
+                    deleting.value = false;
                 });
-        },
+        };
 
-    }
-
-}
+        return {
+            filtering,
+            creating,
+            saving,
+            deleting,
+            savingPresetName,
+            presets,
+            sharedState,
+            fieldFilter,
+            standardFilters,
+            pinnedFilters,
+            unpinnedFilters,
+            creatingFilter,
+            creatingFilterHeader,
+            showUnpinnedFilterSelection,
+            fieldFilterBadges,
+            standardBadges,
+            isFiltering,
+            isDirty,
+            canSave,
+            savingPresetHandle,
+            isUpdatingPreset,
+            preferencesKey,
+            preferencesPayload,
+            resetFilterPopover,
+            fieldFilterClosed,
+            removeFieldFilter,
+            removeStandardFilter,
+            save,
+            remove,
+        };
+    },
+};
 </script>

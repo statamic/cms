@@ -1,7 +1,7 @@
 <template>
     <div class="modal" role="dialog" tabindex="-1" ref="modal" v-cloak>
         <div class="modal-dialog">
-            <div class="modal-content" v-on-clickaway="dismiss">
+            <div class="modal-content" v-click-away="dismiss">
                 <div class="modal-header flex items-center justify-between">
                     <slot name="header"></slot>
                     <slot name="close">
@@ -20,10 +20,10 @@
 </template>
 
 <script>
-import { mixin as clickaway } from 'vue-clickaway';
+
 
 export default {
-    mixins: [ clickaway ],
+
 
     data() {
         return {

@@ -1,10 +1,10 @@
-import Vue from 'vue'
 import Portal from './Portal';
 
-class Portals {
+export default class Portals {
 
     constructor(instance) {
-        this.portals = instance.$root.portals;
+        // @todo(jelleroorda): what's this
+        this.portals = [] // instance.$root.portals;
     }
 
     all() {
@@ -25,11 +25,3 @@ class Portals {
         this.portals.splice(i, 1);
     }
 }
-
-Object.defineProperties(Vue.prototype, {
-    $portals: {
-        get() {
-            return new Portals(this);
-        }
-    }
-});

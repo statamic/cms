@@ -89,7 +89,6 @@
 import { marked } from 'marked';
 
 export default {
-
     props: {
         config: {
             type: Object,
@@ -121,7 +120,9 @@ export default {
         },
 
         fieldtypeComponentExists() {
-            return Vue.options.components[this.fieldtypeComponent] !== undefined;
+            // @todo(jelleroorda): fix
+            throw Error('@todo(jelleroorda): fix')
+            // return Vue.options.components[this.fieldtypeComponent] !== undefined;
         },
 
         instructions() {

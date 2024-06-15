@@ -1,34 +1,36 @@
 <template>
     <div :class="{'popover-open': isOpen}" @mouseleave="leave">
 
-        <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
+        <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$slots.default">
             <slot name="trigger"></slot>
         </div>
 
-        <portal
-            name="popover"
+        <teleport
+            to="#popover"
             :target-class="`popover-container ${targetClass || ''}`"
-            :provide="provide"
         >
             <div :class="`${isOpen ? 'popover-open' : ''}`">
-                <div ref="popover" class="popover" v-if="!disabled" v-on-clickaway="clickawayClose">
+                <div ref="popover" class="popover" v-if="!disabled" v-click-away="clickawayClose">
                     <div class="popover-content bg-white dark:bg-dark-550 shadow-popover dark:shadow-dark-popover rounded-md">
                         <slot :close="close" />
                     </div>
                 </div>
             </div>
-        </portal>
-
+        </teleport>
     </div>
 </template>
 
 <script>
-import { mixin as clickaway } from 'vue-clickaway';
-import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom';
+import {
+    useFloating,
+    offset,
+    flip,
+    shift,
+} from '@floating-ui/vue';
+
+// import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom';
 
 export default {
-
-    mixins: [ clickaway ],
 
     props: {
         autoclose: {
@@ -53,21 +55,30 @@ export default {
         },
     },
 
+    setup() {
+
+    }
     data() {
         return {
             isOpen: false,
             escBinding: null,
             cleanupAutoUpdater: null,
             portalTarget: null,
-            provide: {
-                popover: this.makeProvide(),
-            },
+        }
+    },
+
+    provide() {
+        return {
+            popover: this.makeProvide(),
         }
     },
 
     computed: {
 
         targetClass() {
+            return ''
+
+            // @todo(jasonvarga): what was this used for?
             return this.$vnode.data.staticClass;
         }
 
@@ -76,7 +87,11 @@ export default {
     methods: {
 
         computePosition() {
-            if (! this.$refs.trigger) return;
+            if (! this.$refs.trigger?.firstChild) return;
+            if (! this.$refs.popover) return;
+
+            console.log('t', this.$refs.trigger, this.$refs.trigger.firstChild);
+            console.log('p', this.$refs.popover);
 
             computePosition(this.$refs.trigger.firstChild, this.$refs.popover, {
                 placement: this.placement,

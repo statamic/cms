@@ -47,5 +47,6 @@
     @include('statamic::partials.scripts')
     @yield('scripts')
 
+    <div id="popover"></div>
 </body>
 </html>
