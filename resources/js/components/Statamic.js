@@ -6,7 +6,6 @@ import Config from './Config';
 import Preferences from './Preference';
 import * as GlobalComponents from './GlobalComponents.js';
 
-import axios from 'axios';
 import Echo from './Echo';
 import Bard from './Bard';
 import Keys from './keys/Keys';
@@ -17,7 +16,7 @@ import FieldConditions from './FieldConditions';
 import Callbacks from './Callbacks.js';
 import Slugs from './slugs/Manager.js';
 import * as Globals from "../bootstrap/globals.js";
-import isLatLong from "validator/es/lib/isLatLong.js";
+// import isLatLong from "validator/es/lib/isLatLong.js";
 
 const echo = new Echo;
 const bard = new Bard;
@@ -29,6 +28,12 @@ const conditions = new FieldConditions;
 const callbacks = new Callbacks;
 const slug = new Slugs;
 
+// Packages used by Statamic
+import PortalVue from 'portal-vue';
+import FloatingVue from 'floating-vue';
+import VueClickAway from 'vue3-click-away';
+import vClickOutside from "click-outside-vue3";
+import VueSelect from "vue-select";
 
 export default {
     bootingCallbacks: [],
@@ -112,6 +117,20 @@ export default {
                 }
             },
 
+            computed: {
+                version() {
+                    return Statamic.$config.get('version');
+                },
+
+                stackCount() {
+                    return this.$stacks.count();
+                },
+
+                wrapperClass() {
+                    return this.$config.get('wrapperClass', 'max-w-xl');
+                }
+            },
+
             methods: {
                 bindWindowResizeListener() {
                     window.addEventListener('resize', () => {
@@ -177,6 +196,10 @@ export default {
             }
         });
         this.$app.use(store);
+        this.$app.use(PortalVue);
+        this.$app.use(FloatingVue);
+        this.$app.use(VueClickAway);
+        this.$app.use(vClickOutside);
 
         // Create event bus because of the old events of Vue 2
         this.$app.config.globalProperties.$events = eventBus;
@@ -209,6 +232,8 @@ export default {
         Object.keys(GlobalComponents).forEach(key => {
             this.$app.component(key, GlobalComponents[key]);
         });
+
+        this.$app.component('v-select', VueSelect);
 
         this.bootingCallbacks.forEach(callback => callback(this));
         this.bootingCallbacks = [];

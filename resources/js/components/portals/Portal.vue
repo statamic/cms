@@ -1,7 +1,7 @@
 <template>
 
     <v-portal
-        name="popover"
+        :name="name"
         :to="portal.id"
         :target-class="targetClass"
         :disabled="disabled"

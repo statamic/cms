@@ -50,7 +50,7 @@
 </template>
 
 <script>
-var counter;
+let counter;
 
 export default {
 

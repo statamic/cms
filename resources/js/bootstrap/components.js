@@ -37,8 +37,6 @@ import AssetContainerList from '../components/AssetContainerList.vue';
 import AddonList from '../components/AddonList.vue';
 import AddonDetails from '../components/AddonDetails.vue';
 import CollectionWidget from '../components/entries/Widget.vue';
-import SvgIcon from '../components/SvgIcon.vue';
-import FileIcon from '../components/FileIcon.vue';
 import LoadingGraphic from '../components/LoadingGraphic.vue';
 import ValidationErrors from '../components/ValidationErrors.vue';
 import Slugify from '../components/slugs/Slugify.vue';
@@ -110,7 +108,7 @@ Vue.component('addon-details', AddonDetails);
 Vue.component('collection-widget', CollectionWidget);
 
 // Reusable
-Vue.component('svg-icon', SvgIcon);
+
 Vue.component('file-icon', FileIcon);
 Vue.component('loading-graphic', LoadingGraphic);
 Vue.component('dropdown-list', DropdownList);

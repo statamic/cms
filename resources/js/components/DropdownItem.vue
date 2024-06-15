@@ -11,8 +11,6 @@ export default {
 
     props: ['text', 'redirect', 'externalLink'],
 
-    inject: ['popover'],
-
     computed: {
 
         href() {

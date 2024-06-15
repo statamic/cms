@@ -1,36 +1,26 @@
-// import Toast from './mixins/Toast.js';
+import.meta.glob(['../img/**']);
+import Alpine from 'alpinejs';
+import Cookies from 'cookies-js';
+import Moment from 'moment';
+
+import VueClickAway from "vue3-click-away";
 import Statamic from './components/Statamic.js';
 window.Statamic = Statamic;
+
+// import Toast from './mixins/Toast.js';
 
 // Assign the global functions from the bootstrap/globals.js file to the window object
 import * as Globals from './bootstrap/globals'
 Object.assign(window, Globals);
 
-// Start and the mount
-// Statamic.start();
-// Statamic.mount('#statamic');
-
-import Alpine from 'alpinejs';
-
-
-
-import { default as underscore } from 'underscore'
-import Cookies from 'cookies-js';
-import VueClickAway from "vue3-click-away";
-
-import.meta.glob(['../img/**']);
-
-let global_functions = Object.keys(Globals)
-global_functions.forEach(fnName => { window[fnName] = Globals[fnName] })
+// Assign some packages to the window as well
+window.Cookies = Cookies;
+window.Alpine = Alpine;
+window.moment = Moment;
 
 // Vue.config.silent = false;
 // Vue.config.devtools = true;
 // Vue.config.productionTip = false
-
-window.Cookies = Cookies;
-window.Alpine = Alpine;
-import Moment from 'moment';
-window.moment = Moment;
 
 
 
@@ -45,9 +35,6 @@ import './bootstrap/mixins';
 // import './bootstrap/tooltips';
 
 
-
-// import axios from 'axios';
-// import PortalVue from "portal-vue";
 // import VModal from "vue-js-modal";
 // import vSelect from 'vue-select'
 // import VCalendar from 'v-calendar';
