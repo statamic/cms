@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static self registerStores($stores)
  * @method static mixed stores()
  * @method static mixed store($key)
- * @method static \Illuminate\Contracts\Cache\Store cache()
+ * @method static \Illuminate\Contracts\Cache\Store cacheStore()
  * @method static string generateId()
  * @method static self clear()
  * @method static void refresh()
