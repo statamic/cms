@@ -1,17 +1,18 @@
 <template>
     <div :class="{'popover-open': isOpen}" @mouseleave="leave">
-        <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen">
+        <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$slots.default">
             <slot name="trigger"></slot>
         </div>
+
         <portal
             name="popover"
             :target-class="`popover-container ${targetClass || ''}`"
             :provide="provide"
         >
-            <div :class="`popover-container ${targetClass || ''} ${isOpen ? 'popover-open' : ''}`">
-                <div ref="popover" class="popover" v-if="!disabled" v-click-outside="clickawayClose">
+            <div :class="`${isOpen ? 'popover-open' : ''}`">
+                <div ref="popover" class="popover" v-if="!disabled" v-click-away="clickawayClose">
                     <div class="popover-content bg-white dark:bg-dark-550 shadow-popover dark:shadow-dark-popover rounded-md">
-                        <slot :close="close"></slot>
+                        <slot :close="close" />
                     </div>
                 </div>
             </div>
@@ -20,26 +21,11 @@
 </template>
 
 <script>
-import { ref, computed, nextTick } from 'vue';
+import { nextTick } from 'vue';
 import { computePosition as floatingComputePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom';
 
 export default {
-    directives: {
-        clickOutside: {
-            beforeMount(el, binding) {
-                el.clickOutsideEvent = function(event) {
-                    // Check if the click was outside the element and its children
-                    if (!(el == event.target || el.contains(event.target))) {
-                        binding.value(event);
-                    }
-                };
-                document.body.addEventListener('click', el.clickOutsideEvent);
-            },
-            unmounted(el) {
-                document.body.removeEventListener('click', el.clickOutsideEvent);
-            },
-        },
-    },
+
     props: {
         autoclose: {
             type: Boolean,
@@ -59,7 +45,7 @@ export default {
         },
         placement: {
             type: String,
-            default: 'bottom-end'
+            default: 'bottom-end',
         },
     },
     data() {
@@ -71,6 +57,9 @@ export default {
     },
     computed: {
         targetClass() {
+            // @todo(jasonvarga): what was this used for?
+            // return this.$vnode.data.staticClass;
+
             return this.$refs.trigger ? this.$refs.trigger.classList.value : '';
         },
         provide() {
@@ -103,13 +92,10 @@ export default {
             if (this.disabled) return;
 
             this.isOpen = true;
-            this.escBinding = (e) => {
-                if (e.key === 'Escape') this.close();
-            };
-            document.addEventListener('keydown', this.escBinding);
+            this.escBinding = this.$keys.bindGlobal('esc', e => this.close());
 
             nextTick(() => {
-                if (this.$refs.trigger && this.$refs.trigger.firstChild && this.$refs.popover) {
+                if (this.$refs.trigger?.firstChild && this.$refs.popover) {
                     this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger.firstChild, this.$refs.popover, this.computePosition);
                 }
             });
@@ -119,8 +105,12 @@ export default {
             }, {once: true});
         },
         clickawayClose(e) {
-            if (!this.clickaway || !this.isOpen) return;
-            if (this.$refs.popover.contains(e.target) || this.$refs.trigger.contains(e.target)) return;
+            // If disabled or closed, do nothing.
+            if (! this.clickaway || ! this.isOpen) return;
+
+            // If clicking within the popover, or inside the trigger, do nothing.
+            // These need to be checked separately, because the popover contents away.
+            if (this.$refs.popover.contains(e.target) || this.$el.contains(e.target)) return;
 
             this.close();
             this.$emit('clicked-away', e);
@@ -131,19 +121,11 @@ export default {
             this.isOpen = false;
             this.$emit('closed');
             if (this.cleanupAutoUpdater) this.cleanupAutoUpdater();
-            if (this.escBinding) document.removeEventListener('keydown', this.escBinding);
+            if (this.escBinding) this.escBinding.destroy();
         },
         leave() {
             if (this.autoclose) this.close();
         }
-    },
-    mounted() {
-        document.addEventListener('click', this.clickawayClose);
-    },
-    unmounted() {
-        document.removeEventListener('click', this.clickawayClose);
-        if (this.cleanupAutoUpdater) this.cleanupAutoUpdater();
-        if (this.escBinding) document.removeEventListener('keydown', this.escBinding);
     }
 };
 </script>

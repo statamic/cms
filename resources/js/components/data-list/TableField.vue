@@ -24,7 +24,10 @@ export default {
 
             if (!this.fieldtype) return fallback;
 
-            return Vue.options.components[custom] ? custom : fallback;
+            // @todo(jelleroorda): Where do these Vue.options come from?
+            // return Vue.options.components[custom] ? custom : fallback;
+
+            return fallback;
         },
 
         cssClass() {

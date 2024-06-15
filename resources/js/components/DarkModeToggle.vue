@@ -1,23 +1,28 @@
 <template>
     <dropdown-list v-cloak>
-            <template v-slot:trigger>
-                <button class="global-header-icon-button hidden md:block" v-tooltip="__('Theme') ">
-                    <svg-icon :name="icon"></svg-icon>
-                </button>
-            </template>
+        <template v-slot:trigger>
+            <button class="global-header-icon-button hidden md:block" v-tooltip="__('Theme') ">
+                <svg-icon :name="icon"></svg-icon>
+            </button>
+        </template>
+
+        <template #default>
             <dropdown-item @click="prefer('light')" class="flex items-center space-x-2">
                 <svg-icon name="regular/light-mode" class="h-4 w-4"></svg-icon>
                 <span>{{ __('Light') }}</span>
             </dropdown-item>
+
             <dropdown-item @click="prefer('dark')" class="flex items-center space-x-2">
                 <svg-icon name="regular/dark-mode" class="h-4 w-4"></svg-icon>
                 <span>{{ __('Dark') }}</span>
             </dropdown-item>
+
             <dropdown-item @click="prefer('auto')" class="flex items-center space-x-2">
                 <svg-icon name="regular/system" class="h-4 w-4"></svg-icon>
                 <span>{{ __('System') }}</span>
             </dropdown-item>
-        </dropdown-list>
+        </template>
+    </dropdown-list>
 </template>
 
 <script>
@@ -32,16 +37,16 @@ export default {
         return {
             preference: this.initial, // dark, light, auto
             theme: null, // dark, light
-        }
+        };
     },
     computed: {
         icon() {
             if (this.preference === 'auto') {
-                return 'regular/system'
+                return 'regular/system';
             } else if (this.preference === 'dark') {
-                return 'regular/dark-mode'
+                return 'regular/dark-mode';
             } else {
-                return 'regular/light-mode'
+                return 'regular/light-mode';
             }
         }
     },
@@ -78,5 +83,5 @@ export default {
             }
         }
     }
-}
+};
 </script>

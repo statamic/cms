@@ -4,7 +4,7 @@ import Cookies from 'cookies-js';
 import Moment from 'moment';
 
 import VueClickAway from "vue3-click-away";
-import Statamic from './components/Statamic.js';
+import Statamic from './Statamic.js';
 window.Statamic = Statamic;
 
 // import Toast from './mixins/Toast.js';

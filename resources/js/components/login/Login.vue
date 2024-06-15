@@ -1,5 +1,5 @@
 <template>
-    <slot v-bind="$props" foo="bar"></slot>
+    <slot v-bind="$props"></slot>
 </template>
 
 <script>

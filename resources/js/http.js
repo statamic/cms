@@ -9,4 +9,5 @@ const http = axios.create({
 });
 
 window.axios = axios;
+
 export default http;
