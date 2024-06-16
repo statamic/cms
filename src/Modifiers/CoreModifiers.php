@@ -952,6 +952,50 @@ class CoreModifiers extends Modifier
         }
     }
 
+    /**
+     * Returns true if the array contains $needle, false otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function includes($haystack, $params, $context)
+    {
+        $needle = $this->getFromContext($context, $params);
+
+        if ($needle instanceof Collection) {
+            $needle = $needle->values()->all();
+        }
+
+        if (! is_array($needle)) {
+            $needle = [$needle];
+        }
+
+        if ($haystack instanceof Collection) {
+            $haystack = $haystack->values()->all();
+        }
+
+        if (! is_array($haystack)) {
+            return false;
+        }
+
+        return count(array_intersect($haystack, $needle)) > 0;
+    }
+
+    /**
+     * Returns false if the array contains $needle, true otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function doesnt_include($haystack, $params, $context)
+    {
+        return ! $this->includes($haystack, $params, $context);
+    }
+
     private function renderAPStyleHeadline($value)
     {
         $exceptions = [
