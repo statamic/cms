@@ -54,6 +54,7 @@ class FlatCamp extends Command
         'The drone must have tried flying to its last home point. Florida. - Jack',
         'And then you sniff like a rabbit, like this. - Conrad',
         'Why? - Erin',
+        'I came to Flat Camp, and I picked up smoking. - Colin',
     ];
 
     public function handle()
