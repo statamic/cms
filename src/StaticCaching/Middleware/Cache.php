@@ -87,7 +87,7 @@ class Cache
 
         $request = Request::createFrom($request)->fakeStaticCacheStatus(404);
 
-        if ($this->cacher->hasCachedPage($request)) {
+        if (! $this->cacher->hasCachedPage($request)) {
             $this->cacher->cachePage($request, $response);
         }
     }
