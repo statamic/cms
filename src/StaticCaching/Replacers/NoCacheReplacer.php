@@ -85,7 +85,7 @@ class NoCacheReplacer implements Replacer
                 Str::position($contents, '</head>')
             ])->filter()->min();
 
-            $js = "<script type=\"text/javascript\">{$cacher->getNocacheJs()}</>";
+            $js = "<script type=\"text/javascript\">{$cacher->getNocacheJs()}</script>";
 
             $contents = Str::substrReplace($contents, $js, $insertBefore, 0);
         }
