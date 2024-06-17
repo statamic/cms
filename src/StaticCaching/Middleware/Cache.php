@@ -79,7 +79,7 @@ class Cache
     {
         $status = $response->getStatusCode();
 
-        if (! config('statamic.static_caching.errors.'.$status)) {
+        if (! config('statamic.static_caching.share_errors')) {
             return;
         }
 

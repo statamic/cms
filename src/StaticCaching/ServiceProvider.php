@@ -81,7 +81,7 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         Request::macro('fakeStaticCacheStatus', function (int $status) {
-            $url = str(config('statamic.static_caching.errors.'.$status))->start('/')->toString();
+            $url = '/__shared-errors/'.$status;
             $this->pathInfo = $url;
             $this->requestUri = $url;
 

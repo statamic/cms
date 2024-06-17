@@ -65,7 +65,7 @@ trait RendersHttpExceptions
     {
         $status = $this->getStatusCode();
 
-        if (! config('statamic.static_caching.errors.'.$status)) {
+        if (! config('statamic.static_caching.share_errors')) {
             return null;
         }
 

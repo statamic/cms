@@ -131,16 +131,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Errors
+    | Shared Error Pages
     |--------------------------------------------------------------------------
     |
-    | Here you may define the URLs that should be used for error pages. This
-    | will make all instances of a response code refer to the same page.
+    | You may choose to share the same statically generated error page across
+    | all errors. For example, the first time a 404 is encountered it will
+    | be generated and cached, and then served for all subsequent 404s.
     |
     */
 
-    'errors' => [
-        // 404 => '/404',
-    ],
+    'share_errors' => false,
 
 ];
