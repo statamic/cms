@@ -82,7 +82,7 @@ class NoCacheReplacer implements Replacer
             $insertBefore = collect([
                 Str::position($contents, '<link'),
                 Str::position($contents, '<script'),
-                Str::position($contents, '</head>')
+                Str::position($contents, '</head>'),
             ])->filter()->min();
 
             $js = "<script type=\"text/javascript\">{$cacher->getNocacheJs()}</script>";
