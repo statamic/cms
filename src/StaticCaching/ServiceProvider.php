@@ -80,8 +80,8 @@ class ServiceProvider extends LaravelServiceProvider
             return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>';
         });
 
-        Request::macro('fakeStaticCache404', function () {
-            $url = str(config('statamic.static_caching.errors.404'))->start('/')->toString();
+        Request::macro('fakeStaticCacheStatus', function (int $status) {
+            $url = str(config('statamic.static_caching.errors.'.$status))->start('/')->toString();
             $this->pathInfo = $url;
             $this->requestUri = $url;
 

@@ -71,7 +71,7 @@ trait RendersHttpExceptions
             return null;
         }
 
-        $request = Request::createFrom(request())->fakeStaticCache404();
+        $request = Request::createFrom(request())->fakeStaticCacheStatus(404);
 
         $cacher = app(Cacher::class);
 

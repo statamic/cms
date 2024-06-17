@@ -85,7 +85,7 @@ class Cache
             return;
         }
 
-        $request = Request::createFrom($request)->fakeStaticCache404();
+        $request = Request::createFrom($request)->fakeStaticCacheStatus(404);
 
         if ($this->cacher->hasCachedPage($request)) {
             $this->cacher->cachePage($request, $response);
