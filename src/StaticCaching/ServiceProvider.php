@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
@@ -77,6 +78,14 @@ class ServiceProvider extends LaravelServiceProvider
 
         Blade::directive('nocache', function ($exp) {
             return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>';
+        });
+
+        Request::macro('fakeStaticCache404', function () {
+            $url = str(config('statamic.static_caching.errors.404'))->start('/')->toString();
+            $this->pathInfo = $url;
+            $this->requestUri = $url;
+
+            return $this;
         });
     }
 }

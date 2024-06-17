@@ -2,6 +2,7 @@
 
 namespace Statamic\Exceptions\Concerns;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Cascade;
 use Statamic\Statamic;
@@ -66,15 +67,16 @@ trait RendersHttpExceptions
             return null;
         }
 
-        $cacher = app(Cacher::class);
-
-        $request = request();
-        //        $request->setUrl('404');
-
-        if (! $cacher->hasCachedPage($request)) {
+        if (! config('statamic.static_caching.errors.404')) {
             return null;
         }
 
-        return $cacher->getCachedPage($request)->toResponse($request);
+        $request = Request::createFrom(request())->fakeStaticCache404();
+
+        $cacher = app(Cacher::class);
+
+        if ($cacher->hasCachedPage($request)) {
+            return $cacher->getCachedPage($request)->toResponse($request);
+        }
     }
 }

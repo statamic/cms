@@ -129,4 +129,18 @@ return [
 
     'warm_queue' => null,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Errors
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define the URLs that should be used for error pages. This
+    | will make all instances of a response code refer to the same page.
+    |
+    */
+
+    'errors' => [
+        // 404 => '/404',
+    ],
+
 ];
