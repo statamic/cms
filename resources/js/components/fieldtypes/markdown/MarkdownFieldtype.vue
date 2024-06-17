@@ -2,6 +2,7 @@
 <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
 <element-container @resized="refresh">
     <div class="markdown-fieldtype-wrapper @container/markdown" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
+
         <uploader
             ref="uploader"
             :enabled="assetsEnabled"
@@ -13,8 +14,8 @@
             <div slot-scope="{ dragging }">
                 <div class="markdown-toolbar">
                     <div class="markdown-modes">
-                        <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'"/>
-                        <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'"/>
+                        <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
+                        <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />
                     </div>
                     <div class="markdown-buttons" v-if="! isReadOnly">
                         <button
@@ -67,8 +68,8 @@
                                 </div>
                             </div>
                             <div v-if="fullScreenMode" class="flex items-center rtl:pl-2 ltr:pr-2">
-                                <div class="whitespace-nowrap rtl:ml-4 ltr:mr-4"><span v-text="count.words" />{{ __('Words') }}</div>
-                                <div class="whitespace-nowrap"><span v-text="count.characters" />{{ __('Characters') }}</div>
+                                <div class="whitespace-nowrap rtl:ml-4 ltr:mr-4"><span v-text="count.words" /> {{ __('Words') }}</div>
+                                <div class="whitespace-nowrap"><span v-text="count.characters" /> {{ __('Characters') }}</div>
                             </div>
                         </div>
 
