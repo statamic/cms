@@ -171,14 +171,17 @@ class Email extends Mailable
 
     protected function getRenderableFieldData($values)
     {
-        return collect($values)->map(function ($value, $handle) {
-            $field = $value->field();
-            $display = $field->display();
-            $fieldtype = $field->type();
-            $config = $field->config();
+        return collect($values)
+            ->reject(fn ($field) => $field->field()->visibility() === 'hidden')
+            ->map(function ($value, $handle) {
+                $field = $value->field();
+                $display = $field->display();
+                $fieldtype = $field->type();
+                $config = $field->config();
 
-            return compact('display', 'handle', 'fieldtype', 'config', 'value');
-        })->values();
+                return compact('display', 'handle', 'fieldtype', 'config', 'value');
+            })
+            ->values();
     }
 
     private function getGlobalsData()
