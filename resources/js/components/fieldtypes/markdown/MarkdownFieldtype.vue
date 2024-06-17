@@ -1,133 +1,133 @@
 <template>
-    <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
-        <element-container @resized="refresh">
-            <div class="markdown-fieldtype-wrapper @container/markdown"
-                 :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
-                <uploader
-                    ref="uploader"
-                    :enabled="assetsEnabled"
-                    :container="container"
-                    :path="folder"
-                    @updated="uploadsUpdated"
-                    @upload-complete="uploadComplete"
-                >
-                    <div slot-scope="{ dragging }">
-                        <div class="markdown-toolbar">
-                            <div class="markdown-modes">
-                                <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }"
-                                        v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'"/>
-                                <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }"
-                                        v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'"/>
-                            </div>
-                            <div class="markdown-buttons" v-if="! isReadOnly">
-                                <button
-                                    v-for="button in buttons"
-                                    v-tooltip="button.text"
-                                    :aria-label="button.text"
-                                    @click="button.command(editor)"
-                                >
-                                    <svg-icon :name="button.svg" class="w-4 h-4"/>
-                                </button>
-                                <button @click="toggleDarkMode"
-                                        v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')"
-                                        :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
-                                    <svg-icon name="dark-mode" class="w-4 h-4"/>
-                                </button>
-                                <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')"
-                                        :aria-label="__('Toggle Fullscreen Mode')">
-                                    <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode"/>
-                                    <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode"/>
-                                </button>
-                            </div>
+<portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
+    <element-container @resized="refresh">
+        <div class="markdown-fieldtype-wrapper @container/markdown"
+             :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
+            <uploader
+                ref="uploader"
+                :enabled="assetsEnabled"
+                :container="container"
+                :path="folder"
+                @updated="uploadsUpdated"
+                @upload-complete="uploadComplete"
+            >
+                <div slot-scope="{ dragging }">
+                    <div class="markdown-toolbar">
+                        <div class="markdown-modes">
+                            <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }"
+                                    v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'"/>
+                            <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }"
+                                    v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'"/>
                         </div>
-
-                        <div class="drag-notification" v-show="dragging">
-                            <svg-icon name="upload" class="h-12 w-12 mb-4"/>
-                            {{ __('Drop File to Upload') }}
-                        </div>
-
-                        <uploads
-                            v-if="uploads.length"
-                            :uploads="uploads"
-                            class="-mt-px"
-                        />
-
-                        <div :class="`mode-wrap mode-${mode}`" @click="focus">
-                            <div class="markdown-writer"
-                                 ref="writer"
-                                 v-show="mode == 'write'"
-                                 @dragover="draggingFile = true"
-                                 @dragleave="draggingFile = false"
-                                 @drop="draggingFile = false"
-                                 @keydown="shortcut">
-
-                                <div class="editor" ref="codemirror"></div>
-
-                                <div class="helpers">
-                                    <div class="flex w-full">
-                                        <div class="markdown-cheatsheet-helper">
-                                            <button class="text-link flex items-center" @click="showCheatsheet = true"
-                                                    :aria-label="__('Show Markdown Cheatsheet')">
-                                                <svg-icon name="markdown-icon"
-                                                          class="w-6 h-4 items-start rtl:ml-2 ltr:mr-2"/>
-                                                <span>{{ __('Markdown Cheatsheet') }}</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div v-if="fullScreenMode" class="flex items-center rtl:pl-2 ltr:pr-2">
-                                        <div class="whitespace-nowrap rtl:ml-4 ltr:mr-4"><span v-text="count.words"/>
-                                            {{ __('Words') }}
-                                        </div>
-                                        <div class="whitespace-nowrap"><span v-text="count.characters"/>
-                                            {{ __('Characters') }}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                                    <svg-icon name="upload" class="h-12 w-12 mb-4"/>
-                                    {{ __('Drop File to Upload') }}
-                                </div>
-                            </div>
-
-                            <div v-show="mode == 'preview'" v-html="markdownPreviewText"
-                                 class="markdown-preview prose-sm @md/markdown:prose-base"></div>
+                        <div class="markdown-buttons" v-if="! isReadOnly">
+                            <button
+                                v-for="button in buttons"
+                                v-tooltip="button.text"
+                                :aria-label="button.text"
+                                @click="button.command(editor)"
+                            >
+                                <svg-icon :name="button.svg" class="w-4 h-4"/>
+                            </button>
+                            <button @click="toggleDarkMode"
+                                    v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')"
+                                    :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
+                                <svg-icon name="dark-mode" class="w-4 h-4"/>
+                            </button>
+                            <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')"
+                                    :aria-label="__('Toggle Fullscreen Mode')">
+                                <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode"/>
+                                <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode"/>
+                            </button>
                         </div>
                     </div>
-                </uploader>
 
-                <stack v-if="showAssetSelector && ! isReadOnly" name="markdown-asset-selector"
-                       @closed="closeAssetSelector">
-                    <selector
-                        :container="container"
-                        :folder="folder"
-                        :selected="selectedAssets"
-                        :restrict-container-navigation="restrictAssetNavigation"
-                        :restrict-folder-navigation="restrictAssetNavigation"
-                        @selected="assetsSelected"
-                        @closed="closeAssetSelector"
+                    <div class="drag-notification" v-show="dragging">
+                        <svg-icon name="upload" class="h-12 w-12 mb-4"/>
+                        {{ __('Drop File to Upload') }}
+                    </div>
+
+                    <uploads
+                        v-if="uploads.length"
+                        :uploads="uploads"
+                        class="-mt-px"
                     />
-                </stack>
 
-                <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
-                    <div class="h-full overflow-auto p-6 bg-white dark:bg-dark-600 relative">
-                        <button class="btn-close absolute top-0 rtl:left-0 ltr:right-0 mt-4 rtl:ml-8 ltr:mr-8"
-                                @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;
-                        </button>
-                        <div class="max-w-md mx-auto my-8 prose">
-                            <h2 v-text="__('Markdown Cheatsheet')"></h2>
-                            <div v-html="__('markdown.cheatsheet')"></div>
+                    <div :class="`mode-wrap mode-${mode}`" @click="focus">
+                        <div class="markdown-writer"
+                             ref="writer"
+                             v-show="mode == 'write'"
+                             @dragover="draggingFile = true"
+                             @dragleave="draggingFile = false"
+                             @drop="draggingFile = false"
+                             @keydown="shortcut">
+
+                            <div class="editor" ref="codemirror"></div>
+
+                            <div class="helpers">
+                                <div class="flex w-full">
+                                    <div class="markdown-cheatsheet-helper">
+                                        <button class="text-link flex items-center" @click="showCheatsheet = true"
+                                                :aria-label="__('Show Markdown Cheatsheet')">
+                                            <svg-icon name="markdown-icon"
+                                                      class="w-6 h-4 items-start rtl:ml-2 ltr:mr-2"/>
+                                            <span>{{ __('Markdown Cheatsheet') }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div v-if="fullScreenMode" class="flex items-center rtl:pl-2 ltr:pr-2">
+                                    <div class="whitespace-nowrap rtl:ml-4 ltr:mr-4"><span v-text="count.words"/>
+                                        {{ __('Words') }}
+                                    </div>
+                                    <div class="whitespace-nowrap"><span v-text="count.characters"/>
+                                        {{ __('Characters') }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="drag-notification" v-if="assetsEnabled && draggingFile">
+                                <svg-icon name="upload" class="h-12 w-12 mb-4"/>
+                                {{ __('Drop File to Upload') }}
+                            </div>
                         </div>
-                    </div>
-                </stack>
 
-            </div>
-        </element-container>
-    </portal>
+                        <div v-show="mode == 'preview'" v-html="markdownPreviewText"
+                             class="markdown-preview prose-sm @md/markdown:prose-base"></div>
+                    </div>
+                </div>
+            </uploader>
+
+            <stack v-if="showAssetSelector && ! isReadOnly" name="markdown-asset-selector"
+                   @closed="closeAssetSelector">
+                <selector
+                    :container="container"
+                    :folder="folder"
+                    :selected="selectedAssets"
+                    :restrict-container-navigation="restrictAssetNavigation"
+                    :restrict-folder-navigation="restrictAssetNavigation"
+                    @selected="assetsSelected"
+                    @closed="closeAssetSelector"
+                />
+            </stack>
+
+            <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
+                <div class="h-full overflow-auto p-6 bg-white dark:bg-dark-600 relative">
+                    <button class="btn-close absolute top-0 rtl:left-0 ltr:right-0 mt-4 rtl:ml-8 ltr:mr-8"
+                            @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;
+                    </button>
+                    <div class="max-w-md mx-auto my-8 prose">
+                        <h2 v-text="__('Markdown Cheatsheet')"></h2>
+                        <div v-html="__('markdown.cheatsheet')"></div>
+                    </div>
+                </div>
+            </stack>
+
+        </div>
+    </element-container>
+</portal>
 </template>
 
 <script>
-import {marked} from 'marked';
+import { marked } from 'marked';
 import PlainTextRenderer from 'marked-plaintext';
 
 import CodeMirror from 'codemirror/lib/codemirror';
@@ -145,7 +145,7 @@ import 'codemirror/mode/php/php';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/addon/edit/continuelist';
 
-import {availableButtons} from './buttons';
+import { availableButtons } from './buttons';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
@@ -162,7 +162,7 @@ export default {
         Uploads,
     },
 
-    data: function () {
+    data: function() {
         return {
             data: this.value || '',
             buttons: [],
@@ -250,10 +250,10 @@ export default {
         },
 
         toggleDarkMode() {
-            this.darkMode = !this.darkMode;
+            this.darkMode = ! this.darkMode;
         },
 
-        getText: function (selection) {
+        getText: function(selection) {
             var i = _.indexOf(this.selections, selection);
 
             return this.codemirror.getSelections()[i];
@@ -324,7 +324,7 @@ export default {
             var text = this.getText(selection);
             var blockLength = delimiter.length;
 
-            return text.substring(blockLength, text.length - blockLength);
+            return text.substring(blockLength, text.length-blockLength);
         },
 
         toggleLine(type) {
@@ -345,7 +345,7 @@ export default {
                 let text = this.codemirror.getLine(i);
                 text = this.isInside(type) ? text.replace(patterns[type], "$1") : map[type] + text;
 
-                this.codemirror.replaceRange(text, {line: i, ch: 0}, {line: i, ch: Infinity});
+                this.codemirror.replaceRange(text, { line: i, ch: 0 }, { line: i, ch: Infinity });
             }
 
             this.codemirror.focus();
@@ -356,7 +356,7 @@ export default {
             position = position || this.codemirror.getCursor("start");
             let state = this.codemirror.getTokenAt(position);
 
-            if (!state.type) return {};
+            if(!state.type) return {};
 
             let types = state.type.split(" ");
 
@@ -368,7 +368,7 @@ export default {
 
                 if (data === "strong") {
                     ret.bold = true;
-                } else if (data === "variable-2") {
+                } else if(data === "variable-2") {
                     text = this.codemirror.getLine(position.line);
                     if (/^\s*\d+\.\s/.test(text)) {
                         ret["ordered-list"] = true;
@@ -406,7 +406,7 @@ export default {
             let doc = this.codemirror.getDoc();
             let cursor = doc.getCursor();
             let line = doc.getLine(cursor.line);
-            let pos = {line: cursor.line};
+            let pos = { line: cursor.line };
             let table = "|     |     |\n| --- | --- |\n|     |     |";
 
             if (line.length === 0) {
@@ -420,7 +420,7 @@ export default {
             }
         },
 
-        insertImage: function (url, alt) {
+        insertImage: function(url, alt) {
             var cm = this.codemirror.doc
 
             var selection = '';
@@ -433,14 +433,14 @@ export default {
             var url = url || '';
 
             // Replace the string
-            var str = '![' + selection + '](' + url + ')';
+            var str = '![' + selection + ']('+ url +')';
 
             cm.replaceSelection(str, 'start');
             // Select the text
             var line = cm.getCursor().line;
             var start = cm.getCursor().ch + 2; // move past the ![
             var end = start + selection.length;
-            cm.setSelection({line: line, ch: start}, {line: line, ch: end});
+            cm.setSelection({ line: line, ch: start }, { line: line, ch: end });
 
             this.codemirror.focus();
         },
@@ -456,7 +456,7 @@ export default {
             this.data += '\n\n![' + alt + '](' + url + ')';
         },
 
-        insertLink: function (url, text) {
+        insertLink: function(url, text) {
             var cm = this.codemirror.doc
 
             var selection = '';
@@ -466,42 +466,42 @@ export default {
                 selection = text;
             }
 
-            if (!url) {
+            if (! rl) {
                 url = prompt(__('Enter URL'), 'https://');
-                if (!url) {
+                if (! url) {
                     return;
                 }
             }
 
             // Replace the string
-            var str = '[' + selection + '](' + url + ')';
+            var str = '[' + selection + ']('+ url +')';
             cm.replaceSelection(str, 'start');
 
             // Select the text
             var line = cm.getCursor().line;
             var start = cm.getCursor().ch + 1; // move past the first [
             var end = start + selection.length;
-            cm.setSelection({line: line, ch: start}, {line: line, ch: end});
+            cm.setSelection({ line: line, ch: start }, { line: line, ch: end });
 
             this.codemirror.focus();
         },
 
-        appendLink: function (url, text) {
+        appendLink: function(url, text) {
             text = text || '';
-            this.data += '\n\n[' + text + '](' + url + ')';
+            this.data += '\n\n['+text+']('+url+')';
         },
 
         /**
          * Open the asset selector
          */
-        addAsset: function () {
+        addAsset: function() {
             this.showAssetSelector = true;
         },
 
         /**
          * Execute a keyboard shortcut, when applicable
          */
-        shortcut: function (e) {
+        shortcut: function(e) {
             var key = e.keyCode;
             var mod = e.metaKey === true || e.ctrlKey === true;
 
@@ -561,14 +561,14 @@ export default {
             // We don't want to maintain the asset selections
             this.selectedAssets = [];
 
-            this.$axios.post(cp_url('assets-fieldtype'), {assets}).then(response => {
+            this.$axios.post(cp_url('assets-fieldtype'), { assets }).then(response => {
                 _(response.data).each((asset) => {
                     var alt = asset.values.alt || '';
-                    var url = encodeURI('statamic://' + asset.reference);
+                    var url = encodeURI('statamic://'+asset.reference);
                     if (asset.isImage) {
-                        this[method + 'Image'](url, alt);
+                        this[method+'Image'](url, alt);
                     } else {
-                        this[method + 'Link'](url, alt);
+                        this[method+'Link'](url, alt);
                     }
                 });
             });
@@ -601,9 +601,7 @@ export default {
         },
 
         trackHeightUpdates() {
-            const update = () => {
-                window.dispatchEvent(new Event('resize'))
-            };
+            const update = () => { window.dispatchEvent(new Event('resize')) };
             const throttled = _.throttle(update, 100);
 
             this.$root.$on('livepreview.opened', throttled);
@@ -619,7 +617,7 @@ export default {
 
         updateMarkdownPreview() {
             this.$axios
-                .post(this.meta.previewUrl, {value: this.data, config: this.config})
+                .post(this.meta.previewUrl, { value: this.data, config: this.config })
                 .then(response => this.markdownPreviewText = response.data)
                 .catch(e => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
         },
@@ -659,7 +657,7 @@ export default {
             });
 
             // Update CodeMirror if we change the value independent of CodeMirror
-            this.$watch('value', function (val) {
+            this.$watch('value', function(val) {
                 if (val !== self.codemirror.doc.getValue()) {
                     self.codemirror.doc.setValue(val);
                 }
@@ -669,14 +667,14 @@ export default {
         },
 
         refresh() {
-            this.$nextTick(function () {
+            this.$nextTick(function() {
                 this.codemirror.refresh();
             })
         },
 
         initToolbarButtons() {
             let buttons = this.config.buttons.map(button => {
-                return _.findWhere(availableButtons(), {name: button.toLowerCase()}) || button;
+                return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
             });
 
             // Remove buttons that don't pass conditions.
@@ -745,11 +743,11 @@ export default {
     },
 
     computed: {
-        assetsEnabled: function () {
+        assetsEnabled: function() {
             return Boolean(this.config && this.config.container);
         },
 
-        container: function () {
+        container: function() {
             return this.config.container;
         },
 
@@ -757,7 +755,7 @@ export default {
             return this;
         },
 
-        folder: function () {
+        folder: function() {
             return this.config.folder || '/';
         },
 
@@ -766,11 +764,11 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return marked(this.data || '', {renderer: new PlainTextRenderer})
+            return marked(this.data || '', { renderer: new PlainTextRenderer })
                 .replace(/<\/?[^>]+(>|$)/g, "");
-        },
+        }
     }
 
 };
