@@ -1,5 +1,19 @@
 # Release Notes
 
+## 5.8.0 (2024-06-17)
+
+### What's new
+- 404s get included in the full measure static cache [#10294](https://github.com/statamic/cms/issues/10294) by @jasonvarga
+- More Flat Camp quotes [#10307](https://github.com/statamic/cms/issues/10307) by @jackmcdade
+- Even more [#10288](https://github.com/statamic/cms/issues/10288) by @robdekort
+- And more still [#10300](https://github.com/statamic/cms/issues/10300) by @edalzell
+
+### What's fixed
+- Prevent additional augmented search result data from being lost [#10301](https://github.com/statamic/cms/issues/10301) by @JohnathonKoster
+- Fix nested field path prefixes [#10313](https://github.com/statamic/cms/issues/10313) by @jacksleight
+
+
+
 ## 5.7.3 (2024-06-13)
 
 ### What's fixed
