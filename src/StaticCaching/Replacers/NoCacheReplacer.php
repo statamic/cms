@@ -81,8 +81,9 @@ class NoCacheReplacer implements Replacer
         if ($cacher->shouldOutputJs()) {
             $firstLink = Str::position($contents, '<link');
             $firstScript = Str::position($contents, '<script');
-            $insertBefore = min($firstLink, $firstScript);
-            $js = "<script type=\"text/javascript\">{$cacher->getNocacheJs()}</script>";
+            $endOfHead = Str::position($contents, '</head>');
+            $insertBefore = min($firstLink, $firstScript, $endOfHead);
+            $js = "<script type=\"text/javascript\">{$cacher->getNocacheJs()}</>";
 
             $contents = Str::substrReplace($contents, $js, $insertBefore, 0);
         }
