@@ -103,7 +103,12 @@ class LoginController extends CpController
     {
         $referer = request('referer');
 
-        if ($referer === cp_route('login')) {
+        $authRoutes = [
+            cp_route('login'),
+            cp_route('password.request'),
+        ];
+
+        if (in_array($referer, $authRoutes)) {
             return cp_route('index');
         }
 
