@@ -63,7 +63,7 @@ class Cache
         if ($this->shouldBeCached($request, $response)) {
             $lock->acquire(true);
 
-            $this->copy404($request, $response);
+            $this->copyError($request, $response);
 
             $this->makeReplacementsAndCacheResponse($request, $response);
 
@@ -75,17 +75,15 @@ class Cache
         return $response;
     }
 
-    private function copy404($request, $response)
+    private function copyError($request, $response)
     {
-        if ($response->getStatusCode() !== 404) {
+        $status = $response->getStatusCode();
+
+        if (! config('statamic.static_caching.errors.'.$status)) {
             return;
         }
 
-        if (! config('statamic.static_caching.errors.404')) {
-            return;
-        }
-
-        $request = Request::createFrom($request)->fakeStaticCacheStatus(404);
+        $request = Request::createFrom($request)->fakeStaticCacheStatus($status);
 
         if (! $this->cacher->hasCachedPage($request)) {
             $this->cacher->cachePage($request, $response);

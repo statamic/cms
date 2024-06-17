@@ -21,7 +21,7 @@ trait RendersHttpExceptions
             return response()->json(['message' => $this->getApiMessage()], $this->getStatusCode());
         }
 
-        if ($cached = $this->getCached404()) {
+        if ($cached = $this->getCachedError()) {
             return $cached;
         }
 
@@ -61,17 +61,15 @@ trait RendersHttpExceptions
         return $this->getMessage();
     }
 
-    private function getCached404(): ?Response
+    private function getCachedError(): ?Response
     {
-        if ($this->getStatusCode() !== 404) {
+        $status = $this->getStatusCode();
+
+        if (! config('statamic.static_caching.errors.'.$status)) {
             return null;
         }
 
-        if (! config('statamic.static_caching.errors.404')) {
-            return null;
-        }
-
-        $request = Request::createFrom(request())->fakeStaticCacheStatus(404);
+        $request = Request::createFrom(request())->fakeStaticCacheStatus($status);
 
         $cacher = app(Cacher::class);
 
