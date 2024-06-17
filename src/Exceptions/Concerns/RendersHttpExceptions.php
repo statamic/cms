@@ -7,6 +7,7 @@ use Illuminate\Http\Response;
 use Statamic\Facades\Cascade;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\View\View;
 
 trait RendersHttpExceptions
@@ -69,9 +70,13 @@ trait RendersHttpExceptions
             return null;
         }
 
-        $request = Request::createFrom(request())->fakeStaticCacheStatus($status);
-
         $cacher = app(Cacher::class);
+
+        if (! $cacher instanceof ApplicationCacher) {
+            return null;
+        }
+
+        $request = Request::createFrom(request())->fakeStaticCacheStatus($status);
 
         return $cacher->hasCachedPage($request)
             ? $cacher->getCachedPage($request)->toResponse($request)

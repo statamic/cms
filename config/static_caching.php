@@ -138,6 +138,8 @@ return [
     | all errors. For example, the first time a 404 is encountered it will
     | be generated and cached, and then served for all subsequent 404s.
     |
+    | This is only supported for half measure.
+    |
     */
 
     'share_errors' => false,

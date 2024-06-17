@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
@@ -156,7 +157,9 @@ class Cache
             return false;
         }
 
-        if (! in_array($response->getStatusCode(), [200, 404]) || $response->getContent() == '') {
+        $statuses = $this->cacher instanceof ApplicationCacher ? [200, 404] : [200];
+
+        if (! in_array($response->getStatusCode(), $statuses) || $response->getContent() == '') {
             return false;
         }
 
