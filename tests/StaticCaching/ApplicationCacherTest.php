@@ -42,6 +42,7 @@ class ApplicationCacherTest extends TestCase
         $cachedPage = $cacher->getCachedPage($request);
         $this->assertEquals('html content', $cachedPage->content);
         $this->assertEquals('application/html', $cachedPage->headers['Content-Type']);
+        $this->assertEquals(200, $cachedPage->status);
     }
 
     /** @test */

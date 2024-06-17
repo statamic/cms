@@ -80,7 +80,7 @@ class ApplicationCacher extends AbstractCacher
     {
         $cachedPage = $this->cached ?? $this->getFromCache($request);
 
-        return new Page($cachedPage['content'], $cachedPage['headers'], $cachedPage['status']);
+        return new Page($cachedPage['content'], $cachedPage['headers'], $cachedPage['status'] ?? 200);
     }
 
     private function getFromCache(Request $request)
