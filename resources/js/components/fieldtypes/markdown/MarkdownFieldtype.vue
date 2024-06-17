@@ -425,7 +425,7 @@ export default {
             var line = cm.getCursor().line;
             var start = cm.getCursor().ch + 2; // move past the ![
             var end = start + selection.length;
-            cm.setSelection({line:line, ch:start}, {line:line, ch:end});
+            cm.setSelection({line:line,ch:start}, {line:line,ch:end});
 
             this.codemirror.focus();
         },
@@ -466,7 +466,7 @@ export default {
             var line = cm.getCursor().line;
             var start = cm.getCursor().ch + 1; // move past the first [
             var end = start + selection.length;
-            cm.setSelection({line:line, ch:start}, {line:line, ch:end});
+            cm.setSelection({line:line,ch:start}, {line:line,ch:end});
 
             this.codemirror.focus();
         },
