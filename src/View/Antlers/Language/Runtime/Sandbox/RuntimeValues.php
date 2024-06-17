@@ -12,7 +12,7 @@ use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
 class RuntimeValues
 {
-    protected static function shouldBulkAugment($augmentable)
+    private static function shouldBulkAugment($augmentable)
     {
         if ($augmentable instanceof Collection) {
             $first = $augmentable->first();
