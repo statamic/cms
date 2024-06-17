@@ -425,7 +425,7 @@ export default {
             var line = cm.getCursor().line;
             var start = cm.getCursor().ch + 2; // move past the ![
             var end = start + selection.length;
-            cm.setSelection({ line: line, ch: start }, { line: line, ch: end });
+            cm.setSelection({line: line, ch: start}, {line: line, ch: end});
 
             this.codemirror.focus();
         },
@@ -436,9 +436,9 @@ export default {
          * @param  String url  URL of the image
          * @param  String alt  Alt text
          */
-        appendImage: function (url, alt) {
+        appendImage: function(url, alt) {
             alt = alt || '';
-            this.data += '\n\n![' + alt + '](' + url + ')';
+            this.data += '\n\n!['+alt+']('+url+')';
         },
 
         insertLink: function(url, text) {
@@ -451,7 +451,7 @@ export default {
                 selection = text;
             }
 
-            if (! rl) {
+            if (! url) {
                 url = prompt(__('Enter URL'), 'https://');
                 if (! url) {
                     return;
@@ -466,7 +466,7 @@ export default {
             var line = cm.getCursor().line;
             var start = cm.getCursor().ch + 1; // move past the first [
             var end = start + selection.length;
-            cm.setSelection({ line: line, ch: start }, { line: line, ch: end });
+            cm.setSelection({line: line, ch: start}, {line: line, ch: end});
 
             this.codemirror.focus();
         },
