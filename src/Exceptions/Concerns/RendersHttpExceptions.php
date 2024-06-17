@@ -75,8 +75,8 @@ trait RendersHttpExceptions
 
         $cacher = app(Cacher::class);
 
-        if ($cacher->hasCachedPage($request)) {
-            return $cacher->getCachedPage($request)->toResponse($request);
-        }
+        return $cacher->hasCachedPage($request)
+            ? $cacher->getCachedPage($request)->toResponse($request)
+            : null;
     }
 }
