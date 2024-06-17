@@ -1,8 +1,7 @@
 <template>
 <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
 <element-container @resized="refresh">
-    <div class="markdown-fieldtype-wrapper @container/markdown"
-         :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
+    <div class="markdown-fieldtype-wrapper @container/markdown" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
         <uploader
             ref="uploader"
             :enabled="assetsEnabled"
@@ -14,10 +13,8 @@
             <div slot-scope="{ dragging }">
                 <div class="markdown-toolbar">
                     <div class="markdown-modes">
-                        <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }"
-                                v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'"/>
-                        <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }"
-                                v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'"/>
+                        <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'"/>
+                        <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'"/>
                     </div>
                     <div class="markdown-buttons" v-if="! isReadOnly">
                         <button
@@ -26,23 +23,20 @@
                             :aria-label="button.text"
                             @click="button.command(editor)"
                         >
-                            <svg-icon :name="button.svg" class="w-4 h-4"/>
+                            <svg-icon :name="button.svg" class="w-4 h-4" />
                         </button>
-                        <button @click="toggleDarkMode"
-                                v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')"
-                                :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
-                            <svg-icon name="dark-mode" class="w-4 h-4"/>
+                        <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
+                            <svg-icon name="dark-mode" class="w-4 h-4" />
                         </button>
-                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')"
-                                :aria-label="__('Toggle Fullscreen Mode')">
-                            <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode"/>
-                            <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode"/>
+                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')" :aria-label="__('Toggle Fullscreen Mode')">
+                            <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
+                            <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         </button>
                     </div>
                 </div>
 
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-12 w-12 mb-4"/>
+                    <svg-icon name="upload" class="h-12 w-12 mb-4" />
                     {{ __('Drop File to Upload') }}
                 </div>
 
@@ -54,66 +48,56 @@
 
                 <div :class="`mode-wrap mode-${mode}`" @click="focus">
                     <div class="markdown-writer"
-                         ref="writer"
-                         v-show="mode == 'write'"
-                         @dragover="draggingFile = true"
-                         @dragleave="draggingFile = false"
-                         @drop="draggingFile = false"
-                         @keydown="shortcut">
+                        ref="writer"
+                        v-show="mode == 'write'"
+                        @dragover="draggingFile = true"
+                        @dragleave="draggingFile = false"
+                        @drop="draggingFile = false"
+                        @keydown="shortcut">
 
                         <div class="editor" ref="codemirror"></div>
 
                         <div class="helpers">
                             <div class="flex w-full">
                                 <div class="markdown-cheatsheet-helper">
-                                    <button class="text-link flex items-center" @click="showCheatsheet = true"
-                                            :aria-label="__('Show Markdown Cheatsheet')">
-                                        <svg-icon name="markdown-icon"
-                                                  class="w-6 h-4 items-start rtl:ml-2 ltr:mr-2"/>
+                                    <button class="text-link flex items-center" @click="showCheatsheet = true" :aria-label="__('Show Markdown Cheatsheet')">
+                                        <svg-icon name="markdown-icon" class="w-6 h-4 items-start rtl:ml-2 ltr:mr-2" />
                                         <span>{{ __('Markdown Cheatsheet') }}</span>
                                     </button>
                                 </div>
                             </div>
                             <div v-if="fullScreenMode" class="flex items-center rtl:pl-2 ltr:pr-2">
-                                <div class="whitespace-nowrap rtl:ml-4 ltr:mr-4"><span v-text="count.words"/>
-                                    {{ __('Words') }}
-                                </div>
-                                <div class="whitespace-nowrap"><span v-text="count.characters"/>
-                                    {{ __('Characters') }}
-                                </div>
+                                <div class="whitespace-nowrap rtl:ml-4 ltr:mr-4"><span v-text="count.words" />{{ __('Words') }}</div>
+                                <div class="whitespace-nowrap"><span v-text="count.characters" />{{ __('Characters') }}</div>
                             </div>
                         </div>
 
                         <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                            <svg-icon name="upload" class="h-12 w-12 mb-4"/>
+                            <svg-icon name="upload" class="h-12 w-12 mb-4" />
                             {{ __('Drop File to Upload') }}
                         </div>
                     </div>
 
-                    <div v-show="mode == 'preview'" v-html="markdownPreviewText"
-                         class="markdown-preview prose-sm @md/markdown:prose-base"></div>
+                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview prose-sm @md/markdown:prose-base"></div>
                 </div>
             </div>
         </uploader>
 
-        <stack v-if="showAssetSelector && ! isReadOnly" name="markdown-asset-selector"
-               @closed="closeAssetSelector">
+        <stack v-if="showAssetSelector && ! isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
             <selector
-                :container="container"
-                :folder="folder"
-                :selected="selectedAssets"
-                :restrict-container-navigation="restrictAssetNavigation"
-                :restrict-folder-navigation="restrictAssetNavigation"
-                @selected="assetsSelected"
-                @closed="closeAssetSelector"
+                  :container="container"
+                  :folder="folder"
+                  :selected="selectedAssets"
+                  :restrict-container-navigation="restrictAssetNavigation"
+                  :restrict-folder-navigation="restrictAssetNavigation"
+                  @selected="assetsSelected"
+                  @closed="closeAssetSelector"
             />
         </stack>
 
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
             <div class="h-full overflow-auto p-6 bg-white dark:bg-dark-600 relative">
-                <button class="btn-close absolute top-0 rtl:left-0 ltr:right-0 mt-4 rtl:ml-8 ltr:mr-8"
-                        @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;
-                </button>
+                <button class="btn-close absolute top-0 rtl:left-0 ltr:right-0 mt-4 rtl:ml-8 ltr:mr-8" @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;</button>
                 <div class="max-w-md mx-auto my-8 prose">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>
                     <div v-html="__('markdown.cheatsheet')"></div>
