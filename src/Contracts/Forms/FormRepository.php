@@ -2,6 +2,4 @@
 
 namespace Statamic\Contracts\Forms;
 
-interface FormRepository
-{
-}
+interface FormRepository {}

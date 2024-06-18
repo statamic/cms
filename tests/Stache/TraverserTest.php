@@ -98,13 +98,9 @@ class TraverserTest extends TestCase
         $stache->shouldReceive('sites')->andReturn(collect(['en']));
         $store = new class($stache, app('files')) extends BasicStore
         {
-            public function key()
-            {
-            }
+            public function key() {}
 
-            public function makeItemFromFile($path, $contents)
-            {
-            }
+            public function makeItemFromFile($path, $contents) {}
         };
         $store->directory($this->tempDir);
 

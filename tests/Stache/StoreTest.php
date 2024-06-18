@@ -90,13 +90,9 @@ class StoreTest extends TestCase
 
 class TestStore extends Store
 {
-    public function getItem($key)
-    {
-    }
+    public function getItem($key) {}
 
-    public function getItemValues($keys, $valueIndex, $keyIndex)
-    {
-    }
+    public function getItemValues($keys, $valueIndex, $keyIndex) {}
 
     public function key()
     {
