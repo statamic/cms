@@ -35,6 +35,20 @@ class CacheTagTest extends TestCase
     }
 
     /** @test */
+    public function it_can_use_a_custom_cache_store()
+    {
+        config()->set('cache.stores.statamic', ['driver' => 'array']);
+
+        $template = '{{ cache store="statamic" }}expensive{{ /cache }}';
+
+        Event::fake();
+
+        $this->assertEquals('expensive', $this->tag($template));
+
+        $this->assertMissed();
+    }
+
+    /** @test */
     public function it_skips_the_cache_if_cache_tags_are_not_enabled()
     {
         Config::set('statamic.system.cache_tags_enabled', false);
