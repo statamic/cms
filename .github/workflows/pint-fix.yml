@@ -22,7 +22,8 @@ jobs:
 
       - name: Fix PHP code style issues
         uses: aglipanci/laravel-pint-action@v2
-        pintVersion: 1.16.1
+        with:
+          pintVersion: 1.16.1
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
