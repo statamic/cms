@@ -164,7 +164,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                         : $this->get('blueprint');
                 }
 
-                $blueprint = $this->collection()->entryBlueprint($blueprint, $this);
+                $blueprint = clone $this->collection()->entryBlueprint($blueprint, $this);
 
                 if (! $blueprint) {
                     throw new BlueprintNotFoundException($this->value('blueprint'), 'collections/'.$this->collection()->handle());
