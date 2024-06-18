@@ -131,7 +131,8 @@ class FieldTransformer
 
     private static function referenceFieldToVue($field): array
     {
-        $fieldsetField = Arr::get(static::fieldsetFields(), $field['field'], []);
+        // have to use the Laravel Arr helper so that linking to an addon fieldset's field works
+        $fieldsetField = \Illuminate\Support\Arr::get(static::fieldsetFields(), $field['field'], []);
 
         $mergedConfig = array_merge(
             $fieldsetFieldConfig = Arr::get($fieldsetField, 'config', []),
