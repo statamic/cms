@@ -5,6 +5,7 @@ namespace Statamic\Stache\Query;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
+use Statamic\Support\Arr;
 
 abstract class Builder extends BaseBuilder
 {
@@ -21,21 +22,35 @@ abstract class Builder extends BaseBuilder
         return $this->getFilteredAndLimitedKeys()->count();
     }
 
-    public function get($columns = ['*'])
+    private function resolveKeys()
     {
         $keys = $this->getFilteredKeys();
 
         $keys = $this->orderKeys($keys);
 
-        $keys = $this->limitKeys($keys);
+        return $this->limitKeys($keys);
+    }
 
-        $items = $this->getItems($keys);
+    public function pluck($column, $key = null)
+    {
+        return $this->onceWithColumns(array_filter([$column, $key]), function () use ($column, $key) {
+            return $this->withFakeQueryLogging(function () use ($column, $key) {
+                return $this->store->getItemValues($this->resolveKeys(), $column, $key);
+            });
+        });
+    }
 
-        $items->each(fn ($item) => $item
-            ->selectedQueryColumns($this->columns ?? $columns)
-            ->selectedQueryRelations($this->with));
+    public function get($columns = ['*'])
+    {
+        return $this->onceWithColumns(Arr::wrap($columns), fn () => $this->withFakeQueryLogging(function () {
+            $items = $this->getItems($this->resolveKeys());
 
-        return $this->collect($items)->values();
+            $items->each(fn ($item) => $item
+                ->selectedQueryColumns($this->columns)
+                ->selectedQueryRelations($this->with));
+
+            return $this->collect($items)->values();
+        }));
     }
 
     abstract protected function getFilteredKeys();

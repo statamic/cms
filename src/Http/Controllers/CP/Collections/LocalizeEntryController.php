@@ -10,6 +10,8 @@ class LocalizeEntryController extends CpController
 {
     public function __invoke(Request $request, $collection, $entry)
     {
+        $this->authorize('edit', $entry);
+
         $request->validate(['site' => 'required']);
 
         $localized = $entry->makeLocalization($site = $request->site);

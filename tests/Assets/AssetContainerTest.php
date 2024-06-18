@@ -20,6 +20,8 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerCreating;
+use Statamic\Events\AssetContainerDeleted;
+use Statamic\Events\AssetContainerDeleting;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
@@ -226,6 +228,18 @@ class AssetContainerTest extends TestCase
 
         $this->assertEquals($container, $return);
         $this->assertFalse($container->allowDownloading());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_validation_rules()
+    {
+        $container = new AssetContainer;
+        $this->assertEmpty($container->validationRules());
+
+        $return = $container->validationRules(['max:5120']);
+
+        $this->assertEquals($container, $return);
+        $this->assertEquals(['max:5120'], $container->validationRules());
     }
 
     /** @test */
@@ -991,6 +1005,62 @@ class AssetContainerTest extends TestCase
                 $expected = $expected instanceof Arrayable ? $expected->toArray() : $expected;
                 $this->assertEquals($expected, $value);
             });
+    }
+
+    /** @test */
+    public function it_fires_events_when_deleting()
+    {
+        Event::fake();
+
+        Storage::fake('test');
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $container->save();
+
+        $return = $container->delete();
+
+        Event::assertDispatched(AssetContainerDeleted::class);
+        Event::assertDispatched(AssetContainerDeleting::class);
+
+        $this->assertTrue($return);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        Storage::fake('test');
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $container->save();
+
+        $return = $container->deleteQuietly();
+
+        Event::assertNotDispatched(AssetContainerDeleted::class);
+        Event::assertNotDispatched(AssetContainerDeleting::class);
+
+        $this->assertTrue($return);
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Event::fake([AssetContainerDeleted::class]);
+
+        Event::listen(AssetContainerDeleting::class, function () {
+            return false;
+        });
+
+        Storage::fake('test');
+
+        $container = Facades\AssetContainer::make('test');
+        $container->save();
+
+        $return = $container->delete();
+
+        $this->assertFalse($return);
+        Event::assertNotDispatched(AssetContainerDeleted::class);
     }
 
     private function containerWithDisk($fixture = 'container')

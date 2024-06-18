@@ -11,13 +11,13 @@
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
     >
-        <svg-icon v-if="tab.icon" :name="iconName(tab.icon)" :directory="iconBaseDirectory" class="w-4 h-4 mr-1" />
+        <svg-icon v-if="tab.icon" :name="iconName(tab.icon)" :directory="iconBaseDirectory" class="w-4 h-4 rtl:ml-1 ltr:mr-1" />
 
         {{ __(tab.display) }}
 
-        <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="text-left">
+        <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="rtl:text-right ltr:text-left">
             <template #trigger>
-                <button class="ml-2 hover:text-gray-900 active:text-gray-900" :aria-label="__('Open Dropdown')">
+                <button class="rtl:mr-2 ltr:ml-2 hover:text-gray-900 dark:hover:text-gray-400 active:text-gray-900" :aria-label="__('Open Dropdown')">
                     <svg-icon name="micro/chevron-down-xs" class="w-2" />
                 </button>
             </template>
@@ -134,6 +134,10 @@ export default {
         },
 
         editConfirmed() {
+            if (! this.handle) {
+                this.handle = snake_case(this.display)
+            }
+
             this.$emit('updated', {
                 ...this.tab,
                 handle: this.handle,
@@ -141,6 +145,7 @@ export default {
                 instructions: this.instructions,
                 icon: this.icon,
             });
+
             this.editing = false;
         },
 
@@ -152,7 +157,7 @@ export default {
 
         fieldUpdated(handle, value) {
             if (handle === 'display' && this.handleSyncedWithDisplay) {
-                this.handle = this.$slugify(value, '_');
+                this.handle = snake_case(value);
             }
 
             if (handle === 'handle') {

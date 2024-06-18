@@ -5,10 +5,10 @@
     <div class="code-fieldtype-container" :class="[themeClass, {'code-fullscreen': fullScreenMode }]">
         <div class="code-fieldtype-toolbar">
             <div>
-                <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" class="text-xs leading-none" />
+                <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" :is-read-only="isReadOnly" class="text-xs leading-none" />
                 <div v-else v-text="modeLabel" class="text-xs font-mono text-gray-700"></div>
             </div>
-            <button @click="fullScreenMode = !fullScreenMode" class="btn-icon h-8 leading-none flex items-center justify-center text-gray-800" v-tooltip="__('Toggle Fullscreen Mode')">
+            <button @click="fullScreenMode = !fullScreenMode" class="btn-icon h-8 leading-none flex items-center justify-center text-gray-800 dark:text-dark-150" v-tooltip="__('Toggle Fullscreen Mode')">
                 <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="!fullScreenMode" />
                 <svg-icon name="arrows-shrink" class="h-3.5 w-3.5" v-show="fullScreenMode" />
             </button>
@@ -197,6 +197,10 @@ export default {
             this.refresh();
 
             this.codemirror.setOption('fullScreen', this.fullScreenMode);
+
+            if (this.fullScreenMode === false) {
+                document.documentElement.removeAttribute('style');
+            }
 
             // CodeMirror also needs to be manually refreshed when made visible in the DOM
             this.$events.$on('tab-switched', this.refresh);

@@ -11,12 +11,12 @@
             >
                 <header
                     v-if="fullScreenMode"
-                    class="relative flex items-center justify-between py-3 pl-3 bg-gray-200 border-b"
+                    class="relative flex items-center justify-between py-3 rtl:pr-3 ltr:pl-3 bg-gray-200 border-b"
                 >
                     <h2 v-text="__(config.display)" />
                     <button
                         @click="fullScreenMode = false"
-                        class="absolute btn-close top-2 right-5"
+                        class="absolute btn-close top-2 rtl:left-5 ltr:right-5"
                         :aria-label="__('Exit Fullscreen Mode')"
                     >&times;</button>
                 </header>
@@ -33,11 +33,11 @@
                         >
                             <svg-icon
                                 name="expand-bold"
-                                class="h-3.5 px-0.5 text-gray-750 group-hover:text-black"
+                                class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175 group-hover:text-black dark:group-hover:text-dark-100"
                             />
                         </button>
                     </div>
-                    <div class="mb-4 border rounded shadow-sm replicator-set">
+                    <div class="mb-4 border dark:border-dark-900 rounded shadow-sm replicator-set">
                         <div class="replicator-set-body publish-fields @container">
                             <set-field
                                 v-for="field in fields"
@@ -67,11 +67,11 @@
 
 <style>
     .group-fieldtype-button-wrapper {
-        @apply flex justify-end absolute top-5 sm:top-7 right-0 @md:right-4 @lg:right-6;
+        @apply flex rtl:left-6 ltr:right-6 absolute top-5 sm:top-7;
     }
 
     .replicator-set .group-fieldtype-button-wrapper {
-        @apply top-5 right-4;
+        @apply top-5 rtl:left-4 ltr:right-4;
     }
 </style>
 

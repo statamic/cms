@@ -5,6 +5,7 @@ namespace Statamic\Console;
 class NullConsole
 {
     protected $errors = [];
+    protected $warnings = [];
 
     /**
      * Store error output.
@@ -27,6 +28,29 @@ class NullConsole
     public function getErrors()
     {
         return collect($this->errors);
+    }
+
+    /**
+     * Store warning output.
+     *
+     * @param  string  $warning
+     * @return $this
+     */
+    public function warn($warning)
+    {
+        $this->warnings[] = $warning;
+
+        return $this;
+    }
+
+    /**
+     * Get warning output.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getWarnings()
+    {
+        return collect($this->warnings);
     }
 
     /**

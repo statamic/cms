@@ -11,7 +11,9 @@ use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
 use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -19,10 +21,10 @@ use Statamic\Facades\User;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
 use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Taxonomies\LocalizedTerm;
 
 class Terms extends Relationship
 {
@@ -95,6 +97,11 @@ class Terms extends Relationship
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.terms.config.query_scopes'),
                         'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
                 ],
             ],
@@ -108,11 +115,24 @@ class Terms extends Relationship
 
     public function augment($values)
     {
+        $single = $this->config('max_items') === 1;
+
+        if ($single && Blink::has($key = 'terms-augment-'.json_encode($values))) {
+            return Blink::get($key);
+        }
+
+        $query = $this->queryBuilder($values);
+
+        return $single ? Blink::once($key, fn () => $query->first()) : $query;
+    }
+
+    private function queryBuilder($values)
+    {
         // The parent is the item this terms fieldtype exists on. Most commonly an
         // entry, but could also be something else, like another taxonomy term.
         $parent = $this->field->parent();
 
-        $site = $parent && ($parent instanceof Localization || $parent instanceof LocalizedTerm)
+        $site = $parent && $parent instanceof Localization
             ? $parent->locale()
             : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
 
@@ -134,7 +154,7 @@ class Terms extends Relationship
             $query->where('collection', $parent->collectionHandle());
         }
 
-        return $this->config('max_items') === 1 ? $query->first() : $query;
+        return $query;
     }
 
     private function convertAugmentationValuesToIds($values)
@@ -343,6 +363,7 @@ class Terms extends Relationship
 
         return [
             'id' => $id,
+            'reference' => $term->reference(),
             'title' => $term->value('title'),
             'published' => $term->published(),
             'private' => $term->private(),

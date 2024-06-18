@@ -11,6 +11,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Entries\Entry;
 use Statamic\Events\BlueprintCreated;
 use Statamic\Events\BlueprintCreating;
 use Statamic\Events\BlueprintDeleted;
@@ -412,37 +413,42 @@ class BlueprintTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'title' => 'Test',
             'handle' => 'test',
             'tabs' => [
                 [
                     'display' => 'Tab one',
-                    'handle' => 'tab_one',
                     'instructions' => 'Does stuff',
+                    'handle' => 'tab_one',
                     'sections' => [
                         [
                             'fields' => [
                                 [
-                                    'handle' => 'one',
-                                    'prefix' => null,
-                                    'type' => 'text',
                                     'display' => 'One',
+                                    'hide_display' => false,
+                                    'handle' => 'one',
                                     'instructions' => 'One instructions',
-                                    'required' => true,
+                                    'instructions_position' => 'above',
+                                    'listable' => 'hidden',
+                                    'visibility' => 'visible',
+                                    'replicator_preview' => true,
+                                    'duplicate' => true,
+                                    'type' => 'text',
                                     'validate' => 'required|min:2',
-                                    'component' => 'text',
-                                    'placeholder' => null,
-                                    'character_limit' => 0,
                                     'input_type' => 'text',
+                                    'placeholder' => null,
+                                    'default' => null,
+                                    'character_limit' => 0,
+                                    'autocomplete' => null,
                                     'prepend' => null,
                                     'append' => null,
                                     'antlers' => false,
-                                    'default' => null,
-                                    'visibility' => 'visible',
+                                    'component' => 'text',
+                                    'prefix' => null,
+                                    'required' => true,
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
-                                    'autocomplete' => null,
                                 ],
                             ],
                         ],
@@ -450,25 +456,30 @@ class BlueprintTest extends TestCase
                 ],
                 [
                     'display' => 'Tab two',
-                    'handle' => 'tab_two',
                     'instructions' => null,
+                    'handle' => 'tab_two',
                     'sections' => [
                         [
                             'fields' => [
                                 [
-                                    'handle' => 'two',
-                                    'prefix' => null,
-                                    'type' => 'textarea',
                                     'display' => 'Two',
+                                    'hide_display' => false,
+                                    'handle' => 'two',
                                     'instructions' => 'Two instructions',
-                                    'required' => false,
-                                    'validate' => 'min:2',
-                                    'placeholder' => null,
-                                    'character_limit' => null,
-                                    'component' => 'textarea',
-                                    'antlers' => false,
-                                    'default' => null,
+                                    'instructions_position' => 'above',
+                                    'listable' => 'hidden',
                                     'visibility' => 'visible',
+                                    'replicator_preview' => true,
+                                    'duplicate' => true,
+                                    'type' => 'textarea',
+                                    'placeholder' => null,
+                                    'validate' => 'min:2',
+                                    'character_limit' => null,
+                                    'default' => null,
+                                    'antlers' => false,
+                                    'component' => 'textarea',
+                                    'prefix' => null,
+                                    'required' => false,
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
                                 ],
@@ -527,56 +538,66 @@ class BlueprintTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'title' => 'Test',
             'handle' => 'test',
             'tabs' => [
                 [
                     'display' => 'Tab one',
-                    'handle' => 'tab_one',
                     'instructions' => null,
+                    'handle' => 'tab_one',
                     'sections' => [
                         [
                             'fields' => [
                                 [
-                                    'handle' => 'nested_one',
-                                    'prefix' => 'nested_',
-                                    'type' => 'text',
                                     'display' => 'Nested One',
-                                    'placeholder' => null,
+                                    'hide_display' => false,
+                                    'handle' => 'nested_one',
+                                    'instructions' => null,
+                                    'instructions_position' => 'above',
+                                    'listable' => 'hidden',
+                                    'visibility' => 'visible',
+                                    'replicator_preview' => true,
+                                    'duplicate' => true,
+                                    'type' => 'text',
                                     'input_type' => 'text',
+                                    'placeholder' => null,
+                                    'default' => null,
                                     'character_limit' => 0,
+                                    'autocomplete' => null,
                                     'prepend' => null,
                                     'append' => null,
-                                    'component' => 'text',
-                                    'instructions' => null,
-                                    'required' => false,
                                     'antlers' => false,
-                                    'default' => null,
-                                    'visibility' => 'visible',
+                                    'component' => 'text',
+                                    'prefix' => 'nested_',
+                                    'required' => false,
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
-                                    'autocomplete' => null,
                                 ],
                                 [
-                                    'handle' => 'nested_deeper_two',
-                                    'prefix' => 'nested_deeper_',
-                                    'type' => 'text',
                                     'display' => 'Nested Deeper Two',
-                                    'placeholder' => null,
+                                    'hide_display' => false,
+                                    'handle' => 'nested_deeper_two',
+                                    'instructions' => null,
+                                    'instructions_position' => 'above',
+                                    'listable' => 'hidden',
+                                    'visibility' => 'visible',
+                                    'replicator_preview' => true,
+                                    'duplicate' => true,
+                                    'type' => 'text',
                                     'input_type' => 'text',
+                                    'placeholder' => null,
+                                    'default' => null,
                                     'character_limit' => 0,
+                                    'autocomplete' => null,
                                     'prepend' => null,
                                     'append' => null,
-                                    'component' => 'text',
-                                    'instructions' => null,
-                                    'required' => false,
                                     'antlers' => false,
-                                    'default' => null,
-                                    'visibility' => 'visible',
+                                    'component' => 'text',
+                                    'prefix' => 'nested_deeper_',
+                                    'required' => false,
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
-                                    'autocomplete' => null,
                                 ],
                             ],
                         ],
@@ -784,8 +805,40 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_can_add_fields_multiple_times()
+    {
+        $blueprint = (new Blueprint)
+            ->setNamespace('collections/collection_one')
+            ->setHandle('blueprint_one');
+
+        $entry = (new Entry)
+            ->collection('collection_one')
+            ->blueprint($blueprint);
+
+        $blueprint->setParent($entry);
+
+        $blueprint->ensureFieldsInTab(['field_one' => ['type' => 'text']], 'tab_one');
+
+        $this->assertTrue($blueprint->hasField('field_one'));
+
+        $blueprint->ensureField('field_two', ['type' => 'textarea']);
+
+        $this->assertTrue($blueprint->hasField('field_two'));
+
+    }
+
+    /** @test */
     public function it_ensures_a_field_has_config()
     {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'the_field',
+                    'field' => ['type' => 'text', 'do_not_touch_other_config' => true],
+                ],
+            ]])
+        );
+
         $blueprint = (new Blueprint)->setContents(['tabs' => [
             'tab_one' => [
                 'sections' => [
@@ -808,11 +861,19 @@ class BlueprintTest extends TestCase
                             ['handle' => 'content', 'field' => ['type' => 'text']],
                         ],
                     ],
+                    [
+                        'fields' => [
+                            ['handle' => 'the_field', 'field' => 'the_partial.the_field', 'config' => ['type' => 'text', 'do_not_touch_other_config' => true]],
+                        ],
+                    ],
                 ],
             ],
         ]]);
 
-        $fields = $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only'])->fields();
+        $fields = $blueprint
+            ->ensureFieldHasConfig('author', ['visibility' => 'read_only'])
+            ->ensureFieldHasConfig('the_field', ['visibility' => 'read_only'])
+            ->fields();
 
         $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
         $this->assertEquals(['type' => 'text'], $fields->get('content')->config());
@@ -824,6 +885,7 @@ class BlueprintTest extends TestCase
         ];
 
         $this->assertEquals($expectedConfig, $fields->get('author')->config());
+        $this->assertEquals($expectedConfig, $fields->get('the_field')->config());
     }
 
     // todo: duplicate or tweak above test but make the target field not in the first section.
@@ -1453,5 +1515,20 @@ class BlueprintTest extends TestCase
         $this->assertFalse($return);
         Facades\Blueprint::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(BlueprintDeleted::class);
+    }
+
+    /** @test */
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $blueprint = (new Blueprint)->setHandle('test');
+
+        $return = $blueprint->deleteQuietly();
+
+        Event::assertNotDispatched(BlueprintDeleting::class);
+        Event::assertNotDispatched(BlueprintDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

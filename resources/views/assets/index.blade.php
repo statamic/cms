@@ -16,7 +16,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Assets'),
-        'url' => 'assets'
+        'url' => Statamic::docsUrl('assets')
     ])
 
 @endsection

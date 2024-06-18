@@ -20,12 +20,9 @@ class UpdateTermReferencesTest extends TestCase
         parent::setUp();
 
         // TODO: Test localized terms?
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
         ]);
 
         $this->topics = tap(Facades\Taxonomy::make('topics'))->save();
@@ -107,6 +104,47 @@ class UpdateTermReferencesTest extends TestCase
         $this->termHoff->slug('hoff-new')->save();
 
         $this->assertEquals(['hoff-new', 'norris'], $entry->fresh()->get('favourites'));
+    }
+
+    /** @test */
+    public function it_updates_terms_fields_regardless_of_max_items_setting()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'non_favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => ['hoff'], // assuming it was previously `max_items` > 1
+            'non_favourites' => 'norris', // assuming it was previously `max_files` == 1
+        ]))->save();
+
+        $this->assertEquals(['hoff'], $entry->get('favourite'));
+        $this->assertEquals('norris', $entry->get('non_favourites'));
+
+        $this->termHoff->slug('hoff-new')->save();
+
+        $this->assertEquals(['hoff-new'], $entry->fresh()->get('favourite'));
+        $this->assertEquals('norris', $entry->fresh()->get('non_favourites'));
     }
 
     /** @test */
@@ -233,6 +271,45 @@ class UpdateTermReferencesTest extends TestCase
         $this->termHoff->slug('hoff-new')->save();
 
         $this->assertEquals(['topics::hoff-new', 'topics::norris'], $entry->fresh()->get('favourites'));
+    }
+
+    /** @test */
+    public function it_updates_scoped_term_fields_regardless_of_max_items_setting()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'non_favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => ['topics::hoff'], // assuming it was previously `max_items` > 1
+            'non_favourites' => 'topics::norris', // assuming it was previously `max_files` == 1
+        ]))->save();
+
+        $this->assertEquals(['topics::hoff'], $entry->get('favourite'));
+        $this->assertEquals('topics::norris', $entry->get('non_favourites'));
+
+        $this->termHoff->slug('hoff-new')->save();
+
+        $this->assertEquals(['topics::hoff-new'], $entry->fresh()->get('favourite'));
+        $this->assertEquals('topics::norris', $entry->fresh()->get('non_favourites'));
     }
 
     /** @test */

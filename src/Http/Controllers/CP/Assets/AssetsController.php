@@ -11,7 +11,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
-use Statamic\Validation\AllowedFile;
+use Statamic\Rules\AllowedFile;
 
 class AssetsController extends CpController
 {
@@ -69,14 +69,16 @@ class AssetsController extends CpController
         $request->validate([
             'container' => 'required',
             'folder' => 'required',
-            'file' => ['file', new AllowedFile],
         ]);
 
         $container = AssetContainer::find($request->container);
 
         abort_unless($container->allowUploads(), 403);
-
         $this->authorize('store', [AssetContract::class, $container]);
+
+        $request->validate([
+            'file' => array_merge(['file', new AllowedFile], $container->validationRules()),
+        ]);
 
         $file = $request->file('file');
         $path = ltrim($request->folder.'/'.$file->getClientOriginalName(), '/');
@@ -93,16 +95,5 @@ class AssetsController extends CpController
         // TODO: Auth
 
         return $asset->download();
-    }
-
-    public function destroy($asset)
-    {
-        $asset = Asset::find(base64_decode($asset));
-
-        // TODO: Auth
-
-        $asset->delete();
-
-        return response('', 204);
     }
 }

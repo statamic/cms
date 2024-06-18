@@ -42,6 +42,7 @@ class ViewCollectionListingTest extends TestCase
                     'deleteable' => true,
                     'editable' => true,
                     'blueprint_editable' => true,
+                    'available_in_selected_site' => true,
                 ],
                 [
                     'id' => 'bar',
@@ -56,6 +57,7 @@ class ViewCollectionListingTest extends TestCase
                     'deleteable' => true,
                     'editable' => true,
                     'blueprint_editable' => true,
+                    'available_in_selected_site' => true,
                 ],
             ]))
             ->assertDontSee('no-results');

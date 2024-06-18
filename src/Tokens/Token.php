@@ -2,23 +2,77 @@
 
 namespace Statamic\Tokens;
 
-use Statamic\Data\ExistsAsFile;
+use Closure;
+use Facades\Statamic\Tokens\Generator;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Tokens\Token as Contract;
+use Statamic\Facades\Token as Tokens;
 
-class Token extends AbstractToken
+abstract class Token implements Contract
 {
-    use ExistsAsFile;
+    protected $token;
+    protected $handler;
+    protected $data;
+    protected $expiry;
 
-    public function path()
+    public function __construct(?string $token, string $handler, array $data = [])
     {
-        return storage_path('statamic/tokens/'.$this->token().'.yaml');
+        $this->token = $token ?? Generator::generate();
+        $this->handler = $handler;
+        $this->data = collect($data);
+        $this->expiry = Carbon::now()->addHour();
     }
 
-    public function fileData()
+    public function token(): string
     {
-        return [
-            'handler' => $this->handler,
-            'expires_at' => $this->expiry->timestamp,
-            'data' => $this->data->all(),
-        ];
+        return $this->token;
+    }
+
+    public function handler(): string
+    {
+        return $this->handler;
+    }
+
+    public function data(): Collection
+    {
+        return $this->data;
+    }
+
+    public function get(string $key)
+    {
+        return $this->data->get($key);
+    }
+
+    public function save()
+    {
+        return Tokens::save($this);
+    }
+
+    public function delete()
+    {
+        return Tokens::delete($this);
+    }
+
+    public function handle($request, Closure $next)
+    {
+        return app($this->handler)->handle($this, $request, $next);
+    }
+
+    public function expiry(): Carbon
+    {
+        return $this->expiry;
+    }
+
+    public function expireAt(Carbon $expiry): self
+    {
+        $this->expiry = $expiry;
+
+        return $this;
+    }
+
+    public function hasExpired(): bool
+    {
+        return $this->expiry->isPast();
     }
 }

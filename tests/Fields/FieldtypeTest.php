@@ -500,18 +500,42 @@ class FieldtypeTest extends TestCase
     /** @test */
     public function it_gets_a_config_value()
     {
+        (new class extends Fieldtype
+        {
+            protected static $handle = 'fieldtype_with_array_default';
+            protected $defaultValue = [];
+        })::register();
+
         $field = new Field('test', [
-            'foo' => 'bar',
-            'baz' => 'qux',
+            'foo' => 'bar', // doesn't exist as a config field
+            'alfa' => 'overridden', // doesn't have a default
+            'bravo' => 'also overridden', // does have a default
         ]);
 
-        $fieldtype = (new TestFieldtype)->setField($field);
+        $fieldtype = (new TestFieldtypeWithConfigFields)->setField($field);
 
         $this->assertEquals([
             'foo' => 'bar',
-            'baz' => 'qux',
+            'alfa' => 'overridden',
+            'bravo' => 'also overridden',
+            'charlie' => 'charlie!',
+            // Toggle fields (has default of boolean false)
+            'delta' => false, // No default set
+            'echo' => true, // Default set
+            'foxtrot' => false, // Default set
+            // Test fields (has default of empty array)
+            'golf' => [], // No default set
+            'hotel' => ['hotel!'], // Default set
         ], $fieldtype->config());
         $this->assertEquals('bar', $fieldtype->config('foo'));
+        $this->assertEquals('overridden', $fieldtype->config('alfa'));
+        $this->assertEquals('also overridden', $fieldtype->config('bravo'));
+        $this->assertEquals('charlie!', $fieldtype->config('charlie'));
+        $this->assertEquals(false, $fieldtype->config('delta'));
+        $this->assertEquals(true, $fieldtype->config('echo'));
+        $this->assertEquals(false, $fieldtype->config('foxtrot'));
+        $this->assertEquals([], $fieldtype->config('golf'));
+        $this->assertEquals(['hotel!'], $fieldtype->config('hotel'));
         $this->assertNull($fieldtype->config('unknown'));
         $this->assertEquals('fallback', $fieldtype->config('unknown', 'fallback'));
     }
@@ -549,6 +573,41 @@ class FieldtypeTest extends TestCase
 class TestFieldtype extends Fieldtype
 {
     //
+}
+
+class TestFieldtypeWithConfigFields extends Fieldtype
+{
+    protected $configFields = [
+        'alfa' => [
+            'type' => 'text',
+        ],
+        'bravo' => [
+            'type' => 'text',
+            'default' => 'bravo!',
+        ],
+        'charlie' => [
+            'type' => 'text',
+            'default' => 'charlie!',
+        ],
+        'delta' => [
+            'type' => 'toggle',
+        ],
+        'echo' => [
+            'type' => 'toggle',
+            'default' => true,
+        ],
+        'foxtrot' => [
+            'type' => 'toggle',
+            'default' => false,
+        ],
+        'golf' => [
+            'type' => 'fieldtype_with_array_default',
+        ],
+        'hotel' => [
+            'type' => 'fieldtype_with_array_default',
+            'default' => ['hotel!'],
+        ],
+    ];
 }
 
 class TestMultiWordFieldtype extends Fieldtype

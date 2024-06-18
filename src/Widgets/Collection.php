@@ -2,6 +2,8 @@
 
 namespace Statamic\Widgets;
 
+use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\CP\Column;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -32,6 +34,11 @@ class Collection extends Widget
         $blueprint = $collection->entryBlueprint();
         $columns = $blueprint
             ->columns()
+            ->put('status', Column::make('status')
+                ->listable(true)
+                ->visible(true)
+                ->defaultVisibility(true)
+                ->sortable(false))
             ->only($this->config('fields', []))
             ->map(fn ($column) => $column->sortable(false)->visible(true))
             ->values();
@@ -48,6 +55,7 @@ class Collection extends Widget
             'sortColumn' => $sortColumn,
             'sortDirection' => $sortDirection,
             'columns' => $columns,
+            'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
         ]);
     }
 
