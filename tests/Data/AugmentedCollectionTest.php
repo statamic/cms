@@ -220,6 +220,7 @@ class TestAugmentableObject implements Augmentable
 
     public function __construct(private $data)
     {
+
     }
 
     public function augmentedArrayData()
