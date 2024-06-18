@@ -140,7 +140,7 @@ return [
     */
 
     'background_recache' => env('STATAMIC_BACKGROUND_RECACHE', false),
-  
+
     /*
     |--------------------------------------------------------------------------
     | Shared Error Pages
