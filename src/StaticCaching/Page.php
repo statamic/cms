@@ -11,8 +11,7 @@ class Page implements Responsable
         public string $content,
         public array $headers = [],
         public int $status = 200
-    ) {
-    }
+    ) {}
 
     public function toResponse($request): Response
     {

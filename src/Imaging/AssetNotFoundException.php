@@ -2,6 +2,4 @@
 
 namespace Statamic\Imaging;
 
-class AssetNotFoundException extends \Exception
-{
-}
+class AssetNotFoundException extends \Exception {}

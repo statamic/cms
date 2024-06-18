@@ -2,6 +2,4 @@
 
 namespace Statamic\Contracts\Structures;
 
-interface CollectionTree
-{
-}
+interface CollectionTree {}

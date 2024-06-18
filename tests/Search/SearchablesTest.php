@@ -354,9 +354,7 @@ class TestCustomSearchables extends Provider
         return 'custom';
     }
 
-    public function find(array $keys): Collection
-    {
-    }
+    public function find(array $keys): Collection {}
 
     public static function referencePrefix(): string
     {
