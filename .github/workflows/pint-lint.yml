@@ -18,3 +18,4 @@ jobs:
         with:
           testMode: true
           verboseMode: true
+          useComposer: true
