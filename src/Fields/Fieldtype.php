@@ -34,6 +34,7 @@ abstract class Fieldtype implements Arrayable
     protected $configFields = [];
     protected static $extraConfigFields = [];
     protected $icon;
+    private ?ConfigFields $configFieldsCache = null;
 
     public static function title()
     {
@@ -238,6 +239,10 @@ abstract class Fieldtype implements Arrayable
 
     public function configFields(): Fields
     {
+        if ($this->configFieldsCache) {
+            return $this->configFieldsCache;
+        }
+
         $fields = collect($this->configFieldItems());
 
         if ($this->configFieldsUseSections()) {
@@ -250,7 +255,7 @@ abstract class Fieldtype implements Arrayable
                 return compact('handle', 'field');
             });
 
-        return new ConfigFields($fields);
+        return $this->configFieldsCache = new ConfigFields($fields);
     }
 
     protected function configFieldItems(): array
