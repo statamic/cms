@@ -16,7 +16,9 @@ class DeleteTemporaryAttachments implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public Submission $submission) {}
+    public function __construct(public Submission $submission)
+    {
+    }
 
     public function handle()
     {

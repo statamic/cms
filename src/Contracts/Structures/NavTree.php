@@ -2,4 +2,6 @@
 
 namespace Statamic\Contracts\Structures;
 
-interface NavTree {}
+interface NavTree
+{
+}

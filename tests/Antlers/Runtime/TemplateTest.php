@@ -1240,7 +1240,9 @@ EOT;
                 'line' => 1, 'file' => '',
             ]);
 
-        $object = new class {};
+        $object = new class
+        {
+        };
 
         $this->assertEquals('', $this->renderString('{{ object }}', compact('object')));
     }
@@ -1758,7 +1760,9 @@ EOT;
             $m->shouldNotReceive('get')->with('augmented');
         });
 
-        $fieldtype = new class extends Fieldtype {};
+        $fieldtype = new class extends Fieldtype
+        {
+        };
         $augmented = new Value(['drink' => 'la croix'], 'augmented', $fieldtype);
 
         $context = [
@@ -2220,7 +2224,9 @@ before
 after
 EOT;
         $this->assertEquals($expected, $this->renderString($template, [
-            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator {}),
+            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator
+            {
+            }),
         ]));
     }
 

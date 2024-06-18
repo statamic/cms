@@ -19,7 +19,8 @@ class Provider
     public function __construct(
         protected string $name,
         protected array $config = []
-    ) {}
+    ) {
+    }
 
     public function getSocialiteUser()
     {
