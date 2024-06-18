@@ -5,6 +5,4 @@ namespace Statamic\Search\Comb\Exceptions;
 /**
  * Thrown when no results are found.
  */
-class NoResultsFound extends Exception
-{
-}
+class NoResultsFound extends Exception {}

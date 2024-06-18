@@ -2,6 +2,4 @@
 
 namespace Statamic\Search;
 
-class IndexNotFoundException extends \Exception
-{
-}
+class IndexNotFoundException extends \Exception {}

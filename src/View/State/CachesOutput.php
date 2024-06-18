@@ -2,6 +2,4 @@
 
 namespace Statamic\View\State;
 
-interface CachesOutput
-{
-}
+interface CachesOutput {}

@@ -2,6 +2,4 @@
 
 namespace Statamic\Contracts\Entries;
 
-interface Collection
-{
-}
+interface Collection {}

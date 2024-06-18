@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace Statamic;
 
 use Closure;

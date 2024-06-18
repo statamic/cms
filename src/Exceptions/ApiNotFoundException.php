@@ -2,6 +2,4 @@
 
 namespace Statamic\Exceptions;
 
-class ApiNotFoundException extends \Exception
-{
-}
+class ApiNotFoundException extends \Exception {}
