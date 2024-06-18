@@ -2,4 +2,6 @@
 
 namespace Statamic\Contracts\Structures;
 
-interface Tree {}
+interface Tree
+{
+}

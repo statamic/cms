@@ -395,5 +395,7 @@ class PerformanceTracer implements RuntimeTracerContract
         }
     }
 
-    public function onRenderComplete() {}
+    public function onRenderComplete()
+    {
+    }
 }
