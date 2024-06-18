@@ -1270,7 +1270,7 @@ class EntryTest extends TestCase
 
         Event::assertDispatchedTimes(EntryBlueprintFound::class, 1);
         Event::assertDispatched(EntryBlueprintFound::class, function ($event) use ($blueprint, $entry) {
-            return $event->blueprint === $blueprint
+            return $event->blueprint == $blueprint
                 && $event->entry === $entry;
         });
     }
