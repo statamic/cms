@@ -8,7 +8,7 @@ class ResponseStatusTracker
 {
     private array $responses = [];
 
-    public function set(Response $response, ResponseStatus $status)
+    public function set(Response $response, ResponseStatus $status): void
     {
         $this->responses[spl_object_id($response)] = $status;
     }
@@ -22,12 +22,8 @@ class ResponseStatusTracker
     {
         $tracker = $this;
 
-        Response::macro('setStaticCacheResponseStatus', function ($status) use ($tracker) {
-            $tracker->set($this, $status);
-        });
+        Response::macro('setStaticCacheResponseStatus', fn ($status) => $tracker->set($this, $status));
 
-        Response::macro('wasStaticallyCached', function () use ($tracker) {
-            return $tracker->get($this) === ResponseStatus::HIT;
-        });
+        Response::macro('wasStaticallyCached', fn () => $tracker->get($this) === ResponseStatus::HIT);
     }
 }
