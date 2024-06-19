@@ -93,7 +93,7 @@ class Arr extends Fieldtype
             $values = collect($value);
 
             if ($values->has('null')) {
-                $fail('statamic::validation.arr_fieldtype')->translate();
+                $fail('statamic::validation.options_require_keys')->translate();
             }
         }];
     }
