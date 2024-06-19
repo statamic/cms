@@ -376,7 +376,7 @@ class FieldTransformerTest extends TestCase
             ->setContents(['fields' => [
                 [
                     'handle' => 'field1',
-                    'field' => ['type' => 'text'],
+                    'field' => ['type' => 'text', 'foo' => 'bar'],
                 ],
             ]]);
 
@@ -384,8 +384,11 @@ class FieldTransformerTest extends TestCase
             'addon::some' => $fieldset,
         ]));
 
-        $this->configToVue('addon::some_fieldset.field1');
-
-        $this->assertTrue(true);
+        $this->assertEquals([
+            'type' => 'text',
+            'foo' => 'bar',
+            'width' => 100,
+            'localizable' => false,
+        ], $this->configToVue('addon::some_fieldset.field1'));
     }
 }
