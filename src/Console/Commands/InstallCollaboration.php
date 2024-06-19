@@ -62,7 +62,7 @@ class InstallCollaboration extends Command
 
             return;
         }
-        
+
         if (File::exists(config_path('broadcasting.php'))) {
             $this->components->warn('Broadcasting is already enabled.');
 
