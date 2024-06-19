@@ -7,6 +7,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Revisions\WorkingCopy;
 
 class EntryRevisionsController extends CpController
 {
@@ -18,12 +19,13 @@ class EntryRevisionsController extends CpController
             ->prepend($this->workingCopy($entry))
             ->filter()
             ->each(function ($revision) use ($collection, $entry) {
-                $url = $revision->id() ? cp_route('collections.entries.revisions.show', [
-                    'collection' => $collection,
-                    'entry' => $entry->id(),
-                    'revision' => $revision->id(),
-                ]) : '';
-                $revision->attribute('item_url', $url);
+                if (! $revision instanceof WorkingCopy) {
+                    $revision->attribute('item_url', cp_route('collections.entries.revisions.show', [
+                        'collection' => $collection,
+                        'entry' => $entry->id(),
+                        'revision' => $revision->id(),
+                    ]));
+                }
             });
 
         // The first non manually created revision would be considered the "current"
