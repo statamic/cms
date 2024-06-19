@@ -102,6 +102,10 @@ return [
 
     'ignore_query_strings' => false,
 
+    'allowed_query_parameters' => [
+        'page',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Replacers
