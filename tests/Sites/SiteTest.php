@@ -304,4 +304,30 @@ class SiteTest extends TestCase
 
         $this->assertEquals('rtl', $site->direction());
     }
+
+    /** @test */
+    public function it_gets_attributes()
+    {
+        $this->assertEquals([], (new Site('test', []))->attributes());
+
+        $site = new Site('test', ['attributes' => [
+            'alfa' => 'bravo',
+            'charlie' => [
+                'delta' => 'echo',
+            ],
+        ]]);
+
+        $this->assertEquals([
+            'alfa' => 'bravo',
+            'charlie' => [
+                'delta' => 'echo',
+            ],
+        ], $site->attributes());
+
+        $this->assertEquals('bravo', $site->attribute('alfa'));
+        $this->assertEquals(['delta' => 'echo'], $site->attribute('charlie'));
+        $this->assertEquals('echo', $site->attribute('charlie.delta'));
+        $this->assertNull($site->attribute('unknown'));
+        $this->assertNull($site->attribute('charlie.unknown'));
+    }
 }
