@@ -40,6 +40,63 @@ class EntryRevisionsTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_revisions()
+    {
+        $now = Carbon::parse('2017-02-03');
+        Carbon::setTestNow($now);
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'publish blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->published(true)
+            ->date('2010-12-25')
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Original title',
+                'foo' => 'bar',
+            ])->create();
+
+        tap($entry->makeRevision(), function ($copy) {
+            $copy->message('Revision one');
+            $copy->date(Carbon::parse('2017-02-01'));
+        })->save();
+
+        tap($entry->makeRevision(), function ($copy) {
+            $copy->message('Revision two');
+            $copy->date(Carbon::parse('2017-02-03'));
+        })->save();
+
+        tap($entry->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['data']['title'] = 'Title modified in working copy';
+            $attrs['data']['foo'] = 'baz';
+            $copy->attributes($attrs);
+        })->save();
+
+        $this
+            ->actingAs($user)
+            ->get($entry->revisionsUrl())
+            ->assertOk()
+            ->assertJsonPath('0.revisions.0.action', 'revision')
+            ->assertJsonPath('0.revisions.0.message', 'Revision one')
+            ->assertJsonPath('0.revisions.0.attributes.data.title', 'Original title')
+            ->assertJsonPath('0.revisions.0.attributes.item_url', "http://localhost/cp/collections/blog/entries/1/revisions/".Carbon::parse('2017-02-01')->timestamp)
+
+            ->assertJsonPath('1.revisions.0.action', 'revision')
+            ->assertJsonPath('1.revisions.0.message', false)
+            ->assertJsonPath('1.revisions.0.attributes.data.title', 'Title modified in working copy')
+            ->assertJsonPath('1.revisions.0.attributes.item_url', null)
+
+            ->assertJsonPath('1.revisions.1.action', 'revision')
+            ->assertJsonPath('1.revisions.1.message', 'Revision two')
+            ->assertJsonPath('1.revisions.1.attributes.data.title', 'Original title')
+            ->assertJsonPath('1.revisions.1.attributes.item_url', "http://localhost/cp/collections/blog/entries/1/revisions/".Carbon::parse('2017-02-03')->timestamp);
+    }
+
+    /** @test */
     public function it_publishes_an_entry()
     {
         $now = Carbon::parse('2017-02-03');
