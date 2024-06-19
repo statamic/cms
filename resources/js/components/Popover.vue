@@ -36,7 +36,9 @@ function open() {
     }
 
     isOpen.value = true;
-    // escBinding.value = this.$keys.bindGlobal('esc', e => this.close()); @todo
+
+    // @todo(jelleroorda): Escape closes popover.
+    // escBinding.value = this.$keys.bindGlobal('esc', e => this.close());
 
     popover.value.addEventListener('transitionend', () => {
         $emit('opened');
