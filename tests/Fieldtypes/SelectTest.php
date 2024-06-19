@@ -32,6 +32,7 @@ class SelectTest extends TestCase
                     'one' => 'One',
                     'two' => 'Two',
                     'null' => 'Three',
+                    '' => null,
                 ],
             ]);
 

@@ -32,6 +32,7 @@ class ButtonGroupTest extends TestCase
                     'one' => 'One',
                     'two' => 'Two',
                     'null' => 'Three',
+                    '' => null,
                 ],
             ]);
 
