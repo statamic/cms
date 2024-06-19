@@ -218,7 +218,10 @@ class TestAugmentableObject implements Augmentable
 {
     use HasAugmentedData;
 
-    public function __construct(private $data) {}
+    public function __construct(private $data)
+    {
+
+    }
 
     public function augmentedArrayData()
     {

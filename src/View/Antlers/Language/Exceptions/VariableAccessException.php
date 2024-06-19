@@ -2,4 +2,6 @@
 
 namespace Statamic\View\Antlers\Language\Exceptions;
 
-class VariableAccessException extends RuntimeException {}
+class VariableAccessException extends RuntimeException
+{
+}
