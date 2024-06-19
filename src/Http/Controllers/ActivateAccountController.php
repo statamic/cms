@@ -27,6 +27,10 @@ class ActivateAccountController extends ResetPasswordController
     {
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
 
+        if (is_array($broker)) {
+            $broker = $broker['activations'];
+        }
+
         return Password::broker($broker);
     }
 }
