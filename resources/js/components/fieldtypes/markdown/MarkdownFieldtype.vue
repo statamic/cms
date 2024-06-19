@@ -137,6 +137,46 @@ import Uploads from '../../assets/Uploads.vue';
 // Keymaps
 import 'codemirror/keymap/sublime'
 
+/**
+ * `ucs2decode` function from the punycode.js library.
+ *
+ * Creates an array containing the decimal code points of each Unicode
+ * character in the string. While JavaScript uses UCS-2 internally, this
+ * function will convert a pair of surrogate halves (each of which UCS-2
+ * exposes as separate characters) into a single code point, matching
+ * UTF-16.
+ *
+ * @see     <http://goo.gl/8M09r>
+ * @see     <http://goo.gl/u4UUC>
+ *
+ * @param   {String}  string   The Unicode input string (UCS-2).
+ *
+ * @return  {Array}   The new array of code points.
+ */
+function ucs2decode(string) {
+    const output = [];
+    let counter = 0;
+    const length = string.length;
+    while (counter < length) {
+        const value = string.charCodeAt(counter++);
+        if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+            // It's a high surrogate, and there is a next character.
+            const extra = string.charCodeAt(counter++);
+            if ((extra & 0xFC00) == 0xDC00) { // Low surrogate.
+                output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+            } else {
+                // It's an unmatched surrogate; only append this code unit, in case the
+                // next code unit is the high surrogate of a surrogate pair.
+                output.push(value);
+                counter--;
+            }
+        } else {
+            output.push(value);
+        }
+    }
+    return output;
+}
+
 export default {
 
     mixins: [Fieldtype],
@@ -674,56 +714,8 @@ export default {
         updateCount(data) {
             let trimmed = data.trim();
 
-            this.count.characters = this.decode(trimmed.replace(/\s/g, '')).length;
+            this.count.characters = ucs2decode(trimmed.replace(/\s/g, '')).length;
             this.count.words = trimmed.split(/\s+/).filter(word => word.length > 0).length;
-        },
-
-        /**
-         * `ucs2decode` function from the punycode.js library.
-         *
-         * Creates an array containing the decimal code points of each Unicode
-         * character in the string. While JavaScript uses UCS-2 internally, this
-         * function will convert a pair of surrogate halves (each of which UCS-2
-         * exposes as separate characters) into a single code point, matching
-         * UTF-16.
-         *
-         * @see     <http://goo.gl/8M09r>
-         * @see     <http://goo.gl/u4UUC>
-         *
-         * @param   {String}  string   The Unicode input string (UCS-2).
-         *
-         * @return  {Array}   The new array of code points.
-         */
-        decode(string) {
-            const output = []
-            let counter = 0
-            const length = string.length
-
-            while (counter < length) {
-                const value = string.charCodeAt(counter++)
-
-                if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
-
-                    // It's a high surrogate, and there is a next character.
-
-                    const extra = string.charCodeAt(counter++)
-
-                    if ((extra & 0xFC00) == 0xDC00) { // Low surrogate.
-                        output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000)
-                    } else {
-
-                        // It's an unmatched surrogate; only append this code unit, in case the
-                        // next code unit is the high surrogate of a surrogate pair.
-
-                        output.push(value)
-                        counter--
-                    }
-                } else {
-                    output.push(value)
-                }
-            }
-
-            return output
         }
     },
 
