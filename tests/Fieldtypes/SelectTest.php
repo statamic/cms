@@ -59,7 +59,7 @@ class SelectTest extends TestCase
 
         $this->assertEquals($values, $fields->validate());
     }
-    
+
     /** @test */
     public function does_not_throw_a_validation_error_when_label_is_missing_from_option()
     {
