@@ -155,6 +155,14 @@ EOT;
         $this->simulateLoggableErrorOutput("Permanently added the ECDSA host key for IP address '127.0.0.1' to the list of known hosts.");
     }
 
+    /** @test */
+    public function it_doesnt_log_processed_references_as_error_output()
+    {
+        Log::shouldReceive('error')->never();
+
+        $this->simulateLoggableErrorOutput('remote: Processed 1 references in total');
+    }
+
     private function showLastCommit($path)
     {
         return Process::create($path)->run('git show');
