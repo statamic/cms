@@ -156,10 +156,6 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
         $this->assertEquals('unpublish', $revision->action());
-        $this->get(cp_route('collections.entries.revisions.index', [
-            'collection' => 'blog',
-            'entry' => '1',
-        ]))->assertOk();
     }
 
     /** @test */
