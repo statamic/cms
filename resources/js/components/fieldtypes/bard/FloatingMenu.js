@@ -59,7 +59,7 @@ export const FloatingMenu = {
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             x: this.x,
             y: this.y,
         });

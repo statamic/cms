@@ -19,7 +19,7 @@ export default {
         }}, [
             h('div', { class: { 'pointer-events-none': this.dragging }}, [
                 fileField,
-                ...this.$scopedSlots.default({ dragging: this.enabled ? this.dragging : false })
+                ...this.$slots.default({ dragging: this.enabled ? this.dragging : false })
             ])
         ]);
     },

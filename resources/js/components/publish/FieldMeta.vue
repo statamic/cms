@@ -24,7 +24,7 @@ export default {
     },
 
     render(h) {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             meta: this.meta,
             value: this.value,
             loading: this.loading,

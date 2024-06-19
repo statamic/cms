@@ -304,7 +304,7 @@ export default {
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             values: this.$store.state.publish[this.name].values,
             container: this._self,
             components: this.components,
