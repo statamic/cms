@@ -1,5 +1,13 @@
 <template>
-    <table :data-size="relativeColumnsSize" ref="table" tabindex="0" class="data-table" :class="{ 'select-none' : shifting }" @keydown.shift="shiftDown" @keyup="clearShift">
+    <table
+        ref="table"
+        :data-size="relativeColumnsSize"
+        tabindex="0"
+        class="data-table"
+        :class="{ 'select-none' : shifting }"
+        @keydown.shift="shiftDown"
+        @keyup="clearShift"
+    >
         <thead v-if="allowBulkActions || visibleColumns.length > 1">
             <tr>
                 <th class="rounded-none" :class="{'checkbox-column': ! reorderable, 'handle-column': reorderable}" v-if="allowBulkActions || reorderable">
@@ -29,58 +37,66 @@
                 <th class="actions-column rounded-none" />
             </tr>
         </thead>
+
         <sortable-list
             :value="rows"
             :vertical="true"
             :mirror="false"
+            :disabled="!reorderable"
             item-class="sortable-row"
             handle-class="table-drag-handle"
             @input="$emit('reordered', $event)"
         >
-        <tbody>
-            <slot name="tbody-start" />
-            <tr v-for="(row, index) in rows" :key="row.id" class="sortable-row outline-none" :class="{'row-selected': sharedState.selections.includes(row.id)}">
-                <td class="table-drag-handle" v-if="reorderable"></td>
-                <th class="checkbox-column" v-if="allowBulkActions && !reorderable">
-                    <input
-                        v-if="!reorderable"
-                        type="checkbox"
-                        :value="row.id"
-                        :checked="isSelected(row.id)"
-                        :disabled="reachedSelectionLimit && !singleSelect && !isSelected(row.id)"
-                        :id="`checkbox-${row.id}`"
-                        @click="checkboxClicked(row, index, $event)"
-                    />
-                </th>
-                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'rtl:text-left ltr:text-right rtl:pl-8 ltr:pr-8': column.numeric}">
-                    <slot
-                        :name="`cell-${column.field}`"
-                        :value="row[column.value || column.field]"
-                        :values="row"
-                        :row="row"
-                        :index="actualIndex(row)"
-                        :display-index="index"
-                        :checkbox-id="`checkbox-${row.id}`"
-                    >
-                        <table-field :handle="column.field" :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" :key="column.field" />
-                    </slot>
-                </td>
-                <td class="type-column" v-if="type">
-                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-1 py-px text-2xs uppercase bg-gray-200 dark:bg-dark-400 text-gray dark:text-dark-150">
-                        <template v-if="type === 'entries'">{{ __(row.collection.title) }}</template>
-                        <template v-if="type === 'terms'">{{ __(row.taxonomy.title) }}</template>
-                    </span>
-                </td>
-                <th class="actions-column">
-                    <slot
-                        name="actions"
-                        :row="row"
-                        :index="actualIndex(row)"
-                        :display-index="index"
-                    ></slot>
-                </th>
-            </tr>
-        </tbody>
+            <tbody>
+                <slot name="tbody-start" />
+
+                <tr
+                    v-for="(row, index) in rows"
+                    :key="row.id"
+                    class="sortable-row outline-none"
+                    :class="{'row-selected': sharedState.selections.includes(row.id)}"
+                >
+                    <td class="table-drag-handle" v-if="reorderable"></td>
+                    <th class="checkbox-column" v-if="allowBulkActions && !reorderable">
+                        <input
+                            v-if="!reorderable"
+                            type="checkbox"
+                            :value="row.id"
+                            :checked="isSelected(row.id)"
+                            :disabled="reachedSelectionLimit && !singleSelect && !isSelected(row.id)"
+                            :id="`checkbox-${row.id}`"
+                            @click="checkboxClicked(row, index, $event)"
+                        />
+                    </th>
+                    <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'rtl:text-left ltr:text-right rtl:pl-8 ltr:pr-8': column.numeric}">
+                        <slot
+                            :name="`cell-${column.field}`"
+                            :value="row[column.value || column.field]"
+                            :values="row"
+                            :row="row"
+                            :index="actualIndex(row)"
+                            :display-index="index"
+                            :checkbox-id="`checkbox-${row.id}`"
+                        >
+                            <table-field :handle="column.field" :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" :key="column.field" />
+                        </slot>
+                    </td>
+                    <td class="type-column" v-if="type">
+                        <span v-if="type === 'entries' || type === 'terms'" class="rounded px-1 py-px text-2xs uppercase bg-gray-200 dark:bg-dark-400 text-gray dark:text-dark-150">
+                            <template v-if="type === 'entries'">{{ __(row.collection.title) }}</template>
+                            <template v-if="type === 'terms'">{{ __(row.taxonomy.title) }}</template>
+                        </span>
+                    </td>
+                    <th class="actions-column">
+                        <slot
+                            name="actions"
+                            :row="row"
+                            :index="actualIndex(row)"
+                            :display-index="index"
+                        ></slot>
+                    </th>
+                </tr>
+            </tbody>
         </sortable-list>
     </table>
 </template>

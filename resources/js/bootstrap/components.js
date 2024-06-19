@@ -2,7 +2,7 @@
 // Core
 // export { default as AssetManager } from '../components/assets/AssetManager.vue';
 // export { default as AssetBrowser } from '../components/assets/Browser/Browser.vue';
-// export { default as UpdatesBadge } from '../components/UpdatesBadge.vue';
+export { default as UpdatesBadge } from '../components/UpdatesBadge.vue';
 
 // Publish
 // export { default as PublishContainer } from '../components/publish/Container.vue';
@@ -25,20 +25,20 @@
 // export { default as UserPublishForm } from '../components/users/PublishForm.vue';
 
 // Data List
-// export { default as DataList } from '../components/data-list/DataList.vue';
-// export { default as DataListTable } from '../components/data-list/Table.vue';
+export { default as DataList } from '../components/data-list/DataList.vue';
+export { default as DataListTable } from '../components/data-list/Table.vue';
 // export { default as DataListSearch } from '../components/data-list/Search.vue';
 // export { default as DataListBulkActions } from '../components/data-list/BulkActions.vue';
 // export { default as DataListInlineActions } from '../components/data-list/InlineActions.vue';
 // export { default as DataListColumnPicker } from '../components/data-list/ColumnPicker.vue';
-// export { default as DataListToggleAll } from '../components/data-list/ToggleAll.vue';
+export { default as DataListToggleAll } from '../components/data-list/ToggleAll.vue';
 // export { default as DataListPagination } from '../components/data-list/Pagination.vue';
 // export { default as DataListFilters } from '../components/data-list/Filters.vue';
 // export { default as DataListFilterPresets } from '../components/data-list/FilterPresets.vue';
 
 // Resource Type Lists
 // export { default as EntryList } from '../components/entries/Listing.vue';
-// export { default as CollectionList } from '../components/collections/Listing.vue';
+export { default as CollectionList } from '../components/collections/Listing.vue';
 // export { default as TaxonomyList } from '../components/taxonomies/Listing.vue';
 // export { default as TermList } from '../components/terms/Listing.vue';
 // export { default as AssetContainerList } from '../components/AssetContainerList.vue';
@@ -73,7 +73,7 @@ export { default as Portal } from '../components/portals/Portal.vue';
 // export { default as ConfirmationModal } from '../components/modals/ConfirmationModal.vue';
 export { default as FavoriteCreator } from '../components/FavoriteCreator.vue';
 // export { default as KeyboardShortcutsModal } from '../components/modals/KeyboardShortcutsModal.vue';
-// export { default as ResourceDeleter } from '../components/ResourceDeleter.vue';
+export { default as ResourceDeleter } from '../components/ResourceDeleter.vue';
 
 // export { default as Stack } from '../components/stacks/Stack.vue';
 // export { default as StackTest } from '../components/stacks/StackTest.vue';

@@ -104,18 +104,16 @@ export default {
         }
     },
 
-    render() {
-        return this.$slots.default({
-            items: this.value,
-        })
-    },
-
     mounted() {
         if (this.disabled) {
             return;
         }
 
         this.setupSortableList();
+    },
+
+    destroyed() {
+        this.sortable.destroy()
     },
 
     methods: {
@@ -127,10 +125,6 @@ export default {
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
                 this.$emit('input', move(this.value, oldIndex, newIndex))
-            })
-
-            this.$on('hook:destroyed', () => {
-                this.sortable.destroy()
             })
 
             if (this.mirror === false) {
@@ -151,3 +145,7 @@ export default {
 
 }
 </script>
+
+<template>
+    <slot :items="value"></slot>
+</template>
