@@ -27,7 +27,7 @@ class ResponseStatusTracker
         });
 
         Response::macro('wasStaticallyCached', function () use ($tracker) {
-            return $tracker->get($this) === ResponseStatus::Hit;
+            return $tracker->get($this) === ResponseStatus::HIT;
         });
     }
 }

@@ -100,7 +100,7 @@ class Cache
 
             $this->makeReplacements($response);
 
-            $response->setStaticCacheResponseStatus(ResponseStatus::Hit);
+            $response->setStaticCacheResponseStatus(ResponseStatus::HIT);
 
             return $response;
         }

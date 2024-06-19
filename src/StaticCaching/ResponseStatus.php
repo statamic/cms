@@ -2,8 +2,8 @@
 
 namespace Statamic\StaticCaching;
 
-enum ResponseStatus: string
+enum ResponseStatus
 {
-    case Hit = 'hit';
-    case Miss = 'miss';
+    case HIT;
+    case MISS;
 }
