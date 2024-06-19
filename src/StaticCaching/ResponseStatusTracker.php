@@ -13,9 +13,9 @@ class ResponseStatusTracker
         $this->responses[spl_object_id($response)] = $status;
     }
 
-    public function get(Response $response): ?ResponseStatus
+    public function get(Response $response): ResponseStatus
     {
-        return $this->responses[spl_object_id($response)] ?? null;
+        return $this->responses[spl_object_id($response)] ?? ResponseStatus::UNDEFINED;
     }
 
     public function registerMacros(): void
@@ -24,6 +24,8 @@ class ResponseStatusTracker
 
         Response::macro('setStaticCacheResponseStatus', fn ($status) => $tracker->set($this, $status));
 
-        Response::macro('wasStaticallyCached', fn () => $tracker->get($this) === ResponseStatus::HIT);
+        Response::macro('staticCacheResponseStatus', fn () => $tracker->get($this));
+
+        Response::macro('wasStaticallyCached', fn () => $this->staticCacheResponseStatus() === ResponseStatus::HIT);
     }
 }
