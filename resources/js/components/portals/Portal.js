@@ -1,15 +1,16 @@
 import uniqid from 'uniqid'
+import { useStore } from 'vuex';
 
 export default class Portal {
 
-    constructor(portals, name, data = {}) {
-        this.portals = portals;
+    constructor(name, data = {}) {
         this.id = `${name}-${uniqid()}`;
         this.data = data;
     }
 
     destroy() {
-        this.portals.destroy(this.id);
-    }
+        const store = useStore()
 
+        store.dispatch('portals/destroy', this.id)
+    }
 }

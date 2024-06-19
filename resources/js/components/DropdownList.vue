@@ -41,12 +41,6 @@ export default {
             default: false
         }
     },
-    provide() {
-        // use function syntax so that we can access `this`
-        return {
-            popover: null,
-        }
-    },
     computed: {
         strategy() {
             return this.scroll ? 'fixed' : 'absolute';

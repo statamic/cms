@@ -47,6 +47,6 @@
     @include('statamic::partials.scripts')
     @yield('scripts')
 
-    <div id="popover"></div>
+    <div id="portals" class="portal-targets"></div>
 </body>
 </html>

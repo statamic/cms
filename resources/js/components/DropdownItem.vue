@@ -8,23 +8,17 @@
 
 <script>
 export default {
-
+    inject: ['popover'],
     props: ['text', 'redirect', 'externalLink'],
-
     computed: {
-
         href() {
             return this.redirect || this.externalLink;
         },
-
         target() {
             return this.externalLink ? '_blank' : null;
         },
-
     },
-
     methods: {
-
         selectAndClose($event) {
             if (this.href) {
                 return;
@@ -32,10 +26,8 @@ export default {
 
             this.$emit('click', $event);
 
-            this.popover.vm.close();
+            this.popover.close()
         },
-
     }
-
 }
 </script>

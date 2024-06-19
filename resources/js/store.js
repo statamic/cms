@@ -1,49 +1,12 @@
 import { createStore } from 'vuex';
 
+import statamic from './store/statamic.js'
+import portals from './store/portals.ts'
+
 export const store = createStore({
     modules: {
-        statamic: {
-            namespaced: true,
-
-            state: {
-                windowWidth: null,
-                fieldtypes: null,
-                composer: {},
-                config: {},
-                conditions: {},
-            },
-
-            mutations: {
-                windowWidth(state, width) {
-                    state.windowWidth = width;
-                },
-
-                fieldtypes(state, fieldtypes) {
-                    state.fieldtypes = fieldtypes;
-                },
-
-                composer(state, composer) {
-                    state.composer = composer;
-                },
-
-                config(state, config) {
-
-                    state.config = config;
-                },
-
-                configValue(state, payload) {
-                    state.config[payload.key] = payload.value;
-                },
-
-                preferences(state, preferences) {
-                    state.config.user.preferences = preferences;
-                },
-
-                condition(state, payload) {
-                    state.conditions[payload.name] = payload.condition;
-                }
-            },
-        },
+        statamic,
+        portals,
         publish: {
             namespaced: true
         }

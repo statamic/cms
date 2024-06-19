@@ -62,7 +62,7 @@ export { default as DropdownItem } from '../components/DropdownItem.vue';
 // export { default as Breadcrumbs } from '../components/Breadcrumbs.vue';
 // export { default as CreateEntryButton } from '../components/entries/CreateEntryButton.vue';
 export { default as Popover } from '../components/Popover.vue';
-// export { default as Portal } from '../components/portals/Portal.vue';
+export { default as Portal } from '../components/portals/Portal.vue';
 // export { default as CodeBlock } from '../components/CodeBlock.vue';
 
 // Recursive

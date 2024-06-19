@@ -50,10 +50,14 @@ export default {
             visible: false,
             isHovering: false,
             escBinding: null,
-        }
+        };
     },
 
     computed: {
+
+        stacks() {
+            return this.$store.getters['portals/stacks'];
+        },
 
         portal() {
             return this.stack ? this.stack.id : null;
@@ -71,11 +75,11 @@ export default {
             if (this.isTopStack && this.narrow) {
                 return window.innerWidth - 400;
             } else if (this.isTopStack && this.half) {
-                return window.innerWidth/ 2 ;
+                return window.innerWidth / 2;
             }
 
             // max of 200px, min of 80px
-            return Math.max(400 / (this.$stacks.count() + 1), 80)
+            return Math.max(400 / (this.stacks.length + 1), 80);
         },
 
         leftOffset() {
@@ -91,11 +95,11 @@ export default {
         },
 
         hasChild() {
-            return this.$stacks.count() > this.depth;
+            return this.stacks.length > this.depth;
         },
 
         isTopStack() {
-            return this.$stacks.count() === this.depth;
+            return this.stacks.length === this.depth;
         },
 
         direction() {
@@ -104,8 +108,12 @@ export default {
 
     },
 
-    created() {
-        this.stack = this.$stacks.add(this);
+    async created() {
+        this.stack = await this.$store.dispatch('portals/createStack', {
+            data: {
+                runCloseCallback: this.runCloseCallback
+            }
+        });
 
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => this.isHovering = true);
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => this.isHovering = false);
@@ -113,7 +121,9 @@ export default {
     },
 
     destroyed() {
+        // @todo(jelleroorda): check whether this still works.
         this.stack.destroy();
+
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseenter`);
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);
         this.escBinding.destroy();
@@ -146,7 +156,7 @@ export default {
         runCloseCallback() {
             const shouldClose = this.beforeClose();
 
-            if (! shouldClose) return false;
+            if (!shouldClose) return false;
 
             this.close();
 
@@ -155,7 +165,10 @@ export default {
 
         close() {
             this.visible = false;
-            this.$wait(300).then(() => { this.$emit('closed') });
+
+            this.$wait(300).then(() => {
+                this.$emit('closed');
+            });
         },
     },
 
@@ -163,7 +176,5 @@ export default {
         this.visible = true;
     },
 
-
-
-}
+};
 </script>

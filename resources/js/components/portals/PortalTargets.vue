@@ -16,11 +16,15 @@ export default {
     computed: {
 
         portals() {
-            return this.$portals.all();
+            return this.$store.state.portals.portals;
+        },
+
+        stacks() {
+            return this.$store.getters['portals/stacks'];
         },
 
         hasStacks() {
-            return this.$stacks.count() > 0;
+            return this.stacks.length > 0;
         }
 
     },
@@ -37,8 +41,8 @@ export default {
 
         initStacks() {
             this.$events.$on('stacks.hit-area-clicked', (depth) => {
-                for (let count = this.$stacks.count(); count > depth; count--) {
-                    if (! this.$stacks.stacks()[count-1].data.vm.runCloseCallback()) {
+                for (let count = this.stacks.count(); count > depth; count--) {
+                    if (! this.stacks[count-1].data.vm.runCloseCallback()) {
                         return;
                     }
                 }

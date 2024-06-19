@@ -1,7 +1,6 @@
 <script>
 import Toast from '../mixins/Toast.js';
 import { useToast } from 'vue-toastification';
-import toast from '../mixins/Toast.js';
 
 export default {
     mixins: [Toast],
@@ -17,7 +16,6 @@ export default {
             navOpen: true,
             mobileNavOpen: false,
             showBanner: true,
-            portals: [],
             appendedComponents: [],
         };
     },
@@ -25,15 +23,12 @@ export default {
         version() {
             return Statamic.$config.get('version');
         },
-        stackCount() {
-            return this.$stacks.count();
-        },
         wrapperClass() {
             return this.$config.get('wrapperClass', 'max-w-xl');
         }
     },
     mounted() {
-        this.$toast = toast;
+        // this.$toast = toast;
 
         this.bindWindowResizeListener();
 

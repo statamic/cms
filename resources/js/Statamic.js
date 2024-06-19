@@ -28,12 +28,9 @@ import Components from './components/Components';
 import FieldConditions from './components/FieldConditions';
 import Callbacks from './components/Callbacks.js';
 import Slugs from './components/slugs/Manager.js';
-import Stacks from './components/stacks/Stacks.js';
-import Portals from './components/portals/Portals.js';
 
 import Elastic from './directives/elastic.js';
 import PortalVue from 'portal-vue';
-// import Toast from './mixins/Toast.js';
 
 const echo = new Echo;
 const bard = new Bard;
@@ -128,7 +125,9 @@ export default {
         this.$app.config.devtools = true;
 
         this.$app.use(store);
-        this.$app.use(PortalVue);
+        this.$app.use(PortalVue, {
+            portalName: 'v-portal',
+        });
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue);
         this.$app.use(Toast, {
@@ -162,8 +161,6 @@ export default {
         this.$app.config.globalProperties.$slug = this.$slug;
         this.$app.config.globalProperties.$preferences = new Preferences(http, store);
         this.$app.config.globalProperties.$config = this.$config;
-        this.$app.config.globalProperties.$stacks = new Stacks(this.$app);
-        this.$app.config.globalProperties.$portals = new Portals(this.$app);
 
         // Assign any global helper methods, available in all Vue components.
         Object.assign(this.$app.config.globalProperties, {

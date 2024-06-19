@@ -1,16 +1,16 @@
 <template>
-
-    <v-portal
+    <teleport
+        v-if="portal"
+        to="#portals"
         :name="name"
-        :to="portal.id"
-        :target-class="targetClass"
         :disabled="disabled"
     >
-        <provider :variables="provide">
-           <slot />
-        </provider>
-    </v-portal>
-
+        <div :class="['vue-portal-target', targetClass]">
+            <provider :variables="provide">
+                <slot />
+            </provider>
+        </div>
+    </teleport>
 </template>
 
 <script>
@@ -18,7 +18,7 @@ import Provider from './Provider.vue';
 
 export default {
     components: {
-        Provider
+        Provider,
     },
 
     props: {
@@ -27,7 +27,8 @@ export default {
             required: true
         },
         provide: {
-            type: Object
+            type: Object,
+            default: () => {},
         },
         targetClass: {
             type: String
@@ -41,16 +42,16 @@ export default {
     data() {
         return {
             portal: null,
-        }
+        };
     },
 
-    created() {
-        this.portal = this.$portals.create(this.name);
+    async created() {
+        this.portal = await this.$store.dispatch('portals/create', { name: this.name });
     },
 
     beforeDestroy() {
         this.portal.destroy();
     }
 
-}
+};
 </script>
