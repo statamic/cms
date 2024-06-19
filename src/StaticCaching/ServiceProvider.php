@@ -62,6 +62,8 @@ class ServiceProvider extends LaravelServiceProvider
                 $urls
             );
         });
+
+        $this->app->singleton(ResponseStatusTracker::class, fn () => new ResponseStatusTracker);
     }
 
     public function boot()
@@ -87,5 +89,7 @@ class ServiceProvider extends LaravelServiceProvider
 
             return $this;
         });
+
+        $this->app[ResponseStatusTracker::class]->registerMacros();
     }
 }
