@@ -23,7 +23,7 @@ export default {
 
     },
 
-    render(h) {
+    render() {
         return this.$slots.default({
             meta: this.meta,
             value: this.value,
