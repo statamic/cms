@@ -83,7 +83,7 @@ class EntryRevisionsTest extends TestCase
             ->assertJsonPath('0.revisions.0.action', 'revision')
             ->assertJsonPath('0.revisions.0.message', 'Revision one')
             ->assertJsonPath('0.revisions.0.attributes.data.title', 'Original title')
-            ->assertJsonPath('0.revisions.0.attributes.item_url', "http://localhost/cp/collections/blog/entries/1/revisions/".Carbon::parse('2017-02-01')->timestamp)
+            ->assertJsonPath('0.revisions.0.attributes.item_url', 'http://localhost/cp/collections/blog/entries/1/revisions/'.Carbon::parse('2017-02-01')->timestamp)
 
             ->assertJsonPath('1.revisions.0.action', 'revision')
             ->assertJsonPath('1.revisions.0.message', false)
@@ -93,7 +93,7 @@ class EntryRevisionsTest extends TestCase
             ->assertJsonPath('1.revisions.1.action', 'revision')
             ->assertJsonPath('1.revisions.1.message', 'Revision two')
             ->assertJsonPath('1.revisions.1.attributes.data.title', 'Original title')
-            ->assertJsonPath('1.revisions.1.attributes.item_url', "http://localhost/cp/collections/blog/entries/1/revisions/".Carbon::parse('2017-02-03')->timestamp);
+            ->assertJsonPath('1.revisions.1.attributes.item_url', 'http://localhost/cp/collections/blog/entries/1/revisions/'.Carbon::parse('2017-02-03')->timestamp);
     }
 
     /** @test */
