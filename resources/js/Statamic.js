@@ -32,6 +32,7 @@ import Slugs from './components/slugs/Manager.js';
 import Elastic from './directives/elastic.js';
 import PortalVue from 'portal-vue';
 import useProgressBar from './composables/useProgressBar';
+import useDirtyState from './composables/useDirtyState';
 
 const echo = new Echo;
 const bard = new Bard;
@@ -163,6 +164,7 @@ export default {
         this.$app.config.globalProperties.$preferences = new Preferences(http, store);
         this.$app.config.globalProperties.$config = this.$config;
         this.$app.config.globalProperties.$progress = useProgressBar();
+        this.$app.config.globalProperties.$dirty = useDirtyState();
 
         // Assign any global helper methods, available in all Vue components.
         Object.assign(this.$app.config.globalProperties, {
