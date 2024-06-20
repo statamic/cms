@@ -182,6 +182,7 @@ export default {
             } else {
                 if (value) {
                     this.update(value.value)
+                    this.selectedOptionData.push(value)
                 } else {
                     this.update(null);
                 }
