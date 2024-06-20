@@ -86,6 +86,7 @@ class ServiceProvider extends LaravelServiceProvider
             $url = '/__shared-errors/'.$status;
             $this->pathInfo = $url;
             $this->requestUri = $url;
+            app(Session::class)->setUrl($url);
 
             return $this;
         });
