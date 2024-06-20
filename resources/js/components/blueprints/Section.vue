@@ -49,6 +49,10 @@
                             <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="editingSection.icon = $event" />
                         </publish-field-meta>
                     </div>
+                    <div class="form-group w-full" v-if="showHiddenField">
+                        <label v-text="__('Hidden')" />
+                        <toggle-input :value="editingSection.hidden === true" @input="editingSection.hidden = $event ? true : null" />
+                    </div>
                 </div>
             </confirmation-modal>
 
@@ -105,6 +109,10 @@ export default {
             required: true
         },
         showHandleField: {
+            type: Boolean,
+            default: false
+        },
+        showHiddenField: {
             type: Boolean,
             default: false
         },
@@ -191,6 +199,7 @@ export default {
                 handle: this.section.handle,
                 instructions: this.section.instructions,
                 icon: this.section.icon,
+                hidden: this.section.hidden,
             };
         },
 

@@ -241,6 +241,8 @@ export default {
         commit() {
             this.clearErrors();
 
+            console.log(this.values, this.fields);
+
             this.$axios.post(cp_url('fields/update'), {
                 id: this.id,
                 type: this.type,

@@ -16,6 +16,7 @@
                 :can-define-localizable="canDefineLocalizable"
                 :tab-id="tabId"
                 :show-handle-field="showSectionHandleField"
+                :show-hidden-field="showSectionHiddenField"
                 :edit-text="editSectionText"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
@@ -85,6 +86,10 @@ export default {
         showSectionHandleField: {
             type: Boolean,
             default: false
+        },
+        showSectionHiddenField: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -110,6 +115,7 @@ export default {
                 display: this.newSectionText,
                 instructions: null,
                 icon: null,
+                hidden: null,
                 handle: snake_case(this.newSectionText),
                 fields: []
             };
