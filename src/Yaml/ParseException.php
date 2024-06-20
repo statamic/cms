@@ -3,9 +3,9 @@
 namespace Statamic\Yaml;
 
 use ErrorException;
-use Spatie\Ignition\Contracts\BaseSolution;
-use Spatie\Ignition\Contracts\ProvidesSolution;
-use Spatie\Ignition\Contracts\Solution;
+use Spatie\ErrorSolutions\Contracts\BaseSolution;
+use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
+use Spatie\ErrorSolutions\Contracts\Solution;
 use Statamic\Statamic;
 
 class ParseException extends ErrorException implements ProvidesSolution

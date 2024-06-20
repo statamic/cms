@@ -6,7 +6,7 @@ use Facade\Ignition\Exceptions\ViewException;
 use Facade\Ignition\Exceptions\ViewExceptionWithSolution;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use ReflectionProperty;
-use Spatie\Ignition\Contracts\ProvidesSolution;
+use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\Value;
 use Statamic\Modifiers\ModifierNotFoundException;
