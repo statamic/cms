@@ -82,12 +82,11 @@ class ServiceProvider extends LaravelServiceProvider
             return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>';
         });
 
-        $session = $this->app[Session::class];
-        Request::macro('fakeStaticCacheStatus', function (int $status) use ($session) {
+        Request::macro('fakeStaticCacheStatus', function (int $status) {
             $url = '/__shared-errors/'.$status;
             $this->pathInfo = $url;
             $this->requestUri = $url;
-            $session->setUrl($url);
+            app(Session::class)->setUrl($url);
 
             return $this;
         });
