@@ -2,7 +2,6 @@
 
 namespace Statamic\Dictionaries;
 
-use Illuminate\Support\Collection;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
@@ -13,7 +12,7 @@ abstract class Dictionary
 
     protected static $binding = 'dictionaries';
 
-    abstract public function all(): array;
+    abstract public function options(string $search = null): array;
 
     abstract public function get(string $option);
 

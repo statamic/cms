@@ -9,21 +9,23 @@ class Countries extends Dictionary
 {
     /**
      * Returns all options.
-     *
-     * @return array
      */
-    public function all(): array
+    public function options(?string $search = null): array
     {
-        return $this->getCountries()->mapWithKeys(function ($country) {
-            return [$country['iso3'] => "{$country['emoji']} {$country['name']}"];
-        })->all();
+        return $this->getCountries()
+            ->when($search ?? false, function ($collection) use ($search) {
+                return $collection->filter(function (array $country) use ($search) {
+                    return str_contains(strtolower($country['name']), strtolower($search));
+                });
+            })
+            ->mapWithKeys(function (array $country) {
+                return [$country['iso3'] => "{$country['emoji']} {$country['name']}"];
+            })
+            ->all();
     }
 
     /**
      * Returns data for a single option, given the option's key.
-     *
-     * @param string $option
-     * @return array
      */
     public function get(string $option): array
     {

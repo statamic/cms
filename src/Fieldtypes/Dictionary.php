@@ -79,10 +79,13 @@ class Dictionary extends Fieldtype
 
     public function preload(): array
     {
-        $dictionary = \Statamic\Facades\Dictionary::find($this->config('dictionary'));
-
         return [
-            'options' => $dictionary->all(),
+            'url' => cp_route('dictionary-fieldtype', $this->dictionary()->handle()),
+            'selectedOptions' => collect($this->dictionary()->options())
+                ->only($this->field->value())
+                ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+                ->values()
+                ->all(),
         ];
     }
 
@@ -106,6 +109,11 @@ class Dictionary extends Fieldtype
     protected function multiple(): bool
     {
         return $this->config('multiple');
+    }
+
+    private function dictionary(): \Statamic\Dictionaries\Dictionary
+    {
+        return \Statamic\Facades\Dictionary::find($this->config('dictionary'));
     }
 
     // TODO: graphql - how can we make it work since the keys will be dynamic?

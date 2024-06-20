@@ -9,18 +9,18 @@
             :name="name"
             :clearable="config.clearable"
             :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
-            :options="options"
+            :options="normalizeInputOptions(options)"
             :placeholder="__(config.placeholder)"
-            :searchable="config.searchable || config.taggable"
+            :searchable="true"
             :taggable="config.taggable"
             :push-tags="config.push_tags"
             :multiple="config.multiple"
             :reset-on-options-change="resetOnOptionsChange"
             :close-on-select="true"
             :value="selectedOptions"
-            :create-option="(value) => ({ value, label: value })"
             @input="vueSelectUpdated"
             @focus="$emit('focus')"
+            @search="search"
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')">
             <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
@@ -85,7 +85,6 @@ import HasInputOptions from './HasInputOptions.js'
 import { SortableList } from '../sortable/Sortable';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 
-
 export default {
 
     mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
@@ -94,19 +93,28 @@ export default {
         SortableList
     },
 
+    data() {
+        return {
+            options: {},
+            selectedOptionData: this.meta.selectedOptions,
+        }
+    },
+
     computed: {
         selectedOptions() {
             let selections = this.value || [];
+
             if (typeof selections === 'string' || typeof selections === 'number') {
                 selections = [selections];
             }
-            return selections.map(value => {
-                return _.findWhere(this.options, {value}) || { value, label: value };
-            });
-        },
 
-        options() {
-            return this.normalizeInputOptions(this.meta.options); // duncan: all that's changed here is this.config.options to this.meta.options
+            return selections.map(value => {
+                let option = this.selectedOptionData.find(option => option.value === value);
+
+                if (! option) return {value, label: value};
+
+                return {value: option.value, label: option.label};
+            });
         },
 
         replicatorPreview() {
@@ -155,7 +163,11 @@ export default {
             }
 
             return 'text-gray';
-        }
+        },
+    },
+
+    mounted() {
+      this.request();
     },
 
     methods: {
@@ -166,6 +178,7 @@ export default {
         vueSelectUpdated(value) {
             if (this.config.multiple) {
                 this.update(value.map(v => v.value));
+                value.forEach((option) => this.selectedOptionData.push(option));
             } else {
                 if (value) {
                     this.update(value.value)
@@ -173,6 +186,21 @@ export default {
                     this.update(null);
                 }
             }
+        },
+
+        request(params = {}) {
+            params = {...params};
+
+            return this.$axios.get(this.meta.url, { params }).then(response => {
+                this.options = response.data.data;
+                return Promise.resolve(response);
+            });
+        },
+
+        search(search, loading) {
+            loading(true);
+
+            this.request({ search }).then(response => loading(false));
         },
     }
 };
