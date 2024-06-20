@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Statamic\Facades\AssetContainer;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -365,5 +366,29 @@ class FieldTransformerTest extends TestCase
             'replicator_preview' => false,
             'duplicate' => false,
         ], $fromVue['field']);
+    }
+
+    /** @test */
+    public function it_supports_addon_linked_fields()
+    {
+        $fieldset = tap(new Fieldset)
+            ->setHandle('addon::some_fieldset')
+            ->setContents(['fields' => [
+                [
+                    'handle' => 'field1',
+                    'field' => ['type' => 'text', 'foo' => 'bar'],
+                ],
+            ]]);
+
+        \Statamic\Facades\Fieldset::shouldReceive('all')->andReturn(collect([
+            'addon::some' => $fieldset,
+        ]));
+
+        $this->assertEquals([
+            'type' => 'text',
+            'foo' => 'bar',
+            'width' => 100,
+            'localizable' => false,
+        ], $this->configToVue('addon::some_fieldset.field1'));
     }
 }
