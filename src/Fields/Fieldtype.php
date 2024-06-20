@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
@@ -34,7 +35,6 @@ abstract class Fieldtype implements Arrayable
     protected $configFields = [];
     protected static $extraConfigFields = [];
     protected $icon;
-    private ?ConfigFields $configFieldsCache = null;
 
     public static function title()
     {
@@ -239,8 +239,8 @@ abstract class Fieldtype implements Arrayable
 
     public function configFields(): Fields
     {
-        if ($this->configFieldsCache) {
-            return $this->configFieldsCache;
+        if ($cached = Blink::get($blink = 'config-fields-'.$this->handle())) {
+            return $cached;
         }
 
         $fields = collect($this->configFieldItems());
@@ -255,7 +255,11 @@ abstract class Fieldtype implements Arrayable
                 return compact('handle', 'field');
             });
 
-        return $this->configFieldsCache = new ConfigFields($fields);
+        $fields = new ConfigFields($fields);
+
+        Blink::put($blink, $fields);
+
+        return $fields;
     }
 
     protected function configFieldItems(): array
