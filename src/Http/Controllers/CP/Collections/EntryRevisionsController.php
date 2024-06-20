@@ -7,7 +7,6 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
-use Statamic\Revisions\WorkingCopy;
 
 class EntryRevisionsController extends CpController
 {
@@ -16,17 +15,13 @@ class EntryRevisionsController extends CpController
         $revisions = $entry
             ->revisions()
             ->reverse()
+            ->each(fn ($revision) => $revision->attribute('item_url', cp_route('collections.entries.revisions.show', [
+                'collection' => $collection,
+                'entry' => $entry->id(),
+                'revision' => $revision->id(),
+            ])))
             ->prepend($this->workingCopy($entry))
-            ->filter()
-            ->each(function ($revision) use ($collection, $entry) {
-                if (! $revision instanceof WorkingCopy) {
-                    $revision->attribute('item_url', cp_route('collections.entries.revisions.show', [
-                        'collection' => $collection,
-                        'entry' => $entry->id(),
-                        'revision' => $revision->id(),
-                    ]));
-                }
-            });
+            ->filter();
 
         // The first non manually created revision would be considered the "current"
         // version. It's what corresponds to what's in the content directory.
