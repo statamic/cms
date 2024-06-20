@@ -79,7 +79,6 @@
     "validator": "^13.7.0",
     "vue": "^2.7.14",
     "vue-clickaway": "~2.2.2",
-    "vue-countable": "^1.0.9",
     "vue-draggable-nested-tree": "^2.3.0-beta.1",
     "vue-js-modal": "^2.0.1",
     "vue-select": "^3.10.1",
