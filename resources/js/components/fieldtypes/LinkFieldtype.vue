@@ -60,6 +60,7 @@ export default {
     mixins: [Fieldtype, PositionsSelectOptions],
 
     data() {
+
         return {
             option: this.meta.initialOption,
             options: this.initialOptions(),
@@ -68,7 +69,8 @@ export default {
             selectedEntries: this.meta.initialSelectedEntries,
             selectedAssets: this.meta.initialSelectedAssets,
             metaChanging: false,
-        };
+        }
+
     },
 
     computed: {
@@ -104,14 +106,14 @@ export default {
             } else if (option === 'phone') {
                 this.updateDebounced(this.phoneValue);
             } else if (option === 'first-child') {
-                this.update("@child");
+                this.update('@child');
             } else if (option === 'entry') {
                 if (this.entryValue) {
                     this.update(this.entryValue);
                 } else {
                     setTimeout(() => this.$refs.entries.linkExistingItem(), 0);
                 }
-            } else if (option === "asset") {
+            } else if (option === 'asset') {
                 if (this.assetValue) {
                     this.update(this.assetValue);
                 } else {
@@ -126,7 +128,7 @@ export default {
             if (this.metaChanging) return;
 
             this.update(url);
-            this.updateMeta({ ...this.meta, initialUrl: url });
+            this.updateMeta({...this.meta, initialUrl: url});
         },
 
         email() {
