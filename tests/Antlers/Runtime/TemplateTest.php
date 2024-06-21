@@ -2345,7 +2345,6 @@ EOT;
     /**
      * @see https://github.com/statamic/cms/issues/3374
      **/
-    #[Test]
     public function it_parses_single_and_tag_pairs_with_modifiers()
     {
         $data = ['items' => ['one', 'two', 'three']];
@@ -2482,6 +2481,7 @@ EOT;
         $this->assertEquals($expected, $actual);
     }
 
+    #[Test]
     public function test_rendering_a_non_array_variable_reports_current_file()
     {
         $this->markTestSkipped(); // todo
@@ -2511,11 +2511,13 @@ PARTIAL;
         $this->get('/home')->assertOk();
     }
 
+    #[Test]
     public function test_it_passes_data_to_php_when_enabled()
     {
         $this->assertEquals('hello', (string) $this->parser()->allowPhp(true)->parse('{{ associative }}<?php echo $one; ?>{{ /associative }}', $this->variables));
     }
 
+    #[Test]
     public function test_it_returns_escaped_content()
     {
         $input = 'Hey, look at that @{{ noun }}!';

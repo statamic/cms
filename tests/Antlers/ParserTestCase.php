@@ -2,7 +2,6 @@
 
 namespace Tests\Antlers;
 
-use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
