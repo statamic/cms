@@ -1,5 +1,6 @@
 <template>
     <div class="flex items-center">
+
         <!-- Link type selector -->
         <div class="w-28 rtl:ml-4 ltr:mr-4">
             <v-select
@@ -9,14 +10,16 @@
                 :options="options"
                 :clearable="false"
                 :reduce="(option) => option.value"
+
             >
                 <template #option="{ label }">
-                    {{ __(label) }}
+                  {{ __(label) }}
                 </template>
             </v-select>
         </div>
 
         <div class="flex-1">
+
             <!-- URL text input -->
             <text-input v-if="option === 'url'" v-model="urlValue" />
             <text-input v-if="option === 'mail'" v-model="email" />
@@ -44,14 +47,16 @@
                 @input="assetsSelected"
                 @meta-updated="meta.asset.meta = $event"
             />
+
         </div>
     </div>
 </template>
 
 <script>
-import PositionsSelectOptions from "../../mixins/PositionsSelectOptions";
+import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 
 export default {
+
     mixins: [Fieldtype, PositionsSelectOptions],
 
     data() {
@@ -74,31 +79,33 @@ export default {
         entryValue() {
             return this.selectedEntries.length
                 ? `entry::${this.selectedEntries[0]}`
-                : null;
+                : null
         },
 
         assetValue() {
             return this.selectedAssets.length
                 ? `asset::${this.selectedAssets[0]}`
-                : null;
-        },
+                : null
+        }
+
     },
 
     watch: {
+
         option(option, oldOption) {
             if (this.metaChanging) return;
 
             if (option === null) {
                 this.update(null);
-            } else if (option === "url") {
+            } else if (option === 'url') {
                 this.updateDebounced(this.urlValue);
-            } else if (option === "mail") {
+            } else if (option === 'mail') {
                 this.updateDebounced(this.mailValue);
-            } else if (option === "phone") {
+            } else if (option === 'phone') {
                 this.updateDebounced(this.phoneValue);
-            } else if (option === "first-child") {
+            } else if (option === 'first-child') {
                 this.update("@child");
-            } else if (option === "entry") {
+            } else if (option === 'entry') {
                 if (this.entryValue) {
                     this.update(this.entryValue);
                 } else {
@@ -112,7 +119,7 @@ export default {
                 }
             }
 
-            this.updateMeta({ ...this.meta, initialOption: option });
+            this.updateMeta({...this.meta, initialOption: option});
         },
 
         urlValue(url) {
@@ -138,44 +145,50 @@ export default {
             this.option = meta.initialOption;
             this.selectedEntries = meta.initialSelectedEntries;
             this.selectedAssets = meta.initialSelectedAssets;
-            this.$nextTick(() => (this.metaChanging = false));
-        },
+            this.$nextTick(() => this.metaChanging = false);
+        }
+
     },
 
     methods: {
+
         initialOptions() {
             return [
+
                 this.config.required
                     ? null
-                    : { label: __("None"), value: null },
+                    : { label: __('None'), value: null },
 
-                { label: __("URL"), value: "url" },
-                { label: __("Mail"), value: "mail" },
-                { label: __("Phone"), value: "phone" },
+                { label: __('URL'), value: 'url' },
+                { label: __('Mail'), value: 'mail' },
+                { label: __('Phone'), value: 'phone' },
 
                 this.meta.showFirstChildOption
-                    ? { label: __("First Child"), value: "first-child" }
+                    ? { label: __('First Child'), value: 'first-child' }
                     : null,
 
-                { label: __("Entry"), value: "entry" },
+                { label: __('Entry'), value: 'entry' },
 
                 this.meta.showAssetOption
-                    ? { label: __("Asset"), value: "asset" }
+                    ? { label: __('Asset'), value: 'asset' }
                     : null,
-            ].filter((option) => option);
+
+            ].filter(option => option);
         },
 
         entriesSelected(entries) {
             this.selectedEntries = entries;
             this.update(this.entryValue);
-            this.updateMeta({ ...this.meta, initialSelectedEntries: entries });
+            this.updateMeta({...this.meta, initialSelectedEntries: entries});
         },
 
         assetsSelected(assets) {
             this.selectedAssets = assets;
             this.update(this.assetValue);
-            this.updateMeta({ ...this.meta, initialSelectedAssets: assets });
-        },
-    },
-};
+            this.updateMeta({...this.meta, initialSelectedAssets: assets});
+        }
+
+    }
+
+}
 </script>
