@@ -107,6 +107,13 @@ class Dictionary extends Fieldtype
         return $dictionary->get($value);
     }
 
+    public function extraRenderableFieldData(): array
+    {
+        return [
+            'options' => $this->dictionary()->options(),
+        ];
+    }
+
     protected function multiple(): bool
     {
         return $this->config('multiple');
