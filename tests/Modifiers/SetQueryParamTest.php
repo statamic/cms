@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -57,7 +58,7 @@ class SetQueryParamTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_does_nothing_if_no_parameters_are_passed()
     {
         $this->assertSame($this->baseUrl, $this->modify($this->baseUrl));

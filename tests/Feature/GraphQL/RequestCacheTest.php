@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Token;
@@ -27,7 +28,7 @@ class RequestCacheTest extends TestCase
         GraphQL::addMiddleware(TrackRequests::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_a_request()
     {
         $this->withoutExceptionHandling();
@@ -71,7 +72,7 @@ class RequestCacheTest extends TestCase
         ], $requests->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_endpoint_using_configured_expiry()
     {
         config(['statamic.graphql.cache.expiry' => 13]);
@@ -154,7 +155,7 @@ class RequestCacheTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_busts_whole_cache_when_content_is_saved()
     {
         Cache::forever('completely-unrelated-thing', 'test');
@@ -179,7 +180,7 @@ class RequestCacheTest extends TestCase
         $this->assertEquals('test', Cache::get('completely-unrelated-thing'));
     }
 
-    /** @test */
+    #[Test]
     public function it_ignores_configured_events()
     {
         $entry = EntryFactory::collection('test')->create();
@@ -213,7 +214,7 @@ class RequestCacheTest extends TestCase
         ], $requests->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_disable_caching()
     {
         config(['statamic.graphql.cache' => false]);

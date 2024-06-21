@@ -3,6 +3,7 @@
 namespace Tests\Search\Searchables;
 
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Search\Searchables\Assets;

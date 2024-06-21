@@ -4,6 +4,7 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -26,7 +27,7 @@ class FormTest extends TestCase
         Form::all()->each->delete();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'forms')->andReturnFalse()->once();
@@ -39,7 +40,7 @@ class FormTest extends TestCase
             ->assertSee('Cannot query field \"form\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_a_form_by_handle()
     {
         Form::make('contact')->title('Contact Us')->save();
@@ -72,7 +73,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
         $query = <<<'GQL'
@@ -105,7 +106,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_the_fields()
     {
         Form::make('contact')->title('Contact Us')->save();
@@ -180,7 +181,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_the_validation_rules()
     {
         Form::make('contact')->title('Contact Us')->save();

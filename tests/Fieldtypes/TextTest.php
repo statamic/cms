@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Text;
 use Tests\TestCase;

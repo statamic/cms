@@ -2,6 +2,7 @@
 
 namespace Tests\UpdateScripts;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\UpdateScripts\UseClassBasedStatamicUniqueRules;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -21,7 +22,7 @@ class UseClassBasedStatamicUniqueRulesTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_is_registered()
     {
         $this->assertUpdateScriptRegistered(UseClassBasedStatamicUniqueRules::class);

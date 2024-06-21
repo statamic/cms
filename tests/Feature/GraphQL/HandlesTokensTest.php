@@ -3,6 +3,7 @@
 namespace Tests\Feature\GraphQL;
 
 use Closure;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\Token as Tokens;
 use Tests\TestCase;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 /** @group graphql */
 class HandlesTokensTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_handles_tokens()
     {
         $handler = new class

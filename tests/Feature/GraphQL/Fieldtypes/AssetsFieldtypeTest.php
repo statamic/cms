@@ -5,6 +5,7 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Tests\Feature\GraphQL\EnablesQueries;
@@ -25,7 +26,7 @@ class AssetsFieldtypeTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_assets()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -75,7 +76,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_single_asset()
     {
         Storage::fake('test', ['url' => '/assets']);

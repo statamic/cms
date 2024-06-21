@@ -4,6 +4,7 @@ namespace Tests\Markdown;
 
 use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Markdown;
 use Tests\TestCase;
 use UnexpectedValueException;
@@ -17,7 +18,7 @@ class ManagerTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_forwards_calls_to_default_parser()
     {
         $manager = app(Markdown\Manager::class);
@@ -47,7 +48,7 @@ class ManagerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_a_new_parser_instance()
     {
         $manager = app(Markdown\Manager::class);
@@ -65,7 +66,7 @@ class ManagerTest extends TestCase
         $this->assertEquals(3, $parser->config('max_nesting_level'));
     }
 
-    /** @test */
+    #[Test]
     public function parser_instances_can_be_saved_and_retrieved()
     {
         $manager = new Markdown\Manager;
@@ -103,7 +104,7 @@ class ManagerTest extends TestCase
         $this->assertEquals(5, $parserC->config('max_nesting_level')); // Gets the customized value from the config in the second argument.
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_if_extending_without_returning_a_parser()
     {
         $this->expectNotToPerformAssertions();

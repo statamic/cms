@@ -4,6 +4,7 @@ namespace Tests\Stache;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\ChildStore;
@@ -19,7 +20,7 @@ class StacheTest extends TestCase
         $this->stache = new Stache;
     }
 
-    /** @test */
+    #[Test]
     public function sites_can_be_defined_and_retrieved()
     {
         $this->assertNull($this->stache->sites());
@@ -31,7 +32,7 @@ class StacheTest extends TestCase
         $this->assertEquals(['one', 'two'], $this->stache->sites()->all());
     }
 
-    /** @test */
+    #[Test]
     public function default_site_can_be_retrieved()
     {
         $this->stache->sites(['foo', 'bar']);
@@ -39,7 +40,7 @@ class StacheTest extends TestCase
         $this->assertEquals('foo', $this->stache->defaultSite());
     }
 
-    /** @test */
+    #[Test]
     public function stores_can_be_registered()
     {
         $this->stache->sites(['en']); // store expects the stache to have site(s)
@@ -58,7 +59,7 @@ class StacheTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function multiple_stores_can_be_registered_at_once()
     {
         $this->stache->sites(['en']); // store expects the stache to have site(s)
@@ -80,7 +81,7 @@ class StacheTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function an_aggregate_stores_child_store_can_be_retrieved_directly()
     {
         $this->stache->sites(['en']); // stores expect the stache to have site(s)
@@ -95,31 +96,31 @@ class StacheTest extends TestCase
         $this->assertEquals($two, $this->stache->store('entries::two'));
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_an_id()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_its_cache()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_refreshes_itself()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_its_cache_file_size()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_record_its_build_time()
     {
         $this->markTestIncomplete();

@@ -2,6 +2,7 @@
 
 namespace Tests\Facades;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Pattern;
 use Tests\TestCase;
 

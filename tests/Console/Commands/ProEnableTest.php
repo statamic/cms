@@ -3,6 +3,7 @@
 namespace Tests\Console\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Statamic;
 use Tests\TestCase;
 
@@ -52,7 +53,7 @@ ENV;
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_enable_pro_by_updating_existing_var_in_env()
     {
         $this->assertFalse(Statamic::pro());
@@ -70,7 +71,7 @@ STATAMIC_LICENSE_KEY=
 ENV, $this->files->get($this->envPath));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_enable_pro_by_appending_to_env()
     {
         $this->files->put($this->envPath, $this->defaultEnvContents = <<<'ENV'
@@ -92,7 +93,7 @@ STATAMIC_PRO_ENABLED=true
 ENV, $this->files->get($this->envPath));
     }
 
-    /** @test */
+    #[Test]
     public function if_config_is_not_referencing_env_var_it_should_prompt_user_to_run_with_update_config_option()
     {
         $this->files->put($this->editionsPath, $this->defaultEditionsContents = <<<'EDITIONS'
@@ -171,7 +172,7 @@ STATAMIC_LICENSE_KEY=
 ENV, $this->files->get($this->envPath));
     }
 
-    /** @test */
+    #[Test]
     public function if_it_has_trouble_updating_editions_config_it_should_instruct_user()
     {
         $this->files->put($this->editionsPath, <<<'EDITIONS'

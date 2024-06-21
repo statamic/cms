@@ -2,6 +2,7 @@
 
 namespace Tests\Search\Searchables;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Statamic\Search\Searchables\Users;
 use Tests\PreventSavingStacheItemsToDisk;

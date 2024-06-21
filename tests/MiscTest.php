@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\View\View;

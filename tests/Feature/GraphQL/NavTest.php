@@ -5,6 +5,7 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
@@ -20,7 +21,7 @@ class NavTest extends TestCase
 
     protected $enabledQueries = ['navs'];
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'navs')->andReturnFalse()->once();
@@ -33,7 +34,7 @@ class NavTest extends TestCase
             ->assertSee('Cannot query field \"nav\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_a_nav_by_handle()
     {
         Nav::make('links')->title('Links')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
@@ -70,7 +71,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
         $this->createFooterNav();
@@ -106,7 +107,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_the_tree_inside_a_nav()
     {
         $this->createFooterNav();
@@ -202,7 +203,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_the_tree_inside_a_nav_using_fragments_for_pseudo_recursion()
     {
         // Courtesy of https://hashinteractive.com/blog/graphql-recursive-query-with-fragments/
@@ -288,7 +289,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_the_tree_inside_a_nav_with_entries()
     {
         $this->createEntries();
@@ -401,7 +402,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_the_tree_inside_a_nav_in_a_specific_site()
     {
         config(['app.debug' => true]);

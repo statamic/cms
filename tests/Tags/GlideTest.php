@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Illuminate\Http\UploadedFile;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\Parse;
 use Tests\TestCase;

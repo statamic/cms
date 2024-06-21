@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -10,7 +11,7 @@ use Tests\TestCase;
  */
 class MacroTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_reads_a_macro_from_file_and_applies_it_on_a_string(): void
     {
         $basePath = $this->app->basePath();
@@ -25,7 +26,7 @@ class MacroTest extends TestCase
         $this->app->setBasePath($basePath);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_a_macro_with_multiple_parameters(): void
     {
         $basePath = $this->app->basePath();

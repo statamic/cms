@@ -4,6 +4,7 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
 use Tests\Feature\GraphQL\EnablesQueries;
@@ -27,7 +28,7 @@ class TaxonomiesFieldtypeTest extends TestCase
         Taxonomy::make('colors')->title('Colors')->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_taxonomies()
     {
         $article = Blueprint::makeFromFields([
@@ -72,7 +73,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_single_taxonomy()
     {
         $article = Blueprint::makeFromFields([

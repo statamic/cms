@@ -2,12 +2,13 @@
 
 namespace Tests\Support;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Statamic\Support\DateFormat;
 
 class DateFormatTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_has_conversions()
     {
         $this->assertCount(38, DateFormat::phpToIsoConversions());

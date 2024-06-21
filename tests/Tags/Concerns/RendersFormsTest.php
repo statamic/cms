@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Concerns;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
 use Statamic\Support\Arr;
@@ -22,7 +23,7 @@ class RendersFormsTest extends TestCase
         $this->tag = new FakeTagWithRendersForms;
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_open_tags()
     {
         $output = $this->tag->formOpen('http://localhost:8000/submit');
@@ -32,7 +33,7 @@ class RendersFormsTest extends TestCase
         $this->assertStringNotContainsString('<input type="hidden" name="_method"', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_open_tags_with_custom_method()
     {
         $output = $this->tag->formOpen('http://localhost:8000/submit', 'DELETE');
@@ -42,7 +43,7 @@ class RendersFormsTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_method" value="DELETE">', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_open_tags_with_custom_attributes()
     {
         $output = $this->tag
@@ -59,13 +60,13 @@ class RendersFormsTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_method" value="DELETE">', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_close_tag()
     {
         $this->assertEquals('</form>', $this->tag->formClose());
     }
 
-    /** @test */
+    #[Test]
     public function it_minifies_space_between_field_html_elements()
     {
         $fields = <<<'EOT'

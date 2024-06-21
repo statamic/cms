@@ -3,6 +3,7 @@
 namespace Tests\Support;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Statamic\Fields\Values;
 use Statamic\Support\Arr;
@@ -11,7 +12,7 @@ class ArrTest extends TestCase
 {
     use Concerns\TestsIlluminateArr;
 
-    /** @test */
+    #[Test]
     public function it_adds_scope_to_associative_array()
     {
         $arr = [
@@ -85,7 +86,7 @@ class ArrTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_add_scope_to_lists()
     {
         $this->expectException(\Exception::class);
@@ -94,7 +95,7 @@ class ArrTest extends TestCase
         Arr::addScope(['one', 'two'], 'scope');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_first_non_null_value()
     {
         $this->assertEquals('one', Arr::getFirst([

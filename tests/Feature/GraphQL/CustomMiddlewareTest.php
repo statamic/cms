@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\GraphQL;
 use Tests\TestCase;
 
@@ -15,7 +16,7 @@ class CustomMiddlewareTest extends TestCase
         app()->instance('request-count', 0);
     }
 
-    /** @test **/
+    #[Test]
     public function custom_middleware_does_not_yet_exist()
     {
         $this->post('/graphql', ['query' => '{ping}']);

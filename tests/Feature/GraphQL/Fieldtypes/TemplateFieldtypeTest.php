@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
+
 /** @group graphql */
 class TemplateFieldtypeTest extends FieldtypeTestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_template()
     {
         $this->createEntryWithFields([

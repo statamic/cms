@@ -4,6 +4,7 @@ namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Tags\FluentTag;
@@ -90,7 +91,7 @@ class FluentTagTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_can_iterate_over_tag_results()
     {
         $this->mockTagThatReturns(collect([
@@ -112,7 +113,7 @@ class FluentTagTest extends TestCase
         $this->assertEquals($expected, $slugs);
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_array_access()
     {
         $this->mockTagThatReturns([
@@ -126,7 +127,7 @@ class FluentTagTest extends TestCase
         $this->assertEquals('bar', $result->foo);
     }
 
-    /** @test */
+    #[Test]
     public function it_casts_string_results_to_string()
     {
         $this->mockTagThatReturns('/fanny-packs');

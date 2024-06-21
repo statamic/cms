@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
+
 /** @group graphql */
 class TimeFieldtypeTest extends FieldtypeTestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_time()
     {
         $this->createEntryWithFields([

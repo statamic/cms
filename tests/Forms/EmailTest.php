@@ -5,6 +5,7 @@ namespace Tests\Forms;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\GlobalFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
@@ -124,7 +125,7 @@ class EmailTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_subject_from_the_config()
     {
         $email = $this->makeEmailWithConfig(['subject' => 'A nice form subject']);
@@ -132,7 +133,7 @@ class EmailTest extends TestCase
         $this->assertEquals('A nice form subject', $email->subject);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_data_to_the_view()
     {
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
@@ -178,13 +179,13 @@ class EmailTest extends TestCase
         $this->assertEquals('Statamic', (string) $email->viewData['company']['company_name']);
     }
 
-    /** @test */
+    #[Test]
     public function attachments_are_added()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_renderable_fields()
     {
         $this->markTestIncomplete();
@@ -231,7 +232,7 @@ class EmailTest extends TestCase
         ))->build();
     }
 
-    /** @test */
+    #[Test]
     public function the_sites_locale_gets_used_on_the_mailable()
     {
         $this->setSites([

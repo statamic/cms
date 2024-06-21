@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
@@ -38,7 +39,7 @@ class FieldsetTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_handle()
     {
         $fieldset = new Fieldset;
@@ -50,7 +51,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals('test', $fieldset->handle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_contents()
     {
         $fieldset = new Fieldset;
@@ -92,7 +93,7 @@ class FieldsetTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_fields()
     {
         $fieldset = new Fieldset;
@@ -118,7 +119,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals(['text', 'textarea'], $fields->map->type()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_fields_using_legacy_syntax()
     {
         $fieldset = new Fieldset;
@@ -142,7 +143,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals(['text', 'textarea'], $fields->map->type()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function gets_a_single_field()
     {
         $fieldset = new Fieldset;
@@ -168,7 +169,7 @@ class FieldsetTest extends TestCase
         $this->assertNull($fieldset->field('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_blueprints_importing_fieldset()
     {
         $fieldset = Fieldset::make('seo')->setContents(['fields' => [
@@ -198,7 +199,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function gets_blueprints_importing_fieldset_inside_grid()
     {
         $fieldset = Fieldset::make('seo')->setContents(['fields' => [
@@ -236,7 +237,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function gets_blueprints_importing_fieldset_inside_replicator()
     {
         $fieldset = Fieldset::make('seo')->setContents(['fields' => [
@@ -282,7 +283,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function gets_blueprints_importing_single_field_from_fieldset()
     {
         $fieldset = Fieldset::make('seo')->setContents(['fields' => [
@@ -312,7 +313,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function gets_fieldsets_importing_fieldset()
     {
         $fieldset = Fieldset::make('seo')->setContents(['fields' => [
@@ -333,7 +334,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function gets_fieldsets_importing_fieldset_inside_grid()
     {
         $fieldset = Fieldset::make('seo')->setContents(['fields' => [
@@ -362,7 +363,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function gets_fieldsets_importing_fieldset_inside_replicator()
     {
         $fieldset = Fieldset::make('seo')->setContents(['fields' => [
@@ -399,7 +400,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function gets_fieldsets_importing_single_field_from_fieldset()
     {
         $fieldset = Fieldset::make('seo')->setContents(['fields' => [
@@ -420,7 +421,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_through_the_repository()
     {
         Event::fake();
@@ -451,7 +452,7 @@ class FieldsetTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_fieldset_created_only_once()
     {
         Event::fake();
@@ -469,7 +470,7 @@ class FieldsetTest extends TestCase
         Event::assertDispatched(FieldsetCreated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_quietly()
     {
         Event::fake();
@@ -489,7 +490,7 @@ class FieldsetTest extends TestCase
         Event::assertNotDispatched(FieldsetCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_creating_event_returns_false_the_fieldset_doesnt_save()
     {
         Event::fake([FieldsetCreated::class]);
@@ -506,7 +507,7 @@ class FieldsetTest extends TestCase
         Event::assertNotDispatched(FieldsetCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_saving_event_returns_false_the_fieldset_doesnt_save()
     {
         Event::fake([FieldsetSaved::class]);
@@ -527,7 +528,7 @@ class FieldsetTest extends TestCase
         Event::assertNotDispatched(FieldsetSaved::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_fires_a_deleting_event()
     {
         Event::fake();
@@ -541,7 +542,7 @@ class FieldsetTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         FieldsetRepository::spy();
@@ -559,7 +560,7 @@ class FieldsetTest extends TestCase
         Event::assertNotDispatched(FieldsetDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_quietly()
     {
         Event::fake();

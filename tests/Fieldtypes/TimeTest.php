@@ -5,6 +5,7 @@ namespace Tests\Fieldtypes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Time;
 use Tests\TestCase;

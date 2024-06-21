@@ -4,6 +4,7 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
@@ -30,7 +31,7 @@ class UserTest extends TestCase
         User::make()->id('7')->email('g@example.com')->set('name', 'Fred Armisen')->save();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'users')->andReturnFalse()->once();
@@ -43,7 +44,7 @@ class UserTest extends TestCase
             ->assertSee('Cannot query field \"user\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_a_user_by_id()
     {
         $this->createUsers();
@@ -79,7 +80,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_a_user_by_email()
     {
         $this->createUsers();
@@ -107,7 +108,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields()
     {
         $this->createUsers();
@@ -164,7 +165,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_register_custom_types()
     {
         $this->createUsers();

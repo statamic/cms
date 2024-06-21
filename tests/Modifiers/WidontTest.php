@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -17,7 +18,7 @@ class WidontTest extends TestCase
         $this->assertEquals('Lorem ipsum dolor sit&nbsp;amet.', $this->modify($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_params_to_add_space_to_plain_text()
     {
         $value = 'Lorem ipsum dolor sit amet.';
@@ -25,7 +26,7 @@ class WidontTest extends TestCase
         $this->assertEquals('Lorem ipsum dolor&nbsp;sit&nbsp;amet.', $this->modify($value, 2));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_params_to_add_space_to_long_broken_text()
     {
         $value = <<<'EOD'
@@ -43,7 +44,7 @@ EOD;
         $this->assertEquals($expected, $this->modify($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_space_to_text_within_html_tags()
     {
         $value1 = '<p>Lorem ipsum dolor sit amet.</p>';
@@ -55,7 +56,7 @@ EOD;
         $this->assertEquals('<h2>Lorem ipsum dolor sit&nbsp;amet.</h2>', $this->modify($value3));
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_space_to_text_within_multiple_html_tags()
     {
         $value = '<p>Lorem ipsum dolor sit amet.</p><p>Consectetur adipiscing elit.</p>';
@@ -63,7 +64,7 @@ EOD;
         $this->assertEquals('<p>Lorem ipsum dolor sit&nbsp;amet.</p><p>Consectetur adipiscing&nbsp;elit.</p>', $this->modify($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_params_to_add_space_to_text_within_html_tags()
     {
         $value1 = '<p>Lorem ipsum dolor sit amet.</p>';
@@ -75,7 +76,7 @@ EOD;
         $this->assertEquals('<h2>Lorem&nbsp;ipsum&nbsp;dolor&nbsp;sit&nbsp;amet.</h2>', $this->modify($value3, 4));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_params_to_add_space_to_text_within_multiple_html_tags()
     {
         $value = '<p>Lorem ipsum dolor sit amet.</p><p>Consectetur adipiscing elit.</p>';
@@ -83,7 +84,7 @@ EOD;
         $this->assertEquals('<p>Lorem ipsum dolor&nbsp;sit&nbsp;amet.</p><p>Consectetur&nbsp;adipiscing&nbsp;elit.</p>', $this->modify($value, 2));
     }
 
-    /** @test */
+    #[Test]
     public function it_pases_bard_test()
     {
         $value = '<p>Lorem ipsum dolor sit amet.</p><p></p><p>Consectetur adipiscing elit.</p>';
@@ -96,7 +97,7 @@ EOD;
         return Modify::value($value)->widont($params)->fetch();
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_add_nbsp_to_nested_list()
     {
         $this->markTestSkippedInWindows('TODO: Fix this test on Windows'); // TODO

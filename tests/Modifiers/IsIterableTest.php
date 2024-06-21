@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\EntryCollection;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;

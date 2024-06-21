@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\GraphQL\Queries\PingQuery;
 use Tests\TestCase;
 
@@ -15,7 +16,7 @@ class QueryAuthorizationTest extends TestCase
         PingQuery::auth(null);
     }
 
-    /** @test */
+    #[Test]
     public function it_authorizes_by_default()
     {
         $this
@@ -25,7 +26,7 @@ class QueryAuthorizationTest extends TestCase
             ->assertExactJson(['data' => ['ping' => 'pong']]);
     }
 
-    /** @test */
+    #[Test]
     public function it_provides_custom_passing_authorization_logic()
     {
         PingQuery::auth(function () {
@@ -39,7 +40,7 @@ class QueryAuthorizationTest extends TestCase
             ->assertExactJson(['data' => ['ping' => 'pong']]);
     }
 
-    /** @test */
+    #[Test]
     public function it_provides_custom_failing_authorization_logic()
     {
         PingQuery::auth(function ($a, $b, $c, $d, $e) {

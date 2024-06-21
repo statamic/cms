@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -10,7 +11,7 @@ use Tests\TestCase;
  */
 class IsEmptyTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_checks_if_its_empty()
     {
         $this->assertTrue($this->modify('')); // empty string is empty

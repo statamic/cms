@@ -3,6 +3,7 @@
 namespace Tests\Search\Searchables;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
 use Statamic\Search\Searchables\Entries;

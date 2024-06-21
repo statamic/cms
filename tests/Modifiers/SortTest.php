@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -10,7 +11,7 @@ use Tests\TestCase;
  */
 class SortTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_sorts_primitive_arrays()
     {
         $arr = ['beta', 'zeta', 'alpha'];
@@ -26,7 +27,7 @@ class SortTest extends TestCase
         $this->assertEquals($expected, $this->modify(collect($arr), ['true', 'asc']));
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_primitive_arrays_descending()
     {
         $arr = ['beta', 'zeta', 'alpha'];
@@ -36,7 +37,7 @@ class SortTest extends TestCase
         $this->assertEquals($expected, $this->modify(collect($arr), ['true', 'desc']));
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_multidimensional_arrays_by_a_key()
     {
         $arr = [
@@ -55,7 +56,7 @@ class SortTest extends TestCase
         $this->assertEquals($expected, $this->modify(collect($arr), 'value'));
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_multidimensional_arrays_by_a_key_descending()
     {
         $arr = [
@@ -74,13 +75,13 @@ class SortTest extends TestCase
         $this->assertEquals($expected, $this->modify(collect($arr), ['value', 'desc']));
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_primitive_arrays_randomly()
     {
         $this->assertSortsRandomly(['alpha', 'beta', 'zeta']);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_multidimensional_arrays_randomly()
     {
         $this->assertSortsRandomly([

@@ -3,6 +3,7 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Nav;
@@ -95,7 +96,7 @@ GQL;
         ]];
     }
 
-    /** @test */
+    #[Test]
     public function custom_fields_can_be_added_to_interface()
     {
         GraphQL::addField('PageInterface', 'custom', function () {

@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 
@@ -28,7 +29,7 @@ class CompactTest extends TestCase
         return (string) Parse::template($tag, $data);
     }
 
-    /** @test */
+    #[Test]
     public function compact_converts_variables_to_array()
     {
         $template = <<<'EOT'

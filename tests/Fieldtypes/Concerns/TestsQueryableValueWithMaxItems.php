@@ -2,6 +2,8 @@
 
 namespace Tests\Fieldtypes\Concerns;
 
+use PHPUnit\Framework\Attributes\Test;
+
 trait TestsQueryableValueWithMaxItems
 {
     public static function maxItemsProvider()

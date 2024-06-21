@@ -3,6 +3,7 @@
 namespace Tests\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Nav;
@@ -15,7 +16,7 @@ class NavPageInterfaceTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_the_fields()
     {
         $nav = tap(Nav::make('links'))->save();

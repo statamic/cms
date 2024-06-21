@@ -5,6 +5,7 @@ namespace Tests\Fieldtypes;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Data\AugmentedCollection;
@@ -76,7 +77,7 @@ class EntriesTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_query_builder_when_theres_no_value()
     {
         $augmented = $this->fieldtype()->augment(null);
@@ -85,7 +86,7 @@ class EntriesTest extends TestCase
         $this->assertCount(0, $augmented->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_single_asset_when_max_items_is_one()
     {
         $augmented = $this->fieldtype(['max_items' => 1])->augment(['123']);
@@ -94,7 +95,7 @@ class EntriesTest extends TestCase
         $this->assertEquals('one', $augmented->slug());
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_collection_when_preprocessing_index_and_max_items_is_1()
     {
         $preProcessed = $this
@@ -104,7 +105,7 @@ class EntriesTest extends TestCase
         $this->assertEquals(['123'], $preProcessed->map(fn ($entry) => $entry['id'])->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_empty_collection_when_preprocessing_index_and_max_items_is_1_and_the_value_is_null()
     {
         $preProcessed = $this->fieldtype(['max_items' => 1])->preProcessIndex(null);
@@ -112,7 +113,7 @@ class EntriesTest extends TestCase
         $this->assertEquals([], $preProcessed->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_includes_drafts_when_pre_processing_for_index()
     {
         $preProcessed = $this->fieldtype()->preProcessIndex([456, 'invalid', '123', 'draft', 'scheduled', 'expired']);
@@ -120,7 +121,7 @@ class EntriesTest extends TestCase
         $this->assertEquals([456, '123', 'draft', 'scheduled', 'expired'], $preProcessed->map(fn ($entry) => $entry['id'])->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_augmented_items_to_the_parent_entrys_locale()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
@@ -136,7 +137,7 @@ class EntriesTest extends TestCase
         $this->assertEquals(['one-fr', 'four-fr'], $augmented->get()->map->slug()->all()); // 456 isn't localized, and 789-fr is a draft.
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_augmented_item_to_the_parent_entrys_locale_when_max_items_is_one()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
@@ -157,7 +158,7 @@ class EntriesTest extends TestCase
         $this->assertNull($augmented); // 789-fr is a draft
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_augmented_items_to_the_current_sites_locale_when_parent_is_not_localizable()
     {
         Site::setCurrent('fr');
@@ -177,7 +178,7 @@ class EntriesTest extends TestCase
         $this->assertEquals(['one-fr', 'three-fr'], $augmented->get()->map->slug()->all()); // only 123 and 789 have localized versions
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_augmented_item_to_the_current_sites_locale_when_parent_is_not_localizable_when_max_items_is_one()
     {
         Site::setCurrent('fr');
@@ -199,7 +200,7 @@ class EntriesTest extends TestCase
         $this->assertNull($augmented); // 456 isnt localized
     }
 
-    /** @test */
+    #[Test]
     public function it_shallow_augments_to_a_collection_of_entries()
     {
         $augmented = $this->fieldtype()->shallowAugment(['123', 'invalid', 456, 'draft', 'scheduled', 'expired']);
@@ -225,7 +226,7 @@ class EntriesTest extends TestCase
         ], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_shallow_augments_to_a_single_entry_when_max_items_is_one()
     {
         $augmented = $this->fieldtype(['max_items' => 1])->shallowAugment(['123']);
@@ -240,7 +241,7 @@ class EntriesTest extends TestCase
         ], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_shallow_augmented_items_to_the_parent_entrys_locale()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
@@ -271,7 +272,7 @@ class EntriesTest extends TestCase
         ], $augmented->toArray()); // 456 isn't localized, and 789-fr is a draft.
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_shallow_augmented_item_to_the_parent_entrys_locale_when_max_items_is_one()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
@@ -298,7 +299,7 @@ class EntriesTest extends TestCase
         $this->assertNull($augmented); // 789-fr is a draft
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_shallow_augmented_items_to_the_current_sites_locale_when_parent_is_not_localizable()
     {
         Site::setCurrent('fr');
@@ -333,7 +334,7 @@ class EntriesTest extends TestCase
         ], $augmented->toArray()); // only 123 and 789 have localized versions
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_shallow_augmented_item_to_the_current_sites_locale_when_parent_is_not_localizable_when_max_items_is_one()
     {
         Site::setCurrent('fr');

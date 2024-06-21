@@ -3,6 +3,7 @@
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 
 /** @group graphql */
 class DateFieldtypeTest extends FieldtypeTestCase
@@ -16,7 +17,7 @@ class DateFieldtypeTest extends FieldtypeTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_dates()
     {
         // Set the to string format so can see it uses that rather than a coincidence.
@@ -50,7 +51,7 @@ GQL;
         Carbon::setToStringFormat($originalFormat);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_date_ranges()
     {
         // Set the to string format so can see it uses that rather than a coincidence.

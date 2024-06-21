@@ -3,6 +3,7 @@
 namespace Tests\Support\Concerns;
 
 use Exception;
+use PHPUnit\Framework\Attributes\Test;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
 use Statamic\Support\Str;
@@ -499,7 +500,7 @@ trait TestsIlluminateStr
         $this->assertIsString(Str::random());
     }
 
-    /** @test */
+    #[Test]
     public function TestWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed()
     {
         if (version_compare(app()->version(), 10, '<')) {

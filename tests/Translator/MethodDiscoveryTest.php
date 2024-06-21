@@ -4,6 +4,7 @@ namespace Tests\Translator;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Statamic\Translator\MethodDiscovery;
 
@@ -20,7 +21,7 @@ class MethodDiscoveryTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_discovers_methods()
     {
         $expected = collect([

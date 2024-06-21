@@ -4,6 +4,7 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Role;
 use Tests\FakesRoles;
@@ -31,7 +32,7 @@ class UserRolesFieldtypeTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_roles()
     {
         $article = Blueprint::makeFromFields([
@@ -76,7 +77,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_single_role()
     {
         $article = Blueprint::makeFromFields([

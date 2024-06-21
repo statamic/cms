@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Entries;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\GetSuffixFromPath;
 use Tests\TestCase;
 

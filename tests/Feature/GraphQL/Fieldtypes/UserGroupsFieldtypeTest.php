@@ -4,6 +4,7 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\UserGroup;
 use Tests\FakesUserGroups;
@@ -31,7 +32,7 @@ class UserGroupsFieldtypeTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_groups()
     {
         $article = Blueprint::makeFromFields([
@@ -76,7 +77,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_single_collection()
     {
         $article = Blueprint::makeFromFields([

@@ -2,15 +2,17 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
+
 trait MultipleLabeledValueTests
 {
-    /** @test */
+    #[Test]
     public function it_augments_to_empty_array_when_null_and_configured_for_multiple()
     {
         $this->assertEquals([], $this->field(['multiple' => true])->augment(null));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents()
     {
         $field = $this->field([
@@ -33,7 +35,7 @@ trait MultipleLabeledValueTests
         ], $field->augment(['au', 'us', null, false, true, 'missing']));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_numeric_keys()
     {
         $field = $this->field([
@@ -63,7 +65,7 @@ trait MultipleLabeledValueTests
         ], $field->augment(['2.5']));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_floats_for_keys()
     {
         $field = $this->field([
@@ -84,7 +86,7 @@ trait MultipleLabeledValueTests
         ], $field->augment([2.5]));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_boolean_casting()
     {
         $field = $this->field([
@@ -105,7 +107,7 @@ trait MultipleLabeledValueTests
         ], $field->augment([null, false, true, 'missing']));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_boolean_casting_and_a_null_option()
     {
         $field = $this->field([

@@ -3,6 +3,7 @@
 namespace Tests\Modifiers;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 

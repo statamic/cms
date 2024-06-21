@@ -5,6 +5,7 @@ namespace Tests\Feature\Fieldtypes;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;

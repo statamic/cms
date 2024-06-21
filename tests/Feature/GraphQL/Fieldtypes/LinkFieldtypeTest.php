@@ -4,12 +4,13 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 
 /** @group graphql */
 class LinkFieldtypeTest extends FieldtypeTestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_null_when_undefined()
     {
         $entry = $this->createEntryWithFields([
@@ -24,7 +25,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
         $this->assertGqlEntryHas('link', ['link' => null]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_hardcoded_url()
     {
         $entry = $this->createEntryWithFields([
@@ -39,7 +40,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
         $this->assertGqlEntryHas('link', ['link' => '/hardcoded']);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_entry()
     {
         $entry = $this->createEntryWithFields([
@@ -57,7 +58,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
         $this->assertGqlEntryHas('link', ['link' => '/the-entry-url']);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_child_url()
     {
         $entry = $this->createEntryWithFields([
@@ -75,7 +76,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
         $this->assertGqlEntryHas('link', ['link' => '/the-first-child']);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_404()
     {
         $entry = $this->createEntryWithFields([

@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldRepository;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
@@ -186,7 +187,7 @@ class ReplicatorTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_the_values()
     {
         FieldRepository::shouldReceive('find')
@@ -246,7 +247,7 @@ class ReplicatorTest extends TestCase
         ], $field->process()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_the_values_recursively()
     {
         FieldRepository::shouldReceive('find')
@@ -315,7 +316,7 @@ class ReplicatorTest extends TestCase
         ], $field->process()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_the_values_recursively_with_a_custom_id()
     {
         config()->set('statamic.system.row_id_handle', '_id');
@@ -528,7 +529,7 @@ class ReplicatorTest extends TestCase
         ], $meta['new']['main']);
     }
 
-    /** @test */
+    #[Test]
     public function it_augments()
     {
         (new class extends Fieldtype
@@ -564,7 +565,7 @@ class ReplicatorTest extends TestCase
         ], collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_with_custom_row_id_handle()
     {
         config(['statamic.system.row_id_handle' => '_id']);
@@ -605,7 +606,7 @@ class ReplicatorTest extends TestCase
         ], collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_a_queryable_value()
     {
         $this->assertNull((new Replicator)->toQueryableValue(null));

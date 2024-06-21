@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -30,7 +31,7 @@ class BardTest extends TestCase
         static::$functions = null;
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_prosemirror_structure_to_a_template_friendly_array()
     {
         (new class extends Fieldtype
@@ -125,7 +126,7 @@ class BardTest extends TestCase
         $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_ids_and_sets_id_correctly_with_a_custom_id_handle()
     {
         config()->set('statamic.system.row_id_handle', '_id');
@@ -178,13 +179,13 @@ class BardTest extends TestCase
         $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_augment_when_saved_as_html()
     {
         $this->assertEquals('<p>Paragraph</p>', $this->bard()->augment('<p>Paragraph</p>'));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_tiptap_v1_snake_case_types_to_v2_camel_case_types()
     {
         Augmentor::addExtension('customNode', new class extends Node
@@ -289,7 +290,7 @@ class BardTest extends TestCase
         $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_html_when_there_are_no_sets()
     {
         $data = [
@@ -311,19 +312,19 @@ class BardTest extends TestCase
         $this->assertEquals($expected, $this->bard(['sets' => null])->augment($data));
     }
 
-    /** @test */
+    #[Test]
     public function augmenting_an_empty_value_when_not_using_sets_returns_null()
     {
         $this->assertNull($this->bard(['sets' => null])->augment(null));
     }
 
-    /** @test */
+    #[Test]
     public function augmenting_an_empty_value_when_using_sets_returns_an_empty_array()
     {
         $this->assertSame([], $this->bard(['sets' => ['one' => []]])->augment(null));
     }
 
-    /** @test */
+    #[Test]
     public function augmenting_an_empty_value_when_saving_as_html_returns_null()
     {
         $bard = $this->bard(['save_html' => true, 'sets' => null]);
@@ -331,7 +332,7 @@ class BardTest extends TestCase
         $this->assertNull($bard->augment(null));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_disabled_sets()
     {
         $data = [
@@ -390,7 +391,7 @@ class BardTest extends TestCase
         $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_plain_html_into_prosemirror_structure()
     {
         $data = '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second <a href="statamic://entry::foo">paragraph</a>. <img src="statamic://asset::assets::lagoa.jpg"></p>';
@@ -424,7 +425,7 @@ class BardTest extends TestCase
         $this->assertEquals($expected, $this->bard()->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_detects_v2_formatted_content()
     {
         $textOnly = [
@@ -478,7 +479,7 @@ class BardTest extends TestCase
         $this->assertFalse($bard->isLegacyData($prosemirrorSetsOnly));
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_v2_formatted_content_into_prosemirror_structure()
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -538,7 +539,7 @@ class BardTest extends TestCase
         $this->assertEquals($expected, $bard->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -574,7 +575,7 @@ class BardTest extends TestCase
         $this->assertEquals($expected, $bard->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_an_empty_field_as_null()
     {
         // When a Bard field is emptied and submitted, it's not actually null, it's a single empty paragraph.
@@ -585,7 +586,7 @@ class BardTest extends TestCase
         $this->assertNull($bard->process([]));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_empty_nodes()
     {
         $content = [
@@ -783,7 +784,7 @@ class BardTest extends TestCase
         ], $meta['new']['main']);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_link_data()
     {
         tap(Facades\Collection::make('pages')->routes('/{slug}'))->save();
@@ -816,7 +817,7 @@ EOT;
         ], $bard->getLinkData($prosemirror));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_convert_statamic_asset_urls_when_saving_as_html()
     {
         $content = [
@@ -832,7 +833,7 @@ EOT;
         $this->assertEquals($expected, $this->bard(['save_html' => true, 'sets' => null])->process($content));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_statamic_asset_urls_when_stored_as_html()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -871,7 +872,7 @@ EOT;
         $this->assertEquals($expected, $bard->augment($html));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_a_queryable_value()
     {
         $this->assertNull((new Bard)->toQueryableValue(null));
@@ -908,7 +909,7 @@ EOT;
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_inline_value()
     {
         $data = [[
@@ -925,7 +926,7 @@ EOT;
         $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->process($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_inline_value()
     {
         $data = [
@@ -942,7 +943,7 @@ EOT;
         $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_inline_value_to_block_value()
     {
         $data = [
@@ -959,7 +960,7 @@ EOT;
         $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_block_value_to_inline_value()
     {
         $data = [
@@ -987,7 +988,7 @@ EOT;
         $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_tiptap_v1_snake_case_types_to_v2_camel_case_types()
     {
         $data = [
@@ -1231,7 +1232,7 @@ EOT;
         $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_away_bad_nodes()
     {
         $data = [
@@ -1245,7 +1246,7 @@ EOT;
         $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_calls_hooks()
     {
         Bard::hook('augment', function ($payload, $next) {

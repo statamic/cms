@@ -4,6 +4,7 @@ namespace Tests\Modifiers;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
@@ -18,7 +19,7 @@ class GroupByTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_groups_an_array()
     {
         $items = [
@@ -57,7 +58,7 @@ class GroupByTest extends TestCase
         $this->assertEquals($expected, $this->modify($items, 'sport'));
     }
 
-    /** @test */
+    #[Test]
     public function it_groups_values_instances()
     {
         // eg. grids
@@ -98,7 +99,7 @@ class GroupByTest extends TestCase
         $this->assertEquals($expected, $this->modify($items, 'sport'));
     }
 
-    /** @test */
+    #[Test]
     public function it_groups_an_array_with_value_objects()
     {
         // eg. replicator sets
@@ -139,7 +140,7 @@ class GroupByTest extends TestCase
         $this->assertEquals($expected, $this->modify($items, 'sport'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_keys_from_objects()
     {
         $items = collect([
@@ -160,7 +161,7 @@ class GroupByTest extends TestCase
         $this->assertEquals($expected, $this->modify($items, 'sport'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_nested_keys_from_objects()
     {
         Collection::make('basketball')->title('Basketball')->save();
@@ -184,7 +185,7 @@ class GroupByTest extends TestCase
         $this->assertEquals($expected, $this->modify($items, 'collection:title'));
     }
 
-    /** @test */
+    #[Test]
     public function if_the_grouped_keys_are_objects_itll_convert_them_to_strings()
     {
         $items = collect([
@@ -205,7 +206,7 @@ class GroupByTest extends TestCase
         $this->assertEquals($expected, $this->modify($items, 'sport'));
     }
 
-    /** @test */
+    #[Test]
     public function it_groups_by_date()
     {
         Carbon::setTestNow(now()->startOfDay());
@@ -249,7 +250,7 @@ class GroupByTest extends TestCase
         $this->assertEquals($expected, $this->modify($items, ['when', 'a']));
     }
 
-    /** @test */
+    #[Test]
     public function it_groups_by_date_with_custom_group_format()
     {
         Carbon::setTestNow(Carbon::parse('2022-09-01'));

@@ -3,6 +3,7 @@
 namespace Tests\API;
 
 use Facades\Statamic\API\ResourceAuthorizer;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -337,7 +338,7 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertTrue(ResourceAuthorizer::isAllowed($configFile, 'users'));
     }
 
-    /** @test */
+    #[Test]
     public function sites_are_not_allowed_by_default()
     {
         Config::set('statamic.graphql.resources.sites', false);
@@ -345,7 +346,7 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertFalse(ResourceAuthorizer::isAllowed('graphql', 'sites'));
     }
 
-    /** @test */
+    #[Test]
     public function can_enable_sitess_via_boolean()
     {
         Config::set('statamic.graphql.resources.sites', true);
@@ -353,7 +354,7 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertTrue(ResourceAuthorizer::isAllowed('graphql', 'sites'));
     }
 
-    /** @test */
+    #[Test]
     public function can_enable_sites_via_array_config()
     {
         Config::set('statamic.graphql.resources.sites', [

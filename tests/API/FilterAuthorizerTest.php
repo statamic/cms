@@ -3,6 +3,7 @@
 namespace Tests\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Tests\PreventSavingStacheItemsToDisk;

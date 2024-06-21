@@ -3,6 +3,7 @@
 namespace Tests\Imaging;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Imaging\GlideImageManipulator;
@@ -85,7 +86,7 @@ class GlideImageManipulatorTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function cannot_add_invalid_glide_param()
     {
         $this->expectException('Exception');
@@ -93,7 +94,7 @@ class GlideImageManipulatorTest extends TestCase
         $this->man->setParam('foo', 'bar');
     }
 
-    /** @test */
+    #[Test]
     public function cannot_add_invalid_glide_param_using_magic_method()
     {
         $this->expectException('Exception');
@@ -129,7 +130,7 @@ class GlideImageManipulatorTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function focal_crop_uses_asset_value()
     {
         $asset = $this->mock(Asset::class);
@@ -141,7 +142,7 @@ class GlideImageManipulatorTest extends TestCase
         $this->assertEquals('crop-60-40', Arr::get($this->man->getParams(), 'fit'));
     }
 
-    /** @test */
+    #[Test]
     public function focal_crop_just_uses_crop_if_no_value_exists()
     {
         $asset = $this->mock(Asset::class);

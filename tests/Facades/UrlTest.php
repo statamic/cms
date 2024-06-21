@@ -2,6 +2,7 @@
 
 namespace Tests\Facades;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\URL;
 use Tests\TestCase;
 
@@ -117,7 +118,7 @@ class UrlTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function gets_site_url()
     {
         $this->assertEquals('http://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
@@ -229,7 +230,7 @@ class UrlTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_query_and_fragment()
     {
         $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?query'));

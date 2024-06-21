@@ -4,6 +4,7 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Tests\Feature\GraphQL\EnablesQueries;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -209,7 +210,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_a_string_for_bard_fields_with_no_sets()
     {
         $article = Blueprint::makeFromFields([
@@ -254,7 +255,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_nested_bard_fields()
     {
         $article = Blueprint::makeFromFields([

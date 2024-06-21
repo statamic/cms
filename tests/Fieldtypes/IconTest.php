@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class IconTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_finds_default_icons()
     {
         $result = (string) Antlers::parse('{{ svg src="{test|raw}" }}', ['test' => new Value('add', $this->fieldtype())]);
@@ -18,7 +19,7 @@ class IconTest extends TestCase
         $this->assertStringContainsString('<svg', $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_svg_strings()
     {
         $result = (string) Antlers::parse('{{ svg :src="test" class="w-4 h-4" sanitize="false" }}', ['test' => new Value('add', $this->fieldtype())]);

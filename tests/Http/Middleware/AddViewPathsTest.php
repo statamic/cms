@@ -3,6 +3,7 @@
 namespace Tests\Http\Middleware;
 
 use Illuminate\Http\Request;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\Http\Middleware\AddViewPaths;
 use Statamic\Support\Arr;

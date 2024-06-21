@@ -4,6 +4,7 @@ namespace Tests\Modifiers;
 
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;

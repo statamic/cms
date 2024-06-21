@@ -4,6 +4,7 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Tests\Feature\GraphQL\EnablesQueries;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -116,7 +117,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_nested_replicator_fields()
     {
         $article = Blueprint::makeFromFields([

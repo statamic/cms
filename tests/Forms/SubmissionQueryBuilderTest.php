@@ -3,6 +3,7 @@
 namespace Tests\Forms;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
@@ -13,7 +14,7 @@ class SubmissionQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_submissions()
     {
         $form = tap(Form::make('test'))->save();
@@ -26,7 +27,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEveryItemIsInstanceOf(Submission::class, $submissions);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_using_wheres()
     {
         $form = tap(Form::make('test'))->save();
@@ -38,7 +39,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c'], $submissions->map->get('id')->sort()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_using_or_wheres()
     {
         $form = tap(Form::make('test'))->save();
@@ -52,7 +53,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'd', 'b'], $submissions->map->get('id')->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_using_or_where_ins()
     {
         $form = tap(Form::make('test'))->save();
@@ -67,7 +68,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'd', 'e'], $submissions->map->get('id')->values()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function it_filters_using_or_where_not_ins()
     {
         $form = tap(Form::make('test'))->save();
@@ -83,7 +84,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['c', 'f'], $submissions->map->get('id')->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_using_nested_wheres()
     {
         $form = tap(Form::make('test'))->save();
@@ -107,7 +108,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c', 'd', 'e'], $submissions->map->get('id')->sort()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_using_nested_where_ins()
     {
         $form = tap(Form::make('test'))->save();
@@ -132,7 +133,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c', 'd', 'e', 'f'], $submissions->map->get('id')->sort()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_using_nested_where_not_ins()
     {
         $form = tap(Form::make('test'))->save();
@@ -153,7 +154,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'd'], $submissions->map->get('id')->sort()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts()
     {
         $form = tap(Form::make('test'))->save();
@@ -167,7 +168,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['c', 'b', 'e', 'a', 'd'], $submissions->map->get('id')->all());
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_where_column()
     {
         $form = tap(Form::make('test'))->save();
@@ -188,7 +189,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'e'], $submissions->map->get('id')->all());
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_where_date()
     {
         $this->createWhereDateTestTerms();
@@ -209,7 +210,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->sort()->values()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_where_month()
     {
         $this->createWhereDateTestTerms();
@@ -225,7 +226,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 4'], $entries->map->title->sort()->values()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_where_day()
     {
         $this->createWhereDateTestTerms();
@@ -241,7 +242,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 2', 'Post 4'], $entries->map->title->sort()->values()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_where_year()
     {
         $this->createWhereDateTestTerms();
@@ -257,7 +258,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 4'], $entries->map->title->sort()->values()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_where_time()
     {
         $this->createWhereDateTestTerms();
@@ -282,7 +283,7 @@ class SubmissionQueryBuilderTest extends TestCase
         FormSubmission::make()->form($form)->data(['title' => 'Post 4'])->id(1600008264)->save();
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_where_json_contains()
     {
         $form = tap(Form::make('test'))->save();
@@ -303,7 +304,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['1', '3'], $entries->map->get('id')->all());
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_where_json_doesnt_contain()
     {
         $form = tap(Form::make('test'))->save();
@@ -324,7 +325,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['2', '4', '5'], $entries->map->get('id')->all());
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_or_where_json_contains()
     {
         $form = tap(Form::make('test'))->save();
@@ -340,7 +341,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['1', '3', '5'], $entries->map->get('id')->all());
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_or_where_json_doesnt_contain()
     {
         $form = tap(Form::make('test'))->save();
@@ -356,7 +357,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['1', '3', '2', '4'], $entries->map->get('id')->all());
     }
 
-    /** @test **/
+    #[Test]
     public function submissions_are_found_using_where_json_length()
     {
         $form = tap(Form::make('test'))->save();
@@ -372,7 +373,7 @@ class SubmissionQueryBuilderTest extends TestCase
         $this->assertEquals(['2', '5'], $entries->map->get('id')->all());
     }
 
-    /** @test */
+    #[Test]
     public function submissions_are_found_using_offset()
     {
         $form = tap(Form::make('test'))->save();

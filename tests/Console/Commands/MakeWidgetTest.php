@@ -4,6 +4,7 @@ namespace Tests\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class MakeWidgetTest extends TestCase
@@ -28,7 +29,7 @@ class MakeWidgetTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_widget()
     {
         $path = base_path('app/Widgets/Sloth.php');
@@ -38,10 +39,10 @@ class MakeWidgetTest extends TestCase
         $this->artisan('statamic:make:widget', ['name' => 'Sloth']);
 
         $this->assertFileExists($path);
-        $this->assertStringContainsString('namespace App\Widgets;', $this->files->get($path));
+        $this->assertStringContainsString('namespace App\Widgets; use PHPUnit\Framework\Attributes\Test;', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_will_not_overwrite_an_existing_widget()
     {
         $path = base_path('app/Widgets/Sloth.php');
@@ -58,7 +59,7 @@ class MakeWidgetTest extends TestCase
         $this->assertStringContainsString('overwritten widget', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function using_force_option_will_overwrite_original_widget()
     {
         $path = base_path('app/Widgets/Sloth.php');
@@ -73,7 +74,7 @@ class MakeWidgetTest extends TestCase
         $this->assertStringNotContainsString('overwritten widget', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_widget_into_an_addon()
     {
         $path = base_path('addons/yoda/bag-odah');
@@ -87,6 +88,6 @@ class MakeWidgetTest extends TestCase
         $this->artisan('statamic:make:widget', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 
         $this->assertFileExists($widget);
-        $this->assertStringContainsString('namespace Yoda\BagOdah\Widgets;', $this->files->get($widget));
+        $this->assertStringContainsString('namespace Yoda\BagOdah\Widgets; use PHPUnit\Framework\Attributes\Test;', $this->files->get($widget));
     }
 }

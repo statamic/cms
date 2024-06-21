@@ -2,6 +2,7 @@
 
 namespace Tests\View\Blade;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Tags\Tags;
 use Statamic\View\Blade\TagsDirective;
 use Tests\TestCase;
@@ -76,7 +77,7 @@ class TagsDirectiveTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_supports_multiple_tags()
     {
         $variables = TagsDirective::handle([

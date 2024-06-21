@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Entry as EntryAPI;
@@ -21,7 +22,7 @@ class PageTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_entry()
     {
         $page = new Page;
@@ -34,7 +35,7 @@ class PageTest extends TestCase
         $this->assertEquals($page, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_entry_dynamically_when_its_set_using_a_string()
     {
         EntryAPI::shouldReceive('find')
@@ -52,7 +53,7 @@ class PageTest extends TestCase
         $this->assertEquals($page, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_entry_dynamically_when_its_set_using_an_int()
     {
         EntryAPI::shouldReceive('find')
@@ -70,7 +71,7 @@ class PageTest extends TestCase
         $this->assertEquals($page, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_title()
     {
         $page = new Page;
@@ -84,7 +85,7 @@ class PageTest extends TestCase
         $this->assertTrue($page->hasCustomTitle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_title_when_referencing_an_entry()
     {
         $entry = $this->mock(Entry::class);
@@ -102,7 +103,7 @@ class PageTest extends TestCase
         $this->assertFalse($page->hasCustomTitle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_custom_title_when_referencing_an_entry()
     {
         $entry = $this->mock(Entry::class);
@@ -122,7 +123,7 @@ class PageTest extends TestCase
         $this->assertTrue($page->hasCustomTitle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_parent()
     {
         $page = new Page;
@@ -136,7 +137,7 @@ class PageTest extends TestCase
         $this->assertEquals($page, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_route()
     {
         $page = new Page;
@@ -148,7 +149,7 @@ class PageTest extends TestCase
         $this->assertEquals($page, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_builds_a_uri_based_on_the_position_in_the_structure_when_the_structure_has_a_collection()
     {
         $entry = new class extends Entry
@@ -234,7 +235,7 @@ class PageTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_entrys_uri_when_the_structure_does_not_have_a_collection()
     {
         $entry = $this->partialMock(Entry::class);
@@ -260,7 +261,7 @@ class PageTest extends TestCase
         $this->assertFalse($page->hasCustomUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_uri_of_a_redirect_entry()
     {
         $entry = $this->partialMock(Entry::class);
@@ -286,7 +287,7 @@ class PageTest extends TestCase
         $this->assertFalse($page->hasCustomUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_uri_of_a_hardcoded_relative_link()
     {
         $tree = $this->newTree()->setStructure(
@@ -306,7 +307,7 @@ class PageTest extends TestCase
         $this->assertTrue($page->hasCustomUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_uri_of_a_hardcoded_absolute_link()
     {
         $tree = $this->newTree()->setStructure(
@@ -326,7 +327,7 @@ class PageTest extends TestCase
         $this->assertTrue($page->hasCustomUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_uri_of_a_hardcoded_text_only_page()
     {
         $tree = $this->newTree()->setStructure(
@@ -346,7 +347,7 @@ class PageTest extends TestCase
         $this->assertFalse($page->hasCustomUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_child_pages()
     {
         $tree = $this->newTree()->setStructure($this->mock(Structure::class));
@@ -369,7 +370,7 @@ class PageTest extends TestCase
         $this->assertEquals(['one', 'two'], $pages->all()->map->id()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_flattened_pages()
     {
         $page = (new Page)
@@ -390,7 +391,7 @@ class PageTest extends TestCase
         $this->assertEquals(['one', 'two', 'three', 'four'], $flattened->map->id()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_forwards_calls_to_the_entry()
     {
         $entry = $this->mock(Entry::class);
@@ -403,7 +404,7 @@ class PageTest extends TestCase
         $this->assertEquals('hello', $page->testing('123'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_values()
     {
         $page = new Page;
@@ -431,7 +432,7 @@ class PageTest extends TestCase
         $this->assertEquals('fallback', $page->get('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_values_and_falls_back_to_values_from_the_entry()
     {
         $entry = EntryFactory::id('test-entry')->collection('test')->data([
@@ -484,7 +485,7 @@ class PageTest extends TestCase
         $this->assertEquals('fallback', $page->get('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         $entry = EntryFactory::id('test-entry')->collection('test')->data([
@@ -506,7 +507,7 @@ class PageTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $page[$key]));
     }
 
-    /** @test */
+    #[Test]
     public function it_is_arrayable()
     {
         $entry = EntryFactory::id('test-entry')->collection('test')->data([

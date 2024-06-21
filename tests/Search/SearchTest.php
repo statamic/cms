@@ -3,6 +3,7 @@
 namespace Tests\Search;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Index;
 use Statamic\Search\IndexManager;

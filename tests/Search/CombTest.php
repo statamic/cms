@@ -2,6 +2,7 @@
 
 namespace Tests\Search;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Search\Comb\Comb;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Tests\TestCase;

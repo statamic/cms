@@ -3,6 +3,7 @@
 namespace Tests\Tags\Concerns;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\LabeledValue;
@@ -44,7 +45,7 @@ class QueriesConditionsTest extends TestCase
         return (new Entries($params))->get();
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog')->save();
@@ -60,7 +61,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['featured:is' => false]));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_filter_by_is_condition_when_value_is_empty()
     {
         $this->makeEntry('a')->set('author', 'john-doe')->save();
@@ -70,7 +71,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(3, $this->getEntries(['author:is' => '']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_not_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog')->save();
@@ -88,7 +89,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['featured:not' => false]));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_filter_by_not_condition_when_value_is_empty()
     {
         $this->makeEntry('a')->set('author', 'john-doe')->save();
@@ -98,7 +99,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(3, $this->getEntries(['author:not' => '']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_contains_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -109,7 +110,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(1, $this->getEntries(['title:contains' => 'sto']));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_filter_by_contains_condition_when_value_is_empty()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -119,7 +120,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(3, $this->getEntries(['title:contains' => '']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_doesnt_contain_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -130,7 +131,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(2, $this->getEntries(['title:doesnt_contain' => 'sto']));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_filter_by_doesnt_contains_condition_when_value_is_empty()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -140,7 +141,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(3, $this->getEntries(['title:doesnt_contain' => '']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_in_condition()
     {
         $this->makeEntry('dog')->set('type', 'canine')->save();
@@ -164,7 +165,7 @@ class QueriesConditionsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_not_in_condition()
     {
         $this->makeEntry('dog')->set('type', 'canine')->save();
@@ -200,7 +201,7 @@ class QueriesConditionsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_starts_with_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -214,7 +215,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(1, $this->getEntries(['title:begins_with' => 'dog']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_doesnt_start_with_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -228,7 +229,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(2, $this->getEntries(['title:doesnt_begin_with' => 'dog']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_ends_with_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -240,7 +241,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(1, $this->getEntries(['title:ends_with' => 'stories']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_doesnt_end_with_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -252,7 +253,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(2, $this->getEntries(['title:doesnt_end_with' => 'stories']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_greater_than_condition()
     {
         $this->makeEntry('a')->set('age', 11)->save();
@@ -269,7 +270,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['age:gt' => '18']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_less_than_condition()
     {
         $this->makeEntry('a')->set('age', 11)->save();
@@ -286,7 +287,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(2, $this->getEntries(['age:lt' => '18']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_greater_than_or_equal_to_condition()
     {
         $this->makeEntry('a')->set('age', 11)->save();
@@ -303,7 +304,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['age:gte' => '21']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_less_than_or_equal_to_condition()
     {
         $this->makeEntry('a')->set('age', 11)->save();
@@ -320,7 +321,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['age:lte' => '21']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_regex_condition()
     {
         $this->makeEntry('a')->set('title', 'Dog Stories')->save();
@@ -343,7 +344,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(1, $this->getEntries(['title:matches' => '/^cat/i'])); // v2 patterns required delimiters
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_not_regex_condition()
     {
         $this->makeEntry('a')->set('title', 'Dog Stories')->save();
@@ -360,7 +361,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['title:doesnt_match' => '/^cat/i'])); // v2 patterns required delimiters
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_after_or_before_date_conditions()
     {
         $this->collection->dated(true)->save();
@@ -397,7 +398,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(1, $this->getEntries(['show_future' => true, 'date:is_after' => $time]));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_after_or_before_date_range_conditions()
     {
         $this->collection->save();
@@ -430,7 +431,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(2, $this->getEntries(['date_field.start:is_future' => false]));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_alpha_condition()
     {
         $this->makeEntry('a')->set('title', 'Post')->save();
@@ -444,7 +445,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['title:is_alpha' => false]));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_alpha_numeric_condition()
     {
         $this->makeEntry('a')->set('title', 'Post')->save();
@@ -458,7 +459,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(3, $this->getEntries(['title:is_alpha_numeric' => false]));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_numeric_condition()
     {
         $this->makeEntry('a')->set('title', 'Post')->save();
@@ -475,7 +476,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(5, $this->getEntries(['title:is_numeric' => false]));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_url_condition()
     {
         $this->makeEntry('a')->set('website', 'https://domain.tld')->save();
@@ -497,7 +498,7 @@ class QueriesConditionsTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_embeddable_condition()
     {
         $this->makeEntry('a')->set('video', 'https://youtube.com/id')->save(); // valid
@@ -525,7 +526,7 @@ class QueriesConditionsTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_email_condition()
     {
         $this->makeEntry('a')->set('email', 'han@solo.com')->save();
@@ -543,7 +544,7 @@ class QueriesConditionsTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_empty_condition()
     {
         $this->makeEntry('a')->set('sub_title', 'Has sub-title')->save();
@@ -572,7 +573,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(3, $this->getEntries(['sub_title:isset' => false]));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_is_numberwang_condition()
     {
         $this->makeEntry('a')->set('age', 22)->save();
@@ -584,7 +585,7 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(1, $this->getEntries(['age:is_numberwang' => false]));
     }
 
-    /** @test */
+    #[Test]
     public function when_the_value_is_an_augmentable_object_it_will_use_the_corresponding_value()
     {
         // The value doesn't have to be an entry, it just has to be an augmentable.
@@ -615,7 +616,7 @@ class QueriesConditionsTest extends TestCase
         $class->query($query);
     }
 
-    /** @test */
+    #[Test]
     public function when_the_value_is_an_array_of_augmentables_it_will_get_the_respective_values()
     {
         // The value doesn't have to be an entry, it just has to be an augmentable.
@@ -648,7 +649,7 @@ class QueriesConditionsTest extends TestCase
         $class->query($query);
     }
 
-    /** @test */
+    #[Test]
     public function when_the_value_is_a_collection_of_augmentables_it_will_get_the_respective_values()
     {
         // The value doesn't have to be an entry, it just has to be an augmentable.
@@ -681,7 +682,7 @@ class QueriesConditionsTest extends TestCase
         $class->query($query);
     }
 
-    /** @test */
+    #[Test]
     public function when_the_value_is_a_labeled_value_object_it_will_use_the_corresponding_value()
     {
         $value = new LabeledValue('foo', 'The Foo Label');
@@ -708,7 +709,7 @@ class QueriesConditionsTest extends TestCase
         $class->query($query);
     }
 
-    /** @test */
+    #[Test]
     public function when_the_value_is_a_non_augmentable_object_it_will_throw_an_exception()
     {
         $this->expectExceptionMessage('Cannot query [somefield] using value [Tests\Tags\Concerns\SomeArbitraryTestObject]');

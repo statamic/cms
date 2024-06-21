@@ -3,6 +3,7 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /** @group graphql */
@@ -30,7 +31,7 @@ class SitesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'sites')->andReturnFalse()->once();
@@ -43,7 +44,7 @@ class SitesTest extends TestCase
             ->assertSee('Cannot query field \"entries\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_global_sets()
     {
         $query = <<<'GQL'

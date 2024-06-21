@@ -6,6 +6,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -32,7 +33,7 @@ class StatamicTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_for_cp_route()
     {
         $this->get('/not-cp');
@@ -52,19 +53,19 @@ class StatamicTest extends TestCase
         $this->assertFalse(Statamic::isCpRoute());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_system_date_format()
     {
         $this->assertEquals('system-date-format', Statamic::dateFormat());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_cp_date_format()
     {
         $this->assertEquals('cp-date-format', Statamic::cpDateFormat());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_users_preferred_date_format_when_requesting_cp_format_but_not_the_system_format()
     {
         $user = tap(User::make())->save();
@@ -76,7 +77,7 @@ class StatamicTest extends TestCase
         $this->assertEquals('system-date-format', $response->json('dateFormat'));
     }
 
-    /** @test */
+    #[Test]
     public function it_appends_time_if_system_date_format_doesnt_have_time_in_it()
     {
         config(['statamic.system.date_format' => 'Y--m--d']);
@@ -96,7 +97,7 @@ class StatamicTest extends TestCase
         $this->assertEquals($format, Statamic::dateTimeFormat());
     }
 
-    /** @test */
+    #[Test]
     public function it_appends_time_if_cp_date_format_doesnt_have_time_in_it()
     {
         config(['statamic.cp.date_format' => 'Y--m--d']);
@@ -116,13 +117,13 @@ class StatamicTest extends TestCase
         $this->assertEquals($format, Statamic::cpDateTimeFormat());
     }
 
-    /** @test */
+    #[Test]
     public function it_wraps_fluent_tag_helper()
     {
         $this->assertInstanceOf(\Statamic\Tags\FluentTag::class, Statamic::tag('some_tag'));
     }
 
-    /** @test */
+    #[Test]
     public function it_wraps_fluent_modifier_helper()
     {
         $this->assertInstanceOf(\Statamic\Modifiers\Modify::class, Statamic::modify('some_value'));
@@ -141,7 +142,7 @@ class StatamicTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_aliases_query_builders()
     {
         app()->bind('statamic.queries.test', function () {
@@ -151,7 +152,7 @@ class StatamicTest extends TestCase
         $this->assertEquals('the test query builder', Statamic::query('test'));
     }
 
-    /** @test */
+    #[Test]
     public function native_query_builder_aliases_are_bound()
     {
         $aliases = [
@@ -167,7 +168,7 @@ class StatamicTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_for_invalid_query_builder_alias()
     {
         $this->expectException(BindingResolutionException::class);
@@ -176,7 +177,7 @@ class StatamicTest extends TestCase
         Statamic::query('test');
     }
 
-    /** @test */
+    #[Test]
     public function scripts_will_automatically_be_versioned()
     {
         Statamic::script('test-a', 'test');
@@ -192,7 +193,7 @@ class StatamicTest extends TestCase
         $this->assertEquals(16, strlen(Str::of($testScript)->after('.js?v=')));
     }
 
-    /** @test */
+    #[Test]
     public function styles_will_automatically_be_versioned()
     {
         Statamic::style('test-b', 'test');
@@ -208,7 +209,7 @@ class StatamicTest extends TestCase
         $this->assertEquals(16, strlen(Str::of($testStyle)->after('.css?v=')));
     }
 
-    /** @test */
+    #[Test]
     public function scripts_can_be_passed_with_a_laravel_mix_version()
     {
         $path = 'test.js?id=some-random-laravel-mix-version';
@@ -228,7 +229,7 @@ class StatamicTest extends TestCase
         $this->assertEquals($testScript, $path);
     }
 
-    /** @test */
+    #[Test]
     public function styles_can_be_passed_with_a_laravel_mix_version()
     {
         $path = 'test.css?id=some-random-laravel-mix-version';
@@ -248,7 +249,7 @@ class StatamicTest extends TestCase
         $this->assertEquals($testStyle, $path);
     }
 
-    /** @test */
+    #[Test]
     public function assets_with_equal_names_will_be_cached_differently()
     {
         Statamic::style('test-name', __DIR__.'/../resources/css/test-path-1.css');
@@ -320,7 +321,7 @@ class StatamicTest extends TestCase
         $app->useLangPath(__DIR__.'/__fixtures__/lang');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_detect_if_running_in_a_queue_worker()
     {
         // It should return false by default

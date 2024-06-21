@@ -2,6 +2,7 @@
 
 namespace Feature;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;

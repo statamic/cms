@@ -2,6 +2,7 @@
 
 namespace Tests\Fields;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\ClassRuleParser;
 use Tests\TestCase;
 

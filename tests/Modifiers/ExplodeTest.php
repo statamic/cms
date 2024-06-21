@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -10,7 +11,7 @@ use Tests\TestCase;
  */
 class ExplodeTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_breaks_a_string_into_an_array_of_strings(): void
     {
         $places = 'Scotland, England, Switzerland, Italy';

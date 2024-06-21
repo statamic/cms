@@ -2,6 +2,7 @@
 
 namespace Tests\Query;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Query\OrderBy;
 use Tests\TestCase;
 

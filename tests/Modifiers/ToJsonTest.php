@@ -3,6 +3,7 @@
 namespace Modifiers;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use Statamic\Modifiers\Modify;
 use Tests\PreventSavingStacheItemsToDisk;

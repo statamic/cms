@@ -3,6 +3,7 @@
 namespace Tests\Console\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class MakeAddonTest extends TestCase
@@ -29,7 +30,7 @@ class MakeAddonTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_generate_an_addon()
     {
         $this->assertFileDoesNotExist(base_path('addons/hasselhoff/knight-rider'));
@@ -44,16 +45,16 @@ class MakeAddonTest extends TestCase
         $this->assertStringContainsString('"Hasselhoff\\\KnightRider\\\": "src"', $this->files->get($composerJson));
 
         $this->assertFileExists($provider = base_path('addons/hasselhoff/knight-rider/src/ServiceProvider.php'));
-        $this->assertStringContainsString('namespace Hasselhoff\KnightRider;', $this->files->get($provider));
+        $this->assertStringContainsString('namespace Hasselhoff\KnightRider; use PHPUnit\Framework\Attributes\Test;', $this->files->get($provider));
 
         $this->assertFileExists($testCase = base_path('addons/hasselhoff/knight-rider/tests/TestCase.php'));
-        $this->assertStringContainsString('namespace Hasselhoff\KnightRider\Tests;', $this->files->get($testCase));
+        $this->assertStringContainsString('namespace Hasselhoff\KnightRider\Tests; use PHPUnit\Framework\Attributes\Test;', $this->files->get($testCase));
 
         $this->assertFileExists($exampleTest = base_path('addons/hasselhoff/knight-rider/tests/ExampleTest.php'));
-        $this->assertStringContainsString('namespace Hasselhoff\KnightRider\Tests;', $this->files->get($exampleTest));
+        $this->assertStringContainsString('namespace Hasselhoff\KnightRider\Tests; use PHPUnit\Framework\Attributes\Test;', $this->files->get($exampleTest));
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_make_addon_with_invalid_composer_package_name()
     {
         $this->artisan('statamic:make:addon', ['addon' => 'deaths-tar-vulnerability'])
@@ -65,7 +66,7 @@ class MakeAddonTest extends TestCase
         $this->assertFileDoesNotExist(base_path('addons/erso/deaths-tar-vulnerability'));
     }
 
-    /** @test */
+    #[Test]
     public function it_will_not_overwrite_an_existing_addon()
     {
         $path = base_path('addons/erso/deaths-tar-vulnerability');
@@ -81,7 +82,7 @@ class MakeAddonTest extends TestCase
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
     }
 
-    /** @test */
+    #[Test]
     public function using_force_option_will_overwrite_original_addon()
     {
         $path = base_path('addons/erso/deaths-tar-vulnerability');
@@ -96,7 +97,7 @@ class MakeAddonTest extends TestCase
         $this->assertStringNotContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_generate_with_a_fieldtype()
     {
         $this->assertFileDoesNotExist(base_path('addons/hasselhoff/knight-rider'));
@@ -118,7 +119,7 @@ class MakeAddonTest extends TestCase
         $this->assertDirectoryExists(base_path('addons/hasselhoff/knight-rider/resources/dist'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_an_addon_with_everything_including_the_kitchen_sink()
     {
         $path = base_path('addons/ford/san-holo');
@@ -128,16 +129,16 @@ class MakeAddonTest extends TestCase
         $this->artisan('statamic:make:addon', ['addon' => 'ford/san-holo', '--all' => true]);
 
         $this->assertFileExists("$path/src/Fieldtypes/SanHolo.php");
-        $this->assertStringContainsString('namespace Ford\SanHolo\Fieldtypes;', $this->files->get("$path/src/Fieldtypes/SanHolo.php"));
+        $this->assertStringContainsString('namespace Ford\SanHolo\Fieldtypes; use PHPUnit\Framework\Attributes\Test;', $this->files->get("$path/src/Fieldtypes/SanHolo.php"));
         $this->assertFileExists("$path/src/Scopes/SanHolo.php");
-        $this->assertStringContainsString('namespace Ford\SanHolo\Scopes;', $this->files->get("$path/src/Scopes/SanHolo.php"));
+        $this->assertStringContainsString('namespace Ford\SanHolo\Scopes; use PHPUnit\Framework\Attributes\Test;', $this->files->get("$path/src/Scopes/SanHolo.php"));
         $this->assertFileExists("$path/src/Modifiers/SanHolo.php");
-        $this->assertStringContainsString('namespace Ford\SanHolo\Modifiers;', $this->files->get("$path/src/Modifiers/SanHolo.php"));
+        $this->assertStringContainsString('namespace Ford\SanHolo\Modifiers; use PHPUnit\Framework\Attributes\Test;', $this->files->get("$path/src/Modifiers/SanHolo.php"));
         $this->assertFileExists("$path/src/Tags/SanHolo.php");
 
-        $this->assertStringContainsString('namespace Ford\SanHolo\Tags;', $this->files->get("$path/src/Tags/SanHolo.php"));
+        $this->assertStringContainsString('namespace Ford\SanHolo\Tags; use PHPUnit\Framework\Attributes\Test;', $this->files->get("$path/src/Tags/SanHolo.php"));
         $this->assertFileExists("$path/src/Widgets/SanHolo.php");
-        $this->assertStringContainsString('namespace Ford\SanHolo\Widgets;', $this->files->get("$path/src/Widgets/SanHolo.php"));
+        $this->assertStringContainsString('namespace Ford\SanHolo\Widgets; use PHPUnit\Framework\Attributes\Test;', $this->files->get("$path/src/Widgets/SanHolo.php"));
     }
 
     private function makeAddon($addon, $options = [])

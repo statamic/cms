@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -10,7 +11,7 @@ use Tests\TestCase;
  */
 class PartialTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_injects_variable_data_into_a_partial_and_renders_it(): void
     {
         $this->app->bind('filesystems.paths.resources', function () {

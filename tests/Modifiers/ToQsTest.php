@@ -2,6 +2,7 @@
 
 namespace Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;

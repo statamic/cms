@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -10,7 +11,7 @@ use Tests\TestCase;
  */
 class InArrayTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_checks_if_an_array_contains_a_specific_value(): void
     {
         $input = [

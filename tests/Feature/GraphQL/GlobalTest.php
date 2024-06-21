@@ -5,6 +5,7 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\GlobalFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\GraphQL;
@@ -25,7 +26,7 @@ class GlobalTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'globals')->andReturnFalse()->once();
@@ -38,7 +39,7 @@ class GlobalTest extends TestCase
             ->assertSee('Cannot query field \"globalSet\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_a_global_set_by_handle()
     {
         GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
@@ -77,7 +78,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
         $query = <<<'GQL'
@@ -110,7 +111,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_a_global_set_in_a_specific_site()
     {
         $this->setSites([
@@ -153,7 +154,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields_to_interface()
     {
         GraphQL::addField('GlobalSetInterface', 'one', function () {
@@ -201,7 +202,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields_to_an_implementation()
     {
         GraphQL::addField('GlobalSet_Social', 'one', function () {

@@ -4,6 +4,7 @@ namespace Tests\Tags;
 
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 

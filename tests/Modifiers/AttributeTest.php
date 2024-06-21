@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -37,7 +38,7 @@ class AttributeTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_without_argument()
     {
         $this->expectException(\Exception::class);
@@ -46,7 +47,7 @@ class AttributeTest extends TestCase
         $this->modify('value', null);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_value_is_an_object_without_toString_method()
     {
         $this->expectException(\Error::class);

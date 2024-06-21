@@ -2,6 +2,7 @@
 
 namespace Tests\Fields;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -37,7 +38,7 @@ class ValueTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_through_the_fieldtype()
     {
         $fieldtype = new class extends Fieldtype
@@ -58,7 +59,7 @@ class ValueTest extends TestCase
         $this->assertEquals('TEST!', $value->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_shallow_augments_through_the_fieldtype()
     {
         $fieldtype = new class extends Fieldtype
@@ -81,7 +82,7 @@ class ValueTest extends TestCase
         $this->assertEquals('test shallow', $value->shallow()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_string_using_the_augmented_value()
     {
         $fieldtype = new class extends Fieldtype
@@ -97,7 +98,7 @@ class ValueTest extends TestCase
         $this->assertEquals('TEST!', (string) $value);
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_json_using_the_augmented_value()
     {
         $fieldtype = new class extends Fieldtype
@@ -115,7 +116,7 @@ class ValueTest extends TestCase
         $this->assertEquals('{"foo":"BAR!","baz":"QUX!"}', json_encode($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_json_and_augments_child_values()
     {
         $fieldtype = new class extends Fieldtype
@@ -155,7 +156,7 @@ class ValueTest extends TestCase
         $this->assertEquals('{"foo":"BAR!","baz":{"id":"123","title":"Title for 123"},"qux":[{"id":"456","title":"Title for 456"},{"id":"789","title":"Title for 789"}]}', json_encode($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_default_value()
     {
         $fieldtype = new class extends Fieldtype
@@ -179,7 +180,7 @@ class ValueTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_use_the_default_when_returning_falsey_values()
     {
         $fieldtype = new class extends Fieldtype
@@ -197,7 +198,7 @@ class ValueTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function falsey_values_can_be_used_as_the_default()
     {
         $fieldtype = new class extends Fieldtype

@@ -2,6 +2,7 @@
 
 namespace Tests\Sites;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
@@ -38,7 +39,7 @@ class SitesConfigTest extends TestCase
         Site::swap(new Sites);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_sites_from_yaml()
     {
         $this->assertCount(2, Site::all());
@@ -56,7 +57,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame('fr', Site::get('french')->lang());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_default_site_without_yaml()
     {
         File::delete($this->yamlPath);
@@ -75,7 +76,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame('en', Site::default()->lang());
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_sites_at_runtime()
     {
         Site::setSites([
@@ -114,7 +115,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame(['theme' => 'standard'], Site::get('arabic')->attributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_antlers_when_resolving_sites()
     {
         Config::set('app', [
@@ -146,7 +147,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame(['theme' => 'sunset'], Site::default()->attributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_single_site_back_to_yaml_in_normalized_sites_array()
     {
         Site::setSites([
@@ -168,7 +169,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_multiple_sites_back_to_yaml()
     {
         Site::setSites([
@@ -208,7 +209,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_single_site_back_to_yaml_with_unresolved_antlers()
     {
         Site::setSites([
@@ -238,7 +239,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_multiple_sites_back_to_yaml_with_unresolved_antlers()
     {
         Site::setSites([
@@ -286,7 +287,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_site_through_cp_endpoint()
     {
         $this
@@ -310,7 +311,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_multiple_sites_through_cp_endpoint()
     {
         // Multisite requires this config
@@ -362,7 +363,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_required_fields_for_site_through_cp_endpoint()
     {
         $this
@@ -378,7 +379,7 @@ class SitesConfigTest extends TestCase
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_required_fields_for_multiple_sites_through_cp_endpoint()
     {
         // Multisite requires this config

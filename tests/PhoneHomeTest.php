@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Licensing\Outpost;
 
 class PhoneHomeTest extends TestCase
@@ -60,7 +61,7 @@ class PhoneHomeTest extends TestCase
         $app['config']->set('statamic.system.phone_home_route_enabled', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_contact_the_outpost_when_an_incorrect_key_is_provided()
     {
         config(['statamic.system.license_key' => 'test-key']);
@@ -70,7 +71,7 @@ class PhoneHomeTest extends TestCase
         $this->get('/et/phone/home/invalid')->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_contact_the_outpost_when_key_is_missing()
     {
         config(['statamic.system.license_key' => 'test-key']);

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Roles;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -39,7 +40,7 @@ class UpdateRoleTest extends TestCase
         return tap(User::make()->assignRole('user'))->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_without_permission_to_edit_roles()
     {
         $role = tap(Role::make('test'))->save();
@@ -51,7 +52,7 @@ class UpdateRoleTest extends TestCase
             ->assertRedirect('/original');
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_a_role()
     {
         $role = tap(
@@ -77,7 +78,7 @@ class UpdateRoleTest extends TestCase
         $this->assertFalse($role->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function super_users_can_mark_a_role_as_super()
     {
         $role = tap(
@@ -99,7 +100,7 @@ class UpdateRoleTest extends TestCase
         $this->assertTrue($role->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function non_super_users_may_not_mark_a_role_as_super()
     {
         $role = tap(
@@ -121,7 +122,7 @@ class UpdateRoleTest extends TestCase
         $this->assertFalse($role->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function cannot_sneak_a_super_into_permissions_array()
     {
         $role = tap(

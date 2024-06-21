@@ -5,6 +5,7 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Config;
 use Statamic\Facades\User;
@@ -30,7 +31,7 @@ class UsersTest extends TestCase
         User::make()->id('7')->email('g@example.com')->set('name', 'Fred')->save();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'users')->andReturnFalse()->once();
@@ -43,7 +44,7 @@ class UsersTest extends TestCase
             ->assertSee('Cannot query field \"users\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_all_users()
     {
         $this->createUsers();
@@ -78,7 +79,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_paginates_users()
     {
         $this->createUsers();
@@ -120,7 +121,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_blueprint_specific_fields()
     {
         User::make()->id('1')->email('a@example.com')->set('foo', 'bar')->save();
@@ -152,7 +153,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_filter_users_by_default()
     {
         $this->createUsers();
@@ -202,7 +203,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_users_when_configuration_allows_for_it()
     {
         $this->createUsers();
@@ -250,7 +251,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_users_with_equalto_shorthand()
     {
         $this->createUsers();
@@ -285,7 +286,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_users_with_multiple_conditions_of_the_same_type()
     {
         $this->createUsers();
@@ -384,7 +385,7 @@ GQL;
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_users()
     {
         $this->createUsers();
@@ -415,7 +416,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_users_descending()
     {
         $this->createUsers();
@@ -446,7 +447,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_users_on_multiple_fields()
     {
         User::make()->id('1')->email('a@example.com')->data(['foo' => 'Beta', 'number' => 2])->save();

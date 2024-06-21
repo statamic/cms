@@ -2,12 +2,13 @@
 
 namespace Tests\Feature\GraphQL;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /** @group graphql */
 class PingPongTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_pongs_when_pinged()
     {
         $this

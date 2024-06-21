@@ -19,7 +19,7 @@ replicatorKey1 - Replicator Value 1
         
         &lt;?php
 
-namespace App\Providers;
+namespace App\Providers; use PHPUnit\Framework\Attributes\Test;
 
 use Illuminate\Support\ServiceProvider;
 use Statamic\Statamic;

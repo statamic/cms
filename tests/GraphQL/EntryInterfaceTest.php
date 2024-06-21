@@ -3,6 +3,7 @@
 namespace Tests\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
@@ -16,7 +17,7 @@ class EntryInterfaceTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_adds_types()
     {
         GraphQL::spy();

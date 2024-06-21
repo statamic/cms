@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -10,7 +11,7 @@ use Tests\TestCase;
  */
 class ClassesTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_conditionally_applies_class_names(): void
     {
         $this->assertSame('one two', $this->modify(['one' => true, 'two' => true])->fetch());

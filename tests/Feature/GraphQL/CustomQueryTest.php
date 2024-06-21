@@ -3,6 +3,7 @@
 namespace Tests\Feature\GraphQL;
 
 use GraphQL\Type\Definition\Type;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Queries\Query;
 use Tests\TestCase;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 /** @group graphql */
 class CustomQueryTest extends TestCase
 {
-    /** @test **/
+    #[Test]
     public function custom_query_does_not_yet_exist()
     {
         $this

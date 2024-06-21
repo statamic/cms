@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\API\AbstractCacher;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\Event;
@@ -36,7 +37,7 @@ class CacherTest extends TestCase
         return EntryFactory::id($slug)->slug($slug)->collection($this->collection)->make();
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_endpoint_using_default_cacher()
     {
         $this->makeEntry('apple')->save();
@@ -142,7 +143,7 @@ class CacherTest extends TestCase
         $this->assertFalse(Cache::has($cacheKey));
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_endpoint_with_query_params()
     {
         $this->makeEntry('apple')->save();
@@ -160,7 +161,7 @@ class CacherTest extends TestCase
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_multiple_endpoints()
     {
         $this->makeEntry('apple')->save();
@@ -190,7 +191,7 @@ class CacherTest extends TestCase
         $this->assertEquals($cachedResponses, Cache::get('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_busts_whole_cache_when_content_is_saved()
     {
         $entry = $this->makeEntry('apple');
@@ -221,7 +222,7 @@ class CacherTest extends TestCase
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_busts_whole_cache_when_unrelated_content_is_saved()
     {
         $this->makeEntry('apple')->save();
@@ -252,7 +253,7 @@ class CacherTest extends TestCase
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_disable_default_cacher_by_setting_false_on_parent_cache_config()
     {
         Facades\Config::set('statamic.api.cache', false);
@@ -272,7 +273,7 @@ class CacherTest extends TestCase
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_disable_default_cacher_by_setting_false_on_child_class_config()
     {
         Facades\Config::set('statamic.api.cache.class', false);
@@ -292,7 +293,7 @@ class CacherTest extends TestCase
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_custom_cacher()
     {
         Facades\Config::set('statamic.api.cache.class', CustomCacher::class);

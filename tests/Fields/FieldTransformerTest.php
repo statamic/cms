@@ -2,6 +2,7 @@
 
 namespace Tests\Fields;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
@@ -18,7 +19,7 @@ class FieldTransformerTest extends TestCase
         return FieldTransformer::toVue(['handle' => 'test', 'field' => $config])['config'];
     }
 
-    /** @test */
+    #[Test]
     public function it_defaults_to_width_100()
     {
         // Will use configured width if set.
@@ -28,7 +29,7 @@ class FieldTransformerTest extends TestCase
         $this->assertEquals(100, $this->configToVue([])['width']);
     }
 
-    /** @test */
+    #[Test]
     public function it_defaults_to_localizable_false()
     {
         // Will use configured localizable if set.
@@ -38,7 +39,7 @@ class FieldTransformerTest extends TestCase
         $this->assertFalse($this->configToVue([])['localizable']);
     }
 
-    /** @test */
+    #[Test]
     public function it_normalizes_required_validation()
     {
         // It should replace `required: true` with `validate: ['required']`
@@ -71,7 +72,7 @@ class FieldTransformerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_redundant_config_options()
     {
         $fieldtype = new class extends Fieldtype
@@ -114,7 +115,7 @@ class FieldTransformerTest extends TestCase
         ], $fromVue['field']);
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_full_width_from_field_config()
     {
         $fromVue = FieldTransformer::fromVue([
@@ -136,7 +137,7 @@ class FieldTransformerTest extends TestCase
         ], $fromVue);
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_localizable_false_from_field_config()
     {
         $fromVue = FieldTransformer::fromVue([
@@ -158,7 +159,7 @@ class FieldTransformerTest extends TestCase
         ], $fromVue);
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_duplicate_from_field_config()
     {
         $fromVue = FieldTransformer::fromVue([
@@ -171,7 +172,7 @@ class FieldTransformerTest extends TestCase
         ], $fromVue);
     }
 
-    /** @test */
+    #[Test]
     public function sets_and_fields_are_always_at_the_end_of_field_configs()
     {
         $fromVue = FieldTransformer::fromVue([
@@ -217,7 +218,7 @@ class FieldTransformerTest extends TestCase
         ], $fromVue);
     }
 
-    /** @test */
+    #[Test]
     public function blank_instructions_and_icon_are_removed_from_set_groups()
     {
         $fromVue = FieldTransformer::fromVue([
