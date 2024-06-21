@@ -3,7 +3,7 @@ import Echo from './Echo';
 import Bard from './Bard';
 import Keys from './keys/Keys';
 import Hooks from './Hooks';
-import Tools from './Tools';
+import Actions from './Actions';
 import Reveal from './Reveal';
 import Components from './Components';
 import FieldConditions from './FieldConditions';
@@ -13,7 +13,7 @@ const echo = new Echo;
 const bard = new Bard;
 const keys = new Keys;
 const hooks = new Hooks;
-const tools = new Tools;
+const actions = new Actions;
 const reveal = new Reveal;
 const components = new Components;
 const conditions = new FieldConditions;
@@ -55,8 +55,8 @@ export default new Vue({
             return hooks;
         },
 
-        $tools() {
-            return tools;
+        $actions() {
+            return actions;
         },
 
         $reveal() {

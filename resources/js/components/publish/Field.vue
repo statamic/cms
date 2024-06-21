@@ -57,7 +57,7 @@
                         v-bind="item"
                         @click="item.click" />
                     <template #dropdown>
-                        <dropdown-tools :tools="fieldTools" @run="fieldRunTool" />
+                        <dropdown-tools :tools="fieldActions" @run="fieldRunAction" />
                         <div class="divider" />
                         <dropdown-item
                             v-for="item in fieldDropdownItems"
@@ -252,7 +252,7 @@ export default {
                 || this.syncable // Need to see the icon
         },
 
-        fieldTools() {
+        fieldActions() {
             return this.$refs.field.tools;
         },
 
@@ -265,7 +265,7 @@ export default {
         },
 
         hasDropdown() {
-            return this.fieldTools.length > 0 || this.fieldDropdownItems.length > 0;
+            return this.fieldActions.length > 0 || this.fieldDropdownItems.length > 0;
         },
 
     },
@@ -299,8 +299,8 @@ export default {
             return marked(text);
         },
 
-        fieldRunTool(tool) {
-            this.$refs.field.runTool(tool);
+        fieldRunAction(action) {
+            this.$refs.field.runAction(action);
         }
 
     }

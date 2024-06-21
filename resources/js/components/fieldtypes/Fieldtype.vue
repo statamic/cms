@@ -1,10 +1,10 @@
 <script>
-import HasTools from '../HasTools';
+import HasActions from '../HasActions';
 
 export default {
 
     mixins: [
-        HasTools,
+        HasActions,
     ],
 
     props: {
@@ -87,7 +87,7 @@ export default {
             return [];
         },
 
-        toolPayload() { 
+        actionPayload() { 
             return {
                 field: this,
                 value: this.value,
@@ -114,4 +114,5 @@ export default {
     }
 
 }
-</script>../HasTools
+</script>../HasActions
+../HasActions

@@ -1,10 +1,10 @@
 <template>
     <div>
         <button
-            v-for="tool in tools"
-            @click="run(tool)"
+            v-for="action in actions"
+            @click="run(action)"
         >
-            {{ tool.display }}
+            {{ action.display }}
         </button>
     </div>
 </template>
@@ -12,14 +12,14 @@
 <script>
 export default {
 
-    props: ['tools'],
+    props: ['actions'],
 
     inject: ['popover'],
 
     methods: {
 
-        run(tool) {
-            this.$emit('run', tool);
+        run(action) {
+            this.$emit('run', action);
 
             this.popover.vm.close();
         },
