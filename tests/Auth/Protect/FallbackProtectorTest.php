@@ -2,6 +2,7 @@
 
 namespace Tests\Auth\Protect;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Protect\Protectors\Fallback;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
@@ -17,7 +18,7 @@ class FallbackProtectorTest extends TestCase
         $this->protector = new Fallback;
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_403()
     {
         try {

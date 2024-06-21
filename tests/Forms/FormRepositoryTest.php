@@ -2,6 +2,7 @@
 
 namespace Tests\Forms;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Exceptions\FormNotFoundException;
 use Statamic\Forms\FormRepository;
@@ -22,7 +23,7 @@ class FormRepositoryTest extends TestCase
         $this->repo = new FormRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_gets_form()
     {
         $this->repo->make('test_form')->title('Test')->save();
@@ -33,7 +34,7 @@ class FormRepositoryTest extends TestCase
         $this->assertEquals('Test', $form->title());
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_throws_exception_when_form_does_not_exist()
     {
         $this->expectException(FormNotFoundException::class);

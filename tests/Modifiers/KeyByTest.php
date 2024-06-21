@@ -3,12 +3,13 @@
 namespace Tests\Modifiers;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class KeyByTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_rekeys_an_array(): void
     {
         $modified = $this->modify([
@@ -22,7 +23,7 @@ class KeyByTest extends TestCase
         ], $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_rekeys_a_collection(): void
     {
         $modified = $this->modify(collect([

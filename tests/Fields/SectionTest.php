@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Section;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class SectionTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_display()
     {
         $this->assertNull((new Section([]))->display());
@@ -18,7 +19,7 @@ class SectionTest extends TestCase
         $this->assertEquals('Test', (new Section(['display' => 'Test']))->display());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_instructions()
     {
         $this->assertNull((new Section([]))->instructions());
@@ -26,7 +27,7 @@ class SectionTest extends TestCase
         $this->assertEquals('Test', (new Section(['instructions' => 'Test']))->instructions());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_contents()
     {
         $section = new Section($contents = ['foo' => 'bar']);
@@ -34,7 +35,7 @@ class SectionTest extends TestCase
         $this->assertEquals($contents, $section->contents());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_fields()
     {
         $section = new Section([]);
@@ -74,7 +75,7 @@ class SectionTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldRepository::shouldReceive('find')

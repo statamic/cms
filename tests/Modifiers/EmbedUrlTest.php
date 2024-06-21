@@ -2,18 +2,19 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class EmbedUrlTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_leaves_urls_from_unknown_providers_untouched()
     {
         $this->assertEquals('https://statamic.com/video/hello', $this->embed('https://statamic.com/video/hello'));
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_vimeo_urls()
     {
         $embedUrl = 'https://player.vimeo.com/video/71360261?dnt=1';
@@ -27,7 +28,7 @@ class EmbedUrlTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_private_vimeo_urls()
     {
         $embedUrl = 'https://player.vimeo.com/video/735352648?dnt=1&h=fa55a4d0fc';
@@ -41,7 +42,7 @@ class EmbedUrlTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_youtube_urls()
     {
         $embedUrl = 'https://www.youtube-nocookie.com/embed/s72r_wu_NVY';
