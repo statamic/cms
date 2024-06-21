@@ -983,7 +983,7 @@ trait TestsIlluminateStr
         $this->assertSame('Hello', Str::transliterate('🎂', 'Hello'));
     }
 
-    #[DataProvider('specialCharactersProvider')]
+    #[DataProvider('specialCharacterProvider')]
     public function testTransliterateStrict(string $value, string $expected): void
     {
         $this->assertSame($expected, Str::transliterate($value, '?', true));
