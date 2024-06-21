@@ -11,7 +11,7 @@
                 <span
                     v-if="showLabelText"
                     class="rtl:ml-1 ltr:mr-1"
-                    :class="{ 'text-gray-600': true && isSynced }"
+                    :class="{ 'text-gray-600': isSynced }"
                     v-text="__(labelText)"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
@@ -24,9 +24,9 @@
 
                 <button
                     v-if="!isReadOnly && !isTab"
-                    v-show="true && isSynced"
+                    v-show="isSynced"
                     class="outline-none"
-                    :class="{ flex: true && isSynced }"
+                    :class="{ flex: isSynced }"
                     @click="$emit('desynced')"
                 >
                     <svg-icon name="light/hyperlink" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"
@@ -35,9 +35,9 @@
 
                 <button
                     v-if="!isReadOnly && !isTab"
-                    v-show="true && !isSynced"
+                    v-show="!isSynced"
                     class="outline-none"
-                    :class="{ flex: true && !isSynced }"
+                    :class="{ flex: !isSynced }"
                     @click="$emit('synced')"
                 >
                     <svg-icon name="light/hyperlink-broken" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"
@@ -53,16 +53,17 @@
             <div class="field-dropdown" v-if="mounted && hasDropdown">
                 <quick-dropdown-list>
                     <quick-dropdown-item
-                        v-for="item in fieldQuickItems"
-                        v-bind="item"
-                        @click="item.click" />
+                        v-for="item in fieldQuickActions"
+                        :text="item.display"
+                        :icon="item.icon"
+                        @click="item.run" />
                     <template #dropdown>
-                        <dropdown-tools :tools="fieldActions" @run="fieldRunAction" />
+                        <dropdown-actions :actions="fieldActions" @run="fieldRunAction" />
                         <div class="divider" />
                         <dropdown-item
-                            v-for="item in fieldDropdownItems"
-                            v-bind="item"
-                            @click="item.click" />
+                            v-for="item in fieldInternalActions"
+                            :text="item.display"
+                            @click="item.run" />
                     </template>
                 </quick-dropdown-list>                
             </div>
@@ -165,14 +166,12 @@ export default {
         },
 
         isReadOnly() {
-            return false;
             if (this.storeState.isRoot === false && !this.config.localizable) return true;
 
             return this.isLocked || this.readOnly || this.config.visibility === 'read_only' || false;
         },
 
         isLocalizable() {
-            return true;
             return this.$config.get('sites').length > 1 && this.config.localizable;
         },
 
@@ -213,14 +212,13 @@ export default {
 
         lockingUser() {
             if (this.isLocked) {
-                return Statamic.user;
                 let user = this.locks[this.config.handle];
                 if (typeof user === 'object') return user;
             }
         },
 
         isSynced() {
-            if (!this.true) return;
+            if (!this.syncable) return;
             return !this.storeState.localizedFields.includes(this.config.handle);
         },
 
@@ -253,19 +251,23 @@ export default {
         },
 
         fieldActions() {
-            return this.$refs.field.tools;
+            return this.$refs.field.actions;
         },
 
-        fieldDropdownItems() {
-            return this.$refs.field.dropdownItems;
+        fieldInternalActions() {
+            return this.$refs.field.internalActions;
         },
 
-        fieldQuickItems() {
-            return this.fieldDropdownItems.filter(item => item.quick);
+        fieldAllActions() {
+            return [...this.fieldActions, ...this.fieldInternalActions];
+        },
+
+        fieldQuickActions() {
+            return this.fieldAllActions.filter(item => item.quick);
         },
 
         hasDropdown() {
-            return this.fieldActions.length > 0 || this.fieldDropdownItems.length > 0;
+            return this.fieldAllActions.length > 0;
         },
 
     },

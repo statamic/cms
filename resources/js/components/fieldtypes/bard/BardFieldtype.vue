@@ -328,25 +328,25 @@ export default {
             return this.config.sets;
         },
 
-        dropdownItems() {
+        internalActions() {
             return [
                 {
-                    text: __('Expand All'),
+                    display: __('Expand All'),
                     icon: 'arrows-horizontal-expand',
                     quick: true,
-                    click: this.expandAll,
+                    run: this.expandAll,
                 },
                 {
-                    text: __('Collapse All'),
+                    display: __('Collapse All'),
                     icon: 'arrows-horizontal-collapse',
                     quick: true,
-                    click: this.collapseAll,
+                    run: this.collapseAll,
                 },
                 {
-                    text: __('Fullscreen'),
+                    display: __('Fullscreen'),
                     icon: 'expand-bold',
                     quick: true,
-                    click: this.toggleFullscreen,
+                    run: this.toggleFullscreen,
                 },
             ];
         },

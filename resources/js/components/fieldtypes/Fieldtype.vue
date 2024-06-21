@@ -83,7 +83,7 @@ export default {
             return prefix+'field_'+this.config.handle;
         },
 
-        dropdownItems() {
+        internalActions() {
             return [];
         },
 

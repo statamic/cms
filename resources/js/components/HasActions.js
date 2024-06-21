@@ -18,8 +18,8 @@ export default {
 
     methods: {
 
-        runAction({ callback }) {
-            callback({
+        runAction({ run }) {
+            run({
                 ...this.actionPayload,
             });
         },

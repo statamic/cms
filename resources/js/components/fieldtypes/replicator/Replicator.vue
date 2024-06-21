@@ -25,21 +25,6 @@
 
     <section :class="{'mt-12 p-4 bg-gray-200 dark:bg-dark-700': fullScreenMode}">
 
-        <!-- <div class="flex justify-end" :class="{'absolute top-3 rtl:left-3 ltr:right-3 @md:right-6': !config.hide_display}" v-if="! fullScreenMode">
-            <div class="btn-group">
-                <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
-                    <svg-icon name="arrows-horizontal-expand" class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175" />
-                </button>
-                <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
-                    <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175" />
-                </button>
-                <button v-if="config.fullscreen" @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
-                    <svg-icon name="expand-bold" class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175" v-show="! fullScreenMode" />
-                    <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175" v-show="fullScreenMode" />
-                </button>
-            </div>
-        </div> -->
-
         <sortable-list
             :value="value"
             :vertical="true"
@@ -179,25 +164,25 @@ export default {
             return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
         },
 
-        dropdownItems() {
+        internalActions() {
             return [
                 {
-                    text: __('Expand All'),
+                    display: __('Expand All'),
                     icon: 'arrows-horizontal-expand',
                     quick: true,
-                    click: this.expandAll,
+                    run: this.expandAll,
                 },
                 {
-                    text: __('Collapse All'),
+                    display: __('Collapse All'),
                     icon: 'arrows-horizontal-collapse',
                     quick: true,
-                    click: this.collapseAll,
+                    run: this.collapseAll,
                 },
                 {
-                    text: __('Fullscreen'),
+                    display: __('Fullscreen'),
                     icon: 'expand-bold',
                     quick: true,
-                    click: this.toggleFullscreen,
+                    run: this.toggleFullscreen,
                 },
             ];
         },
