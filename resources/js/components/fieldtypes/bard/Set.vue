@@ -31,7 +31,9 @@
                         class="toggle-sm rtl:ml-4 ltr:mr-4"
                         v-model="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
-                    <dropdown-list class="-mt-1">
+                    <dropdown-list>
+                        <dropdown-actions :actions="actions" @run="runAction" v-if="hasActions" />
+                        <div class="divider" />
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="deleteNode" />
@@ -68,6 +70,7 @@ import { NodeViewWrapper } from '@tiptap/vue-2';
 import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
+import HasActions from '../../HasActions.js';
 
 export default {
 

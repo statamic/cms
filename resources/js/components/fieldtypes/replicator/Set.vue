@@ -31,7 +31,7 @@
                         :value="values.enabled"
                         v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
-                        <dropdown-actions :actions="actions" @run="runAction" />
+                        <dropdown-actions :actions="actions" @run="runAction" v-if="hasActions" />
                         <div class="divider" />
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
@@ -245,4 +245,3 @@ export default {
 
 }
 </script>
-../../HasActions.js

@@ -11,7 +11,7 @@
                 <span
                     v-if="showLabelText"
                     class="rtl:ml-1 ltr:mr-1"
-                    :class="{ 'text-gray-600': isSynced }"
+                    :class="{ 'text-gray-600': syncable && isSynced }"
                     v-text="__(labelText)"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
@@ -24,9 +24,9 @@
 
                 <button
                     v-if="!isReadOnly && !isTab"
-                    v-show="isSynced"
+                    v-show="syncable && isSynced"
                     class="outline-none"
-                    :class="{ flex: isSynced }"
+                    :class="{ flex: syncable && isSynced }"
                     @click="$emit('desynced')"
                 >
                     <svg-icon name="light/hyperlink" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"
@@ -35,9 +35,9 @@
 
                 <button
                     v-if="!isReadOnly && !isTab"
-                    v-show="!isSynced"
+                    v-show="syncable && !isSynced"
                     class="outline-none"
-                    :class="{ flex: !isSynced }"
+                    :class="{ flex: syncable && !isSynced }"
                     @click="$emit('synced')"
                 >
                     <svg-icon name="light/hyperlink-broken" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"
@@ -206,7 +206,6 @@ export default {
         },
 
         isLocked() {
-            return true;
             return Object.keys(this.locks).includes(this.config.handle);
         },
 
