@@ -14,11 +14,11 @@ class MiscTest extends TestCase
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
-    #[Test]
-    #[DataProvider('localesTagTestProvider')]
     /**
      * @see https://github.com/statamic/cms/issues/4839
      **/
+    #[Test]
+    #[DataProvider('localesTagTestProvider')]
     public function locales_tag_doesnt_ruin_future_tag_pairs($withParameter)
     {
         $this->setSites([
@@ -66,10 +66,10 @@ EOT;
         ];
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/4889
      **/
+    #[Test]
     public function fieldtype_gets_correct_parent_in_loop()
     {
         $fieldtype = new class extends Fieldtype

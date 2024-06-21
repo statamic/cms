@@ -295,10 +295,10 @@ class TreeTest extends TestCase
         $this->assertEquals($arr, $tree->tree());
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/3148
      */
+    #[Test]
     public function it_doesnt_get_moved_to_root_if_its_already_there_and_the_target_is_null()
     {
         $tree = $this->tree()->tree($arr = [
@@ -326,10 +326,10 @@ class TreeTest extends TestCase
         $this->assertEquals($arr, $tree->tree());
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/1548
      **/
+    #[Test]
     public function it_can_move_the_root()
     {
         $tree = $this->tree([

@@ -156,10 +156,10 @@ EOT;
         $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/3612
      **/
+    #[Test]
     public function it_dumps_front_matter_properly_when_symfony_yaml_dumper_doesnt_end_with_a_line_break()
     {
         $array = [

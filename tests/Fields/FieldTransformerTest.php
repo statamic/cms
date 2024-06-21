@@ -298,10 +298,10 @@ class FieldTransformerTest extends TestCase
         ], $fromVue);
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/10056
      */
+    #[Test]
     public function it_doesnt_remove_max_items_from_form_fieldtype()
     {
         $fromVue = FieldTransformer::fromVue([
@@ -320,10 +320,10 @@ class FieldTransformerTest extends TestCase
         ], $fromVue['field']);
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/10050
      */
+    #[Test]
     public function it_ensures_the_asset_container_is_saved_on_the_assets_fieldtype()
     {
         AssetContainer::make('test')->save();
@@ -344,10 +344,10 @@ class FieldTransformerTest extends TestCase
         ], $fromVue['field']);
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/10040
      */
+    #[Test]
     public function it_saves_a_toggle_as_false_where_the_default_is_true()
     {
         $fromVue = FieldTransformer::fromVue([

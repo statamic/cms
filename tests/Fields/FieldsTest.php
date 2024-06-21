@@ -211,10 +211,10 @@ class FieldsTest extends TestCase
         $this->assertEquals('test_two', $fields['test_two']->handle());
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/2869
      **/
+    #[Test]
     public function it_prefixes_the_handles_of_nested_imported_fieldsets()
     {
         $outer = (new Fieldset)->setHandle('outer')->setContents([

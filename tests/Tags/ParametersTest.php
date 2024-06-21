@@ -208,10 +208,10 @@ class ParametersTest extends TestCase
         $this->assertSame('fallback', $this->params->float('unknown', 'fallback'));
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/3248
      */
+    #[Test]
     public function it_gets_nested_values()
     {
         $augmentable = new class implements \Statamic\Contracts\Data\Augmentable

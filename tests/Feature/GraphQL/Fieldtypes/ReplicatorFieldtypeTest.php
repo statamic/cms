@@ -219,10 +219,10 @@ GQL;
             ]]);
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/3200
      **/
+    #[Test]
     public function it_outputs_replicator_fields_with_value_based_subfields()
     {
         // Using an `entries` field set to max_items 1, which would augment

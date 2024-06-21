@@ -93,10 +93,10 @@ GQL;
             ]]);
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/3200
      **/
+    #[Test]
     public function it_outputs_nested_grid_fields()
     {
         $article = Blueprint::makeFromFields([

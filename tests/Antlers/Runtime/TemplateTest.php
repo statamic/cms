@@ -2341,10 +2341,10 @@ EOT;
         ]));
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/3374
      **/
+    #[Test]
     public function it_parses_single_and_tag_pairs_with_modifiers()
     {
         $data = ['items' => ['one', 'two', 'three']];
