@@ -51,6 +51,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $dictionaries = [
         \Statamic\Dictionaries\Countries::class,
+        \Statamic\Dictionaries\Timezones::class,
     ];
 
     protected $fieldtypes = [
