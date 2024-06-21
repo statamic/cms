@@ -81,6 +81,16 @@ EOT;
     }
 
     /** @test */
+    public function it_renders_a_nav_with_selected_fields()
+    {
+        $this->createCollectionAndNav();
+
+        $template = '{{ nav:test select="title" }}{{ *recursive children* }}{{ /nav:test }}';
+
+        $this->assertNotNull(Antlers::parse($template));
+    }
+
+    /** @test */
     public function it_renders_a_nav_with_scope()
     {
         $this->createCollectionAndNav();
