@@ -39,7 +39,7 @@ class MakeFilterTest extends TestCase
         $this->artisan('statamic:make:filter', ['name' => 'Mouse']);
 
         $this->assertFileExists($path);
-        $this->assertStringContainsString('namespace App\Scopes; use PHPUnit\Framework\Attributes\Test;', $this->files->get($path));
+        $this->assertStringContainsString('namespace App\Scopes;', $this->files->get($path));
     }
 
     #[Test]
@@ -88,6 +88,6 @@ class MakeFilterTest extends TestCase
         $this->artisan('statamic:make:filter', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 
         $this->assertFileExists($filter);
-        $this->assertStringContainsString('namespace Yoda\BagOdah\Scopes; use PHPUnit\Framework\Attributes\Test;', $this->files->get($filter));
+        $this->assertStringContainsString('namespace Yoda\BagOdah\Scopes;', $this->files->get($filter));
     }
 }

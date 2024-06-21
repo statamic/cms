@@ -39,7 +39,7 @@ class MakeModifierTest extends TestCase
         $this->artisan('statamic:make:modifier', ['name' => 'Giraffe']);
 
         $this->assertFileExists($path);
-        $this->assertStringContainsString('namespace App\Modifiers; use PHPUnit\Framework\Attributes\Test;', $this->files->get($path));
+        $this->assertStringContainsString('namespace App\Modifiers;', $this->files->get($path));
     }
 
     #[Test]
@@ -88,6 +88,6 @@ class MakeModifierTest extends TestCase
         $this->artisan('statamic:make:modifier', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 
         $this->assertFileExists($modifier);
-        $this->assertStringContainsString('namespace Yoda\BagOdah\Modifiers; use PHPUnit\Framework\Attributes\Test;', $this->files->get($modifier));
+        $this->assertStringContainsString('namespace Yoda\BagOdah\Modifiers;', $this->files->get($modifier));
     }
 }

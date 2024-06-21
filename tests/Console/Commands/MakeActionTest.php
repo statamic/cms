@@ -39,7 +39,7 @@ class MakeActionTest extends TestCase
         $this->artisan('statamic:make:action', ['name' => 'Delete']);
 
         $this->assertFileExists($path);
-        $this->assertStringContainsString('namespace App\Actions; use PHPUnit\Framework\Attributes\Test;', $this->files->get($path));
+        $this->assertStringContainsString('namespace App\Actions;', $this->files->get($path));
     }
 
     #[Test]
@@ -86,6 +86,6 @@ class MakeActionTest extends TestCase
         $this->artisan('statamic:make:action', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 
         $this->assertFileExists($action);
-        $this->assertStringContainsString('namespace Yoda\BagOdah\Actions; use PHPUnit\Framework\Attributes\Test;', $this->files->get($action));
+        $this->assertStringContainsString('namespace Yoda\BagOdah\Actions;', $this->files->get($action));
     }
 }

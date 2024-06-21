@@ -39,7 +39,7 @@ class MakeTagTest extends TestCase
         $this->artisan('statamic:make:tag', ['name' => 'Donkey']);
 
         $this->assertFileExists($path);
-        $this->assertStringContainsString('namespace App\Tags; use PHPUnit\Framework\Attributes\Test;', $this->files->get($path));
+        $this->assertStringContainsString('namespace App\Tags;', $this->files->get($path));
     }
 
     #[Test]
@@ -88,6 +88,6 @@ class MakeTagTest extends TestCase
         $this->artisan('statamic:make:tag', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 
         $this->assertFileExists($tag);
-        $this->assertStringContainsString('namespace Yoda\BagOdah\Tags; use PHPUnit\Framework\Attributes\Test;', $this->files->get($tag));
+        $this->assertStringContainsString('namespace Yoda\BagOdah\Tags;', $this->files->get($tag));
     }
 }

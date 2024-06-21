@@ -39,7 +39,7 @@ class MakeWidgetTest extends TestCase
         $this->artisan('statamic:make:widget', ['name' => 'Sloth']);
 
         $this->assertFileExists($path);
-        $this->assertStringContainsString('namespace App\Widgets; use PHPUnit\Framework\Attributes\Test;', $this->files->get($path));
+        $this->assertStringContainsString('namespace App\Widgets;', $this->files->get($path));
     }
 
     #[Test]
@@ -88,6 +88,6 @@ class MakeWidgetTest extends TestCase
         $this->artisan('statamic:make:widget', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 
         $this->assertFileExists($widget);
-        $this->assertStringContainsString('namespace Yoda\BagOdah\Widgets; use PHPUnit\Framework\Attributes\Test;', $this->files->get($widget));
+        $this->assertStringContainsString('namespace Yoda\BagOdah\Widgets;', $this->files->get($widget));
     }
 }

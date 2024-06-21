@@ -38,7 +38,7 @@ class MakeFieldtypeTest extends TestCase
         $this->artisan('statamic:make:fieldtype', ['name' => 'KnightRider']);
 
         $this->assertFileExists($fieldtype = base_path('app/Fieldtypes/KnightRider.php'));
-        $this->assertStringContainsString('namespace App\Fieldtypes; use PHPUnit\Framework\Attributes\Test;', $this->files->get($fieldtype));
+        $this->assertStringContainsString('namespace App\Fieldtypes;', $this->files->get($fieldtype));
 
         $this->assertFileExists(resource_path('js/components/fieldtypes/KnightRider.vue'));
 
@@ -91,6 +91,6 @@ class MakeFieldtypeTest extends TestCase
         $this->artisan('statamic:make:fieldtype', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 
         $this->assertFileExists($fieldtype);
-        $this->assertStringContainsString('namespace Yoda\BagOdah\Fieldtypes; use PHPUnit\Framework\Attributes\Test;', $this->files->get($fieldtype));
+        $this->assertStringContainsString('namespace Yoda\BagOdah\Fieldtypes;', $this->files->get($fieldtype));
     }
 }
