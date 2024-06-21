@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\GraphQL;
@@ -25,11 +26,8 @@ class CustomMiddlewareTest extends TestCase
         $this->assertEquals(0, app('request-count'));
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup addCustomMiddlewareWithMethod
-     **/
+    #[Test]
+    #[DefineEnvironment('addCustomMiddlewareWithMethod')]
     public function a_custom_middleware_can_be_added_to_the_default_schema()
     {
         $this->post('/graphql', ['query' => '{ping}']);
@@ -42,11 +40,8 @@ class CustomMiddlewareTest extends TestCase
         GraphQL::addMiddleware(CountRequests::class);
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup addCustomMiddlewareThroughConfig
-     **/
+    #[Test]
+    #[DefineEnvironment('addCustomMiddlewareWithMethod')]
     public function a_custom_middleware_can_be_added_to_the_default_schema_through_config()
     {
         $this->post('/graphql', ['query' => '{ping}']);

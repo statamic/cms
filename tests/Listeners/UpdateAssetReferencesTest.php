@@ -4,6 +4,7 @@ namespace Tests\Listeners;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetFolder;
 use Statamic\Facades;
@@ -378,11 +379,8 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertFalse($entry->fresh()->has('featured'));
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableUpdateReferences
-     **/
+    #[Test]
+    #[DefineEnvironment('disableUpdateReferences')]
     public function it_can_be_disabled()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();

@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\API\AbstractCacher;
@@ -115,9 +116,7 @@ class CacherTest extends TestCase
     }
 
     #[Test]
-    /**
-     * @environment-setup setCustomExpiry
-     */
+    #[DefineEnvironment('setCustomExpiry')]
     public function it_caches_endpoint_using_configured_expiry()
     {
         $this->makeEntry('apple')->save();

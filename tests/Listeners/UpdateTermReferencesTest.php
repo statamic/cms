@@ -2,6 +2,7 @@
 
 namespace Tests\Listeners;
 
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Support\Arr;
@@ -368,11 +369,8 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertFalse($entry->fresh()->has('favourites'));
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableUpdateReferences
-     **/
+    #[Test]
+    #[DefineEnvironment('disableUpdateReferences')]
     public function it_can_be_disabled()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
