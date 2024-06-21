@@ -2,6 +2,7 @@
 
 namespace Tests\Support;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Statamic\Support\DateFormat;
@@ -14,11 +15,8 @@ class DateFormatTest extends TestCase
         $this->assertCount(38, DateFormat::phpToIsoConversions());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider formatProvider
-     **/
+    #[Test]
+    #[DataProvider('formatProvider')]
     public function it_converts_from_php_to_iso($php, $iso)
     {
         $this->assertEquals($iso, DateFormat::toIso($php));

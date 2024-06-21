@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use LogicException;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use ReflectionClass;
 use Statamic\Contracts\Data\Augmentable;
@@ -221,11 +222,8 @@ class EntryTest extends TestCase
         $this->assertEquals('delta (augmented)', $entry['charlie']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider queryBuilderProvider
-     **/
+    #[Test]
+    #[DataProvider('queryBuilderProvider')]
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
     {
         $builder->shouldReceive('get')->times(2)->andReturn('query builder results');

@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Value;
 use Statamic\Modifiers\Modify;
@@ -12,11 +13,8 @@ use Tests\TestCase;
  */
 class SumTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider sumsProvider
-     **/
+    #[Test]
+    #[DataProvider('sumsProvider')]
     public function it_sums($sum, $key, $array)
     {
         $this->assertSame($sum, $this->modify($array, $key));

@@ -8,6 +8,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
@@ -181,11 +182,8 @@ class ValuesTest extends TestCase
         $this->assertNull($values->raw('missing'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider queryBuilderProvider
-     **/
+    #[Test]
+    #[DataProvider('queryBuilderProvider')]
     public function it_gets_a_query($builder)
     {
         $values = new Values(['the_query_field' => $builder]);

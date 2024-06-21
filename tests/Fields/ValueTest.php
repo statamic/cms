@@ -2,6 +2,7 @@
 
 namespace Tests\Fields;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Field;
@@ -11,11 +12,8 @@ use Tests\TestCase;
 
 class ValueTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider isRelationshipFieldtypeProvider
-     **/
+    #[Test]
+    #[DataProvider('isRelationshipFieldtypeProvider')]
     public function it_gets_whether_its_a_relationship_through_the_fieldtype($isRelationship, $fieldtype)
     {
         $value = new Value('test', null, $fieldtype);

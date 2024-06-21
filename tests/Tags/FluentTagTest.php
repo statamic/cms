@@ -4,6 +4,7 @@ namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Support\Arr;
@@ -33,11 +34,8 @@ class FluentTagTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider fluentTagProvider
-     **/
+    #[Test]
+    #[DataProvider('fluentTagProvider')]
     public function it_handles_params_fluently($usedTag, $expectedTagName, $expectedTag, $expectedTagMethod, $expectedClassMethod)
     {
         $tag = Mockery::mock(Tags::class);

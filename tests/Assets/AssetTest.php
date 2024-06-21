@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use ReflectionClass;
 use Statamic\Assets\Asset;
@@ -301,11 +302,8 @@ class AssetTest extends TestCase
         $this->assertEquals(123, $asset->getRawMeta()['size']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider reAddRemovedDataProvider
-     **/
+    #[Test]
+    #[DataProvider('reAddRemovedDataProvider')]
     public function it_doesnt_try_to_re_remove_newly_added_data_from_meta($reAddRemovedData)
     {
         Storage::disk('test')->put('foo/test.txt', '');
@@ -388,11 +386,8 @@ class AssetTest extends TestCase
         $this->assertEquals('delta (augmented)', $asset['charlie']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider queryBuilderProvider
-     **/
+    #[Test]
+    #[DataProvider('queryBuilderProvider')]
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
     {
         $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
@@ -1811,11 +1806,8 @@ class AssetTest extends TestCase
         return [['format'], ['fm']];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider formatParamsProvider
-     **/
+    #[Test]
+    #[DataProvider('formatParamsProvider')]
     public function it_can_upload_an_image_into_a_container_with_new_extension_format($formatParam)
     {
         Event::fake();
@@ -1907,11 +1899,8 @@ class AssetTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider nonGlideableFileExtensionsProvider
-     **/
+    #[Test]
+    #[DataProvider('nonGlideableFileExtensionsProvider')]
     public function it_doesnt_process_or_error_when_uploading_non_glideable_file_with_glide_config($extension)
     {
         Event::fake();

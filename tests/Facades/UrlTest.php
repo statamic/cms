@@ -2,6 +2,7 @@
 
 namespace Tests\Facades;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\URL;
 use Tests\TestCase;
@@ -78,11 +79,8 @@ class UrlTest extends TestCase
         $this->assertFalse(URL::isExternal(null));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider ancestorProvider
-     **/
+    #[Test]
+    #[DataProvider('ancestorProvider')]
     public function it_checks_whether_a_url_is_an_ancestor_of_another($child, $parent, $isAncestor)
     {
         $this->assertSame($isAncestor, URL::isAncestorOf($child, $parent));
@@ -130,11 +128,8 @@ class UrlTest extends TestCase
         $this->assertEquals('http://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider absoluteProvider
-     **/
+    #[Test]
+    #[DataProvider('absoluteProvider')]
     public function it_makes_urls_absolute($url, $expected, $forceScheme = false)
     {
         if ($forceScheme) {
@@ -167,11 +162,8 @@ class UrlTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider relativeProvider
-     **/
+    #[Test]
+    #[DataProvider('relativeProvider')]
     public function makes_urls_relative($url, $expected)
     {
         $this->assertSame($expected, URL::makeRelative($url));

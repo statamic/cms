@@ -3,6 +3,7 @@
 namespace Tests\CP\Navigation;
 
 use Illuminate\Support\Arr;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Navigation\NavPreferencesNormalizer;
 use Tests\TestCase;
@@ -255,11 +256,8 @@ class NavPreferencesNormalizerTest extends TestCase
         ])['sections']['content']['items']));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider modifiersProvider
-     **/
+    #[Test]
+    #[DataProvider('modifiersProvider')]
     public function it_defaults_action_to_modify_when_modifying_in_original_section($modifier)
     {
         // With `reorder: true`

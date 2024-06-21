@@ -2,7 +2,6 @@
 
 namespace Tests\Antlers\Runtime\UseCaseTests;
 
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Antlers\Fixtures\Addon\Tags\TestTags as Test;
 use Tests\Antlers\ParserTestCase;
 

@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
@@ -13,11 +14,9 @@ class MiscTest extends TestCase
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
+    #[Test]
+    #[DataProvider('localesTagTestProvider')]
     /**
-     * @test
-     *
-     * @dataProvider localesTagTestProvider
-     *
      * @see https://github.com/statamic/cms/issues/4839
      **/
     public function locales_tag_doesnt_ruin_future_tag_pairs($withParameter)
@@ -67,9 +66,8 @@ EOT;
         ];
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/4889
      **/
     public function fieldtype_gets_correct_parent_in_loop()

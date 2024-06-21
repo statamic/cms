@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\LabeledValue;
 
@@ -247,11 +248,8 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->label());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider noOptionsProvider
-     **/
+    #[Test]
+    #[DataProvider('noOptionsProvider')]
     public function it_augments_to_a_LabeledValue_object_with_no_options($options)
     {
         $field = $this->field([

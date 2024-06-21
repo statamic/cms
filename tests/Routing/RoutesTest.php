@@ -4,6 +4,7 @@ namespace Tests\Routing;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Config;
@@ -169,11 +170,8 @@ class RoutesTest extends TestCase
             ->assertSee('Custom layout Hello world');
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider undefinedLayoutRouteProvider
-     **/
+    #[Test]
+    #[DataProvider('undefinedLayoutRouteProvider')]
     public function it_renders_a_view_without_a_layout($route)
     {
         $this->withoutExceptionHandling();

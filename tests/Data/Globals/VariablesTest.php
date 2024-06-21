@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
@@ -250,11 +251,8 @@ EOT;
         $this->assertEquals('delta (augmented)', $variables['charlie']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider queryBuilderProvider
-     **/
+    #[Test]
+    #[DataProvider('queryBuilderProvider')]
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
     {
         $builder->shouldReceive('get')->times(2)->andReturn('query builder results');

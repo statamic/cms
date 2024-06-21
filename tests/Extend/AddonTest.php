@@ -5,6 +5,7 @@ namespace Statamic\Testing\Extend;
 use Facades\Statamic\Licensing\LicenseManager;
 use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extend\Addon;
 use Statamic\Facades\File;
@@ -242,11 +243,8 @@ class AddonTest extends TestCase
         $this->assertEquals('the license', Addon::make('foo/bar')->license());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider isLatestVersionProvider
-     **/
+    #[Test]
+    #[DataProvider('isLatestVersionProvider')]
     public function it_checks_if_its_the_latest_version($version, $latest, $isLatest)
     {
         $this->assertEquals($isLatest, $this->makeFromPackage([

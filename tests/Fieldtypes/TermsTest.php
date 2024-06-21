@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Query\Builder;
@@ -337,11 +338,8 @@ class TermsTest extends TestCase
         ], $augmented->toArray());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider collectionAttachmentProvider
-     **/
+    #[Test]
+    #[DataProvider('collectionAttachmentProvider')]
     public function it_attaches_collection_during_augmentation($expectCollection, $parentIsEntry, $handle, $isRootLevel, $collectionUsesTaxonomy)
     {
         if ($collectionUsesTaxonomy) {

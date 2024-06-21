@@ -2,6 +2,7 @@
 
 namespace Tests\Search;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Search\Comb\Comb;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
@@ -9,11 +10,8 @@ use Tests\TestCase;
 
 class CombTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider searchesProvider
-     **/
+    #[Test]
+    #[DataProvider('searchesProvider')]
     public function it_searches($term, $expected)
     {
         $comb = new Comb([

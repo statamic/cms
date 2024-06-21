@@ -4,6 +4,7 @@ namespace Tests\API;
 
 use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
@@ -24,11 +25,8 @@ class APITest extends TestCase
             ->assertJson(['message' => 'Not found.']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider entryNotFoundProvider
-     */
+    #[Test]
+    #[DataProvider('entryNotFoundProvider')]
     public function it_handles_not_found_entries($url, $requestShouldSucceed)
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -59,11 +57,8 @@ class APITest extends TestCase
         return [['status:is'], ['published:is'], ['title:is']];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider exampleFiltersProvider
-     */
+    #[Test]
+    #[DataProvider('exampleFiltersProvider')]
     public function it_cannot_filter_entries_by_default($filter)
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -386,11 +381,8 @@ class APITest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider userPasswordFilterProvider
-     */
+    #[Test]
+    #[DataProvider('userPasswordFilterProvider')]
     public function it_never_allows_filtering_users_by_password($filter)
     {
         Facades\Config::set('statamic.api.resources.users', [
@@ -468,12 +460,8 @@ class APITest extends TestCase
             'password_hash:regex',
         ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
     }
-
-    /**
-     * @test
-     *
-     * @dataProvider termNotFoundProvider
-     */
+    #[Test]
+    #[DataProvider('termNotFoundProvider')]
     public function it_handles_not_found_terms($url, $requestShouldSucceed)
     {
         Facades\Config::set('statamic.api.resources.taxonomies', true);

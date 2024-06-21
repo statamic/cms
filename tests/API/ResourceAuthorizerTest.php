@@ -3,6 +3,7 @@
 namespace Tests\API;
 
 use Facades\Statamic\API\ResourceAuthorizer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Config;
@@ -44,11 +45,8 @@ class ResourceAuthorizerTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function no_sub_resources_are_allowed_by_default($configFile)
     {
         Config::set("statamic.{$configFile}.resources", [
@@ -79,11 +77,8 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing([], ResourceAuthorizer::allowedSubResources($configFile, 'forms'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function all_sub_resources_are_allowed_when_setting_true_at_top_level($configFile)
     {
         Config::set("statamic.{$configFile}.resources", [
@@ -114,11 +109,8 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing(['contact', 'newsletter'], ResourceAuthorizer::allowedSubResources($configFile, 'forms'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function wildcard_config_does_not_enable_sub_resource_by_default($configFile)
     {
         Config::set("statamic.{$configFile}.resources.collections", [
@@ -131,11 +123,8 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing([], ResourceAuthorizer::allowedSubResources($configFile, 'collections'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function wildcard_config_can_enable_all_sub_resources($configFile)
     {
         Config::set("statamic.{$configFile}.resources.collections", [
@@ -149,11 +138,8 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing(['blog', 'pages'], ResourceAuthorizer::allowedSubResources($configFile, 'collections'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function disabling_sub_resource_overrides_wildcard_config($configFile)
     {
         Facades\Collection::make('products')->save();
@@ -170,11 +156,8 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing(['blog', 'products'], ResourceAuthorizer::allowedSubResources($configFile, 'collections'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function can_enable_individual_sub_resources_via_boolean($configFile)
     {
         Config::set("statamic.{$configFile}.resources", [
@@ -217,11 +200,8 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing(['contact'], ResourceAuthorizer::allowedSubResources($configFile, 'forms'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function can_enable_individual_sub_resources_via_array_values($configFile)
     {
         // We suggest enabling via booleans, as shown in above test, but still allow this for backwards compatibility
@@ -253,11 +233,8 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing(['contact'], ResourceAuthorizer::allowedSubResources($configFile, 'forms'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function can_enable_individual_sub_resources_via_array_config($configFile)
     {
         Config::set("statamic.{$configFile}.resources", [
@@ -300,11 +277,8 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing(['contact'], ResourceAuthorizer::allowedSubResources($configFile, 'forms'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function users_are_not_allowed_by_default($configFile)
     {
         Config::set("statamic.{$configFile}.resources.users", false);
@@ -312,11 +286,8 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertFalse(ResourceAuthorizer::isAllowed($configFile, 'users'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function can_enable_users_via_boolean($configFile)
     {
         Config::set("statamic.{$configFile}.resources.users", true);
@@ -324,11 +295,8 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertTrue(ResourceAuthorizer::isAllowed($configFile, 'users'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function can_enable_users_via_array_config($configFile)
     {
         Config::set("statamic.{$configFile}.resources.users", [

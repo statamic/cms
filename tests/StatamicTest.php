@@ -6,6 +6,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Statamic\Statamic;
@@ -85,11 +86,8 @@ class StatamicTest extends TestCase
         $this->assertEquals('Y--m--d H:i', Statamic::dateTimeFormat());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider formatsWithTimeProvider
-     **/
+    #[Test]
+    #[DataProvider('formatsWithTimeProvider')]
     public function it_doesnt_append_time_if_system_date_format_already_has_time_in_it($format)
     {
         config(['statamic.system.date_format' => $format]);
@@ -105,11 +103,8 @@ class StatamicTest extends TestCase
         $this->assertEquals('Y--m--d H:i', Statamic::cpDateTimeFormat());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider formatsWithTimeProvider
-     **/
+    #[Test]
+    #[DataProvider('formatsWithTimeProvider')]
     public function it_doesnt_append_time_if_cp_date_format_already_has_time_in_it($format)
     {
         config(['statamic.cp.date_format' => $format]);
