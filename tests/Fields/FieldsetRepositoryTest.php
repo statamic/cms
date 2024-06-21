@@ -252,7 +252,7 @@ EOT;
         $this->repo->delete($fieldset);
     }
 
-    /** @test  */
+    #[Test]
     public function it_gets_a_namespaced_fieldset()
     {
         $contents = <<<'EOT'
@@ -272,7 +272,7 @@ EOT;
         $this->assertEquals('foo::bar.baz.test', $fieldset->handle());
     }
 
-    /** @test  */
+    #[Test]
     public function it_gets_an_overridden_namespaced_fieldset()
     {
         $contents = <<<'EOT'

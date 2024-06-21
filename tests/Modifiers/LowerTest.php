@@ -8,9 +8,7 @@ use Tests\TestCase;
 
 class LowerTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function it_converts_all_chars_to_lowercase(): void
     {
         $modified = $this->modify('I DON\'T KNOW WHAT WE\'RE YELLING ABOUT');

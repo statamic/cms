@@ -343,8 +343,8 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Grape', 'Hummus', 'Fig'], $this->runTagAndGetTitles('newer')); // Alias of prev when date:desc
     }
 
+    #[Test]
     /**
-     * @test
      * https://github.com/statamic/cms/issues/1831
      */
     public function it_can_get_previous_and_next_entries_in_a_dated_desc_collection_when_multiple_entries_share_the_same_date()
@@ -411,8 +411,8 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Carrot', 'Banana', 'Danish'], $this->runTagAndGetTitles('older')); // Alias of prev when date:desc
     }
 
+    #[Test]
     /**
-     * @test
      * https://github.com/statamic/cms/issues/1831
      */
     public function it_can_get_previous_and_next_entries_in_a_dated_asc_collection_when_multiple_entries_share_the_same_date()

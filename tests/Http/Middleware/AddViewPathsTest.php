@@ -146,9 +146,7 @@ class AddViewPathsTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function middleware_attached_to_routes()
     {
         /** @var Router $router */

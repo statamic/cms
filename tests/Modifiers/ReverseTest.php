@@ -56,9 +56,7 @@ class ReverseTest extends TestCase
         $this->assertEquals($expected, $modified);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_reverses_items_from_query_builder(): void
     {
         $builder = Mockery::mock(Builder::class);

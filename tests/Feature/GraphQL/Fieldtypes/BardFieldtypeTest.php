@@ -363,9 +363,8 @@ GQL;
             ]]);
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/3200
      **/
     public function it_outputs_bard_fields_with_value_based_subfields()

@@ -11,9 +11,7 @@ class ToQsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_converts_to_query_string(): void
     {
         $input = [

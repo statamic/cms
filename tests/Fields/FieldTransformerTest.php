@@ -298,9 +298,8 @@ class FieldTransformerTest extends TestCase
         ], $fromVue);
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/10056
      */
     public function it_doesnt_remove_max_items_from_form_fieldtype()
@@ -346,9 +345,8 @@ class FieldTransformerTest extends TestCase
         ], $fromVue['field']);
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/10040
      */
     public function it_saves_a_toggle_as_false_where_the_default_is_true()
@@ -369,7 +367,7 @@ class FieldTransformerTest extends TestCase
         ], $fromVue['field']);
     }
 
-    /** @test */
+    #[Test]
     public function it_supports_addon_linked_fields()
     {
         $fieldset = tap(new Fieldset)

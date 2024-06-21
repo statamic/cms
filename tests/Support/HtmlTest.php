@@ -61,9 +61,7 @@ class HtmlTest extends TestCase
         $this->assertEquals('<ol><li>foo</li><li><ol><li>alfa</li><li>bravo</li></ol></li><li>bar</li></ol>', $ol);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_returns_empty_string_when_no_list_items_given(): void
     {
         $list = [];

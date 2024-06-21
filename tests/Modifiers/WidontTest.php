@@ -8,9 +8,7 @@ use Tests\TestCase;
 
 class WidontTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function it_adds_space_to_plain_text()
     {
         $value = 'Lorem ipsum dolor sit amet.';

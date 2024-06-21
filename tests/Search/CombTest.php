@@ -28,9 +28,7 @@ class CombTest extends TestCase
         $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('data.title')->all());
     }
 
-    /**
-     * @test
-     **/
+    #[Test]
     public function it_extracts_snippets()
     {
         $content = <<<'EOT'
@@ -60,9 +58,7 @@ EOT;
         $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('snippets.content')->all());
     }
 
-    /**
-     * @test
-     **/
+    #[Test]
     public function it_extracts_snippets_from_a_bard_field()
     {
         $content = [
@@ -206,9 +202,7 @@ EOT;
         $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('snippets.content')->all());
     }
 
-    /**
-     * @test
-     **/
+    #[Test]
     public function it_can_search_for_plus_signs()
     {
         $comb = new Comb([
@@ -221,9 +215,7 @@ EOT;
         $this->assertSame(1, $result['info']['total_results']);
     }
 
-    /**
-     * @test
-     **/
+    #[Test]
     public function it_can_search_for_slashes()
     {
         $comb = new Comb([
