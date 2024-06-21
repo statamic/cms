@@ -320,9 +320,8 @@ class FieldTransformerTest extends TestCase
         ], $fromVue['field']);
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/10050
      */
     public function it_ensures_the_asset_container_is_saved_on_the_assets_fieldtype()

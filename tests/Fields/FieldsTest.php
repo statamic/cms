@@ -1003,9 +1003,7 @@ class FieldsTest extends TestCase
         $this->assertEquals('foo', $collection['two']->parentField());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_sets_the_parentindex_on_all_fields()
     {
         $fields = new Fields([
@@ -1023,9 +1021,7 @@ class FieldsTest extends TestCase
         $this->assertEquals(1, $collection['two']->parentIndex());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_sets_the_parentfield_and_parentindex_on_imported_fields()
     {
         $fieldset = (new Fieldset)->setHandle('partial')->setContents([
@@ -1050,9 +1046,7 @@ class FieldsTest extends TestCase
         $this->assertEquals(1, $collection['bar']->parentIndex());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_sets_the_parentfield_and_parentindex_on_referenced_fields()
     {
         $fieldset = (new Fieldset)->setHandle('partial')->setContents([

@@ -36,9 +36,8 @@ class BackspaceTest extends TestCase
         $this->assertEquals('super', $modified);
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @todo This originates from substr(). Is this the intended behaviour for the modifier?
      */
     public function it_returns_empty_string_when_passing_zero(): void

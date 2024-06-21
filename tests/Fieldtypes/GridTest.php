@@ -529,9 +529,7 @@ class GridTest extends TestCase
         $this->assertEquals([['foo' => 'bar']], (new Grid)->toQueryableValue([['foo' => 'bar']]));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_generates_field_path_prefix()
     {
         $fieldtype = new class extends Fieldtype
