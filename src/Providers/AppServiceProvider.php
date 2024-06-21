@@ -12,6 +12,7 @@ use Statamic\Facades;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Sites\Sites;
@@ -196,7 +197,7 @@ class AppServiceProvider extends ServiceProvider
         AboutCommand::add('Statamic', [
             'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
             'Addons' => $addons->count(),
-            'Stache Watcher' => config('statamic.stache.watcher') ? 'Enabled' : 'Disabled',
+            'Stache Watcher' => Stache::isWatcherEnabled() ? 'Enabled' : 'Disabled',
             'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',
             'Sites' => fn () => $this->sitesAboutCommandInfo(),
         ]);

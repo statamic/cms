@@ -4,7 +4,7 @@ namespace Tests\Stache;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\ChildStore;
 use Statamic\Stache\Stores\CollectionsStore;
@@ -16,6 +16,7 @@ class StacheTest extends TestCase
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->stache = new Stache;
     }
 
@@ -123,5 +124,34 @@ class StacheTest extends TestCase
     public function it_can_record_its_build_time()
     {
         $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider watcherProvider
+     */
+    public function it_can_determine_if_watcher_is_enabled($environment, $config, $expected)
+    {
+        app()['env'] = $environment;
+
+        config(['statamic.stache.watcher' => $config]);
+
+        $this->assertEquals($expected, $this->stache->isWatcherEnabled());
+    }
+
+    public static function watcherProvider()
+    {
+        return [
+            ['local', 'config' => true, 'expected' => true],
+            ['production', 'config' => true, 'expected' => true],
+            ['local', 'config' => false, 'expected' => false],
+            ['production', 'config' => false, 'expected' => false],
+            ['local', 'config' => 'auto', 'expected' => true],
+            ['production', 'config' => 'auto', 'expected' => false],
+            ['other', 'config' => 'auto', 'expected' => false],
+            ['local', 'config' => null, 'expected' => false],
+            ['production', 'config' => null, 'expected' => false],
+        ];
     }
 }

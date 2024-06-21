@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Stache;
 use Statamic\Statamic;
 
 class SupportDetails extends Command
@@ -28,7 +29,7 @@ class SupportDetails extends Command
         $this->line(sprintf('<info>Statamic</info> %s %s', Statamic::version(), Statamic::pro() ? 'Pro' : 'Solo'));
         $this->line('<info>Laravel</info> '.Application::VERSION);
         $this->line('<info>PHP</info> '.phpversion());
-        $this->line(sprintf('<info>Stache Watcher</info> %s', config('statamic.stache.watcher') ? 'Enabled' : 'Disabled'));
+        $this->line(sprintf('<info>Stache Watcher</info> %s', Stache::isWatcherEnabled() ? 'Enabled' : 'Disabled'));
         $this->line(sprintf('<info>Static Caching</info> %s', config('statamic.static_caching.strategy') ?: 'Disabled'));
         $this->addons();
 
