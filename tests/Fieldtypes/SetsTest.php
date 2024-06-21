@@ -57,6 +57,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'hide' => null,
                         'fields' => [
                             [
                                 '_id' => 'group-alfa-section-one-0',
@@ -87,6 +88,7 @@ class SetsTest extends TestCase
                         'display' => null,
                         'instructions' => null,
                         'icon' => null,
+                        'hide' => null,
                         'fields' => [
                             [
                                 '_id' => 'group-bravo-section-two-0',
@@ -137,6 +139,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'hide' => null,
                         'fields' => [
                             [
                                 '_id' => 'group-main-section-one-0',
@@ -393,6 +396,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
+                        'hide' => null,
                         'fields' => [
                             [
                                 'handle' => 'field_one',
