@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Closure;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
 use Statamic\Contracts\Entries\QueryBuilder;
@@ -91,6 +92,31 @@ class EntryRepository implements RepositoryContract
         return $entry->hasStructure()
             ? $entry->structure()->in($site)->find($entry->id())
             : $entry;
+    }
+
+    public function findOrNew($id)
+    {
+        return $this->query()->findOrNew($id);
+    }
+
+    public function findOr($id, Closure $callback)
+    {
+        return $this->query()->findOr($id, $callback);
+    }
+
+    public function firstOrNew(array $attributes = [], array $values = [])
+    {
+        return $this->query()->firstOrNew($attributes, $values);
+    }
+
+    public function firstOrCreate(array $attributes, array $values = [])
+    {
+        return $this->query()->firstOrCreate($attributes, $values);
+    }
+
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        return $this->query()->updateOrCreate($attributes, $values);
     }
 
     public function save($entry)
