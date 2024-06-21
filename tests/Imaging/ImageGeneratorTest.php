@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlideImageGenerated;
 use Statamic\Facades\AssetContainer;

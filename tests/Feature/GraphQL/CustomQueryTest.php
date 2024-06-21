@@ -23,11 +23,8 @@ class CustomQueryTest extends TestCase
             ]]]);
     }
 
-    /**
-     * @test
-     *
-     * ronment-setup addCustomQueryWithMethod
-     **/
+    #[Test]
+    #[DefineEnvironment('addCustomQueryWithMethod')]
     public function a_custom_query_can_be_added_to_the_default_schema()
     {
         $this
