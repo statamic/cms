@@ -92,7 +92,7 @@ class Dictionary extends Fieldtype
 
     public function augment($value)
     {
-        if ($this->multiple() && is_null($value)) {
+        if (is_null($value)) {
             return [];
         }
 
