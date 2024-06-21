@@ -3,16 +3,25 @@
 namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EntryQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        app('statamic.scopes')[CustomScope::handle()] = CustomScope::class;
+    }
 
     private function createDummyCollectionAndEntries()
     {
@@ -664,6 +673,17 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame($found, $substituteFr);
     }
 
+    /** @test **/
+    public function entries_are_found_using_scopes()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+
+        $entries = Entry::query()->customScope('Post 1')->get();
+
+        $this->assertCount(1, $entries);
+    }
+
     /** @test */
     public function entries_are_found_using_offset()
     {
@@ -900,5 +920,13 @@ class EntryQueryBuilderTest extends TestCase
             'post-3',
             'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('title', Arr::first($params));
     }
 }

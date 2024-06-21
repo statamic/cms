@@ -21,21 +21,19 @@ class ScopeRepository
             return;
         }
 
-        if (! $scope = app('statamic.scopes')->get($key)) {
-            return;
-        }
+        if ($class = app('statamic.scopes')->get($key)) {
+            $scope = app($class);
 
-        $scope = app($scope);
+            if (! $scope) {
+                return null;
+            }
 
-        if (! $scope) {
-            return;
-        }
+            if ($scope instanceof Filter) {
+                $scope->context($context);
+            }
 
-        if (! method_exists($scope, 'context')) {
             return $scope;
         }
-
-        return $scope->context($context);
     }
 
     public function filters($key, $context = [])

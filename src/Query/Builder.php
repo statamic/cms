@@ -13,10 +13,11 @@ use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 use Statamic\Query\Concerns\FakesQueries;
+use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
 {
-    use FakesQueries;
+    use AppliesScopes, FakesQueries;
 
     protected $columns;
     protected $limit;
@@ -37,6 +38,13 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+
+    public function __call($method, $args)
+    {
+        $this->applyScope($method, $args);
+
+        return $this;
+    }
 
     public function select($columns = ['*'])
     {

@@ -2,10 +2,12 @@
 
 namespace Tests\Data\Assets;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -28,6 +30,8 @@ class AssetQueryBuilderTest extends TestCase
         Storage::disk('test')->put('e.jpg', '');
         Storage::disk('test')->put('f.jpg', '');
         $this->container = tap(AssetContainer::make('test')->disk('test'))->save();
+
+        app('statamic.scopes')[CustomScope::handle()] = CustomScope::class;
     }
 
     /** @test */
@@ -524,6 +528,14 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a'], $assets->map->filename()->all());
     }
 
+    /** @test **/
+    public function assets_are_found_using_scopes()
+    {
+        $assets = $this->container->queryAssets()->customScope('a.jpg')->get();
+
+        $this->assertCount(1, $assets);
+    }
+
     /** @test */
     public function assets_are_found_using_offset()
     {
@@ -629,5 +641,13 @@ class AssetQueryBuilderTest extends TestCase
             'e.jpg',
             'f.jpg',
         ], $this->container->queryAssets()->where('extension', 'jpg')->pluck('path')->all());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('path', Arr::first($params));
     }
 }
