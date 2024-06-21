@@ -3,6 +3,7 @@
 namespace Tests\Actions;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\DuplicateEntry;
 use Statamic\Facades\Collection;
@@ -64,11 +65,8 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider authorizationProvider
-     */
+    #[Test]
+    #[DataProvider('authorizationProvider')]
     public function it_authorizes(
         bool $isMultisite,
         array $permissions,
@@ -126,11 +124,8 @@ class DuplicateEntryTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider bulkAuthorizationProvider
-     */
+    #[Test]
+    #[DataProvider('bulkAuthorizationProvider')]
     public function it_authorizes_in_bulk(
         bool $isMultisite,
         array $permissions,

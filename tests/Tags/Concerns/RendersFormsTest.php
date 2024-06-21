@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Concerns;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
@@ -116,11 +117,8 @@ EOT;
         return $this->tag->getRenderableField($field);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider renderTextProvider
-     */
+    #[Test]
+    #[DataProvider('renderTextProvider')]
     public function renders_text_fields($value, $default, $old, $expected)
     {
         $this->textFieldtypeTest('text', $value, $default, $old, $expected);
@@ -134,11 +132,8 @@ EOT;
         $this->assertStringContainsString('value="'.$rendered['value'].'"', $rendered['field']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider renderTextProvider
-     */
+    #[Test]
+    #[DataProvider('renderTextProvider')]
     public function renders_fallback_fields_as_text_fields($value, $default, $old, $expected)
     {
         (new class extends \Statamic\Fields\Fieldtype
@@ -149,11 +144,8 @@ EOT;
         $this->textFieldtypeTest('testing', $value, $default, $old, $expected);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider renderTextProvider
-     */
+    #[Test]
+    #[DataProvider('renderTextProvider')]
     public function renders_textarea_fields($value, $default, $old, $expected)
     {
         $rendered = $this->createField('textarea', $value, $default, $old);
@@ -183,11 +175,8 @@ EOT;
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider renderToggleProvider
-     */
+    #[Test]
+    #[DataProvider('renderToggleProvider')]
     public function renders_toggles($value, $default, $old, $expected)
     {
         $rendered = $this->createField('toggle', $value, $default, $old);
@@ -239,11 +228,8 @@ EOT;
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider renderSingleSelectProvider
-     */
+    #[Test]
+    #[DataProvider('renderSingleSelectProvider')]
     public function renders_single_select_fields($value, $default, $old, $expected)
     {
         $rendered = $this->createField('select', $value, $default, $old, [
@@ -268,11 +254,8 @@ EOT;
         }
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider renderSingleSelectProvider
-     */
+    #[Test]
+    #[DataProvider('renderSingleSelectProvider')]
     public function renders_radio_fields($value, $default, $old, $expected)
     {
         $rendered = $this->createField('radio', $value, $default, $old, [
@@ -317,11 +300,8 @@ EOT;
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider renderMultipleSelectProvider
-     */
+    #[Test]
+    #[DataProvider('renderMultipleSelectProvider')]
     public function renders_multiple_select_fields($value, $default, $old, $expected)
     {
         $rendered = $this->createField('select', $value, $default, $old, [
@@ -350,11 +330,8 @@ EOT;
         }
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider renderMultipleSelectProvider
-     */
+    #[Test]
+    #[DataProvider('renderMultipleSelectProvider')]
     public function renders_checkboxes_fields($value, $default, $old, $expected)
     {
         $rendered = $this->createField('checkboxes', $value, $default, $old, [

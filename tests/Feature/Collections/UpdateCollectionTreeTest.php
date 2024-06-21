@@ -3,6 +3,7 @@
 namespace Tests\Feature\Collections;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -16,11 +17,8 @@ class UpdateCollectionTreeTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     *
-     * @dataProvider collectionTreeDataProvider
-     */
+    #[Test]
+    #[DataProvider('collectionTreeDataProvider')]
     public function it_updates_the_tree($collectionHandle)
     {
         $this->withoutExceptionHandling();

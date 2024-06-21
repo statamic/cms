@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
@@ -69,11 +70,8 @@ class FieldsetTest extends TestCase
         $this->assertEquals($contents, $fieldset->contents());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider titleProvider
-     */
+    #[Test]
+    #[DataProvider('titleProvider')]
     public function it_gets_the_title($handle, $title, $expectedTitle)
     {
         $fieldset = (new Fieldset)->setHandle($handle)->setContents(['title' => $title]);

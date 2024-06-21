@@ -2,6 +2,7 @@
 
 namespace Tests\View\Blade;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Tags\Tags;
 use Statamic\View\Blade\TagsDirective;
@@ -15,11 +16,8 @@ class TagsDirectiveTest extends TestCase
         TheTag::register();
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider singleTagProvider
-     */
+    #[Test]
+    #[DataProvider('singleTagProvider')]
     public function it_gets_single_tag($tag, $expected)
     {
         $variables = TagsDirective::handle($tag);
@@ -35,11 +33,8 @@ class TagsDirectiveTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider singleTagWithAliasProvider
-     */
+    #[Test]
+    #[DataProvider('singleTagWithAliasProvider')]
     public function it_aliases_using_array($alias, $tag, $expected)
     {
         $variables = TagsDirective::handle([$alias => $tag]);
@@ -55,11 +50,8 @@ class TagsDirectiveTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider withParametersProvider
-     */
+    #[Test]
+    #[DataProvider('withParametersProvider')]
     public function it_aliases_with_parameters($alias, $tag, $params, $expected)
     {
         $variables = TagsDirective::handle([

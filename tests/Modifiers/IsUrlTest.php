@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
@@ -20,11 +21,8 @@ class IsUrlTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider urlsProvider
-     */
+    #[Test]
+    #[DataProvider('urlsProvider')]
     public function it_returns_true_if_value_is_valid_url($expected, $input): void
     {
         $modified = $this->modify($input);

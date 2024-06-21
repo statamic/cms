@@ -3,6 +3,7 @@
 namespace Tests\Imaging;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
@@ -31,22 +32,16 @@ class GlideImageManipulatorTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider paramProvider
-     */
+    #[Test]
+    #[DataProvider('paramProvider')]
     public function adds_standard_api_params($param)
     {
         $this->man->setParam($param, 'value');
         $this->assertArrayHasKey($param, $this->man->getParams());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider paramProvider
-     */
+    #[Test]
+    #[DataProvider('paramProvider')]
     public function adds_standard_api_params_using_magic_method($param)
     {
         $this->man->$param('value');
@@ -102,11 +97,8 @@ class GlideImageManipulatorTest extends TestCase
         $this->man->foo('bar');
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider aliasProvider
-     */
+    #[Test]
+    #[DataProvider('aliasProvider')]
     public function testAddsParamsUsingAliases($alias, $value, $expected)
     {
         $this->man->$alias($value);

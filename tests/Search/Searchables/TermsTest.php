@@ -2,6 +2,7 @@
 
 namespace Tests\Search\Searchables;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -41,11 +42,8 @@ class TermsTest extends TestCase
         ], $found->map->reference()->all());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider termsProvider
-     */
+    #[Test]
+    #[DataProvider('termsProvider')]
     public function it_gets_terms($locale, $config, $expected)
     {
         $this->setSites([
@@ -191,11 +189,8 @@ class TermsTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider indexFilterProvider
-     */
+    #[Test]
+    #[DataProvider('indexFilterProvider')]
     public function it_can_use_a_custom_filter($filter)
     {
         Taxonomy::make('tags')->sites(['en'])->save();

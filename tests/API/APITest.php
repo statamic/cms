@@ -460,6 +460,7 @@ class APITest extends TestCase
             'password_hash:regex',
         ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
     }
+
     #[Test]
     #[DataProvider('termNotFoundProvider')]
     public function it_handles_not_found_terms($url, $requestShouldSucceed)

@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
@@ -22,11 +23,8 @@ class SetQueryParamTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider existingQueryParametersProvider
-     */
+    #[Test]
+    #[DataProvider('existingQueryParametersProvider')]
     public function it_updates_an_existing_query_param($expected, $input, array $queryParam = [])
     {
         $this->assertSame(
@@ -45,11 +43,8 @@ class SetQueryParamTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider nonExistingQueryParametersProvider
-     */
+    #[Test]
+    #[DataProvider('nonExistingQueryParametersProvider')]
     public function it_adds_a_non_existant_query_param($expected, $input, array $queryParam = [])
     {
         $this->assertSame(

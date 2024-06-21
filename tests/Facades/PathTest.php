@@ -2,6 +2,7 @@
 
 namespace Tests\Facades;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Path;
 use Tests\TestCase;
@@ -14,11 +15,8 @@ class PathTest extends TestCase
         $this->assertEquals('something', Path::makeRelative(base_path('something')));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider extensionProvider
-     */
+    #[Test]
+    #[DataProvider('extensionProvider')]
     public function it_gets_the_extension($path, $extension)
     {
         $this->assertSame($extension, Path::extension($path));

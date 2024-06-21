@@ -6,6 +6,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
@@ -255,13 +256,9 @@ class StatamicTest extends TestCase
         $this->assertNotEquals($allStyles['test-name'][0], $allStyles['test-name'][1]);
     }
 
-    /**
-     * @test
-     *
-     * @define-env customAssetUrl
-     *
-     * @dataProvider cpAssetUrlProvider
-     */
+    #[Test]
+    #[DefineEnvironment('customAssetUrl')]
+    #[DataProvider('cpAssetUrlProvider')]
     public function it_gets_a_cp_asset_url($url, $expected)
     {
         $this->assertEquals($expected, Statamic::cpAssetUrl($url));
@@ -275,13 +272,9 @@ class StatamicTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @define-env customAssetUrl
-     *
-     * @dataProvider vendorPackageAssetUrlProvider
-     */
+    #[Test]
+    #[DefineEnvironment('customAssetUrl')]
+    #[DataProvider('vendorPackageAssetUrlProvider')]
     public function it_gets_the_vendor_package_asset_url($arguments, $expected)
     {
         $this->assertEquals($expected, Statamic::vendorPackageAssetUrl(...$arguments));
@@ -298,11 +291,8 @@ class StatamicTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @define-env useFixtureTranslations
-     **/
+    #[Test]
+    #[DefineEnvironment('useFixtureTranslations')]
     public function it_makes_breadcrumbs()
     {
         // confirm the fake translations are being loaded

@@ -4,6 +4,7 @@ namespace Tests\Git;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Processes\Git;
 use Statamic\Console\Processes\Process;
@@ -36,11 +37,8 @@ class GitProcessTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @group integration
-     *
-     * @test
-     */
+    #[Group('integration')]
+    #[Test]
     public function it_can_get_git_root()
     {
         $this->assertEquals(
@@ -59,11 +57,8 @@ class GitProcessTest extends TestCase
         );
     }
 
-    /**
-     * @group integration
-     *
-     * @test
-     */
+    #[Group('integration')]
+    #[Test]
     public function it_can_check_if_folder_is_in_git_repo()
     {
         $this->assertTrue(Git::create($this->basePath('temp/content'))->isRepo());
@@ -76,11 +71,8 @@ class GitProcessTest extends TestCase
         $this->assertFalse(Git::create($notARepoPath)->isRepo());
     }
 
-    /**
-     * @group integration
-     *
-     * @test
-     */
+    #[Group('integration')]
+    #[Test]
     public function it_can_get_git_status_of_parent_repo()
     {
         $this->assertNull(Git::create($this->basePath('temp/content'))->status());
@@ -100,11 +92,8 @@ EOT;
         $this->assertNull(Git::create($this->basePath('temp/assets'))->status());
     }
 
-    /**
-     * @group integration
-     *
-     * @test
-     */
+    #[Group('integration')]
+    #[Test]
     public function it_can_get_git_status_of_specific_sub_paths()
     {
         $this->files->put($this->basePath('temp/content/collections/pages.yaml'), 'title: Pages Title Changed');

@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\GraphQL;
@@ -93,11 +94,8 @@ class RequestCacheTest extends TestCase
         $this->assertFalse(Cache::has($key));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider bypassCacheProvider
-     */
+    #[Test]
+    #[DataProvider('bypassCacheProvider')]
     public function it_bypasses_cache_when_using_a_valid_token($url, $headers)
     {
         $this->withoutExceptionHandling();
@@ -120,11 +118,8 @@ class RequestCacheTest extends TestCase
         ], $requests->all());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider bypassCacheProvider
-     */
+    #[Test]
+    #[DataProvider('bypassCacheProvider')]
     public function it_doesnt_bypass_cache_when_using_an_invalid_token($url, $headers)
     {
         $this->withoutExceptionHandling();

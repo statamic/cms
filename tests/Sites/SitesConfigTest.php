@@ -2,6 +2,7 @@
 
 namespace Tests\Sites;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
@@ -419,11 +420,8 @@ class SitesConfigTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider submitsNoSites
-     */
+    #[Test]
+    #[DataProvider('submitsNoSites')]
     public function it_validates_at_least_one_site_is_required_for_multiple_sites_through_cp_endpoint($data)
     {
         // Multisite requires this config

@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
@@ -745,9 +746,8 @@ class FrontendTest extends TestCase
         );
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/1537
      **/
     public function home_page_is_not_overridden_by_entries_in_another_structured_collection_with_no_url()
@@ -772,11 +772,8 @@ class FrontendTest extends TestCase
         $this->get('/')->assertSee('Home');
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider redirectProvider
-     */
+    #[Test]
+    #[DataProvider('redirectProvider')]
     public function redirect_is_followed($dataValue, $augmentedValue, $expectedStatus, $expectedLocation)
     {
         // Making a fake fieldtype to test that the augmented value is used for the redirect.
@@ -842,11 +839,8 @@ class FrontendTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider redirectProviderNoBlueprintProvider
-     */
+    #[Test]
+    #[DataProvider('redirectProviderNoBlueprintProvider')]
     public function redirect_is_followed_when_no_field_is_present_in_blueprint(
         $dataValue,
         $shouldResolve,
@@ -911,9 +905,7 @@ class FrontendTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function redirect_is_followed_when_value_is_inherited_from_origin()
     {
         $this->setSites([
@@ -950,9 +942,7 @@ class FrontendTest extends TestCase
         $response->assertStatus(301);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function redirect_http_status_is_applied_when_present_in_blueprint()
     {
         $blueprint = Blueprint::makeFromFields([
@@ -981,9 +971,7 @@ class FrontendTest extends TestCase
         $response->assertStatus(301);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function redirect_http_status_is_applied_when_missing_from_blueprint()
     {
         tap($this->createPage('about', [

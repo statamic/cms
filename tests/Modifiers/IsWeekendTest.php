@@ -3,6 +3,7 @@
 namespace Tests\Modifiers;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
@@ -20,11 +21,8 @@ class IsWeekendTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider datesProvider
-     */
+    #[Test]
+    #[DataProvider('datesProvider')]
     public function it_returns_true_if_date_is_weekend($expected, $input): void
     {
         $modified = $this->modify($input);

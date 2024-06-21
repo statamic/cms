@@ -5,6 +5,7 @@ namespace Tests\Feature\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blueprint;
@@ -119,11 +120,8 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('foo-bar-baz.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleSlugLangsProvider
-     */
+    #[Test]
+    #[DataProvider('multipleSlugLangsProvider')]
     public function slug_is_not_required_and_will_get_created_from_the_submitted_title_and_correct_language_if_slug_is_in_the_blueprint_and_the_submitted_slug_was_empty($lang, $expectedSlug)
     {
         $this->setSiteValue('en', 'lang', $lang);

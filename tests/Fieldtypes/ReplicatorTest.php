@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldRepository;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -14,11 +15,8 @@ use Tests\TestCase;
 
 class ReplicatorTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_preprocesses_with_empty_value($areSetsGrouped)
     {
         $field = (new Field('test', [
@@ -42,11 +40,8 @@ class ReplicatorTest extends TestCase
         $this->assertSame([], $field->preProcess()->value());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_preprocesses_the_values($areSetsGrouped)
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -110,11 +105,8 @@ class ReplicatorTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_preprocesses_the_values_recursively($areSetsGrouped)
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -391,11 +383,8 @@ class ReplicatorTest extends TestCase
         ], $field->process()->value());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_preloads($areSetsGrouped)
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -614,11 +603,8 @@ class ReplicatorTest extends TestCase
         $this->assertEquals([['foo' => 'bar']], (new Replicator)->toQueryableValue([['foo' => 'bar']]));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_generates_field_path_prefix($areSetsGrouped)
     {
         $fieldtype = new class extends Fieldtype
@@ -692,11 +678,8 @@ class ReplicatorTest extends TestCase
         $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_generates_nested_field_path_prefix($areSetsGrouped)
     {
         $fieldtype = new class extends Fieldtype

@@ -5,6 +5,7 @@ namespace Tests\Forms;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\GlobalFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
@@ -19,11 +20,8 @@ class EmailTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_recipient_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['to' => $address]);
@@ -31,11 +29,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->to);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider singleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('singleAddressProvider')]
     public function it_adds_sender_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['from' => $address]);
@@ -43,11 +38,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->from);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_reply_to_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['reply_to' => $address]);
@@ -55,11 +47,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->replyTo);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_cc_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['cc' => $address]);
@@ -67,11 +56,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->cc);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_bcc_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['bcc' => $address]);

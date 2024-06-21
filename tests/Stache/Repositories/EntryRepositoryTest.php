@@ -2,6 +2,7 @@
 
 namespace Tests\Stache\Repositories;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\EntryCollection;
@@ -156,11 +157,8 @@ class EntryRepositoryTest extends TestCase
         $this->repo->findOrFail('does-not-exist');
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider entryByUriProvider
-     */
+    #[Test]
+    #[DataProvider('entryByUriProvider')]
     public function it_gets_entry_by_uri($uri, $expectedTitle)
     {
         $entry = $this->repo->findByUri($uri);

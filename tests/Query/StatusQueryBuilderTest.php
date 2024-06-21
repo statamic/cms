@@ -2,6 +2,7 @@
 
 namespace Tests\Query;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Query\StatusQueryBuilder;
@@ -61,11 +62,8 @@ class StatusQueryBuilderTest extends TestCase
         $this->assertEquals('results', $results);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider statusQueryMethodProvider
-     */
+    #[Test]
+    #[DataProvider('statusQueryMethodProvider')]
     public function it_doesnt_perform_fallback_status_query_when_status_is_explicitly_queried($method)
     {
         $builder = $this->mock(Builder::class);
@@ -93,11 +91,8 @@ class StatusQueryBuilderTest extends TestCase
         $this->assertEquals('results', $query->get());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider statusQueryMethodProvider
-     */
+    #[Test]
+    #[DataProvider('statusQueryMethodProvider')]
     public function it_doesnt_perform_fallback_status_query_when_published_is_explicitly_queried($method)
     {
         $builder = $this->mock(Builder::class);

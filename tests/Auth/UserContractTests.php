@@ -515,9 +515,7 @@ trait UserContractTests
         return [];
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_has_a_dirty_state()
     {
         $user = $this->makeUser();

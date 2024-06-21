@@ -5,6 +5,7 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Config;
@@ -331,11 +332,8 @@ GQL;
             ]]]]);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider userPasswordFilterProvider
-     */
+    #[Test]
+    #[DataProvider('userPasswordFilterProvider')]
     public function it_doesnt_allow_filtering_users_by_password($field, $filter)
     {
         Config::set('statamic.graphql.resources.users', [

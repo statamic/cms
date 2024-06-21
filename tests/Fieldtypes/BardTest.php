@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Fields\Field;
@@ -630,11 +631,8 @@ class BardTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_preloads($areSetsGrouped)
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -880,11 +878,8 @@ EOT;
         $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider inlineProvider
-     */
+    #[Test]
+    #[DataProvider('inlineProvider')]
     public function it_augments_inline_value($config)
     {
         $data = [
@@ -1112,11 +1107,8 @@ EOT;
         $this->assertEquals($expected, $this->bard()->preProcess($data));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_generates_field_path_prefix($areSetsGrouped)
     {
         $fieldtype = new class extends Fieldtype

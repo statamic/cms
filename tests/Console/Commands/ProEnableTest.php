@@ -3,6 +3,7 @@
 namespace Tests\Console\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Statamic;
 use Tests\TestCase;
@@ -136,11 +137,8 @@ ENV, $this->files->get($this->envPath));
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider hardcodedBooleans
-     */
+    #[Test]
+    #[DataProvider('hardcodedBooleans')]
     public function it_can_update_editions_config_to_reference_env_var($boolean)
     {
         $this->files->put($this->editionsPath, <<<"EDITIONS"

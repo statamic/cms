@@ -5,6 +5,7 @@ namespace Tests\Data\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
@@ -875,11 +876,8 @@ class CollectionTest extends TestCase
         $collection->updateEntryUris(['one', 'two']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider additionalPreviewTargetProvider
-     */
+    #[Test]
+    #[DataProvider('additionalPreviewTargetProvider')]
     public function it_gets_and_sets_preview_targets($throughFacade)
     {
         $collection = (new Collection)->handle('test');

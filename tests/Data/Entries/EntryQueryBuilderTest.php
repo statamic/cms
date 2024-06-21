@@ -4,6 +4,7 @@ namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
@@ -680,11 +681,8 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider likeProvider
-     */
+    #[Test]
+    #[DataProvider('likeProvider')]
     public function entries_are_found_using_like($like, $expected)
     {
         Collection::make('posts')->save();
@@ -802,11 +800,8 @@ class EntryQueryBuilderTest extends TestCase
         Entry::query()->whereStatus('foo')->get();
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider filterByStatusProvider
-     */
+    #[Test]
+    #[DataProvider('filterByStatusProvider')]
     public function it_filters_by_status($status, $expected)
     {
         Collection::make('pages')->dated(false)->save();

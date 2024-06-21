@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
@@ -15,11 +16,8 @@ class EntitiesTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider entityDataProvider
-     */
+    #[Test]
+    #[DataProvider('entityDataProvider')]
     public function it_encodes_html_entities($expected, $input): void
     {
         $modified = $this->modify($input);

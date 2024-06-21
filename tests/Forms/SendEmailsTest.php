@@ -3,6 +3,7 @@
 namespace Tests\Forms;
 
 use Illuminate\Support\Facades\Bus;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
@@ -114,11 +115,8 @@ class SendEmailsTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider noEmailsProvider
-     */
+    #[Test]
+    #[DataProvider('noEmailsProvider')]
     public function no_email_jobs_are_queued_if_none_are_configured($emailConfig)
     {
         Bus::fake();

@@ -213,11 +213,8 @@ class ValuesTest extends TestCase
         $values->missing();
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider queryBuilderProvider
-     */
+    #[Test]
+    #[DataProvider('queryBuilderProvider')]
     public function completes_a_query($builder)
     {
         $builder->shouldReceive('get')->andReturn($queryResults = EntryCollection::make([

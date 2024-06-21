@@ -2,6 +2,7 @@
 
 namespace Feature;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -11,11 +12,8 @@ class SlugTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     *
-     * @dataProvider slugProvider
-     */
+    #[Test]
+    #[DataProvider('slugProvider')]
     public function it_generates_a_slug($string, $separator, $language, $expected)
     {
         $this

@@ -3,6 +3,7 @@
 namespace Tests\Http\Middleware;
 
 use Illuminate\Http\Request;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\Http\Middleware\AddViewPaths;
@@ -14,11 +15,8 @@ use Tests\TestCase;
 
 class AddViewPathsTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider viewPathProvider
-     */
+    #[Test]
+    #[DataProvider('viewPathProvider')]
     public function adds_view_paths($isAmpEnabled, $requestUrl, $expectedPaths)
     {
         $this->setSites([
@@ -49,11 +47,8 @@ class AddViewPathsTest extends TestCase
         $this->assertEquals($originalPaths, view()->getFinder()->getPaths());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider namespacedViewPathProvider
-     */
+    #[Test]
+    #[DataProvider('namespacedViewPathProvider')]
     public function adds_namespaced_view_paths($requestUrl, $expectedPaths)
     {
         $this->setSites([

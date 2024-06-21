@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
@@ -16,11 +17,8 @@ class Nl2brTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider stringsProvider
-     */
+    #[Test]
+    #[DataProvider('stringsProvider')]
     public function it_replaces_linebreaks_with_br_tags($expected, $input): void
     {
         $modified = $this->modify($input);

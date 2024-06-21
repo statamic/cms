@@ -5,6 +5,7 @@ namespace Tests\Fieldtypes;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Query\Builder;
@@ -46,11 +47,8 @@ class EntriesTest extends TestCase
         EntryFactory::id('expired')->collection($events)->slug('expired')->data(['title' => 'Expired'])->date('2021-01-01')->create();
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider augmentQueryBuilderProvider
-     */
+    #[Test]
+    #[DataProvider('augmentQueryBuilderProvider')]
     public function it_augments_to_a_query_builder($expectedIds, $queryCallback)
     {
         $augmented = $this->fieldtype()->augment([456, 'invalid', '123', 'draft', 'scheduled', 'expired']);

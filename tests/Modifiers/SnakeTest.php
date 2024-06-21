@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
@@ -16,11 +17,8 @@ class SnakeTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider raidersOfTheLostArkProvider
-     */
+    #[Test]
+    #[DataProvider('raidersOfTheLostArkProvider')]
     public function it_converts_a_string_into_snake_case($expected, $input): void
     {
         $modified = $this->modify($input);

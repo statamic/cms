@@ -2293,9 +2293,7 @@ class AssetTest extends TestCase
         ], Arr::only($asset->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_has_a_dirty_state()
     {
         $container = Facades\AssetContainer::make('test')->disk('test');
@@ -2514,11 +2512,8 @@ YAML;
         ], $asset->getRawOriginal());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider warmPresetProvider
-     */
+    #[Test]
+    #[DataProvider('warmPresetProvider')]
     public function it_gets_which_presets_to_warm($extension, $orientation, $cpEnabled, $expectedWarm)
     {
         config(['statamic.cp.enabled' => $cpEnabled]);

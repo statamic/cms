@@ -5,6 +5,7 @@ namespace Tests\Data\Taxonomies;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Events\TaxonomyCreated;
@@ -205,11 +206,8 @@ class TaxonomyTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value, $taxonomy[$key]));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider additionalPreviewTargetProvider
-     */
+    #[Test]
+    #[DataProvider('additionalPreviewTargetProvider')]
     public function it_gets_and_sets_preview_targets($throughFacade)
     {
         $taxonomy = (new Taxonomy)->handle('test');

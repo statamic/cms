@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
@@ -2340,9 +2341,8 @@ EOT;
         ]));
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/3374
      **/
     #[Test]
@@ -2437,11 +2437,8 @@ EOT;
         ]));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider objectInConditionProvider
-     */
+    #[Test]
+    #[DataProvider('objectInConditionProvider')]
     public function it_uses_entries_as_conditions($object)
     {
         $this->assertEquals('yes', $this->renderString('{{ if the_field }}yes{{ else }}no{{ /if }}', [

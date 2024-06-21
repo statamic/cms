@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\API\AbstractCacher;
 use Statamic\Events\EntrySaved;
@@ -62,11 +63,8 @@ class CacherTest extends TestCase
             ->assertJson(['foo' => 'bar']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider bypassCacheProvider
-     */
+    #[Test]
+    #[DataProvider('bypassCacheProvider')]
     public function it_bypasses_cache_when_using_a_valid_token($endpoint, $headers)
     {
         optional(Token::find('test-token'))->delete(); // garbage collection
@@ -85,11 +83,8 @@ class CacherTest extends TestCase
         $this->assertNull(Cache::get('api-cache:tracked-responses'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider bypassCacheProvider
-     */
+    #[Test]
+    #[DataProvider('bypassCacheProvider')]
     public function it_doesnt_bypass_cache_when_using_an_invalid_token($endpoint, $headers)
     {
         // No token should exist, but do garbage collection.
@@ -119,9 +114,8 @@ class CacherTest extends TestCase
         ];
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @environment-setup setCustomExpiry
      */
     public function it_caches_endpoint_using_configured_expiry()

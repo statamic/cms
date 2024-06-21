@@ -4,6 +4,7 @@ namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\ConfigFields;
@@ -345,11 +346,8 @@ class FieldtypeTest extends TestCase
         $this->assertCount(1, $fieldtypeWithAppendedConfig->configFields()->all());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configBlueprintProvider
-     */
+    #[Test]
+    #[DataProvider('configBlueprintProvider')]
     public function it_gets_the_config_blueprint($property, $expectedSections, $expectedConfigFields)
     {
         $fieldtype = new TestFieldtypeWithConfigFieldsProperty($property);

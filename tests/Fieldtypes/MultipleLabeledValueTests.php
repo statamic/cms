@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
 trait MultipleLabeledValueTests
@@ -129,11 +130,8 @@ trait MultipleLabeledValueTests
         ], $field->augment([null, false, true, 'missing']));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider noMultipleOptionsProvider
-     */
+    #[Test]
+    #[DataProvider('noMultipleOptionsProvider')]
     public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_no_options($options)
     {
         $field = $this->field([

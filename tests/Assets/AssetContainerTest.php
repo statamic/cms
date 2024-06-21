@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
@@ -255,11 +256,8 @@ class AssetContainerTest extends TestCase
         $this->assertEquals('watermarked', $container->sourcePreset());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider warmPresetProvider
-     */
+    #[Test]
+    #[DataProvider('warmPresetProvider')]
     public function it_defines_which_presets_to_warm($source, $presets, $expectedIntelligent, $expectedWarm)
     {
         config(['statamic.assets.image_manipulation.presets' => [
@@ -861,9 +859,8 @@ class AssetContainerTest extends TestCase
         });
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/8825
      * @see https://github.com/statamic/cms/pull/8826
      **/
@@ -875,9 +872,8 @@ class AssetContainerTest extends TestCase
         });
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/5405
      * @see https://github.com/statamic/cms/pull/5433
      **/
@@ -917,9 +913,8 @@ class AssetContainerTest extends TestCase
         $container->disk()->delete('0');
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/5405
      * @see https://github.com/statamic/cms/pull/5433
      **/

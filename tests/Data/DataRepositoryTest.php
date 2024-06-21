@@ -4,6 +4,7 @@ namespace Tests\Data;
 
 use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Data\DataRepository;
@@ -111,11 +112,8 @@ class DataRepositoryTest extends TestCase
         $this->assertEquals('test', $this->data->find('123'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider findByRequestUrlProvider
-     */
+    #[Test]
+    #[DataProvider('findByRequestUrlProvider')]
     public function it_finds_by_request_url($requestUrl, $entryId)
     {
         $this->setSites([
@@ -126,11 +124,8 @@ class DataRepositoryTest extends TestCase
         $this->findByRequestUrlTest($requestUrl, $entryId);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider findByRequestUrlNoRootSiteProvider
-     */
+    #[Test]
+    #[DataProvider('findByRequestUrlNoRootSiteProvider')]
     public function it_finds_by_request_url_with_no_root_site($requestUrl, $entryId)
     {
         $this->setSites([

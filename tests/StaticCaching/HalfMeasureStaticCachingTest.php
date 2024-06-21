@@ -4,6 +4,7 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
@@ -326,11 +327,8 @@ EOT;
         ]);
     }
 
-    /**
-     * @test
-     *
-     * @define-env bladeViewPaths
-     */
+    #[Test]
+    #[DefineEnvironment('bladeViewPaths')]
     public function it_can_keep_parts_dynamic_using_blade()
     {
         // Use a tag that outputs something dynamic.

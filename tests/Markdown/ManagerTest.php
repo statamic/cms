@@ -4,6 +4,7 @@ namespace Tests\Markdown;
 
 use InvalidArgumentException;
 use Mockery;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Markdown;
 use Tests\TestCase;
@@ -29,11 +30,8 @@ class ManagerTest extends TestCase
         $this->assertEquals('bar', $manager->foo());
     }
 
-    /**
-     * @test
-     *
-     * @define-env configureDefaultParser
-     */
+    #[Test]
+    #[DefineEnvironment('configureDefaultParser')]
     public function the_default_parser_can_have_its_config_customized()
     {
         $manager = app(Markdown\Manager::class);

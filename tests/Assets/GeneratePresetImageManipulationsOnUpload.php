@@ -26,11 +26,8 @@ class GeneratePresetImageManipulationsOnUpload extends TestCase
         (new GeneratePresetImageManipulations($generator))->subscribe($events);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider presetProvider
-     */
+    #[Test]
+    #[DataProvider('presetProvider')]
     public function presets_are_generated_for_images($event, $extension, $shouldGenerate)
     {
         $generator = Mockery::mock(PresetGenerator::class);

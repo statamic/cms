@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\FieldsetNotFoundException;
 use Statamic\Facades;
@@ -185,11 +186,8 @@ EOT;
         $this->assertCount(0, $all);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider saveProvider
-     */
+    #[Test]
+    #[DataProvider('saveProvider')]
     public function it_saves_to_disk($handle, $expectedPath)
     {
         Facades\Fieldset::addNamespace('foo', '/path/to/foo');

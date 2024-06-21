@@ -3,6 +3,7 @@
 namespace Modifiers;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use Statamic\Modifiers\Modify;
@@ -13,11 +14,8 @@ class ToJsonTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     *
-     * @dataProvider bourneJsonBourneProvider
-     */
+    #[Test]
+    #[DataProvider('bourneJsonBourneProvider')]
     public function it_converts_to_json($input, $expected): void
     {
         $modified = $this->modify(value($input));
@@ -25,11 +23,8 @@ class ToJsonTest extends TestCase
         $this->assertEquals($expected, $modified);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider bourneJsonBourneProvider
-     */
+    #[Test]
+    #[DataProvider('bourneJsonBourneProvider')]
     public function it_pretty_prints($input, $expected): void
     {
         $modified = $this->modify(value($input), ['pretty']);

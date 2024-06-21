@@ -3,6 +3,7 @@
 namespace Tests\Modifiers;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
@@ -10,11 +11,8 @@ use Tests\TestCase;
 
 class RandomTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider inputsProvider
-     */
+    #[Test]
+    #[DataProvider('inputsProvider')]
     public function it_returns_one_random_item($input): void
     {
         $this->assertFalse(

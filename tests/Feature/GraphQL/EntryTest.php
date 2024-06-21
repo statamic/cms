@@ -6,6 +6,7 @@ use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
@@ -86,11 +87,8 @@ GQL;
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider findEventOneByArgProvider
-     */
+    #[Test]
+    #[DataProvider('findEventOneByArgProvider')]
     public function it_cannot_query_against_non_allowed_sub_resource_with_other_args($arg)
     {
         $query = <<<"GQL"

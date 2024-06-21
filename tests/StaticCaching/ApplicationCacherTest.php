@@ -5,6 +5,7 @@ namespace Tests\StaticCaching;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cacher;
@@ -119,11 +120,8 @@ class ApplicationCacherTest extends TestCase
         $this->assertNotNull($cache->get('static-cache:responses:two'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider invalidateEventProvider
-     */
+    #[Test]
+    #[DataProvider('invalidateEventProvider')]
     public function invalidating_a_url_dispatches_event($domain, $expectedUrl)
     {
         Event::fake();

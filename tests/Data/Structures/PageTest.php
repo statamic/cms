@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Entries\Entry;
@@ -186,11 +187,8 @@ class PageTest extends TestCase
         $this->assertFalse($page->hasCustomUrl());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider stripExtensionFromParentUriProvider
-     */
+    #[Test]
+    #[DataProvider('stripExtensionFromParentUriProvider')]
     public function it_builds_a_uri_and_strips_out_file_extensions_from_parent_uri($ext)
     {
         $entry = new class extends Entry
