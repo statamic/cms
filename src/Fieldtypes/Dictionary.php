@@ -7,9 +7,10 @@ use Statamic\Fields\Fieldtype;
 
 class Dictionary extends Fieldtype
 {
-    protected $categories = ['relationship'];
+    protected $categories = ['controls', 'relationship'];
     protected $selectableInForms = true; // TODO: include in frontend forms
     protected $indexComponent = 'tags';
+    protected $icon = 'select';
 
     protected function configFieldItems(): array
     {
@@ -19,7 +20,7 @@ class Dictionary extends Fieldtype
                 'fields' => [
                     'dictionary' => [
                         'display' => __('Dictionary'),
-                        'instructions' => 'Which dictionary do you want to select options from?', // TODO: move into translations file
+                        'instructions' => __('statamic::fieldtypes.dictionary.config.dictionary'),
                         'type' => 'select',
                         'options' => \Statamic\Facades\Dictionary::all()
                             ->mapWithKeys(fn ($dictionary) => [$dictionary->handle() => $dictionary->title()])

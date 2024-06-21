@@ -72,6 +72,7 @@ return [
     'date.config.time_enabled' => 'Enable the timepicker.',
     'date.config.time_seconds_enabled' => 'Show seconds in the timepicker.',
     'date.title' => 'Date',
+    'dictionary.config.dictionary' => 'Please select the dictionary you wish to pull options from.',
     'entries.config.create' => 'Allow creation of new entries.',
     'entries.config.collections' => 'Choose which collections the user can select from.',
     'entries.config.query_scopes' => 'Choose which query scopes should be applied when retrieving selectable entries.',
