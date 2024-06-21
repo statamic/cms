@@ -114,5 +114,4 @@ export default {
     }
 
 }
-</script>../HasActions
-../HasActions
+</script>
