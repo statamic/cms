@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP;
 use Illuminate\Http\Request;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
+use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class ActionController extends CpController
@@ -38,16 +39,25 @@ abstract class ActionController extends CpController
         $response = $action->run($items, $values);
 
         if ($redirect = $action->redirect($items, $values)) {
-            return ['redirect' => $redirect];
+            return [
+                'redirect' => $redirect,
+                'bypassesDirtyWarning' => $action->bypassesDirtyWarning(),
+            ];
         } elseif ($download = $action->download($items, $values)) {
             return $download instanceof Response ? $download : response()->download($download);
         }
 
         if (is_string($response)) {
-            return ['message' => $response];
+            $response = ['message' => $response];
         }
 
-        return $response ?: [];
+        $response = $response ?: [];
+
+        if (Arr::get($context, 'view') === 'form') {
+            $response['data'] = $this->getItemData($items->first(), $context);
+        }
+
+        return $response;
     }
 
     public function bulkActions(Request $request)
@@ -65,4 +75,9 @@ abstract class ActionController extends CpController
     }
 
     abstract protected function getSelectedItems($items, $context);
+
+    protected function getItemData($item, $context): array
+    {
+        return [];
+    }
 }

@@ -279,7 +279,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             'layout' => $this->layout,
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $data['sites'] = $this->sites;
         }
 
@@ -298,7 +298,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                if (! Site::hasMultiple() || ! $sites) {
+                if (! Site::multiEnabled() || ! $sites) {
                     $sites = [Site::default()->handle()];
                 }
 

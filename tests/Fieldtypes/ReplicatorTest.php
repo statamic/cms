@@ -691,6 +691,103 @@ class ReplicatorTest extends TestCase
         $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
     }
 
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_generates_nested_field_path_prefix($areSetsGrouped)
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public static function handle()
+            {
+                return 'custom';
+            }
+
+            public function preProcess($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function process($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function preload()
+            {
+                return ['fieldPathPrefix' => $this->field()->fieldPathPrefix()];
+            }
+
+            public function augment($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+        };
+
+        $fieldtype::register();
+
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => $this->groupSets($areSetsGrouped, [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'nested', 'field' => [
+                            'type' => 'replicator',
+                            'sets' => $this->groupSets($areSetsGrouped, [
+                                'two' => [
+                                    'fields' => [
+                                        ['handle' => 'words', 'field' => ['type' => 'custom']],
+                                    ],
+                                ],
+                            ]),
+                        ]],
+                    ],
+                ],
+            ]),
+        ]))->setValue([
+            [
+                '_id' => 'set-id-1',
+                'type' => 'one',
+                'nested' => [
+                    [
+                        '_id' => 'nested-set-id-1a',
+                        'type' => 'two',
+                        'words' => 'test',
+                    ],
+                    [
+                        '_id' => 'nested-set-id-1b',
+                        'type' => 'two',
+                        'words' => 'test',
+                    ],
+                ],
+            ],
+            [
+                '_id' => 'set-id-2',
+                'type' => 'one',
+                'nested' => [
+                    [
+                        '_id' => 'nested-set-id-2a',
+                        'type' => 'two',
+                        'words' => 'test',
+                    ],
+                    [
+                        '_id' => 'nested-set-id-2b',
+                        'type' => 'two',
+                        'words' => 'test',
+                    ],
+                ],
+            ],
+        ]);
+
+        $value = $field->augment()->value()->value();
+        $this->assertEquals('test.0.nested.0.words', $value[0]['nested'][0]['words']);
+        $this->assertEquals('test.0.nested.1.words', $value[0]['nested'][1]['words']);
+        $this->assertEquals('test.1.nested.0.words', $value[1]['nested'][0]['words']);
+        $this->assertEquals('test.1.nested.1.words', $value[1]['nested'][1]['words']);
+    }
+
     public static function groupedSetsProvider()
     {
         return [

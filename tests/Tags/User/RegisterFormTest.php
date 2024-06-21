@@ -4,7 +4,9 @@ namespace Tests\Tags\User;
 
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
+use Statamic\Facades\Role;
 use Statamic\Facades\User;
+use Statamic\Facades\UserGroup;
 use Statamic\Statamic;
 use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -139,8 +141,8 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The email field is required.',
-            'The password field is required.',
+            'The Email Address field is required.',
+            'The Password field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -191,8 +193,8 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            trans('validation.min.string', ['attribute' => 'password', 'min' => 8]), // 'The password must be at least 8 characters.',
-            trans('validation.required', ['attribute' => 'age']), // 'The age field is required.',
+            trans('validation.min.string', ['attribute' => 'Password', 'min' => 8]), // 'The password must be at least 8 characters.',
+            trans('validation.required', ['attribute' => 'Over 18 years of age?']), // 'The age field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -311,8 +313,8 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The email field is required.',
-            'The password field is required.',
+            'The Email Address field is required.',
+            'The Password field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -337,6 +339,35 @@ EOT
 
         $this->assertStringContainsString($expectedRedirect, $output);
         $this->assertStringContainsString($expectedErrorRedirect, $output);
+    }
+
+    /** @test */
+    public function it_ensures_some_fields_arent_saved()
+    {
+        UserGroup::make('client')->title('Client')->save();
+        Role::make('admin')->title('Admin')->save();
+
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        $this
+            ->post('/!/auth/register', [
+                'email' => 'san@holo.com',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
+                'groups' => ['client'],
+                'roles' => ['admin'],
+                'super' => true,
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $user = User::findByEmail('san@holo.com');
+
+        $this->assertEquals($user->groups()->count(), 0);
+        $this->assertEquals($user->roles()->count(), 0);
+        $this->assertNull($user->get('super'));
+        $this->assertNull($user->get('password_confirmation'));
     }
 
     private function useCustomBlueprint()
@@ -460,5 +491,21 @@ EOT
         $this->assertEquals(['Registration successful.'], $success[1]);
 
         config()->set('statamic.users.registration_form_honeypot_field', null);
+    }
+
+    /** @test */
+    public function it_handles_precognitive_requests()
+    {
+        if (! method_exists($this, 'withPrecognition')) {
+            $this->markTestSkipped();
+        }
+
+        $response = $this
+            ->withPrecognition()
+            ->postJson('/!/auth/register', [
+                'password_confirmation' => 'no',
+            ]);
+
+        $response->assertStatus(422);
     }
 }

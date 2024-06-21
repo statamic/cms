@@ -286,18 +286,48 @@ class SiteTest extends TestCase
     }
 
     /** @test */
-    public function gets_direction()
+    public function it_gets_direction()
     {
-        $site = new Site('ar', ['locale' => 'ar_SA', 'direction' => 'rtl']);
+        $this->assertEquals('ltr', (new Site('irrelevant', ['locale' => 'en']))->direction());
+        $this->assertEquals('ltr', (new Site('irrelevant', ['locale' => 'en_US']))->direction());
+        $this->assertEquals('ltr', (new Site('irrelevant', ['locale' => 'en_IRRELEVANT']))->direction());
+
+        $this->assertEquals('rtl', (new Site('irrelevant', ['locale' => 'ar']))->direction());
+        $this->assertEquals('rtl', (new Site('irrelevant', ['locale' => 'ar_SA']))->direction());
+        $this->assertEquals('rtl', (new Site('irrelevant', ['locale' => 'ar_IRRELEVANT']))->direction());
+    }
+
+    /** @test */
+    public function it_gets_direction_from_custom_lang()
+    {
+        $site = new Site('reverse_elvish', ['locale' => 'en_US', 'lang' => 'ar']); // ar should be rtl lang
 
         $this->assertEquals('rtl', $site->direction());
     }
 
     /** @test */
-    public function gets_direction_with_fallback()
+    public function it_gets_attributes()
     {
-        $site = new Site('en', ['locale' => 'en_US']);
+        $this->assertEquals([], (new Site('test', []))->attributes());
 
-        $this->assertEquals('ltr', $site->direction());
+        $site = new Site('test', ['attributes' => [
+            'alfa' => 'bravo',
+            'charlie' => [
+                'delta' => 'echo',
+            ],
+        ]]);
+
+        $this->assertEquals([
+            'alfa' => 'bravo',
+            'charlie' => [
+                'delta' => 'echo',
+            ],
+        ], $site->attributes());
+
+        $this->assertEquals('bravo', $site->attribute('alfa'));
+        $this->assertEquals(['delta' => 'echo'], $site->attribute('charlie'));
+        $this->assertEquals('echo', $site->attribute('charlie.delta'));
+        $this->assertNull($site->attribute('unknown'));
+        $this->assertNull($site->attribute('charlie.unknown'));
     }
 }

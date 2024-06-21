@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
@@ -12,6 +13,7 @@ use Statamic\Facades\Addon;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\Token;
+use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
@@ -22,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected $configFiles = [
         'antlers', 'api', 'assets', 'autosave', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'markdown', 'oauth', 'protect', 'revisions',
-        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users',
+        'routes', 'search', 'static_caching', 'stache', 'system', 'users',
     ];
 
     public function boot()
@@ -91,6 +93,8 @@ class AppServiceProvider extends ServiceProvider
             return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
+        TrimStrings::skipWhen(fn (Request $request) => $request->is(config('statamic.cp.route').'/*'));
+
         $this->addAboutCommandInfo();
     }
 
@@ -100,9 +104,7 @@ class AppServiceProvider extends ServiceProvider
             $this->mergeConfigFrom("{$this->root}/config/$config.php", "statamic.$config");
         });
 
-        $this->app->singleton(Sites::class, function () {
-            return new Sites(config('statamic.sites'));
-        });
+        $this->app->singleton(Sites::class);
 
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
@@ -118,6 +120,8 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Structures\NavigationRepository::class => \Statamic\Stache\Repositories\NavigationRepository::class,
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
             \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
+            \Statamic\Contracts\Forms\SubmissionRepository::class => \Statamic\Stache\Repositories\SubmissionRepository::class,
+            \Statamic\Contracts\Tokens\TokenRepository::class => \Statamic\Tokens\FileTokenRepository::class,
         ])->each(function ($concrete, $abstract) {
             if (! $this->app->bound($abstract)) {
                 Statamic::repository($abstract, $concrete);
@@ -150,8 +154,11 @@ class AppServiceProvider extends ServiceProvider
                 ->setDirectory(resource_path('fieldsets'));
         });
 
+        $this->app->singleton(FieldsetRecursionStack::class);
+
         collect([
             'entries' => fn () => Facades\Entry::query(),
+            'form-submissions' => fn () => Facades\FormSubmission::query(),
             'terms' => fn () => Facades\Term::query(),
             'assets' => fn () => Facades\Asset::query(),
             'users' => fn () => Facades\User::query(),
@@ -188,7 +195,6 @@ class AppServiceProvider extends ServiceProvider
 
         AboutCommand::add('Statamic', [
             'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
-            'Antlers' => config('statamic.antlers.version'),
             'Addons' => $addons->count(),
             'Stache Watcher' => config('statamic.stache.watcher') ? 'Enabled' : 'Disabled',
             'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',

@@ -11,8 +11,18 @@
                 </div>
             </h1>
 
-            <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint">
-                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint || hasItemActions">
+                <dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
+                <li class="divider" />
+                <data-list-inline-actions
+                    v-if="!isCreating && hasItemActions"
+                    :item="values.id"
+                    :url="itemActionUrl"
+                    :actions="itemActions"
+                    :is-dirty="isDirty"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                />
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex rtl:ml-4 ltr:mr-4" v-if="readOnly">
@@ -124,7 +134,7 @@
                                 <div
                                     v-if="!revisionsEnabled"
                                     class="flex items-center justify-between px-4 py-2"
-                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                    :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
                                 >
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
@@ -133,7 +143,7 @@
                                 <div
                                     v-if="revisionsEnabled && !isCreating"
                                     class="p-4"
-                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                    :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
                                 >
                                     <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
                                     <div class="mb-1 flex items-center" v-if="published">
@@ -161,14 +171,14 @@
                                         </button>
                                 </div>
 
-                                <div class="p-4 border-t" v-if="localizations.length > 1">
+                                <div class="p-4 border-t dark:border-dark-900" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-2" v-text="__('Sites')" />
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
                                         class="text-sm flex items-center -mx-4 px-4 py-2"
                                         :class="[
-                                            option.active ? 'bg-blue-100' : 'hover:bg-gray-200',
+                                            option.active ? 'bg-blue-100 dark:bg-dark-300' : 'hover:bg-gray-200 dark:hover:bg-dark-400',
                                             !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
                                         ]"
                                         @click="localizationSelected(option)"
@@ -186,9 +196,9 @@
                                                 class="rtl:mr-2 ltr:ml-2"
                                                 v-if="localizing && localizing.handle === option.handle" />
                                         </div>
-                                        <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
-                                        <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
-                                        <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
+                                        <div class="badge-sm bg-orange dark:bg-orange-dark" v-if="option.origin" v-text="__('Origin')" />
+                                        <div class="badge-sm bg-blue dark:bg-dark-blue-175" v-if="option.active" v-text="__('Active')" />
+                                        <div class="badge-sm bg-purple dark:bg-purple-dark" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                                     </div>
                                 </div>
                             </div>
@@ -297,12 +307,14 @@ import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
+import HasActions from '../publish/HasActions';
 
 export default {
 
     mixins: [
         HasPreferences,
         HasHiddenFields,
+        HasActions,
     ],
 
     components: {
@@ -486,13 +498,24 @@ export default {
                 }));
         },
 
+        direction() {
+            return this.$config.get('direction', 'ltr');
+        },
+
     },
 
     watch: {
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
-        }
+        },
+
+        title(title) {
+            if (this.isBase) {
+                const arrow = this.direction === 'ltr' ? '‹' : '›';
+                document.title = `${title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
+            }
+        },
 
     },
 
@@ -546,9 +569,6 @@ export default {
                 }
                 this.title = response.data.data.title;
                 this.isWorkingCopy = true;
-                if (this.isBase) {
-                    document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
-                }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
@@ -747,6 +767,7 @@ export default {
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.title = response.data.data.title;
+            this.values = this.resetValuesFromResponse(response.data.data.values);
             this.activeLocalization.title = response.data.data.title;
             this.activeLocalization.published = response.data.data.published;
             this.activeLocalization.status = response.data.data.status;
@@ -788,7 +809,20 @@ export default {
             }, this.autosaveInterval);
 
             this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
-        }
+        },
+
+        afterActionSuccessfullyCompleted(response) {
+            if (response.data) {
+                this.title = response.data.title;
+                if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                this.values = this.resetValuesFromResponse(response.data.values);
+                this.initialPublished = response.data.published;
+                this.activeLocalization.published = response.data.published;
+                this.activeLocalization.status = response.data.status;
+                this.itemActions = response.data.itemActions;
+            }
+        },
+
     },
 
     mounted() {

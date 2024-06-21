@@ -46,7 +46,7 @@ import DropdownTools from '../components/DropdownTools.vue';
 import QuickDropdownList from '../components/QuickDropdownList.vue';
 import QuickDropdownItem from '../components/QuickDropdownItem.vue';
 import ValidationErrors from '../components/ValidationErrors.vue';
-import Slugify from '../components/Slugify.vue';
+import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import Avatar from '../components/Avatar.vue';
 import Breadcrumb from '../components/Breadcrumb.vue';

@@ -65,31 +65,31 @@
             <template #empty>
                 <div class="card p-4 content w-full">
                     <div class="flex flex-wrap w-full">
-                        <a :href="editUrl" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-                            <svg-icon name="light/hammer-wrench" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800" />
+                        <a :href="editUrl" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <svg-icon name="light/hammer-wrench" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
                             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Configure Navigation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
+                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Configure Navigation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
                                 <p>{{ __('messages.navigation_configure_settings_intro') }}</p>
                             </div>
                         </a>
-                        <a @click="linkPage()" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-                            <svg-icon name="paperclip" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800" />
+                        <a @click="linkPage()" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <svg-icon name="paperclip" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
                             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Link to URL') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
+                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Link to URL') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
                                  <p>{{ __('messages.navigation_link_to_url_instructions') }}</p>
                             </div>
                         </a>
-                        <a @click="linkEntries()" v-if="hasCollections" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-                            <svg-icon name="light/hierarchy-files" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800" />
+                        <a @click="linkEntries()" v-if="hasCollections" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <svg-icon name="light/hierarchy-files" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
                             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Link to Entry') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
+                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Link to Entry') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
                                  <p>{{ __('messages.navigation_link_to_entry_instructions') }}</p>
                             </div>
                         </a>
-                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-                            <svg-icon name="light/book-pages" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800" />
+                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <svg-icon name="light/book-pages" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
                             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Read the Documentation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
+                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Read the Documentation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
                                  <p>{{ __('messages.navigation_documentation_instructions') }}</p>
                             </div>
                         </a>
@@ -249,7 +249,7 @@ export default {
         },
 
         direction() {
-            return this.$config.get('direction', 'rtl');
+            return this.$config.get('direction', 'ltr');
         },
 
     },

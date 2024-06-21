@@ -7,7 +7,6 @@ use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Entry;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
@@ -18,7 +17,7 @@ class CollectionStructureTest extends StructureTestCase
 {
     private $collection;
     private $entryQueryBuilder;
-    private $queryBuilderGetReturnValue;
+    private $queryBuilderPluckReturnValue;
 
     public function setUp(): void
     {
@@ -27,8 +26,9 @@ class CollectionStructureTest extends StructureTestCase
         $this->entryQueryBuilder = $this->mock(EntryQueryBuilder::class);
         $this->entryQueryBuilder->shouldReceive('where')->with('site', 'en')->andReturnSelf();
         $this->entryQueryBuilder->shouldReceive('where')->with('site', 'fr')->andReturnSelf();
-        $this->entryQueryBuilder->shouldReceive('get')->andReturnUsing(function () {
-            return $this->queryBuilderGetReturnValue();
+        $this->entryQueryBuilder->shouldReceive('get')->never();
+        $this->entryQueryBuilder->shouldReceive('pluck')->andReturnUsing(function () {
+            return $this->queryBuilderPluckReturnValue();
         });
 
         $this->collection = $this->mock(Collection::class);
@@ -42,9 +42,9 @@ class CollectionStructureTest extends StructureTestCase
         return (new CollectionStructure)->handle($handle);
     }
 
-    public function queryBuilderGetReturnValue()
+    public function queryBuilderPluckReturnValue()
     {
-        return $this->queryBuilderGetReturnValue ?? collect();
+        return $this->queryBuilderPluckReturnValue ?? collect();
     }
 
     /** @test */
@@ -80,8 +80,8 @@ class CollectionStructureTest extends StructureTestCase
         $this->collection->shouldReceive('structure')->andReturn($structure);
         $this->collection->shouldReceive('handle')->andReturn('test');
 
-        $this->queryBuilderGetReturnValue = collect([
-            Entry::make()->id('1'),
+        $this->queryBuilderPluckReturnValue = collect([
+            1,
         ]);
 
         $tree = $structure->makeTree('fr', [
@@ -256,9 +256,9 @@ class CollectionStructureTest extends StructureTestCase
     {
         Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
 
-        $this->queryBuilderGetReturnValue = collect([
-            Entry::make()->id('123'),
-            Entry::make()->id('456'),
+        $this->queryBuilderPluckReturnValue = collect([
+            123,
+            456,
         ]);
 
         parent::the_tree_root_can_have_children_when_not_expecting_root();
@@ -269,9 +269,9 @@ class CollectionStructureTest extends StructureTestCase
     {
         Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
 
-        $this->queryBuilderGetReturnValue = collect([
-            Entry::make()->id('1'),
-            Entry::make()->id('2'),
+        $this->queryBuilderPluckReturnValue = collect([
+            1,
+            2,
         ]);
 
         $validated = $this->structure('test')->validateTree([
@@ -300,12 +300,12 @@ class CollectionStructureTest extends StructureTestCase
     {
         Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
 
-        $this->queryBuilderGetReturnValue = collect([
-            Entry::make()->id('1'),
-            Entry::make()->id('2'),
-            Entry::make()->id('3'),
-            Entry::make()->id('4'),
-            Entry::make()->id('5'),
+        $this->queryBuilderPluckReturnValue = collect([
+            1,
+            2,
+            3,
+            4,
+            5,
         ]);
 
         $actual = $this->structure('test')->validateTree([
