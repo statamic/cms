@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Closure;
+use Exception;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
@@ -17,20 +18,37 @@ class BlueprintRepository
     protected const BLINK_FROM_FILE = 'blueprints.from-file';
     protected const BLINK_NAMESPACE_PATHS = 'blueprints.paths-in-namespace';
 
-    protected $directory;
+    protected $directories;
     protected $fallbacks = [];
     protected $additionalNamespaces = [];
 
-    public function setDirectory(string $directory)
+    public function setDirectory(string|array $directories)
     {
-        $this->directory = Path::tidy($directory);
+        if (is_string($directories)) {
+            $directories = ['default' => $directories];
+        }
+
+        $this->directories = collect($directories)
+            ->map(fn ($directory) => Path::tidy($directory))
+            ->all();
+
+        if (! isset($this->directories['default'])) {
+            throw new Exception('Default blueprint directory not provided');
+        }
 
         return $this;
     }
 
     public function directory()
     {
-        return $this->directory;
+        return $this->directories['default'];
+    }
+
+    public function namespaceDirectory($namespace)
+    {
+        return isset($this->directories[$namespace])
+            ? $this->directories[$namespace]
+            : $this->directories['default'].'/'.$namespace;
     }
 
     public function find($blueprint): ?Blueprint
@@ -69,7 +87,14 @@ class BlueprintRepository
             return null;
         }
 
-        return $this->directory.'/'.str_replace('.', '/', $handle).'.yaml';
+        if (! Str::contains($handle, '.')) {
+            return $this->directory().'/'.str_replace('.', '/', $handle).'.yaml';
+        }
+
+        $namespace = Str::before($handle, '.');
+        $handle = Str::after($handle, '.');
+
+        return $this->namespaceDirectory($namespace).'/'.str_replace('.', '/', $handle).'.yaml';
     }
 
     public function findNamespacedBlueprintPath($handle)
@@ -79,7 +104,7 @@ class BlueprintRepository
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
-        $overridePath = "{$this->directory}/vendor/{$namespaceDir}/{$path}.yaml";
+        $overridePath = "{$this->directory()}/vendor/{$namespaceDir}/{$path}.yaml";
 
         if (File::exists($overridePath)) {
             return $overridePath;
@@ -224,12 +249,12 @@ class BlueprintRepository
         return Blink::store(self::BLINK_NAMESPACE_PATHS)->once($namespace, function () use ($namespace) {
             $namespace = str_replace('/', '.', $namespace);
             $namespaceDir = str_replace('.', '/', $namespace);
-            $directory = $this->directory.'/'.$namespaceDir;
+            $directory = $this->directory().'/'.$namespaceDir;
 
             if (isset($this->additionalNamespaces[$namespace])) {
                 $directory = $this->additionalNamespaces[$namespace];
 
-                $overridePath = "{$this->directory}/vendor/{$namespaceDir}";
+                $overridePath = "{$this->directory()}/vendor/{$namespaceDir}";
 
                 if (File::exists($overridePath)) {
                     $directory = $overridePath;
@@ -249,7 +274,7 @@ class BlueprintRepository
         return Blink::store(self::BLINK_FROM_FILE)->once($path, function () use ($path, $namespace) {
             if (! $namespace || ! isset($this->additionalNamespaces[$namespace])) {
                 [$namespace, $handle] = $this->getNamespaceAndHandle(
-                    Str::after(Str::before($path, '.yaml'), $this->directory.'/')
+                    Str::after(Str::before($path, '.yaml'), $this->directory().'/')
                 );
             } else {
                 $handle = Str::of($path)->afterLast('/')->before('.');
