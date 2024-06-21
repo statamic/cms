@@ -109,14 +109,14 @@ export default {
 
             if (this.search) {
                 return sets
-                    .filter(set => !set.hidden)
+                    .filter(set => !set.hide)
                     .filter(set => {
                         return __(set.display).toLowerCase().includes(this.search.toLowerCase())
                             || set.handle.toLowerCase().includes(this.search.toLowerCase());
                     });
             }
 
-            return sets.filter(set => !set.hidden);
+            return sets.filter(set => !set.hide);
         },
 
         items() {

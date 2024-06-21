@@ -14,7 +14,7 @@
             :new-section-text="__('New Set')"
             show-tab-instructions-field
             show-section-handle-field
-            show-section-hidden-field
+            show-section-hide-field
             @updated="tabsUpdated"
         />
 
