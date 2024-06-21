@@ -20,5 +20,5 @@ abstract class Dictionary
     /**
      * Returns data for a single option, given the option's key.
      */
-    abstract public function get(string $key);
+    abstract public function get(string $key): string|array;
 }

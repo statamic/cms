@@ -21,9 +21,9 @@ class Countries extends Dictionary
             ->all();
     }
 
-    public function get(string $key): array
+    public function get(string $key): string|array
     {
-        return $this->getCountries()->filter(fn ($value, $key) => $value['iso3'] === $key)->first();
+        return $this->getCountries()->filter(fn (array $country) => $country['iso3'] === $key)->first();
     }
 
     private function getCountries(): Collection
