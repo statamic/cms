@@ -86,10 +86,10 @@ class HasAvatarTest extends TestCase
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=128', $user->gravatarUrl(128));
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/3207
      **/
+    #[Test]
     public function it_gets_the_gravatar_if_theres_a_field_defined_in_the_blueprint_and_an_uploaded_asset_was_deleted()
     {
         $user = $this->withAvatarField()->withGravatar()->user()->set('avatar', 'john.jpg');

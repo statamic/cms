@@ -859,11 +859,11 @@ class AssetContainerTest extends TestCase
         });
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/8825
      * @see https://github.com/statamic/cms/pull/8826
      **/
+    #[Test]
     public function it_doesnt_get_kebab_case_folder_assets_when_querying_snake_case_folder()
     {
         tap($this->containerWithDisk('snake-kebab')->assets('foo_bar', true), function ($assets) {
@@ -872,11 +872,11 @@ class AssetContainerTest extends TestCase
         });
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/5405
      * @see https://github.com/statamic/cms/pull/5433
      **/
+    #[Test]
     public function it_can_get_assets_in_a_folder_named_zero()
     {
         $container = $this->containerWithDisk();
@@ -913,11 +913,11 @@ class AssetContainerTest extends TestCase
         $container->disk()->delete('0');
     }
 
-    #[Test]
     /**
      * @see https://github.com/statamic/cms/issues/5405
      * @see https://github.com/statamic/cms/pull/5433
      **/
+    #[Test]
     public function it_wont_get_assets_that_share_a_similar_folder_prefix()
     {
         $container = $this->containerWithDisk();
