@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -553,11 +554,8 @@ class FieldTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     *
-     * @group graphql
-     **/
+    #[Test]
+    #[Group('graphql')]
     public function it_gets_the_graphql_type()
     {
         $fieldtype = new class extends Fieldtype
@@ -581,11 +579,8 @@ class FieldTest extends TestCase
         $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']);
     }
 
-    /**
-     * @test
-     *
-     * @group graphql
-     **/
+    #[Test]
+    #[Group('graphql')]
     public function it_makes_the_graphql_type_non_nullable_if_its_required()
     {
         $fieldtype = new class extends Fieldtype

@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades\Fieldset as FieldsetRepository;
@@ -210,9 +211,8 @@ class FieldsTest extends TestCase
         $this->assertEquals('test_two', $fields['test_two']->handle());
     }
 
+    #[Test]
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/2869
      **/
     public function it_prefixes_the_handles_of_nested_imported_fieldsets()
@@ -944,11 +944,8 @@ class FieldsTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Validation\ValidationException::class, $e);
     }
 
-    /**
-     * @test
-     *
-     * @group graphql
-     **/
+    #[Test]
+    #[Group('graphql')]
     public function it_gets_the_fields_as_graphql_types()
     {
         $fields = new Fields([

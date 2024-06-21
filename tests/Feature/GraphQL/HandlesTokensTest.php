@@ -8,7 +8,7 @@ use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\Token as Tokens;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class HandlesTokensTest extends TestCase
 {
     #[Test]

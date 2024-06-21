@@ -2,11 +2,12 @@
 
 namespace Tests\Feature\GraphQL;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\StatamicProAuthorizationException;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class StatamicProRequiredTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

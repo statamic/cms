@@ -2,11 +2,12 @@
 
 namespace Tests\Feature\GraphQL;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\GraphQL;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class CustomMiddlewareTest extends TestCase
 {
     public function setUp(): void

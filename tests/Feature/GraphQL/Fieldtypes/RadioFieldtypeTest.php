@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 
-/** @group graphql */
+#[Group('graphql')]
 class RadioFieldtypeTest extends FieldtypeTestCase
 {
     #[Test]

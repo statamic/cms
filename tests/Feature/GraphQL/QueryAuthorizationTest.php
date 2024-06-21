@@ -2,11 +2,12 @@
 
 namespace Tests\Feature\GraphQL;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\GraphQL\Queries\PingQuery;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class QueryAuthorizationTest extends TestCase
 {
     public function tearDown(): void

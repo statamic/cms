@@ -3,6 +3,7 @@
 namespace Tests\Modifiers;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
@@ -10,11 +11,8 @@ use Tests\TestCase;
 
 class ReverseTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @group array
-     */
+    #[Test]
+    #[Group('array')]
     public function it_reverses_the_items_of_an_array(): void
     {
         $orderOfCeremony = [
@@ -33,11 +31,8 @@ class ReverseTest extends TestCase
         $this->assertEquals($expected, $modified);
     }
 
-    /**
-     * @test
-     *
-     * @group array
-     */
+    #[Test]
+    #[Group('array')]
     public function it_reverses_the_items_of_a_collection(): void
     {
         $orderOfCeremony = collect([

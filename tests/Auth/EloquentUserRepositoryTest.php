@@ -2,11 +2,12 @@
 
 namespace Tests\Auth;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\TestCase;
 
-/** @group user-repo */
+#[Group('user-repo')]
 class EloquentUserRepositoryTest extends TestCase
 {
     use UserRepositoryTests;

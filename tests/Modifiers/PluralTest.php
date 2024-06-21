@@ -3,13 +3,12 @@
 namespace Tests\Modifiers;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class PluralTest extends TestCase
 {
     public static function shoppingListProvider()

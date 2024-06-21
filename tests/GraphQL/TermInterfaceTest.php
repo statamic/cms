@@ -3,6 +3,7 @@
 namespace Tests\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Facades\Taxonomy;
@@ -12,7 +13,7 @@ use Statamic\GraphQL\Types\TermType;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class TermInterfaceTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;

@@ -4,6 +4,7 @@ namespace Tests\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\GlobalFactory;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Fields\Blueprint;
@@ -12,7 +13,7 @@ use Statamic\GraphQL\Types\GlobalSetType;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class GlobalSetInterfaceTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;

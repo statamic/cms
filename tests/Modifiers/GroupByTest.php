@@ -12,9 +12,7 @@ use Statamic\Modifiers\Modify;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class GroupByTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;

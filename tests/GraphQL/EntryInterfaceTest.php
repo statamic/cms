@@ -3,6 +3,7 @@
 namespace Tests\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Facades\Collection;
@@ -12,7 +13,7 @@ use Statamic\GraphQL\Types\EntryType;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class EntryInterfaceTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;

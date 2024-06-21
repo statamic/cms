@@ -3,9 +3,10 @@
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 
-/** @group graphql */
+#[Group('graphql')]
 class DateFieldtypeTest extends FieldtypeTestCase
 {
     public function setUp(): void

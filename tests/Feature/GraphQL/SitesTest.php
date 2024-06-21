@@ -3,10 +3,11 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class SitesTest extends TestCase
 {
     use EnablesQueries {

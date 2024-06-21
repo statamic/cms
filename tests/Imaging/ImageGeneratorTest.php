@@ -275,12 +275,9 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
     }
 
-    /**
-     * @test
-     *
-     *     #[Test]
-    #[DataProvider('bypassCacheProvider')]Provider guzzleWatermarkProvider
-     */
+
+    #[Test]
+    #[DataProvider('guzzleWatermarkProvider')]
     public function the_watermark_disk_is_a_guzzle_adapter_when_a_url_is_provided($protocol)
     {
         $generator = $this->makeGenerator();

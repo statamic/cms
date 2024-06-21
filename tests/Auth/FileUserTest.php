@@ -3,6 +3,7 @@
 namespace Tests\Auth;
 
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\User;
 use Statamic\Contracts\Auth\Role as RoleContract;
@@ -13,7 +14,7 @@ use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group user */
+#[Group('user')]
 class FileUserTest extends TestCase
 {
     use PermissibleContractTests, PreventSavingStacheItemsToDisk, UserContractTests;

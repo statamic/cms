@@ -4,10 +4,11 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
 use Mockery;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 
-/** @group graphql */
+#[Group('graphql')]
 class LinkFieldtypeTest extends FieldtypeTestCase
 {
     #[Test]

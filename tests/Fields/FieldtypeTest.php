@@ -5,6 +5,7 @@ namespace Tests\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\ConfigFields;
@@ -539,11 +540,8 @@ class FieldtypeTest extends TestCase
         $this->assertEquals('fallback', $fieldtype->config('unknown', 'fallback'));
     }
 
-    /**
-     * @test
-     *
-     * @group graphql
-     **/
+    #[Test]
+    #[Group('graphql')]
     public function it_gets_the_graphql_type_of_string_by_default()
     {
         $type = (new TestFieldtype)->toGqlType();

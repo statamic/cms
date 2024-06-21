@@ -2,14 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class WhereTest extends TestCase
 {
     #[Test]

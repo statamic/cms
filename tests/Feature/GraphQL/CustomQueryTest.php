@@ -3,12 +3,13 @@
 namespace Tests\Feature\GraphQL;
 
 use GraphQL\Type\Definition\Type;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Queries\Query;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class CustomQueryTest extends TestCase
 {
     #[Test]
