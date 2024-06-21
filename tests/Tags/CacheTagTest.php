@@ -165,7 +165,7 @@ class CacheTagTest extends TestCase
 {{ yield:header }}
 
 {{ cache }}
-    {{ section:header }}The Header{{ /section:header }}
+{{ section:header }}The Header{{ /section:header }}
 
     Cached content.
 {{ /cache }}
@@ -206,7 +206,7 @@ EXP;
 {{ stack:test }}{{ value }}{{ /stack:test }}
 
 {{ cache }}
-    {{ push:test }}Hello{{ /push:test }}{{ push:test }}, universe.{{ /push:test }}
+{{ push:test }}Hello{{ /push:test }}{{ push:test }}, universe.{{ /push:test }}
 
     Cached content.
 {{ /cache }}
