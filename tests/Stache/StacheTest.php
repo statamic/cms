@@ -4,11 +4,11 @@ namespace Tests\Stache;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use Orchestra\Testbench\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\ChildStore;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Stores\EntriesStore;
+use Tests\TestCase;
 
 class StacheTest extends TestCase
 {
