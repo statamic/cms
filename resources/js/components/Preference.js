@@ -45,7 +45,7 @@ class Preference {
     }
 
     defaults() {
-        return this.instance.$store.state.statamic.config.defaultPreferences;
+        return Statamic.$config.get('defaultPreferences');
     }
 
     getDefault(key, fallback) {
