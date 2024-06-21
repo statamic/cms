@@ -12,7 +12,13 @@ abstract class Dictionary
 
     protected static $binding = 'dictionaries';
 
+    /**
+     * Returns all options, optionally filtered by a search term.
+     */
     abstract public function options(?string $search = null): array;
 
-    abstract public function get(string $option);
+    /**
+     * Returns data for a single option, given the option's key.
+     */
+    abstract public function get(string $key);
 }

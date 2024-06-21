@@ -7,9 +7,6 @@ use Statamic\Facades\File;
 
 class Countries extends Dictionary
 {
-    /**
-     * Returns all options.
-     */
     public function options(?string $search = null): array
     {
         return $this->getCountries()
@@ -24,12 +21,9 @@ class Countries extends Dictionary
             ->all();
     }
 
-    /**
-     * Returns data for a single option, given the option's key.
-     */
-    public function get(string $option): array
+    public function get(string $key): array
     {
-        return $this->getCountries()->filter(fn ($value, $key) => $value['iso3'] === $option)->first();
+        return $this->getCountries()->filter(fn ($value, $key) => $value['iso3'] === $key)->first();
     }
 
     private function getCountries(): Collection
