@@ -89,7 +89,7 @@ class Dictionary extends Fieldtype
         ];
     }
 
-    public function augment($value): array
+    public function augment($value)
     {
         if ($this->multiple() && is_null($value)) {
             return [];
