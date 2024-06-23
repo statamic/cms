@@ -1,73 +1,77 @@
 <template>
 
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-gray-100 dark:bg-dark-700 h-full flex flex-col">
+        <template #default="{ close }">
+            <div class="bg-gray-100 dark:bg-dark-700 h-full flex flex-col">
 
-            <header class="bg-white dark:bg-dark-550 rtl:pr-6 ltr:pl-6 rtl:pl-3 ltr:pr-3 py-2 mb-4 border-b dark:border-dark-950 shadow-md text-lg font-medium flex items-center justify-between">
-                {{ headerText }}
-                <button
-                    type="button"
-                    class="btn-close"
-                    @click="confirmClose(close)"
-                    v-html="'&times'" />
-            </header>
+                <header class="bg-white dark:bg-dark-550 rtl:pr-6 ltr:pl-6 rtl:pl-3 ltr:pr-3 py-2 mb-4 border-b dark:border-dark-950 shadow-md text-lg font-medium flex items-center justify-between">
+                    {{ headerText }}
+                    <button
+                        type="button"
+                        class="btn-close"
+                        @click="confirmClose(close)"
+                        v-html="'&times'" />
+                </header>
 
-            <div v-if="loading" class="flex-1 overflow-auto relative">
-                <div class="absolute inset-0 z-10 bg-white dark:bg-dark-700 bg-opacity-75 flex items-center justify-center text-center">
-                    <loading-graphic />
-                </div>
-            </div>
-
-            <div v-if="!loading" class="flex-1 overflow-auto px-1">
-
-                <publish-container
-                    ref="container"
-                    :name="publishContainer"
-                    :blueprint="adjustedBlueprint"
-                    :values="values"
-                    :meta="meta"
-                    :errors="errors"
-                    :localized-fields="localizedFields"
-                    :site="site"
-                    class="px-2"
-                    @updated="values = $event"
-                >
-                    <div slot-scope="{ container, setFieldMeta }">
-                        <div v-if="validating" class="absolute inset-0 z-10 bg-white dark:bg-dark-500 bg-opacity-75 flex items-center justify-center">
-                            <loading-graphic text="" />
-                        </div>
-
-                        <publish-sections
-                            :sections="adjustedBlueprint.tabs[0].sections"
-                            :syncable="type == 'entry'"
-                            :syncable-fields="syncableFields"
-                            :read-only="readOnly"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                            @synced="syncField"
-                            @desynced="desyncField"
-                            @focus="container.$emit('focus', $event)"
-                            @blur="container.$emit('blur', $event)"
-                        />
+                <div v-if="loading" class="flex-1 overflow-auto relative">
+                    <div class="absolute inset-0 z-10 bg-white dark:bg-dark-700 bg-opacity-75 flex items-center justify-center text-center">
+                        <loading-graphic />
                     </div>
-                </publish-container>
+                </div>
+
+                <div v-if="!loading" class="flex-1 overflow-auto px-1">
+
+                    <publish-container
+                        ref="container"
+                        :name="publishContainer"
+                        :blueprint="adjustedBlueprint"
+                        :values="values"
+                        :meta="meta"
+                        :errors="errors"
+                        :localized-fields="localizedFields"
+                        :site="site"
+                        class="px-2"
+                        @updated="values = $event"
+                    >
+                        <template #default="{ container, setFieldMeta }">
+                            <div>
+                                <div v-if="validating" class="absolute inset-0 z-10 bg-white dark:bg-dark-500 bg-opacity-75 flex items-center justify-center">
+                                    <loading-graphic text="" />
+                                </div>
+
+                                <publish-sections
+                                    :sections="adjustedBlueprint.tabs[0].sections"
+                                    :syncable="type == 'entry'"
+                                    :syncable-fields="syncableFields"
+                                    :read-only="readOnly"
+                                    @updated="setFieldValue"
+                                    @meta-updated="setFieldMeta"
+                                    @synced="syncField"
+                                    @desynced="desyncField"
+                                    @focus="container.$emit('focus', $event)"
+                                    @blur="container.$emit('blur', $event)"
+                                />
+                            </div>
+                        </template>
+                    </publish-container>
+
+                </div>
+
+                <div v-if="!loading && (!readOnly || type === 'entry')" class="bg-gray-200 dark:bg-dark-500 p-4 border-t dark:border-dark-900 flex items-center justify-between flex-row-reverse">
+                    <div v-if="!readOnly">
+                        <button @click="confirmClose(close)" class="btn rtl:ml-2 ltr:mr-2">{{ __('Cancel') }}</button>
+                        <button @click="submit" class="btn-primary">{{ __('Submit') }}</button>
+                    </div>
+                    <div v-if="type === 'entry'">
+                        <a :href="editEntryUrl" target="_blank" class="text-xs flex items-center justify-center text-blue hover:text-blue underline rtl:ml-4 ltr:mr-4">
+                            <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2" />
+                            {{ __('Edit Entry') }}
+                        </a>
+                    </div>
+                </div>
 
             </div>
-
-            <div v-if="!loading && (!readOnly || type === 'entry')" class="bg-gray-200 dark:bg-dark-500 p-4 border-t dark:border-dark-900 flex items-center justify-between flex-row-reverse">
-                <div v-if="!readOnly">
-                    <button @click="confirmClose(close)" class="btn rtl:ml-2 ltr:mr-2">{{ __('Cancel') }}</button>
-                    <button @click="submit" class="btn-primary">{{ __('Submit') }}</button>
-                </div>
-                <div v-if="type === 'entry'">
-                    <a :href="editEntryUrl" target="_blank" class="text-xs flex items-center justify-center text-blue hover:text-blue underline rtl:ml-4 ltr:mr-4">
-                        <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2" />
-                        {{ __('Edit Entry') }}
-                    </a>
-                </div>
-            </div>
-
-        </div>
+        </template>
     </stack>
 
 </template>

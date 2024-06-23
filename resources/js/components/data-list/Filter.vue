@@ -11,7 +11,7 @@
             @updated="updateValues"
         >
             <publish-fields
-                slot-scope="{ setFieldValue }"
+                #default="{ setFieldValue }"
                 :fields="filter.fields"
                 :name-prefix="`filter-${filter.handle}`"
                 @updated="setFieldValue"

@@ -73,7 +73,7 @@
             @updated="values = $event"
         >
             <live-preview
-                slot-scope="{ container, components, setFieldMeta }"
+                #default="{ container, components, setFieldMeta }"
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
@@ -255,7 +255,7 @@
 
         <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
             <revision-history
-                slot-scope="{ close }"
+                #default="{ close }"
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"

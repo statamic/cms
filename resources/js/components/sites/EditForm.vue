@@ -11,18 +11,21 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
-            <header class="mb-6">
-                <div class="flex items-center">
-                    <h1 class="flex-1" v-text="pageTitle" />
-                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-                </div>
-            </header>
-            <publish-tabs
-                @updated="setFieldValue"
-                @meta-updated="setFieldMeta"
-                :enable-sidebar="false"/>
-        </div>
+        <template #default="{ setFieldValue, setFieldMeta }">
+            <div>
+                <header class="mb-6">
+                    <div class="flex items-center">
+                        <h1 class="flex-1" v-text="pageTitle" />
+                        <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+                    </div>
+                </header>
+                <publish-tabs
+                    @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
+                    :enable-sidebar="false"
+                />
+            </div>
+        </template>
     </publish-container>
 
 </template>
@@ -42,7 +45,7 @@ export default {
             values: this.initialValues,
             error: null,
             errors: {},
-        }
+        };
     },
 
     computed: {
@@ -65,7 +68,7 @@ export default {
         },
 
         initialHandleChanged() {
-            return this.initialSiteHandles.filter(handle => ! this.currentSiteHandles.includes(handle)).length > 0;
+            return this.initialSiteHandles.filter(handle => !this.currentSiteHandles.includes(handle)).length > 0;
         },
 
         initialHandleChangedWarning() {
@@ -81,7 +84,7 @@ export default {
         },
 
         submit() {
-            if (this.initialHandleChanged && ! confirm(this.initialHandleChangedWarning)) {
+            if (this.initialHandleChanged && !confirm(this.initialHandleChangedWarning)) {
                 return;
             }
 
@@ -116,5 +119,5 @@ export default {
         });
     },
 
-}
+};
 </script>

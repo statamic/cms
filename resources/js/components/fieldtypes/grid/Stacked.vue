@@ -25,7 +25,6 @@
                 'mt-4': !hideDisplay,
                 'mt-10': allowFullscreen,
             }"
-            slot-scope="{}"
         >
             <stacked-row
                 v-for="(row, index) in rows"

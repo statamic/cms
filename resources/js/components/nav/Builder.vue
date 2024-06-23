@@ -9,10 +9,15 @@
                 <h1 class="flex-1">{{ __(title) }}</h1>
 
                 <dropdown-list class="rtl:ml-2 ltr:mr-2">
-                    <dropdown-item :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"></dropdown-item>
+                    <dropdown-item
+                        :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"
+                    ></dropdown-item>
                 </dropdown-list>
 
-                <a @click="discardChanges" class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline" v-if="isDirty" v-text="__('Discard changes')" />
+                <a
+                    @click="discardChanges" class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline" v-if="isDirty"
+                    v-text="__('Discard changes')"
+                />
 
                 <dropdown-list>
                     <template #trigger>
@@ -31,7 +36,8 @@
                         :class="{ 'disabled': !changed }"
                         :disabled="!changed"
                         @click="save"
-                        v-text="__('Save Changes')" />
+                        v-text="__('Save Changes')"
+                    />
 
                     <dropdown-list v-if="hasSaveAsOptions" class="rtl:mr-0 ltr:ml-0">
                         <template #trigger>
@@ -40,9 +46,14 @@
                             </button>
                         </template>
                         <h6 class="p-2">{{ __('Save to') }}...</h6>
-                        <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group">
+                        <dropdown-item
+                            v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group"
+                        >
                             <div class="flex items-start rtl:pl-4 ltr:pr-4">
-                                <svg-icon :name="option.icon" class="text-gray shrink-0 rtl:ml-2 ltr:mr-2 w-4 group-hover:text-white" />
+                                <svg-icon
+                                    :name="option.icon"
+                                    class="text-gray shrink-0 rtl:ml-2 ltr:mr-2 w-4 group-hover:text-white"
+                                />
                                 <span class="whitespace-normal">{{ __(option.label) }}</span>
                             </div>
                         </dropdown-item>
@@ -79,41 +90,47 @@
                 @drag="treeDrag"
                 @drop="treeDrop"
             >
-                <tree-branch
-                    slot-scope="{ data: item, store, vm }"
-                    :item="item"
-                    :depth="vm.level"
-                    :vm="vm"
-                    :is-open="item.open"
-                    :has-children="item.children.length > 0"
-                    :disable-sections="true"
-                    :top-level="true"
-                    @edit="editItem(item, true)"
-                    @toggle-open="store.toggleOpen(item)"
-                >
-                    <template #branch-options="{ item }">
-                        <dropdown-item
-                            v-if="vm.level < 2"
-                            :text="__('Add Item')"
-                            @click="addItem(item.children)" />
-                        <dropdown-item
-                            :text="__('Edit')"
-                            @click="editingItem = item" />
-                        <dropdown-item
-                            :text="__('Duplicate')"
-                            @click="aliasItem(item)" />
-                        <li class="divider" />
-                        <dropdown-item
-                            v-if="itemIsVisible(item)"
-                            :text="isHideable(item) ? __('Hide') : __('Remove')"
-                            class="warning"
-                            @click="isHideable(item) ? hideItem(item) : removeItem(item, vm)" />
-                        <dropdown-item
-                            v-else
-                            :text="__('Show')"
-                            @click="showItem(item)" />
-                    </template>
-                </tree-branch>
+                <template #default="{ data: item, store, vm }">
+                    <tree-branch
+                        :item="item"
+                        :depth="vm.level"
+                        :vm="vm"
+                        :is-open="item.open"
+                        :has-children="item.children.length > 0"
+                        :disable-sections="true"
+                        :top-level="true"
+                        @edit="editItem(item, true)"
+                        @toggle-open="store.toggleOpen(item)"
+                    >
+                        <template #branch-options="{ item }">
+                            <dropdown-item
+                                v-if="vm.level < 2"
+                                :text="__('Add Item')"
+                                @click="addItem(item.children)"
+                            />
+                            <dropdown-item
+                                :text="__('Edit')"
+                                @click="editingItem = item"
+                            />
+                            <dropdown-item
+                                :text="__('Duplicate')"
+                                @click="aliasItem(item)"
+                            />
+                            <li class="divider" />
+                            <dropdown-item
+                                v-if="itemIsVisible(item)"
+                                :text="isHideable(item) ? __('Hide') : __('Remove')"
+                                class="warning"
+                                @click="isHideable(item) ? hideItem(item) : removeItem(item, vm)"
+                            />
+                            <dropdown-item
+                                v-else
+                                :text="__('Show')"
+                                @click="showItem(item)"
+                            />
+                        </template>
+                    </tree-branch>
+                </template>
             </draggable-tree>
 
             <draggable-tree
@@ -129,45 +146,52 @@
                 @drag="treeDrag"
                 @drop="treeDrop"
             >
-                <tree-branch
-                    slot-scope="{ data: item, store, vm }"
-                    :item="item"
-                    :parent-section="getParentSectionNode(item)"
-                    :depth="vm.level"
-                    :vm="vm"
-                    :is-open="item.open"
-                    :has-children="item.children.length > 0"
-                    @edit="editItem(item)"
-                    @toggle-open="store.toggleOpen(item)"
-                >
-                    <template #branch-options="{ item }">
-                        <dropdown-item
-                            v-if="vm.level < 3"
-                            :text="__('Add Item')"
-                            @click="addItem(item.children)" />
-                        <dropdown-item
-                            :text="__('Edit')"
-                            @click="editItem(item)" />
-                        <dropdown-item
-                            v-if="! isSectionNode(item)"
-                            :text="__('Pin to Top Level')"
-                            @click="pinItem(item)" />
-                        <dropdown-item
-                            v-if="! isSectionNode(item)"
-                            :text="__('Duplicate')"
-                            @click="aliasItem(item)" />
-                        <li class="divider" />
-                        <dropdown-item
-                            v-if="itemIsVisible(item)"
-                            :text="isHideable(item) ? __('Hide') : __('Remove')"
-                            class="warning"
-                            @click="isHideable(item) ? hideItem(item) : removeItem(item)" />
-                        <dropdown-item
-                            v-else
-                            :text="__('Show')"
-                            @click="showItem(item)" />
-                    </template>
-                </tree-branch>
+                <template #default="{ data: item, store, vm }">
+                    <tree-branch
+                        :item="item"
+                        :parent-section="getParentSectionNode(item)"
+                        :depth="vm.level"
+                        :vm="vm"
+                        :is-open="item.open"
+                        :has-children="item.children.length > 0"
+                        @edit="editItem(item)"
+                        @toggle-open="store.toggleOpen(item)"
+                    >
+                        <template #branch-options="{ item }">
+                            <dropdown-item
+                                v-if="vm.level < 3"
+                                :text="__('Add Item')"
+                                @click="addItem(item.children)"
+                            />
+                            <dropdown-item
+                                :text="__('Edit')"
+                                @click="editItem(item)"
+                            />
+                            <dropdown-item
+                                v-if="! isSectionNode(item)"
+                                :text="__('Pin to Top Level')"
+                                @click="pinItem(item)"
+                            />
+                            <dropdown-item
+                                v-if="! isSectionNode(item)"
+                                :text="__('Duplicate')"
+                                @click="aliasItem(item)"
+                            />
+                            <li class="divider" />
+                            <dropdown-item
+                                v-if="itemIsVisible(item)"
+                                :text="isHideable(item) ? __('Hide') : __('Remove')"
+                                class="warning"
+                                @click="isHideable(item) ? hideItem(item) : removeItem(item)"
+                            />
+                            <dropdown-item
+                                v-else
+                                :text="__('Show')"
+                                @click="showItem(item)"
+                            />
+                        </template>
+                    </tree-branch>
+                </template>
             </draggable-tree>
         </div>
 
@@ -224,11 +248,11 @@
 </template>
 
 <script>
-import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
+import { DraggableTree } from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
-import { data_get } from  '../../bootstrap/globals.js'
+import { data_get } from '../../bootstrap/globals.js';
 
 export default {
 
@@ -282,7 +306,7 @@ export default {
             confirmingRemoval: false,
             draggingNode: false,
             draggingNodeParent: false,
-        }
+        };
     },
 
     created() {
@@ -307,7 +331,7 @@ export default {
         },
 
         showTopLevelSectionPlaceholder() {
-            if (! this.topLevelTreeData.length) {
+            if (!this.topLevelTreeData.length) {
                 return true;
             }
 
@@ -392,7 +416,7 @@ export default {
             });
 
             // Ensure you can only drop nav item nodes into top level tree root
-            this.$set(this.$refs.topLevelTree.rootData, 'droppable', ! this.isSectionNode(node));
+            this.$set(this.$refs.topLevelTree.rootData, 'droppable', !this.isSectionNode(node));
 
             // Ensure you can only drop section nodes to main tree root
             this.$set(this.$refs.mainTree.rootData, 'droppable', this.isSectionNode(node));
@@ -404,14 +428,14 @@ export default {
             // Ensure max depth for top level tree
             this.traverseTree(this.topLevelTreeData, (childNode, { depth }) => {
                 if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= topLevelTreeMaxDepth && ! this.isSectionNode(node));
+                    this.$set(childNode, 'droppable', depth <= topLevelTreeMaxDepth && !this.isSectionNode(node));
                 }
             });
 
             // Ensure max depth for main tree
             this.traverseTree(this.mainTreeData, (childNode, { depth }) => {
                 if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= mainTreeMaxDepth && ! this.isSectionNode(node));
+                    this.$set(childNode, 'droppable', depth <= mainTreeMaxDepth && !this.isSectionNode(node));
                 }
             });
         },
@@ -438,7 +462,7 @@ export default {
         },
 
         getParentSectionNode(node) {
-            if (! this.isSectionNode(node) && node !== undefined) {
+            if (!this.isSectionNode(node) && node !== undefined) {
                 return this.getParentSectionNode(node.parent);
             }
 
@@ -450,7 +474,7 @@ export default {
                 return false;
             }
 
-            return ! this.isSectionNode(node.parent);
+            return !this.isSectionNode(node.parent);
         },
 
         traverseTree(nodes, callback, parentPath = []) {
@@ -509,7 +533,7 @@ export default {
         },
 
         editItem(item, topLevel) {
-            if (this.isSectionNode(item) && ! topLevel) {
+            if (this.isSectionNode(item) && !topLevel) {
                 this.editingSection = item;
             } else {
                 this.editingItem = item;
@@ -603,7 +627,7 @@ export default {
                 .children
                 .map(child => child.id);
 
-            if (this.isChildItemNode(item) && ! parentsOriginalChildIds.includes(item.config.id)) {
+            if (this.isChildItemNode(item) && !parentsOriginalChildIds.includes(item.config.id)) {
                 return true;
             }
 
@@ -614,7 +638,7 @@ export default {
                 return false;
             }
 
-            if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.config.id)) {
+            if (!this.isChildItemNode(item) && !sectionsOriginalIds.includes(item.config.id)) {
                 return true;
             }
 
@@ -645,13 +669,13 @@ export default {
 
         expandAll() {
             this.traverseTree(this.topLevelTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
+                if (!this.isSectionNode(node)) {
                     this.$set(node, 'open', true);
                 }
             });
 
             this.traverseTree(this.mainTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
+                if (!this.isSectionNode(node)) {
                     this.$set(node, 'open', true);
                 }
             });
@@ -659,13 +683,13 @@ export default {
 
         collapseAll() {
             this.traverseTree(this.topLevelTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
+                if (!this.isSectionNode(node)) {
                     this.$set(node, 'open', false);
                 }
             });
 
             this.traverseTree(this.mainTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
+                if (!this.isSectionNode(node)) {
                     this.$set(node, 'open', false);
                 }
             });
@@ -720,11 +744,11 @@ export default {
                 return false;
             }
 
-            return ! ['@alias', '@create'].includes(action);
+            return !['@alias', '@create'].includes(action);
         },
 
         removeItem(item, bypassConfirmation = false) {
-            if (this.isCustomSectionNode(item) && item.children.length && ! bypassConfirmation) {
+            if (this.isCustomSectionNode(item) && item.children.length && !bypassConfirmation) {
                 return this.confirmingRemoval = item;
             }
 
@@ -758,7 +782,7 @@ export default {
         },
 
         save() {
-            if (! this.changed) {
+            if (!this.changed) {
                 return;
             }
 
@@ -770,7 +794,7 @@ export default {
             let tree = this.preparePreferencesSubmission();
 
             this.$axios
-                .patch(url, {tree})
+                .patch(url, { tree })
                 .then(() => location.reload())
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
@@ -817,5 +841,5 @@ export default {
 
     },
 
-}
+};
 </script>

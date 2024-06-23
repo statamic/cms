@@ -10,108 +10,110 @@
             @upload-complete="uploadComplete"
             @error="uploadError"
         >
-            <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
+            <template #default="{ dragging }">
+                <div class="assets-fieldtype-drag-container">
 
-                <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
-                    <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 rtl:ml-2 ltr:mr-2 @md:mr-6" />
-                    <span>{{ __('Drop to Upload') }}</span>
-                </div>
+                    <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
+                        <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 rtl:ml-2 ltr:mr-2 @md:mr-6" />
+                        <span>{{ __('Drop to Upload') }}</span>
+                    </div>
 
-                <div
-                    v-if="!isReadOnly && showPicker"
-                    class="assets-fieldtype-picker"
-                    :class="{
+                    <div
+                        v-if="!isReadOnly && showPicker"
+                        class="assets-fieldtype-picker"
+                        :class="{
                         'is-expanded': expanded,
                         'bard-drag-handle': isInBardField
                     }"
-                >
-
-                    <button
-                        v-if="canBrowse"
-                        :class="{'opacity-0': dragging }"
-                        type="button"
-                        class="btn btn-with-icon"
-                        @click="openSelector"
-                        @keyup.space.enter="openSelector"
-                        tabindex="0">
-                        <svg-icon name="folder-image" class="w-4 h-4 text-gray-800 dark:text-dark-150"></svg-icon>
-                        {{ __('Browse') }}
-                    </button>
-
-                    <p class="asset-upload-control" v-if="canUpload">
-                        <button type="button" class="upload-text-button" @click.prevent="uploadFile">
-                            {{ __('Upload file') }}
-                        </button>
-                        <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
-                        <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
-                    </p>
-                </div>
-
-                <uploads
-                    v-if="uploads.length"
-                    :uploads="uploads"
-                />
-
-                <template v-if="expanded">
-
-                    <sortable-list
-                        v-if="displayMode === 'grid'"
-                        v-model="assets"
-                        item-class="asset-tile"
-                        handle-class="asset-thumb-container"
-                        @dragstart="$emit('focus')"
-                        @dragend="$emit('blur')"
-                        :constrain-dimensions="true"
-                        :disabled="isReadOnly"
-                        :distance="5"
-                        :animate="false"
-                        append-to="body"
                     >
-                        <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden rounded-t-none" ref="assets">
-                            <asset-tile
-                                v-for="asset in assets"
-                                :key="asset.id"
-                                :asset="asset"
-                                :read-only="isReadOnly"
-                                :show-filename="config.show_filename"
-                                :show-set-alt="showSetAlt"
-                                @updated="assetUpdated"
-                                @removed="assetRemoved"
-                                @id-changed="idChanged(asset.id, $event)">
-                            </asset-tile>
-                        </div>
-                    </sortable-list>
 
-                    <div class="asset-table-listing" v-if="displayMode === 'list'">
-                        <table class="table-fixed">
-                            <sortable-list
-                                v-model="assets"
-                                item-class="asset-row"
-                                handle-class="asset-row"
-                                :vertical="true"
-                                :disabled="isReadOnly"
-                                :distance="5"
-                                :mirror="false"
-                            >
-                                <tbody ref="assets">
-                                    <tr is="assetRow"
-                                        class="asset-row"
-                                        v-for="asset in assets"
-                                        :key="asset.id"
-                                        :asset="asset"
-                                        :read-only="isReadOnly"
-                                        :show-filename="config.show_filename"
-                                        :show-set-alt="showSetAlt"
-                                        @updated="assetUpdated"
-                                        @removed="assetRemoved"
-                                        @id-changed="idChanged(asset.id, $event)">
-                                    </tr>
-                                </tbody>
-                            </sortable-list>
-                        </table>
+                        <button
+                            v-if="canBrowse"
+                            :class="{'opacity-0': dragging }"
+                            type="button"
+                            class="btn btn-with-icon"
+                            @click="openSelector"
+                            @keyup.space.enter="openSelector"
+                            tabindex="0">
+                            <svg-icon name="folder-image" class="w-4 h-4 text-gray-800 dark:text-dark-150"></svg-icon>
+                            {{ __('Browse') }}
+                        </button>
+
+                        <p class="asset-upload-control" v-if="canUpload">
+                            <button type="button" class="upload-text-button" @click.prevent="uploadFile">
+                                {{ __('Upload file') }}
+                            </button>
+                            <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
+                            <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
+                        </p>
                     </div>
-                </template>
-            </div>
+
+                    <uploads
+                        v-if="uploads.length"
+                        :uploads="uploads"
+                    />
+
+                    <template v-if="expanded">
+
+                        <sortable-list
+                            v-if="displayMode === 'grid'"
+                            v-model="assets"
+                            item-class="asset-tile"
+                            handle-class="asset-thumb-container"
+                            @dragstart="$emit('focus')"
+                            @dragend="$emit('blur')"
+                            :constrain-dimensions="true"
+                            :disabled="isReadOnly"
+                            :distance="5"
+                            :animate="false"
+                            append-to="body"
+                        >
+                            <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden rounded-t-none" ref="assets">
+                                <asset-tile
+                                    v-for="asset in assets"
+                                    :key="asset.id"
+                                    :asset="asset"
+                                    :read-only="isReadOnly"
+                                    :show-filename="config.show_filename"
+                                    :show-set-alt="showSetAlt"
+                                    @updated="assetUpdated"
+                                    @removed="assetRemoved"
+                                    @id-changed="idChanged(asset.id, $event)">
+                                </asset-tile>
+                            </div>
+                        </sortable-list>
+
+                        <div class="asset-table-listing" v-if="displayMode === 'list'">
+                            <table class="table-fixed">
+                                <sortable-list
+                                    v-model="assets"
+                                    item-class="asset-row"
+                                    handle-class="asset-row"
+                                    :vertical="true"
+                                    :disabled="isReadOnly"
+                                    :distance="5"
+                                    :mirror="false"
+                                >
+                                    <tbody ref="assets">
+                                        <tr is="assetRow"
+                                            class="asset-row"
+                                            v-for="asset in assets"
+                                            :key="asset.id"
+                                            :asset="asset"
+                                            :read-only="isReadOnly"
+                                            :show-filename="config.show_filename"
+                                            :show-set-alt="showSetAlt"
+                                            @updated="assetUpdated"
+                                            @removed="assetRemoved"
+                                            @id-changed="idChanged(asset.id, $event)">
+                                        </tr>
+                                    </tbody>
+                                </sortable-list>
+                            </table>
+                        </div>
+                    </template>
+                </div>
+            </template>
         </uploader>
 
         <stack v-if="showSelector" name="asset-selector" @closed="closeSelector">

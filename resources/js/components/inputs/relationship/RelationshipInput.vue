@@ -64,7 +64,7 @@
 
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
-                    slot-scope="{ close }"
+                    #default="{ close }"
                     :name="name"
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"

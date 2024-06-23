@@ -15,7 +15,7 @@ export { default as FileIcon } from './FileIcon.vue';
 // export { default as AssetManager } from './assets/AssetManager.vue';
 // export { default as Browser } from './assets/Browser/Browser.vue';
 // export { default as UpdatesBadge } from './UpdatesBadge.vue';
-// export { default as Container } from './publish/Container.vue';
+export { default as Container } from './publish/Container.vue';
 // export { default as PublishForm } from './publish/PublishForm.vue';
 // export { default as Fields } from './publish/Fields.vue';
 // export { default as FieldsContainer } from './publish/FieldsContainer.vue'; // deprecated

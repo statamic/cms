@@ -27,7 +27,7 @@
             @dragend="$emit('blur')"
             @input="(rows) => $emit('sorted', rows)"
         >
-            <tbody slot-scope="{}">
+            <tbody>
                 <grid-row
                     v-for="(row, index) in rows"
                     :key="`row-${row._id}`"

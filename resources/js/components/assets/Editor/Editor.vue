@@ -130,22 +130,24 @@
                     :errors="errors"
                     @updated="values = { ...$event, focus: values.focus }"
                 >
-                    <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll" slot-scope="{ setFieldValue, setFieldMeta }">
+                    <template #default="{ setFieldValue, setFieldMeta }">
+                        <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll">
 
-                        <div v-if="saving" class="loading">
-                            <loading-graphic text="Saving" />
+                            <div v-if="saving" class="loading">
+                                <loading-graphic text="Saving" />
+                            </div>
+
+                            <div v-if="error" class="bg-red-500 text-white p-4 shadow mb-4" v-text="error" />
+
+                            <publish-sections
+                                :sections="fieldset.tabs[0].sections"
+                                :read-only="readOnly"
+                                @updated="setFieldValue"
+                                @meta-updated="setFieldMeta"
+                            />
+
                         </div>
-
-                        <div v-if="error" class="bg-red-500 text-white p-4 shadow mb-4" v-text="error" />
-
-                        <publish-sections
-                            :sections="fieldset.tabs[0].sections"
-                            :read-only="readOnly"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                        />
-
-                    </div>
+                    </template>
                 </publish-container>
             </div>
 

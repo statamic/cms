@@ -58,15 +58,17 @@
                     :is-root="true"
                     @updated="values = $event"
                 >
-                    <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue, setFieldMeta }">
+                    <template #default="{ setFieldValue, setFieldMeta }">
+                        <div v-show="activeTab === 'settings'">
 
-                        <publish-sections
-                            :sections="blueprint.tabs[0].sections"
-                            @updated="(handle, value) => updateField(handle, value, setFieldValue)"
-                            @meta-updated="setFieldMeta"
-                        />
+                            <publish-sections
+                                :sections="blueprint.tabs[0].sections"
+                                @updated="(handle, value) => updateField(handle, value, setFieldValue)"
+                                @meta-updated="setFieldMeta"
+                            />
 
-                    </div>
+                        </div>
+                    </template>
                 </publish-container>
 
                 <div class="card p-0" v-show="activeTab === 'conditions'">

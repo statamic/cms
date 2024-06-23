@@ -44,7 +44,7 @@
             v-if="isSelectingNewFieldtype"
             @closed="isSelectingNewFieldtype = false"
         >
-            <fieldtype-selector slot-scope="{ close }" @closed="close" @selected="fieldtypeSelected" />
+            <fieldtype-selector #default="{ close }" @closed="close" @selected="fieldtypeSelected" />
         </stack>
 
         <stack name="field-settings"
@@ -52,7 +52,7 @@
             @closed="pendingCreatedField = null"
         >
             <field-settings
-                slot-scope="{ close }"
+                #default="{ close }"
                 ref="settings"
                 :type="pendingCreatedField.config.type"
                 :root="true"

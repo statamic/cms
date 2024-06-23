@@ -11,17 +11,19 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
-            <configure-tabs
-                @updated="setFieldValue"
-                @meta-updated="setFieldMeta"
-                :enable-sidebar="false" />
+        <template #default="{ setFieldValue, setFieldMeta }">
+            <div>
+                <configure-tabs
+                    @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
+                    :enable-sidebar="false" />
 
-            <div class="py-4 border-t dark:border-dark-950 flex justify-between">
-                <a :href="url" class="btn" v-text="__('Cancel') "/>
-                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+                <div class="py-4 border-t dark:border-dark-950 flex justify-between">
+                    <a :href="url" class="btn" v-text="__('Cancel') "/>
+                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+                </div>
             </div>
-        </div>
+        </template>
     </publish-container>
 
 </template>

@@ -23,7 +23,7 @@
                 >
                     <!-- TODO: handle showing/hiding of labels more elegantly -->
                     <publish-fields
-                        slot-scope="{ setFieldValue, setFieldMeta }"
+                        #default="{ setFieldValue, setFieldMeta }"
                         :fields="filter.fields"
                         name-prefix="filter-field"
                         class="w-full no-label"

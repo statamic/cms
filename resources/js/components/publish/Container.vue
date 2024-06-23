@@ -169,10 +169,12 @@ export default {
                         state.localizedFields = fields;
                     },
                     lockField(state, { handle, user }) {
-                        Vue.set(state.fieldLocks, handle, user || true);
+                        // @todo(jelleroorda):
+                        // Vue.set(state.fieldLocks, handle, user || true);
                     },
                     unlockField(state, handle) {
-                        Vue.delete(state.fieldLocks, handle);
+                        // @todo(jelleroorda): fix.
+                        // Vue.delete(state.fieldLocks, handle);
                     },
                     initialize(state, payload) {
                         state.blueprint = payload.blueprint;

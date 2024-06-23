@@ -1,18 +1,21 @@
 <template>
     <data-list :visible-columns="visibleColumns" :columns="columns" :rows="initialRows">
-        <div class="card p-0" slot-scope="{ filteredRows: rows }">
-            <data-list-table :rows="rows">
-                <template slot="cell-title" slot-scope="{ row: container }">
-                    <a :href="container.edit_url">{{ container.title }}</a>
-                </template>
-                <template slot="actions" slot-scope="{ row: container, index }">
-                    <dropdown-list>
-                        <dropdown-item :text="__('Edit')" :redirect="container.edit_url" />
-                        <dropdown-item :text="__('Delete')" class="warning" @click="destroy(container, index)" />
-                    </dropdown-list>
-                </template>
-            </data-list-table>
-        </div>
+        <template #default="{ filteredRows: rows }">
+            <div class="card p-0">
+                <data-list-table :rows="rows">
+                    <template #cell-title="{ row: container }">
+                        <a :href="container.edit_url">{{ container.title }}</a>
+                    </template>
+
+                    <template #actions="{ row: container, index }">
+                        <dropdown-list>
+                            <dropdown-item :text="__('Edit')" :redirect="container.edit_url" />
+                            <dropdown-item :text="__('Delete')" class="warning" @click="destroy(container, index)" />
+                        </dropdown-list>
+                    </template>
+                </data-list-table>
+            </div>
+        </template>
     </data-list>
 </template>
 
@@ -28,7 +31,7 @@ export default {
     data() {
         return {
             rows: this.initialRows
-        }
+        };
     },
 
     methods: {
@@ -43,5 +46,5 @@ export default {
 
     }
 
-}
+};
 </script>

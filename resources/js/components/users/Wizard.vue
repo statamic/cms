@@ -2,8 +2,11 @@
     <div class="max-w-xl mx-auto card">
         <div v-if="steps.length > 1" class="max-w-lg mx-auto pt-16 relative">
             <div class="wizard-steps">
-                <a class="step" :class="{'complete': currentStep >= index}" v-for="(step, index) in steps" @click="goToStep(index)">
-                    <div class="ball">{{ index+1 }}</div>
+                <a
+                    class="step" :class="{'complete': currentStep >= index}" v-for="(step, index) in steps"
+                    @click="goToStep(index)"
+                >
+                    <div class="ball">{{ index + 1 }}</div>
                     <div class="label">{{ step }}</div>
                 </a>
             </div>
@@ -25,15 +28,17 @@
                 class="max-w-md mx-auto -mt-6 py-0 px-4 pb-20"
                 @updated="values = $event"
             >
-                <div slot-scope="{ setFieldValue, setFieldMeta }">
-                    <div class="-mx-6">
-                        <publish-fields
-                            :fields="fields"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                        />
+                <template #default="{ setFieldValue, setFieldMeta }">
+                    <div>
+                        <div class="-mx-6">
+                            <publish-fields
+                                :fields="fields"
+                                @updated="setFieldValue"
+                                @meta-updated="setFieldMeta"
+                            />
+                        </div>
                     </div>
-                </div>
+                </template>
             </publish-container>
         </div>
 
@@ -45,7 +50,7 @@
             </div>
 
             <!-- Super Admin -->
-             <div class="pb-10" v-if="canCreateSupers">
+            <div class="pb-10" v-if="canCreateSupers">
                 <div class="flex items-center">
                     <toggle-input v-model="user.super" id="super" />
                     <label class="font-bold rtl:mr-2 ltr:ml-2" for="super">{{ __('Super Admin') }}</label>
@@ -61,16 +66,20 @@
                 <label class="font-bold text-base mb-1" for="role">{{ __('Roles') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
-                    :initial-value="user.roles">
-                    <div slot-scope="{ meta, value, loading }">
-                        <relationship-fieldtype
-                            v-if="!loading"
-                            handle="user.roles"
-                            :config="{ type: 'user_roles', mode: 'select' }"
-                            :value="value"
-                            :meta="meta"
-                            @input="user.roles = $event" />
-                    </div>
+                    :initial-value="user.roles"
+                >
+                    <template #default="{ meta, value, loading }">
+                        <div>
+                            <relationship-fieldtype
+                                v-if="!loading"
+                                handle="user.roles"
+                                :config="{ type: 'user_roles', mode: 'select' }"
+                                :value="value"
+                                :meta="meta"
+                                @input="user.roles = $event"
+                            />
+                        </div>
+                    </template>
                 </publish-field-meta>
             </div>
 
@@ -79,16 +88,20 @@
                 <label class="font-bold text-base mb-1" for="group">{{ __('Groups') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.groups', type: 'user_groups' }"
-                    :initial-value="user.groups">
-                    <div slot-scope="{ meta, value, loading }">
-                        <relationship-fieldtype
-                            v-if="!loading"
-                            handle="user.groups"
-                            :config="{ type: 'user_groups', mode: 'select' }"
-                            :value="value"
-                            :meta="meta"
-                            @input="user.groups = $event" />
-                    </div>
+                    :initial-value="user.groups"
+                >
+                    <template #default="{ meta, value, loading }">
+                        <div>
+                            <relationship-fieldtype
+                                v-if="!loading"
+                                handle="user.groups"
+                                :config="{ type: 'user_groups', mode: 'select' }"
+                                :value="value"
+                                :meta="meta"
+                                @input="user.groups = $event"
+                            />
+                        </div>
+                    </template>
                 </publish-field-meta>
             </div>
         </div>
@@ -103,14 +116,22 @@
             <!-- Send Email? -->
             <div class="max-w-md mx-auto px-4 mb-6 flex items-center">
                 <toggle-input v-model="invitation.send" id="send_email_invitation" />
-                <label class="font-bold rtl:mr-2 ltr:ml-2" for="send_email_invitation">{{ __('Send Email Invitation') }}</label>
+                <label class="font-bold rtl:mr-2 ltr:ml-2" for="send_email_invitation">{{
+                        __('Send Email Invitation')
+                    }}</label>
             </div>
 
-            <div class="max-w-lg mx-auto bg-gray-100 dark:bg-dark-650 py-10 mb-20 border dark:border-dark-900 rounded-lg " v-if="invitation.send">
+            <div
+                class="max-w-lg mx-auto bg-gray-100 dark:bg-dark-650 py-10 mb-20 border dark:border-dark-900 rounded-lg "
+                v-if="invitation.send"
+            >
                 <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-4 pb-10">
                     <label class="font-bold text-base mb-1" for="invitation_subject">{{ __('Email Subject') }}</label>
-                    <input type="text" v-model="invitation.subject" class="input-text bg-white dark:bg-dark-700" id="invitation_subject">
+                    <input
+                        type="text" v-model="invitation.subject" class="input-text bg-white dark:bg-dark-700"
+                        id="invitation_subject"
+                    >
                 </div>
 
                 <!-- Email Content -->
@@ -144,24 +165,32 @@
             </div>
             <div class="max-w-md mx-auto px-4 pb-10">
                 <label class="font-bold text-base mb-1" for="activation_url">{{ __('Activation URL') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" id="activation_url" />
+                <input
+                    type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl"
+                    id="activation_url"
+                />
             </div>
             <div class="max-w-md mx-auto px-4 pb-20">
                 <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="values.email" id="email" />
+                <input
+                    type="text" readonly class="input-text" onclick="this.select()" :value="values.email" id="email"
+                />
             </div>
         </div>
 
         <div class="border-t dark:border-dark-900 p-4">
             <div class="max-w-md mx-auto flex items-center justify-center">
                 <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="! completed && ! onFirstStep">
-                    <span v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span> {{ __('Previous')}}
+                    <span v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span> {{ __('Previous') }}
                 </button>
                 <button tabindex="4" class="btn mx-4 w-32" @click="nextStep" v-if="onUserInfoStep">
-                    {{ __('Next')}} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
+                    {{ __('Next') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                 </button>
-                <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="nextStep" v-if="!onUserInfoStep && ! completed && ! onLastStep">
-                    {{ __('Next')}} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
+                <button
+                    tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="nextStep"
+                    v-if="!onUserInfoStep && ! completed && ! onLastStep"
+                >
+                    {{ __('Next') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                 </button>
                 <button tabindex="4" class="btn-primary mx-4" @click="submit" v-if="! completed && onLastStep">
                     {{ finishButtonText }}
@@ -180,7 +209,10 @@
 <style scoped>
 >>> .publish-fields .form-group .field-inner > label {
     @apply text-base font-bold mb-1;
-    & + .help-block { @apply -mt-1 !important; }
+
+    & + .help-block {
+        @apply -mt-1 !important;
+    }
 }
 </style>
 
@@ -221,7 +253,10 @@ export default {
             invitation: {
                 send: this.canSendInvitation,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
-                message: __n('messages.user_wizard_invitation_body', this.activationExpiry, { site: window.location.hostname, expiry: this.activationExpiry }),
+                message: __n('messages.user_wizard_invitation_body', this.activationExpiry, {
+                    site: window.location.hostname,
+                    expiry: this.activationExpiry
+                }),
             },
             userExists: false,
             completed: false,
@@ -231,7 +266,7 @@ export default {
             error: null,
             storeName: 'userwizard',
             values: this.initialValues,
-        }
+        };
     },
 
     computed: {
@@ -275,20 +310,21 @@ export default {
         },
         checkIfUserExists(email) {
             this.$axios.post(cp_url('user-exists'), { email }).then(response => {
-                this.userExists = response.data.exists
+                this.userExists = response.data.exists;
             }).catch(error => {
                 this.$toast.error(error.response.data.message);
             });
         },
         nextStep() {
             if (this.onUserInfoStep) {
-                return this.submit(true).then(this.next).catch(() => {})
+                return this.submit(true).then(this.next).catch(() => {
+                });
             }
 
             this.next();
         },
         submit(validateOnly) {
-            let payload = {...this.user, ...this.values, invitation: this.invitation};
+            let payload = { ...this.user, ...this.values, invitation: this.invitation };
 
             if (validateOnly === true) {
                 payload._validate_only = true;
@@ -333,7 +369,7 @@ export default {
     },
 
     watch: {
-        'values.email': function(email) {
+        'values.email': function (email) {
             if (email && isEmail(email)) this.checkIfUserExists(email);
         },
 
@@ -363,5 +399,5 @@ export default {
         });
     }
 
-}
+};
 </script>

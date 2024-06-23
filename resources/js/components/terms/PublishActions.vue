@@ -1,70 +1,72 @@
 <template>
 
     <stack narrow name="publish-options" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-white dark:bg-dark-800 h-full flex flex-col">
+        <template #default="{ close }">
+            <div class="bg-white dark:bg-dark-800 h-full flex flex-col">
 
-            <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
-                {{ __('Publish') }}
-                <button
-                    type="button"
-                    class="btn-close"
-                    @click="close"
-                    v-html="'&times'" />
-            </div>
-
-            <div class="flex-1 overflow-auto p-6">
-
-                <div class="flex h-full items-center justify-center loading" v-if="saving">
-                    <loading-graphic text="" />
+                <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
+                    {{ __('Publish') }}
+                    <button
+                        type="button"
+                        class="btn-close"
+                        @click="close"
+                        v-html="'&times'" />
                 </div>
 
-                <select-input
-                    class="mb-6"
-                    v-model="action"
-                    :options="options"
-                />
+                <div class="flex-1 overflow-auto p-6">
 
-                <div v-if="action">
+                    <div class="flex h-full items-center justify-center loading" v-if="saving">
+                        <loading-graphic text="" />
+                    </div>
 
-                    <date-fieldtype
-                        v-if="action == 'schedule'"
+                    <select-input
                         class="mb-6"
-                        name="publishTime"
-                        :value="publishTime" />
-
-                    <textarea-input
-                        class="mb-6 text-sm"
-                        v-model="revisionMessage"
-                        :placeholder="__('Notes about this revision')"
-                        @keydown.enter="submit"
-                        :focus="true" />
-
-                    <button
-                        class="btn-primary w-full mb-6"
-                        v-text="submitButtonText"
-                        @click="submit"
+                        v-model="action"
+                        :options="options"
                     />
 
-                    <div class="text-gray text-xs flex mb-6">
-                        <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
-                            <svg-icon name="info-circle" class="pt-px" />
-                        </div>
-                        <div class="flex-1" v-text="actionInfoText" />
-                    </div>
+                    <div v-if="action">
 
-                    <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
-                        <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
-                            <svg-icon name="info-circle" class="pt-px" />
+                        <date-fieldtype
+                            v-if="action == 'schedule'"
+                            class="mb-6"
+                            name="publishTime"
+                            :value="publishTime" />
+
+                        <textarea-input
+                            class="mb-6 text-sm"
+                            v-model="revisionMessage"
+                            :placeholder="__('Notes about this revision')"
+                            @keydown.enter="submit"
+                            :focus="true" />
+
+                        <button
+                            class="btn-primary w-full mb-6"
+                            v-text="submitButtonText"
+                            @click="submit"
+                        />
+
+                        <div class="text-gray text-xs flex mb-6">
+                            <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
+                                <svg-icon name="info-circle" class="pt-px" />
+                            </div>
+                            <div class="flex-1" v-text="actionInfoText" />
                         </div>
-                        <div class="flex-1">
-                            Since the current revision is published and you've selected a date in the future, once you submit, the revision will act like a draft until the selected date.
+
+                        <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
+                            <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
+                                <svg-icon name="info-circle" class="pt-px" />
+                            </div>
+                            <div class="flex-1">
+                                Since the current revision is published and you've selected a date in the future, once you submit, the revision will act like a draft until the selected date.
+                            </div>
                         </div>
+
                     </div>
 
                 </div>
-
             </div>
-        </div>
+        </template>
     </stack>
 
 </template>

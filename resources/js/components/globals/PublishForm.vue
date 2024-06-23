@@ -57,26 +57,28 @@
             :is-root="isRoot"
             @updated="values = $event"
         >
-            <div slot-scope="{ container, components, setFieldMeta }">
-                <component
-                    v-for="component in components"
-                    :key="component.name"
-                    :is="component.name"
-                    :container="container"
-                    v-bind="component.props"
-                />
-                <publish-tabs
-                    :read-only="! canEdit"
-                    :syncable="hasOrigin"
-                    :enable-sidebar="false"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                    @synced="syncField"
-                    @desynced="desyncField"
-                    @focus="container.$emit('focus', $event)"
-                    @blur="container.$emit('blur', $event)"
-                />
-            </div>
+            <template #default="{ container, components, setFieldMeta }">
+                <div>
+                    <component
+                        v-for="component in components"
+                        :key="component.name"
+                        :is="component.name"
+                        :container="container"
+                        v-bind="component.props"
+                    />
+                    <publish-tabs
+                        :read-only="! canEdit"
+                        :syncable="hasOrigin"
+                        :enable-sidebar="false"
+                        @updated="setFieldValue"
+                        @meta-updated="setFieldMeta"
+                        @synced="syncField"
+                        @desynced="desyncField"
+                        @focus="container.$emit('focus', $event)"
+                        @blur="container.$emit('blur', $event)"
+                    />
+                </div>
+            </template>
         </publish-container>
     </div>
 

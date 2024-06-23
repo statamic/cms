@@ -51,45 +51,47 @@
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >
-            <div slot-scope="{}" class="replicator-set-container">
-                <replicator-set
-                    v-for="(set, index) in value"
-                    :key="set._id"
-                    :index="index"
-                    :values="set"
-                    :meta="meta.existing[set._id]"
-                    :config="setConfig(set.type)"
-                    :parent-name="name"
-                    :sortable-item-class="sortableItemClass"
-                    :sortable-handle-class="sortableHandleClass"
-                    :is-read-only="isReadOnly"
-                    :collapsed="collapsed.includes(set._id)"
-                    :field-path-prefix="fieldPathPrefix || handle"
-                    :has-error="setHasError(index)"
-                    :previews="previews[set._id]"
-                    :show-field-previews="config.previews"
-                    :can-add-set="canAddSet"
-                    @collapsed="collapseSet(set._id)"
-                    @expanded="expandSet(set._id)"
-                    @duplicated="duplicateSet(set._id)"
-                    @updated="updated"
-                    @meta-updated="updateSetMeta(set._id, $event)"
-                    @removed="removed(set, index)"
-                    @focus="focused = true"
-                    @blur="blurred"
-                    @previews-updated="updateSetPreviews(set._id, $event)"
-                >
-                    <template v-slot:picker>
-                        <add-set-button
-                            class="between"
-                            :groups="groupConfigs"
-                            :sets="setConfigs"
-                            :index="index"
-                            :enabled="canAddSet"
-                            @added="addSet" />
-                    </template>
-                </replicator-set>
-            </div>
+            <template #default="{}">
+                <div class="replicator-set-container">
+                    <replicator-set
+                        v-for="(set, index) in value"
+                        :key="set._id"
+                        :index="index"
+                        :values="set"
+                        :meta="meta.existing[set._id]"
+                        :config="setConfig(set.type)"
+                        :parent-name="name"
+                        :sortable-item-class="sortableItemClass"
+                        :sortable-handle-class="sortableHandleClass"
+                        :is-read-only="isReadOnly"
+                        :collapsed="collapsed.includes(set._id)"
+                        :field-path-prefix="fieldPathPrefix || handle"
+                        :has-error="setHasError(index)"
+                        :previews="previews[set._id]"
+                        :show-field-previews="config.previews"
+                        :can-add-set="canAddSet"
+                        @collapsed="collapseSet(set._id)"
+                        @expanded="expandSet(set._id)"
+                        @duplicated="duplicateSet(set._id)"
+                        @updated="updated"
+                        @meta-updated="updateSetMeta(set._id, $event)"
+                        @removed="removed(set, index)"
+                        @focus="focused = true"
+                        @blur="blurred"
+                        @previews-updated="updateSetPreviews(set._id, $event)"
+                    >
+                        <template v-slot:picker>
+                            <add-set-button
+                                class="between"
+                                :groups="groupConfigs"
+                                :sets="setConfigs"
+                                :index="index"
+                                :enabled="canAddSet"
+                                @added="addSet" />
+                        </template>
+                    </replicator-set>
+                </div>
+            </template>
         </sortable-list>
 
         <add-set-button v-if="canAddSet"

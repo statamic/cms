@@ -3,8 +3,10 @@
     <div v-if="showAlways || hasSelections" class="data-list-bulk-actions">
         <div class="input-group input-group-sm relative">
             <div class="input-group-prepend">
-                <div class="text-gray-700 dark:text-dark-175 hidden md:inline-block"
-                    v-text="__n(`:count item selected|:count items selected`, selections.length)" />
+                <div
+                    class="text-gray-700 dark:text-dark-175 hidden md:inline-block"
+                    v-text="__n(`:count item selected|:count items selected`, selections.length)"
+                />
                 <div class="text-gray-700 dark:text-dark-175 md:hidden" v-text="selections.length" />
             </div>
 
@@ -17,12 +19,14 @@
                 :errors="errors"
                 @selected="run"
             >
-                <button
-                    slot-scope="{ action, select }"
-                    class="input-group-item"
-                    :class="{'text-red-500': action.dangerous, 'ltr:rounded-r rtl:rounded-l': index + 1 === sortedActions.length }"
-                    @click="select"
-                    v-text="__(action.title)" />
+                <template #default="{ action, select }">
+                    <button
+                        class="input-group-item"
+                        :class="{'text-red-500': action.dangerous, 'ltr:rounded-r rtl:rounded-l': index + 1 === sortedActions.length }"
+                        @click="select"
+                        v-text="__(action.title)"
+                    />
+                </template>
             </data-list-action>
         </div>
     </div>
@@ -41,7 +45,8 @@ export default {
     props: {
         context: {
             type: Object,
-            default: () => {}
+            default: () => {
+            }
         },
         showAlways: {
             type: Boolean,
@@ -85,11 +90,11 @@ export default {
                 data.context = this.context;
             }
 
-            this.$axios.post(this.url+'/list', data).then(response => {
+            this.$axios.post(this.url + '/list', data).then(response => {
                 this.actions = response.data;
             });
         },
     },
 
-}
+};
 </script>

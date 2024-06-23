@@ -33,6 +33,7 @@ import Elastic from './directives/elastic.js';
 import PortalVue from 'portal-vue';
 import useProgressBar from './composables/useProgressBar';
 import useDirtyState from './composables/useDirtyState';
+import registerFieldTypes from './bootstrap/fieldtypes.js';
 
 const echo = new Echo;
 const bard = new Bard;
@@ -188,6 +189,9 @@ export default {
         Object.keys(GlobalComponents).forEach(key => {
             this.$app.component(key, GlobalComponents[key]);
         });
+
+        // Load all Fieldtypes
+        registerFieldTypes(this.$app)
 
         this.$app.component('v-select', VueSelect);
 

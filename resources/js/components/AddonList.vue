@@ -23,50 +23,52 @@
         </div>
 
         <data-list :rows="rows" v-if="!initializing && !showingAddon">
-            <div class="" slot-scope="{ rows: addons }">
+            <template #default="{ rows: addons }">
+                <div>
 
-                <div class="card p-0">
-                    <div class="border-b dark:border-dark-900 px-4 text-sm">
-                        <button
-                            class="data-list-filter-link"
-                            :class="{ active: filter === 'all' }"
-                            @click="filter = 'all'"
-                            v-text="__('All')" />
-                        <button
-                            class="data-list-filter-link"
-                            :class="{ active: filter === 'installed' }"
-                            @click="filter = 'installed'"
-                        >
-                            {{ __('Installed') }}
-                            <span class="badge" v-if="installCount">{{ installCount }}</span>
-                        </button>
-                    </div>
+                    <div class="card p-0">
+                        <div class="border-b dark:border-dark-900 px-4 text-sm">
+                            <button
+                                class="data-list-filter-link"
+                                :class="{ active: filter === 'all' }"
+                                @click="filter = 'all'"
+                                v-text="__('All')" />
+                            <button
+                                class="data-list-filter-link"
+                                :class="{ active: filter === 'installed' }"
+                                @click="filter = 'installed'"
+                            >
+                                {{ __('Installed') }}
+                                <span class="badge" v-if="installCount">{{ installCount }}</span>
+                            </button>
+                        </div>
 
-                    <div class="p-2">
-                        <data-list-search
-                            ref="search"
-                            v-model="searchQuery" />
-                    </div>
-                </div>
-
-                <div class="addon-grid my-8" :class="{ 'opacity-50': loading }">
-                    <div class="addon-card bg-white dark:bg-dark-600 text-gray-800 dark:text-dark-150 h-full shadow dark:shadow-dark rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
-                        <span class="badge absolute top-0 rtl:right-0 ltr:left-0 mt-2 rtl:mr-2 ltr:ml-2" v-if="addon.installed">Installed</span>
-                        <div class="h-48 rounded-t bg-cover bg-center" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
-                        <div class="px-6 mb-4 relative text-center">
-                            <a :href="addon.seller.website" class="relative">
-                                <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 bg-white dark:bg-dark-600 relative -mt-8 border-2 border-white dark:border-dark-600 inline">
-                            </a>
-                            <div class="addon-card-title mb-2 text-lg font-bold text-center">{{ addon.name }}</div>
-                            <p class="text-gray dark:text-dark-175 mb-4" v-text="getPriceRange(addon)" />
-                            <p v-text="addon.summary" class="text-sm"></p>
+                        <div class="p-2">
+                            <data-list-search
+                                ref="search"
+                                v-model="searchQuery" />
                         </div>
                     </div>
 
-                </div>
+                    <div class="addon-grid my-8" :class="{ 'opacity-50': loading }">
+                        <div class="addon-card bg-white dark:bg-dark-600 text-gray-800 dark:text-dark-150 h-full shadow dark:shadow-dark rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
+                            <span class="badge absolute top-0 rtl:right-0 ltr:left-0 mt-2 rtl:mr-2 ltr:ml-2" v-if="addon.installed">Installed</span>
+                            <div class="h-48 rounded-t bg-cover bg-center" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
+                            <div class="px-6 mb-4 relative text-center">
+                                <a :href="addon.seller.website" class="relative">
+                                    <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 bg-white dark:bg-dark-600 relative -mt-8 border-2 border-white dark:border-dark-600 inline">
+                                </a>
+                                <div class="addon-card-title mb-2 text-lg font-bold text-center">{{ addon.name }}</div>
+                                <p class="text-gray dark:text-dark-175 mb-4" v-text="getPriceRange(addon)" />
+                                <p v-text="addon.summary" class="text-sm"></p>
+                            </div>
+                        </div>
 
-                <data-list-pagination :resource-meta="meta" @page-selected="setPage"></data-list-pagination>
-            </div>
+                    </div>
+
+                    <data-list-pagination :resource-meta="meta" @page-selected="setPage"></data-list-pagination>
+                </div>
+            </template>
         </data-list>
 
         <template v-if="unlisted.length && !showingAddon">

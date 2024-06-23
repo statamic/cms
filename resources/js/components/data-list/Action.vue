@@ -27,7 +27,7 @@
                 @updated="values = $event"
             >
                 <publish-fields
-                    slot-scope="{ setFieldValue, setFieldMeta }"
+                    #default="{ setFieldValue, setFieldMeta }"
                     :fields="action.fields"
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"

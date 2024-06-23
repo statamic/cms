@@ -30,15 +30,17 @@
             :errors="errors"
             @updated="values = $event"
         >
-            <div slot-scope="{ container, setFieldValue, setFieldMeta }">
-                <publish-tabs
-                    :enable-sidebar="false"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                    @focus="container.$emit('focus', $event)"
-                    @blur="container.$emit('blur', $event)"
-                ></publish-tabs>
-            </div>
+            <template #default="{ container, setFieldValue, setFieldMeta }">
+                <div>
+                    <publish-tabs
+                        :enable-sidebar="false"
+                        @updated="setFieldValue"
+                        @meta-updated="setFieldMeta"
+                        @focus="container.$emit('focus', $event)"
+                        @blur="container.$emit('blur', $event)"
+                    ></publish-tabs>
+                </div>
+            </template>
         </publish-container>
 
     </div>
