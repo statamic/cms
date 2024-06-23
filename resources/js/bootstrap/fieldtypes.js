@@ -63,8 +63,6 @@ import RelationshipIndexFieldtype from '../components/fieldtypes/relationship/Re
 // import SetField from '../components/fieldtypes/replicator/Field.vue';
 
 export default function registerFieldTypes(app) {
-    console.log('registering');
-    
     app.component('select-input', Select);
     app.component('text-input', Text);
     app.component('textarea-input', Textarea);
@@ -131,7 +129,4 @@ export default function registerFieldTypes(app) {
     // app.component('revealer-fieldtype', RevealerFieldtype);
     // app.component('status-fieldtype', StatusFieldtype);
     // app.component('template-fieldtype', TemplateFieldtype);
-
-    console.log('registered');
-
 }

@@ -26,11 +26,7 @@ export default {
 
             if (!this.fieldtype) return fallback;
 
-            if (!this.$options.components[custom]) {
-                console.error('Did not find custom component', custom)
-            }
-
-            return this.$options.components[custom] ? custom : fallback;
+            return Statamic.$app.component(custom) ? custom : fallback
         },
 
         cssClass() {
