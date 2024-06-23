@@ -10,6 +10,7 @@ export default {
 
     methods: {
         showField(field, dottedKey) {
+            // @todo(jelleroorda): Why are we looping until infinity.
             let dottedFieldPath = dottedKey || field.handle;
             let dottedPrefix = dottedKey ? dottedKey.replace(new RegExp('\.'+field.handle+'$'), '') : '';
 
@@ -40,13 +41,14 @@ export default {
             }
 
             // Ensure DOM is updated to ensure all revealers are properly loaded and tracked before committing to store.
-            this.$nextTick(() => {
-                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
-                    dottedKey: dottedFieldPath,
-                    hidden: ! passes,
-                    omitValue: field.type === 'revealer' || ! validator.passesNonRevealerConditions(dottedPrefix),
-                });
-            });
+            // @todo this causes an infinite loop. Find out why.
+            // this.$nextTick(() => {
+            //     this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+            //         dottedKey: dottedFieldPath,
+            //         hidden: ! passes,
+            //         omitValue: field.type === 'revealer' || ! validator.passesNonRevealerConditions(dottedPrefix),
+            //     });
+            // });
 
             return passes;
         },

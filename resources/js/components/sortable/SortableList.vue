@@ -15,7 +15,7 @@ function move(items, oldIndex, newIndex) {
 }
 
 export default {
-
+    emits: ['dragstart', 'dragend', 'input'],
     props: {
         value: {
             required: true,

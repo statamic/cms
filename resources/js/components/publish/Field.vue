@@ -1,94 +1,122 @@
 <template>
+    <div :class="classes">
+        <publish-field-meta
+            :config="config"
+            :initial-value="value"
+            :initial-meta="meta"
+        >
+            <template #default="{ meta, value, loading: loadingMeta }">
+                <div class="field-inner">
+                    <!--                    <label-->
+                    <!--                        v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId"-->
+                    <!--                    >-->
+                    <!--                        <span-->
+                    <!--                            v-if="showLabelText"-->
+                    <!--                            class="rtl:ml-1 ltr:mr-1"-->
+                    <!--                            :class="{ 'text-gray-600': syncable && isSynced }"-->
+                    <!--                            v-text="__(labelText)"-->
+                    <!--                            v-tooltip="{content: config.handle, delay: 500, autoHide: false}"-->
+                    <!--                        />-->
+                    <!--                        <i class="required rtl:ml-1 ltr:mr-1" v-if="showLabelText && config.required">*</i>-->
+                    <!--                        <avatar-->
+                    <!--                            v-if="isLocked"-->
+                    <!--                            :user="lockingUser"-->
+                    <!--                            class="w-6 h-6 rounded-full -mt-px rtl:mr-2 ltr:ml-2 rtl:ml-2 ltr:mr-2"-->
+                    <!--                            v-tooltip="lockingUser.name"-->
+                    <!--                        />-->
+                    <!--                        <span-->
+                    <!--                            v-if="isReadOnly && !isTab && !isSection"-->
+                    <!--                            class="text-gray-500 font-normal text-2xs rtl:ml-1 ltr:mr-1"-->
+                    <!--                        >-->
+                    <!--                            {{ isLocked ? __('Locked') : __('Read Only') }}-->
+                    <!--                        </span>-->
+                    <!--                        <svg-icon-->
+                    <!--                            name="translate" class="h-4 rtl:ml-1 ltr:mr-1 w-4 text-gray-600"-->
+                    <!--                            v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')"-->
+                    <!--                        />-->
 
-    <publish-field-meta
-        :config="config"
-        :initial-value="value"
-        :initial-meta="meta"
-    >
-    <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
-        <div class="field-inner">
-            <label v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
-                <span
-                    v-if="showLabelText"
-                    class="rtl:ml-1 ltr:mr-1"
-                    :class="{ 'text-gray-600': syncable && isSynced }"
-                    v-text="__(labelText)"
-                    v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
+                    <!--                        <button-->
+                    <!--                            v-if="!isReadOnly && !isTab"-->
+                    <!--                            v-show="syncable && isSynced"-->
+                    <!--                            class="outline-none"-->
+                    <!--                            :class="{ flex: syncable && isSynced }"-->
+                    <!--                            @click="$emit('desynced')"-->
+                    <!--                        >-->
+                    <!--                            <svg-icon-->
+                    <!--                                name="light/hyperlink" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"-->
+                    <!--                                v-tooltip.top="__('messages.field_synced_with_origin')"-->
+                    <!--                            />-->
+                    <!--                        </button>-->
+
+                    <!--                        <button-->
+                    <!--                            v-if="!isReadOnly && !isTab"-->
+                    <!--                            v-show="syncable && !isSynced"-->
+                    <!--                            class="outline-none"-->
+                    <!--                            :class="{ flex: syncable && !isSynced }"-->
+                    <!--                            @click="$emit('synced')"-->
+                    <!--                        >-->
+                    <!--                            <svg-icon-->
+                    <!--                                name="light/hyperlink-broken" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"-->
+                    <!--                                v-tooltip.top="__('messages.field_desynced_from_origin')"-->
+                    <!--                            />-->
+                    <!--                        </button>-->
+                    <!--                    </label>-->
+
+                    <div
+                        class="help-block" :class="{ '-mt-2': showLabel }"
+                        v-if="instructions && config.instructions_position !== 'below'"
+                        v-html="instructions"
+                    />
+                </div>
+
+                <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
+
+                <slot name="fieldtype" v-if="!loadingMeta">
+                    <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">Component <code
+                        v-text="fieldtypeComponent"
+                    ></code> does not exist.
+                    </div>
+                    <component
+                        v-else
+                        :is="fieldtypeComponent"
+                        :config="config"
+                        :value="value"
+                        :meta="meta"
+                        :handle="config.handle"
+                        :name-prefix="namePrefix"
+                        :field-path-prefix="fieldPathPrefix"
+                        :read-only="isReadOnly"
+                        @input="$emit('input', $event)"
+                        @meta-updated="$emit('meta-updated', $event)"
+                        @focus="focused"
+                        @blur="blurred"
+                    /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
+                </slot>
+
+                <div
+                    class="help-block mt-2"
+                    v-if="instructions && config.instructions_position === 'below'"
+                    v-html="instructions"
                 />
-                <i class="required rtl:ml-1 ltr:mr-1" v-if="showLabelText && config.required">*</i>
-                <avatar v-if="isLocked" :user="lockingUser" class="w-6 h-6 rounded-full -mt-px rtl:mr-2 ltr:ml-2 rtl:ml-2 ltr:mr-2" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isTab && !isSection" class="text-gray-500 font-normal text-2xs rtl:ml-1 ltr:mr-1">
-                    {{ isLocked ? __('Locked') : __('Read Only') }}
-                </span>
-                <svg-icon name="translate" class="h-4 rtl:ml-1 ltr:mr-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
 
-                <button
-                    v-if="!isReadOnly && !isTab"
-                    v-show="syncable && isSynced"
-                    class="outline-none"
-                    :class="{ flex: syncable && isSynced }"
-                    @click="$emit('desynced')"
-                >
-                    <svg-icon name="light/hyperlink" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"
-                        v-tooltip.top="__('messages.field_synced_with_origin')" />
-                </button>
-
-                <button
-                    v-if="!isReadOnly && !isTab"
-                    v-show="syncable && !isSynced"
-                    class="outline-none"
-                    :class="{ flex: syncable && !isSynced }"
-                    @click="$emit('synced')"
-                >
-                    <svg-icon name="light/hyperlink-broken" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"
-                        v-tooltip.top="__('messages.field_desynced_from_origin')" />
-                </button>
-            </label>
-
-            <div
-                class="help-block" :class="{ '-mt-2': showLabel }"
-                v-if="instructions && config.instructions_position !== 'below'"
-                v-html="instructions" />
-        </div>
-
-        <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
-
-        <slot name="fieldtype" v-if="!loadingMeta">
-            <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
-            <component
-                v-else
-                :is="fieldtypeComponent"
-                :config="config"
-                :value="value"
-                :meta="meta"
-                :handle="config.handle"
-                :name-prefix="namePrefix"
-                :field-path-prefix="fieldPathPrefix"
-                :read-only="isReadOnly"
-                @input="$emit('input', $event)"
-                @meta-updated="$emit('meta-updated', $event)"
-                @focus="focused"
-                @blur="blurred"
-            /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
-        </slot>
-
-        <div
-            class="help-block mt-2"
-            v-if="instructions && config.instructions_position === 'below'"
-            v-html="instructions" />
-
-        <div v-if="hasError">
-            <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
-        </div>
+                <div v-if="hasError">
+                    <small
+                        class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error"
+                    />
+                </div>
+            </template>
+        </publish-field-meta>
     </div>
-    </publish-field-meta>
-
 </template>
 
 <script>
 import { marked } from 'marked';
+import PublishFieldMeta from '../publish/FieldMeta.vue';
 
 export default {
+    components: {
+        PublishFieldMeta,
+    },
     props: {
         config: {
             type: Object,
@@ -97,8 +125,7 @@ export default {
         value: {
             required: true
         },
-        meta: {
-        },
+        meta: {},
         errors: {
             type: Array
         },
@@ -120,15 +147,18 @@ export default {
         },
 
         fieldtypeComponentExists() {
-            // @todo(jelleroorda): fix
-            throw Error('@todo(jelleroorda): fix')
-            // return Vue.options.components[this.fieldtypeComponent] !== undefined;
+            if (!['radio-fieldtype'].includes(this.fieldtypeComponent)) {
+                console.log('components', Statamic.$app.component(this.fieldtypeComponent));
+                throw Error('unsupported fieldtype: ' + this.fieldtypeComponent);
+            }
+
+            return Statamic.$app.component(this.fieldtypeComponent) !== undefined;
         },
 
         instructions() {
             return this.config.instructions
                 ? this.renderMarkdownAndLinks(__(this.config.instructions))
-                : null
+                : null;
         },
 
         hasError() {
@@ -157,7 +187,7 @@ export default {
             return [
                 'form-group publish-field',
                 `publish-field__` + this.config.handle,
-                `${this.config.component || this.config.type}-fieldtype`,,
+                `${this.config.component || this.config.type}-fieldtype`, ,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
                 this.config.classes || '',
@@ -167,7 +197,7 @@ export default {
         },
 
         fieldId() {
-            return 'field_'+this.config.handle;
+            return 'field_' + this.config.handle;
         },
 
         locks() {
@@ -201,22 +231,23 @@ export default {
         },
 
         labelText() {
-             return this.config.display
-                 || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
-         },
+            return this.config.display;
+            // @todo(jelleroorda): fix
+            //  || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
+        },
 
-         showLabelText() {
+        showLabelText() {
             return !this.config.hide_display;
-         },
+        },
 
-         showLabel() {
+        showLabel() {
             return this.showLabelText // Need to see the text
                 || this.isReadOnly // Need to see the "Read Only" text
                 || this.config.required // Need to see the asterisk
                 || this.isLocked // Need to see the avatar
                 || this.isLocalizable // Need to see the icon
-                || this.syncable // Need to see the icon
-         }
+                || this.syncable; // Need to see the icon
+        }
 
     },
 
@@ -237,9 +268,9 @@ export default {
         renderMarkdownAndLinks(text) {
             var renderer = new marked.Renderer();
 
-            renderer.link = function(href, title, text) {
+            renderer.link = function (href, title, text) {
                 var link = marked.Renderer.prototype.link.call(this, href, title, text);
-                return link.replace("<a","<a target='_blank' ");
+                return link.replace('<a', '<a target=\'_blank\' ');
             };
 
             marked.setOptions({
@@ -250,6 +281,6 @@ export default {
         }
 
     }
-}
+};
 
 </script>

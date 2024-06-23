@@ -146,8 +146,6 @@ export default {
             }
         })
 
-        // @todo(jelleroorda): Find a replacement toaster, since this one is Vue 2 only.
-
         // Vue.use(VModal, { componentName: 'v-modal' })
         // Vue.use(Vuex);
         // Vue.use(VCalendar);

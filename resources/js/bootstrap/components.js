@@ -5,12 +5,12 @@
 export { default as UpdatesBadge } from '../components/UpdatesBadge.vue';
 
 // Publish
-// export { default as PublishContainer } from '../components/publish/Container.vue';
-// export { default as PublishForm } from '../components/publish/PublishForm.vue';
-// export { default as PublishFields } from '../components/publish/Fields.vue';
-// export { default as PublishFieldsContainer } from '../components/publish/FieldsContainer.vue'; // deprecated
-// export { default as PublishField } from '../components/publish/Field.vue';
-// export { default as PublishFieldMeta } from '../components/publish/FieldMeta.vue';
+export { default as PublishContainer } from '../components/publish/Container.vue';
+export { default as PublishForm } from '../components/publish/PublishForm.vue';
+export { default as PublishFields } from '../components/publish/Fields.vue';
+export { default as PublishFieldsContainer } from '../components/publish/FieldsContainer.vue'; // deprecated
+export { default as PublishField } from '../components/publish/Field.vue';
+export { default as PublishFieldMeta } from '../components/publish/FieldMeta.vue';
 // export { default as ConfigureTabs } from '../components/configure/Tabs.vue';
 // export { default as PublishTabs } from '../components/publish/Tabs.vue';
 // export { default as PublishSections } from '../components/publish/Sections.vue';
@@ -27,14 +27,14 @@ export { default as UpdatesBadge } from '../components/UpdatesBadge.vue';
 // Data List
 export { default as DataList } from '../components/data-list/DataList.vue';
 export { default as DataListTable } from '../components/data-list/Table.vue';
-// export { default as DataListSearch } from '../components/data-list/Search.vue';
-// export { default as DataListBulkActions } from '../components/data-list/BulkActions.vue';
-// export { default as DataListInlineActions } from '../components/data-list/InlineActions.vue';
-// export { default as DataListColumnPicker } from '../components/data-list/ColumnPicker.vue';
+export { default as DataListSearch } from '../components/data-list/Search.vue';
+export { default as DataListBulkActions } from '../components/data-list/BulkActions.vue';
+export { default as DataListInlineActions } from '../components/data-list/InlineActions.vue';
+export { default as DataListColumnPicker } from '../components/data-list/ColumnPicker.vue';
 export { default as DataListToggleAll } from '../components/data-list/ToggleAll.vue';
-// export { default as DataListPagination } from '../components/data-list/Pagination.vue';
-// export { default as DataListFilters } from '../components/data-list/Filters.vue';
-// export { default as DataListFilterPresets } from '../components/data-list/FilterPresets.vue';
+export { default as DataListPagination } from '../components/data-list/Pagination.vue';
+export { default as DataListFilters } from '../components/data-list/Filters.vue';
+export { default as DataListFilterPresets } from '../components/data-list/FilterPresets.vue';
 
 // Resource Type Lists
 export { default as EntryList } from '../components/entries/Listing.vue';
@@ -57,7 +57,7 @@ export { default as DropdownItem } from '../components/DropdownItem.vue';
 // export { default as ValidationErrors } from '../components/ValidationErrors.vue';
 // export { default as Slugify } from '../components/slugs/Slugify.vue';
 // export { default as ElementContainer } from '../components/ElementContainer.vue';
-// export { default as Avatar } from '../components/Avatar.vue';
+export { default as Avatar } from '../components/Avatar.vue';
 export { default as Breadcrumb } from '../components/Breadcrumb.vue';
 // export { default as Breadcrumbs } from '../components/Breadcrumbs.vue';
 export { default as CreateEntryButton } from '../components/entries/CreateEntryButton.vue';

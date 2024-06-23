@@ -22,6 +22,7 @@
 
 <script>
 import HasInputOptions from './HasInputOptions.js'
+import Fieldtype from './Fieldtype.vue';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],

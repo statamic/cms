@@ -3,6 +3,7 @@ import uniqid from 'uniqid';
 import Component from '../Component';
 
 export default {
+    emits: ['publish-container-created', 'publish-container-destroyed', 'updated'],
 
     model: {
         prop: 'values',
@@ -308,7 +309,7 @@ export default {
     render() {
         return this.$slots.default({
             values: this.$store.state.publish[this.name].values,
-            container: this._self,
+            container: {}, // @todo this was this._self, how to fix this?
             components: this.components,
             setFieldValue: this.setFieldValue,
             setFieldMeta: this.setFieldMeta,
