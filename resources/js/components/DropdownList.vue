@@ -1,6 +1,6 @@
 <template>
     <popover
-        class="dropdown-list"
+        :class="['dropdown-list', className]"
         :disabled="disabled"
         :placement="placement"
         :autoclose="autoclose"
@@ -39,11 +39,17 @@ export default {
         autoclose: {
             type: Boolean,
             default: false
+        },
+        class: {
+            type: String,
         }
     },
     computed: {
         strategy() {
             return this.scroll ? 'fixed' : 'absolute';
+        },
+        className() {
+            return this.class
         }
     }
 };

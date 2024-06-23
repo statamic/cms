@@ -98,7 +98,7 @@ const provide = computed(() => ({
 </script>
 
 <template>
-    <div ref="root" :class="{'popover-open': isOpen}" @mouseleave="leave">
+    <div ref="root" :class="[isOpen && 'popover-open', targetClass]" @mouseleave="leave">
         <div
             ref="trigger"
             v-if="$slots.default"
