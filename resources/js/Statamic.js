@@ -8,6 +8,7 @@ import VueSelect from "vue-select";
 // Or make a custom component instead:
 // https://github.com/Maronato/vue-toastification?tab=readme-ov-file#render-a-component
 import "vue-toastification/dist/index.css";
+import 'floating-vue/dist/style.css';
 
 // import isLatLong from "validator/es/lib/isLatLong.js";
 
@@ -132,11 +133,9 @@ export default {
             portalName: 'v-portal',
         });
         this.$app.use(VueClickAway);
-        this.$app.use(FloatingVue);
+        this.$app.use(FloatingVue, {disposeTimeout: 30000, distance: 10});
         this.$app.use(Toast, {
-            position: POSITION.BOTTOM_LEFT,
-            timeout: 3500,
-            transition: 'Vue-Toastification__slideBlurred',
+            position: POSITION.BOTTOM_LEFT, timeout: 3500, transition: 'Vue-Toastification__slideBlurred',
         });
 
         this.$app.directive('elastic', Elastic);
