@@ -1,5 +1,7 @@
 <template>
-    <div><component :class="cssClass" :is="component" :handle="handle" :value="value" :values="values" /></div>
+    <div>
+        <component :class="cssClass" :is="component" :handle="handle" :value="value" :values="values" />
+    </div>
 </template>
 
 <script>
@@ -26,6 +28,7 @@ export default {
 
             // @todo(jelleroorda): Where do these Vue.options come from?
             // return Vue.options.components[custom] ? custom : fallback;
+            console.log('triggerd');
 
             return fallback;
         },
@@ -36,5 +39,5 @@ export default {
 
     }
 
-}
+};
 </script>

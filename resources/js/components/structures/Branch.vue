@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import * as th from 'tree-helper';
+// import * as th from 'tree-helper';
 
 export default {
 
@@ -66,13 +66,13 @@ export default {
         page: Object,
         depth: Number,
         root: Boolean,
-        vm: Object,
         firstPageIsRoot: Boolean,
         isOpen: Boolean,
         hasChildren: Boolean,
         showSlugs: Boolean,
         showBlueprint: Boolean,
         editable: Boolean,
+        stat: Object,
     },
 
     data() {
@@ -91,7 +91,10 @@ export default {
             if (!this.firstPageIsRoot) return false;
             if (!this.isTopLevel) return false;
 
-            const firstNodeId = this.vm.data.parent.children[0].id;
+            console.log('niet ok', this.page, this.stat);
+            const firstNodeId = '' // @todo(jelleroorda): fix.
+            // const firstNodeId = this.vm.data.parent.children[0].id;
+
             return this.page.id === firstNodeId;
         },
 
@@ -133,6 +136,9 @@ export default {
         },
 
         remove() {
+            // @todo(jelleroorda): fix me.
+            return;
+
             const store = this.page._vm.store;
             store.deleteNode(this.page);
             this.$emit('removed', store);

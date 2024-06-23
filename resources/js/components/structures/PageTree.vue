@@ -23,47 +23,62 @@
         </div>
 
         <div v-if="!loading" class="page-tree w-full">
-            <draggable-tree
-                :draggable="editable"
+            <Draggable v-model="testData" ref="tree" virtualization style="height: 500px">
+                <template #default="{ node, stat }">
+                    <span v-if="stat.children.length" @click="stat.open = !stat.open">
+                      {{ stat.open ? "-" : "+" }}
+                    </span>
+                    <!-- <span v-else>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <input type="checkbox" v-model="stat.checked" /> -->
+                    {{ node.text }}
+                </template>
+            </Draggable>
+
+            <Draggable
                 ref="tree"
-                :data="treeData"
+                v-model="treeData"
+                :disable-drag="!editable"
                 :space="1"
                 :indent="24"
                 :dir="direction"
+                :node-key="(stat) => stat.data.id"
                 @change="treeChanged"
                 @drag="treeDragstart"
                 @nodeOpenChanged="saveTreeState"
+                :each-droppable="eachDroppable"
             >
-                <tree-branch
-                    slot-scope="{ data: page, store, vm }"
-                    :page="page"
-                    :depth="vm.level"
-                    :vm="vm"
-                    :first-page-is-root="expectsRoot"
-                    :is-open="page.open"
-                    :has-children="page.children.length > 0"
-                    :show-slugs="showSlugs"
-                    :show-blueprint="blueprints?.length > 1"
-                    :editable="editable"
-                    @edit="$emit('edit-page', page, vm, store, $event)"
-                    @toggle-open="store.toggleOpen(page)"
-                    @removed="pageRemoved"
-                    @children-orphaned="childrenOrphaned"
-                    @branch-clicked="$emit('branch-clicked', page)"
-                >
-                    <template #branch-action="props">
-                        <slot name="branch-action" v-bind="{ ...props, vm }" />
-                    </template>
+                <template #default="{ node, stat }">
+<!--                    <pre>{{ JSON.stringify(stat, null, 2) }}</pre>-->
 
-                    <template #branch-icon="props">
-                        <slot name="branch-icon" v-bind="{ ...props, vm }" />
-                    </template>
+                    <tree-branch
+                        :page="node"
+                        :depth="stat.level"
+                        :first-page-is-root="expectsRoot"
+                        :is-open="stat.open"
+                        :has-children="stat.children.length > 0"
+                        :show-slugs="showSlugs"
+                        :show-blueprint="blueprints?.length > 1"
+                        :editable="editable"
+                        @edit="$emit('edit-page', page, store, $event)"
+                        @toggle-open="store.toggleOpen(page)"
+                        @removed="pageRemoved"
+                        @children-orphaned="childrenOrphaned"
+                        @branch-clicked="$emit('branch-clicked', page)"
+                    >
+                        <template #branch-action="props">
+                            <slot name="branch-action" v-bind="{ ...props }" />
+                        </template>
 
-                    <template #branch-options="props">
-                        <slot name="branch-options" v-bind="{ ...props, vm }" />
-                    </template>
-                </tree-branch>
-            </draggable-tree>
+                        <template #branch-icon="props">
+                            <slot name="branch-icon" v-bind="{ ...props }" />
+                        </template>
+
+                        <template #branch-options="props">
+                            <slot name="branch-options" v-bind="{ ...props }" />
+                        </template>
+                    </tree-branch>
+                </template>
+            </Draggable>
 
         </div>
 
@@ -72,14 +87,15 @@
 
 
 <script>
-import * as th from 'tree-helper';
-import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
+// import * as th from 'tree-helper';
+
+import { Draggable, dragContext } from '@he-tree/vue'
 import TreeBranch from './Branch.vue';
 
 export default {
 
     components: {
-        DraggableTree,
+        Draggable,
         TreeBranch,
     },
 
@@ -104,6 +120,65 @@ export default {
             saving: false,
             pages: [],
             treeData: [],
+            testData: [
+                {
+                    text: "Projects",
+                    children: [
+                        {
+                            text: "Frontend",
+                            children: [
+                                {
+                                    text: "Vue",
+                                    children: [
+                                        {
+                                            text: "Nuxt",
+                                        },
+                                    ],
+                                },
+                                {
+                                    text: "React",
+                                    children: [
+                                        {
+                                            text: "Next",
+                                        },
+                                    ],
+                                },
+                                {
+                                    text: "Angular",
+                                },
+                            ],
+                        },
+                        {
+                            text: "Backend",
+                        },
+                    ],
+                },
+                {
+                    text: "Videos",
+                    children: [
+                        {
+                            text: "Movie",
+                            children: [
+                                {
+                                    text: "The Godfather",
+                                },
+                                {
+                                    text: "La Dolce Vita",
+                                },
+                                {
+                                    text: "In the Mood for Love",
+                                },
+                            ],
+                        },
+                        {
+                            text: "AD",
+                        },
+                        {
+                            text: "Shorts",
+                        },
+                    ],
+                },
+            ]
         }
     },
 
@@ -155,7 +230,10 @@ export default {
             });
         },
 
-        treeChanged(node, tree) {
+        treeChanged() {
+            // console.log('tree changed', node, tree);
+
+            return;
             if (!this.validate()) {
                 this.updateTreeData();
                 return;
@@ -174,7 +252,10 @@ export default {
         validate() {
             let isValid = true;
 
-            this.traverseTree(this.treeData, (node, { isRoot }) => {
+            this.traverseTree(this.treeData, (node, stat) => {
+                console.log(stat, 'yo');
+                const { isRoot } = stat
+
                 if (isRoot && node.children.length) {
                     isValid = false;
                     return false;
@@ -289,16 +370,21 @@ export default {
 
         treeDragstart(node) {
             let nodeDepth = 1;
+
             this.traverseTree(node, (_, { depth }) => {
                 nodeDepth = Math.max(nodeDepth, depth);
             });
+
             const maxDepth = this.maxDepth - nodeDepth;
 
-            this.traverseTree(this.treeData, (childNode, { depth, isRoot }) => {
-                if (childNode !== node) {
-                    this.$set(childNode, 'droppable', !isRoot && depth <= maxDepth);
-                }
-            });
+            // @todo(jelleroorda): fix without $set.
+            // this.traverseTree(this.treeData, (childNode, { depth, isRoot }) => {
+            //     if (childNode !== node) {
+            //         console.log(childNode, 'child');
+                    //
+                    // this.$set(childNode, 'droppable', !isRoot && depth <= maxDepth);
+                // }
+            // });
         },
 
         pageUpdated(tree) {
@@ -370,9 +456,10 @@ export default {
                     return false;
                 }
 
-                if (node.children.length) {
-                    this.traverseTree(node.children, callback, nodePath);
-                }
+                // @todo(jelleroorda): fix.
+                // if (node.children.length) {
+                    // this.traverseTree(node.children, callback, nodePath);
+                // }
 
                 return true;
             });

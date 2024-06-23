@@ -37,7 +37,7 @@ export { default as DataListToggleAll } from '../components/data-list/ToggleAll.
 // export { default as DataListFilterPresets } from '../components/data-list/FilterPresets.vue';
 
 // Resource Type Lists
-// export { default as EntryList } from '../components/entries/Listing.vue';
+export { default as EntryList } from '../components/entries/Listing.vue';
 export { default as CollectionList } from '../components/collections/Listing.vue';
 // export { default as TaxonomyList } from '../components/taxonomies/Listing.vue';
 // export { default as TermList } from '../components/terms/Listing.vue';
@@ -58,9 +58,9 @@ export { default as DropdownItem } from '../components/DropdownItem.vue';
 // export { default as Slugify } from '../components/slugs/Slugify.vue';
 // export { default as ElementContainer } from '../components/ElementContainer.vue';
 // export { default as Avatar } from '../components/Avatar.vue';
-// export { default as Breadcrumb } from '../components/Breadcrumb.vue';
+export { default as Breadcrumb } from '../components/Breadcrumb.vue';
 // export { default as Breadcrumbs } from '../components/Breadcrumbs.vue';
-// export { default as CreateEntryButton } from '../components/entries/CreateEntryButton.vue';
+export { default as CreateEntryButton } from '../components/entries/CreateEntryButton.vue';
 export { default as Popover } from '../components/Popover.vue';
 export { default as Portal } from '../components/portals/Portal.vue';
 // export { default as CodeBlock } from '../components/CodeBlock.vue';
@@ -109,7 +109,7 @@ export { default as Login } from '../components/login/Login.vue';
 // export { default as CollectionCreateForm } from '../components/collections/CreateForm.vue';
 // export { default as CollectionScaffolder } from '../components/collections/Scaffolder.vue';
 // export { default as CollectionEditForm } from '../components/collections/EditForm.vue';
-// export { default as CollectionView } from '../components/collections/View.vue';
+export { default as CollectionView } from '../components/collections/View.vue';
 // export { default as CollectionBlueprintListing } from '../components/collections/BlueprintListing.vue';
 export { default as SessionExpiry } from '../components/SessionExpiry.vue';
 // export { default as NavigationListing } from '../components/navigation/Listing.vue';
