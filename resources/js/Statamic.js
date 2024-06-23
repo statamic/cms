@@ -85,8 +85,8 @@ export default {
         return keys;
     },
 
-    $preferences() {
-        return preferences;
+    get $preferences() {
+        return this.$app.config.globalProperties.$preferences;
     },
 
     $slug() {

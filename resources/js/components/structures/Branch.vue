@@ -58,8 +58,6 @@
 </template>
 
 <script>
-// import * as th from 'tree-helper';
-
 export default {
 
     props: {
@@ -88,10 +86,15 @@ export default {
         },
 
         isRoot() {
+            // @todo pass root prop at other places where <tree-branch> is being used.
+            // then we can remove the other props.
+            if (this.root) {
+                return true
+            }
+
             if (!this.firstPageIsRoot) return false;
             if (!this.isTopLevel) return false;
 
-            console.log('niet ok', this.page, this.stat);
             const firstNodeId = '' // @todo(jelleroorda): fix.
             // const firstNodeId = this.vm.data.parent.children[0].id;
 

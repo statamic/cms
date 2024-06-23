@@ -1,6 +1,5 @@
 <template>
     <div>
-
         <div class="mb-2 flex justify-end">
             <a
                 class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
@@ -23,17 +22,6 @@
         </div>
 
         <div v-if="!loading" class="page-tree w-full">
-            <Draggable v-model="testData" ref="tree" virtualization style="height: 500px">
-                <template #default="{ node, stat }">
-                    <span v-if="stat.children.length" @click="stat.open = !stat.open">
-                      {{ stat.open ? "-" : "+" }}
-                    </span>
-                    <!-- <span v-else>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <input type="checkbox" v-model="stat.checked" /> -->
-                    {{ node.text }}
-                </template>
-            </Draggable>
-
             <Draggable
                 ref="tree"
                 v-model="treeData"
@@ -42,16 +30,23 @@
                 :indent="24"
                 :dir="direction"
                 :node-key="(stat) => stat.data.id"
-                @change="treeChanged"
-                @drag="treeDragstart"
-                @nodeOpenChanged="saveTreeState"
                 :each-droppable="eachDroppable"
+                :root-droppable="rootDroppable"
+                :max-level="maxDepth"
+                @after-drop="treeUpdated"
+                @open:node="saveTreeState"
+                @close:node="saveTreeState"
             >
-                <template #default="{ node, stat }">
-<!--                    <pre>{{ JSON.stringify(stat, null, 2) }}</pre>-->
+                <template #placeholder>
+                    <div class="w-full bg-blue-500/10 rounded p-2 border-2 border-blue-400 border-dotted">
+                        &nbsp;
+                    </div>
+                </template>
 
+                <template #default="{ node, stat }">
                     <tree-branch
                         :page="node"
+                        :stat="stat"
                         :depth="stat.level"
                         :first-page-is-root="expectsRoot"
                         :is-open="stat.open"
@@ -59,11 +54,13 @@
                         :show-slugs="showSlugs"
                         :show-blueprint="blueprints?.length > 1"
                         :editable="editable"
+                        :root="isRoot(stat)"
                         @edit="$emit('edit-page', page, store, $event)"
-                        @toggle-open="store.toggleOpen(page)"
+                        @toggle-open="stat.open = !stat.open"
                         @removed="pageRemoved"
                         @children-orphaned="childrenOrphaned"
                         @branch-clicked="$emit('branch-clicked', page)"
+                        class="mb-px"
                     >
                         <template #branch-action="props">
                             <slot name="branch-action" v-bind="{ ...props }" />
@@ -79,17 +76,13 @@
                     </tree-branch>
                 </template>
             </Draggable>
-
         </div>
-
     </div>
 </template>
 
 
 <script>
-// import * as th from 'tree-helper';
-
-import { Draggable, dragContext } from '@he-tree/vue'
+import { dragContext, Draggable } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
 
 export default {
@@ -120,70 +113,10 @@ export default {
             saving: false,
             pages: [],
             treeData: [],
-            testData: [
-                {
-                    text: "Projects",
-                    children: [
-                        {
-                            text: "Frontend",
-                            children: [
-                                {
-                                    text: "Vue",
-                                    children: [
-                                        {
-                                            text: "Nuxt",
-                                        },
-                                    ],
-                                },
-                                {
-                                    text: "React",
-                                    children: [
-                                        {
-                                            text: "Next",
-                                        },
-                                    ],
-                                },
-                                {
-                                    text: "Angular",
-                                },
-                            ],
-                        },
-                        {
-                            text: "Backend",
-                        },
-                    ],
-                },
-                {
-                    text: "Videos",
-                    children: [
-                        {
-                            text: "Movie",
-                            children: [
-                                {
-                                    text: "The Godfather",
-                                },
-                                {
-                                    text: "La Dolce Vita",
-                                },
-                                {
-                                    text: "In the Mood for Love",
-                                },
-                            ],
-                        },
-                        {
-                            text: "AD",
-                        },
-                        {
-                            text: "Shorts",
-                        },
-                    ],
-                },
-            ]
         }
     },
 
     computed: {
-
         activeLocalization() {
             return _.findWhere(this.localizations, { active: true });
         },
@@ -199,7 +132,6 @@ export default {
     },
 
     watch: {
-
         site(site) {
             this.getPages();
         }
@@ -217,6 +149,13 @@ export default {
     },
 
     methods: {
+        isRoot(stat) {
+            if (!this.expectsRoot) {
+                return false
+            }
+
+            return stat.level === 1 && stat.data.id === this.treeData[0]?.id
+        },
 
         getPages() {
             this.loading = true;
@@ -230,39 +169,9 @@ export default {
             });
         },
 
-        treeChanged() {
-            // console.log('tree changed', node, tree);
-
-            return;
-            if (!this.validate()) {
-                this.updateTreeData();
-                return;
-            }
-
-            this.treeUpdated(tree);
-        },
-
-        treeUpdated(tree) {
-            tree = tree || this.$refs.tree;
-
-            this.pages = tree.getPureData();
+        treeUpdated() {
+            this.pages = this.$refs.tree.getData();
             this.$emit('changed');
-        },
-
-        validate() {
-            let isValid = true;
-
-            this.traverseTree(this.treeData, (node, stat) => {
-                console.log(stat, 'yo');
-                const { isRoot } = stat
-
-                if (isRoot && node.children.length) {
-                    isValid = false;
-                    return false;
-                }
-            });
-
-            return isValid;
         },
 
         cleanPagesForSubmission(pages) {
@@ -332,13 +241,13 @@ export default {
             this.treeData = clone(this.pages);
         },
 
-        pageRemoved(tree) {
-            this.pages = tree.getPureData();
+        pageRemoved() {
+            this.pages = this.$refs.tree.getData();
             this.$emit('changed');
         },
 
-        childrenOrphaned(tree) {
-            this.pages = tree.getPureData();
+        childrenOrphaned() {
+            this.pages = this.$refs.tree.getData();
             this.$emit('changed');
         },
 
@@ -368,42 +277,33 @@ export default {
             this.$emit('canceled');
         },
 
-        treeDragstart(node) {
-            let nodeDepth = 1;
+        rootDroppable() {
+            if (!this.expectsRoot) {
+                return true
+            }
 
-            this.traverseTree(node, (_, { depth }) => {
-                nodeDepth = Math.max(nodeDepth, depth);
-            });
-
-            const maxDepth = this.maxDepth - nodeDepth;
-
-            // @todo(jelleroorda): fix without $set.
-            // this.traverseTree(this.treeData, (childNode, { depth, isRoot }) => {
-            //     if (childNode !== node) {
-            //         console.log(childNode, 'child');
-                    //
-                    // this.$set(childNode, 'droppable', !isRoot && depth <= maxDepth);
-                // }
-            // });
+            return dragContext.dragNode.children.length === 0
         },
 
-        pageUpdated(tree) {
-            this.pages = tree.getPureData();
+        eachDroppable(targetStat) {
+            if (!this.expectsRoot) {
+                return true
+            }
+
+            return !this.isRoot(targetStat)
+        },
+
+        pageUpdated() {
+            this.pages = this.$refs.tree.getData();
             this.$emit('changed');
         },
 
         expandAll() {
-            this.traverseTree(this.treeData, node => {
-                node.open = true
-            })
-            this.saveTreeState();
+            this.$refs.tree.openAll()
         },
 
         collapseAll() {
-            this.traverseTree(this.treeData, node => {
-                node.open = false
-            })
-            this.saveTreeState();
+            this.$refs.tree.closeAll()
         },
 
         loadTreeState(treeData) {
@@ -456,10 +356,9 @@ export default {
                     return false;
                 }
 
-                // @todo(jelleroorda): fix.
-                // if (node.children.length) {
-                    // this.traverseTree(node.children, callback, nodePath);
-                // }
+                if (node.children?.length) {
+                    this.traverseTree(node.children, callback, nodePath);
+                }
 
                 return true;
             });
