@@ -1,16 +1,8 @@
 <script>
 import Toast from '../mixins/Toast.js';
-import { useToast } from 'vue-toastification';
 
 export default {
     mixins: [Toast],
-    setup() {
-        const toast = useToast()
-
-        return {
-            toast
-        }
-    },
     data() {
         return {
             navOpen: true,
@@ -28,8 +20,6 @@ export default {
         }
     },
     mounted() {
-        // this.$toast = toast;
-
         this.bindWindowResizeListener();
 
         this.$keys.bind(['command+\\'], e => {

@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue'
-import Toast, { POSITION } from 'vue-toastification';
+import Toast, { useToast, POSITION } from 'vue-toastification';
 import VueSelect from "vue-select";
 
 import { createVfm, ModalsContainer, useVfm } from 'vue-final-modal';
@@ -95,6 +95,10 @@ export default {
         return this.$app.config.globalProperties.$preferences;
     },
 
+    get $toast() {
+        return this.$app.config.globalProperties.$toast
+    },
+
     $slug() {
         return slug;
     },
@@ -159,7 +163,7 @@ export default {
         // Vue.use(VCalendar);
 
 
-        this.$app.config.globalProperties.$toast = null; // Initialized in App.vue
+        this.$app.config.globalProperties.$toast = useToast();
         this.$app.config.globalProperties.$moment = window.moment;
         this.$app.config.globalProperties.$axios = http;
         this.$app.config.globalProperties.$events = eventBus;
