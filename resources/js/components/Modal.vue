@@ -32,10 +32,19 @@ watch(model, (newValue) => {
     }
 })
 
-const styling = computed(() => ({
-    width: props.width ? props.width === 'auto' ? 'auto' : `${props.width}px` : undefined,
-    height: props.height ? props.height === 'auto' ? 'auto' : `${props.height}px` : undefined,
-}))
+const styling = computed(() => {
+    const width = props.width ?? 600;
+    const height = props.height ?? 'auto';
+
+    return ({
+        width: typeof(width) === 'number'
+            ? `${width}px`
+            : width,
+        height: typeof(height) === 'number'
+            ? `${height}px`
+            : height,
+    });
+})
 
 // @todo: make transition to be as clean as previously?
 // We can apply your own by writing the Vue classes for it and choosing it for content-transition below.
@@ -63,7 +72,7 @@ const modalId = computed(() => {
         v-bind="$attrs"
     >
         <div :style="styling">
-            <slot  />
+            <slot />
         </div>
     </VueFinalModal>
 </template>
