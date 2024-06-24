@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Stache;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
@@ -25,7 +26,7 @@ class ContainerAssetsStore extends ChildStore
 
         $this->fileChangesHandled = true;
 
-        if (! config('statamic.stache.watcher')) {
+        if (! Stache::isWatcherEnabled()) {
             return;
         }
 
