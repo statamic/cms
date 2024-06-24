@@ -540,7 +540,7 @@ export default {
                 this.loading = false;
                 this.initializing = false;
             }).catch(e => {
-                this.$toast.error(e.response.data.message, { action: null, duration: null });
+                this.$toast.error(e.response.data.message, { timeout: false });
                 this.assets = [];
                 this.folders = [];
                 this.loading = false;

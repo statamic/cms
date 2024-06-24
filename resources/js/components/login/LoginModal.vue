@@ -1,6 +1,6 @@
 <template>
     <div>
-        <modal :show="show" class="modal-login" :shake="hasErrors">
+        <modal :model-value="show" class="modal-login" :shake="hasErrors">
             <template slot="header">
                 {{ __('Log in to continue') }}
             </template>
