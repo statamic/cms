@@ -4,6 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Facades;
@@ -35,7 +36,7 @@ class AssetContainersStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
@@ -59,7 +60,7 @@ class AssetContainersStoreTest extends TestCase
         $this->assertTrue(file_exists($this->tempDir.'/three.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_asset_container_instances_from_files()
     {
         config(['filesystems.disks.test' => ['driver' => 'local', 'root' => __DIR__.'/../../Assets/__fixtures__/container']]);
@@ -93,7 +94,7 @@ EOL;
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_handle_as_the_item_key()
     {
         $this->assertEquals(
@@ -102,7 +103,7 @@ EOL;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         Facades\Stache::shouldReceive('store')
@@ -125,12 +126,15 @@ title: 'New Container'
 EOT;
         $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);
 
-        $container->allowUploads(false)->createFolders(false)->save();
+        $container->allowUploads(false)->createFolders(false)->validationRules(['max:150', 'mimes:jpg'])->save();
 
         $expected = <<<'EOT'
 title: 'New Container'
 allow_uploads: false
 create_folders: false
+validate:
+  - 'max:150'
+  - 'mimes:jpg'
 
 EOT;
         $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);

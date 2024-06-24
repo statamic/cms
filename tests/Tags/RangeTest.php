@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 
@@ -12,7 +13,7 @@ class RangeTest extends TestCase
         return (string) Parse::template($tag, $data);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_range()
     {
         $this->assertEquals('123', $this->tag('{{ range to="3" }}{{ value }}{{ /range }}'));
@@ -20,7 +21,7 @@ class RangeTest extends TestCase
         $this->assertEquals('543210', $this->tag('{{ range from="5" to="0" }}{{ value }}{{ /range }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_nothing_if_from_is_not_set_and_times_is_zero()
     {
         $this->assertEquals('', $this->tag('{{ range to="0" }}{{ value }}{{ /range }}'));

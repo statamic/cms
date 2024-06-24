@@ -5,7 +5,10 @@ namespace Tests\Assets;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetRepository;
+use Statamic\Contracts\Assets\Asset as AssetContract;
+use Statamic\Exceptions\AssetNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -15,7 +18,7 @@ class AssetRepositoryTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_saves_the_meta_file_to_disk()
     {
         $disk = Storage::fake('test');
@@ -45,7 +48,7 @@ EOT;
         $this->assertEquals($contents, $disk->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_the_correct_disk_from_similar_names()
     {
         Storage::fake('disk_long', ['url' => 'test_long_url_same_beginning']);
@@ -78,5 +81,39 @@ EOT;
         $foundAssetLongUrl = Asset::findByUrl($assetLongUrl->url());
         $this->assertInstanceOf(\Statamic\Contracts\Assets\Asset::class, $foundAssetLongUrl);
         $this->assertEquals('test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
+    }
+
+    #[Test]
+    public function it_finds_assets_using_find_or_fail()
+    {
+        Storage::fake('disk_short', ['url' => 'test']);
+
+        $assetRepository = new AssetRepository;
+
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
+
+        Storage::disk('disk_short')->putFileAs('foo', $file, 'image_in_short.jpg');
+        $realFilePath = Storage::disk('disk_short')->path('foo/image_in_short.jpg');
+        touch($realFilePath, $timestamp = Carbon::now()->subMinutes(3)->timestamp);
+
+        $containerShortUrl = tap(AssetContainer::make('container_short')->disk('disk_short'))->save();
+        $assetShortUrl = $containerShortUrl->makeAsset('foo/image_in_short.jpg');
+        $assetRepository->save($assetShortUrl);
+
+        $asset = $assetRepository->findOrFail($assetShortUrl->id());
+
+        $this->assertInstanceOf(AssetContract::class, $asset);
+        $this->assertEquals($assetShortUrl->id(), $asset->id());
+    }
+
+    #[Test]
+    public function test_find_or_fail_throws_exception_when_asset_does_not_exist()
+    {
+        $assetRepository = new AssetRepository;
+
+        $this->expectException(AssetNotFoundException::class);
+        $this->expectExceptionMessage('Asset [does-not-exist] not found');
+
+        $assetRepository->findOrFail('does-not-exist');
     }
 }

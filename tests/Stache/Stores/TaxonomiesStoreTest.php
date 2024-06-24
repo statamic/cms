@@ -4,6 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Path;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
@@ -33,7 +34,7 @@ class TaxonomiesStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_only_gets_top_level_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
@@ -56,7 +57,7 @@ class TaxonomiesStoreTest extends TestCase
         $this->assertTrue(file_exists($dir.'/top-level-non-yaml-file.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_taxonomy_instances_from_files()
     {
         $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example\nfoo: bar");
@@ -66,7 +67,7 @@ class TaxonomiesStoreTest extends TestCase
         $this->assertEquals('Example', $item->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_normalizes_preview_target_url_into_format()
     {
         // it's just nicer to write "url" into yaml than "format".
@@ -87,7 +88,7 @@ YAML;
         ], $item->previewTargets()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_filename_as_the_item_key()
     {
         $this->assertEquals(
@@ -96,7 +97,7 @@ YAML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         $taxonomy = TaxonomyAPI::make('new');

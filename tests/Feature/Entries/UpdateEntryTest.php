@@ -5,12 +5,13 @@ namespace Tests\Feature\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Role;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Structures\CollectionStructure;
 use Tests\FakesRoles;
@@ -22,7 +23,7 @@ class UpdateEntryTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_edit_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -43,13 +44,13 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('Existing Entry', $entry->fresh()->value('title'));
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_site_permission()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
             'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
-        ]]);
+        ]);
 
         [$user, $collection] = $this->seedUserAndCollection();
         $collection->sites(['en', 'fr'])->save();
@@ -69,7 +70,7 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('Existing Entry', $entry->fresh()->value('title'));
     }
 
-    /** @test */
+    #[Test]
     public function entry_gets_updated()
     {
         [$user, $collection] = $this->seedUserAndCollection();
@@ -94,7 +95,7 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('updated-entry', $entry->slug());
     }
 
-    /** @test */
+    #[Test]
     public function slug_is_not_required_and_will_get_created_from_the_submitted_title_if_slug_is_in_the_blueprint_and_the_submitted_slug_was_empty()
     {
         [$user, $collection] = $this->seedUserAndCollection();
@@ -119,16 +120,11 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('foo-bar-baz.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleSlugLangsProvider
-     */
+    #[Test]
+    #[DataProvider('multipleSlugLangsProvider')]
     public function slug_is_not_required_and_will_get_created_from_the_submitted_title_and_correct_language_if_slug_is_in_the_blueprint_and_the_submitted_slug_was_empty($lang, $expectedSlug)
     {
-        Site::setConfig(['sites' => [
-            'en' => array_merge(config('statamic.sites.sites.en'), ['lang' => $lang]),
-        ]]);
+        $this->setSiteValue('en', 'lang', $lang);
 
         [$user, $collection] = $this->seedUserAndCollection();
 
@@ -160,7 +156,7 @@ class UpdateEntryTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function slug_is_not_required_and_will_be_null_if_slug_is_not_in_the_blueprint()
     {
         [$user, $collection] = $this->seedUserAndCollection();
@@ -187,7 +183,7 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals($entry->id().'.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
-    /** @test */
+    #[Test]
     public function slug_is_not_required_and_will_get_created_from_auto_generated_title_when_using_title_format()
     {
         [$user, $collection] = $this->seedUserAndCollection();
@@ -212,7 +208,7 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('auto-bar.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
-    /** @test */
+    #[Test]
     public function submitted_slug_is_favored_over_auto_generated_title_when_using_title_format()
     {
         [$user, $collection] = $this->seedUserAndCollection();
@@ -237,7 +233,7 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('manually-entered-slug.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
-    /** @test */
+    #[Test]
     public function slug_and_auto_title_get_generated_after_save()
     {
         // We want addons to be able to add/modify data that the auto title could rely on.
@@ -270,13 +266,13 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('auto-avada-kedavra.md', pathinfo($entry->path(), PATHINFO_BASENAME));
     }
 
-    /** @test */
+    #[Test]
     public function auto_title_only_gets_saved_on_localization_when_different_from_origin()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr/'],
-        ]]);
+        ]);
 
         [$user, $collection] = $this->seedUserAndCollection();
         $collection->sites(['en', 'fr']);
@@ -324,7 +320,7 @@ class UpdateEntryTest extends TestCase
         $this->assertNull($localization->get('title'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_validate_against_published_value()
     {
         [$user, $collection] = $this->seedUserAndCollection();
@@ -344,31 +340,31 @@ class UpdateEntryTest extends TestCase
             ->assertStatus(422);
     }
 
-    /** @test */
+    #[Test]
     public function published_entry_gets_saved_to_working_copy()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function draft_entry_gets_saved_to_content()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function validation_error_returns_back()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function user_without_permission_to_manage_publish_state_cannot_change_publish_status()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function validates_max_depth()
     {
         [$user, $collection] = $this->seedUserAndCollection();
@@ -400,7 +396,7 @@ class UpdateEntryTest extends TestCase
             ->assertUnprocessable();
     }
 
-    /** @test */
+    #[Test]
     public function does_not_validate_max_depth_when_collection_max_depth_is_null()
     {
         [$user, $collection] = $this->seedUserAndCollection();

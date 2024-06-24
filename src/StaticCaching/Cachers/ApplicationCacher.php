@@ -3,7 +3,10 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Events\ResponsePrepared;
+use Illuminate\Support\Facades\Event;
 use Statamic\Events\UrlInvalidated;
+use Statamic\StaticCaching\Page;
 
 class ApplicationCacher extends AbstractCacher
 {
@@ -41,11 +44,21 @@ class ApplicationCacher extends AbstractCacher
         $key = $this->normalizeKey('responses:'.$key);
         $value = $this->normalizeContent($content);
 
-        if ($expiration = $this->getDefaultExpiration()) {
-            $this->cache->put($key, $value, now()->addMinutes($expiration));
-        } else {
-            $this->cache->forever($key, $value);
-        }
+        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($key, $value) {
+            $headers = collect($event->response->headers->all())
+                ->reject(fn ($value, $key) => in_array($key, ['date', 'x-powered-by', 'cache-control', 'expires', 'set-cookie']))
+                ->all();
+
+            $cacheValue = [
+                'content' => $value,
+                'headers' => $headers,
+                'status' => $event->response->getStatusCode(),
+            ];
+
+            $this->getDefaultExpiration()
+                ? $this->cache->put($key, $cacheValue, now()->addMinutes($this->getDefaultExpiration()))
+                : $this->cache->forever($key, $cacheValue);
+        });
     }
 
     /**
@@ -61,11 +74,13 @@ class ApplicationCacher extends AbstractCacher
     /**
      * Get a cached page.
      *
-     * @return string
+     * @return Page
      */
     public function getCachedPage(Request $request)
     {
-        return $this->cached ?? $this->getFromCache($request);
+        $cachedPage = $this->cached ?? $this->getFromCache($request);
+
+        return new Page($cachedPage['content'], $cachedPage['headers'], $cachedPage['status'] ?? 200);
     }
 
     private function getFromCache(Request $request)

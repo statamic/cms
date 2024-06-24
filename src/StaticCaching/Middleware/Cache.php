@@ -3,16 +3,19 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
+use Statamic\StaticCaching\ResponseStatus;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\NoLock;
 use Symfony\Component\Lock\Store\FlockStore;
@@ -62,6 +65,8 @@ class Cache
         if ($this->shouldBeCached($request, $response)) {
             $lock->acquire(true);
 
+            $this->copyError($request, $response);
+
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
@@ -72,12 +77,30 @@ class Cache
         return $response;
     }
 
+    private function copyError($request, $response)
+    {
+        $status = $response->getStatusCode();
+
+        if (! config('statamic.static_caching.share_errors')) {
+            return;
+        }
+
+        $request = Request::createFrom($request)->fakeStaticCacheStatus($status);
+
+        if (! $this->cacher->hasCachedPage($request)) {
+            $this->cacher->cachePage($request, $response);
+        }
+    }
+
     private function attemptToGetCachedResponse($request)
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            $response = response($this->cacher->getCachedPage($request));
+            $cachedPage = $this->cacher->getCachedPage($request);
+            $response = $cachedPage->toResponse($request);
 
             $this->makeReplacements($response);
+
+            $response->setStaticCacheResponseStatus(ResponseStatus::HIT);
 
             return $response;
         }
@@ -137,7 +160,9 @@ class Cache
             return false;
         }
 
-        if ($response->getStatusCode() !== 200 || $response->getContent() == '') {
+        $statuses = $this->cacher instanceof ApplicationCacher ? [200, 404] : [200];
+
+        if (! in_array($response->getStatusCode(), $statuses) || $response->getContent() == '') {
             return false;
         }
 

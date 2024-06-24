@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
@@ -17,13 +18,13 @@ use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
 use Statamic\Search\Index;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
-use Statamic\Taxonomies\LocalizedTerm;
 
 class Entries extends Relationship
 {
@@ -105,6 +106,11 @@ class Entries extends Relationship
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
                         'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
                 ],
             ],
@@ -319,10 +325,10 @@ class Entries extends Relationship
         return new \Statamic\Entries\EntryCollection($value);
     }
 
-    public function augment($values)
+    private function queryBuilder($values)
     {
         $site = Site::current()->handle();
-        if (($parent = $this->field()->parent()) && ($parent instanceof Localization || $parent instanceof LocalizedTerm)) {
+        if (($parent = $this->field()->parent()) && $parent instanceof Localization) {
             $site = $parent->locale();
         }
 
@@ -335,10 +341,21 @@ class Entries extends Relationship
             ->filter()
             ->all();
 
-        $query = (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
+        return (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
             ->whereIn('id', $ids);
+    }
 
-        return $this->config('max_items') === 1 ? $query->first() : $query;
+    public function augment($values)
+    {
+        $single = $this->config('max_items') === 1;
+
+        if ($single && Blink::has($key = 'entries-augment-'.json_encode($values))) {
+            return Blink::get($key);
+        }
+
+        $query = $this->queryBuilder($values);
+
+        return $single ? Blink::once($key, fn () => $query->first()) : $query;
     }
 
     public function shallowAugment($values)
@@ -409,13 +426,7 @@ class Entries extends Relationship
 
     protected function getItemsForPreProcessIndex($values): SupportCollection
     {
-        if (! $augmented = $this->augment($values)) {
-            return collect();
-        }
-
-        return $this->config('max_items') === 1
-            ? collect([$augmented])
-            : $augmented->whereAnyStatus()->get();
+        return $this->queryBuilder($values)->whereAnyStatus()->get();
     }
 
     public function filter()

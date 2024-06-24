@@ -1,6 +1,7 @@
 @php use function Statamic\trans as __; @endphp
 
 @extends('statamic::layout')
+@section('wrapper_class', 'max-w-7xl')
 
 @section('nontent')
 
@@ -159,7 +160,7 @@
     </div>
 
     <h2 class="mb-2">Colors</h2>
-    <div class="bg-white p-10 shadow rounded-lg overflow-hidden mb-16">
+    <div class="bg-white dark:bg-black p-10 shadow rounded-lg overflow-hidden mb-16">
 
         <h6 class="mb-4">grays</h6>
         {{-- <div class="p-4" style="background: #48606f"></div> --}}
@@ -201,6 +202,32 @@
             <div class="text-black bg-slate-700 p-4 flex-1">700</div>
             <div class="text-white bg-slate-800 p-4 flex-1">800</div>
             <div class="text-white bg-slate-900 p-4 flex-1">900</div>
+            <div class="text-white bg-black p-4 flex-1">Black</div>
+        </div>
+
+         <h6 class="mb-4">dark mode</h6>
+        <div class="flex flex-row-reverse overflow-x-auto text-sm text-center mb-8">
+            <div class="text-black bg-white p-4 flex-1">White</div>
+            <div class="text-black bg-dark-100 p-4 flex-1">100</div>
+            <div class="text-black bg-dark-150 p-4 flex-1">150</div>
+            <div class="text-black bg-dark-175 p-4 flex-1">175</div>
+            <div class="text-black bg-dark-200 p-4 flex-1">200</div>
+            <div class="text-black bg-dark-250 p-4 flex-1">250</div>
+            <div class="text-black bg-dark-275 p-4 flex-1">275</div>
+            <div class="text-black bg-dark-300 p-4 flex-1">300</div>
+            <div class="text-black bg-dark-350 p-4 flex-1">350</div>
+            <div class="text-black bg-dark-400 p-4 flex-1">400</div>
+            <div class="text-black bg-dark-500 p-4 flex-1">500</div>
+            <div class="text-black bg-dark-550 p-4 flex-1">550</div>
+            <div class="text-black bg-dark-575 p-4 flex-1">575</div>
+            <div class="text-black bg-dark-600 p-4 flex-1">600</div>
+            <div class="text-black bg-dark-650 p-4 flex-1">650</div>
+            <div class="text-black bg-dark-700 p-4 flex-1">700</div>
+            <div class="text-black bg-dark-750 p-4 flex-1">750</div>
+            <div class="text-white bg-dark-800 p-4 flex-1">800</div>
+            <div class="text-white bg-dark-900 p-4 flex-1">900</div>
+            <div class="text-white bg-dark-950 p-4 flex-1">950</div>
+            <div class="text-white bg-dark-975 p-4 flex-1">975</div>
             <div class="text-white bg-black p-4 flex-1">Black</div>
         </div>
 

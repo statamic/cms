@@ -132,8 +132,8 @@ return [
     */
 
     'commands' => [
-        config('statamic.git.binary').' add {{ paths }}',
-        config('statamic.git.binary').' -c "user.name={{ name }}" -c "user.email={{ email }}" commit -m "{{ message }}"',
+        '{{ git }} add {{ paths }}',
+        '{{ git }} -c "user.name={{ name }}" -c "user.email={{ email }}" commit -m "{{ message }}"',
     ],
 
     /*

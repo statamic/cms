@@ -4,6 +4,7 @@ namespace Tests\Forms;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionDeleted;
@@ -11,11 +12,14 @@ use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class SubmissionTest extends TestCase
 {
-    /** @test */
+    use PreventSavingStacheItemsToDisk;
+
+    #[Test]
     public function the_id_is_generated_the_first_time_but_can_be_overridden()
     {
         $submission = Form::make('test')->makeSubmission();
@@ -29,7 +33,7 @@ class SubmissionTest extends TestCase
         $this->assertEquals('123', $submission->id());
     }
 
-    /** @test */
+    #[Test]
     public function generated_ids_dont_have_commas()
     {
         // this test becomes unnecessary if we ever move away from using microtime for ids.
@@ -45,7 +49,7 @@ class SubmissionTest extends TestCase
         setlocale(LC_TIME, $originalLocale);
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_and_gets_data()
     {
         $submission = Form::make('test')->makeSubmission();
@@ -87,7 +91,7 @@ class SubmissionTest extends TestCase
         $this->assertNull($submission->hello);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_submission()
     {
         Event::fake();
@@ -117,7 +121,7 @@ class SubmissionTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_submission_created_only_once()
     {
         Event::fake();
@@ -135,7 +139,7 @@ class SubmissionTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_quietly()
     {
         Event::fake();
@@ -152,7 +156,7 @@ class SubmissionTest extends TestCase
         Event::assertNotDispatched(SubmissionCreating::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_creating_event_returns_false_the_submission_doesnt_save()
     {
         Event::fake([SubmissionCreated::class]);
@@ -171,7 +175,7 @@ class SubmissionTest extends TestCase
         Event::assertNotDispatched(SubmissionCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_saving_event_returns_false_the_submission_doesnt_save()
     {
         Event::fake([SubmissionSaved::class]);
@@ -189,7 +193,7 @@ class SubmissionTest extends TestCase
         Event::assertNotDispatched(SubmissionSaved::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_quietly()
     {
         Event::fake();

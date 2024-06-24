@@ -10,8 +10,6 @@ use Statamic\Facades\User;
 
 class Impersonate extends Action
 {
-    protected $confirm = false;
-
     public static function title()
     {
         return __('Start Impersonating');
@@ -66,5 +64,22 @@ class Impersonate extends Action
         }
 
         return $users->first()->can('access cp') ? cp_route('index') : '/';
+    }
+
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'statamic::messages.impersonate_action_confirmation';
+    }
+
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Confirm';
+    }
+
+    public function bypassesDirtyWarning(): bool
+    {
+        return true;
     }
 }

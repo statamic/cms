@@ -5,15 +5,16 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
-use Statamic\Facades\Site;
 use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class CollectionTest extends TestCase
 {
     use EnablesQueries;
@@ -29,7 +30,7 @@ class CollectionTest extends TestCase
         Collection::make('events')->title('Events')->save();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnFalse()->once();
@@ -42,7 +43,7 @@ class CollectionTest extends TestCase
             ->assertSee('Cannot query field \"collection\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_a_collection_by_handle()
     {
         $query = <<<'GQL'
@@ -70,7 +71,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
         $query = <<<'GQL'
@@ -104,18 +105,15 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_the_structure_and_its_tree()
     {
         // Start with fresh slate for this test so it's easier to mock things with one pages collection...
         Collection::all()->each->delete();
 
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'french', 'locale' => 'fr_FR', 'url' => 'http://test.com/fr/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'french', 'locale' => 'fr_FR', 'url' => 'http://test.com/fr/'],
         ]);
 
         BlueprintRepository::partialMock();
@@ -285,7 +283,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields()
     {
         GraphQL::addField('Collection', 'custom', function () {

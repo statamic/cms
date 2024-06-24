@@ -3,8 +3,8 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -24,13 +24,13 @@ class LocalizeEntryTest extends TestCase
         config(['cache.default' => 'file']);
         \Illuminate\Support\Facades\Cache::clear();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_an_entry()
     {
         $user = $this->user();
@@ -50,7 +50,7 @@ class LocalizeEntryTest extends TestCase
         $this->assertCount(0, $entry->in('fr')->revisions());
     }
 
-    /** @test */
+    #[Test]
     public function site_is_required()
     {
         $entry = EntryFactory::collection('blog')->slug('test')->create();
@@ -63,7 +63,7 @@ class LocalizeEntryTest extends TestCase
             ->assertSessionHasErrors('site');
     }
 
-    /** @test */
+    #[Test]
     public function cant_localize_entry_without_edit_permissions()
     {
         $user = $this->user();
@@ -81,7 +81,7 @@ class LocalizeEntryTest extends TestCase
         $this->assertNull($localized);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_an_entry_to_the_structure_tree_if_its_nested()
     {
         $collection = tap(Collection::make('pages')->sites(['en', 'fr']))->save();
@@ -128,7 +128,7 @@ class LocalizeEntryTest extends TestCase
         ], Collection::findByHandle('pages')->structure()->in('fr')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_an_entry_to_the_end_of_the_structure_tree_if_the_parent_is_the_root()
     {
         $collection = tap(Collection::make('pages')->sites(['en', 'fr']))->save();
@@ -173,7 +173,7 @@ class LocalizeEntryTest extends TestCase
         ], Collection::findByHandle('pages')->structure()->in('fr')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_an_entry_to_the_end_of_the_structure_tree_if_the_parent_doesnt_exist_in_that_site()
     {
         $collection = tap(Collection::make('pages')->sites(['en', 'fr']))->save();
@@ -215,7 +215,7 @@ class LocalizeEntryTest extends TestCase
         ], Collection::findByHandle('pages')->structure()->in('fr')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_an_entry_with_revisions()
     {
         config(['statamic.revisions.enabled' => true]);
