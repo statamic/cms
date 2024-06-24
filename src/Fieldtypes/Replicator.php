@@ -333,22 +333,7 @@ class Replicator extends Fieldtype
 
     protected function groupKey()
     {
+        // @todo This should be refactored into a list of allowed set config hashes.
         return md5(serialize($this->field->config('sets')));
-
-        // if (! $parent = $this->field->parent()) {
-        //     return;
-        // }
-        // if (! $blueprint = $parent->blueprint()) {
-        //     return;
-        // }
-        // if (! $handlePath = $this->field->handlePath()) {
-        //     return;
-        // }
-
-        // return implode('.', [
-        //     $blueprint->namespace(),
-        //     $blueprint->handle(),
-        //     ...$handlePath,
-        // ]);
     }
 }
