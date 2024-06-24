@@ -241,7 +241,7 @@ class Replicator extends Fieldtype
             'defaults' => $defaults,
             'collapsed' => [],
             'previews' => $previews,
-            'sortableGroup' => implode('-', $this->field->handlePath()),
+            'groupKey' => $this->groupKey(),
         ];
     }
 
@@ -329,5 +329,11 @@ class Replicator extends Fieldtype
     public function toQueryableValue($value)
     {
         return empty($value) ? null : $value;
+    }
+
+    protected function groupKey()
+    {
+        // @todo This should be refactored into a list of allowed set config hashes, if possible.
+        return md5(serialize($this->field->config('sets')));
     }
 }

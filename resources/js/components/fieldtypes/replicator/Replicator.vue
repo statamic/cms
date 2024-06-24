@@ -43,7 +43,7 @@
         <sortable-list
             :value="value"
             :vertical="true"
-            :group="sortableGroup"
+            :group="groupKey"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
             append-to="body"
@@ -162,16 +162,16 @@ export default {
             return this.config.sets;
         },
 
-        sortableGroup() {
-            return this.meta.sortableGroup;
+        groupKey() {
+            return this.meta.groupKey;
         },
 
         sortableItemClass() {
-            return `${this.sortableGroup}-sortable-item`;
+            return `${this.groupKey}-sortable-item`;
         },
 
         sortableHandleClass() {
-            return `${this.sortableGroup}-sortable-handle`;
+            return `${this.groupKey}-sortable-handle`;
         },
 
         storeState() {
