@@ -8,6 +8,7 @@ import Sortables from './Sortables';
 import Components from './Components';
 import FieldConditions from './FieldConditions';
 import Callbacks from './Callbacks';
+import Slugs from './slugs/Manager.js';
 const echo = new Echo;
 const bard = new Bard;
 const keys = new Keys;
@@ -17,6 +18,7 @@ const sortables = new Sortables;
 const components = new Components;
 const conditions = new FieldConditions;
 const callbacks = new Callbacks;
+const slug = new Slugs;
 
 export default new Vue({
     data() {
@@ -67,6 +69,10 @@ export default new Vue({
 
         $keys() {
             return keys;
+        },
+
+        $slug() {
+            return slug;
         },
 
         user() {

@@ -111,12 +111,15 @@ export default {
                     setTimeout(() => this.$refs.assets.openSelector(), 0);
                 }
             }
+
+            this.updateMeta({...this.meta, initialOption: option});
         },
 
         urlValue(url) {
             if (this.metaChanging) return;
 
             this.update(url);
+            this.updateMeta({...this.meta, initialUrl: url});
         },
 
         meta(meta, oldMeta) {
@@ -159,11 +162,13 @@ export default {
         entriesSelected(entries) {
             this.selectedEntries = entries;
             this.update(this.entryValue);
+            this.updateMeta({...this.meta, initialSelectedEntries: entries});
         },
 
         assetsSelected(assets) {
             this.selectedAssets = assets;
             this.update(this.assetValue);
+            this.updateMeta({...this.meta, initialSelectedAssets: assets});
         }
 
     }

@@ -10,6 +10,7 @@ use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\IndexNotFoundException;
 use Statamic\Search\Result;
+use Statamic\Support\Arr;
 
 class Index extends BaseIndex
 {
@@ -37,7 +38,7 @@ class Index extends BaseIndex
             $data['search_score'] = $result['score'];
             $data['search_snippets'] = $result['snippets'];
 
-            return array_except($data, '_category');
+            return Arr::except($data, '_category');
         });
     }
 

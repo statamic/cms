@@ -4,6 +4,7 @@ namespace Tests\Search;
 
 use Illuminate\Support\Carbon;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Search\Result;
 use Statamic\Contracts\Search\Result as SearchResult;
 use Statamic\Contracts\Search\Searchable;
@@ -17,7 +18,7 @@ class QueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_can_get_results()
     {
         $items = collect([
@@ -32,7 +33,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'c'], $results->map->reference->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_results_with_data()
     {
         // Using actual searchable providers here simply because calling
@@ -86,7 +87,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals([$resultC, $resultA, $resultB], $results->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where()
     {
         $items = collect([
@@ -102,19 +103,19 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_or_where()
     {
         $this->markTestSkipped();
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_or_where_in()
     {
         $this->markTestSkipped();
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_date()
     {
         $items = $this->createWhereDateTestItems();
@@ -135,7 +136,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_month()
     {
         $items = $this->createWhereDateTestItems();
@@ -151,7 +152,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['d'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_day()
     {
         $items = $this->createWhereDateTestItems();
@@ -167,7 +168,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'd'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_year()
     {
         $items = $this->createWhereDateTestItems();
@@ -183,7 +184,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['d'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_time()
     {
         $items = $this->createWhereDateTestItems();
@@ -210,7 +211,7 @@ class QueryBuilderTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function results_are_found_using_where_null()
     {
         $items = collect([
@@ -227,7 +228,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['c', 'e'], $results->map->reference->all());
     }
 
-    /** @test */
+    #[Test]
     public function results_are_found_using_where_not_null()
     {
         $items = collect([
@@ -244,19 +245,19 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'd'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_or_where_null()
     {
         $this->markTestSkipped();
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_or_where_not_null()
     {
         $this->markTestSkipped();
     }
 
-    /** @test */
+    #[Test]
     public function results_are_found_using_where_between()
     {
         $items = collect([
@@ -273,7 +274,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'c', 'd'], $results->map->reference->all());
     }
 
-    /** @test */
+    #[Test]
     public function results_are_found_using_where_not_between()
     {
         $items = collect([
@@ -290,19 +291,19 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'e'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_or_where_between()
     {
         $this->markTestSkipped();
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_or_where_not_between()
     {
         $this->markTestSkipped();
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_nested_where()
     {
         $items = collect([
@@ -328,7 +329,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'd', 'e'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_nested_where_in()
     {
         $items = collect([
@@ -353,7 +354,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'd', 'c', 'e'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_json_contains()
     {
         $items = collect([
@@ -375,7 +376,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_json_doesnt_contain()
     {
         $items = collect([
@@ -397,7 +398,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'd', 'e'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_or_where_json_contains()
     {
         $items = collect([
@@ -414,7 +415,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c', 'e'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_or_where_json_doesnt_contain()
     {
         $items = collect([
@@ -431,7 +432,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c', 'b', 'd'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_json_length()
     {
         $items = collect([
@@ -448,7 +449,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'e', 'd'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_multiple_wheres()
     {
         $items = collect([
@@ -464,7 +465,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_array_of_wheres()
     {
         $items = collect([
@@ -486,7 +487,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['e'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_with_json_value()
     {
         $items = collect([
@@ -514,7 +515,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'c', 'e', 'f'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_column()
     {
         $items = collect([
@@ -541,7 +542,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['Post 1', 'Post 2', 'Post 5', 'Post 6'], $results->map->foo->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_when()
     {
         $items = collect([
@@ -566,7 +567,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'c', 'd'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_unless()
     {
         $items = collect([
@@ -591,7 +592,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c'], $results->map->reference->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_tap()
     {
         $items = collect([
@@ -609,7 +610,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c'], $results->map->reference->all());
     }
 
-    /** @test */
+    #[Test]
     public function results_are_found_using_offset()
     {
         $items = collect([
@@ -624,6 +625,39 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'c', 'd'], $query->get()->map->reference->all());
 
         $this->assertEquals(['b', 'c', 'd'], $query->offset(1)->get()->map->reference->all());
+    }
+
+    #[Test]
+    public function values_can_be_plucked()
+    {
+        $items = collect([
+            ['reference' => 'a', 'title' => 'Frodo', 'type' => 'a'],
+            ['reference' => 'b', 'title' => 'Gandalf', 'type' => 'a'],
+            ['reference' => 'c', 'title' => 'Frodo\'s Precious', 'type' => 'b'],
+            ['reference' => 'd', 'title' => 'Smeagol\'s Precious', 'type' => 'b'],
+        ]);
+
+        $query = (new FakeQueryBuilder($items))->withoutData();
+
+        $this->assertEquals([
+            'a' => 'Frodo',
+            'b' => 'Gandalf',
+            'c' => 'Frodo\'s Precious',
+            'd' => 'Smeagol\'s Precious',
+        ], $query->pluck('title', 'reference')->all());
+
+        $this->assertEquals([
+            'Frodo',
+            'Gandalf',
+            'Frodo\'s Precious',
+            'Smeagol\'s Precious',
+        ], $query->pluck('title')->all());
+
+        // Assert only queried values are plucked.
+        $this->assertSame([
+            'Frodo\'s Precious',
+            'Smeagol\'s Precious',
+        ], $query->where('type', 'b')->pluck('title')->all());
     }
 }
 

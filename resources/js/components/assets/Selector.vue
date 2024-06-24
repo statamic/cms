@@ -1,6 +1,6 @@
 <template>
 
-        <div class="flex flex-col justify-end h-full bg-white">
+        <div class="flex flex-col justify-end h-full bg-white dark:bg-dark-800">
 
             <div class="flex-1 overflow-scroll">
                 <asset-browser
@@ -24,7 +24,7 @@
                 </asset-browser>
             </div>
 
-            <div class="p-4 border-t flex items-center justify-between bg-gray-200">
+            <div class="p-4 border-t dark:border-dark-200 flex items-center justify-between bg-gray-200 dark:bg-dark-500">
                 <div class="text-sm text-gray-700"
                     v-text="hasMaxFiles
                         ? __n(':count/:max selected', browserSelections, { max: maxFiles })

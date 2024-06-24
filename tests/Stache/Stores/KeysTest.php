@@ -3,6 +3,7 @@
 namespace Tests\Stache\Stores;
 
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Stache\Exceptions\DuplicateKeyException;
 use Statamic\Stache\Stores\Keys;
 use Statamic\Stache\Stores\Store;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class KeysTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_tracks_keys()
     {
         $store = $this->mock(Store::class);
@@ -27,7 +28,7 @@ class KeysTest extends TestCase
         ], $keys->all());
     }
 
-    /** @test */
+    #[Test]
     public function adding_a_duplicate_throws_an_exception()
     {
         $keys = (new Keys($this->mock(Store::class)))->setKeys(['123' => 'original.md']);
@@ -51,7 +52,7 @@ class KeysTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_the_cache()
     {
         $store = $this->mock(Store::class);
@@ -66,7 +67,7 @@ class KeysTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], Cache::get('stache::keys/test-store'));
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_from_cache()
     {
         Cache::forever('stache::keys/test-store', ['foo' => 'bar']);
@@ -82,7 +83,7 @@ class KeysTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $keys->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_the_cache()
     {
         Cache::forever('stache::keys/test-store', ['foo' => 'bar']);
@@ -99,7 +100,7 @@ class KeysTest extends TestCase
         $this->assertNull(Cache::get('stache::keys/test-store'));
     }
 
-    /** @test */
+    #[Test]
     public function it_forgets_a_key()
     {
         $store = $this->mock(Store::class);
@@ -116,7 +117,7 @@ class KeysTest extends TestCase
         $this->assertEquals(['456' => 'another.md'], $keys->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_the_path_of_a_key()
     {
         $store = $this->mock(Store::class);

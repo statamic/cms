@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class AsciiTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_replaces_non_ascii_chars_with_closest_counterparts(): void
     {
         $modified = $this->modify('lemoñade');

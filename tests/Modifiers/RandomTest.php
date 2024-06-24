@@ -2,68 +2,34 @@
 
 namespace Tests\Modifiers;
 
-use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class RandomTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @group array
-     */
-    public function it_returns_one_random_item_from_an_array(): void
+    #[Test]
+    #[DataProvider('inputsProvider')]
+    public function it_returns_one_random_item($input): void
     {
-        $orderOfCeremony = [
-            'Sonic',
-            'Knuckles',
-            'Tails',
+        $this->assertFalse(
+            $this->modify($input) === $this->modify($input) && $this->modify($input) === $this->modify($input),
+            'The same value was returned multiple times.',
+        );
+    }
+
+    public static function inputsProvider()
+    {
+        $range = range(1, 5000);
+
+        return [
+            'array' => [$range],
+            'collection' => [collect($range)],
+            'query builder' => [Mockery::mock(Builder::class)->shouldReceive('get')->andReturn(collect($range))->getMock()],
         ];
-
-        srand(1234);
-
-        $modified = $this->modify($orderOfCeremony);
-        $expected = $this->modify($orderOfCeremony);
-        $this->assertEquals($expected, $modified);
-    }
-
-    /**
-     * @test
-     *
-     * @group array
-     */
-    public function it_returns_one_random_item_from_a_collection(): void
-    {
-        $orderOfCeremony = collect([
-            'Sonic',
-            'Knuckles',
-            'Tails',
-        ]);
-
-        srand(1234);
-
-        $modified = $this->modify($orderOfCeremony);
-        $expected = $this->modify($orderOfCeremony);
-        $this->assertEquals($expected, $modified);
-    }
-
-    /** @test */
-    public function it_returns_one_random_item_from_a_query_builder()
-    {
-        $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('get')->andReturn(Collection::make([
-            'Sonic',
-            'Knuckles',
-            'Tails',
-        ]));
-
-        srand(1234);
-        $modified = $this->modify($builder);
-        $expected = $this->modify($builder);
-        $this->assertEquals($expected, $modified);
     }
 
     private function modify($value)

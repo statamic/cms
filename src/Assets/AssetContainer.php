@@ -13,6 +13,7 @@ use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerDeleted;
+use Statamic\Events\AssetContainerDeleting;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
@@ -48,6 +49,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $withEvents = true;
     protected $sortField;
     protected $sortDirection;
+    protected $validation;
 
     public function id($id = null)
     {
@@ -95,6 +97,20 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             ->getter(function ($title) {
                 return $title ?? ucfirst($this->handle);
             })
+            ->args(func_get_args());
+    }
+
+    /**
+     * Get or set the validation rules.
+     *
+     * @param  null|array  $rules
+     * @return array
+     */
+    public function validationRules($rules = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('validation')
+            ->getter(fn ($rules) => $rules ?? [])
             ->args(func_get_args());
     }
 
@@ -262,6 +278,13 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     /**
      * Delete the container.
      *
@@ -269,9 +292,18 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && AssetContainerDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\AssetContainer::delete($this);
 
-        AssetContainerDeleted::dispatch($this);
+        if ($withEvents) {
+            AssetContainerDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -608,6 +640,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'create_folders' => $this->createFolders,
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
+            'validate' => $this->validation,
         ];
 
         $array = Arr::removeNullValues(array_merge($array, [

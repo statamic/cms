@@ -3,9 +3,12 @@
 namespace Tests\Imaging;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Imaging\GlideImageManipulator;
+use Statamic\Support\Arr;
 use Tests\TestCase;
 
 class GlideImageManipulatorTest extends TestCase
@@ -29,22 +32,16 @@ class GlideImageManipulatorTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider paramProvider
-     */
+    #[Test]
+    #[DataProvider('paramProvider')]
     public function adds_standard_api_params($param)
     {
         $this->man->setParam($param, 'value');
         $this->assertArrayHasKey($param, $this->man->getParams());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider paramProvider
-     */
+    #[Test]
+    #[DataProvider('paramProvider')]
     public function adds_standard_api_params_using_magic_method($param)
     {
         $this->man->$param('value');
@@ -84,7 +81,7 @@ class GlideImageManipulatorTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function cannot_add_invalid_glide_param()
     {
         $this->expectException('Exception');
@@ -92,7 +89,7 @@ class GlideImageManipulatorTest extends TestCase
         $this->man->setParam('foo', 'bar');
     }
 
-    /** @test */
+    #[Test]
     public function cannot_add_invalid_glide_param_using_magic_method()
     {
         $this->expectException('Exception');
@@ -100,11 +97,8 @@ class GlideImageManipulatorTest extends TestCase
         $this->man->foo('bar');
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider aliasProvider
-     */
+    #[Test]
+    #[DataProvider('aliasProvider')]
     public function testAddsParamsUsingAliases($alias, $value, $expected)
     {
         $this->man->$alias($value);
@@ -128,7 +122,7 @@ class GlideImageManipulatorTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function focal_crop_uses_asset_value()
     {
         $asset = $this->mock(Asset::class);
@@ -137,10 +131,10 @@ class GlideImageManipulatorTest extends TestCase
         $this->man->fit('crop_focal');
 
         $this->assertArrayHasKey('fit', $this->man->getParams());
-        $this->assertEquals('crop-60-40', array_get($this->man->getParams(), 'fit'));
+        $this->assertEquals('crop-60-40', Arr::get($this->man->getParams(), 'fit'));
     }
 
-    /** @test */
+    #[Test]
     public function focal_crop_just_uses_crop_if_no_value_exists()
     {
         $asset = $this->mock(Asset::class);
@@ -149,6 +143,6 @@ class GlideImageManipulatorTest extends TestCase
         $this->man->fit('crop_focal');
 
         $this->assertArrayHasKey('fit', $this->man->getParams());
-        $this->assertEquals('crop', array_get($this->man->getParams(), 'fit'));
+        $this->assertEquals('crop', Arr::get($this->man->getParams(), 'fit'));
     }
 }

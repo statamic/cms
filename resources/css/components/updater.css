@@ -48,7 +48,7 @@
 .update-release {
 
     .date {
-		@apply font-normal text-gray;
+		@apply font-normal text-gray dark:text-dark-175;
 	}
 
 	p {
@@ -78,8 +78,9 @@
 			width: 6px;
 			content: "";
 			top: 7px;
-		 left: 4px ; [dir="rtl"] & { left: auto ; right: 4px ; }
+            left: 4px ; [dir="rtl"] & { left: auto ; right: 4px ; }
 
+            .dark & { @apply bg-dark-200; }
 		}
 
 		.label {

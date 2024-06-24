@@ -4,6 +4,7 @@ namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Form;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
 use Statamic\Query\Scopes\Filter;
@@ -24,7 +25,7 @@ class Fields extends Filter
             ->map(function ($field) {
                 return [
                     'handle' => $field->handle(),
-                    'display' => $field->display(),
+                    'display' => __($field->display()),
                     'fields' => $field->fieldtype()->filter()->fields()->toPublishArray(),
                 ];
             })
@@ -63,7 +64,7 @@ class Fields extends Filter
 
     public function visibleTo($key)
     {
-        return in_array($key, ['entries', 'entries-fieldtype', 'terms', 'users', 'usergroup-users']);
+        return in_array($key, ['entries', 'entries-fieldtype', 'form-submissions', 'terms', 'users', 'usergroup-users']);
     }
 
     protected function getFields()
@@ -88,6 +89,17 @@ class Fields extends Filter
         if ($taxonomies = Arr::getFirst($this->context, ['taxonomy', 'taxonomies'])) {
             return collect(Arr::wrap($taxonomies))->flatMap(function ($taxonomy) {
                 return Taxonomy::findByHandle($taxonomy)->termBlueprints();
+            });
+        }
+
+        if ($forms = Arr::getFirst($this->context, ['form', 'forms'])) {
+            return collect(Arr::wrap($forms))->map(function ($form) {
+                return Form::find($form)
+                    ->blueprint()
+                    ->ensureField('date', [
+                        'type' => 'date',
+                        'filterable' => true,
+                    ]);
             });
         }
 

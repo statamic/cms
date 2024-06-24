@@ -158,6 +158,7 @@ return [
     'slug.title' => 'Slug',
     'structures.title' => 'Strukturen',
     'table.title' => 'Tabelle',
+    'taggable.config.options' => 'Vordefinierte Tags zur Verfügung stellen, die dann ausgewählt werden können.',
     'taggable.config.placeholder' => 'Tippen und ↩ Enter drücken',
     'taggable.title' => 'Tags',
     'taxonomies.title' => 'Taxonomien',

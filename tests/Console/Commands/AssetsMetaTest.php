@@ -3,6 +3,7 @@
 namespace Tests\Console\Commands;
 
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades\AssetContainer as AssetContainerFacade;
 use Statamic\Facades\YAML;
@@ -57,7 +58,7 @@ class AssetsMetaTest extends TestCase
         return $container;
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_one_asset_meta_file_for_asset_with_no_meta_file()
     {
         $this->containerWithDisk();
@@ -72,13 +73,13 @@ class AssetsMetaTest extends TestCase
         Storage::disk('test')->assertMissing('foo/.meta/bar.txt.yaml');
 
         $this->artisan('statamic:assets:meta test_container')
-            ->expectsOutput('Asset metadata generated');
+            ->expectsOutputToContain('Generated metadata for 1 asset.');
 
         Storage::disk('test')->assertExists('foo/bar.txt');
         Storage::disk('test')->assertExists('foo/.meta/bar.txt.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function it_preserves_data_property_in_meta_data_file()
     {
         $this->containerWithDisk();
@@ -90,7 +91,7 @@ class AssetsMetaTest extends TestCase
         );
 
         $this->artisan('statamic:assets:meta test_container')
-            ->expectsOutput('Asset metadata generated');
+            ->expectsOutputToContain('Generated metadata for 1 asset.');
 
         $this->assertEquals(
             Arr::get(YAML::parse(Storage::disk('test')->get('foo/.meta/bar.txt.yaml')), 'data.foo'),

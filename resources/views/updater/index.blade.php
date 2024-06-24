@@ -33,7 +33,7 @@
         <div class="card p-0 mt-2">
             <table class="data-table">
                 <tr>
-                    <td class="w-64"><a href="{{ route('statamic.cp.updater.product', 'statamic') }}" class="text-blue font-bold">Statamic</a></td>
+                    <td class="w-64"><a href="{{ route('statamic.cp.updater.product', 'statamic') }}" class="text-blue font-bold">{{ __('Statamic') }}</a></td>
                     <td>{{ $statamic->currentVersion() }}</td>
                     @if ($count = $statamic->availableUpdatesCount())
                         <td class="rtl:text-left ltr:text-right"><span class="badge-sm bg-green-600 btn-xs">{{ trans_choice('1 update|:count updates', $count) }}</span></td>

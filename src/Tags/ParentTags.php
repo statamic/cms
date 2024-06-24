@@ -55,7 +55,7 @@ class ParentTags extends Tags
     {
         $parent = $this->getParent();
 
-        return array_get($parent, 'url');
+        return Arr::get($parent, 'url');
     }
 
     /**

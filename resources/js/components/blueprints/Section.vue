@@ -1,19 +1,19 @@
 <template>
 
     <div class="blueprint-section @container">
-        <div class="blueprint-section-card card p-0 h-full flex rounded-t flex-col">
+        <div class="blueprint-section-card card dark:bg-dark-800 p-0 h-full flex rounded-t flex-col">
 
-            <div class="bg-gray-200 border-b text-sm flex rounded-t">
-                <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 ltr:border-r rtl:border-l"></div>
+            <div class="bg-gray-200 dark:bg-dark-600 border-b dark:border-none text-sm flex rounded-t">
+                <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 ltr:border-r rtl:border-l dark:border-dark-900"></div>
                 <div class="p-2 flex-1 flex items-center">
                     <a class="flex items-center flex-1 group" @click="edit">
-                        <svg-icon :name="iconName(section.icon)" :directory="iconBaseDirectory" class="h-4 w-4 rtl:ml-2 ltr:mr-2 text-gray-700 group-hover:text-blue-500" />
+                        <svg-icon :name="iconName(section.icon)" :directory="iconBaseDirectory" class="h-4 w-4 rtl:ml-2 ltr:mr-2 text-gray-700 dark:text-dark-150 group-hover:text-blue-500 dark:group-hover:text-dark-blue-100" />
                         <div class="rtl:ml-2 ltr:mr-2" v-text="__(section.display)" />
                     </a>
-                    <button class="flex items-center text-gray-700 hover:text-gray-950 rtl:ml-3 ltr:mr-3" @click="edit">
+                    <button class="flex items-center text-gray-700 dark:text-dark-175 hover:text-gray-950 dark:hover:text-dark-100 rtl:ml-3 ltr:mr-3" @click="edit">
                         <svg-icon class="h-4 w-4" name="pencil" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-700 hover:text-gray-950">
+                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-700 dark:text-dark-175 hover:text-gray-950 dark:hover:text-dark-100">
                         <svg-icon class="h-4 w-4" name="micro/trash" />
                     </button>
                 </div>
@@ -70,7 +70,7 @@
                 <template v-slot:empty-state>
                     <div
                         v-text="__('Add or drag fields here')"
-                        class="text-2xs text-gray-600 text-center border border-dashed rounded mb-2 p-2"
+                        class="text-2xs text-gray-600 dark:text-dark-150 text-center border dark:border-dark-200 border-dashed rounded mb-2 p-2"
                     />
                 </template>
             </fields>
@@ -148,7 +148,7 @@ export default {
 
         'editingSection.display': function(display) {
             if (this.editingSection && this.handleSyncedWithDisplay) {
-                this.editingSection.handle = this.$slugify(display, '_');
+                this.editingSection.handle = snake_case(display);
             }
         }
 
@@ -195,6 +195,10 @@ export default {
         },
 
         editConfirmed() {
+            if (! this.editingSection.handle) {
+                this.editingSection.handle = snake_case(this.editingSection.display)
+            }
+
             this.$emit('updated', {...this.section, ...this.editingSection});
             this.editingSection = false;
         },

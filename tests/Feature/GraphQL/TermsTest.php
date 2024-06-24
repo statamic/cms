@@ -5,13 +5,15 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class TermsTest extends TestCase
 {
     use EnablesQueries;
@@ -58,7 +60,7 @@ class TermsTest extends TestCase
         return $this;
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnFalse()->once();
@@ -71,7 +73,7 @@ class TermsTest extends TestCase
             ->assertSee('Cannot query field \"terms\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_all_terms()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -105,7 +107,41 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
+    public function it_queries_all_terms_in_a_specific_site()
+    {
+        $this->createTaxonomies()->createTerms()->createBlueprints();
+
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        Taxonomy::find('tags')->sites(['en', 'fr'])->save();
+
+        Term::find('tags::alpha')->in('fr')->data(['title' => 'Le Alpha'])->save();
+
+        $query = <<<'GQL'
+{
+    terms(site: "fr") {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['terms' => ['data' => [
+                ['id' => 'tags::alpha', 'title' => 'Le Alpha'],
+            ]]]]);
+    }
+
+    #[Test]
     public function it_queries_only_terms_on_allowed_sub_resources()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -135,7 +171,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -173,7 +209,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_paginates_terms()
     {
         $this->createTaxonomies()->createBlueprints();
@@ -223,7 +259,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_terms_from_a_single_taxonomy()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -249,7 +285,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_terms_from_multiple_taxonomies()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -277,7 +313,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_blueprint_specific_fields()
     {
         $this->createTaxonomies()->createTerms();
@@ -332,7 +368,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_filter_terms_by_default()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -376,7 +412,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_taxonomy_terms_when_configuration_allows_for_it()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -411,7 +447,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_all_terms_when_configuration_allows_for_it()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -447,7 +483,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_terms_with_equalto_shorthand()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -480,7 +516,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_terms_with_multiple_conditions_of_the_same_type()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -515,7 +551,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_terms()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -545,7 +581,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_terms_descending()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
@@ -575,7 +611,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_terms_on_multiple_fields()
     {
         Taxonomy::make('tags')->save();

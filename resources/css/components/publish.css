@@ -85,7 +85,7 @@ code.parent-url {
 }
 
 .publish-section-header {
-    @apply border-b border-gray-400 bg-gray-100 rounded-t-lg;
+    @apply border-b border-gray-400 dark:border-dark-900 bg-gray-100 dark:bg-dark-700 rounded-t-lg;
 }
 
 .publish-section-header-inner {

@@ -3,6 +3,8 @@
 namespace Tests\Feature\Collections;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
@@ -15,11 +17,8 @@ class UpdateCollectionTreeTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     *
-     * @dataProvider collectionTreeDataProvider
-     */
+    #[Test]
+    #[DataProvider('collectionTreeDataProvider')]
     public function it_updates_the_tree($collectionHandle)
     {
         $this->withoutExceptionHandling();
@@ -74,13 +73,13 @@ class UpdateCollectionTreeTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_update_the_tree_if_theres_a_duplicate_uri_when_expecting_root()
     {
         $this->duplicateUriTest(true);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_update_the_tree_if_theres_a_duplicate_uri_when_not_expecting_root()
     {
         $this->duplicateUriTest(false);
@@ -127,7 +126,7 @@ class UpdateCollectionTreeTest extends TestCase
         ], $collection->structure()->in('en')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_entries_scheduled_for_deletion()
     {
         $user = tap(User::make()->makeSuper())->save();
@@ -146,7 +145,7 @@ class UpdateCollectionTreeTest extends TestCase
         $this->assertCount(1, Entry::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_delete_entries_if_theres_a_duplicate_uri_validation_error()
     {
         $user = tap(User::make()->makeSuper())->save();
@@ -188,7 +187,7 @@ class UpdateCollectionTreeTest extends TestCase
         ], $collection->structure()->in('en')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission_to_reorder()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -215,7 +214,7 @@ class UpdateCollectionTreeTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_a_specific_sites_tree()
     {
         $this->markTestIncomplete();

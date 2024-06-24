@@ -7,11 +7,11 @@
             <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label class="text-xs whitespace-nowrap rtl:ml-2 ltr:mr-2 cursor-pointer">
-                        <template v-if="setGroup">
+                    <label class="text-xs rtl:ml-2 ltr:mr-2 cursor-pointer">
+                        <span v-if="isSetGroupVisible">
                             {{ setGroup.display }}
                             <svg-icon name="micro/chevron-right" class="w-4" />
-                        </template>
+                        </span>
                         {{ display || config.handle }}
                     </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
@@ -166,6 +166,10 @@ export default {
 
         hasMultipleFields() {
             return this.fields.length > 1;
+        },
+
+        isSetGroupVisible() {
+            return this.replicatorSets.length > 1 && this.setGroup?.display;
         },
 
         isHidden() {
