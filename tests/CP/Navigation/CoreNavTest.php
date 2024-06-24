@@ -2,6 +2,7 @@
 
 namespace Tests\CP\Navigation;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\User;
@@ -16,7 +17,7 @@ class CoreNavTest extends TestCase
 
     protected $shouldPreventNavBeingBuilt = false;
 
-    /** @test */
+    #[Test]
     public function it_can_build_a_default_nav()
     {
         $expected = collect([
@@ -40,7 +41,7 @@ class CoreNavTest extends TestCase
         $this->assertEquals($expected->get('Users'), $nav->get('Users')->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_builds_plural_sites_item_when_multisite_is_enabled()
     {
         Facades\Config::set('statamic.system.multisite', true);
@@ -55,7 +56,7 @@ class CoreNavTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_build_collection_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
         $this->setSites([
@@ -93,7 +94,7 @@ class CoreNavTest extends TestCase
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_build_navigation_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
         $this->setSites([
@@ -139,7 +140,7 @@ class CoreNavTest extends TestCase
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_build_taxonomy_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
         $this->setSites([
@@ -177,7 +178,7 @@ class CoreNavTest extends TestCase
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_build_globals_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
         $this->setSites([

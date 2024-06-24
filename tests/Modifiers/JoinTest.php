@@ -2,15 +2,15 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class JoinTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_joins_values_of_an_array_using_a_comma_by_default()
     {
         $joined = $this->modify(['foo', 'bar']);
@@ -18,7 +18,7 @@ class JoinTest extends TestCase
         $this->assertEquals('foo, bar', $joined);
     }
 
-    /** @test */
+    #[Test]
     public function it_joins_values_of_an_array_using_a_custom_delimiter()
     {
         $joined = $this->modify(['foo', 'bar'], '+');
@@ -26,7 +26,7 @@ class JoinTest extends TestCase
         $this->assertEquals('foo+bar', $joined);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_empty_string_when_value_is_null()
     {
         $joined = $this->modify(null, ' ');

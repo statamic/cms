@@ -3,13 +3,14 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Fieldtype;
 use Tests\TestCase;
 
 class ConfigFieldsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_preprocesses_each_fields_values_by_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Collections;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Structure;
@@ -15,7 +16,7 @@ class DeleteCollectionTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -34,7 +35,7 @@ class DeleteCollectionTest extends TestCase
         $this->assertCount(1, Collection::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_the_collection()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
@@ -51,7 +52,7 @@ class DeleteCollectionTest extends TestCase
         $this->assertCount(0, Collection::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_the_collection_with_localized_entries()
     {
         $this->withoutExceptionHandling();
@@ -78,7 +79,7 @@ class DeleteCollectionTest extends TestCase
         $this->assertCount(0, Collection::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_tree_files()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
@@ -101,7 +102,7 @@ class DeleteCollectionTest extends TestCase
         $this->assertNull(Structure::find('collection::test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_tree_files_in_a_multisite()
     {
         $this->setSites([

@@ -3,6 +3,7 @@
 namespace Tests\Data\Structures;
 
 use Facades\Statamic\Structures\BranchIdGenerator;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Structures\BranchIds;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -11,7 +12,7 @@ class BranchIdsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_adds_ids_to_branches()
     {
         $tree = [

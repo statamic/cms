@@ -5,6 +5,7 @@ namespace Tests\Data\Structures;
 use Facades\Statamic\Stache\Repositories\NavTreeRepository;
 use Illuminate\Support\Collection as LaravelCollection;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavDeleting;
@@ -26,7 +27,7 @@ class NavTest extends StructureTestCase
         return (new Nav)->handle($handle);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_handle()
     {
         $structure = $this->structure();
@@ -38,7 +39,7 @@ class NavTest extends StructureTestCase
         $this->assertEquals($structure, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_a_tree()
     {
         $structure = $this->structure()->handle('test');
@@ -53,7 +54,7 @@ class NavTest extends StructureTestCase
         ], $tree->tree());
     }
 
-    /** @test */
+    #[Test]
     public function trees_exist_if_they_exist_as_files()
     {
         $this->setSites([
@@ -83,7 +84,7 @@ class NavTest extends StructureTestCase
         $this->assertNull($structure->in('de'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_title()
     {
         $structure = $this->structure('test');
@@ -97,7 +98,7 @@ class NavTest extends StructureTestCase
         $this->assertEquals($structure, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_the_nav_through_the_api()
     {
         $nav = $this->structure();
@@ -107,7 +108,7 @@ class NavTest extends StructureTestCase
         $this->assertTrue($nav->save());
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_through_the_api()
     {
         $nav = $this->structure();
@@ -117,7 +118,7 @@ class NavTest extends StructureTestCase
         $this->assertTrue($nav->delete());
     }
 
-    /** @test */
+    #[Test]
     public function collections_can_be_get_and_set()
     {
         $nav = $this->structure();
@@ -138,7 +139,7 @@ class NavTest extends StructureTestCase
         $this->assertEquals([$collectionOne, $collectionTwo], $collections->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_has_cp_urls()
     {
         $nav = $this->structure('test');
@@ -149,13 +150,13 @@ class NavTest extends StructureTestCase
         $this->assertEquals('http://localhost/cp/navigation/test', $nav->deleteUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_has_no_route()
     {
         $this->assertNull($this->structure('test')->route('en'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_available_sites_from_trees()
     {
         $this->setSites([
@@ -172,7 +173,7 @@ class NavTest extends StructureTestCase
         $this->assertEquals(['en', 'fr'], $nav->sites()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_view_navs_from_sites_that_the_user_is_not_authorized_to_see()
     {
         $this->setSites([
@@ -209,7 +210,7 @@ class NavTest extends StructureTestCase
         $this->assertFalse($user->can('view', $nav3));
     }
 
-    /** @test */
+    #[Test]
     public function it_fires_a_deleting_event()
     {
         Event::fake();
@@ -223,7 +224,7 @@ class NavTest extends StructureTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         Facades\Nav::spy();

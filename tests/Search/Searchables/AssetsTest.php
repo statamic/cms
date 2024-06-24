@@ -3,6 +3,8 @@
 namespace Tests\Search\Searchables;
 
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Search\Searchables\Assets;
@@ -13,11 +15,8 @@ class AssetsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     *
-     * @dataProvider assetsProvider
-     */
+    #[Test]
+    #[DataProvider('assetsProvider')]
     public function it_gets_assets($locale, $config, $expected)
     {
         $this->setSites([
@@ -122,11 +121,8 @@ class AssetsTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider indexFilterProvider
-     */
+    #[Test]
+    #[DataProvider('indexFilterProvider')]
     public function it_can_use_a_custom_filter($filter)
     {
         Storage::fake('images');

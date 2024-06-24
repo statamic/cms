@@ -3,11 +3,13 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class AssetContainerTest extends TestCase
 {
     use EnablesQueries;
@@ -23,7 +25,7 @@ class AssetContainerTest extends TestCase
         AssetContainer::make('private')->title('Private')->save();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnFalse()->once();
@@ -36,7 +38,7 @@ class AssetContainerTest extends TestCase
             ->assertSee('Cannot query field \"assetContainer\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_asset_container_by_handle()
     {
         $query = <<<'GQL'
@@ -64,7 +66,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
         $query = <<<'GQL'
