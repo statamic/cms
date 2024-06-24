@@ -79,7 +79,7 @@
                 </button>
 
                 <confirmation-modal
-                    v-if="deleting !== false"
+                    :model-value="deleting !== false"
                     :title="__('Delete Value')"
                     :bodyText="__('Are you sure you want to delete this value?')"
                     :buttonText="__('Delete')"

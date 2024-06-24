@@ -60,7 +60,7 @@
             </section>
 
             <confirmation-modal
-                v-if="deletingRow !== false"
+                :model-value="deletingRow !== false"
                 :title="__('Delete Row')"
                 :bodyText="__('Are you sure you want to delete this row?')"
                 :buttonText="__('Delete')"
@@ -71,7 +71,7 @@
             </confirmation-modal>
 
             <confirmation-modal
-                v-if="deletingColumn !== false"
+                :model-value="deletingColumn !== false"
                 :title="__('Delete Column')"
                 :bodyText="__('Are you sure you want to delete this column?')"
                 :buttonText="__('Delete')"

@@ -277,7 +277,7 @@
         />
 
         <confirmation-modal
-            v-if="selectingOrigin"
+            v-model="selectingOrigin"
             :title="__('Create Localization')"
             :buttonText="__('Create')"
             @cancel="cancelLocalization()"

@@ -45,7 +45,7 @@
         />
 
         <confirmation-modal
-            v-if="modalOpen"
+            v-model="modalOpen"
             :cancellable="false"
             :button-text="__('OK')"
             @confirm="modalOpen = false"

@@ -198,7 +198,7 @@ export default {
                 this.loading = false;
                 this.initializing = false;
                 if (e.request && ! e.response) return;
-                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
+                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { timeout: false });
             })
         },
 

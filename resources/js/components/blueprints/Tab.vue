@@ -26,7 +26,7 @@
         </dropdown-list>
 
         <confirmation-modal
-            v-if="editing"
+            v-model="editing"
             :title="editText"
             @opened="$refs.title.focus()"
             @confirm="editConfirmed"

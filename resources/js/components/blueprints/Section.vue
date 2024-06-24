@@ -20,7 +20,7 @@
             </div>
 
             <confirmation-modal
-                v-if="editingSection"
+                v-model="editingSection"
                 :title="editText"
                 @opened="$refs.displayInput.select()"
                 @confirm="editConfirmed"

@@ -1,6 +1,6 @@
 <template>
     <confirmation-modal
-        v-if="deleting"
+        v-model="deleting"
         :title="modalTitle"
         :buttonText="__('Delete')"
         :danger="true"

@@ -4,7 +4,7 @@
         <slot :action="action" :select="select" />
 
         <confirmation-modal
-            v-if="confirming"
+            v-model="confirming"
             :title="action.title"
             :danger="action.dangerous"
             :buttonText="runButtonText"
