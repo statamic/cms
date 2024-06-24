@@ -1,17 +1,23 @@
 <script>
 import { Plugins } from '@shopify/draggable'
 
-function move(items, oldIndex, newIndex) {
-    const itemRemovedArray = [
-        ...items.slice(0, oldIndex),
-        ...items.slice(oldIndex + 1, items.length)
-    ]
-
+function add(items, item, index) {
     return [
-        ...itemRemovedArray.slice(0, newIndex),
-        items[oldIndex],
-        ...itemRemovedArray.slice(newIndex, itemRemovedArray.length)
+        ...items.slice(0, index),
+        item,
+        ...items.slice(index, items.length)
     ]
+}
+
+function remove(items, index) {
+    return [
+        ...items.slice(0, index),
+        ...items.slice(index + 1, items.length)
+    ]
+}
+
+function move(items, oldIndex, newIndex) {
+    return add(remove(items, oldIndex), items[oldIndex], newIndex);
 }
 
 export default {
@@ -129,8 +135,14 @@ export default {
             this.sortable.on('drag:start', () => this.$emit('dragstart'));
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
-            this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-                this.$emit('input', move(this.value, oldIndex, newIndex))
+            this.sortable.on('sortable:stop', ({ newContainer, oldContainer, oldIndex, newIndex }) => {
+                if (newContainer === this.$el && oldContainer === this.$el) {
+                    this.$emit('input', move(this.value, oldIndex, newIndex));
+                } else if (newContainer === this.$el) {
+                    this.$emit('input', add(this.value, oldContainer.__vue__.value[oldIndex], newIndex));
+                } else if (oldContainer === this.$el) {
+                    this.$emit('input', remove(this.value, oldIndex));
+                }
             })
 
             this.$on('hook:destroyed', () => {
