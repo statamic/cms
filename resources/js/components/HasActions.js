@@ -19,9 +19,7 @@ export default {
     methods: {
 
         runAction({ run }) {
-            run({
-                ...this.actionPayload,
-            });
+            run(this.actionPayload);
         },
 
     }
