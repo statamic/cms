@@ -69,10 +69,10 @@ export { default as Portal } from '../components/portals/Portal.vue';
 // export { default as RolePermissionTree } from '../components/roles/PermissionTree.vue';
 
 // Modals
-// export { default as Modal } from '../components/Modal.vue';
-// export { default as ConfirmationModal } from '../components/modals/ConfirmationModal.vue';
+export { default as Modal } from '../components/Modal.vue';
+export { default as ConfirmationModal } from '../components/modals/ConfirmationModal.vue';
 export { default as FavoriteCreator } from '../components/FavoriteCreator.vue';
-// export { default as KeyboardShortcutsModal } from '../components/modals/KeyboardShortcutsModal.vue';
+export { default as KeyboardShortcutsModal } from '../components/modals/KeyboardShortcutsModal.vue';
 export { default as ResourceDeleter } from '../components/ResourceDeleter.vue';
 
 // export { default as Stack } from '../components/stacks/Stack.vue';

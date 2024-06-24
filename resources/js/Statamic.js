@@ -4,7 +4,10 @@ import FloatingVue from 'floating-vue'
 import Toast, { POSITION } from 'vue-toastification';
 import VueSelect from "vue-select";
 
-// @todo(jack): Replace with own toast styles
+import { createVfm, ModalsContainer, useVfm } from 'vue-final-modal';
+import 'vue-final-modal/style.css'
+
+// @todo(jack): Replace with own toast styles?
 // Or make a custom component instead:
 // https://github.com/Maronato/vue-toastification?tab=readme-ov-file#render-a-component
 import "vue-toastification/dist/index.css";
@@ -35,6 +38,7 @@ import PortalVue from 'portal-vue';
 import useProgressBar from './composables/useProgressBar';
 import useDirtyState from './composables/useDirtyState';
 import registerFieldTypes from './bootstrap/fieldtypes.js';
+import TestModals from './components/TestModals.vue';
 
 const echo = new Echo;
 const bard = new Bard;
@@ -145,6 +149,11 @@ export default {
             }
         })
 
+        // Modals
+        this.$app.use(createVfm())
+        this.$app.component('modals-container', ModalsContainer)
+        this.$app.component('test-modals', TestModals)
+
         // Vue.use(VModal, { componentName: 'v-modal' })
         // Vue.use(Vuex);
         // Vue.use(VCalendar);
@@ -163,6 +172,7 @@ export default {
         this.$app.config.globalProperties.$config = this.$config;
         this.$app.config.globalProperties.$progress = useProgressBar();
         this.$app.config.globalProperties.$dirty = useDirtyState();
+        this.$app.config.globalProperties.$modal = useVfm();
 
         // Assign any global helper methods, available in all Vue components.
         Object.assign(this.$app.config.globalProperties, {

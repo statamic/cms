@@ -1,9 +1,11 @@
 <template>
 
-    <stack name="asset-editor"
+    <stack
+        name="asset-editor"
         :before-close="shouldClose"
         :full="true"
-        @closed="close">
+        @closed="close"
+    >
 
     <div class="asset-editor flex flex-col relative bg-gray-100 dark:bg-dark-800 h-full rounded" :class="isImage ? 'is-image' : 'is-file'">
 
