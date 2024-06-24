@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 import { VueFinalModal } from 'vue-final-modal'
+import uniqid from 'uniqid';
 
 const props = withDefaults(defineProps<{
     name?: string
@@ -42,10 +43,19 @@ const styling = computed(() => ({
 // @todo support "shake" prop.
 // @todo support "adaptive" prop.
 // @todo support "draggable" prop.
+
+const modalId = computed(() => {
+    if (props.name) {
+        return props.name
+    }
+
+    return uniqid()
+})
 </script>
 
 <template>
     <VueFinalModal
+        :modal-id="modalId"
         class="flex items-start justify-center pt-[5%]"
         overlay-transition="vfm-fade"
         content-transition="vfm-fade"
