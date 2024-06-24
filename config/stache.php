@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'watcher' => env('STATAMIC_STACHE_WATCHER', true),
+    'watcher' => env('STATAMIC_STACHE_WATCHER', 'auto'),
 
     /*
     |--------------------------------------------------------------------------

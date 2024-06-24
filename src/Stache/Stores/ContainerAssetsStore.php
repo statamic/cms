@@ -25,7 +25,7 @@ class ContainerAssetsStore extends ChildStore
 
         $this->fileChangesHandled = true;
 
-        if (! config('statamic.stache.watcher')) {
+        if (! Stache::isWatcherEnabled()) {
             return;
         }
 

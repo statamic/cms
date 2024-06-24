@@ -209,4 +209,13 @@ class Stache
 
         return $this->duplicates = (new Duplicates($this))->load();
     }
+
+    public function isWatcherEnabled(): bool
+    {
+        $config = config('statamic.stache.watcher');
+
+        return $config === 'auto'
+            ? app()->isLocal()
+            : (bool) $config;
+    }
 }

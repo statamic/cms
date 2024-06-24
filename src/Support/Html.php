@@ -92,7 +92,7 @@ class Html
      */
     public static function entities($value)
     {
-        return htmlentities($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
+        return htmlentities($value ?? '', ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
     }
 
     /**
@@ -348,7 +348,7 @@ class Html
             return Arr::sanitize($value, $antlers);
         }
 
-        $value = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
+        $value = htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
 
         if ($antlers) {
             $value = str_replace(['{', '}'], ['&lbrace;', '&rbrace;'], $value);

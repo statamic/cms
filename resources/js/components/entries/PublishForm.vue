@@ -259,6 +259,7 @@
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"
+                :can-restore-revisions="!readOnly"
                 @closed="close"
             />
         </stack>
