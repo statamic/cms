@@ -4,21 +4,14 @@ namespace Tests\Auth\Eloquent;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
 use Statamic\Facades\Config;
 use Statamic\Facades\User;
-use Statamic\Support\Str;
-use Tests\Auth\PermissibleContractTests;
-use Tests\Auth\UserContractTests;
-use Tests\Preferences\HasPreferencesTests;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Schema;
 
 class ActualUserModel extends \Illuminate\Database\Eloquent\Model
 {
@@ -31,7 +24,6 @@ class ActualUserModel extends \Illuminate\Database\Eloquent\Model
         ];
     }
 }
-
 
 class EloquentQueryUserTest extends TestCase
 {
@@ -61,7 +53,6 @@ class EloquentQueryUserTest extends TestCase
         }
 
         $this->loadMigrationsFrom($tmpDir);
-
 
         Schema::table(config('statamic.users.tables.users', 'users'), function (Blueprint $table) {
             $table->string('password')->nullable()->change();
@@ -244,5 +235,4 @@ class EloquentQueryUserTest extends TestCase
         $this->assertCount(2, $users);
         $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
     }
-
 }
