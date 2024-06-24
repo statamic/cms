@@ -70,7 +70,7 @@ class KeysTest extends TestCase
     #[Test]
     public function it_can_use_a_different_cache_store()
     {
-        config()->set('stache.cache_store', 'stache');
+        config()->set('statamic.stache.cache_store', 'stache');
         config()->set('cache.stores.stache', [
             'driver' => 'array',
         ]);

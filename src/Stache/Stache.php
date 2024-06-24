@@ -65,7 +65,7 @@ class Stache
 
     public function cacheStore()
     {
-        return Cache::store(config('stache.cache_store'));
+        return Cache::store(config('statamic.stache.cache_store'));
     }
 
     public function store($key)
