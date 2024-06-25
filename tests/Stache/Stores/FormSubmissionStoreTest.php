@@ -3,6 +3,7 @@
 namespace Tests\Stache\Stores;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades;
 use Statamic\Facades\Path;
@@ -28,7 +29,7 @@ class FormSubmissionStoreTest extends TestCase
         Stache::store('form-submissions')->directory($this->directory);
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_entry_instances_from_files()
     {
         $item = $this->parent->store('contact_form')->makeItemFromFile(
@@ -43,7 +44,7 @@ class FormSubmissionStoreTest extends TestCase
         $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i:s', '2021-09-08 06:46:31')->eq($item->date()->startOfSecond()));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         $form = tap(Facades\Form::make('test_form'))->save();

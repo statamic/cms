@@ -3,15 +3,15 @@
 namespace Tests\Modifiers;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class OffsetTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_offsets_arrays(): void
     {
         $arr = ['one', 'two', 'three'];
@@ -20,7 +20,7 @@ class OffsetTest extends TestCase
         $this->assertEquals(['three'], $this->modify($arr, 2));
     }
 
-    /** @test */
+    #[Test]
     public function it_offsets_collections(): void
     {
         $collection = collect(['one', 'two', 'three']);

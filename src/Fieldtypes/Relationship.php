@@ -23,7 +23,6 @@ abstract class Relationship extends Fieldtype
     protected $canSearch = false;
     protected $statusIcons = false;
     protected $taggable = false;
-    protected $defaultValue = [];
     protected $formComponentProps = [
         '_' => '_', // forces an object in js
     ];

@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Structures;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Structures\CollectionTree;
@@ -25,7 +26,7 @@ class CollectionTreeTest extends TestCase
         $stache->store('collection-trees')->directory($this->directory = '/path/to/structures/collections');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_and_set_the_handle()
     {
         $tree = new CollectionTree;
@@ -37,7 +38,7 @@ class CollectionTreeTest extends TestCase
         $this->assertEquals('test', $tree->handle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_structure()
     {
         $collection = Collection::make('test')->structureContents(['root' => true]);
@@ -54,7 +55,7 @@ class CollectionTreeTest extends TestCase
         $this->assertSame($structure, Blink::get($blinkKey));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_path()
     {
         $collection = Collection::make('pages')->structureContents(['root' => true]);
@@ -63,7 +64,7 @@ class CollectionTreeTest extends TestCase
         $this->assertEquals('/path/to/structures/collections/pages.yaml', $tree->path());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_path_when_using_multisite()
     {
         $this->setSites([
@@ -77,7 +78,7 @@ class CollectionTreeTest extends TestCase
         $this->assertEquals('/path/to/structures/collections/en/pages.yaml', $tree->path());
     }
 
-    /** @test */
+    #[Test]
     public function it_does_a_diff()
     {
         $collection = Collection::make('pages')->structureContents(['root' => true]);

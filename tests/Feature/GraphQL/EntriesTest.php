@@ -6,13 +6,15 @@ use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class EntriesTest extends TestCase
 {
     use CreatesQueryableTestEntries;
@@ -27,7 +29,7 @@ class EntriesTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnFalse()->once();
@@ -40,7 +42,7 @@ class EntriesTest extends TestCase
             ->assertSee('Cannot query field \"entries\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_all_entries()
     {
         $this->createEntries();
@@ -73,7 +75,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_all_entries_in_a_specific_site()
     {
         $this->createEntries();
@@ -106,7 +108,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_only_entries_on_allowed_sub_resources()
     {
         $this->createEntries();
@@ -136,7 +138,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
         $this->createEntries();
@@ -174,7 +176,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_paginates_entries()
     {
         $this->createEntries();
@@ -219,7 +221,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_entries_from_a_single_collection()
     {
         $this->createEntries();
@@ -245,7 +247,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_entries_from_multiple_collections()
     {
         $this->createEntries();
@@ -272,7 +274,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_entries_from_multiple_collections_using_variables()
     {
         $this->createEntries();
@@ -304,7 +306,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_blueprint_specific_fields()
     {
         $this->createEntries();
@@ -356,7 +358,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_filter_entries_by_default()
     {
         $this->createEntries();
@@ -400,7 +402,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_collection_entries_when_configuration_allows_for_it()
     {
         $this->createEntries();
@@ -455,7 +457,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_all_entries_when_configuration_allows_for_it()
     {
         $this->createEntries();
@@ -510,7 +512,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_entries_with_multiple_conditions()
     {
         $this->createEntries();
@@ -570,7 +572,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_entries_with_multiple_conditions_of_the_same_type()
     {
         $this->createEntries();
@@ -626,7 +628,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_entries_with_equalto_shorthand()
     {
         $this->createEntries();
@@ -661,7 +663,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_entries()
     {
         $this->createEntries();
@@ -690,7 +692,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_entries_descending()
     {
         $this->createEntries();
@@ -719,7 +721,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_entries_on_multiple_fields()
     {
         $blueprint = Blueprint::makeFromFields([
@@ -759,7 +761,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_drafts_by_default()
     {
         FilterAuthorizer::shouldReceive('allowedForSubResources')
@@ -871,7 +873,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_future_entries_from_future_private_collection()
     {
         $default = Blueprint::makeFromFields([]);
@@ -909,7 +911,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_past_entries_from_past_private_collection()
     {
 

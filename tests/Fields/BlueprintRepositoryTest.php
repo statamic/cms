@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\File;
@@ -25,7 +26,7 @@ class BlueprintRepositoryTest extends TestCase
         Facades\Blueprint::swap($this->repo);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_blueprint()
     {
         $contents = <<<'EOT'
@@ -54,7 +55,7 @@ EOT;
         ], $blueprint->contents());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_blueprint_in_a_namespace()
     {
         $contents = <<<'EOT'
@@ -83,7 +84,7 @@ EOT;
         ], $blueprint->contents());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_blueprint_in_a_custom_namespace()
     {
         $contents = <<<'EOT'
@@ -115,7 +116,7 @@ EOT;
         ], $blueprint->contents());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_overidden_blueprint_in_a_custom_namespace()
     {
         $contents = <<<'EOT'
@@ -146,7 +147,7 @@ EOT;
         ], $blueprint->contents());
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_if_blueprint_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
@@ -154,7 +155,7 @@ EOT;
         $this->assertNull($this->repo->find('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_if_blueprint_doesnt_exist_in_a_namespace()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnFalse();
@@ -162,7 +163,7 @@ EOT;
         $this->assertNull($this->repo->find('foo.bar.unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_fallback_blueprint()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
@@ -177,7 +178,7 @@ EOT;
         $this->assertNull($fallback->namespace());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_namespaced_fallback_blueprint()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnNull();
@@ -192,7 +193,7 @@ EOT;
         $this->assertEquals('foo.bar', $fallback->namespace());
     }
 
-    /** @test */
+    #[Test]
     public function getting_a_non_existent_namespaced_blueprint_will_not_return_the_non_namespaced_fallback()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnNull();
@@ -205,7 +206,7 @@ EOT;
         $this->assertNull($this->repo->find('foo.bar.unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         $expectedYaml = <<<'EOT'
@@ -261,7 +262,7 @@ EOT;
         $this->repo->save($blueprint);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_blueprints_in_a_namespace()
     {
         $dir = '/path/to/resources/blueprints/collections/blog';
@@ -284,7 +285,7 @@ EOT;
         $this->assertEquals(['First Blueprint', 'Second Blueprint'], $blueprints->map->title()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_empty_collection_if_directory_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/test')->once()->andReturnFalse();
@@ -295,7 +296,7 @@ EOT;
         $this->assertCount(0, $all);
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_the_namespace_when_passed_when_making()
     {
         $blueprint = $this->repo->make('test::handle');
@@ -304,7 +305,7 @@ EOT;
         $this->assertSame($blueprint->handle(), 'handle');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_blueprint_using_find_or_fail()
     {
         $contents = <<<'EOT'
@@ -325,7 +326,7 @@ EOT;
         $this->assertEquals('test', $blueprint->handle());
     }
 
-    /** @test */
+    #[Test]
     public function find_or_fail_throws_exception_when_blueprint_does_not_exist()
     {
         $this->expectException(BlueprintNotFoundException::class);

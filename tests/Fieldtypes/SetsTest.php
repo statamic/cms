@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\ConfigField;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Sets;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class SetsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_preprocesses_with_groups()
     {
         $field = (new Field('test', [
@@ -107,7 +108,7 @@ class SetsTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_without_groups()
     {
         $field = (new Field('test', [
@@ -157,7 +158,7 @@ class SetsTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_with_empty_value()
     {
         $field = (new Field('test', [
@@ -167,7 +168,7 @@ class SetsTest extends TestCase
         $this->assertEquals([], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_for_config_with_groups()
     {
         $field = (new ConfigField('test', [
@@ -284,7 +285,7 @@ class SetsTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_for_config_without_groups()
     {
         $field = (new ConfigField('test', [
@@ -344,7 +345,7 @@ class SetsTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_for_config_with_empty_value()
     {
         $field = (new ConfigField('test', [
@@ -354,7 +355,7 @@ class SetsTest extends TestCase
         $this->assertEquals([], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_processes()
     {
         $field = (new Field('test', [
@@ -411,7 +412,7 @@ class SetsTest extends TestCase
         ], $field->process()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_provides_statamic_plump_icons_to_script_by_default()
     {
         $jsonVariables = Statamic::jsonVariables(request());
@@ -420,7 +421,7 @@ class SetsTest extends TestCase
         $this->assertEquals('plump', $jsonVariables['setIconsFolder']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_provide_custom_user_icons_subfolder()
     {
         Sets::setIconsDirectory(folder: 'light');
@@ -431,7 +432,7 @@ class SetsTest extends TestCase
         $this->assertEquals('light', $jsonVariables['setIconsFolder']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_provide_custom_user_icons_directory()
     {
         Sets::setIconsDirectory($customDir = resource_path());
@@ -442,7 +443,7 @@ class SetsTest extends TestCase
         $this->assertEquals(null, $jsonVariables['setIconsFolder']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_provide_custom_user_icons_directory_and_sub_folder()
     {
         Sets::setIconsDirectory($customDir = base_path(), $customSubFolder = 'resources');

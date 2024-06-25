@@ -2,16 +2,16 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class WhereTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_filters_data_by_a_given_key(): void
     {
         $games = [
@@ -24,7 +24,7 @@ class WhereTest extends TestCase
         $this->assertEquals($expected, Arr::pluck($modified, 'title'));
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_workaround_for_colon_syntax()
     {
         // Before the runtime parser fixed the argument inconsistency, many

@@ -7,12 +7,13 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StaticWarmJob;
 use Tests\TestCase;
 
 class StaticWarmJobTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_sends_a_get_request()
     {
         $mock = new MockHandler([
