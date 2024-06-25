@@ -5,6 +5,7 @@ namespace Tests\Tags\Collection;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as SupportCollection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
@@ -59,7 +60,7 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->books, 'i')->set('title', 'I Hate Martin')->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_for_an_invalid_collection()
     {
         $this->makePosts();
@@ -72,7 +73,7 @@ class CollectionTest extends TestCase
         $this->collectionTag->index();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_from_multiple_collections()
     {
         $this->makePosts();
@@ -93,7 +94,7 @@ class CollectionTest extends TestCase
         $this->assertCount(6, $this->collectionTag->index());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_from_collections_using_collection_objects()
     {
         $this->makePosts();
@@ -114,7 +115,7 @@ class CollectionTest extends TestCase
         $this->assertCount(6, $this->collectionTag->index());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_from_all_collections()
     {
         $this->makePosts();
@@ -135,7 +136,7 @@ class CollectionTest extends TestCase
         $this->assertCount(9, $this->collectionTag->index());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_from_all_collections_excluding_one()
     {
         $this->makePosts();
@@ -156,7 +157,7 @@ class CollectionTest extends TestCase
         $this->assertCount(6, $this->collectionTag->index());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_from_multiple_collections_using_params()
     {
         $this->makePosts();
@@ -177,7 +178,7 @@ class CollectionTest extends TestCase
         $this->assertCount(4, $this->collectionTag->index());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_from_all_collections_using_params()
     {
         $this->makePosts();
@@ -198,7 +199,7 @@ class CollectionTest extends TestCase
         $this->assertCount(6, $this->collectionTag->index());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_from_all_collections_excluding_some_with_params()
     {
         $this->makePosts();
@@ -219,7 +220,7 @@ class CollectionTest extends TestCase
         $this->assertCount(2, $this->collectionTag->index());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_exclude_collections_using_collection_objects()
     {
         $this->makePosts();
@@ -234,7 +235,7 @@ class CollectionTest extends TestCase
         $this->assertCount(3, $this->collectionTag->index());
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_redirects()
     {
         $this->makePosts();
@@ -258,7 +259,7 @@ class CollectionTest extends TestCase
         $this->assertCount(2, $this->collectionTag->index());
     }
 
-    /** @test */
+    #[Test]
     public function it_counts_entries_in_a_collection()
     {
         $this->makePosts();
@@ -279,7 +280,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(9, $this->collectionTag->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_counts_entries_in_a_collection_with_params()
     {
         $this->makePosts();
@@ -300,7 +301,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(2, $this->collectionTag->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_previous_and_next_entries_in_a_dated_desc_collection()
     {
         $this->foods->dated(true)->save();
@@ -342,8 +343,8 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Grape', 'Hummus', 'Fig'], $this->runTagAndGetTitles('newer')); // Alias of prev when date:desc
     }
 
+    #[Test]
     /**
-     * @test
      * https://github.com/statamic/cms/issues/1831
      */
     public function it_can_get_previous_and_next_entries_in_a_dated_desc_collection_when_multiple_entries_share_the_same_date()
@@ -368,7 +369,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Banana'], $this->runTagAndGetTitles('older')); // Alias of next when date:desc
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_previous_and_next_entries_in_a_dated_asc_collection()
     {
         $this->foods->dated(true)->save();
@@ -411,9 +412,9 @@ class CollectionTest extends TestCase
     }
 
     /**
-     * @test
      * https://github.com/statamic/cms/issues/1831
      */
+    #[Test]
     public function it_can_get_previous_and_next_entries_in_a_dated_asc_collection_when_multiple_entries_share_the_same_date()
     {
         $this->foods->dated(true)->save();
@@ -436,7 +437,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Danish'], $this->runTagAndGetTitles('newer')); // Alias of next when date:asc
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_previous_and_next_entries_in_an_orderable_asc_collection()
     {
         $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
@@ -485,7 +486,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Hummus', 'Apple', 'Ice Cream'], $this->runTagAndGetTitles('previous'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_previous_and_next_entries_in_an_orderable_desc_collection()
     {
         $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
@@ -534,7 +535,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Egg', 'Grape', 'Fig'], $this->runTagAndGetTitles('previous'));
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_defaults_for_missing_items_based_on_blueprint()
     {
         $blueprint = Blueprint::make('test')->setContents(['fields' => [['handle' => 'title', 'field' => ['type' => 'text']]]]);
@@ -559,7 +560,7 @@ class CollectionTest extends TestCase
         ], $items);
     }
 
-    /** @test */
+    #[Test]
     public function when_using_the_tag_without_any_parameters_that_define_the_collection_it_will_get_the_collection_object_from_context()
     {
         $item = Facades\Collection::make();
@@ -581,7 +582,7 @@ class CollectionTest extends TestCase
         $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['collection' => 'music'])->index());
     }
 
-    /** @test */
+    #[Test]
     public function it_orders_using_the_collection_sort_direction()
     {
         $this->foods->sortField('title')->sortDirection('asc')->save();

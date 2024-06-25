@@ -3,6 +3,7 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
@@ -15,7 +16,7 @@ class DeleteEntryTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_deletes_entries()
     {
         $user = tap(User::make('test')->makeSuper())->save();
@@ -34,7 +35,7 @@ class DeleteEntryTest extends TestCase
         $this->assertEquals('two', Entry::all()->first()->slug());
     }
 
-    /** @test */
+    #[Test]
     public function entries_get_removed_from_the_structure_tree_and_child_pages_are_moved_to_the_parent()
     {
         $this->withoutExceptionHandling();
@@ -116,7 +117,7 @@ class DeleteEntryTest extends TestCase
         $this->assertNotSame($originalTree, $updatedTree);
     }
 
-    /** @test */
+    #[Test]
     public function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_parent_and_maintain_order()
     {
         // TODO: This is a reminder that the previous test needs to have the following assertion swapped in.

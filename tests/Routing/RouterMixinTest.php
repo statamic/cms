@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Routing\Router;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\Mixins\Router as RouterMixin;
 use Tests\TestCase;
@@ -22,7 +23,7 @@ class RouterMixinTest extends TestCase
         $this->router->mixin(new RouterMixin);
     }
 
-    /** @test */
+    #[Test]
     public function statamic_routes_are_registered()
     {
         $this->assertCount(0, $this->router->getRoutes()->get());

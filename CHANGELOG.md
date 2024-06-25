@@ -1,5 +1,57 @@
 # Release Notes
 
+## 5.11.0 (2024-06-24)
+
+### What's new
+- Auto stache watcher setting [#10354](https://github.com/statamic/cms/issues/10354) by @jasonvarga
+- Allow configuring the Stache's Cache Store [#10303](https://github.com/statamic/cms/issues/10303) by @riasvdv
+
+### What's fixed
+- Custom file cache store adjustments [#10362](https://github.com/statamic/cms/issues/10362) by @jasonvarga
+- Hide "Restore Revision" button when user is missing relevant permissions [#10314](https://github.com/statamic/cms/issues/10314) by @duncanmcclean
+- Remove old logic from support details command [#10360](https://github.com/statamic/cms/issues/10360) by @jasonvarga
+- Resolve some deprecatation warnings [#10346](https://github.com/statamic/cms/issues/10346) by @martinoak
+- Move test suite from metadata to attributes [#10351](https://github.com/statamic/cms/issues/10351) by @ryanmitchell
+- Hide "Rename" and "Delete" options for default filter presets [#10320](https://github.com/statamic/cms/issues/10320) by @duncanmcclean
+
+
+
+## 5.10.0 (2024-06-20)
+
+### What's new
+- Add site `attribute` method [#10327](https://github.com/statamic/cms/issues/10327) by @ajnsn
+
+### What's fixed
+- Fix performance regression by caching fieldtype configs [#10325](https://github.com/statamic/cms/issues/10325) by @jasonvarga
+- CSS improvements [#10284](https://github.com/statamic/cms/issues/10284) by @martinoak
+- Fix broken revision links on unpublished entries [#10330](https://github.com/statamic/cms/issues/10330) by @faltjo
+- Update some translations [#10343](https://github.com/statamic/cms/issues/10343) by @jasonvarga
+- Fix linking to addon fields [#10324](https://github.com/statamic/cms/issues/10324) by @edalzell
+- Fix nocache tags on shared error pages [#10340](https://github.com/statamic/cms/issues/10340) by @jacksleight
+- Migrate from vue-countable [#10287](https://github.com/statamic/cms/issues/10287) by @Cannonb4ll
+- Prevent entries being selected when collapsing/expending entries in Tree View [#10322](https://github.com/statamic/cms/issues/10322) by @duncanmcclean
+- Ensure `install:broadcasting` is run when installing into Laravel 11 application [#10335](https://github.com/statamic/cms/issues/10335) by @duncanmcclean
+- French translations [#10337](https://github.com/statamic/cms/issues/10337) by @ebeauchamps
+
+
+
+## 5.9.0 (2024-06-19)
+
+### What's new
+- Static cache response statuses [#10334](https://github.com/statamic/cms/issues/10334) by @jasonvarga
+- Allow defining a store in the cache tag [#10318](https://github.com/statamic/cms/issues/10318) by @riasvdv
+
+### What's fixed
+- Prevent logging "remote: Processed 1 references in total" Git errors [#10332](https://github.com/statamic/cms/issues/10332) by @duncanmcclean
+- Fix "Reupload Asset" action [#10333](https://github.com/statamic/cms/issues/10333) by @duncanmcclean
+- Lock pint version [#10326](https://github.com/statamic/cms/issues/10326) by @jasonvarga
+- Split fieldsets out in install eloquent command [#10310](https://github.com/statamic/cms/issues/10310) by @ryanmitchell
+- Fix using `hook` as field name [#10319](https://github.com/statamic/cms/issues/10319) by @duncanmcclean
+- Bump braces from 3.0.2 to 3.0.3 [#10315](https://github.com/statamic/cms/issues/10315) by @dependabot
+- Bump ws from 8.13.0 to 8.17.1 [#10316](https://github.com/statamic/cms/issues/10316) by @dependabot
+
+
+
 ## 5.8.0 (2024-06-17)
 
 ### What's new

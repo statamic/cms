@@ -4,12 +4,15 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Tests\Feature\GraphQL\EnablesQueries;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class ReplicatorFieldtypeTest extends TestCase
 {
     use EnablesQueries;
@@ -23,11 +26,8 @@ class ReplicatorFieldtypeTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_outputs_replicator_fields($isGrouped)
     {
         $article = Blueprint::makeFromFields([
@@ -116,7 +116,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_nested_replicator_fields()
     {
         $article = Blueprint::makeFromFields([
@@ -220,10 +220,9 @@ GQL;
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/3200
      **/
+    #[Test]
     public function it_outputs_replicator_fields_with_value_based_subfields()
     {
         // Using an `entries` field set to max_items 1, which would augment

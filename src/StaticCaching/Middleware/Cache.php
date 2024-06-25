@@ -16,6 +16,7 @@ use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
+use Statamic\StaticCaching\ResponseStatus;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\NoLock;
 use Symfony\Component\Lock\Store\FlockStore;
@@ -99,6 +100,8 @@ class Cache
             $response = $cachedPage->toResponse($request);
 
             $this->makeReplacements($response);
+
+            $response->setStaticCacheResponseStatus(ResponseStatus::HIT);
 
             return $response;
         }
