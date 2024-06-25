@@ -338,6 +338,7 @@ class FieldTest extends TestCase
             'instructions' => 'Test instructions',
             'instructions_position' => 'below',
             'listable' => 'hidden',
+            'sortable' => true,
             'visibility' => 'visible',
             'replicator_preview' => true,
             'duplicate' => true,

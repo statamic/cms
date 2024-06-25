@@ -533,6 +533,12 @@ class Field implements Arrayable
                     'type' => 'section',
                 ],
             ],
+            'sortable' => [
+                'display' => __('Sortable'),
+                'instructions' => __('statamic::messages.fields_sortable_instructions'),
+                'type' => 'toggle',
+                'default' => true,
+            ],
             'visibility' => [
                 'display' => __('Visibility'),
                 'instructions' => __('statamic::messages.fields_visibility_instructions'),
