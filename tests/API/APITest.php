@@ -71,7 +71,7 @@ class APITest extends TestCase
             'message' => 'Not found.',
         ]);
 
-        $this->get('/api/collections/pages/entries/about?draft=true')->assertJson([
+        $this->get('/api/collections/pages/entries/about?drafts=true')->assertJson([
             'data' => [
                 'id' => 'about',
             ],
