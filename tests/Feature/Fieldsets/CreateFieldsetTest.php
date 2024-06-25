@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Fieldsets;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -12,7 +13,7 @@ class CreateFieldsetTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

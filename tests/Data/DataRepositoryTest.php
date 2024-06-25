@@ -4,6 +4,8 @@ namespace Tests\Data;
 
 use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Data\DataRepository;
 use Statamic\Facades\Collection;
@@ -32,7 +34,7 @@ class DataRepositoryTest extends TestCase
         static::$functions = null;
     }
 
-    /** @test */
+    #[Test]
     public function it_splits_the_repository_and_key_if_the_repository_exists()
     {
         $this->data->setRepository('entry', new \stdClass);
@@ -40,7 +42,7 @@ class DataRepositoryTest extends TestCase
         $this->assertEquals([null, 'unknown::123'], $this->data->splitReference('unknown::123'));
     }
 
-    /** @test */
+    #[Test]
     public function it_splits_the_repository_and_key_even_if_there_are_multiple_delimiters()
     {
         $this->data->setRepository('asset', new \stdClass);
@@ -49,13 +51,13 @@ class DataRepositoryTest extends TestCase
         $this->assertEquals([null, 'unknown::main::foo/bar'], $this->data->splitReference('unknown::main::foo/bar'));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_the_key_as_is_if_theres_no_delimiter()
     {
         $this->assertEquals([null, '123'], $this->data->splitReference('123'));
     }
 
-    /** @test */
+    #[Test]
     public function it_proxies_find_to_a_repository()
     {
         $this->app->instance('FooRepository', Mockery::mock('FooRepository', function ($m) {
@@ -67,7 +69,7 @@ class DataRepositoryTest extends TestCase
         $this->assertEquals('test', $this->data->find('foo::123'));
     }
 
-    /** @test */
+    #[Test]
     public function it_bails_early_when_finding_null()
     {
         $this->app->instance('FooRepository', Mockery::mock('FooRepository', function ($m) {
@@ -79,7 +81,7 @@ class DataRepositoryTest extends TestCase
         $this->assertNull($this->data->find(null));
     }
 
-    /** @test */
+    #[Test]
     public function when_a_repository_key_isnt_provided_it_will_loop_through_repositories()
     {
         $this->mockMethodExists();
@@ -110,11 +112,8 @@ class DataRepositoryTest extends TestCase
         $this->assertEquals('test', $this->data->find('123'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider findByRequestUrlProvider
-     */
+    #[Test]
+    #[DataProvider('findByRequestUrlProvider')]
     public function it_finds_by_request_url($requestUrl, $entryId)
     {
         $this->setSites([
@@ -125,11 +124,8 @@ class DataRepositoryTest extends TestCase
         $this->findByRequestUrlTest($requestUrl, $entryId);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider findByRequestUrlNoRootSiteProvider
-     */
+    #[Test]
+    #[DataProvider('findByRequestUrlNoRootSiteProvider')]
     public function it_finds_by_request_url_with_no_root_site($requestUrl, $entryId)
     {
         $this->setSites([

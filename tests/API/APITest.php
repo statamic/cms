@@ -4,6 +4,8 @@ namespace Tests\API;
 
 use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Token;
@@ -15,7 +17,7 @@ class APITest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function not_found_responses_are_formatted_with_json()
     {
         $this
@@ -24,11 +26,8 @@ class APITest extends TestCase
             ->assertJson(['message' => 'Not found.']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider entryNotFoundProvider
-     */
+    #[Test]
+    #[DataProvider('entryNotFoundProvider')]
     public function it_handles_not_found_entries($url, $requestShouldSucceed)
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -54,7 +53,7 @@ class APITest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_unpublished_entries()
     {
         Facades\Config::set('statamic.api.resources.collections', [
@@ -84,11 +83,8 @@ class APITest extends TestCase
         return [['status:is'], ['published:is'], ['title:is']];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider exampleFiltersProvider
-     */
+    #[Test]
+    #[DataProvider('exampleFiltersProvider')]
     public function it_cannot_filter_entries_by_default($filter)
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -108,7 +104,7 @@ class APITest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_published_entries_by_default()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -125,7 +121,7 @@ class APITest extends TestCase
         $this->assertEndpointNotFound('/api/collections/pages/entries/nectar');
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_future_entries_from_future_private_collection()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -145,7 +141,7 @@ class APITest extends TestCase
         $response->assertJsonPath('data.0.id', 'c');
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_past_entries_from_past_private_collection()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -165,7 +161,7 @@ class APITest extends TestCase
         $response->assertJsonPath('data.0.id', 'a');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_collection_entries_when_configuration_allows_for_it()
     {
         Facades\Config::set('statamic.api.resources.collections.pages', [
@@ -184,7 +180,7 @@ class APITest extends TestCase
         $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=false', 2);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_published_entries_in_collection_tree_route_by_default()
     {
         Facades\Config::set('statamic.api.resources.collections.pages', [
@@ -210,7 +206,7 @@ class APITest extends TestCase
         $this->assertEndpointDataCount('/api/collections/pages/tree?filter[published:is]=false', 2);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_published_entries_on_term_entries_route_by_default()
     {
         Facades\Config::set('statamic.api.resources.taxonomies', true);
@@ -235,7 +231,7 @@ class APITest extends TestCase
         $this->assertEndpointDataCount('/api/taxonomies/topics/terms/dance/entries?filter[published:is]=false', 2);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_published_entries_in_nav_route_by_default()
     {
         Facades\Config::set('statamic.api.resources.navs', true);
@@ -258,7 +254,7 @@ class APITest extends TestCase
         $this->assertEndpointDataCount('/api/navs/footer/tree', 2);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_taxonomy_terms()
     {
         Facades\Config::set('statamic.api.resources.collections.test', [
@@ -303,7 +299,7 @@ class APITest extends TestCase
         $this->assertEquals([1], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:in]=rad,meh&filter[taxonomy:categories:in]=news'));
     }
 
-    /** @test */
+    #[Test]
     public function it_excludes_keys()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -339,7 +335,7 @@ class APITest extends TestCase
             ->assertJsonPath('data.edit_url', null);
     }
 
-    /** @test */
+    #[Test]
     public function next_prev_link_include_original_query_params()
     {
         Facades\Config::set('statamic.api.cache', false);
@@ -359,7 +355,7 @@ class APITest extends TestCase
             ->assertJsonPath('links.next', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=2');
     }
 
-    /** @test */
+    #[Test]
     public function relationships_are_shallow_augmented()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -411,11 +407,8 @@ class APITest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider userPasswordFilterProvider
-     */
+    #[Test]
+    #[DataProvider('userPasswordFilterProvider')]
     public function it_never_allows_filtering_users_by_password($filter)
     {
         Facades\Config::set('statamic.api.resources.users', [
@@ -434,7 +427,7 @@ class APITest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_replaces_entries_using_live_preview_token()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -458,7 +451,7 @@ class APITest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function live_preview_token_bypasses_entry_status_check()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -478,7 +471,7 @@ class APITest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function non_live_preview_tokens_dont_bypasses_entry_status_check()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -496,7 +489,7 @@ class APITest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_replaces_terms_using_live_preview_token()
     {
         Facades\Config::set('statamic.api.resources.taxonomies', true);
@@ -532,11 +525,8 @@ class APITest extends TestCase
         ])->mapWithKeys(fn ($filter) => [$filter => [$filter]])->all();
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider termNotFoundProvider
-     */
+    #[Test]
+    #[DataProvider('termNotFoundProvider')]
     public function it_handles_not_found_terms($url, $requestShouldSucceed)
     {
         Facades\Config::set('statamic.api.resources.taxonomies', true);

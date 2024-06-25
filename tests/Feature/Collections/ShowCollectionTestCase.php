@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Collections;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -12,7 +13,7 @@ abstract class ShowCollectionTestCase extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_the_empty_entry_listing_page_if_you_have_permission_and_there_are_no_entries()
     {
         $this->setTestRoles(['test' => ['access cp', 'view test entries']]);
@@ -26,7 +27,7 @@ abstract class ShowCollectionTestCase extends TestCase
             ->assertViewIs('statamic::collections.empty');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

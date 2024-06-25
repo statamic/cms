@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Markdown;
@@ -14,7 +15,7 @@ class MarkdownTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_augments_to_html()
     {
         $this->assertEqualsTrimmed(
@@ -23,7 +24,7 @@ class MarkdownTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_on_null_value()
     {
         $this->assertSame(
@@ -32,7 +33,7 @@ class MarkdownTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_with_smartypants()
     {
         $default = $this->fieldtype();
@@ -45,7 +46,7 @@ class MarkdownTest extends TestCase
         $this->assertEqualsTrimmed('<p>Some &quot;quoted&quot; text.</p>', $disabled->augment('Some "quoted" text.'));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_smartypants_after_html()
     {
         $md = $this->fieldtype(['smartypants' => true]);
@@ -70,7 +71,7 @@ EOT;
         $this->assertEqualsTrimmed($expected, $md->augment($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_links_automatically_when_augmenting()
     {
         $value = 'before http://example.com after';
@@ -87,7 +88,7 @@ EOT;
         $this->assertEqualsTrimmed($unreplaced, $disabled->augment($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_escape_markup_when_augmenting()
     {
         $value = 'before <div>in the div</div> after';
@@ -104,7 +105,7 @@ EOT;
         $this->assertEqualsTrimmed($unescaped, $disabled->augment($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_automatically_add_line_breaks_when_augmenting()
     {
         $value = <<<'EOT'
@@ -123,7 +124,7 @@ second line</p>
 EOT;
 
         $default = $this->fieldtype();
-        $this->assertEqualsTrimmed($withoutBreaks, $default->augment($value));
+        $this->assertEqualsTrimmed($withBreaks, $default->augment($value));
 
         $enabled = $this->fieldtype(['automatic_line_breaks' => true]);
         $this->assertEqualsTrimmed($withBreaks, $enabled->augment($value));
@@ -132,7 +133,7 @@ EOT;
         $this->assertEqualsTrimmed($withoutBreaks, $disabled->augment($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_statamic_asset_urls()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -156,12 +157,12 @@ EOT;
 
         $expected = <<<'EOT'
 <h1>Actual asset...</h1>
-<p><a href="/assets/foo/hoff.jpg">link</a>
-<img src="/assets/foo/hoff.jpg" alt="" />
+<p><a href="/assets/foo/hoff.jpg">link</a><br />
+<img src="/assets/foo/hoff.jpg" alt="" /><br />
 <img src="/assets/foo/hoff.jpg" alt="Asset" /></p>
 <h1>Non-existent asset...</h1>
-<p><a href="">link</a>
-<img src="" alt="" />
+<p><a href="">link</a><br />
+<img src="" alt="" /><br />
 <a href="">Asset Link</a></p>
 
 EOT;

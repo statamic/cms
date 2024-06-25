@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static self registerStores($stores)
  * @method static mixed stores()
  * @method static mixed store($key)
+ * @method static \Illuminate\Contracts\Cache\Store cacheStore()
  * @method static string generateId()
  * @method static self clear()
  * @method static void refresh()
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed|null buildDate()
  * @method static self disableUpdatingIndexes()
  * @method static bool shouldUpdateIndexes()
+ * @method static bool isWatcherEnabled()
  *
  * @see \Statamic\Stache\Stache
  */

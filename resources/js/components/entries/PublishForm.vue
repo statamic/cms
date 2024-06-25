@@ -11,11 +11,11 @@
                 </div>
             </h1>
 
-            <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint">
-                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint || hasItemActions">
+                <dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
                 <li class="divider" />
                 <data-list-inline-actions
-                    v-if="!isCreating"
+                    v-if="!isCreating && hasItemActions"
                     :item="values.id"
                     :url="itemActionUrl"
                     :actions="itemActions"
@@ -259,6 +259,7 @@
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"
+                :can-restore-revisions="!readOnly"
                 @closed="close"
             />
         </stack>

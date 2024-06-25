@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
@@ -38,7 +39,7 @@ EOT;
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), $results);
     }
 
-    /** @test */
+    #[Test]
     public function its_reevaluated_across_requests()
     {
         $this->withFakeViews();

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\UserGroups;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
@@ -44,7 +45,7 @@ class StoreGroupTest extends TestCase
         return tap(User::make()->assignRole('user'))->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_without_permission_to_edit_groups()
     {
         $this
@@ -54,7 +55,7 @@ class StoreGroupTest extends TestCase
             ->assertRedirect('/original');
     }
 
-    /** @test */
+    #[Test]
     public function it_stores_a_group()
     {
         $this
@@ -71,7 +72,7 @@ class StoreGroupTest extends TestCase
         $this->assertEquals([], $group->roles()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_assigns_roles_with_permission()
     {
         $this
@@ -89,7 +90,7 @@ class StoreGroupTest extends TestCase
         ], $group->roles()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_discards_roles_without_permission()
     {
         $this

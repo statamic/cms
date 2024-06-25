@@ -4,12 +4,13 @@ namespace Tests\CP;
 
 use Illuminate\Contracts\Translation\Translator;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Breadcrumbs;
 use Tests\TestCase;
 
 class BreadcrumbsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_creates_breadcrumbs()
     {
         $bc = new Breadcrumbs($array = [
@@ -22,7 +23,7 @@ class BreadcrumbsTest extends TestCase
         $this->assertEquals('Second ‹ First', $bc->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_is_arrayable()
     {
         $bc = new Breadcrumbs($array = [
@@ -35,7 +36,7 @@ class BreadcrumbsTest extends TestCase
         $this->assertSame(['breadcrumbs' => $array], $collection->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_pushes_a_crumb_into_the_title()
     {
         $translator = Mockery::mock(app(Translator::class))

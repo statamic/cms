@@ -3,6 +3,7 @@
 namespace Tests\Data;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Tests\TestCase;
 
@@ -34,14 +35,14 @@ class TracksLastModifiedTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_last_updated_at_from_file()
     {
         $this->assertFalse($this->entry->has('updated_at'));
         $this->assertEquals($this->entry->fileLastModified()->timestamp, $this->entry->lastModified()->timestamp);
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_and_gets_last_updated_with_user()
     {
         $this->assertFalse($this->entry->has('updated_at'));
@@ -55,7 +56,7 @@ class TracksLastModifiedTest extends TestCase
         $this->assertEquals('hoff@baywatch.com', $this->entry->lastModifiedBy()->email());
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_and_gets_last_updated_without_user()
     {
         $this->assertFalse($this->entry->has('updated_at'));
@@ -69,7 +70,7 @@ class TracksLastModifiedTest extends TestCase
         $this->assertNull($this->entry->lastModifiedBy());
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_and_changes_last_updated_by_user()
     {
         $this->entry->set('updated_by', $this->user->id())->save();
@@ -83,7 +84,7 @@ class TracksLastModifiedTest extends TestCase
         $this->assertEquals('casey@baywatch.com', $this->entry->lastModifiedBy()->email());
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_and_nulls_last_updated_by_user()
     {
         $this->entry->set('updated_by', $this->user->id())->save();
@@ -96,7 +97,7 @@ class TracksLastModifiedTest extends TestCase
         $this->assertNull($this->entry->lastModifiedBy());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_touch_item_similar_to_eloquent()
     {
         $this->assertFalse($this->entry->has('updated_at'));
@@ -111,7 +112,7 @@ class TracksLastModifiedTest extends TestCase
         $this->assertNull($this->entry->lastModifiedBy());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_touch_item_with_user()
     {
         $this->assertFalse($this->entry->has('updated_at'));
@@ -126,7 +127,7 @@ class TracksLastModifiedTest extends TestCase
         $this->assertEquals('hoff@baywatch.com', $this->entry->lastModifiedBy()->email());
     }
 
-    /** @test */
+    #[Test]
     public function it_will_not_update_when_config_disables_last_update_tracking()
     {
         $this->assertFalse($this->entry->has('updated_at'));
