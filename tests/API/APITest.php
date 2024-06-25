@@ -447,7 +447,7 @@ class APITest extends TestCase
     }
 
     #[Test]
-    public function non_live_preview_tokens_dont_bypasses_entry_status_check()
+    public function non_live_preview_tokens_doesnt_bypass_entry_status_check()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
         Facades\Collection::make('pages')->save();
