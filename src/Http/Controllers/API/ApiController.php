@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\ResourceAuthorizer;
-use Illuminate\Http\Request;
 use Statamic\Exceptions\ApiValidationException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
@@ -24,13 +23,9 @@ class ApiController extends Controller
      *
      * @param  mixed  $item
      */
-    protected function abortIfUnpublished(Request $request, $item)
+    protected function abortIfUnpublished($item)
     {
-        if ($request->isLivePreview()) {
-            return;
-        }
-
-        if ($request->boolean('drafts') && in_array('status', $this->allowedFilters())) {
+        if (request()->isLivePreview()) {
             return;
         }
 

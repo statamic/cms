@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
-use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Entry;
 use Statamic\Http\Resources\API\EntryResource;
@@ -34,15 +33,14 @@ class CollectionEntriesController extends ApiController
         );
     }
 
-    public function show(Request $request, $collection, $handle)
+    public function show($collection, $handle)
     {
         $this->abortIfDisabled();
 
         $entry = Entry::find($handle);
-        $this->collectionHandle = $entry?->collectionHandle();
 
         $this->abortIfInvalid($entry, $collection);
-        $this->abortIfUnpublished($request, $entry);
+        $this->abortIfUnpublished($entry);
 
         return app(EntryResource::class)::make($entry);
     }
