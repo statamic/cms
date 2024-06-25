@@ -538,10 +538,6 @@ class Field implements Arrayable
                 'instructions' => __('statamic::messages.fields_sortable_instructions'),
                 'type' => 'toggle',
                 'default' => true,
-                'if' => [
-                    'listable' => 'not hidden',
-                    'visibility' => 'not computed',
-                ],
             ],
             'visibility' => [
                 'display' => __('Visibility'),
