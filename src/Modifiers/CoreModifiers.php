@@ -271,7 +271,7 @@ class CoreModifiers extends Modifier
         }
 
         if (is_string($value)) {
-            return $value;
+            return strip_tags($value);
         }
 
         if (Arr::isAssoc($value)) {

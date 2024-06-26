@@ -85,7 +85,7 @@ class BardTextTest extends TestCase
     #[Test]
     public function it_extracts_bard_text_from_string()
     {
-        $data = 'This is a paragraph.';
+        $data = 'This <b>is a</b> paragraph.';
 
         $expected = 'This is a paragraph.';
 
