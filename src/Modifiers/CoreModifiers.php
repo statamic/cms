@@ -270,6 +270,10 @@ class CoreModifiers extends Modifier
             return '';
         }
 
+        if (is_string($value)) {
+            return $value;
+        }
+
         if (Arr::isAssoc($value)) {
             $value = [$value];
         }
