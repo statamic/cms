@@ -1,10 +1,15 @@
 <p align="center"><img src="https://statamic.com/assets/branding/Statamic-Logo+Wordmark-Rad.svg" width="400" alt="Statamic Logo" /></p>
 
+# Statamic CMS for Laravel
+
 ## About Statamic
 
 Statamic is the flat-first, Laravel + Git powered CMS designed for building beautiful, easy to manage websites.
 
-> **Note:** This repository contains the code for the core CMS package. To start your own website project with Statamic, visit the [Statamic application repository][app-repo].
+> [!NOTE]
+> This repository contains the code for the core CMS package, for installation into an existing Laravel codebase. 
+> 
+> To start your own website project from scratch with Statamic, visit the [Statamic application repository][app-repo].
 
 ## Learning Statamic
 
