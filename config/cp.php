@@ -21,7 +21,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Whether the Control Panel's authentication pages should be enabled,
-    | or if users should be redirected elsewhere.
+    | and where users should be redirected in order to authenticate.
     |
     */
 
