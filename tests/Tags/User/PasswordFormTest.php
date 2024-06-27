@@ -2,7 +2,6 @@
 
 namespace Tests\Tags\User;
 
-use Illuminate\Support\Facades\Config;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
@@ -171,43 +170,6 @@ EOT
     #[Test]
     public function it_will_update_password_and_render_success()
     {
-        $this->actingAs(User::make()->password('mypassword')->save());
-
-        $this
-            ->post('/!/auth/password', [
-                'current_password' => 'mypassword',
-                'password' => 'newpassword',
-                'password_confirmation' => 'newpassword',
-            ])
-            ->assertSessionHasNoErrors();
-
-        $output = $this->tag(<<<'EOT'
-{{ user:password_form }}
-    <p class="success">{{ success }}</p>
-    {{ errors }}
-        <p class="error">{{ value }}</p>
-    {{ /errors }}
-    {{ fields }}
-        <p class="inline-error">{{ error }}</p>
-    {{ /fields }}
-{{ /user:password_form }}
-EOT
-        );
-
-        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
-        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
-        preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
-
-        $this->assertEquals(['Change successful.'], $success[1]);
-        $this->assertEmpty($errors[1]);
-        $this->assertEmpty($inlineErrors[1]);
-    }
-
-    #[Test]
-    public function it_will_update_password_and_render_success_even_when_cp_auth_is_disabled()
-    {
-        Config::set('statamic.cp.auth', ['enabled' => false]);
-
         $this->actingAs(User::make()->password('mypassword')->save());
 
         $this

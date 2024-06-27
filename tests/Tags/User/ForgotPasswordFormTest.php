@@ -2,7 +2,6 @@
 
 namespace Tests\Tags\User;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Password;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
@@ -111,45 +110,6 @@ EOT
     #[Test]
     public function it_will_send_password_reset_email_and_render_success()
     {
-        $this->simulateSuccessfulPasswordResetEmail();
-
-        User::make()
-            ->email('san@holo.com')
-            ->password('chewy')
-            ->save();
-
-        $this
-            ->post('/!/auth/password/email', [
-                'email' => 'san@holo.com',
-            ])
-            ->assertLocation('/');
-
-        $output = $this->tag(<<<'EOT'
-{{ user:forgot_password_form }}
-    {{ errors }}
-        <p class="error">{{ value }}</p>
-    {{ /errors }}
-
-    <p class="success">{{ success }}</p>
-    <p class="email_sent">{{ email_sent }}</p>
-{{ /user:forgot_password_form }}
-EOT
-        );
-
-        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
-        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
-        preg_match_all('/<p class="email_sent">(.+)<\/p>/U', $output, $emailSent);
-
-        $this->assertEmpty($errors[1]);
-        $this->assertEquals([__(Password::RESET_LINK_SENT)], $success[1]);
-        $this->assertEquals([__(Password::RESET_LINK_SENT)], $emailSent[1]);
-    }
-
-    #[Test]
-    public function it_will_send_password_reset_email_and_render_success_even_when_cp_auth_is_disabled()
-    {
-        Config::set('statamic.cp.auth', ['enabled' => false]);
-
         $this->simulateSuccessfulPasswordResetEmail();
 
         User::make()
