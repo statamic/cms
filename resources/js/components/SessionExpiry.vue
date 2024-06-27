@@ -103,16 +103,7 @@ export default {
     watch: {
 
         count(count) {
-            let hasSessionExpired = this.remaining <= 0;
-
-            // When the user's session has expired and Statamic's auth is disabled,
-            // we'll redirect to the login page.
-            if (hasSessionExpired && ! this.auth.enabled) {
-                window.location.href = this.auth.redirect_to;
-                return;
-            }
-
-            this.isShowingLogin = hasSessionExpired;
+            this.isShowingLogin = this.auth.enabled && this.remaining <= 0;
 
             // While we're in the warning period, we'll check every second so that any
             // activity in another tab is picked up and the count will get restarted.
@@ -130,7 +121,7 @@ export default {
             }
 
             this.lastCount = Vue.moment();
-        },
+        }
 
     },
 
@@ -155,7 +146,10 @@ export default {
             return this.$axios.get(cp_url('session-timeout')).then(response => {
                 this.count = this.remaining = response.data;
             }).catch(e => {
-                if (e.response.status === 401) this.remaining = 0;
+                if (e.response.status === 401) {
+                    this.remaining = 0;
+                    if (!this.auth.enabled) window.location = this.auth.redirect_to || '/';
+                }
                 throw e;
             }).finally(response => {
                 this.pinging = false;
