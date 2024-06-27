@@ -408,9 +408,14 @@ class Field implements Arrayable
 
         $fields = $fieldtype->configFields()->addValues($this->config);
 
-        return array_merge($this->config, $fields->preProcess()->values()->all(), [
-            'component' => $fieldtype->component(),
-        ]);
+        return array_merge(
+            self::commonFieldOptions()->all()->map->defaultValue()->all(),
+            $this->config,
+            $fields->preProcess()->values()->all(),
+            [
+                'component' => $fieldtype->component(),
+            ]
+        );
     }
 
     public function meta()
@@ -477,11 +482,16 @@ class Field implements Arrayable
                 'instructions' => __('statamic::messages.fields_display_instructions'),
                 'type' => 'field_display',
             ],
+            'hide_display' => [
+                'type' => 'toggle',
+                'visibility' => 'hidden',
+            ],
             'handle' => [
                 'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
                 'type' => 'slug',
                 'from' => 'display',
+                'async' => false,
                 'separator' => '_',
                 'validate' => [
                     'required',
@@ -523,6 +533,12 @@ class Field implements Arrayable
                     'type' => 'section',
                 ],
             ],
+            'sortable' => [
+                'display' => __('Sortable'),
+                'instructions' => __('statamic::messages.fields_sortable_instructions'),
+                'type' => 'toggle',
+                'default' => true,
+            ],
             'visibility' => [
                 'display' => __('Visibility'),
                 'instructions' => __('statamic::messages.fields_visibility_instructions'),
@@ -551,6 +567,6 @@ class Field implements Arrayable
             ],
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 
-        return new Fields($fields);
+        return new ConfigFields($fields);
     }
 }

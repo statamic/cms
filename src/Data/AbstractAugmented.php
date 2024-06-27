@@ -69,7 +69,7 @@ abstract class AbstractAugmented implements Augmented
 
         if ($this->methodExistsOnThisClass($method)) {
             $value = $this->wrapAugmentedMethodInvokable($method, $handle);
-        } elseif (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
+        } elseif ($this->methodExistsOnData($handle, $method)) {
             $value = $this->wrapDataMethodInvokable($method, $handle);
         } else {
             $value = $this->wrapDeferredValue($handle);
@@ -90,9 +90,16 @@ abstract class AbstractAugmented implements Augmented
             : [];
     }
 
-    private function methodExistsOnThisClass($method)
+    private function methodExistsOnThisClass(string $method): bool
     {
         return method_exists($this, $method) && ! in_array($method, ['select', 'except']);
+    }
+
+    private function methodExistsOnData(string $handle, string $method): bool
+    {
+        return method_exists($this->data, $method)
+            && collect($this->keys())->contains(Str::snake($handle))
+            && ! in_array($handle, ['hook']);
     }
 
     protected function getFromData($handle)

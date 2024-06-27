@@ -6,6 +6,8 @@ return [
     'group_cp' => 'Panneau de contrôle',
     'access_cp' => 'Accéder au panneau de contrôle',
     'access_cp_desc' => 'Permet l’accès au panneau de contrôle, mais ne garantit pas que vous puissiez y faire quoi que ce soit une fois à l’intérieur !',
+    'configure_sites' => 'Configurer les sites',
+    'configure_sites_desc' => 'Capacité à configurer les sites quand le multisite est activé.',
     'configure_fields' => 'Configurer les champs',
     'configure_fields_desc' => 'Capacité à modifier les Blueprints, les jeux de champs et leurs champs.',
     'configure_addons' => 'Configurer les addons',

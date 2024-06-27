@@ -6,7 +6,7 @@
 
         <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true">
             <div class="-max-h-screen-px">
-            <div class="flex items-center p-6 bg-gray-200 border-b text-center">
+            <div class="flex items-center p-6 bg-gray-200 dark:bg-dark-700 border-b dark:border-dark-900 text-center">
                 {{ __('Resume Your Session') }}
             </div>
 

@@ -1,7 +1,7 @@
 <template>
 
     <div
-        class="replicator-set shadow-sm mb-4 rounded border"
+        class="replicator-set shadow-sm mb-4 rounded border dark:border-dark-900"
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
 

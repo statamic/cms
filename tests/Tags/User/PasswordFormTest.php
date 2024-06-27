@@ -3,6 +3,7 @@
 namespace Tests\Tags\User;
 
 use Illuminate\Support\Facades\Config;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
 use Tests\NormalizesHtml;
@@ -18,7 +19,7 @@ class PasswordFormTest extends TestCase
         return Parse::template($tag, []);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form()
     {
         $this->actingAs(User::make()->password('mypassword')->save());
@@ -30,7 +31,7 @@ class PasswordFormTest extends TestCase
         $this->assertStringEndsWith('</form>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_params()
     {
         $this->actingAs(User::make()->password('mypassword')->save());
@@ -42,7 +43,7 @@ class PasswordFormTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="/errors" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_redirects_to_anchor()
     {
         $this->actingAs(User::make()->password('mypassword')->save());
@@ -53,7 +54,7 @@ class PasswordFormTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_fields_array()
     {
         $this->actingAs(User::make()
@@ -81,7 +82,7 @@ EOT
         $this->assertEquals($expected, $actual[0]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_update_password_and_renders_errors()
     {
         $this->actingAs(User::make()->password('mypassword')->save());
@@ -124,7 +125,7 @@ EOT
         $this->assertEquals($expected, $inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_update_password_and_renders_errors_with_incorrect_password()
     {
         $this->actingAs(User::make()->password('mypassword')->save());
@@ -167,7 +168,7 @@ EOT
         $this->assertContains($inlineErrors[1], $expected);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_update_password_and_render_success()
     {
         $this->actingAs(User::make()->password('mypassword')->save());
@@ -202,7 +203,7 @@ EOT
         $this->assertEmpty($inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_update_password_and_render_success_even_when_cp_auth_is_disabled()
     {
         Config::set('statamic.cp.auth', ['enabled' => false]);
@@ -239,7 +240,7 @@ EOT
         $this->assertEmpty($inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_update_password_and_follow_custom_redirect_with_success()
     {
         $this->actingAs(User::make()->password('mypassword')->save());
@@ -266,7 +267,7 @@ EOT
         $this->assertEquals(['Change successful.'], $success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_update_password_and_follow_custom_redirect_with_errors()
     {
         $this->actingAs(User::make()->password('mypassword')->save());
@@ -311,7 +312,7 @@ EOT
         $this->assertContains($inlineErrors[1], $expected);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=password-successful&error_redirect=registration-failure');
@@ -328,5 +329,25 @@ EOT
 
         $this->assertStringContainsString($expectedRedirect, $output);
         $this->assertStringContainsString($expectedErrorRedirect, $output);
+    }
+
+    #[Test]
+    public function it_handles_precognitive_requests()
+    {
+        if (! method_exists($this, 'withPrecognition')) {
+            $this->markTestSkipped();
+        }
+
+        $this->actingAs(User::make()->password('mypassword')->save());
+
+        $response = $this
+            ->withPrecognition()
+            ->postJson('/!/auth/password', [
+                'current_password' => 'wrongpassword',
+                'password' => 'newpassword',
+                'password_confirmation' => 'newpassword',
+            ]);
+
+        $response->assertStatus(422);
     }
 }

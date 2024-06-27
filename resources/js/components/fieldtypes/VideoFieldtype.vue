@@ -6,7 +6,7 @@
                 <input type="text"
                     v-model="data"
                     class="input-text flex-1"
-                    :class="{ 'bg-white': !isReadOnly }"
+                    :class="{ 'bg-white dark:bg-dark-600': !isReadOnly }"
                     :id="fieldId"
                     :readonly="isReadOnly"
                     :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"

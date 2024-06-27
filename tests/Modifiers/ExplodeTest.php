@@ -2,15 +2,15 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class ExplodeTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_breaks_a_string_into_an_array_of_strings(): void
     {
         $places = 'Scotland, England, Switzerland, Italy';

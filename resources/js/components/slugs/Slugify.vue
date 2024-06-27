@@ -17,12 +17,19 @@ export default {
         enabled: {
             type: Boolean,
             default: true
+        },
+        async: {
+            type: Boolean,
+            default: true
         }
     },
 
     data() {
+        let slugifier = this.$slug.in(this.language).separatedBy(this.separator);
+        if (this.async) slugifier.async();
+
         return {
-            slugifier: this.$slug.async().in(this.language).separatedBy(this.separator),
+            slugifier,
             slug: null,
             shouldSlugify: this.enabled && !this.to
         }
@@ -74,6 +81,14 @@ export default {
         },
 
         slugify() {
+            if (! this.async) {
+                return new Promise((resolve, reject) => {
+                    const slug = this.slugifier.create(this.from);
+                    this.slug = slug;
+                    resolve(slug);
+                });
+            }
+
             return new Promise((resolve, reject) => {
                 this.$emit('slugifying');
                 this.slugifier.create(this.from).then(slug => {
