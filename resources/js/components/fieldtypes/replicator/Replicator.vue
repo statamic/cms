@@ -43,16 +43,17 @@
         <sortable-list
             :value="value"
             :vertical="true"
-            :group="groupKey"
-            :item-class="sortableItemClass"
-            :handle-class="sortableHandleClass"
+            group="replicator-fieldtype"
+            :group-validator="sortableGroupValidator"
+            item-class="replicator-sortable-item"
+            handle-class="replicator-sortable-handle"
             append-to="body"
             constrain-dimensions
-            @input="sorted($event)"
+            @sortablestop="sorted($event)"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >
-            <div slot-scope="{}" class="replicator-set-container">
+            <div slot-scope="{}" class="replicator-set-container" ref="sortable">
                 <replicator-set
                     v-for="(set, index) in value"
                     :key="set._id"
@@ -61,8 +62,8 @@
                     :meta="meta.existing[set._id]"
                     :config="setConfig(set.type)"
                     :parent-name="name"
-                    :sortable-item-class="sortableItemClass"
-                    :sortable-handle-class="sortableHandleClass"
+                    sortable-item-class="replicator-sortable-item"
+                    sortable-handle-class="replicator-sortable-handle"
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
                     :field-path-prefix="fieldPathPrefix || handle"
@@ -118,6 +119,7 @@ import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 import reduce from 'underscore/modules/reduce';
+import { closestVm } from '../../../bootstrap/globals';
 
 export default {
 
@@ -166,14 +168,6 @@ export default {
             return this.meta.groupKey;
         },
 
-        sortableItemClass() {
-            return `${this.groupKey}-sortable-item`;
-        },
-
-        sortableHandleClass() {
-            return `${this.groupKey}-sortable-handle`;
-        },
-
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
         },
@@ -201,8 +195,30 @@ export default {
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
-        sorted(value) {
-            this.update(value);
+        sorted({ oldIndex, newIndex, oldContainer, newContainer }) {
+            if (newContainer === this.$refs.sortable && oldContainer === this.$refs.sortable) {
+                // Set moved within this replicator
+                this.update(arrayMove(this.value, oldIndex, newIndex));
+            } else if (newContainer === this.$refs.sortable) {
+                // Set moved into this replicator
+                const oldVm = closestVm(oldContainer, 'replicator-fieldtype');
+                const set = oldVm.value[oldIndex];
+                const meta = oldVm.meta.existing[set._id];
+                const previews = oldVm.previews[set._id];
+                this.updateSetPreviews(set._id, previews);
+                this.updateSetMeta(set._id, meta);
+                this.update(arrayAdd(this.value, set, newIndex));
+                if (oldVm.collapsed.includes(set._id)) {
+                    this.collapseSet(set._id);
+                } else {
+                    this.expandSet(set._id);
+                }
+            } else if (oldContainer === this.$refs.sortable) {
+                // Set moved out of this replicator
+                const set = this.value[oldIndex];
+                this.removeSetMeta(set._id);
+                this.update(arrayRemove(this.value, oldIndex)); 
+            }
         },
 
         addSet(handle, index) {
@@ -290,6 +306,17 @@ export default {
 
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
+
+        sortableGroupValidator({ sourceContainer, overContainer, source }) {
+            if (overContainer !== this.$refs.sortable || sourceContainer === this.$refs.sortable) {
+                return true;
+            }
+            if (!this.canAddSet) {
+                return false;
+            }
+            return _.pluck(this.setConfigs, 'handle').includes(source.dataset.handle);
+        },
+
     },
 
     mounted() {

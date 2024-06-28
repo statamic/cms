@@ -1,23 +1,23 @@
 <script>
-import { Plugins } from '@shopify/draggable'
+import { Sortable, Plugins } from '@shopify/draggable'
 
-function add(items, item, index) {
-    return [
-        ...items.slice(0, index),
-        item,
-        ...items.slice(index, items.length)
-    ]
+const instances = {};
+function connect(id, container, options) {
+    if (!instances[id]) {
+        instances[id] = new Sortable(container, options);
+    } else {
+        instances[id].addContainer(container);
+    }
+    return instances[id];
 }
-
-function remove(items, index) {
-    return [
-        ...items.slice(0, index),
-        ...items.slice(index + 1, items.length)
-    ]
-}
-
-function move(items, oldIndex, newIndex) {
-    return add(remove(items, oldIndex), items[oldIndex], newIndex);
+function disconnect(id, container) {
+    if (instances[id]) {
+        instances[id].removeContainer(container);
+        if (instances[id].containers.length === 0) {
+            instances[id].destroy();
+            delete instances[id];
+        }
+    }
 }
 
 export default {
@@ -27,6 +27,9 @@ export default {
             required: true,
         },
         group: {
+            default: null,
+        },
+        groupValidator: {
             default: null,
         },
         itemClass: {
@@ -72,7 +75,7 @@ export default {
     data() {
         return {
             sortable: null,
-            sortableId: this.group || uniqid(),
+            instanceId: this.group || uniqid(),
         }
     },
 
@@ -130,32 +133,35 @@ export default {
 
     methods: {
         setupSortableList() {
-            this.sortable = this.$sortables.connect(this.sortableId, this.$el, this.computedOptions);
+            this.sortable = connect(this.instanceId, this.$el, this.computedOptions);
 
             this.sortable.on('drag:start', () => this.$emit('dragstart'));
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
-            this.sortable.on('sortable:stop', ({ newContainer, oldContainer, oldIndex, newIndex }) => {
-                if (newContainer === this.$el && oldContainer === this.$el) {
-                    this.$emit('input', move(this.value, oldIndex, newIndex));
-                } else if (newContainer === this.$el) {
-                    this.$emit('input', add(this.value, oldContainer.__vue__.value[oldIndex], newIndex));
-                } else if (oldContainer === this.$el) {
-                    this.$emit('input', remove(this.value, oldIndex));
-                }
+            this.sortable.on('sortable:stop', (event) => {
+                this.$emit('input', arrayMove(this.value, event.oldIndex, event.newIndex));
+                this.$emit('sortablestop', event);
             })
 
             this.$on('hook:destroyed', () => {
-                this.sortable.destroy()
+                this.destroySortableList();
             })
 
             if (this.mirror === false) {
                 this.sortable.on('mirror:create', (e) => e.cancel());
             }
+
+            if (this.group && this.groupValidator) {
+                this.sortable.on('sortable:sort', (event) => {
+                    if (!this.groupValidator(event.dragEvent)) {
+                        event.cancel();
+                    }
+                });
+            }
         },
 
         destroySortableList() {
-            this.$sortables.disconnect(this.sortableId, this.$el, this.computedOptions);
+            disconnect(this.instanceId, this.$el);
         },
     },
 

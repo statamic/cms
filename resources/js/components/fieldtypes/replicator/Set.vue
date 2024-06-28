@@ -1,6 +1,6 @@
 <template>
 
-    <div :class="sortableItemClass">
+    <div :class="sortableItemClass" :data-handle="config.handle">
         <slot name="picker" />
         <div class="replicator-set" :class="{ 'has-error': this.hasError }">
 

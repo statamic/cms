@@ -138,3 +138,22 @@ export function str_slug(string) {
 export function snake_case(string) {
     return Statamic.$slug.separatedBy('_').create(string);
 }
+
+export function arrayAdd(items, item, index) {
+    return [
+        ...items.slice(0, index),
+        item,
+        ...items.slice(index, items.length)
+    ]
+}
+
+export function arrayRemove(items, index) {
+    return [
+        ...items.slice(0, index),
+        ...items.slice(index + 1, items.length)
+    ]
+}
+
+export function arrayMove(items, oldIndex, newIndex) {
+    return arrayAdd(arrayRemove(items, oldIndex), items[oldIndex], newIndex);
+}
