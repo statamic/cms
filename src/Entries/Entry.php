@@ -813,10 +813,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             $localization->afterSave($callback);
         }
 
-        if ($this->collection()->dated()) {
-            $localization->date($this->date());
-        }
-
         return $localization;
     }
 
