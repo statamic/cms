@@ -335,8 +335,6 @@ export default {
                 return true;
             }
 
-            console.log(this.setConfigHashes);
-
             // Set dragged into this replicator
             return this.canAddSet && Object.values(this.setConfigHashes).includes(source.dataset.configHash);
         },
