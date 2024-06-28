@@ -1,5 +1,22 @@
 # Release Notes
 
+## 5.12.0 (2024-06-28)
+
+### What's new
+- Ability to disable CP authentication [#8960](https://github.com/statamic/cms/issues/8960) by @duncanmcclean
+- Add UI for listing field sortable config [#10259](https://github.com/statamic/cms/issues/10259) by @ryanmitchell
+
+### What's fixed
+- Localized entry dates fall back to the origin [#10282](https://github.com/statamic/cms/issues/10282) by @arthurperton
+- Support strings in `bard_text` & `bard_html` modifiers [#10369](https://github.com/statamic/cms/issues/10369) by @edalzell
+- Allow accessing drafts via the REST API with Live Preview [#10229](https://github.com/statamic/cms/issues/10229) by @duncanmcclean
+- Make Asset::clearCaches protected [#10342](https://github.com/statamic/cms/issues/10342) by @ryanmitchell
+- Fix HTML fieldtype [#10364](https://github.com/statamic/cms/issues/10364) by @jacksleight
+- French translations [#10366](https://github.com/statamic/cms/issues/10366) by @ebeauchamps
+- Clarify Statamic repository differences in README [#10368](https://github.com/statamic/cms/issues/10368) by @steveparks
+
+
+
 ## 5.11.0 (2024-06-24)
 
 ### What's new
