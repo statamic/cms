@@ -119,12 +119,13 @@ class Replicator extends Fieldtype
 
     public function fields($set, $index = -1)
     {
-        $configHash = $this->configHash();
-        $fieldsHash = md5($this->field->fieldPathPrefix().'.'.$index);
+        $setConfig = Arr::get($this->flattenedSetsConfig(), $set);
+        $setConfigHash = $setConfig['hash'];
+        $itemHash = md5($this->field->fieldPathPrefix().'.'.$index);
 
-        return Blink::once('replicator-'.$configHash.'-'.$fieldsHash, function () use ($set, $index) {
+        return Blink::once('replicator-'.$setConfigHash.'-'.$itemHash, function () use ($setConfig, $index) {
             return new Fields(
-                Arr::get($this->flattenedSetsConfig(), "$set.fields"),
+                $setConfig['fields'],
                 $this->field()->parent(),
                 $this->field(),
                 $index
@@ -342,8 +343,8 @@ class Replicator extends Fieldtype
 
     protected function configHash()
     {
-        return Blink::once('replicator-'.spl_object_id($this->field).'-hash', function () {
-            return md5($this->field->handle().json_encode($this->field->config()));
-        });
+        // return Blink::once('replicator-'.spl_object_id($this->field).'-hash', function () {
+        return md5($this->field->handle().json_encode($this->field->config()));
+        // });
     }
 }
