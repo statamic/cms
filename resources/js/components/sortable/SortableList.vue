@@ -2,23 +2,6 @@
 import { Sortable, Plugins } from '@shopify/draggable'
 
 const instances = {};
-function connect(id, container, options) {
-    if (!instances[id]) {
-        instances[id] = new Sortable(container, options);
-    } else {
-        instances[id].addContainer(container);
-    }
-    return instances[id];
-}
-function disconnect(id, container) {
-    if (instances[id]) {
-        instances[id].removeContainer(container);
-        if (instances[id].containers.length === 0) {
-            instances[id].destroy();
-            delete instances[id];
-        }
-    }
-}
 
 export default {
 
@@ -132,15 +115,16 @@ export default {
     },
 
     methods: {
+
         setupSortableList() {
-            this.sortable = connect(this.instanceId, this.$el, this.computedOptions);
+            this.sortable = this.connectInstace(this.instanceId, this.$el, this.computedOptions);
 
             this.sortable.on('drag:start', () => this.$emit('dragstart'));
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
             this.sortable.on('sortable:stop', (event) => {
-                this.$emit('input', arrayMove(this.value, event.oldIndex, event.newIndex));
                 this.$emit('sortablestop', event);
+                this.$emit('input', arrayMove(this.value, event.oldIndex, event.newIndex));
             })
 
             this.$on('hook:destroyed', () => {
@@ -153,7 +137,7 @@ export default {
 
             if (this.group && this.groupValidator) {
                 this.sortable.on('sortable:sort', (event) => {
-                    if (!this.groupValidator(event.dragEvent)) {
+                    if (!this.groupValidator(event)) {
                         event.cancel();
                     }
                 });
@@ -161,8 +145,28 @@ export default {
         },
 
         destroySortableList() {
-            disconnect(this.instanceId, this.$el);
+            this.disconnectInstace(this.instanceId, this.$el);
         },
+
+        connectInstace(id, container, options) {
+            if (!instances[id]) {
+                instances[id] = new Sortable(container, options);
+            } else {
+                instances[id].addContainer(container);
+            }
+            return instances[id];
+        },
+
+        disconnectInstace(id, container) {
+            if (instances[id]) {
+                instances[id].removeContainer(container);
+                if (instances[id].containers.length === 0) {
+                    instances[id].destroy();
+                    delete instances[id];
+                }
+            }
+        },
+
     },
 
     watch: {

@@ -307,8 +307,10 @@ export default {
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
 
-        sortableGroupValidator({ sourceContainer, overContainer, source }) {
+        sortableGroupValidator({ dragEvent }) {
+            const { sourceContainer, overContainer, source } = dragEvent;
             if (overContainer !== this.$refs.sortable || sourceContainer === this.$refs.sortable) {
+                // Set dragged over another replicator or within this replicator
                 return true;
             }
             if (!this.canAddSet) {
