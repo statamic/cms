@@ -15,7 +15,18 @@ return [
     |
     */
 
-    'watcher' => env('STATAMIC_STACHE_WATCHER', true),
+    'watcher' => env('STATAMIC_STACHE_WATCHER', 'auto'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Store
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure which Cache Store the Stache uses.
+    |
+    */
+
+    'cache_store' => null,
 
     /*
     |--------------------------------------------------------------------------

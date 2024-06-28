@@ -270,6 +270,10 @@ class CoreModifiers extends Modifier
             return '';
         }
 
+        if (is_string($value)) {
+            return strip_tags($value);
+        }
+
         if (Arr::isAssoc($value)) {
             $value = [$value];
         }
@@ -296,6 +300,11 @@ class CoreModifiers extends Modifier
         if ($value instanceof Value) {
             $value = $value->raw();
         }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
         if (Arr::isAssoc($value)) {
             $value = [$value];
         }

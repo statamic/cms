@@ -37,6 +37,7 @@ class CacheServiceProvider extends ServiceProvider
     private function extendFileStore()
     {
         $this->app->booting(function () {
+            /** @deprecated */
             Cache::extend('statamic', function () {
                 return Cache::repository(new FileStore(
                     $this->app['files'],
@@ -45,10 +46,13 @@ class CacheServiceProvider extends ServiceProvider
                 ), $this->app['config']['cache.stores.file']);
             });
 
-            if (config('cache.default') === 'file') {
-                config(['cache.stores.statamic' => ['driver' => 'statamic']]);
-                config(['cache.default' => 'statamic']);
-            }
+            Cache::extend('file', function ($app, $config) {
+                return Cache::repository(
+                    (new FileStore($app['files'], $config['path'], $config['permission'] ?? null))
+                        ->setLockDirectory($config['lock_path'] ?? null),
+                    $config
+                );
+            });
         });
     }
 

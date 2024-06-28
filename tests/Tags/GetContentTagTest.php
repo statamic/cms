@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Collection;
@@ -29,19 +30,19 @@ class GetContentTagTest extends TestCase
         $this->two = EntryFactory::id('456')->collection('blog')->slug('second')->data(['title' => 'Second'])->create();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_single_item_by_id()
     {
         $this->assertParseEquals('First', '{{ get_content from="123" }}{{ title }}{{ /get_content }}');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_single_item_by_uri()
     {
         $this->assertParseEquals('First', '{{ get_content from="/blog/first" }}{{ title }}{{ /get_content }}');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_single_item_by_variable()
     {
         $this->assertParseEquals(
@@ -51,7 +52,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_items_by_pipe_delimited_ids()
     {
         $this->assertParseEquals(
@@ -60,7 +61,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_items_by_pipe_delimited_uris()
     {
         $this->assertParseEquals(
@@ -69,7 +70,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_items_by_variable_containing_ids()
     {
         $this->assertParseEquals(
@@ -79,7 +80,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_items_by_variable_containing_uris()
     {
         $this->assertParseEquals(
@@ -89,7 +90,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_single_item_using_shorthand()
     {
         $this->assertParseEquals(
@@ -99,7 +100,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_items_by_pipe_delimited_ids_using_shorthand()
     {
         $this->assertParseEquals(
@@ -109,7 +110,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_items_by_pipe_delimited_uris_using_shorthand()
     {
         $this->assertParseEquals(
@@ -119,7 +120,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_items_by_variable_containing_ids_using_shorthand()
     {
         $this->assertParseEquals(
@@ -129,7 +130,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_items_by_variable_containing_uris_using_shorthand()
     {
         $this->assertParseEquals(
@@ -139,7 +140,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_the_entries_if_theyre_already_entries()
     {
         $this->assertParseEquals(
@@ -149,7 +150,7 @@ class GetContentTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_the_entries_if_theyre_already_entries_using_shorthand()
     {
         $this->assertParseEquals(

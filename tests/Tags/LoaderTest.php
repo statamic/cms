@@ -2,13 +2,14 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Tests\Fixtures\Addon\Tags\TestTags;
 use Tests\TestCase;
 
 class LoaderTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function loading_a_tag_will_run_the_init_hook()
     {
         TestTags::register();
