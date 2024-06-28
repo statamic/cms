@@ -1048,6 +1048,28 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_falls_back_to_the_origin_for_the_date()
+    {
+        Collection::make('dated')->dated(true)->save();
+
+        $origin = tap((new Entry)->collection('dated')->id('origin')->date('2024-06-10'))->save();
+        $descendant = tap((new Entry)->collection('dated')->id('descendant')->origin($origin))->save();
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d', '2024-06-10')->startOfDay()->eq($descendant->date()));
+
+        $origin->date('2024-06-11')->save();
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d', '2024-06-11')->startOfDay()->eq($descendant->date()));
+
+        $descendant->date('2024-06-12')->save();
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d', '2024-06-12')->startOfDay()->eq($descendant->date()));
+
+        $origin->date('2024-06-13')->save();
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d', '2024-06-12')->startOfDay()->eq($descendant->date()));
+
+        $descendant->date(null)->save();
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d', '2024-06-13')->startOfDay()->eq($descendant->date()));
+    }
+
+    #[Test]
     public function it_gets_the_order_from_the_collections_structure()
     {
         $collection = tap(Collection::make('ordered'))->save();
