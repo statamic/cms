@@ -12,7 +12,7 @@ export default {
         group: {
             default: null,
         },
-        groupValidator: {
+        groupDroppable: {
             default: null,
         },
         itemClass: {
@@ -123,9 +123,28 @@ export default {
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
             this.sortable.on('sortable:stop', (event) => {
+                const { oldIndex, newIndex, oldContainer, newContainer } = event;
+                if (oldContainer !== this.$el && newContainer !== this.$el) {
+                    // Event doesn't concern this list
+                    return;                    
+                }
                 this.$emit('sortablestop', event);
-                this.$emit('input', arrayMove(this.value, event.oldIndex, event.newIndex));
+                this.$emit('input', arrayMove(this.value, oldIndex, newIndex));
             })
+
+            if (this.group && this.groupDroppable) {
+                this.sortable.on('sortable:sort', (event) => {
+                    const { dragEvent } = event;
+                    const { sourceContainer, overContainer, source } = dragEvent;
+                    if (sourceContainer !== this.$el && overContainer !== this.$el) {
+                        // Event doesn't concern this list
+                        return;                    
+                    }
+                    if (!this.groupDroppable(event)) {
+                        event.cancel();
+                    }
+                });
+            }
 
             this.$on('hook:destroyed', () => {
                 this.destroySortableList();
@@ -133,14 +152,6 @@ export default {
 
             if (this.mirror === false) {
                 this.sortable.on('mirror:create', (e) => e.cancel());
-            }
-
-            if (this.group && this.groupValidator) {
-                this.sortable.on('sortable:sort', (event) => {
-                    if (!this.groupValidator(event)) {
-                        event.cancel();
-                    }
-                });
             }
         },
 

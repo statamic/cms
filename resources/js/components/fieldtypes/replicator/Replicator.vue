@@ -44,7 +44,7 @@
             :value="value"
             :vertical="true"
             group="replicator-fieldtype"
-            :group-validator="sortableGroupValidator"
+            :group-droppable="sortableGroupDroppable"
             item-class="replicator-sortable-item"
             handle-class="replicator-sortable-handle"
             append-to="body"
@@ -196,29 +196,39 @@ export default {
         },
 
         sorted({ oldIndex, newIndex, oldContainer, newContainer }) {
+            // Set moved within this replicator
             if (newContainer === this.$refs.sortable && oldContainer === this.$refs.sortable) {
-                // Set moved within this replicator
                 this.update(arrayMove(this.value, oldIndex, newIndex));
-            } else if (newContainer === this.$refs.sortable) {
-                // Set moved into this replicator
-                const oldVm = closestVm(oldContainer, 'replicator-fieldtype');
-                const set = oldVm.value[oldIndex];
-                const meta = oldVm.meta.existing[set._id];
-                const previews = oldVm.previews[set._id];
-                this.updateSetPreviews(set._id, previews);
-                this.updateSetMeta(set._id, meta);
-                this.update(arrayAdd(this.value, set, newIndex));
-                if (oldVm.collapsed.includes(set._id)) {
-                    this.collapseSet(set._id);
-                } else {
-                    this.expandSet(set._id);
-                }
-            } else if (oldContainer === this.$refs.sortable) {
-                // Set moved out of this replicator
-                const set = this.value[oldIndex];
-                this.removeSetMeta(set._id);
-                this.update(arrayRemove(this.value, oldIndex)); 
+                return;
             }
+
+            // Set moved out of this replicator
+            if (oldContainer === this.$refs.sortable) {
+                // We'll deal with updating this replicator from the target replicator (see below), as we need to
+                // control the order of operations to avoid race conditions with nested replicators both trying to
+                // update their parent's value at the same time.
+                return;
+            }
+
+            // Set moved into this replicator
+            const oldVm = closestVm(oldContainer, 'replicator-fieldtype');
+            const set = oldVm.value[oldIndex];
+            const meta = oldVm.meta.existing[set._id];
+            const previews = oldVm.previews[set._id];
+            this.updateSetPreviews(set._id, previews);
+            this.updateSetMeta(set._id, meta);
+            this.update(arrayAdd(this.value, set, newIndex));
+            if (oldVm.collapsed.includes(set._id)) {
+                this.collapseSet(set._id);
+            } else {
+                this.expandSet(set._id);
+            }
+
+            // Remove the set from the old replicator
+            this.$nextTick(() => {
+                oldVm.removeSetMeta(set._id);
+                oldVm.update(arrayRemove(oldVm.value, oldIndex)); 
+            });
         },
 
         addSet(handle, index) {
@@ -307,16 +317,21 @@ export default {
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
 
-        sortableGroupValidator({ dragEvent }) {
+        sortableGroupDroppable({ dragEvent }) {
             const { sourceContainer, overContainer, source } = dragEvent;
-            if (overContainer !== this.$refs.sortable || sourceContainer === this.$refs.sortable) {
-                // Set dragged over another replicator or within this replicator
+
+            // Set dragged within this replicator
+            if (overContainer === this.$refs.sortable && sourceContainer === this.$refs.sortable) {
                 return true;
             }
-            if (!this.canAddSet) {
-                return false;
+
+            // Set dragged out of this replicator
+            if (sourceContainer === this.$refs.sortable) {
+                return true;
             }
-            return _.pluck(this.setConfigs, 'handle').includes(source.dataset.handle);
+
+            // Set dragged into this replicator
+            return this.canAddSet && _.pluck(this.setConfigs, 'handle').includes(source.dataset.handle);
         },
 
     },
