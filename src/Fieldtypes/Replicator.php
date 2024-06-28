@@ -119,12 +119,12 @@ class Replicator extends Fieldtype
 
     public function fields($set, $index = -1)
     {
-        $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
-        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config));
+        $configHash = $this->configHash();
+        $fieldsHash = md5($this->field->fieldPathPrefix().'.'.$index);
 
-        return Blink::once($hash, function () use ($config, $index) {
+        return Blink::once('replicator-'.$configHash.'-'.$fieldsHash, function () use ($set, $index) {
             return new Fields(
-                $config,
+                Arr::get($this->flattenedSetsConfig(), "$set.fields"),
                 $this->field()->parent(),
                 $this->field(),
                 $index
@@ -209,13 +209,13 @@ class Replicator extends Fieldtype
 
     public function preload()
     {
+        $configHash = $this->configHash();
+
         $existing = collect($this->field->value())->mapWithKeys(function ($set, $index) {
             return [$set['_id'] => $this->fields($set['type'], $index)->addValues($set)->meta()->put('_', '_')];
         })->toArray();
 
-        $blink = md5(json_encode($this->flattenedSetsConfig()));
-
-        $defaults = Blink::once($blink.'-defaults', function () {
+        $defaults = Blink::once('replicator-'.$configHash.'-defaults', function () {
             return collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
                 return $this->fields($handle)->all()->map(function ($field) {
                     return $field->fieldtype()->preProcess($field->defaultValue());
@@ -223,7 +223,7 @@ class Replicator extends Fieldtype
             })->all();
         });
 
-        $new = Blink::once($blink.'-new', function () use ($defaults) {
+        $new = Blink::once('replicator-'.$configHash.'-new', function () use ($defaults) {
             return collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
                 return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
             })->toArray();
@@ -241,15 +241,17 @@ class Replicator extends Fieldtype
             'defaults' => $defaults,
             'collapsed' => [],
             'previews' => $previews,
-            'groupKey' => $this->groupKey(),
+            'setConfigHashes' => $this->flattenedSetsConfig()
+                ->map(fn ($set) => $set['hash'])
+                ->all(),
         ];
     }
 
     public function flattenedSetsConfig()
     {
-        $blink = md5($this->field?->handle().json_encode($this->field?->config()));
+        $configHash = $this->configHash();
 
-        return Blink::once($blink, function () {
+        return Blink::once('replicator-'.$configHash.'-sets', function () {
             $sets = collect($this->config('sets'));
 
             // If the first set doesn't have a nested "set" key, it would be the legacy format.
@@ -263,9 +265,16 @@ class Replicator extends Fieldtype
                 ]);
             }
 
-            return $sets->flatMap(function ($section) {
-                return $section['sets'];
-            });
+            return $sets
+                ->flatMap(function ($section) {
+                    return $section['sets'];
+                })
+                ->map(function ($set) {
+                    return [
+                        ...$set,
+                        'hash' => md5(json_encode($set)),
+                    ];
+                });
         });
     }
 
@@ -331,9 +340,10 @@ class Replicator extends Fieldtype
         return empty($value) ? null : $value;
     }
 
-    protected function groupKey()
+    protected function configHash()
     {
-        // @todo This should be refactored into a list of allowed set config hashes, if possible.
-        return md5(serialize($this->field->config('sets')));
+        return Blink::once('replicator-'.spl_object_id($this->field).'-hash', function () {
+            return md5($this->field->handle().json_encode($this->field->config()));
+        });
     }
 }

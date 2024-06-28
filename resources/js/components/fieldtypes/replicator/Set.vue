@@ -1,6 +1,6 @@
 <template>
 
-    <div :class="sortableItemClass" :data-handle="config.handle">
+    <div :class="sortableItemClass" :data-config-hash="configHash">
         <slot name="picker" />
         <div class="replicator-set" :class="{ 'has-error': this.hasError }">
 
@@ -89,6 +89,10 @@ export default {
     props: {
         config: {
             type: Object,
+            required: true
+        },
+        configHash: {
+            type: String,
             required: true
         },
         meta: {

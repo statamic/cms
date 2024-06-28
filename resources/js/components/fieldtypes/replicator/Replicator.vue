@@ -61,6 +61,7 @@
                     :values="set"
                     :meta="meta.existing[set._id]"
                     :config="setConfig(set.type)"
+                    :config-hash="setConfigHash(set.type)"
                     :parent-name="name"
                     sortable-item-class="replicator-sortable-item"
                     sortable-handle-class="replicator-sortable-handle"
@@ -160,12 +161,12 @@ export default {
             }, []);
         },
 
-        groupConfigs() {
-            return this.config.sets;
+        setConfigHashes() {
+            return this.meta.setConfigHashes;
         },
 
-        groupKey() {
-            return this.meta.groupKey;
+        groupConfigs() {
+            return this.config.sets;
         },
 
         storeState() {
@@ -183,6 +184,10 @@ export default {
 
         setConfig(handle) {
             return _.find(this.setConfigs, { handle }) || {};
+        },
+
+        setConfigHash(handle) {
+            return this.setConfigHashes[handle];
         },
 
         updated(index, set) {
@@ -330,8 +335,10 @@ export default {
                 return true;
             }
 
+            console.log(this.setConfigHashes);
+
             // Set dragged into this replicator
-            return this.canAddSet && _.pluck(this.setConfigs, 'handle').includes(source.dataset.handle);
+            return this.canAddSet && Object.values(this.setConfigHashes).includes(source.dataset.configHash);
         },
 
     },
