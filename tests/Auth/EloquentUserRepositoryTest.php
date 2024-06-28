@@ -2,10 +2,12 @@
 
 namespace Tests\Auth;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\TestCase;
 
-/** @group user-repo */
+#[Group('user-repo')]
 class EloquentUserRepositoryTest extends TestCase
 {
     use UserRepositoryTests;
@@ -52,7 +54,7 @@ class EloquentUserRepositoryTest extends TestCase
         return FakeEloquentUser::class;
     }
 
-    /** @test */
+    #[Test]
     public function it_normalizes_to_statamic_user_from_model()
     {
         $user = User::make()->email('foo@bar.com')->data(['name' => 'foo', 'password' => 'foo']);

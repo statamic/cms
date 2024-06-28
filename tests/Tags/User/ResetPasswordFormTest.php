@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\User;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -15,7 +16,7 @@ class ResetPasswordFormTest extends TestCase
         return Parse::template($tag, []);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form()
     {
         $output = $this->tag('{{ user:reset_password_form }}{{ /user:reset_password_form }}');

@@ -4,6 +4,8 @@ namespace Tests\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Blueprint;
@@ -12,12 +14,12 @@ use Statamic\GraphQL\Types\AssetType;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class AssetInterfaceTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_adds_types()
     {
         GraphQL::spy();

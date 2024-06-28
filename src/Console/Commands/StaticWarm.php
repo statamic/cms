@@ -16,6 +16,7 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
 use Statamic\Entries\Entry;
 use Statamic\Facades;
+use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
@@ -168,6 +169,8 @@ class StaticWarm extends Command
             ->merge($this->additionalUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
+                Site::resolveCurrentUrlUsing(fn () => $uri);
+
                 return $cacher->isExcluded($uri);
             })
             ->sort()
@@ -216,7 +219,7 @@ class StaticWarm extends Command
                 return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
                     // Needed because Taxonomy uses the current site. If the Taxonomy
                     // class ever gets its own localization logic we can remove this.
-                    Facades\Site::setCurrent($site);
+                    Site::setCurrent($site);
 
                     return $taxonomy->absoluteUrl();
                 });

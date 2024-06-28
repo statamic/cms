@@ -2,15 +2,15 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class DlTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_turns_an_yaml_key_value_mapping_into_html_definition_list(): void
     {
         $input = [
@@ -29,7 +29,7 @@ class DlTest extends TestCase
         $this->assertEquals($expected, $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_turns_an_empty_yaml_key_value_mapping_into_html_definition_list(): void
     {
         $input = [];

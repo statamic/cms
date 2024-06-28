@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class Md5Test extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_creates_an_md5_hash_from_value(): void
     {
         $modified = $this->modify('hello');

@@ -1,6 +1,6 @@
 <template>
-    <div class="shadow-inner bg-gray-300">
-        <div class="flex items-center flex-wrap px-3 border-b pt-2">
+    <div class="shadow-inner bg-gray-300 dark:bg-dark-600">
+        <div class="flex items-center flex-wrap px-3 border-b dark:border-dark-900 pt-2">
 
             <!-- Field filter (requires custom selection UI) -->
             <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">

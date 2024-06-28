@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Parser;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Antlers\ParserTestCase;
 
 class StringsTest extends ParserTestCase

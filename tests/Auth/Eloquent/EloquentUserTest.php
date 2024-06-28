@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
@@ -66,7 +67,7 @@ class EloquentUserTest extends TestCase
         parent::tearDownAfterClass();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_roles_already_in_the_db_without_explicitly_assigning_them()
     {
         $roleA = new class extends Role
@@ -149,7 +150,7 @@ class EloquentUserTest extends TestCase
         $this->assertSame([$user->email(), $userTwo->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereRoleIn(['a', 'b'])->orWhereRoleIn(['c'])->get()->map->email()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_groups_already_in_the_db_without_explicitly_assigning_them()
     {
         $roleA = new class extends UserGroup
@@ -271,7 +272,7 @@ class EloquentUserTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_timestamps_property_from_the_model()
     {
         $user = $this->user();
@@ -283,7 +284,7 @@ class EloquentUserTest extends TestCase
         $this->assertFalse($user->timestamps);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_super_correctly_on_the_model()
     {
         $user = $this->makeUser();

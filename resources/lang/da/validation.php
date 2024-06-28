@@ -17,7 +17,7 @@ return [
     'between.array' => 'Skal have mellem :min og :max værdier.',
     'boolean' => 'Skal være sandt eller falsk.',
     'confirmed' => 'Bekræftelsen stemmer ikke overens.',
-    'current_password' => 'Das Passwort ist falsch.',
+    'current_password' => 'Kodeordet er forkert.',
     'date' => 'Ikke en gyldig dato.',
     'date_format' => 'Matcher ikke formatet :format .',
     'different' => 'Dette felt og :other skal være anderledes.',

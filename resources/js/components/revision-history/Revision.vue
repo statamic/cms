@@ -14,7 +14,7 @@
 
             <div class="revision-item-content w-full flex">
                 <div class="flex-1">
-                    <div class="revision-author text-gray-700 text-2xs">
+                    <div class="revision-author text-gray-700 dark:text-dark-150 text-2xs">
                         <template v-if="revision.user">{{ revision.user.name || revision.user.email }} &ndash;</template>
                         {{ date.toDate().toLocaleTimeString($config.get('locale').replace('_', '-'), { hour: 'numeric', minute: '2-digit' }) }}
                     </div>
@@ -33,6 +33,7 @@
                 >
                     <template slot="action-buttons-right">
                         <restore-revision
+                            v-if="canRestoreRevisions"
                             :revision="revision"
                             :url="restoreUrl"
                             :reference="reference"
@@ -60,6 +61,7 @@ export default {
         revision: Object,
         restoreUrl: String,
         reference: String,
+        canRestoreRevisions: Boolean,
     },
 
     data() {

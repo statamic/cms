@@ -5,6 +5,7 @@ namespace Tests\Data\Taxonomies;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Event;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
 use Statamic\Events\TermCreating;
@@ -24,7 +25,7 @@ class TermTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_the_blueprint_when_defined_on_itself()
     {
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
@@ -38,7 +39,7 @@ class TermTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_blueprint_when_defined_in_a_value()
     {
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
@@ -52,7 +53,7 @@ class TermTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_default_taxonomy_blueprint_when_undefined()
     {
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
@@ -66,7 +67,7 @@ class TermTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function the_blueprint_is_blinked_when_getting_and_flushed_when_setting()
     {
         $term = (new Term)->taxonomy('tags');
@@ -84,7 +85,7 @@ class TermTest extends TestCase
         $this->assertEquals('the new blueprint', $term->blueprint());
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_an_event_when_getting_blueprint()
     {
         Event::fake();
@@ -106,7 +107,7 @@ class TermTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_entry_count_through_the_repository()
     {
         $term = (new Term)->taxonomy('tags')->slug('foo');
@@ -119,7 +120,7 @@ class TermTest extends TestCase
         $this->assertEquals(7, $term->entriesCount());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_through_the_api()
     {
         Event::fake();
@@ -148,7 +149,7 @@ class TermTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_term_created_only_once()
     {
         Event::fake();
@@ -167,7 +168,7 @@ class TermTest extends TestCase
         Event::assertDispatched(TermCreated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_quietly()
     {
         Event::fake();
@@ -185,7 +186,7 @@ class TermTest extends TestCase
         Event::assertNotDispatched(TermCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_creating_event_returns_false_the_term_doesnt_save()
     {
         Event::fake([TermCreated::class]);
@@ -204,7 +205,7 @@ class TermTest extends TestCase
         Event::assertNotDispatched(TermCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_saving_event_returns_false_the_term_doesnt_save()
     {
         Event::fake([TermSaved::class]);
@@ -266,7 +267,7 @@ class TermTest extends TestCase
         ], $term->fileData());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_preview_targets()
     {
         $this->setSites([
@@ -316,7 +317,7 @@ class TermTest extends TestCase
         ], $termDe->previewTargets()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_routes()
     {
         $this->setSites([
@@ -350,7 +351,7 @@ class TermTest extends TestCase
         $this->assertEquals('/das-blog/{slug}', $termDe->route());
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_dirty_state()
     {
         tap(Taxonomy::make('tags')->sites(['en', 'fr']))->save();
@@ -394,7 +395,7 @@ class TermTest extends TestCase
         $this->assertFalse($term->isClean(['title', 'food']));
     }
 
-    /** @test */
+    #[Test]
     public function it_syncs_original_at_the_right_time()
     {
         $eventsHandled = 0;
@@ -426,7 +427,7 @@ class TermTest extends TestCase
         $this->assertEquals(4, $eventsHandled);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_layout()
     {
         $taxonomy = tap(Taxonomy::make('tags'))->save();
@@ -445,7 +446,7 @@ class TermTest extends TestCase
         $this->assertEquals('baz', $term->layout());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_template()
     {
         $taxonomy = tap(Taxonomy::make('tags'))->save();
@@ -464,7 +465,7 @@ class TermTest extends TestCase
         $this->assertEquals('baz', $term->template());
     }
 
-    /** @test */
+    #[Test]
     public function it_fires_a_deleting_event()
     {
         Event::fake();
@@ -479,7 +480,7 @@ class TermTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         Facades\Term::spy();
@@ -499,7 +500,7 @@ class TermTest extends TestCase
         Event::assertNotDispatched(TermDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_quietly()
     {
         Event::fake();

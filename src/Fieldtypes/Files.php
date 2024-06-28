@@ -6,7 +6,6 @@ use Statamic\Fields\Fieldtype;
 
 class Files extends Fieldtype
 {
-    protected $defaultValue = [];
     protected $selectable = false;
     protected $selectableInForms = true;
     protected $categories = ['media'];

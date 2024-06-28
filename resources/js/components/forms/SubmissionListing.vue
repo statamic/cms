@@ -15,8 +15,8 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card overflow-hidden p-0 relative">
-                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
+                <div class="card p-0 relative">
+                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
                         <data-list-filter-presets
                             ref="presets"
                             :active-preset="activePreset"
@@ -64,29 +64,31 @@
                         @completed="actionCompleted"
                     />
 
-                    <data-list-table
-                        v-if="items.length"
-                        :allow-bulk-actions="true"
-                        :allow-column-picker="true"
-                        :column-preferences-key="preferencesKey('columns')"
-                        @sorted="sorted"
-                    >
-                        <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
-                            <a :href="submission.url" class="text-blue">{{ value }}</a>
-                        </template>
-                        <template slot="actions" slot-scope="{ row: submission, index }">
-                            <dropdown-list>
-                                <dropdown-item :text="__('View')" :redirect="submission.url" />
-                                <data-list-inline-actions
-                                    :item="submission.id"
-                                    :url="actionUrl"
-                                    :actions="submission.actions"
-                                    @started="actionStarted"
-                                    @completed="actionCompleted"
-                                />
-                            </dropdown-list>
-                        </template>
-                    </data-list-table>
+                    <div class="overflow-x-auto overflow-y-hidden">
+                        <data-list-table
+                            v-if="items.length"
+                            :allow-bulk-actions="true"
+                            :allow-column-picker="true"
+                            :column-preferences-key="preferencesKey('columns')"
+                            @sorted="sorted"
+                        >
+                            <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
+                                <a :href="submission.url" class="text-blue">{{ value }}</a>
+                            </template>
+                            <template slot="actions" slot-scope="{ row: submission, index }">
+                                <dropdown-list>
+                                    <dropdown-item :text="__('View')" :redirect="submission.url" />
+                                    <data-list-inline-actions
+                                        :item="submission.id"
+                                        :url="actionUrl"
+                                        :actions="submission.actions"
+                                        @started="actionStarted"
+                                        @completed="actionCompleted"
+                                    />
+                                </dropdown-list>
+                            </template>
+                        </data-list-table>
+                    </div>
                 </div>
 
                 <data-list-pagination

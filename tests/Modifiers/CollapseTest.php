@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class CollapseTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_return_empty_array_when_simple_array_given(): void
     {
         $actual = ['one', 'two', 'three'];
@@ -16,7 +17,7 @@ class CollapseTest extends TestCase
         $this->assertEquals($expected, $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_collapses_an_array_of_arrays(): void
     {
         $actual = [

@@ -3,6 +3,7 @@
 namespace Tests\Console\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\TestCase;
 
@@ -21,7 +22,7 @@ class MakeUserTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_user()
     {
         $this->withoutMockingConsoleOutput();
@@ -36,7 +37,7 @@ class MakeUserTest extends TestCase
         $this->assertEquals('jason@tellmewhatyouchasin.com', $user->email());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_super_user_interactively()
     {
         $this->assertEmpty(User::all());
@@ -57,7 +58,7 @@ class MakeUserTest extends TestCase
         $this->assertTrue($user->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_non_super_user_interactively()
     {
         $this->assertEmpty(User::all());
@@ -76,7 +77,7 @@ class MakeUserTest extends TestCase
         $this->assertFalse($user->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_email()
     {
         $this->assertEmpty(User::all());
@@ -91,7 +92,7 @@ class MakeUserTest extends TestCase
             ->expectsOutputToContain('A user with this email already exists.');
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_with_and_without_super_option()
     {
         $this->assertEmpty(User::all());
