@@ -118,13 +118,18 @@ export function replicatorPreviewHtml(html) {
     return new PreviewHtml(html);
 }
 
-export function closestVm(el, name) {
-    let parent = el;
-    while (parent) {
-        if (parent.__vue__) break;
-        parent = parent.parentElement;
+export function closestVm(obj, name) {
+    let vm, parent;
+    if (obj instanceof HTMLElement) {
+        parent = obj;
+        while (parent) {
+            if (parent.__vue__) break;
+            parent = parent.parentElement;
+        }
+        vm = parent.__vue__;
+    } else {
+        vm = obj;
     }
-    let vm = parent.__vue__;
     while (vm !== vm.$root) {
         if (!name || name === vm.$options.name) return vm;
         vm = vm.$parent;

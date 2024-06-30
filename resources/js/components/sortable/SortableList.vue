@@ -1,5 +1,6 @@
 <script>
 import { Sortable, Plugins } from '@shopify/draggable'
+import { closestVm } from '../../bootstrap/globals';
 
 const instances = {};
 
@@ -12,7 +13,7 @@ export default {
         group: {
             default: null,
         },
-        groupDroppable: {
+        groupValidator: {
             default: null,
         },
         itemClass: {
@@ -124,24 +125,31 @@ export default {
 
             this.sortable.on('sortable:stop', (event) => {
                 const { oldIndex, newIndex, oldContainer, newContainer } = event;
-                if (oldContainer !== this.$el && newContainer !== this.$el) {
-                    // Event doesn't concern this list
-                    return;                    
+                if (!this.group) {
+                    this.$emit('input', arrayMove(this.value, oldIndex, newIndex));
+                    return;           
                 }
-                this.$emit('sortablestop', event);
-                this.$emit('input', arrayMove(this.value, oldIndex, newIndex));
-            })
+                const payload = { oldIndex, newIndex };
+                if (newContainer === this.$el && oldContainer === this.$el) {
+                    this.$emit('input', { operation: 'move', oldList: this, newList: this, ...payload });
+                } else if (newContainer === this.$el) {
+                    this.$emit('input', { operation: 'add', oldList: closestVm(oldContainer, 'sortable-list'), newList: this, ...payload });
+                } else if (oldContainer === this.$el) {
+                    this.$emit('input', { operation: 'remove', oldList: this, newList: closestVm(newContainer, 'sortable-list'), ...payload });
+                }
+                this.$el.classList.remove('cursor-not-allowed');
+            });
 
-            if (this.group && this.groupDroppable) {
+            if (this.group && this.groupValidator) {
                 this.sortable.on('sortable:sort', (event) => {
                     const { dragEvent } = event;
                     const { sourceContainer, overContainer, source } = dragEvent;
-                    if (sourceContainer !== this.$el && overContainer !== this.$el) {
-                        // Event doesn't concern this list
-                        return;                    
+                    if (overContainer !== this.$el || sourceContainer === this.$el) {
+                        return;
                     }
-                    if (!this.groupDroppable(event)) {
+                    if (!this.groupValidator({ source })) {
                         event.cancel();
+                        this.$el.classList.add('cursor-not-allowed');
                     }
                 });
             }

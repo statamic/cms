@@ -44,16 +44,16 @@
             :value="value"
             :vertical="true"
             group="replicator-fieldtype"
-            :group-droppable="sortableGroupDroppable"
+            :group-validator="sortableGroupValidator"
             item-class="replicator-sortable-item"
             handle-class="replicator-sortable-handle"
             append-to="body"
             constrain-dimensions
-            @sortablestop="sorted($event)"
+            @input="sorted($event)"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >
-            <div slot-scope="{}" class="replicator-set-container" ref="sortable">
+            <div slot-scope="{}" class="replicator-set-container">
                 <replicator-set
                     v-for="(set, index) in value"
                     :key="set._id"
@@ -200,40 +200,32 @@ export default {
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
-        sorted({ oldIndex, newIndex, oldContainer, newContainer }) {
-            // Set moved within this replicator
-            if (newContainer === this.$refs.sortable && oldContainer === this.$refs.sortable) {
+        sorted({ operation, oldIndex, newIndex, oldList }) {
+            if (operation === 'move') {
+                // Move set within this replicator
                 this.update(arrayMove(this.value, oldIndex, newIndex));
-                return;
+            } else if (operation === 'add') {
+                // Add set to this replicator
+                const oldReplicator = closestVm(oldList, 'replicator-fieldtype');
+                const set = oldReplicator.value[oldIndex];
+                const meta = oldReplicator.meta.existing[set._id];
+                const previews = oldReplicator.previews[set._id];
+                this.updateSetPreviews(set._id, previews);
+                this.updateSetMeta(set._id, meta);
+                this.update(arrayAdd(this.value, set, newIndex));
+                if (oldReplicator.collapsed.includes(set._id)) {
+                    this.collapseSet(set._id);
+                } else {
+                    this.expandSet(set._id);
+                }
+                // Remove set from old replicator
+                // Do this from the target replicator in order to avoid race conditions with nested
+                // replicators both trying to update their parent's value at the same time.
+                this.$nextTick(() => {
+                    oldReplicator.removeSetMeta(set._id);
+                    oldReplicator.update(arrayRemove(oldReplicator.value, oldIndex)); 
+                });
             }
-
-            // Set moved out of this replicator
-            if (oldContainer === this.$refs.sortable) {
-                // We'll deal with updating this replicator from the target replicator (see below), as we need to
-                // control the order of operations to avoid race conditions with nested replicators both trying to
-                // update their parent's value at the same time.
-                return;
-            }
-
-            // Set moved into this replicator
-            const oldVm = closestVm(oldContainer, 'replicator-fieldtype');
-            const set = oldVm.value[oldIndex];
-            const meta = oldVm.meta.existing[set._id];
-            const previews = oldVm.previews[set._id];
-            this.updateSetPreviews(set._id, previews);
-            this.updateSetMeta(set._id, meta);
-            this.update(arrayAdd(this.value, set, newIndex));
-            if (oldVm.collapsed.includes(set._id)) {
-                this.collapseSet(set._id);
-            } else {
-                this.expandSet(set._id);
-            }
-
-            // Remove the set from the old replicator
-            this.$nextTick(() => {
-                oldVm.removeSetMeta(set._id);
-                oldVm.update(arrayRemove(oldVm.value, oldIndex)); 
-            });
         },
 
         addSet(handle, index) {
@@ -322,20 +314,7 @@ export default {
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
 
-        sortableGroupDroppable({ dragEvent }) {
-            const { sourceContainer, overContainer, source } = dragEvent;
-
-            // Set dragged within this replicator
-            if (overContainer === this.$refs.sortable && sourceContainer === this.$refs.sortable) {
-                return true;
-            }
-
-            // Set dragged out of this replicator
-            if (sourceContainer === this.$refs.sortable) {
-                return true;
-            }
-
-            // Set dragged into this replicator
+        sortableGroupValidator({ source }) {
             return this.canAddSet && Object.values(this.setConfigHashes).includes(source.dataset.configHash);
         },
 
