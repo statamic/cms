@@ -65,7 +65,7 @@ class FormController extends Controller
         } catch (ValidationException $e) {
             $this->removeUploadedAssets($uploadedAssets);
 
-            return $this->formFailure($params, $e->errors(), $form->handle());
+            return $this->formFailure($params, $e, $form->handle());
         } catch (SilentFormFailureException $e) {
             if (isset($uploadedAssets)) {
                 $this->removeUploadedAssets($uploadedAssets);
@@ -101,13 +101,21 @@ class FormController extends Controller
      * The steps for a failed form submission.
      *
      * @param  array  $params
-     * @param  array  $submission
+     * @param  ValidationException  $errors
      * @param  string  $form
      * @return Response|RedirectResponse
      */
-    private function formFailure($params, $errors, $form)
+    private function formFailure($params, $exception, $form)
     {
-        if (request()->ajax() || request()->wantsJson()) {
+        $request = request();
+
+        if ($request->isPrecognitive() || $request->wantsJson()) {
+            return $exception;
+        }
+
+        $errors = $exception->errors();
+
+        if ($request->ajax()) {
             return response([
                 'errors' => (new MessageBag($errors))->all(),
                 'error' => collect($errors)->map(function ($errors, $field) {
