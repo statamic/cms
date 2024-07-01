@@ -10,6 +10,6 @@ class UnauthorizedController
             ? cp_route('login')
             : config('statamic.cp.auth.redirect_to');
 
-        return view('statamic::auth.unauthorized', compact($redirect));
+        return view('statamic::auth.unauthorized', compact('redirect'));
     }
 }
