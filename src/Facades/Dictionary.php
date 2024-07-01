@@ -8,7 +8,7 @@ use Statamic\Dictionaries\DictionaryRepository;
 
 /**
  * @method static \Illuminate\Support\Collection all()
- * @method static \Statamic\Dictionaries\Dictionary find(string $dictionary)
+ * @method static \Statamic\Dictionaries\Dictionary find(string $handle, array $dictionary = [])
  *
  * @see \Statamic\Actions\DictionaryRepository
  */

@@ -14,10 +14,22 @@ class DictionaryRepository
             ->values();
     }
 
-    public function find(string $dictionary): ?Dictionary
+    public function find(string $handle, array $context = []): ?Dictionary
     {
-        if ($class = app('statamic.dictionaries')->get($dictionary)) {
-            return app($class);
+        if (! $dictionary = app('statamic.dictionaries')->get($handle)) {
+            return null;
         }
+
+        $dictionary = app($dictionary);
+
+        if (! $dictionary) {
+            return null;
+        }
+
+        if (! method_exists($dictionary, 'context')) {
+            return $dictionary;
+        }
+
+        return $dictionary->context($context);
     }
 }

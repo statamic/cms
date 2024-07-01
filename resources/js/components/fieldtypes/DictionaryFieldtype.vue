@@ -164,10 +164,14 @@ export default {
 
             return 'text-gray';
         },
+
+        configParameter() {
+            return utf8btoa(JSON.stringify(this.config));
+        },
     },
 
     mounted() {
-      this.request();
+        this.request();
     },
 
     methods: {
@@ -190,7 +194,10 @@ export default {
         },
 
         request(params = {}) {
-            params = {...params};
+            params = {
+                config: this.configParameter,
+                ...params,
+            }
 
             return this.$axios.get(this.meta.url, { params }).then(response => {
                 this.options = response.data.data;

@@ -2,13 +2,15 @@
 
 namespace Statamic\Fieldtypes;
 
-use mysql_xdevapi\Collection;
+use Statamic\Exceptions\DictionaryNotFoundException;
+use Statamic\Exceptions\UndefinedDictionaryException;
 use Statamic\Fields\Fieldtype;
+use Statamic\Support\Arr;
 
 class Dictionary extends Fieldtype
 {
     protected $categories = ['controls', 'relationship'];
-    protected $selectableInForms = true; // TODO: include in frontend forms
+    protected $selectableInForms = true;
     protected $indexComponent = 'tags';
     protected $icon = 'select';
 
@@ -19,14 +21,9 @@ class Dictionary extends Fieldtype
                 'display' => __('Options'),
                 'fields' => [
                     'dictionary' => [
-                        'display' => __('Dictionary'),
-                        'instructions' => __('statamic::fieldtypes.dictionary.config.dictionary'),
-                        'type' => 'select',
-                        'options' => \Statamic\Facades\Dictionary::all()
-                            ->mapWithKeys(fn ($dictionary) => [$dictionary->handle() => $dictionary->title()])
-                            ->all(),
-                        'taggable' => true,
-                        'validate' => 'required',
+                        'type' => 'dictionary_fields',
+                        'hide_display' => true,
+                        'full_width_setting' => true,
                     ],
                 ],
             ],
@@ -96,7 +93,7 @@ class Dictionary extends Fieldtype
             return [];
         }
 
-        $dictionary = \Statamic\Facades\Dictionary::find($this->config('dictionary'));
+        $dictionary = $this->dictionary();
 
         if ($this->multiple()) {
             return collect($value)->map(function ($value) use ($dictionary) {
@@ -119,9 +116,24 @@ class Dictionary extends Fieldtype
         return $this->config('multiple');
     }
 
-    private function dictionary(): \Statamic\Dictionaries\Dictionary
+    public function dictionary(): \Statamic\Dictionaries\Dictionary
     {
-        return \Statamic\Facades\Dictionary::find($this->config('dictionary'));
+        if (! $this->config('dictionary')) {
+            throw new UndefinedDictionaryException();
+        }
+
+        $config = $this->config('dictionary');
+
+        $handle = is_array($config) ? Arr::get($config, 'type') : $config;
+        $context = is_array($config) ? Arr::except($config, 'type') : [];
+
+        $dictionary = \Statamic\Facades\Dictionary::find($handle, $context);
+
+        if (! $dictionary) {
+            throw new DictionaryNotFoundException($handle);
+        }
+
+        return $dictionary;
     }
 
     // TODO: graphql - how can we make it work since the keys will be dynamic?

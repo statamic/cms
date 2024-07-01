@@ -10,6 +10,9 @@ class Countries extends Dictionary
     public function options(?string $search = null): array
     {
         return $this->getCountries()
+            ->when($this->context['region'] ?? false, function ($collection) {
+                return $collection->where('region', $this->context['region']);
+            })
             ->when($search ?? false, function ($collection) use ($search) {
                 return $collection->filter(function (array $country) use ($search) {
                     return str_contains(strtolower($country['name']), strtolower($search));
@@ -24,6 +27,18 @@ class Countries extends Dictionary
     public function get(string $key): string|array
     {
         return $this->getCountries()->filter(fn (array $country) => $country['iso3'] === $key)->first();
+    }
+
+    protected function fieldItems()
+    {
+        return [
+            'region' => [
+                'display' => __('Region'),
+                'instructions' => __('statamic::messages.dictionaries_countries_region_instructions'),
+                'type' => 'select',
+                'options' => $this->getCountries()->unique('region')->pluck('region', 'region')->filter()->all(),
+            ],
+        ];
     }
 
     private function getCountries(): Collection
