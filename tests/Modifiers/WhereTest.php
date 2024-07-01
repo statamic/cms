@@ -40,6 +40,19 @@ class WhereTest extends TestCase
         $this->assertEquals($expected, Arr::pluck($modified, 'title'));
     }
 
+    #[Test]
+    public function it_filters_data_using_operator(): void
+    {
+        $games = [
+            ['feeling' => 'love', 'title' => 'Dominion'],
+            ['feeling' => 'love', 'title' => 'Netrunner'],
+            ['feeling' => 'hate', 'title' => 'Chutes and Ladders'],
+        ];
+        $expected = ['Chutes and Ladders'];
+        $modified = $this->modify($games, ['feeling', '!=', 'love']);
+        $this->assertEquals($expected, Arr::pluck($modified, 'title'));
+    }
+
     private function modify($value, array $params)
     {
         return Modify::value($value)->where($params)->fetch();
