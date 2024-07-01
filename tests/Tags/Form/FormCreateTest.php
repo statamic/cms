@@ -957,5 +957,4 @@ EOT
         $this->assertArrayHasKey('errors', $json);
         $this->assertSame($json['errors'], ['some' => ['error']]);
     }
-
 }
