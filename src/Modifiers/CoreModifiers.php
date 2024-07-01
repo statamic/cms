@@ -2880,13 +2880,18 @@ class CoreModifiers extends Modifier
     public function where($value, $params)
     {
         $key = Arr::get($params, 0);
-        $val = Arr::get($params, 1);
+        $opr = Arr::get($params, 1);
+        $val = Arr::get($params, 2);
 
-        if (! $val && Str::contains($key, ':')) {
-            [$key, $val] = explode(':', $key);
+        if (! $opr && Str::contains($key, ':')) {
+            [$key, $opr] = explode(':', $key);
+        }
+        if (! $val) {
+            $val = $opr;
+            $opr = '==';
         }
 
-        $collection = collect($value)->where($key, $val);
+        $collection = collect($value)->where($key, $opr, $val);
 
         return $collection->values()->all();
     }
