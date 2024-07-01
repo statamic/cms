@@ -47,13 +47,6 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
-        $lock = $this->createLock($request);
-
-        return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next, $lock));
-    }
-
-    private function handleRequest($request, Closure $next, Lock $lock)
-    {
         try {
             if ($response = $this->attemptToGetCachedResponse($request)) {
                 return $response;
@@ -62,6 +55,13 @@ class Cache
             Log::debug("Static cache region [{$e->getRegion()}] not found on [{$request->fullUrl()}]. Serving uncached response.");
         }
 
+        $lock = $this->createLock($request);
+
+        return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
+    }
+
+    private function handleRequest($request, Closure $next)
+    {
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
