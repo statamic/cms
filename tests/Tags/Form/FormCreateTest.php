@@ -934,12 +934,8 @@ EOT
     }
 
     #[Test]
-    public function it_renders_exceptions_thrown_during_precognitive_requests_as_standard_laravel_errors()
+    public function it_renders_exceptions_thrown_during_json_requests_as_standard_laravel_errors()
     {
-        if (! method_exists($this, 'withPrecognition')) {
-            $this->markTestSkipped();
-        }
-
         Event::listen(function (\Statamic\Events\FormSubmitted $event) {
             throw ValidationException::withMessages(['some' => 'error']);
         });
@@ -956,5 +952,29 @@ EOT
         $this->assertArrayHasKey('message', $json);
         $this->assertArrayHasKey('errors', $json);
         $this->assertSame($json['errors'], ['some' => ['error']]);
+    }
+
+    #[Test]
+    public function it_renders_exceptions_thrown_during_xml_http_requests_in_statamic_error_format()
+    {
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['some' => 'error']);
+        });
+
+        $response = $this
+            ->withHeaders([
+                'X-Requested-With' => 'XMLHttpRequest',
+            ])
+            ->postJson('/!/forms/contact', [
+                'name' => 'Name',
+                'email' => 'test@test.com',
+                'message' => 'This is a message',
+            ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('error', $json);
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertSame($json['error'], ['some' => 'error']);
     }
 }

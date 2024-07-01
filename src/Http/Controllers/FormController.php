@@ -109,10 +109,6 @@ class FormController extends Controller
     {
         $request = request();
 
-        if ($request->isPrecognitive() || $request->wantsJson()) {
-            throw ValidationException::withMessages($errors);
-        }
-
         if ($request->ajax()) {
             return response([
                 'errors' => (new MessageBag($errors))->all(),
@@ -120,6 +116,10 @@ class FormController extends Controller
                     return $errors[0];
                 })->all(),
             ], 400);
+        }
+
+        if ($request->isPrecognitive() || $request->wantsJson()) {
+            throw ValidationException::withMessages($errors);
         }
 
         $redirect = Arr::get($params, '_error_redirect');
