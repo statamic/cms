@@ -932,4 +932,30 @@ EOT
 
         Storage::disk('avatars')->assertMissing('avatar.jpg');
     }
+
+    #[Test]
+    public function it_renders_exceptions_thrown_during_precognitive_requests_as_standard_laravel_errors()
+    {
+        if (! method_exists($this, 'withPrecognition')) {
+            $this->markTestSkipped();
+        }
+
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['some' => 'error']);
+        });
+
+        $response = $this
+            ->postJson('/!/forms/contact', [
+                'name' => 'Name',
+                'email' => 'test@test.com',
+                'message' => 'This is a message',
+            ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('message', $json);
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertSame($json['errors'], ['some' => ['error']]);
+    }
+
 }
