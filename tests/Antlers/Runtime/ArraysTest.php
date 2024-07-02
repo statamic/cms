@@ -26,13 +26,13 @@ class ArraysTest extends ParserTestCase
             'address' => [
                 'city' => 'City Name',
                 'region' => 'Region Name',
-                'country' => 'Countries Name',
+                'country' => 'Country Name',
             ],
         ];
 
         $this->assertSame('City Name', $this->renderString('{{ address:city }}', $data));
         $this->assertSame('Region Name', $this->renderString('{{ address:region }}', $data));
-        $this->assertSame('Countries Name', $this->renderString('{{ address:country }}', $data));
+        $this->assertSame('Country Name', $this->renderString('{{ address:country }}', $data));
     }
 
     public function test_multi_dimensional_array_access()
