@@ -3,7 +3,6 @@
 namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Statamic\Actions\ActionRepository;
 use Statamic\Dictionaries\DictionaryRepository;
 
 /**
