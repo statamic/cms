@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
+use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Extend\Manifest;
 use Statamic\Fields\Fieldtype;
@@ -50,8 +51,8 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $dictionaries = [
-        \Statamic\Dictionaries\Countries::class,
-        \Statamic\Dictionaries\Timezones::class,
+        Dictionaries\Countries::class,
+        Dictionaries\Timezones::class,
     ];
 
     protected $fieldtypes = [
@@ -274,7 +275,7 @@ class ExtensionServiceProvider extends ServiceProvider
             'dictionaries' => [
                 'class' => Dictionary::class,
                 'directory' => 'Dictionaries',
-                'extensions' => $this->dictionaries
+                'extensions' => $this->dictionaries,
             ],
             'fieldtypes' => [
                 'class' => Fieldtype::class,
