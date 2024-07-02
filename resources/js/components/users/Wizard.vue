@@ -50,7 +50,7 @@
                     <toggle-input v-model="user.super" id="super" />
                     <label class="font-bold rtl:mr-2 ltr:ml-2" for="super">{{ __('Super Admin') }}</label>
                 </div>
-                <div class="text-2xs text-gray-600 dark:text-dark-150 mt-2 flex items-center space-x-1">
+                <div class="text-2xs text-gray-600 dark:text-dark-150 mt-2 flex items-center space-x-1 rtl:space-x-reverse">
                     <svg-icon name="info-circle" class="h-4 w-4 flex items-center mb-px"></svg-icon>
                     <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
                 </div>

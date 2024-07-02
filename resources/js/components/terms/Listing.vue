@@ -33,7 +33,7 @@
 
                         <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
 
-                        <div class="flex space-x-2 mt-2">
+                        <div class="flex space-x-2 rtl:space-x-reverse mt-2">
                             <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
                             <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />

@@ -243,7 +243,7 @@
         </div>
 
         <h6 class="my-4">Reds</h6>
-        <div class="flex text-sm text-center space-x-1">
+        <div class="flex text-sm text-center space-x-1 rtl:space-x-reverse">
             <div class="text-black bg-red-100 border border-red-200 p-6 flex-1">Red Lighter</div>
             <div class="text-black bg-red-400 p-6 flex-1">Red Light</div>
             <div class="text-black bg-red-500 p-6 flex-1">Red</div>

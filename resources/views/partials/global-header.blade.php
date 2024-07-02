@@ -23,7 +23,7 @@
         </global-search>
     </div>
 
-    <div class="head-link h-full px-6 space-x-3 flex items-center justify-end">
+    <div class="head-link h-full px-6 space-x-3 rtl:space-x-reverse flex items-center justify-end">
 
         @if (Statamic\Facades\Site::authorized()->count() > 1)
             <global-site-selector>
