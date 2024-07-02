@@ -4,6 +4,7 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\UrlInvalidated;
@@ -314,6 +315,28 @@ class FileCacherTest extends TestCase
         Event::assertDispatched(UrlInvalidated::class, function ($event) use ($expectedUrl) {
             return $event->url === $expectedUrl;
         });
+    }
+
+    #[Test]
+    public function recaching_a_url_will_trigger_a_recache_job()
+    {
+        Queue::fake();
+
+        $writer = \Mockery::spy(Writer::class);
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher(['base_url' => 'http://base.com'], $writer, $cache);
+
+        $this->instance(Cacher::class, $cacher);
+
+        $cache->forever($this->cacheKey('http://example.com'), [
+            'one' => '/one',
+            'onemore' => '/onemore',
+            'two' => '/two',
+        ]);
+
+        $cacher->recacheUrl('/one', 'http://example.com');
+
+        Queue::assertPushed(\Statamic\Jobs\StaticRecacheJob::class);
     }
 
     public static function invalidateEventProvider()
