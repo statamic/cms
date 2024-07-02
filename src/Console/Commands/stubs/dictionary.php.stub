@@ -1,0 +1,46 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Support\Collection;
+use Statamic\Dictionaries\Dictionary;
+
+class DummyClass extends Dictionary
+{
+    /**
+     * Returns a key/value array of options.
+     *
+     * @param string|null $search
+     * @return array
+     */
+    public function options(?string $search = null): array
+    {
+        return $this->getItems()
+            ->when($search ?? false, function ($collection) use ($search) {
+                return $collection->filter(fn ($item) => str_contains($item['name'], $search));
+            })
+            ->mapWithKeys(fn ($item) => [$item['slug'] => $item['name']])
+            ->all();
+    }
+
+    /**
+     * Returns a single option.
+     *
+     * @param string $key
+     * @return string|array
+     */
+    public function get(string $key): string|array
+    {
+        return $this->getItems()->firstWhere('slug', $key);
+    }
+
+    private function getItems(): Collection
+    {
+        return collect([
+            ['name' => 'January', 'slug' => 'january'],
+            ['name' => 'February', 'slug' => 'february'],
+            ['name' => 'March', 'slug' => 'march'],
+            // ...
+        ]);
+    }
+}
