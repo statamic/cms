@@ -78,7 +78,7 @@ class DictionaryFields extends Fieldtype
     {
         if (! $dictionary = Arr::get($this->field->value(), 'type')) {
             return [
-                $this->field->handle().'.type' => 'required',
+                $this->field->handle().'.type' => ['required'],
             ];
         }
 
