@@ -96,6 +96,9 @@ class CollectionRepository implements RepositoryContract
         $this->store->delete($collection);
     }
 
+    /**
+     * @deprecated Use EntryRepository::updateUris($collection, $ids)
+     */
     public function updateEntryUris(Collection $collection, $ids = null)
     {
         $this->store->updateEntryUris($collection, $ids);

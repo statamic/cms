@@ -503,7 +503,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function updateEntryUris($ids = null)
     {
-        Facades\Collection::updateEntryUris($this, $ids);
+        Facades\Entry::updateUris($this, $ids);
 
         return $this;
     }
