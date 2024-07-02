@@ -8,6 +8,7 @@ use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
 use Statamic\Data\StoresScopedComputedFieldCallbacks;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Entry;
 use Statamic\Stache\Stache;
 
 class CollectionRepository implements RepositoryContract
@@ -97,11 +98,11 @@ class CollectionRepository implements RepositoryContract
     }
 
     /**
-     * @deprecated Use EntryRepository::updateUris($collection, $ids)
+     * @deprecated Use Entry::updateUris($collection, $ids)
      */
     public function updateEntryUris(Collection $collection, $ids = null)
     {
-        $this->store->updateEntryUris($collection, $ids);
+        Entry::updateUris($collection, $ids);
     }
 
     public function updateEntryOrder(Collection $collection, $ids = null)
