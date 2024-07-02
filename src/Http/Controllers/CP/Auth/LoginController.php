@@ -103,7 +103,18 @@ class LoginController extends CpController
     {
         $referer = request('referer');
 
-        return Str::contains($referer, '/'.config('statamic.cp.route')) ? $referer : cp_route('index');
+        $authRoutes = [
+            cp_route('login'),
+            cp_route('password.request'),
+        ];
+
+        if (in_array($referer, $authRoutes)) {
+            return cp_route('index');
+        }
+
+        return Str::contains($referer, '/'.config('statamic.cp.route'))
+            ? $referer
+            : cp_route('index');
     }
 
     protected function authenticated(Request $request, $user)
