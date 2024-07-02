@@ -49,6 +49,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $withEvents = true;
     protected $sortField;
     protected $sortDirection;
+    protected $order;
     protected $validation;
 
     public function id($id = null)
@@ -640,6 +641,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             'create_folders' => $this->createFolders,
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
+            'order' => $this->order,
             'validate' => $this->validation,
         ];
 
@@ -667,6 +669,16 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             ->fluentlyGetOrSet('searchIndex')
             ->getter(function ($index) {
                 return $index ? Search::index($index) : null;
+            })
+            ->args(func_get_args());
+    }
+
+    public function order($order = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('order')
+            ->getter(function ($order) {
+                return $order ?? 1;
             })
             ->args(func_get_args());
     }

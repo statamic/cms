@@ -19,7 +19,7 @@ class AssetContainersController extends CpController
 
     public function index(Request $request)
     {
-        $containers = AssetContainer::all()->sortBy->title()->filter(function ($container) {
+        $containers = AssetContainer::all()->filter(function ($container) {
             return User::current()->can('view', $container);
         })->map(function ($container) {
             return [
@@ -65,6 +65,7 @@ class AssetContainersController extends CpController
             'source_preset' => $container->sourcePreset(),
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
+            'order' => $container->order() == 1 ? '' : $container->order(),
             'validation' => $container->validationRules(),
         ];
 
@@ -101,6 +102,7 @@ class AssetContainersController extends CpController
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
             ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
+            ->order($values['order'])
             ->validationRules($values['validation'] ?? null);
 
         $container->save();
@@ -149,7 +151,8 @@ class AssetContainersController extends CpController
             ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
-            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
+            ->order($values['order']);
 
         $container->save();
 
@@ -304,6 +307,20 @@ class AssetContainersController extends CpController
                         'if' => [
                             'warm_intelligent' => false,
                         ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields = array_merge($fields, [
+            'display' => [
+                'display' => __('Display'),
+                'fields' => [
+                    'order' => [
+                        'type' => 'text',
+                        'display' => __('Order'),
+                        'instructions' => __('statamic::messages.asset_container_order_instructions'),
+                        'validate' => 'numeric',
                     ],
                 ],
             ],
