@@ -135,6 +135,4 @@ class Dictionary extends Fieldtype
 
         return $dictionary;
     }
-
-    // TODO: graphql - how can we make it work since the keys will be dynamic?
 }
