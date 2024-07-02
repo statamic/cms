@@ -14,7 +14,10 @@ export default {
             this.$events.$emit('clear-selections');
             this.$events.$emit('reset-action-modals');
 
-            if (response.message !== false) {
+            if (response.successful === false) {
+                this.$toast.error(response.message || __("Action failed"));
+            }
+            else {
                 this.$toast.success(response.message || __("Action completed"));
             }
 
