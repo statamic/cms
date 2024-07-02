@@ -4,8 +4,8 @@ namespace Tests\Dictionaries;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Dictionaries\Dictionary;
-use Tests\TestCase;
 use Statamic\Facades\Dictionary as DictionaryFacade;
+use Tests\TestCase;
 
 class DictionariesTest extends TestCase
 {
