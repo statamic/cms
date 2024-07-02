@@ -2,9 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\Dictionary;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
-use Statamic\Facades\Dictionary;
 use Statamic\Support\Arr;
 
 class DictionaryFields extends Fieldtype

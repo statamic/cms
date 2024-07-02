@@ -18,17 +18,11 @@ abstract class Dictionary
 
     /**
      * Returns a key/value array of options.
-     *
-     * @param string|null $search
-     * @return array
      */
     abstract public function options(?string $search = null): array;
 
     /**
      * Returns a single option.
-     *
-     * @param string $key
-     * @return string|array
      */
     abstract public function get(string $key): string|array;
 
