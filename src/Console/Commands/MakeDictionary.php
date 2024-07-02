@@ -68,7 +68,7 @@ class MakeDictionary extends GeneratorCommand
                 ->add()->protected()->property('dictionaries', $dictionaryClassValue)
                 ->save();
         } catch (\Exception $e) {
-            $this->comment("Don't forget to register the Dictionary class and scripts in your addon's service provider.");
+            $this->comment("Don't forget to register the Dictionary class in your addon's service provider.");
         }
     }
 }
