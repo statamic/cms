@@ -33,6 +33,7 @@
             :tab="tab"
             v-show="currentTab === tab._id"
             :show-section-handle-field="showSectionHandleField"
+            :show-section-hide-field="showSectionHideField"
             :new-section-text="newSectionText"
             :edit-section-text="editSectionText"
             :add-section-text="addSectionText"
@@ -93,6 +94,10 @@ export default {
             default: false
         },
         showSectionHandleField: {
+            type: Boolean,
+            default: false
+        },
+        showSectionHideField: {
             type: Boolean,
             default: false
         },
