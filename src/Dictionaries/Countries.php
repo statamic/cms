@@ -26,7 +26,7 @@ class Countries extends Dictionary
 
     public function get(string $key): string|array
     {
-        return $this->getCountries()->filter(fn (array $country) => $country['iso3'] === $key)->first();
+        return $this->getCountries()->firstWhere('iso3', $key);
     }
 
     protected function fieldItems()
