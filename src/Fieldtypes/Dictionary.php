@@ -12,7 +12,6 @@ class Dictionary extends Fieldtype
     protected $categories = ['controls', 'relationship'];
     protected $selectableInForms = true;
     protected $indexComponent = 'tags';
-    protected $icon = 'select';
 
     protected function configFieldItems(): array
     {
