@@ -33,13 +33,21 @@ class FormTest extends TestCase
 
         $form = Form::make('contact_us')
             ->title('Contact Us')
-            ->honeypot('winnie');
+            ->honeypot('winnie')
+            ->data([
+                'foo' => 'bar',
+                'roo' => 'rar',
+            ]);
 
         $form->save();
 
         $this->assertEquals('contact_us', $form->handle());
         $this->assertEquals('Contact Us', $form->title());
         $this->assertEquals('winnie', $form->honeypot());
+        $this->assertEquals([
+            'foo' => 'bar',
+            'roo' => 'rar',
+        ], $form->data()->all());
 
         Event::assertDispatched(FormCreating::class, function ($event) use ($form) {
             return $event->form === $form;
