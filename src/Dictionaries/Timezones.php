@@ -12,8 +12,8 @@ class Timezones extends Dictionary
             ->all();
     }
 
-    public function get(string $option): string|array
+    public function get(string $key): string|array
     {
-        return $option;
+        return $key;
     }
 }
