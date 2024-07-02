@@ -31,6 +31,8 @@
                         :value="values.enabled"
                         v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
+                        <dropdown-actions :actions="actions" @run="runAction" v-if="hasActions" />
+                        <div class="divider" />
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
@@ -77,12 +79,17 @@
 import SetField from './Field.vue';
 import ManagesPreviewText from './ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
+import HasActions from '../../HasActions.js';
 
 export default {
 
     components: { SetField },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText],
+    mixins: [
+        ValidatesFieldConditions,
+        ManagesPreviewText,
+        HasActions,
+    ],
 
     inject: ['replicatorSets'],
 

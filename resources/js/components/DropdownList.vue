@@ -1,5 +1,5 @@
 <template>
-    <popover class="dropdown-list" :disabled="disabled" :placement="placement" :autoclose="autoclose" @opened="$emit('opened')" @closed="$emit('closed')">
+    <popover class="dropdown-list" :disabled="disabled" :placement="placement" :autoclose="autoclose" :offset="offset" @opened="$emit('opened')" @closed="$emit('closed')">
         <template #trigger>
             <slot name="trigger">
                 <button class="rotating-dots-button" :aria-label="__('Open Dropdown')">
@@ -25,7 +25,11 @@ export default {
         autoclose: {
             type: Boolean,
             default: false
-        }
+        },
+        offset: {
+            type: Array,
+            default: () => [10, 0]
+        },
     },
     computed: {
         strategy() {
