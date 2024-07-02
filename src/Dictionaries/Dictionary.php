@@ -17,12 +17,18 @@ abstract class Dictionary
     protected $context = [];
 
     /**
-     * Returns all options, optionally filtered by a search term.
+     * Returns a key/value array of options.
+     *
+     * @param string|null $search
+     * @return array
      */
     abstract public function options(?string $search = null): array;
 
     /**
-     * Returns data for a single option, given the option's key.
+     * Returns a single option.
+     *
+     * @param string $key
+     * @return string|array
      */
     abstract public function get(string $key): string|array;
 
