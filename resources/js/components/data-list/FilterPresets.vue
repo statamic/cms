@@ -14,9 +14,9 @@
                             </button>
                         </template>
                         <dropdown-item :text="__('Duplicate')" @click="createPreset" />
-                        <dropdown-item :text="__('Rename')" @click="renamePreset" />
+                        <dropdown-item v-if="canRenamePreset(handle)" :text="__('Rename')" @click="renamePreset" />
                         <div class="divider" />
-                        <dropdown-item :text="__('Delete')" class="warning" @click="deletePreset" />
+                        <dropdown-item v-if="canDeletePreset(handle)" :text="__('Delete')" class="warning" @click="deletePreset" />
                     </dropdown-list>
                 </button>
                 <button class="pill-tab rtl:ml-1 ltr:mr-1" v-else @click="viewPreset(handle)">
@@ -140,6 +140,14 @@ export default {
             } else {
                 this.viewAll();
             }
+        },
+
+        canRenamePreset(handle) {
+            return !this.$preferences.hasDefault(`${this.preferencesKey}.${handle}`);
+        },
+
+        canDeletePreset(handle) {
+            return !this.$preferences.hasDefault(`${this.preferencesKey}.${handle}`);
         },
 
         viewAll() {

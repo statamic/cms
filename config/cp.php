@@ -17,6 +17,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Whether the Control Panel's authentication pages should be enabled,
+    | and where users should be redirected in order to authenticate.
+    |
+    */
+
+    'auth' => [
+        'enabled' => true,
+        'redirect_to' => null,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Start Page
     |--------------------------------------------------------------------------
     |

@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
-/** @group graphql */
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
+
+#[Group('graphql')]
 class RangeFieldtypeTest extends FieldtypeTestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_an_integer()
     {
         $this->createEntryWithFields([

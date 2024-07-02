@@ -4,6 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
@@ -31,7 +32,7 @@ class UsersStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
@@ -56,7 +57,7 @@ class UsersStoreTest extends TestCase
         $this->assertTrue(file_exists($dir.'/three.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_user_instances_from_files()
     {
         $item = $this->store->makeItemFromFile($this->tempDir.'/john@example.com.yaml', "id: 123\nname: John Doe\nemail: john@example.com");
@@ -68,7 +69,7 @@ class UsersStoreTest extends TestCase
         $this->assertEquals(['name' => 'John Doe', 'email' => 'john@example.com'], $item->data()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_id_as_the_item_key()
     {
         $user = \Mockery::mock();

@@ -266,7 +266,6 @@
 .bard-fieldtype .bard-content > {
     p {
         @apply text-gray-800 dark:text-dark-150;
-        word-break: break-all;
         word-break: break-word;
 
         line-height: 1.7;
@@ -379,17 +378,18 @@
     ul,
     blockquote ol,
     blockquote ul {
-        padding: 0;
-        margin: 0;
-        margin-bottom: .85em;
-        padding-left: 2em ; [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
+        margin: 0 0 .85em;
+        padding: 0 0 0 2em;
+
+        [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
     }
 
     .tableWrapper table ol,
     .tableWrapper table ul {
-        padding: 0;
         margin: 0;
-        padding-left: 2em ; [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
+        padding: 0 0 0 2em;
+
+        [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
     }
 
     ol ol,

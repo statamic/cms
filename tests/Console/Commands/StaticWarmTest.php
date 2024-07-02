@@ -4,6 +4,7 @@ namespace Tests\Console\Commands;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Collection;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -25,7 +26,7 @@ class StaticWarmTest extends TestCase
         $this->createPage('contact');
     }
 
-    /** @test */
+    #[Test]
     public function it_exits_with_error_when_static_caching_is_disabled()
     {
         $this->artisan('statamic:static:warm')
@@ -33,7 +34,7 @@ class StaticWarmTest extends TestCase
             ->assertExitCode(1);
     }
 
-    /** @test */
+    #[Test]
     public function it_warms_the_static_cache()
     {
         config(['statamic.static_caching.strategy' => 'half']);
@@ -43,7 +44,7 @@ class StaticWarmTest extends TestCase
             ->assertExitCode(0);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_queue_the_requests_when_connection_is_set_to_sync()
     {
         config(['statamic.static_caching.strategy' => 'half']);
@@ -53,7 +54,7 @@ class StaticWarmTest extends TestCase
             ->assertExitCode(0);
     }
 
-    /** @test */
+    #[Test]
     public function it_queues_the_requests()
     {
         config([

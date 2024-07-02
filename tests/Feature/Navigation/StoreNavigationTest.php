@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Navigation;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Nav;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -13,7 +14,7 @@ class StoreNavigationTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this
@@ -24,7 +25,7 @@ class StoreNavigationTest extends TestCase
             ->assertSessionHas('error', 'You are not authorized to create navs.');
     }
 
-    /** @test */
+    #[Test]
     public function it_stores_a_nav()
     {
         $this->assertCount(0, Nav::all());
@@ -40,7 +41,7 @@ class StoreNavigationTest extends TestCase
         $this->assertEquals('test', $nav->handle());
     }
 
-    /** @test */
+    #[Test]
     public function title_is_required()
     {
         $this->assertCount(0, Nav::all());
@@ -57,7 +58,7 @@ class StoreNavigationTest extends TestCase
         $this->assertCount(0, Nav::all());
     }
 
-    /** @test */
+    #[Test]
     public function handle_must_be_alpha_dash()
     {
         $this->assertCount(0, Nav::all());

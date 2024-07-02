@@ -3,6 +3,8 @@
 namespace Tests\Modifiers;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -24,11 +26,8 @@ class IsPastTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider dates
-     */
+    #[Test]
+    #[DataProvider('dates')]
     public function it_returns_true_if_date_is_past($expected, $input): void
     {
         $modified = $this->modify($input);

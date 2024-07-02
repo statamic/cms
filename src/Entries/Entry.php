@@ -559,7 +559,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     return null;
                 }
 
-                $date = $date ?? $this->lastModified();
+                $date = $date ?? optional($this->origin())->date() ?? $this->lastModified();
 
                 if (! $this->hasTime()) {
                     $date->startOfDay();
@@ -811,10 +811,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         if ($callback = $this->addToStructure($site, $this->parent())) {
             $localization->afterSave($callback);
-        }
-
-        if ($this->collection()->dated()) {
-            $localization->date($this->date());
         }
 
         return $localization;
