@@ -43,15 +43,17 @@
         <sortable-list
             :value="value"
             :vertical="true"
-            :item-class="sortableItemClass"
-            :handle-class="sortableHandleClass"
+            group="replicator-fieldtype"
+            :group-droppable="sortableGroupDroppable"
+            item-class="replicator-sortable-item"
+            handle-class="replicator-sortable-handle"
             append-to="body"
             constrain-dimensions
-            @input="sorted($event)"
+            @sortablestop="sorted($event)"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >
-            <div slot-scope="{}" class="replicator-set-container">
+            <div slot-scope="{}" class="replicator-set-container" ref="sortable">
                 <replicator-set
                     v-for="(set, index) in value"
                     :key="set._id"
@@ -59,9 +61,10 @@
                     :values="set"
                     :meta="meta.existing[set._id]"
                     :config="setConfig(set.type)"
+                    :config-hash="setConfigHash(set.type)"
                     :parent-name="name"
-                    :sortable-item-class="sortableItemClass"
-                    :sortable-handle-class="sortableHandleClass"
+                    sortable-item-class="replicator-sortable-item"
+                    sortable-handle-class="replicator-sortable-handle"
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
                     :field-path-prefix="fieldPathPrefix || handle"
@@ -117,6 +120,7 @@ import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 import reduce from 'underscore/modules/reduce';
+import { closestVm } from '../../../bootstrap/globals';
 
 export default {
 
@@ -157,16 +161,12 @@ export default {
             }, []);
         },
 
+        setConfigHashes() {
+            return this.meta.setConfigHashes;
+        },
+
         groupConfigs() {
             return this.config.sets;
-        },
-
-        sortableItemClass() {
-            return `${this.name}-sortable-item`;
-        },
-
-        sortableHandleClass() {
-            return `${this.name}-sortable-handle`;
         },
 
         storeState() {
@@ -186,6 +186,10 @@ export default {
             return _.find(this.setConfigs, { handle }) || {};
         },
 
+        setConfigHash(handle) {
+            return this.setConfigHashes[handle];
+        },
+
         updated(index, set) {
             this.update([...this.value.slice(0, index), set, ...this.value.slice(index + 1)]);
         },
@@ -196,8 +200,40 @@ export default {
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
-        sorted(value) {
-            this.update(value);
+        sorted({ oldIndex, newIndex, oldContainer, newContainer }) {
+            // Set moved within this replicator
+            if (newContainer === this.$refs.sortable && oldContainer === this.$refs.sortable) {
+                this.update(arrayMove(this.value, oldIndex, newIndex));
+                return;
+            }
+
+            // Set moved out of this replicator
+            if (oldContainer === this.$refs.sortable) {
+                // We'll deal with updating this replicator from the target replicator (see below), as we need to
+                // control the order of operations to avoid race conditions with nested replicators both trying to
+                // update their parent's value at the same time.
+                return;
+            }
+
+            // Set moved into this replicator
+            const oldVm = closestVm(oldContainer, 'replicator-fieldtype');
+            const set = oldVm.value[oldIndex];
+            const meta = oldVm.meta.existing[set._id];
+            const previews = oldVm.previews[set._id];
+            this.updateSetPreviews(set._id, previews);
+            this.updateSetMeta(set._id, meta);
+            this.update(arrayAdd(this.value, set, newIndex));
+            if (oldVm.collapsed.includes(set._id)) {
+                this.collapseSet(set._id);
+            } else {
+                this.expandSet(set._id);
+            }
+
+            // Remove the set from the old replicator
+            this.$nextTick(() => {
+                oldVm.removeSetMeta(set._id);
+                oldVm.update(arrayRemove(oldVm.value, oldIndex)); 
+            });
         },
 
         addSet(handle, index) {
@@ -285,6 +321,24 @@ export default {
 
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
+
+        sortableGroupDroppable({ dragEvent }) {
+            const { sourceContainer, overContainer, source } = dragEvent;
+
+            // Set dragged within this replicator
+            if (overContainer === this.$refs.sortable && sourceContainer === this.$refs.sortable) {
+                return true;
+            }
+
+            // Set dragged out of this replicator
+            if (sourceContainer === this.$refs.sortable) {
+                return true;
+            }
+
+            // Set dragged into this replicator
+            return this.canAddSet && Object.values(this.setConfigHashes).includes(source.dataset.configHash);
+        },
+
     },
 
     mounted() {

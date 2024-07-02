@@ -1,24 +1,19 @@
 <script>
 import { Sortable, Plugins } from '@shopify/draggable'
 
-function move(items, oldIndex, newIndex) {
-    const itemRemovedArray = [
-        ...items.slice(0, oldIndex),
-        ...items.slice(oldIndex + 1, items.length)
-    ]
-
-    return [
-        ...itemRemovedArray.slice(0, newIndex),
-        items[oldIndex],
-        ...itemRemovedArray.slice(newIndex, itemRemovedArray.length)
-    ]
-}
+const instances = {};
 
 export default {
 
     props: {
         value: {
             required: true,
+        },
+        group: {
+            default: null,
+        },
+        groupDroppable: {
+            default: null,
         },
         itemClass: {
             default: 'sortable-item',
@@ -63,6 +58,7 @@ export default {
     data() {
         return {
             sortable: null,
+            instanceId: this.group || uniqid(),
         }
     },
 
@@ -119,18 +115,39 @@ export default {
     },
 
     methods: {
+
         setupSortableList() {
-            this.sortable = new Sortable(this.$el, this.computedOptions);
+            this.sortable = this.connectInstace(this.instanceId, this.$el, this.computedOptions);
 
             this.sortable.on('drag:start', () => this.$emit('dragstart'));
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
-            this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-                this.$emit('input', move(this.value, oldIndex, newIndex))
+            this.sortable.on('sortable:stop', (event) => {
+                const { oldIndex, newIndex, oldContainer, newContainer } = event;
+                if (oldContainer !== this.$el && newContainer !== this.$el) {
+                    // Event doesn't concern this list
+                    return;                    
+                }
+                this.$emit('sortablestop', event);
+                this.$emit('input', arrayMove(this.value, oldIndex, newIndex));
             })
 
+            if (this.group && this.groupDroppable) {
+                this.sortable.on('sortable:sort', (event) => {
+                    const { dragEvent } = event;
+                    const { sourceContainer, overContainer, source } = dragEvent;
+                    if (sourceContainer !== this.$el && overContainer !== this.$el) {
+                        // Event doesn't concern this list
+                        return;                    
+                    }
+                    if (!this.groupDroppable(event)) {
+                        event.cancel();
+                    }
+                });
+            }
+
             this.$on('hook:destroyed', () => {
-                this.sortable.destroy()
+                this.destroySortableList();
             })
 
             if (this.mirror === false) {
@@ -139,8 +156,28 @@ export default {
         },
 
         destroySortableList() {
-            this.sortable.destroy()
+            this.disconnectInstace(this.instanceId, this.$el);
         },
+
+        connectInstace(id, container, options) {
+            if (!instances[id]) {
+                instances[id] = new Sortable(container, options);
+            } else {
+                instances[id].addContainer(container);
+            }
+            return instances[id];
+        },
+
+        disconnectInstace(id, container) {
+            if (instances[id]) {
+                instances[id].removeContainer(container);
+                if (instances[id].containers.length === 0) {
+                    instances[id].destroy();
+                    delete instances[id];
+                }
+            }
+        },
+
     },
 
     watch: {

@@ -4,6 +4,7 @@
 
 .replicator-set-container {
     @apply outline-none;
+    min-height: 1rem;
 }
 
 .replicator-set {
