@@ -108,7 +108,7 @@ class Result implements ContainsQueryableValues, Contract
 
     public function toDeferredAugmentedArray($keys = null)
     {
-        return $this->toAugmentedCollection($keys);
+        return $this->toAugmentedArray($keys);
     }
 
     public function newAugmentedInstance(): Augmented
