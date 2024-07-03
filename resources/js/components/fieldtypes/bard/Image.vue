@@ -31,7 +31,7 @@
                 </button>
                 <button @click="deleteNode" class="flex btn btn-sm text-red-500 px-3 py-1.5">
                     <svg-icon name="trash" class="h-4" />
-                    <span class="rtl:mr-2 ltr:ml-2 hidden @md/toolbar:inline-block">{{ __('Delete') }}</span>
+                    <span class="rtl:mr-2 ltr:ml-2 hidden @md/toolbar:inline-block">{{ __('Remove') }}</span>
                 </button>
             </div>
 
