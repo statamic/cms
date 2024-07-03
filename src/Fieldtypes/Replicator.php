@@ -343,8 +343,8 @@ class Replicator extends Fieldtype
 
     protected function configHash()
     {
-        return Blink::once('replicator-'.implode('.', $this->field->handlePath()).'-hash', function () {
-            return md5($this->field->handle().json_encode($this->field->config()));
+        return Blink::once('replicator-'.implode('.', $this->field?->handlePath()).'-hash', function () {
+            return md5($this->field?->handle().json_encode($this->field?->config()));
         });
     }
 }
