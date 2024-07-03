@@ -7,6 +7,14 @@
     min-height: 1rem;
 }
 
+.replicator-droppable {
+    @apply ring ring-green-500;
+}
+
+.replicator-not-droppable {
+    @apply ring ring-red-500;
+}
+
 .replicator-set {
     @apply shadow-set dark:shadow-dark-set rounded bg-white dark:bg-dark-800 outline-none relative;
 }

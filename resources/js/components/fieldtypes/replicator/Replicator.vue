@@ -6,7 +6,11 @@
      once it has been portaled out. -->
 <div :class="{ 'publish-fields': fullScreenMode }">
 <div :class="{ wrapperClasses: fullScreenMode }">
-<div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-gray-200 dark:bg-dark-700': fullScreenMode }">
+<div class="replicator-fieldtype-container" :class="{
+    'replicator-fullscreen bg-gray-200 dark:bg-dark-700': fullScreenMode,
+    'replicator-droppable': canDropSet === true,
+    'replicator-not-droppable': canDropSet === false,
+}">
 
     <header class="bg-white dark:bg-dark-550 fixed top-0 inset-x-0 border-b dark:border-dark-900 p-3 rtl:pr-4 ltr:pl-4 flex items-center justify-between shadow z-max" v-if="fullScreenMode">
         <h2 v-text="__(config.display)" class="flex-1" />
@@ -50,6 +54,8 @@
             append-to="body"
             constrain-dimensions
             @input="sorted($event)"
+            @groupstart="sortableGroupStart"
+            @groupend="sortableGroupEnd"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >
@@ -140,6 +146,7 @@ export default {
             collapsed: clone(this.meta.collapsed),
             previews: this.meta.previews,
             fullScreenMode: false,
+            canDropSet: null,
             provide: {
                 storeName: this.storeName,
                 replicatorSets: this.config.sets
@@ -315,7 +322,16 @@ export default {
         },
 
         sortableGroupValidator({ source }) {
-            return this.canAddSet && Object.values(this.setConfigHashes).includes(source.dataset.configHash);
+            this.canDropSet = this.canAddSet && Object.values(this.setConfigHashes).includes(source.dataset.configHash);
+            return this.canDropSet;
+        },
+
+        sortableGroupStart({ valid }) {
+            this.canDropSet = valid;
+        },
+
+        sortableGroupEnd() {
+            this.canDropSet = null;
         },
 
     },

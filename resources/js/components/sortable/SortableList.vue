@@ -137,7 +137,6 @@ export default {
                 } else if (oldContainer === this.$el) {
                     this.$emit('input', { operation: 'remove', oldList: this, newList: closestVm(newContainer, 'sortable-list'), ...payload });
                 }
-                this.$el.classList.remove('cursor-not-allowed');
             });
 
             if (this.group && this.groupValidator) {
@@ -149,8 +148,16 @@ export default {
                     }
                     if (!this.groupValidator({ source })) {
                         event.cancel();
-                        this.$el.classList.add('cursor-not-allowed');
                     }
+                });
+                this.sortable.on('sortable:start', (event) => {
+                    const { dragEvent } = event;
+                    const { source } = dragEvent;
+                    const valid = this.groupValidator({ source });
+                    this.$emit('groupstart', { valid });
+                });
+                this.sortable.on('sortable:stop', () => {
+                    this.$emit('groupend');
                 });
             }
 
