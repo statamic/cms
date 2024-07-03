@@ -48,7 +48,7 @@
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js'
 
-const onEachSide = 3;
+const onEachSide = 2;
 
 export default {
 
