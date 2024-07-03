@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Illuminate\Support\Facades\URL;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\CP\Nav;
