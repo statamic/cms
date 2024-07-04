@@ -463,7 +463,7 @@ class Field implements Arrayable
     public function configHash(): string
     {
         if (! isset($this->configHash)) {
-            $this->configHash = md5(json_encode($this->config));
+            $this->configHash = md5($this->handle.json_encode($this->config));
         }
 
         return $this->configHash;

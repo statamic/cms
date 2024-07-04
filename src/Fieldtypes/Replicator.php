@@ -270,10 +270,10 @@ class Replicator extends Fieldtype
                 ->flatMap(function ($section) {
                     return $section['sets'];
                 })
-                ->map(function ($set) {
+                ->map(function ($config, $handle) {
                     return [
-                        ...$set,
-                        'hash' => md5(json_encode($set)),
+                        ...$config,
+                        'hash' => md5($handle.json_encode($config)),
                     ];
                 });
         });
