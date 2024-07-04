@@ -257,7 +257,7 @@ class Replicator extends Fieldtype
 
             // If the first set doesn't have a nested "set" key, it would be the legacy format.
             // We'll put it in a "main" group so it's compatible with the new format.
-            // This also happens in the "sets" fieldtype.
+            // This also happens in the "sets" fieldtype
             if (! Arr::has($sets->first(), 'sets')) {
                 $sets = collect([
                     'main' => [
