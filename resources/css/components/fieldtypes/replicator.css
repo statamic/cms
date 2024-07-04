@@ -7,14 +7,6 @@
     min-height: 1rem;
 }
 
-.replicator-droppable {
-    @apply ring ring-green-500;
-}
-
-.replicator-not-droppable {
-    @apply ring ring-red-500;
-}
-
 .replicator-set {
     @apply shadow-set dark:shadow-dark-set rounded bg-white dark:bg-dark-800 outline-none relative;
 }
@@ -88,4 +80,22 @@
 
 .replicator-fullscreen {
     @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
+}
+
+@scope (.replicator-droppable) to (.replicator-fieldtype) {
+    :scope {
+        cursor: auto;
+    }
+    * {
+        pointer-events: auto;
+    }
+}
+
+@scope (.replicator-not-droppable) to (.replicator-fieldtype) {
+    :scope {
+        cursor: not-allowed;
+    }
+    * {
+        pointer-events: none;
+    }
 }

@@ -120,7 +120,7 @@ class Replicator extends Fieldtype
     public function fields($set, $index = -1)
     {
         $config = Arr::get($this->flattenedSetsConfig(), $set);
-        $configHash = $config['hash'] ?? null;
+        $configHash = $config['hash'] ?? 'invalid_set';
         $itemHash = md5($this->field->fieldPathPrefix().'.'.$index);
 
         return Blink::once('replicator-'.$configHash.'-'.$itemHash, function () use ($config, $index) {
@@ -210,7 +210,7 @@ class Replicator extends Fieldtype
 
     public function preload()
     {
-        $configHash = $this->configHash();
+        $configHash = $this->field->configHash();
 
         $existing = collect($this->field->value())->mapWithKeys(function ($set, $index) {
             return [$set['_id'] => $this->fields($set['type'], $index)->addValues($set)->meta()->put('_', '_')];
@@ -250,7 +250,7 @@ class Replicator extends Fieldtype
 
     public function flattenedSetsConfig()
     {
-        $configHash = $this->configHash();
+        $configHash = $this->field->configHash();
 
         return Blink::once('replicator-'.$configHash.'-sets', function () {
             $sets = collect($this->config('sets'));
@@ -339,12 +339,5 @@ class Replicator extends Fieldtype
     public function toQueryableValue($value)
     {
         return empty($value) ? null : $value;
-    }
-
-    protected function configHash()
-    {
-        return Blink::once('replicator-'.implode('.', $this->field?->handlePath()).'-hash', function () {
-            return md5($this->field?->handle().json_encode($this->field?->config()));
-        });
     }
 }
