@@ -22,11 +22,9 @@ class StaticWarmJobTest extends TestCase
 
         $handlerStack = HandlerStack::create($mock);
 
-        $client = new Client(['handler' => $handlerStack]);
+        $job = new StaticWarmJob(new Request('GET', '/about'), ['handler' => $handlerStack]);
 
-        $job = new StaticWarmJob(new Request('GET', '/about'));
-
-        $job->handle($client);
+        $job->handle();
 
         $this->assertEquals('/about', $mock->getLastRequest()->getUri()->getPath());
     }
