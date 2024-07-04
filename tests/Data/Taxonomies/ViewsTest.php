@@ -18,6 +18,7 @@ class ViewsTest extends TestCase
 
     private $blogEntry;
     private $frenchBlogEntry;
+    private $germanBlogEntry;
     private $blogCollection;
 
     public function setUp(): void
@@ -26,6 +27,7 @@ class ViewsTest extends TestCase
 
         $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
+            'de' => ['url' => '/de', 'locale' => 'de'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
         ]);
 
@@ -34,8 +36,9 @@ class ViewsTest extends TestCase
         Collection::make('pages')->routes('{slug}')->sites(['en', 'fr'])->save();
         $this->blogEntry = EntryFactory::collection('pages')->locale('en')->slug('the-blog')->create();
         $this->frenchBlogEntry = EntryFactory::collection('pages')->locale('fr')->slug('le-blog')->origin($this->blogEntry->id())->create();
+        $this->germanBlogEntry = EntryFactory::collection('pages')->locale('de')->slug('der-blog')->origin($this->blogEntry->id())->create();
 
-        $this->blogCollection = tap(Collection::make('blog')->sites(['en', 'fr'])->taxonomies(['tags']))->save();
+        $this->blogCollection = tap(Collection::make('blog')->sites(['en', 'de', 'fr'])->taxonomies(['tags']))->save();
 
         Taxonomy::make('tags')->sites(['en', 'fr'])->title('Tags')->save();
 
@@ -43,6 +46,16 @@ class ViewsTest extends TestCase
             $term->in('en')->slug('test')->set('title', 'Test');
             $term->in('fr')->slug('le-test')->set('title', 'Le Test');
         })->save();
+    }
+
+    #[Test]
+    public function the_taxonomy_url_404s_for_unconfigured_sites()
+    {
+        $this->viewShouldReturnRaw('tags.index', '{{ title }} index');
+
+        $this->get('/tags')->assertOk()->assertSee('Tags index');
+        $this->get('/fr/tags')->assertOk()->assertSee('Tags index');
+        $this->get('/de/tags')->assertNotFound();
     }
 
     #[Test]
@@ -79,6 +92,18 @@ class ViewsTest extends TestCase
         $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
 
         $this->get('/fr/tags/le-test')->assertOk()->assertSee('showing Le Test');
+    }
+
+    #[Test]
+    public function the_collection_specific_taxonomy_url_404s_for_unconfigured_sites()
+    {
+        $this->mountBlogPageToBlogCollection();
+
+        $this->viewShouldReturnRaw('blog.tags.index', '{{ title }} index');
+
+        $this->get('/the-blog/tags')->assertOk()->assertSee('Tags index');
+        $this->get('/fr/le-blog/tags')->assertOk()->assertSee('Tags index');
+        $this->get('/de/der-blog/tags')->assertNotFound();
     }
 
     #[Test]
