@@ -33,8 +33,8 @@
                     <dropdown-list>
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
-                        <dropdown-item :text="__('Cut Set')" @click="cut" v-if="canCopySet"  />
-                        <dropdown-item :text="__('Copy Set')" @click="copy" v-if="canCopySet"  />
+                        <dropdown-item :text="__('Cut Set')" @click="cut" />
+                        <dropdown-item :text="__('Copy Set')" @click="copy" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                     </dropdown-list>
                 </div>
@@ -128,10 +128,6 @@ export default {
             type: String
         },
         canAddSet: {
-            type: Boolean,
-            default: true
-        },
-        canCopySet: {
             type: Boolean,
             default: true
         },
