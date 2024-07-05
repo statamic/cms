@@ -81,7 +81,8 @@ class ContainerAssetsStore extends ChildStore
     private function getFiles()
     {
         return $this->container()->listContents()->reject(function ($file) {
-            return $file['type'] ?? '' !== 'file'
+            return !isset($file['type'])
+                || $file['type'] !== 'file'
                 || $file['path'] === ''
                 || $file['dirname'] === '.meta'
                 || Str::contains($file['path'], '/.meta/')
