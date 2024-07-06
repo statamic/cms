@@ -1,5 +1,25 @@
 # Release Notes
 
+## 5.13.0 (2024-07-05)
+
+### What's new
+- Arabic translations [#10391](https://github.com/statamic/cms/issues/10391) by @rezbouchabou
+- Support operators in where modifier [#10377](https://github.com/statamic/cms/issues/10377) by @jacksleight
+
+### What's fixed
+- Fix list fieldtype rendering in listings [#10379](https://github.com/statamic/cms/issues/10379) by @ryanmitchell
+- Fix dirty state after entry action or revision publish [#10381](https://github.com/statamic/cms/issues/10381) by @jacksleight
+- Fix static:warm not working when using queues and auth together [#10395](https://github.com/statamic/cms/issues/10395) by @duncanmcclean
+- Fix CSS for dark mode CP login background [#10399](https://github.com/statamic/cms/issues/10399) by @heidkaemper
+- Add negative bottom margin to Textarea's character counter [#10390](https://github.com/statamic/cms/issues/10390) by @jackmcdade
+- Improve Asset Fieldtype Dark Mode UI [#10388](https://github.com/statamic/cms/issues/10388) by @jackmcdade
+- Rename "Delete" to "Remove" for clarity. [#10387](https://github.com/statamic/cms/issues/10387) by @jackmcdade
+- Refactor frontend formFailure to handle precognitive and fetch exceptions [#10376](https://github.com/statamic/cms/issues/10376) by @ryanmitchell
+- Fix unauthorized page logout redirect [#10378](https://github.com/statamic/cms/issues/10378) by @bensherred
+- Fix user filtering for role or group when using eloquent and a custom table name [#10358](https://github.com/statamic/cms/issues/10358) by @faltjo
+
+
+
 ## 5.12.0 (2024-06-28)
 
 ### What's new

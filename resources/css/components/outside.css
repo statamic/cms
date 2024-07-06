@@ -19,7 +19,8 @@
 }
 
 .dark .outside.rad-theme {
-    background: #212223 radial-gradient(at 32.6% 91.5%, #142038 0px, transparent 50%), radial-gradient(at 87.4% 39.4%, #353945 0px, transparent 50%), radial-gradient(at 84.6% 52.5%, #171717 0px, transparent 50%);
+    background: #212223;
+    background-image: radial-gradient(at 32.6% 91.5%, #142038 0px, transparent 50%), radial-gradient(at 87.4% 39.4%, #353945 0px, transparent 50%), radial-gradient(at 84.6% 52.5%, #171717 0px, transparent 50%);
 }
 
 .dark .outside-shadow {
