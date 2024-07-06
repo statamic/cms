@@ -15,7 +15,6 @@ class StaticWarmJob implements ShouldQueue, ShouldBeUnique
     use Dispatchable, InteractsWithQueue, Queueable;
 
     public $tries = 1;
-    
     private $id;
 
     public function __construct(public Request $request, public array $clientConfig)
