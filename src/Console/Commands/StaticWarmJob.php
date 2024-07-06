@@ -19,7 +19,7 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
 
     public function __construct(public Request $request, public array $clientConfig)
     {
-        $this->id = $request->getUri()->getPath();
+        $this->id = $request->getUri()->getHost() . $request->getUri()->getPath();
     }
 
     public function handle()
