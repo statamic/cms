@@ -1,10 +1,8 @@
 <?php
 
 return [
-
-    'super' => 'مستخدم سوبر',
-    'super_desc' => 'لدى المستخدم سوبر السيطرة الكاملة والوصول إلى كل شيء في لوحة التحكم. امنح هذا الدور بحكمة.',
-
+    'super' => 'مستخدم خارق',
+    'super_desc' => 'لدى المستخدم الخارق السيطرة الكاملة والوصول إلى كل شيء في لوحة التحكم. امنح هذا الدور بحذر.',
     'group_cp' => 'لوحة التحكم',
     'access_cp' => 'الوصول إلى لوحة التحكم',
     'access_cp_desc' => 'يسمح بالوصول إلى لوحة التحكم، لكنه لا يضمن أن يتمكن من فعل أي شيء بمجرد الدخول.',
@@ -16,10 +14,8 @@ return [
     'configure_addons_desc' => 'القدرة على الوصول إلى قسم الإضافات لتثبيتها وإلغاء تثبيتها.',
     'manage_preferences' => 'إدارة التفضيلات',
     'manage_preferences_desc' => 'القدرة على تخصيص التفضيلات العامة وتفضيلات الأدوار.',
-
     'group_sites' => 'المواقع',
     'access_{site}_site' => 'الوصول إلى موقع :site',
-
     'group_collections' => 'المجموعات',
     'configure_collections' => 'تكوين المجموعات',
     'configure_collections_desc' => 'يمنح الوصول إلى جميع الأذونات المتعلقة بالمجموعة',
@@ -28,13 +24,12 @@ return [
     'create_{collection}_entries' => 'إنشاء إدخالات جديدة',
     'delete_{collection}_entries' => 'حذف الإدخالات',
     'publish_{collection}_entries' => 'إدارة حالة النشر',
-    'publish_{collection}_entries_desc' => 'القدرة على التغيير من المسودة إلى المنشور والعكس',
+    'publish_{collection}_entries_desc' => 'القدرة على التغيير من مسودة إلى منشور والعكس',
     'reorder_{collection}_entries' => 'إعادة ترتيب الإدخالات',
     'reorder_{collection}_entries_desc' => 'تمكين إعادة الترتيب بالسحب والإفلات',
     'edit_other_authors_{collection}_entries' => "تحرير إدخالات المؤلفين الآخرين",
     'publish_other_authors_{collection}_entries' => "إدارة حالة نشر إدخالات المؤلفين الآخرين",
     'delete_other_authors_{collection}_entries' => "حذف إدخالات المؤلفين الآخرين",
-
     'group_taxonomies' => 'التصنيفات',
     'configure_taxonomies' => 'تكوين التصنيفات',
     'configure_taxonomies_desc' => 'يمنح الوصول إلى جميع الأذونات المتعلقة بالتصنيف',
@@ -44,18 +39,15 @@ return [
     'delete_{taxonomy}_terms' => 'حذف المصطلحات',
     'publish_{taxonomy}_terms' => 'إدارة حالة النشر',
     'reorder_{taxonomy}_terms' => 'إعادة ترتيب المصطلحات',
-
     'group_navigation' => 'التنقل',
     'configure_navs' => 'تكوين التنقل',
     'configure_navs_desc' => 'يمنح الوصول إلى جميع الأذونات المتعلقة بالتنقل',
     'view_{nav}_nav' => 'عرض تنقل :nav',
     'edit_{nav}_nav' => 'تحرير التنقل',
-
     'group_globals' => 'العموميات',
     'configure_globals' => 'تكوين العموميات',
     'configure_globals_desc' => 'يمنح الوصول إلى جميع الأذونات المتعلقة بالعموميات',
-    'edit_{global}_globals' => 'تحرير :global العموميات',
-
+    'edit_{global}_globals' => 'تحرير عموميات :global',
     'group_assets' => 'الأصول',
     'configure_asset_containers' => 'تكوين حاويات الأصول',
     'configure_asset_containers_desc' => 'يمنح الوصول إلى جميع الأذونات المتعلقة بالأصول',
@@ -65,7 +57,6 @@ return [
     'move_{container}_assets' => 'نقل الأصول',
     'rename_{container}_assets' => 'إعادة تسمية الأصول',
     'delete_{container}_assets' => 'حذف الأصول',
-
     'group_forms' => 'النماذج',
     'configure_forms' => 'تكوين النماذج',
     'configure_forms_desc' => 'يمنح الوصول إلى جميع الأذونات المتعلقة بالنماذج',
@@ -73,31 +64,25 @@ return [
     'configure_form_fields_desc' => 'القدرة على تحرير مخططات النموذج ومجموعات الحقول وحقولها.',
     'view_{form}_form_submissions' => 'عرض إرسالات :form',
     'delete_{form}_form_submissions' => 'حذف إرسالات :form',
-
     'group_users' => 'المستخدمين',
     'view_users' => 'عرض المستخدمين',
     'edit_users' => 'تحرير المستخدمين',
     'create_users' => 'إنشاء مستخدمين',
     'delete_users' => 'حذف المستخدمين',
     'change_passwords' => 'تغيير كلمات المرور',
-    'edit_user_groups' => 'تحرير المجموعات',
+    'edit_user_groups' => 'تحرير مجموعات المستخدمين',
     'edit_roles' => 'تحرير الأدوار',
     'assign_user_groups' => 'تعيين المجموعات للمستخدمين',
     'assign_roles' => 'تعيين الأدوار للمستخدمين',
     'impersonate_users' => 'تقمص هوية المستخدمين',
-
     'group_updates' => 'التحديثات',
     'view_updates' => 'عرض التحديثات',
-
     'group_utilities' => 'الأدوات',
     'access_utility' => ':title',
     'access_utility_desc' => 'يمنح الوصول إلى أداة :title',
-
     'group_misc' => 'متفرقات',
-    'resolve_duplicate_ids' => 'حل معرفات مكررة',
+    'resolve_duplicate_ids' => 'حل المعرفات المكررة',
     'resolve_duplicate_ids_desc' => 'يمنح القدرة على رؤية وحل المعرفات المكررة.',
-
     'view_graphql' => 'عرض GraphQL',
     'view_graphql_desc' => 'يمنح القدرة على الوصول إلى عارض GraphQL',
-
 ];
