@@ -195,6 +195,9 @@ class StaticWarm extends Command
     {
         $this->line('[ ] Entries...');
 
+        // "Warm" the structure trees
+        Facades\Collection::whereStructured()->each(fn ($collection) => $collection->structure()->trees()->each->tree());
+
         $entries = Facades\Entry::all()->map(function (Entry $entry) {
             if (! $entry->published() || $entry->private()) {
                 return null;
