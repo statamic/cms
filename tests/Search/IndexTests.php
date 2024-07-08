@@ -24,5 +24,7 @@ trait IndexTests
         });
     }
 
-    protected function beforeSearched() {}
+    protected function beforeSearched()
+    {
+    }
 }

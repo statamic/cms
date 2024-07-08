@@ -2,4 +2,6 @@
 
 namespace Statamic\Contracts\Routing;
 
-interface UrlBuilder {}
+interface UrlBuilder
+{
+}

@@ -68,4 +68,6 @@ class AttributeTestStringable
     }
 }
 
-class AttributeTestNotStringable {}
+class AttributeTestNotStringable
+{
+}

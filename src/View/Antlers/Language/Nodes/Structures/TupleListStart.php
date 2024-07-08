@@ -4,4 +4,6 @@ namespace Statamic\View\Antlers\Language\Nodes\Structures;
 
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 
-class TupleListStart extends AbstractNode {}
+class TupleListStart extends AbstractNode
+{
+}
