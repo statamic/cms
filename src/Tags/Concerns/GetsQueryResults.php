@@ -10,7 +10,7 @@ trait GetsQueryResults
     protected function results($query)
     {
         $this
-            ->setPaginationParameterPrecedence()
+            ->allowLegacyStylePaginationLimiting()
             ->preventIncompatiblePaginationParameters();
 
         if ($paginate = $this->params->int('paginate')) {
@@ -32,7 +32,7 @@ trait GetsQueryResults
         return $query->get();
     }
 
-    protected function setPaginationParameterPrecedence()
+    protected function allowLegacyStylePaginationLimiting()
     {
         if ($this->params->get('paginate') === true) {
             $this->params->put('paginate', $this->params->get('limit'));
