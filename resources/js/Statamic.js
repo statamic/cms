@@ -16,7 +16,6 @@ import 'floating-vue/dist/style.css';
 // import isLatLong from "validator/es/lib/isLatLong.js";
 
 import { store } from './store.js';
-import eventBus from './eventBus.js';
 import http from './http';
 import Config from './components/Config';
 import Preferences from './components/Preference';
@@ -37,6 +36,7 @@ import Elastic from './directives/elastic.js';
 import PortalVue from 'portal-vue';
 import useProgressBar from './composables/useProgressBar';
 import useDirtyState from './composables/useDirtyState';
+import useEventBus from './composables/useEventBus';
 import registerFieldTypes from './bootstrap/fieldtypes.js';
 
 const echo = new Echo;
@@ -164,7 +164,7 @@ export default {
         this.$app.config.globalProperties.$toast = useToast();
         this.$app.config.globalProperties.$moment = window.moment;
         this.$app.config.globalProperties.$axios = http;
-        this.$app.config.globalProperties.$events = eventBus;
+        this.$app.config.globalProperties.$events = useEventBus();
         this.$app.config.globalProperties.$echo = this.$echo;
         this.$app.config.globalProperties.$bard = this.$bard;
         this.$app.config.globalProperties.$keys = this.$keys;
