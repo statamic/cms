@@ -74,132 +74,133 @@
             :is-root="isRoot"
             @updated="values = $event"
         >
-            <live-preview
-                #default="{ container, components, setFieldMeta }"
-                :name="publishContainer"
-                :url="livePreviewUrl"
-                :previewing="isPreviewing"
-                :targets="previewTargets"
-                :values="values"
-                :blueprint="fieldset.handle"
-                :reference="initialReference"
-                @opened-via-keyboard="openLivePreview"
-                @closed="closeLivePreview"
-            >
-                <div>
-                    <component
-                        v-for="component in components"
-                        :key="component.name"
-                        :is="component.name"
-                        :container="container"
-                        v-bind="component.props"
-                    />
+            <template #default="{ container, components, setFieldMeta }">
+                <live-preview
+                    :name="publishContainer"
+                    :url="livePreviewUrl"
+                    :previewing="isPreviewing"
+                    :targets="previewTargets"
+                    :values="values"
+                    :blueprint="fieldset.handle"
+                    :reference="initialReference"
+                    @opened-via-keyboard="openLivePreview"
+                    @closed="closeLivePreview"
+                >
+                    <div>
+                        <component
+                            v-for="component in components"
+                            :key="component.name"
+                            :is="component.name"
+                            :container="container"
+                            v-bind="component.props"
+                        />
 
-                    <transition name="live-preview-tabs-drop">
-                        <publish-tabs
-                            v-show="tabsVisible"
-                            :read-only="readOnly"
-                            :syncable="hasOrigin"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                            @synced="syncField"
-                            @desynced="desyncField"
-                            @focus="container.$emit('focus', $event)"
-                            @blur="container.$emit('blur', $event)"
-                        >
-                            <template #actions="{ shouldShowSidebar }">
-                            <div class="card p-0" :class="{ 'mb-5': showLivePreviewButton || showVisitUrlButton || localizations.length > 1 }">
+                        <transition name="live-preview-tabs-drop">
+                            <publish-tabs
+                                v-show="tabsVisible"
+                                :read-only="readOnly"
+                                :syncable="hasOrigin"
+                                @updated="setFieldValue"
+                                @meta-updated="setFieldMeta"
+                                @synced="syncField"
+                                @desynced="desyncField"
+                                @focus="container.$emit('focus', $event)"
+                                @blur="container.$emit('blur', $event)"
+                            >
+                                <template #actions="{ shouldShowSidebar }">
+                                    <div class="card p-0" :class="{ 'mb-5': showLivePreviewButton || showVisitUrlButton || localizations.length > 1 }">
 
-                                <div :class="{ 'hi': !shouldShowSidebar }">
+                                        <div :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
-                                        <button
-                                            class="flex items-center justify-center btn w-full"
-                                            v-if="showLivePreviewButton"
-                                            @click="openLivePreview">
-                                            <svg-icon name="light/synchronize" class="h-4 w-4 rtl:ml-2 ltr:mr-2 shrink-0" />
-                                            <span>{{ __('Live Preview') }}</span>
-                                        </button>
-                                        <a
-                                            class="flex items-center justify-center btn w-full"
-                                            v-if="showVisitUrlButton"
-                                            :href="permalink"
-                                            target="_blank">
-                                            <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2 shrink-0" />
-                                            <span>{{ __('Visit URL') }}</span>
-                                        </a>
-                                    </div>
-                                </div>
+                                            <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
+                                                <button
+                                                    class="flex items-center justify-center btn w-full"
+                                                    v-if="showLivePreviewButton"
+                                                    @click="openLivePreview">
+                                                    <svg-icon name="light/synchronize" class="h-4 w-4 rtl:ml-2 ltr:mr-2 shrink-0" />
+                                                    <span>{{ __('Live Preview') }}</span>
+                                                </button>
+                                                <a
+                                                    class="flex items-center justify-center btn w-full"
+                                                    v-if="showVisitUrlButton"
+                                                    :href="permalink"
+                                                    target="_blank">
+                                                    <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2 shrink-0" />
+                                                    <span>{{ __('Visit URL') }}</span>
+                                                </a>
+                                            </div>
+                                        </div>
 
-                                <!--
-                                TODO
-                                <div class="flex items-center border-t justify-between px-4 py-2" v-if="!revisionsEnabled">
-                                    <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                    <toggle-input v-model="published" />
-                                </div>
+                                        <!--
+                                        TODO
+                                        <div class="flex items-center border-t justify-between px-4 py-2" v-if="!revisionsEnabled">
+                                            <label v-text="__('Published')" class="publish-field-label font-medium" />
+                                            <toggle-input v-model="published" />
+                                        </div>
 
-                                <div class="border-t p-4" v-if="revisionsEnabled">
-                                    <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
-                                    <div class="mb-1 flex items-center" v-if="published">
-                                        <span class="text-green-600 w-6 text-center">&check;</span>
-                                        <span class="text-2xs" v-text="__('Entry has a published version')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-else="published">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Entry has not been published')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-if="isWorkingCopy && isDirty">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Working copy has unsaved changes')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-else-if="isWorkingCopy">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Entry has unpublished changes')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
-                                        <span class="text-green-600 w-6 text-center">&check;</span>
-                                        <span class="text-2xs" v-text="__('This is the published version')"></span>
-                                    </div>
-                                    <button
-                                            class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
-                                            v-if="!isCreating && revisionsEnabled"
-                                            @click="showRevisionHistory = true">
-                                            <svg-icon name="history" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
-                                            <span>{{ __('View History') }}</span>
-                                        </button>
-                                </div>
-                                -->
+                                        <div class="border-t p-4" v-if="revisionsEnabled">
+                                            <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
+                                            <div class="mb-1 flex items-center" v-if="published">
+                                                <span class="text-green-600 w-6 text-center">&check;</span>
+                                                <span class="text-2xs" v-text="__('Entry has a published version')"></span>
+                                            </div>
+                                            <div class="mb-1 flex items-center" v-else="published">
+                                                <span class="text-orange w-6 text-center">!</span>
+                                                <span class="text-2xs" v-text="__('Entry has not been published')"></span>
+                                            </div>
+                                            <div class="mb-1 flex items-center" v-if="isWorkingCopy && isDirty">
+                                                <span class="text-orange w-6 text-center">!</span>
+                                                <span class="text-2xs" v-text="__('Working copy has unsaved changes')"></span>
+                                            </div>
+                                            <div class="mb-1 flex items-center" v-else-if="isWorkingCopy">
+                                                <span class="text-orange w-6 text-center">!</span>
+                                                <span class="text-2xs" v-text="__('Entry has unpublished changes')"></span>
+                                            </div>
+                                            <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
+                                                <span class="text-green-600 w-6 text-center">&check;</span>
+                                                <span class="text-2xs" v-text="__('This is the published version')"></span>
+                                            </div>
+                                            <button
+                                                    class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
+                                                    v-if="!isCreating && revisionsEnabled"
+                                                    @click="showRevisionHistory = true">
+                                                    <svg-icon name="history" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
+                                                    <span>{{ __('View History') }}</span>
+                                                </button>
+                                        </div>
+                                        -->
 
-                                <div class="p-4 border-t dark:border-dark-900" v-if="localizations.length > 1">
-                                    <label class="publish-field-label font-medium mb-2" v-text="__('Sites')" />
-                                    <div
-                                        v-for="option in localizations"
-                                        :key="option.handle"
-                                        class="text-sm flex items-center -mx-4 px-4 py-2 cursor-pointer"
-                                        :class="option.active ? 'bg-blue-100 dark:bg-dark-300' : 'hover:bg-gray-200 dark:hover:bg-dark-400'"
-                                        @click="localizationSelected(option)"
-                                    >
-                                        <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
+                                        <div class="p-4 border-t dark:border-dark-900" v-if="localizations.length > 1">
+                                            <label class="publish-field-label font-medium mb-2" v-text="__('Sites')" />
+                                            <div
+                                                v-for="option in localizations"
+                                                :key="option.handle"
+                                                class="text-sm flex items-center -mx-4 px-4 py-2 cursor-pointer"
+                                                :class="option.active ? 'bg-blue-100 dark:bg-dark-300' : 'hover:bg-gray-200 dark:hover:bg-dark-400'"
+                                                @click="localizationSelected(option)"
+                                            >
+                                                <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
                                             <span class="little-dot rtl:ml-2 ltr:mr-2" :class="{
                                                 'bg-green-600': option.published,
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
                                             }" />
-                                            {{ __(option.name) }}
-                                            <loading-graphic :size="14" text="" class="rtl:mr-2 ltr:ml-2" v-if="localizing === option.handle" />
+                                                    {{ __(option.name) }}
+                                                    <loading-graphic :size="14" text="" class="rtl:mr-2 ltr:ml-2" v-if="localizing === option.handle" />
+                                                </div>
+                                                <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
+                                                <div class="badge-sm bg-blue dark:bg-dark-blue-100" v-if="option.active" v-text="__('Active')" />
+                                                <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
+                                            </div>
                                         </div>
-                                        <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
-                                        <div class="badge-sm bg-blue dark:bg-dark-blue-100" v-if="option.active" v-text="__('Active')" />
-                                        <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
-                                    </div>
-                                </div>
 
-                            </div>
-                            </template>
-                        </publish-tabs>
-                    </transition>
-                </div>
-            </live-preview>
+                                    </div>
+                                </template>
+                            </publish-tabs>
+                        </transition>
+                    </div>
+                </live-preview>
+            </template>
         </publish-container>
 
         <div class="md:hidden mt-6 flex items-center">
@@ -225,12 +226,13 @@
         </div>
 
         <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
-            <revision-history
-                #default="{ close }"
-                :index-url="actions.revisions"
-                :restore-url="actions.restore"
-                @closed="close"
-            />
+            <template #default="{ close }">
+                <revision-history
+                    :index-url="actions.revisions"
+                    :restore-url="actions.restore"
+                    @closed="close"
+                />
+            </template>
         </stack>
 
         <publish-actions

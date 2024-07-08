@@ -10,12 +10,13 @@
             :track-dirty-state="false"
             @updated="updateValues"
         >
-            <publish-fields
-                #default="{ setFieldValue }"
-                :fields="filter.fields"
-                :name-prefix="`filter-${filter.handle}`"
-                @updated="setFieldValue"
-            />
+            <template #default="{ setFieldValue }">
+                <publish-fields
+                    :fields="filter.fields"
+                    :name-prefix="`filter-${filter.handle}`"
+                    @updated="setFieldValue"
+                />
+            </template>
         </publish-container>
 
         <div class="flex border-t dark:border-dark-900">

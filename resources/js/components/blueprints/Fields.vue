@@ -44,26 +44,28 @@
             v-if="isSelectingNewFieldtype"
             @closed="isSelectingNewFieldtype = false"
         >
-            <fieldtype-selector #default="{ close }" @closed="close" @selected="fieldtypeSelected" />
+            <template #default="{ close }">
+                <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
+            </template>
         </stack>
 
         <stack name="field-settings"
             v-if="pendingCreatedField != null"
             @closed="pendingCreatedField = null"
         >
-            <field-settings
-                #default="{ close }"
-                ref="settings"
-                :type="pendingCreatedField.config.type"
-                :root="true"
-                :fields="fields"
-                :config="pendingCreatedField.config"
-                :suggestable-condition-fields="suggestableConditionFields"
-                @committed="fieldCreated"
-                @closed="close"
-            />
+            <template #default="{ close }">
+                <field-settings
+                    ref="settings"
+                    :type="pendingCreatedField.config.type"
+                    :root="true"
+                    :fields="fields"
+                    :config="pendingCreatedField.config"
+                    :suggestable-condition-fields="suggestableConditionFields"
+                    @committed="fieldCreated"
+                    @closed="close"
+                />
+            </template>
         </stack>
-
     </div>
 
 </template>

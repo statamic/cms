@@ -26,12 +26,13 @@
                 :errors="errors"
                 @updated="values = $event"
             >
-                <publish-fields
-                    #default="{ setFieldValue, setFieldMeta }"
-                    :fields="action.fields"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                />
+                <template #default="{ setFieldValue, setFieldMeta }">
+                    <publish-fields
+                        :fields="action.fields"
+                        @updated="setFieldValue"
+                        @meta-updated="setFieldMeta"
+                    />
+                </template>
             </publish-container>
         </confirmation-modal>
     </span>

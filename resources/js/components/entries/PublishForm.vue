@@ -72,163 +72,164 @@
             :track-dirty-state="trackDirtyState"
             @updated="values = $event"
         >
-            <live-preview
-                #default="{ container, components, setFieldMeta }"
-                :name="publishContainer"
-                :url="livePreviewUrl"
-                :previewing="isPreviewing"
-                :targets="previewTargets"
-                :values="values"
-                :blueprint="fieldset.handle"
-                :reference="initialReference"
-                @opened-via-keyboard="openLivePreview"
-                @closed="closeLivePreview"
-            >
+            <template #default="{ container, components, setFieldMeta }">
+                <live-preview
+                    :name="publishContainer"
+                    :url="livePreviewUrl"
+                    :previewing="isPreviewing"
+                    :targets="previewTargets"
+                    :values="values"
+                    :blueprint="fieldset.handle"
+                    :reference="initialReference"
+                    @opened-via-keyboard="openLivePreview"
+                    @closed="closeLivePreview"
+                >
 
-                <div>
-                    <component
-                        v-for="component in components"
-                        :key="component.id"
-                        :is="component.name"
-                        :container="container"
-                        v-bind="component.props"
-                        v-on="component.events"
-                    />
+                    <div>
+                        <component
+                            v-for="component in components"
+                            :key="component.id"
+                            :is="component.name"
+                            :container="container"
+                            v-bind="component.props"
+                            v-on="component.events"
+                        />
 
-                    <transition name="live-preview-tabs-drop">
-                        <publish-tabs
-                            v-show="tabsVisible"
-                            :read-only="readOnly"
-                            :syncable="hasOrigin"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                            @synced="syncField"
-                            @desynced="desyncField"
-                            @focus="container.$emit('focus', $event)"
-                            @blur="container.$emit('blur', $event)"
-                        >
-                            <template #actions="{ shouldShowSidebar }">
-                            <div class="card p-0 mb-5">
+                        <transition name="live-preview-tabs-drop">
+                            <publish-tabs
+                                v-show="tabsVisible"
+                                :read-only="readOnly"
+                                :syncable="hasOrigin"
+                                @updated="setFieldValue"
+                                @meta-updated="setFieldMeta"
+                                @synced="syncField"
+                                @desynced="desyncField"
+                                @focus="container.$emit('focus', $event)"
+                                @blur="container.$emit('blur', $event)"
+                            >
+                                <template #actions="{ shouldShowSidebar }">
+                                    <div class="card p-0 mb-5">
 
-                                <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
+                                        <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
-                                        <button
-                                            class="flex items-center justify-center btn w-full"
-                                            v-if="showLivePreviewButton"
-                                            @click="openLivePreview">
-                                            <svg-icon name="light/synchronize" class="h-4 w-4 rtl:ml-2 ltr:mr-2 shrink-0" />
-                                            <span>{{ __('Live Preview') }}</span>
-                                        </button>
-                                        <a
-                                            class="flex items-center justify-center btn w-full"
-                                            v-if="showVisitUrlButton"
-                                            :href="permalink"
-                                            target="_blank">
-                                            <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2 shrink-0" />
-                                            <span>{{ __('Visit URL') }}</span>
-                                        </a>
-                                    </div>
-                                </div>
+                                            <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
+                                                <button
+                                                    class="flex items-center justify-center btn w-full"
+                                                    v-if="showLivePreviewButton"
+                                                    @click="openLivePreview">
+                                                    <svg-icon name="light/synchronize" class="h-4 w-4 rtl:ml-2 ltr:mr-2 shrink-0" />
+                                                    <span>{{ __('Live Preview') }}</span>
+                                                </button>
+                                                <a
+                                                    class="flex items-center justify-center btn w-full"
+                                                    v-if="showVisitUrlButton"
+                                                    :href="permalink"
+                                                    target="_blank">
+                                                    <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2 shrink-0" />
+                                                    <span>{{ __('Visit URL') }}</span>
+                                                </a>
+                                            </div>
+                                        </div>
 
-                                <div
-                                    v-if="!revisionsEnabled"
-                                    class="flex items-center justify-between px-4 py-2"
-                                    :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
-                                >
-                                    <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                    <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
-                                </div>
+                                        <div
+                                            v-if="!revisionsEnabled"
+                                            class="flex items-center justify-between px-4 py-2"
+                                            :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
+                                        >
+                                            <label v-text="__('Published')" class="publish-field-label font-medium" />
+                                            <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
+                                        </div>
 
-                                <div
-                                    v-if="revisionsEnabled && !isCreating"
-                                    class="p-4"
-                                    :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
-                                >
-                                    <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
-                                    <div class="mb-1 flex items-center" v-if="published">
-                                        <span class="text-green-600 w-6 text-center">&check;</span>
-                                        <span class="text-2xs" v-text="__('Entry has a published version')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-else>
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Entry has not been published')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
-                                        <span class="text-green-600 w-6 text-center">&check;</span>
-                                        <span class="text-2xs" v-text="__('This is the published version')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-if="isDirty">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Unsaved changes')"></span>
-                                    </div>
-                                    <button
-                                            class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
-                                            v-if="!isCreating && revisionsEnabled"
-                                            @click="showRevisionHistory = true">
-                                            <svg-icon name="light/history" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
-                                            <span>{{ __('View History') }}</span>
-                                        </button>
-                                </div>
+                                        <div
+                                            v-if="revisionsEnabled && !isCreating"
+                                            class="p-4"
+                                            :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
+                                        >
+                                            <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
+                                            <div class="mb-1 flex items-center" v-if="published">
+                                                <span class="text-green-600 w-6 text-center">&check;</span>
+                                                <span class="text-2xs" v-text="__('Entry has a published version')"></span>
+                                            </div>
+                                            <div class="mb-1 flex items-center" v-else>
+                                                <span class="text-orange w-6 text-center">!</span>
+                                                <span class="text-2xs" v-text="__('Entry has not been published')"></span>
+                                            </div>
+                                            <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
+                                                <span class="text-green-600 w-6 text-center">&check;</span>
+                                                <span class="text-2xs" v-text="__('This is the published version')"></span>
+                                            </div>
+                                            <div class="mb-1 flex items-center" v-if="isDirty">
+                                                <span class="text-orange w-6 text-center">!</span>
+                                                <span class="text-2xs" v-text="__('Unsaved changes')"></span>
+                                            </div>
+                                            <button
+                                                class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
+                                                v-if="!isCreating && revisionsEnabled"
+                                                @click="showRevisionHistory = true">
+                                                <svg-icon name="light/history" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
+                                                <span>{{ __('View History') }}</span>
+                                            </button>
+                                        </div>
 
-                                <div class="p-4 border-t dark:border-dark-900" v-if="localizations.length > 1">
-                                    <label class="publish-field-label font-medium mb-2" v-text="__('Sites')" />
-                                    <div
-                                        v-for="option in localizations"
-                                        :key="option.handle"
-                                        class="text-sm flex items-center -mx-4 px-4 py-2"
-                                        :class="[
+                                        <div class="p-4 border-t dark:border-dark-900" v-if="localizations.length > 1">
+                                            <label class="publish-field-label font-medium mb-2" v-text="__('Sites')" />
+                                            <div
+                                                v-for="option in localizations"
+                                                :key="option.handle"
+                                                class="text-sm flex items-center -mx-4 px-4 py-2"
+                                                :class="[
                                             option.active ? 'bg-blue-100 dark:bg-dark-300' : 'hover:bg-gray-200 dark:hover:bg-dark-400',
                                             !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
                                         ]"
-                                        @click="localizationSelected(option)"
-                                    >
-                                        <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
+                                                @click="localizationSelected(option)"
+                                            >
+                                                <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
                                             <span class="little-dot rtl:ml-2 ltr:mr-2" :class="{
                                                 'bg-green-600': option.published,
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
                                             }" />
-                                            {{ __(option.name) }}
-                                            <loading-graphic
-                                                :size="14"
-                                                text=""
-                                                class="rtl:mr-2 ltr:ml-2"
-                                                v-if="localizing && localizing.handle === option.handle" />
+                                                    {{ __(option.name) }}
+                                                    <loading-graphic
+                                                        :size="14"
+                                                        text=""
+                                                        class="rtl:mr-2 ltr:ml-2"
+                                                        v-if="localizing && localizing.handle === option.handle" />
+                                                </div>
+                                                <div class="badge-sm bg-orange dark:bg-orange-dark" v-if="option.origin" v-text="__('Origin')" />
+                                                <div class="badge-sm bg-blue dark:bg-dark-blue-175" v-if="option.active" v-text="__('Active')" />
+                                                <div class="badge-sm bg-purple dark:bg-purple-dark" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
+                                            </div>
                                         </div>
-                                        <div class="badge-sm bg-orange dark:bg-orange-dark" v-if="option.origin" v-text="__('Origin')" />
-                                        <div class="badge-sm bg-blue dark:bg-dark-blue-175" v-if="option.active" v-text="__('Active')" />
-                                        <div class="badge-sm bg-purple dark:bg-purple-dark" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                                     </div>
-                                </div>
-                            </div>
-                            </template>
-                        </publish-tabs>
-                    </transition>
-                </div>
-                <template v-slot:buttons>
-                   <button
-                        v-if="!readOnly"
-                        class="rtl:mr-4 ltr:ml-4"
-                        :class="{
+                                </template>
+                            </publish-tabs>
+                        </transition>
+                    </div>
+                    <template v-slot:buttons>
+                        <button
+                            v-if="!readOnly"
+                            class="rtl:mr-4 ltr:ml-4"
+                            :class="{
                             'btn': revisionsEnabled,
                             'btn-primary': isCreating || !revisionsEnabled,
                         }"
-                        :disabled="!canSave"
-                        @click.prevent="save"
-                        v-text="saveText">
-                    </button>
+                            :disabled="!canSave"
+                            @click.prevent="save"
+                            v-text="saveText">
+                        </button>
 
-                    <button
-                        v-if="revisionsEnabled && !isCreating"
-                        class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
-                        :disabled="!canPublish"
-                        @click="confirmingPublish = true">
-                        <span v-text="__('Publish')" />
-                        <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
-                    </button>
-                </template>
-            </live-preview>
+                        <button
+                            v-if="revisionsEnabled && !isCreating"
+                            class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
+                            :disabled="!canPublish"
+                            @click="confirmingPublish = true">
+                            <span v-text="__('Publish')" />
+                            <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
+                        </button>
+                    </template>
+                </live-preview>
+            </template>
         </publish-container>
 
         <div class="md:hidden mt-6 flex items-center">
@@ -254,13 +255,14 @@
         </div>
 
         <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
-            <revision-history
-                #default="{ close }"
-                :index-url="actions.revisions"
-                :restore-url="actions.restore"
-                :reference="initialReference"
-                @closed="close"
-            />
+            <template #default="{ close }">
+                <revision-history
+                    :index-url="actions.revisions"
+                    :restore-url="actions.restore"
+                    :reference="initialReference"
+                    @closed="close"
+                />
+            </template>
         </stack>
 
         <publish-actions

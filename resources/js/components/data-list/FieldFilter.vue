@@ -21,15 +21,16 @@
                     class="filter-fields mt-2"
                     @updated="updateValues"
                 >
-                    <!-- TODO: handle showing/hiding of labels more elegantly -->
-                    <publish-fields
-                        #default="{ setFieldValue, setFieldMeta }"
-                        :fields="filter.fields"
-                        name-prefix="filter-field"
-                        class="w-full no-label"
-                        @updated="setFieldValue"
-                        @meta-updated="setFieldMeta"
-                    />
+                    <template #default="{ setFieldValue, setFieldMeta }">
+                        <!-- TODO: handle showing/hiding of labels more elegantly -->
+                        <publish-fields
+                            :fields="filter.fields"
+                            name-prefix="filter-field"
+                            class="w-full no-label"
+                            @updated="setFieldValue"
+                            @meta-updated="setFieldMeta"
+                        />
+                    </template>
                 </publish-container>
 
             </div>

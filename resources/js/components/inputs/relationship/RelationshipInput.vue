@@ -63,24 +63,25 @@
             </div>
 
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
-                <item-selector
-                    #default="{ close }"
-                    :name="name"
-                    :filters-url="filtersUrl"
-                    :selections-url="selectionsUrl"
-                    :site="site"
-                    :initial-columns="columns"
-                    :initial-sort-column="initialSortColumn"
-                    :initial-sort-direction="initialSortDirection"
-                    :initial-selections="value"
-                    :max-selections="maxItems"
-                    :search="search"
-                    :exclusions="exclusions"
-                    :type="config.type"
-                    :tree="tree"
-                    @selected="selectionsUpdated"
-                    @closed="close"
-                />
+                <template #default="{ close }">
+                    <item-selector
+                        :name="name"
+                        :filters-url="filtersUrl"
+                        :selections-url="selectionsUrl"
+                        :site="site"
+                        :initial-columns="columns"
+                        :initial-sort-column="initialSortColumn"
+                        :initial-sort-direction="initialSortDirection"
+                        :initial-selections="value"
+                        :max-selections="maxItems"
+                        :search="search"
+                        :exclusions="exclusions"
+                        :type="config.type"
+                        :tree="tree"
+                        @selected="selectionsUpdated"
+                        @closed="close"
+                    />
+                </template>
             </stack>
 
             <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
