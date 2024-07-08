@@ -18,7 +18,6 @@
                     :meta="{}"
                     :values="containerValues"
                     :track-dirty-state="false"
-                    class="filter-fields mt-2"
                     @updated="updateValues"
                 >
                     <template #default="{ setFieldValue, setFieldMeta }">
@@ -26,7 +25,7 @@
                         <publish-fields
                             :fields="filter.fields"
                             name-prefix="filter-field"
-                            class="w-full no-label"
+                            class="filter-fields mt-2 w-full no-label"
                             @updated="setFieldValue"
                             @meta-updated="setFieldMeta"
                         />

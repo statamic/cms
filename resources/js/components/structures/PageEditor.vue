@@ -30,11 +30,10 @@
                         :errors="errors"
                         :localized-fields="localizedFields"
                         :site="site"
-                        class="px-2"
                         @updated="values = $event"
                     >
                         <template #default="{ container, setFieldMeta }">
-                            <div>
+                            <div class="px-2">
                                 <div v-if="validating" class="absolute inset-0 z-10 bg-white dark:bg-dark-500 bg-opacity-75 flex items-center justify-center">
                                     <loading-graphic text="" />
                                 </div>

@@ -25,11 +25,10 @@
                 :values="values"
                 :meta="meta"
                 :track-dirty-state="false"
-                class="max-w-md mx-auto -mt-6 py-0 px-4 pb-20"
                 @updated="values = $event"
             >
                 <template #default="{ setFieldValue, setFieldMeta }">
-                    <div>
+                    <div class="max-w-md mx-auto -mt-6 py-0 px-4 pb-20">
                         <div class="-mx-6">
                             <publish-fields
                                 :fields="fields"
