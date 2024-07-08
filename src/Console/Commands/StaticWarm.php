@@ -74,12 +74,7 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $client = new Client([
-            'verify' => $this->shouldVerifySsl(),
-            'auth' => $this->option('user') && $this->option('password')
-                ? [$this->option('user'), $this->option('password')]
-                : null,
-        ]);
+        $client = new Client($this->clientConfig());
 
         $this->output->newLine();
         $this->line('Compiling URLs...');
@@ -93,7 +88,7 @@ class StaticWarm extends Command
             $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
 
             foreach ($requests as $request) {
-                StaticWarmJob::dispatch($request)->onQueue($queue);
+                StaticWarmJob::dispatch($request, $this->clientConfig())->onQueue($queue);
             }
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
@@ -115,6 +110,16 @@ class StaticWarm extends Command
         $strategy = config('statamic.static_caching.strategy');
 
         return config("statamic.static_caching.strategies.$strategy.warm_concurrency", 25);
+    }
+
+    private function clientConfig(): array
+    {
+        return [
+            'verify' => $this->shouldVerifySsl(),
+            'auth' => $this->option('user') && $this->option('password')
+                ? [$this->option('user'), $this->option('password')]
+                : null,
+        ];
     }
 
     public function outputSuccessLine(Response $response, $index): void

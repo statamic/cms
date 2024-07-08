@@ -3,11 +3,12 @@
 namespace Tests\Policies;
 
 use Facades\Tests\Factories\GlobalFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Globals\GlobalSet;
 
 class GlobalSetPolicyTest extends PolicyTestCase
 {
-    /** @test */
+    #[Test]
     public function index_is_allowed_if_any_set_is_viewable()
     {
         $userWithAlfaPermission = $this->userWithPermissions(['edit alfa globals']);
@@ -24,7 +25,7 @@ class GlobalSetPolicyTest extends PolicyTestCase
         $this->assertFalse($userWithoutPermission->can('index', GlobalSet::class));
     }
 
-    /** @test */
+    #[Test]
     public function index_is_allowed_if_any_set_is_viewable_with_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de']);
@@ -46,7 +47,7 @@ class GlobalSetPolicyTest extends PolicyTestCase
         $this->assertFalse($userWithDePermission->can('index', GlobalSet::class));
     }
 
-    /** @test */
+    #[Test]
     public function globals_are_viewable_with_edit_permissions()
     {
         $user = $this->userWithPermissions(['edit test globals']);
@@ -57,7 +58,7 @@ class GlobalSetPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $global));
     }
 
-    /** @test */
+    #[Test]
     public function globals_are_editable_with_configure_permissions()
     {
         $authorizedUser = $this->userWithPermissions(['configure globals']);
@@ -69,7 +70,7 @@ class GlobalSetPolicyTest extends PolicyTestCase
         $this->assertFalse($forbiddenUser->can('edit', $global));
     }
 
-    /** @test */
+    #[Test]
     public function globals_can_be_created_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);
@@ -79,7 +80,7 @@ class GlobalSetPolicyTest extends PolicyTestCase
         $this->assertFalse($forbiddenUser->can('create', GlobalSet::class));
     }
 
-    /** @test */
+    #[Test]
     public function globals_can_be_deleted_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);

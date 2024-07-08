@@ -120,7 +120,7 @@ class Replicator extends Fieldtype
     public function fields($set, $index = -1)
     {
         $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
-        $hash = md5($index.json_encode($config));
+        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config));
 
         return Blink::once($hash, function () use ($config, $index) {
             return new Fields(

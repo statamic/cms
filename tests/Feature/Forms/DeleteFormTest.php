@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Forms;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\form;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -20,7 +21,7 @@ class DeleteFormTest extends TestCase
         $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -39,7 +40,7 @@ class DeleteFormTest extends TestCase
         $this->assertCount(1, Form::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_the_form()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure forms']]);

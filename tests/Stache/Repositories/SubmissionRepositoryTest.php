@@ -3,6 +3,7 @@
 namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission as SubmissionAPI;
@@ -30,7 +31,7 @@ class SubmissionRepositoryTest extends TestCase
         Form::make('sign_up')->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_submissions()
     {
         $submissions = $this->repo->all();
@@ -40,7 +41,7 @@ class SubmissionRepositoryTest extends TestCase
         $this->assertEveryItemIsInstanceOf(Submission::class, $submissions);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_submission_to_the_stache_and_to_a_file()
     {
         $submission = SubmissionAPI::make()->id('new');

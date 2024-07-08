@@ -60,7 +60,7 @@ button {
     }
 
     &.active, &.active:hover {
-        box-shadow: inset 2px 2px 3px 0px rgba(25,30,35,.1);
+        box-shadow: inset 2px 2px 3px 0 rgba(25,30,35,.1);
         background: theme('colors.gray.400');
         border-color: #aeb9c3 !important;
 

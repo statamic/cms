@@ -170,6 +170,7 @@ class Sites
                 'handle' => 'url',
                 'field' => [
                     'type' => 'text',
+                    'display' => __('URL'),
                     'instructions' => __('statamic::messages.site_configure_url_instructions'),
                     'required' => true,
                     'width' => 33,
@@ -180,6 +181,7 @@ class Sites
                 'handle' => 'locale',
                 'field' => [
                     'type' => 'text',
+                    'display' => __('Locale'),
                     'instructions' => __('statamic::messages.site_configure_locale_instructions'),
                     'required' => true,
                     'width' => 33,
@@ -190,6 +192,7 @@ class Sites
                 'handle' => 'lang',
                 'field' => [
                     'type' => 'text',
+                    'display' => __('Language'),
                     'instructions' => __('statamic::messages.site_configure_lang_instructions'),
                     'width' => 33,
                     'direction' => 'ltr',

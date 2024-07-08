@@ -3,6 +3,8 @@
 namespace Tests\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
@@ -11,12 +13,12 @@ use Statamic\GraphQL\Types\PageInterface;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class PageInterfaceTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_adds_types()
     {
         GraphQL::spy();

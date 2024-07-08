@@ -260,6 +260,7 @@
                     :index-url="actions.revisions"
                     :restore-url="actions.restore"
                     :reference="initialReference"
+                    :can-restore-revisions="!readOnly"
                     @closed="close"
                 />
             </template>
@@ -769,7 +770,10 @@ export default {
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.title = response.data.data.title;
+            clearTimeout(this.trackDirtyStateTimeout);
+            this.trackDirtyState = false;
             this.values = this.resetValuesFromResponse(response.data.data.values);
+            this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
             this.activeLocalization.title = response.data.data.title;
             this.activeLocalization.published = response.data.data.published;
             this.activeLocalization.status = response.data.data.status;
@@ -817,7 +821,10 @@ export default {
             if (response.data) {
                 this.title = response.data.title;
                 if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
                 this.values = this.resetValuesFromResponse(response.data.values);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;
                 this.activeLocalization.status = response.data.status;

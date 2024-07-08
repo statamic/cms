@@ -87,7 +87,6 @@
         "validator": "^13.7.0",
         "vite-svg-loader": "^5.1.0",
         "vue": "^3.4.27",
-        "vue-countable": "^1.0.9",
         "vue-final-modal": "^4.5.4",
         "vue-select": "4.0.0-beta.6",
         "vue-toastification": "^2.0.0-rc.5",

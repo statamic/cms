@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Mockery;
 use PHPUnit\Framework\Assert as PHPUnit;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\BasicStore;
@@ -34,7 +35,7 @@ class TraverserTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function throws_exception_if_store_doesnt_have_a_directory_defined()
     {
         $this->expectException('Exception');
@@ -47,7 +48,7 @@ class TraverserTest extends TestCase
         $this->traverser->traverse($store);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_no_files_if_directory_doesnt_exist()
     {
         $store = Mockery::mock();
@@ -60,7 +61,7 @@ class TraverserTest extends TestCase
         $this->assertCount(0, $files);
     }
 
-    /** @test */
+    #[Test]
     public function gets_files_in_a_stores_directory()
     {
         mkdir($this->tempDir.'/nested');
@@ -87,7 +88,7 @@ class TraverserTest extends TestCase
         ], $files->all());
     }
 
-    /** @test */
+    #[Test]
     public function files_can_be_filtered()
     {
         touch($this->tempDir.'/one.txt', 1234567891);

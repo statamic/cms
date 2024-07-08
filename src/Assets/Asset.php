@@ -678,7 +678,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     /**
      * Clear meta and filesystem listing caches.
      */
-    private function clearCaches()
+    protected function clearCaches()
     {
         $this->meta = null;
         Cache::forget($this->metaCacheKey());
