@@ -2,6 +2,4 @@
 
 namespace Statamic\Exceptions;
 
-class UuidExistsException extends \Exception
-{
-}
+class UuidExistsException extends \Exception {}

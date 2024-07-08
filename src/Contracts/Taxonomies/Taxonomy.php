@@ -2,6 +2,4 @@
 
 namespace Statamic\Contracts\Taxonomies;
 
-interface Taxonomy
-{
-}
+interface Taxonomy {}

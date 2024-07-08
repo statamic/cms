@@ -50,6 +50,4 @@ class TestAggregateStore extends AggregateStore
     }
 }
 
-class TestChildStore extends ChildStore
-{
-}
+class TestChildStore extends ChildStore {}
