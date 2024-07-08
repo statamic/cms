@@ -9,7 +9,9 @@ trait GetsQueryResults
 {
     protected function results($query)
     {
-        $this->setPaginationParameterPrecedence();
+        $this
+            ->setPaginationParameterPrecedence()
+            ->preventIncompatiblePaginationParameters();
 
         if ($paginate = $this->params->int('paginate')) {
             return $this->paginatedResults($query, $paginate);
@@ -35,6 +37,25 @@ trait GetsQueryResults
         if ($this->params->get('paginate') === true) {
             $this->params->put('paginate', $this->params->get('limit'));
         }
+
+        return $this;
+    }
+
+    protected function preventIncompatiblePaginationParameters()
+    {
+        if ($this->params->int('paginate') && $this->params->int('limit')) {
+            throw new \Exception('Cannot use [paginate] integer in combination with [limit] param!');
+        }
+
+        if ($this->params->int('paginate') && $this->params->int('offset')) {
+            throw new \Exception('Cannot use [paginate] integer in combination with [offset] param!');
+        }
+
+        if ($this->params->int('paginate') && $this->params->int('chunk')) {
+            throw new \Exception('Cannot use [paginate] integer in combination with [chunk] param!');
+        }
+
+        return $this;
     }
 
     protected function paginatedResults($query, $perPage)
