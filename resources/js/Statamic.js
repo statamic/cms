@@ -38,7 +38,6 @@ import PortalVue from 'portal-vue';
 import useProgressBar from './composables/useProgressBar';
 import useDirtyState from './composables/useDirtyState';
 import registerFieldTypes from './bootstrap/fieldtypes.js';
-import TestModals from './components/TestModals.vue';
 
 const echo = new Echo;
 const bard = new Bard;
@@ -156,7 +155,6 @@ export default {
         // Modals
         this.$app.use(createVfm())
         this.$app.component('modals-container', ModalsContainer)
-        this.$app.component('test-modals', TestModals)
 
         // Vue.use(VModal, { componentName: 'v-modal' })
         // Vue.use(Vuex);
