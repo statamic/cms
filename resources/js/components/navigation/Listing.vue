@@ -2,7 +2,7 @@
     <data-list :columns="columns" :rows="rows">
         <template #default="{ filteredRows: rows }">
             <div class="card p-0">
-                <data-list-table :rows="rows">
+                <data-list-table>
                     <template #cell-title="{ row: structure }">
                         <a :href="structure.available_in_selected_site ? structure.show_url : structure.edit_url" class="flex items-center" v-text="__(structure.title)" />
                     </template>

@@ -69,7 +69,7 @@ export default {
         hasChildren: Boolean,
         showSlugs: Boolean,
         showBlueprint: Boolean,
-        editable: Boolean,
+        editable: { type: Boolean, default: true },
         stat: Object,
     },
 

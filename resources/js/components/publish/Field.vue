@@ -114,6 +114,8 @@ import { marked } from 'marked';
 import PublishFieldMeta from '../publish/FieldMeta.vue';
 
 export default {
+    emits: ['meta-updated', 'input', 'focus', 'blur'],
+
     components: {
         PublishFieldMeta,
     },
@@ -147,9 +149,8 @@ export default {
         },
 
         fieldtypeComponentExists() {
-            if (!['radio-fieldtype'].includes(this.fieldtypeComponent)) {
-                console.log('components', Statamic.$app.component(this.fieldtypeComponent));
-                throw Error('unsupported fieldtype: ' + this.fieldtypeComponent);
+            if (!Statamic.$app.component(this.fieldtypeComponent)) {
+                console.warn('unsupported fieldtype: ' + this.fieldtypeComponent);
             }
 
             return Statamic.$app.component(this.fieldtypeComponent) !== undefined;

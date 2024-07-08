@@ -30,6 +30,7 @@
 
 <script>
 export default {
+    emits: ['updated'],
 
     props: {
         blueprint: Object,

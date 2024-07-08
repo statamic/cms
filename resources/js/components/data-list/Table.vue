@@ -142,7 +142,7 @@ export default {
         },
         type: {
             type: String
-        },
+        }
     },
 
     inject: ['sharedState'],

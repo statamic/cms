@@ -1,7 +1,6 @@
 <template>
 
     <div class="publish-fields @container">
-
         <template
             v-for="field in fields"
             :key="field.handle"
@@ -23,7 +22,6 @@
                 @blur="$emit('blur', field.handle)"
             />
         </template>
-
     </div>
 
 </template>
@@ -54,7 +52,6 @@ export default {
     computed: {
 
         state() {
-            console.log(this.$store.state.publish);
             return this.$store.state.publish[this.storeName];
         },
 

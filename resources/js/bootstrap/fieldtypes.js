@@ -32,9 +32,9 @@ import SlugFieldtype from '../components/fieldtypes/SlugFieldtype.vue';
 // import GridIndex from '../components/fieldtypes/grid/GridIndex.vue';
 // import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
 import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue';
-// import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
+import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 // import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
-// import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
+import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 // import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
 // import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
 // import ListIndexFieldtype from '../components/fieldtypes/ListIndexFieldtype.vue';
@@ -55,7 +55,7 @@ import RelationshipIndexFieldtype from '../components/fieldtypes/relationship/Re
 // import TagsIndexFieldtype from '../components/fieldtypes/TagsIndexFieldtype.vue';
 // import TemplateFolderFieldtype from '../components/fieldtypes/TemplateFolderFieldtype.vue';
 // import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
-// import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue';
+import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue';
 // import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.vue';
 // import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 // import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
@@ -72,6 +72,7 @@ export default function registerFieldTypes(app) {
     app.component('text-fieldtype', TextFieldtype);
     app.component('textarea-fieldtype', TextareaFieldtype);
     app.component('slug-fieldtype', SlugFieldtype);
+    app.component('toggle-fieldtype', ToggleFieldtype);
 
     // app.component('array-fieldtype', ArrayFieldtype);
     // app.component('assets-fieldtype', AssetsFieldtype);
@@ -96,9 +97,9 @@ export default function registerFieldTypes(app) {
     // app.component('grid-fieldtype-index', GridIndex);
     // app.component('group-fieldtype', GroupFieldtype);
     // app.component('hidden-fieldtype', HiddenFieldtype);
-    // app.component('html-fieldtype', HtmlFieldtype);
+    app.component('html-fieldtype', HtmlFieldtype);
     // app.component('icon-fieldtype', IconFieldtype);
-    // app.component('integer-fieldtype', IntegerFieldtype);
+    app.component('integer-fieldtype', IntegerFieldtype);
     // app.component('link-fieldtype', LinkFieldtype);
     // app.component('list-fieldtype', ListFieldtype);
     // app.component('list-fieldtype-index', ListIndexFieldtype);

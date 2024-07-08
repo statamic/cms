@@ -3,7 +3,10 @@
 </template>
 
 <script>
-export default {
-    mixins: [Fieldtype]
-};
+    import Fieldtype from './Fieldtype.vue';
+
+    export default {
+
+        mixins: [Fieldtype]
+    };
 </script>
