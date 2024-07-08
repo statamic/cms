@@ -47,10 +47,6 @@ trait GetsQueryResults
             throw new \Exception('Cannot use [paginate] integer in combination with [limit] param!');
         }
 
-        if ($this->params->int('paginate') && $this->params->int('offset')) {
-            throw new \Exception('Cannot use [paginate] integer in combination with [offset] param!');
-        }
-
         if ($this->params->int('paginate') && $this->params->int('chunk')) {
             throw new \Exception('Cannot use [paginate] integer in combination with [chunk] param!');
         }
