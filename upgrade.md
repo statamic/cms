@@ -14,5 +14,6 @@ https://euvl.github.io/vue-js-modal/Properties.html#properties-2
 
 Use another nice accessible modal?
 
-## vue-toasted replaced with ???
-Vue-toasted is only available for vue 2.
+## vue-toasted replaced with vue-toastification (in progress)
+Vue-toasted is only available for vue 2. We still need to style the new toasts.
+Also document the new api changes between the two packages.
