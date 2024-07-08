@@ -355,14 +355,14 @@ export default {
         request() {
             this.loading = true;
 
-            if (this.source) this.source.cancel();
-            this.source = this.$axios.CancelToken.source();
+            if (this.source) this.source.abort();
+            this.source = new AbortController();
 
             const params = {...this.parameters, ...{
                 search: this.searchQuery,
             }};
 
-            return this.$axios.get(this.selectionsUrl, { params, cancelToken: this.source.token }).then(response => {
+            return this.$axios.get(this.selectionsUrl, { params, signal: this.source.signal }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
@@ -370,7 +370,7 @@ export default {
                 this.loading = false;
                 this.initializing = false;
             }).catch(e => {
-                if (this.$axios.isCancel(e)) return;
+                if (e.code === 'ERR_CANCELED') return;
                 this.loading = false;
                 this.initializing = false;
                 this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });

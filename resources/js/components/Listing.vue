@@ -194,7 +194,7 @@ export default {
                 this.initializing = false;
                 this.afterRequestCompleted(response);
             }).catch(e => {
-                if (this.$axios.isCancel(e)) return;
+                if (e.code === 'ERR_CANCELED') return;
                 this.loading = false;
                 this.initializing = false;
                 if (e.request && ! e.response) return;

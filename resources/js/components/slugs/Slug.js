@@ -94,7 +94,7 @@ export default class Slug {
         return axios.post(cp_url('slug'), payload, { signal: this.#controller.signal })
             .then(response => response.data)
             .catch(e => {
-                if (axios.isCancel(e)) {
+                if (e.code === 'ERR_CANCELED') {
                     aborted = true;
                     return;
                 }
