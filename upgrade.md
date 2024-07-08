@@ -2,6 +2,12 @@
 # Vue 3 upgrade guide
 This document describes the things still to do, in progress and what should be done by addon authors.
 
+## Model values
+The way v-model works has changed. For more info see: https://v3-migration.vuejs.org/breaking-changes/v-model.html
+- `:value` should become `:model-value`
+- `@input="someHandler"` should become `@update:model-value="someHandler"`. 
+Existing `v-model` bindings are not affected.
+
 ## v-calendar: v2 -> v3 (todo)
 If you're using v-calendar in any of your addons, please follow the [upgrade guide](https://vcalendar.io/getting-started/upgrade-guide.html).
 

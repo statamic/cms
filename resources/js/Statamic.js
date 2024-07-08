@@ -70,7 +70,7 @@ export default {
         return echo;
     },
 
-    $bard() {
+    get $bard() {
         return bard;
     },
 
@@ -78,7 +78,7 @@ export default {
         return hooks;
     },
 
-    $reveal() {
+    get $reveal() {
         return reveal;
     },
 
@@ -98,7 +98,7 @@ export default {
         return this.$app.config.globalProperties.$toast
     },
 
-    $slug() {
+    get $slug() {
         return slug;
     },
 
