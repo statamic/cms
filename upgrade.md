@@ -11,6 +11,9 @@ Existing `v-model` bindings are not affected.
 ## v-calendar: v2 -> v3 (todo)
 If you're using v-calendar in any of your addons, please follow the [upgrade guide](https://vcalendar.io/getting-started/upgrade-guide.html).
 
+## vue-select v3 -> v4.beta (in progress)
+See https://github.com/sagalbot/vue-select/issues/1597
+
 ## vue-clickaway: replaced (done)
 Any instances of `v-on-clickaway` should be replaced with `v-click-away`.
 

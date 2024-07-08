@@ -8,8 +8,8 @@
                     :placeholder="__('Field')"
                     :options="fieldOptions"
                     :reduce="option => option.value"
-                    :value="field"
-                    @input="createFilter"
+                    :model-value="field"
+                    @update:model-value="createFilter"
                 />
 
                 <publish-container

@@ -2,12 +2,12 @@
 
     <v-select
         class="text-sm"
-        :value="site"
         :clearable="false"
         :searchable="false"
         :get-option-label="site => __(site.name)"
         :options="sites"
-        @input="$emit('input', $event)"
+        :model-value="site"
+        @update:model-value="$emit('update:model-value', $event)"
     />
 
 </template>

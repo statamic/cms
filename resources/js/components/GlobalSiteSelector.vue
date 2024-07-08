@@ -4,10 +4,10 @@
             :options="sites"
             label="name"
             :get-option-key="(option) => option.handle"
-            :value="active"
             :clearable="false"
             :searchable="false"
-            @input="selected"
+            :model-value="active"
+            @update:model-value="selected"
         >
             <template #selected-option="{ name, handle }">
                 <div class="flex items-center px-2 text-sm text-gray dark:text-dark-100 hover:text-gray-800 dark:hover:text-dark-175 anti">
