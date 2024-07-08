@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'any.config.antlers' => "تمكين تحليل Antlers في محتوى هذا الحقل.",
+    'any.config.antlers' => 'تمكين تحليل Antlers في محتوى هذا الحقل.',
     'any.config.cast_booleans' => 'سيتم حفظ الخيارات ذات القيم الصحيحة (true) والخاطئة (false) كقيم منطقية.',
     'any.config.mode' => 'اختر نمط واجهة المستخدم المفضل لديك.',
     'array.config.keys' => 'حدد مفاتيح المصفوفة (المتغيرات) والتسميات الاختيارية.',
