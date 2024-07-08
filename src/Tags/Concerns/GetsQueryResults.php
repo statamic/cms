@@ -36,6 +36,7 @@ trait GetsQueryResults
     {
         if ($this->params->get('paginate') === true) {
             $this->params->put('paginate', $this->params->get('limit'));
+            $this->params->forget('limit');
         }
 
         return $this;
