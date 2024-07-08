@@ -6,7 +6,7 @@ import uniqid from 'uniqid';
 const props = withDefaults(defineProps<{
     name?: string
     adaptive?: boolean
-    draggable?: boolean
+    draggable?: string | false
     clickToClose?: boolean
     focusTrap?: boolean
     height?: number | 'auto'

@@ -17,3 +17,4 @@ Use another nice accessible modal?
 ## vue-toasted replaced with vue-toastification (in progress)
 Vue-toasted is only available for vue 2. We still need to style the new toasts.
 Also document the new api changes between the two packages.
+For example, the `duration` option is now called `timeout`.
