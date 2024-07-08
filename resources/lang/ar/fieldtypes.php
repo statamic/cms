@@ -17,7 +17,7 @@ return [
     'assets.config.show_filename' => 'عرض اسم الملف بجوار الصورة المصغرة.',
     'assets.config.show_set_alt' => 'عرض رابط لتعيين النص البديل لأي صورة.',
     'assets.config.query_scopes' => 'اختر مجالات الاستعلام التي ينبغي تطبيقها عند استرداد الأصول القابلة للتحديد.',
-    'assets.title' => 'الأصول',
+    'assets.title' => 'أصول',
     'bard.config.allow_source' => 'تمكين عرض كود HTML المصدر أثناء الكتابة.',
     'bard.config.always_show_set_button' => 'تمكين عرض زر "إضافة مجموعة" دائمًا.',
     'bard.config.buttons' => 'اختر الأزرار التي تظهر في شريط الأدوات.',
