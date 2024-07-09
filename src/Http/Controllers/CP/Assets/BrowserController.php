@@ -81,17 +81,17 @@ class BrowserController extends CpController
         $page = Paginator::resolveCurrentPage();
 
         $totalAssets = $folder->queryAssets()->count();
-        $totalSubfolders = $folder->assetFolders()->count();
-        $totalItems = $totalAssets + $totalSubfolders;
+        $totalFolders = $folder->assetFolders()->count();
+        $totalItems = $totalAssets + $totalFolders;
 
-        $lastPageShowingSubfolders = (int) ceil($totalSubfolders / $perPage);
-        $numberOfSubfoldersOnLastPage = $totalSubfolders % $perPage ?: $perPage;
+        $lastPageWithFolders = (int) ceil($totalFolders / $perPage);
+        $foldersOnLastPage = $totalFolders % $perPage ?: $perPage;
 
-        $subfolders = $folder->assetFolders()
+        $folders = $folder->assetFolders()
             ->slice(($page - 1) * $perPage, $perPage)
             ->values();
 
-        $hasRoomForAssets = ($perPage - $subfolders->count()) > 0;
+        $hasRoomForAssets = ($perPage - $folders->count()) > 0;
 
         if ($hasRoomForAssets) {
             $query = $folder->queryAssets();
@@ -104,13 +104,13 @@ class BrowserController extends CpController
 
             $this->applyQueryScopes($query, $request->all());
 
-            $offset = $page === $lastPageShowingSubfolders
+            $offset = $page === $lastPageWithFolders
                 ? 0
-                : $perPage * ($page - $lastPageShowingSubfolders) - $numberOfSubfoldersOnLastPage;
+                : $perPage * ($page - $lastPageWithFolders) - $foldersOnLastPage;
 
             $assets = $query
                 ->offset($offset)
-                ->limit($perPage - $subfolders->count())
+                ->limit($perPage - $folders->count())
                 ->get();
         } else {
             $assets = collect();
@@ -120,7 +120,7 @@ class BrowserController extends CpController
             'data' => [
                 'assets' => FolderAsset::collection($assets)->resolve(),
                 'folder' => array_merge((new Folder($folder))->resolve(), [
-                    'folders' => $subfolders,
+                    'folders' => $folders,
                 ]),
             ],
             'links' => [
