@@ -15,7 +15,7 @@
                 :read-only="readOnly"
                 :syncable="isSyncableField(field)"
                 :name-prefix="namePrefix"
-                @input="$emit('updated', field.handle, $event)"
+                @update:model-value="$emit('updated', field.handle, $event)"
                 @meta-updated="$emit('meta-updated', field.handle, $event)"
                 @synced="$emit('synced', field.handle)"
                 @desynced="$emit('desynced', field.handle)"
@@ -54,12 +54,10 @@ export default {
     computed: {
 
         state() {
-            console.log(this.$store.state.publish);
             return this.$store.state.publish[this.storeName];
         },
 
         values() {
-            console.log(this.state);
             return this.state.values;
         },
 

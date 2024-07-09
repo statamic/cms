@@ -12,7 +12,6 @@ const props = defineProps({
     placeholder: { required: false },
     type: { default: 'text' },
     step: {},
-    value: { required: true },
     prepend: { default: null },
     append: { default: null },
     focus: { type: Boolean },
@@ -51,7 +50,8 @@ const { currentLength, limitIndicatorColor } = useLengthLimiter({
                 </div>
             </slot>
             <input
-                v-model="modelValue"
+                :value="modelValue"
+                @input="modelValue = $event.target.value"
                 ref="input"
                 class="input-text"
                 :class="classes"

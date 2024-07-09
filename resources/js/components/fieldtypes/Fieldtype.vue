@@ -1,5 +1,6 @@
 <script>
 export default {
+    emits: ['update:model-value', 'meta-updated', 'replicator-preview-updated'],
 
     props: {
         value: {
@@ -31,7 +32,7 @@ export default {
 
     methods: {
         update(value) {
-            this.$emit('input', value);
+            this.$emit('update:model-value', value);
         },
 
         updateDebounced: _.debounce(function (value) {

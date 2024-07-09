@@ -72,9 +72,8 @@
                 <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
 
                 <slot name="fieldtype" v-if="!loadingMeta">
-                    <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">Component <code
-                        v-text="fieldtypeComponent"
-                    ></code> does not exist.
+                    <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
+                        Component <code v-text="fieldtypeComponent"></code> does not exist.
                     </div>
                     <component
                         v-else
@@ -86,7 +85,7 @@
                         :name-prefix="namePrefix"
                         :field-path-prefix="fieldPathPrefix"
                         :read-only="isReadOnly"
-                        @input="$emit('input', $event)"
+                        @update:modelValue="$emit('update:modelValue', $event)"
                         @meta-updated="$emit('meta-updated', $event)"
                         @focus="focused"
                         @blur="blurred"
@@ -147,9 +146,8 @@ export default {
         },
 
         fieldtypeComponentExists() {
-            if (!['radio-fieldtype'].includes(this.fieldtypeComponent)) {
-                console.log('components', Statamic.$app.component(this.fieldtypeComponent));
-                throw Error('unsupported fieldtype: ' + this.fieldtypeComponent);
+            if (!Statamic.$app.component(this.fieldtypeComponent)) {
+                console.warn('unsupported fieldtype: ' + this.fieldtypeComponent);
             }
 
             return Statamic.$app.component(this.fieldtypeComponent) !== undefined;

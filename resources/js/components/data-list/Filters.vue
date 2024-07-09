@@ -254,6 +254,8 @@ export default {
 
             delete fields[handle];
 
+            console.log('newFields', fields, 'old', JSON.parse(JSON.stringify(this.activeFilters.fields)));
+
             this.$emit('changed', {handle: 'fields', values: fields});
         },
 

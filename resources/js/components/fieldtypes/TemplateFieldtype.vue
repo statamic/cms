@@ -25,7 +25,7 @@
 
 <script>
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
-
+import Fieldtype from './Fieldtype.vue';
 
 export default {
 

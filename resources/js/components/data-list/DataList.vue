@@ -2,7 +2,7 @@
 import Fuse from 'fuse.js';
 
 export default {
-    emits: ['visible-columns-updated'],
+    emits: ['visible-columns-updated', 'selections-updated'],
     props: {
         columns: {
             type: Array,

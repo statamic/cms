@@ -1,6 +1,6 @@
 // import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 // import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
-// import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
+import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 import Select from '../components/inputs/Select.vue';
 import Text from '../components/inputs/Text.vue';
 import Textarea from '../components/inputs/Textarea.vue';
@@ -48,7 +48,7 @@ import RelationshipIndexFieldtype from '../components/fieldtypes/relationship/Re
 // import ReplicatorSet from '../components/fieldtypes/replicator/Set.vue';
 // import ReplicatorIndex from '../components/fieldtypes/replicator/ReplicatorIndex.vue';
 // import SectionFieldtype from '../components/fieldtypes/SectionFieldtype.vue';
-// import SelectFieldtype from '../components/fieldtypes/SelectFieldtype.vue';
+import SelectFieldtype from '../components/fieldtypes/SelectFieldtype.vue';
 // import SetsFieldtype from '../components/fieldtypes/replicator/SetsFieldtype.vue';
 // import TableFieldtype from '../components/fieldtypes/TableFieldtype.vue';
 // import TagsFieldtype from '../components/fieldtypes/TagsFieldtype.vue';
@@ -112,7 +112,7 @@ export default function registerFieldTypes(app) {
     // app.component('replicator-fieldtype-set', ReplicatorSet);
     // app.component('replicator-fieldtype-index', ReplicatorIndex);
     // app.component('section-fieldtype', SectionFieldtype);
-    // app.component('select-fieldtype', SelectFieldtype);
+    app.component('select-fieldtype', SelectFieldtype);
     // app.component('sets-fieldtype', SetsFieldtype);
     // app.component('table-fieldtype', TableFieldtype);
     // app.component('tags-fieldtype', TagsFieldtype);
@@ -131,5 +131,5 @@ export default function registerFieldTypes(app) {
     //
     // app.component('revealer-fieldtype', RevealerFieldtype);
     // app.component('status-fieldtype', StatusFieldtype);
-    // app.component('template-fieldtype', TemplateFieldtype);
+    app.component('template-fieldtype', TemplateFieldtype);
 }

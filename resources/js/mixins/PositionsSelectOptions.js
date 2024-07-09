@@ -27,7 +27,8 @@ export default {
                 updatePosition
             );
 
-            this.$once('hook:destroyed', cleanup);
+            // @todo fix this
+            // this.$once('hook:destroyed', cleanup);
         }
     }
 }

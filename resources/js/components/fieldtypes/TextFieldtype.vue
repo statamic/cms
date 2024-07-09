@@ -1,7 +1,6 @@
 <template>
     <text-input
         ref="input"
-        :value="value"
         :classes="config.classes"
         :focus="config.focus || name === 'title' || name === 'alt'"
         :autocomplete="config.autocomplete"
@@ -15,7 +14,8 @@
         :name="name"
         :id="fieldId"
         :direction="config.direction"
-        @input="inputUpdated"
+        :model-value="value"
+        @update:model-value="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />
@@ -25,6 +25,7 @@
 import Fieldtype from './Fieldtype.vue';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [Fieldtype],
 
