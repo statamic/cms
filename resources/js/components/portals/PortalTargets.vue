@@ -1,8 +1,10 @@
 <template>
     <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks }">
-        <div
+        <component
+            :is="portal.data?.type === 'stack' ? 'portal-target' : 'div'"
             v-for="(portal, i) in portals"
             :key="portal.id"
+            :name="portal.id"
             :id="portal.id"
         />
     </div>
@@ -41,8 +43,8 @@ export default {
 
         initStacks() {
             this.$events.$on('stacks.hit-area-clicked', (depth) => {
-                for (let count = this.stacks.count(); count > depth; count--) {
-                    if (! this.stacks[count-1].data.vm.runCloseCallback()) {
+                for (let count = this.stacks.length; count > depth; count--) {
+                    if (! this.stacks[count-1].data.runCloseCallback()) {
                         return;
                     }
                 }
@@ -62,6 +64,7 @@ export default {
 
         destroyStacks() {
             this.$events.$off('stacks.hit-area-clicked');
+
             enableBodyScroll(this.$el);
         }
 
