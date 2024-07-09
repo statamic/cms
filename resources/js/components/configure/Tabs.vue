@@ -1,30 +1,28 @@
 <template>
     <element-container @resized="containerWidth = $event.width">
-        <template #default>
-            <div>
-                <div v-for="tab in mainTabs" :key="tab.handle">
-                    <div class="mb-2 content">
-                        <h2 v-text="tab.display" class="text-base" />
-                        <p v-html="tab.instructions" />
-                    </div>
-                    <div class="">
-                        <publish-sections
-                            :sections="tab.sections"
-                            :read-only="readOnly"
-                            :syncable="syncable"
-                            @updated="(handle, value) => $emit('updated', handle, value)"
-                            @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
-                            @synced="$emit('synced', $event)"
-                            @desynced="$emit('desynced', $event)"
-                            @focus="$emit('focus', $event)"
-                            @blur="$emit('blur', $event)"
-                        />
-                    </div>
+        <div>
+            <div v-for="tab in mainTabs" :key="tab.handle">
+                <div class="mb-2 content">
+                    <h2 v-text="tab.display" class="text-base" />
+                    <p v-html="tab.instructions" />
                 </div>
-
-                <portal-target :name="actionsPortal" class="publish-tab publish-tab-actions-footer" />
+                <div class="">
+                    <publish-sections
+                        :sections="tab.sections"
+                        :read-only="readOnly"
+                        :syncable="syncable"
+                        @updated="(handle, value) => $emit('updated', handle, value)"
+                        @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
+                        @synced="$emit('synced', $event)"
+                        @desynced="$emit('desynced', $event)"
+                        @focus="$emit('focus', $event)"
+                        @blur="$emit('blur', $event)"
+                    />
+                </div>
             </div>
-        </template>
+
+            <portal-target :name="actionsPortal" class="publish-tab publish-tab-actions-footer" />
+        </div>
     </element-container>
 </template>
 
@@ -37,7 +35,6 @@ export default {
     props: {
         readOnly: Boolean,
         syncable: Boolean,
-        enableSidebar: Boolean,
     },
 
     data() {
@@ -59,8 +56,17 @@ export default {
         },
 
         mainTabs() {
-            // @todo(jsonvarga): Check if this is correct. It seems like that shouldShowSidebar always was false
-            return this.tabs;
+            // @todo(jasonvarga): is this correct? Seems to be from copy paste from publish/tabs.vue
+            // Since this.shouldShowSidebar doesn't exist this would always return all tabs.
+            return this.tabs
+
+            // if (! this.shouldShowSidebar) return this.tabs;
+            //
+            // if (this.active === "sidebar") {
+            //     this.active = this.state.blueprint.tabs[0].handle
+            // }
+            //
+            // return _.filter(this.tabs, tab => tab.handle != 'sidebar');
         },
 
         actionsPortal() {
