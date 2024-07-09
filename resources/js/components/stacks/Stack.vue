@@ -1,21 +1,33 @@
 <template>
 
-    <v-portal :to="portal" :order="depth" target-class="stack">
-        <div class="stack-container"
-            :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-2 shadow-lg': full }"
-            :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
-        >
-            <transition name="stack-overlay-fade">
-                <div class="stack-overlay" v-if="visible" :style="direction === 'ltr' ? { left: `-${leftOffset}px` } : { right: `-${leftOffset}px` }" />
-            </transition>
+    <v-portal :to="portal" :order="depth">
+        <div class="vue-portal-target stack">
+            <div
+                class="stack-container"
+                :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-2 shadow-lg': full }"
+                :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
+            >
+                <transition name="stack-overlay-fade">
+                    <div
+                        class="stack-overlay" v-if="visible"
+                        :style="direction === 'ltr' ? { left: `-${leftOffset}px` } : { right: `-${leftOffset}px` }"
+                    />
+                </transition>
 
-            <div class="stack-hit-area" :style="direction === 'ltr' ? { left: `-${offset}px` } : { right: `-${offset}px` }" @click="clickedHitArea" @mouseenter="mouseEnterHitArea" @mouseout="mouseOutHitArea" />
+                <div
+                    class="stack-hit-area"
+                    :style="direction === 'ltr' ? { left: `-${offset}px` } : { right: `-${offset}px` }"
+                    @click="clickedHitArea"
+                    @mouseenter="mouseEnterHitArea"
+                    @mouseout="mouseOutHitArea"
+                />
 
-            <transition name="stack-slide">
-                <div class="stack-content" v-if="visible">
-                    <slot name="default" :depth="depth" :close="close" />
-                </div>
-            </transition>
+                <transition name="stack-slide">
+                    <div class="stack-content" v-if="visible">
+                        <slot name="default" :depth="depth" :close="close" />
+                    </div>
+                </transition>
+            </div>
         </div>
     </v-portal>
 
@@ -65,7 +77,7 @@ export default {
 
         depth() {
             if (!this.stack) {
-                return 1
+                return 1;
             }
 
             return this.stack.data.depth;
