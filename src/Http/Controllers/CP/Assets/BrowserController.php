@@ -112,13 +112,11 @@ class BrowserController extends CpController
                 ->offset($offset)
                 ->limit($perPage - $folders->count())
                 ->get();
-        } else {
-            $assets = collect();
         }
 
         return [
             'data' => [
-                'assets' => FolderAsset::collection($assets)->resolve(),
+                'assets' => FolderAsset::collection($assets ?? collect())->resolve(),
                 'folder' => array_merge((new Folder($folder))->resolve(), [
                     'folders' => $folders,
                 ]),
