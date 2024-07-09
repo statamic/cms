@@ -87,7 +87,6 @@ class BrowserController extends CpController
         $totalItems = $totalAssets + $totalFolders;
 
         $lastPageWithFolders = (int) ceil($totalFolders / $perPage);
-        $foldersOnLastPage = $totalFolders % $perPage ?: $perPage;
         $canShowAssets = ($perPage - $folders->count()) > 0;
 
         if ($canShowAssets) {
@@ -103,7 +102,7 @@ class BrowserController extends CpController
 
             $offset = $page === $lastPageWithFolders
                 ? 0
-                : $perPage * ($page - $lastPageWithFolders) - $foldersOnLastPage;
+                : $perPage * ($page - $lastPageWithFolders) - ($totalFolders % $perPage);
 
             $assets = $query
                 ->offset($offset)
