@@ -80,6 +80,15 @@ class AssetUploader extends Uploader
         $replacements = [
             ' ' => '-',
             '#' => '-',
+            ':' => '-',
+            '<' => '-',
+            '>' => '-',
+            '""' => '-',
+            '/' => '-',
+            '\\' => '-',
+            '|' => '-',
+            '?' => '-',
+            '*' => '-',
         ];
 
         $str = Stringy::create(urldecode($string))->toAscii();
