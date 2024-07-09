@@ -46,12 +46,12 @@
                 </save-button-options>
 
                 <button
-                    v-if="revisionsEnabled && !isCreating && canManagePublishState"
+                    v-if="revisionsEnabled && !isCreating"
                     class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
                     :disabled="!canPublish"
-                    @click="confirmingPublish = true">
-                    <span>{{ __('Publish') }}…</span>
-                </button>
+                    @click="confirmingPublish = true"
+                    v-text="publishButtonText"
+                />
             </div>
 
             <slot name="action-buttons-right" />
@@ -469,6 +469,13 @@ export default {
                 default:
                     return __('Save & Publish');
             }
+        },
+        publishButtonText() {
+            if (this.canManagePublishState) {
+                return __('Publish');
+            }
+
+            return __('Create Revision');
         },
 
         isUnpublishing() {
