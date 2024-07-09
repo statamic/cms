@@ -8,15 +8,15 @@
     </div>
 
     <sortable-list
-        :value="rows"
         :vertical="true"
         :item-class="sortableItemClass"
         :handle-class="sortableHandleClass"
         append-to="body"
         constrain-dimensions
+        :model-value="rows"
+        @update:model-value="(rows) => $emit('sorted', rows)"
         @dragstart="$emit('focus')"
         @dragend="$emit('blur')"
-        @input="(rows) => $emit('sorted', rows)"
     >
         <div
             class="grid-stacked"

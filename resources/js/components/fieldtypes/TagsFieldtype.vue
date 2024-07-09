@@ -35,10 +35,10 @@
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
-                    :value="value"
                     :distance="5"
                     :mirror="false"
-                    @input="update"
+                    :model-value="value"
+                    @update:model-value="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="tag in value" :key="tag" class="vs__selected mt-2 sortable-item">

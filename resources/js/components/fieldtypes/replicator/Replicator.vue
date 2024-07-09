@@ -41,13 +41,13 @@
         </div>
 
         <sortable-list
-            :value="value"
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
             append-to="body"
             constrain-dimensions
-            @input="sorted($event)"
+            :model-value="value"
+            @update:model-value="sorted($event)"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >

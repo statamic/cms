@@ -1,5 +1,6 @@
 <script>
 import { Sortable, Plugins } from '@shopify/draggable'
+import { first_child } from '../../node_helpers.js';
 
 function move(items, oldIndex, newIndex) {
     const itemRemovedArray = [
@@ -15,10 +16,11 @@ function move(items, oldIndex, newIndex) {
 }
 
 export default {
-    emits: ['dragstart', 'dragend', 'input'],
+    emits: ['dragstart', 'dragend', 'update:model-value'],
     props: {
-        value: {
+        modelValue: {
             required: true,
+            type: Array,
         },
         itemClass: {
             default: 'sortable-item',
@@ -67,7 +69,6 @@ export default {
     },
 
     computed: {
-
         computedOptions() {
             let plugins = [];
             if (this.animate) plugins.push(Plugins.SwapAnimation);
@@ -94,7 +95,6 @@ export default {
 
             return options;
         }
-
     },
 
     provide() {
@@ -118,13 +118,17 @@ export default {
 
     methods: {
         setupSortableList() {
-            this.sortable = new Sortable(this.$el, this.computedOptions);
+            // Since Vue components can now contain multiple children,
+            // We'll get the first child of the vue component and make that the sortable container.
+            const firstChild = first_child(this.$el.parentNode)
+
+            this.sortable = new Sortable(firstChild, this.computedOptions);
 
             this.sortable.on('drag:start', () => this.$emit('dragstart'));
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-                this.$emit('input', move(this.value, oldIndex, newIndex))
+                this.$emit('update:model-value', move(this.modelValue, oldIndex, newIndex))
             })
 
             if (this.mirror === false) {
@@ -142,10 +146,9 @@ export default {
             disabled ? this.destroySortableList() : this.setupSortableList();
         },
     },
-
 }
 </script>
 
 <template>
-    <slot :items="value"></slot>
+    <slot :items="modelValue" />
 </template>

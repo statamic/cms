@@ -39,10 +39,10 @@
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
-                    :value="items"
                     :distance="5"
                     :mirror="false"
-                    @input="input"
+                    :model-value="items"
+                    @update:model-value="input"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="item in items" :key="item.id" class="vs__selected mt-2" :class="{ 'sortable-item': !readOnly }">
