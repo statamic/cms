@@ -105,14 +105,16 @@ class CollectionRepository implements RepositoryContract
         Entry::updateUris($collection, $ids);
     }
 
+    /** @deprecated Use Entry::updateOrders($collection, $ids) */
     public function updateEntryOrder(Collection $collection, $ids = null)
     {
-        $this->store->updateEntryOrder($collection, $ids);
+        Entry::updateOrders($collection, $ids);
     }
 
+    /** @deprecated Use Entry::updateParents($collection, $ids) */
     public function updateEntryParent(Collection $collection, $ids = null)
     {
-        $this->store->updateEntryParent($collection, $ids);
+        Entry::updateParents($collection, $ids);
     }
 
     public function whereStructured(): IlluminateCollection

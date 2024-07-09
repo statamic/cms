@@ -877,6 +877,30 @@ class CollectionTest extends TestCase
     }
 
     #[Test]
+    public function it_updates_entry_orders_through_the_entry_repository()
+    {
+        $collection = (new Collection)->handle('test');
+
+        Facades\Entry::shouldReceive('updateOrders')->with($collection, null)->once()->ordered();
+        Facades\Entry::shouldReceive('updateOrders')->with($collection, ['one', 'two'])->once()->ordered();
+
+        $collection->updateEntryOrder();
+        $collection->updateEntryOrder(['one', 'two']);
+    }
+
+    #[Test]
+    public function it_updates_entry_parents_through_the_entry_repository()
+    {
+        $collection = (new Collection)->handle('test');
+
+        Facades\Entry::shouldReceive('updateParents')->with($collection, null)->once()->ordered();
+        Facades\Entry::shouldReceive('updateParents')->with($collection, ['one', 'two'])->once()->ordered();
+
+        $collection->updateEntryParent();
+        $collection->updateEntryParent(['one', 'two']);
+    }
+
+    #[Test]
     #[DataProvider('additionalPreviewTargetProvider')]
     public function it_gets_and_sets_preview_targets($throughFacade)
     {

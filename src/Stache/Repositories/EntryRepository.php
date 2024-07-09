@@ -168,4 +168,14 @@ class EntryRepository implements RepositoryContract
     {
         $this->store->store($collection->handle())->updateUris($ids);
     }
+
+    public function updateOrders($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateOrders($ids);
+    }
+
+    public function updateParents($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateParents($ids);
+    }
 }

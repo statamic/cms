@@ -258,6 +258,16 @@ class CollectionEntriesStore extends ChildStore
         $this->updateEntriesWithinStore($ids);
     }
 
+    public function updateOrders($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('order'), $ids);
+    }
+
+    public function updateParents($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('parent'), $ids);
+    }
+
     private function updateEntriesWithinIndex($index, $ids)
     {
         if (empty($ids)) {

@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -80,36 +79,6 @@ class CollectionsStore extends BasicStore
         }
 
         return $value === 'published';
-    }
-
-    public function updateEntryOrder($collection, $ids = null)
-    {
-        $index = Stache::store('entries')
-            ->store($collection->handle())
-            ->index('order');
-
-        $this->updateEntriesWithinIndex($index, $ids);
-    }
-
-    public function updateEntryParent($collection, $ids = null)
-    {
-        $index = Stache::store('entries')
-            ->store($collection->handle())
-            ->index('parent');
-
-        $this->updateEntriesWithinIndex($index, $ids);
-    }
-
-    private function updateEntriesWithinIndex($index, $ids)
-    {
-        if (empty($ids)) {
-            return $index->update();
-        }
-
-        collect($ids)
-            ->map(fn ($id) => Entry::find($id))
-            ->filter()
-            ->each(fn ($entry) => $index->updateItem($entry));
     }
 
     public function handleFileChanges()
