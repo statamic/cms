@@ -187,7 +187,7 @@ export default {
             return [
                 'form-group publish-field',
                 `publish-field__` + this.config.handle,
-                `${this.config.component || this.config.type}-fieldtype`, ,
+                `${this.config.component || this.config.type}-fieldtype`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
                 this.config.classes || '',
