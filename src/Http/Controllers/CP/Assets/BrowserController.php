@@ -3,13 +3,15 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Http\Resources\CP\Assets\FolderAssetsCollection;
+use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Http\Resources\CP\Assets\Folder;
 use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
 use Statamic\Support\Arr;
 
@@ -75,6 +77,22 @@ class BrowserController extends CpController
 
         $folder = $container->assetFolder($path);
 
+        $totalAssets = $folder->queryAssets()->count();
+        $totalSubfolders = $folder->assetFolders()->count();
+        $totalItems = $totalAssets + $totalSubfolders;
+
+        $subfolders = $folder->assetFolders()
+            ->slice(($request->page - 1) * $request->perPage, $request->perPage)
+            ->values();
+
+        $countOfSubfoldersFromPastPages = $subfolders->isEmpty()
+            ? $totalSubfolders
+            : $subfolders->count();
+
+        $countOfAssetsFromPastPages = $request->page > 1
+            ? ($request->perPage * ($request->page - 1)) - $countOfSubfoldersFromPastPages
+            : 0;
+
         $query = $folder->queryAssets();
 
         if ($request->sort) {
@@ -85,9 +103,32 @@ class BrowserController extends CpController
 
         $this->applyQueryScopes($query, $request->all());
 
-        $assets = $query->paginate(request('perPage'));
+        $assets = $query
+            ->offset($countOfAssetsFromPastPages)
+            ->limit($request->perPage - $subfolders->count())
+            ->get();
 
-        return (new FolderAssetsCollection($assets))->folder($folder);
+        return [
+            'data' => [
+                'assets' => array_map(fn ($item) => $item['data'], AssetResource::collection($assets)->resolve()),
+                'folder' => array_merge((new Folder($folder))->resolve(), [
+                    'folders' => $subfolders,
+                ]),
+            ],
+            'links' => [
+                'asset_action' => cp_route('assets.actions.run'),
+                'folder_action' => cp_route('assets.folders.actions.run', $container->id()),
+            ],
+            'meta' => [
+                'current_page' => Paginator::resolveCurrentPage(),
+                'from' => $totalItems > 0 ? ($request->page - 1) * $request->perPage + 1 : null,
+                'last_page' => $totalItems > 0 ? max((int) ceil($totalItems / $request->perPage), 1) : null,
+                'path' => Paginator::resolveCurrentPath(),
+                'per_page' => $request->perPage,
+                'to' => $totalItems > 0 ? ($request->page) * $request->perPage : null,
+                'total' => $totalItems,
+            ],
+        ];
     }
 
     public function search(Request $request, $container, $path = null)
