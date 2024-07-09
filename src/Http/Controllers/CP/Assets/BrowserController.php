@@ -84,32 +84,39 @@ class BrowserController extends CpController
         $totalSubfolders = $folder->assetFolders()->count();
         $totalItems = $totalAssets + $totalSubfolders;
 
+        $lastPageShowingSubfolders = (int) ceil($totalSubfolders / $perPage);
+        $numberOfSubfoldersOnLastPage = $totalSubfolders % $perPage ?: $perPage;
+
         $subfolders = $folder->assetFolders()
             ->slice(($page - 1) * $perPage, $perPage)
             ->values();
 
-        $countOfSubfoldersFromPastPages = $subfolders->isEmpty()
-            ? $totalSubfolders
-            : $subfolders->count();
+        $hasRoomForAssets = ($perPage - $subfolders->count()) > 0;
 
-        $countOfAssetsFromPastPages = $page > 1
-            ? ($perPage * ($page - 1)) - $countOfSubfoldersFromPastPages
-            : 0;
+        if ($hasRoomForAssets) {
+            $query = $folder->queryAssets();
 
-        $query = $folder->queryAssets();
+            if ($request->sort) {
+                $query->orderBy($request->sort, $request->order ?? 'asc');
+            } else {
+                $query->orderBy($container->sortField(), $container->sortDirection());
+            }
 
-        if ($request->sort) {
-            $query->orderBy($request->sort, $request->order ?? 'asc');
+            $this->applyQueryScopes($query, $request->all());
+
+            if ($page === $lastPageShowingSubfolders) {
+                $offset = 0;
+            } else {
+                $offset = $perPage * ($page - $lastPageShowingSubfolders) - $numberOfSubfoldersOnLastPage;
+            }
+
+            $assets = $query
+                ->offset($offset)
+                ->limit($perPage - $subfolders->count())
+                ->get();
         } else {
-            $query->orderBy($container->sortField(), $container->sortDirection());
+            $assets = collect();
         }
-
-        $this->applyQueryScopes($query, $request->all());
-
-        $assets = $query
-            ->offset($countOfAssetsFromPastPages)
-            ->limit($perPage - $subfolders->count())
-            ->get();
 
         return [
             'data' => [
