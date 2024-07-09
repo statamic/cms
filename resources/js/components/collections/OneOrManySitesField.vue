@@ -3,13 +3,18 @@
     <div>
         <div v-if="hasMultipleSites">
             <div class="radio-fieldtype mb-2">
-                <radio-fieldtype :handle="`${handle}_mode`" :model-value="mode" @input="setMode" :config="{
-                    inline: true,
-                    options: {
-                        single: __('Single'),
-                        multiple: __('Per-site'),
-                    }
-                }" />
+                <radio-fieldtype
+                    :handle="`${handle}_mode`"
+                    :model-value="mode"
+                    @update:model-value="setMode"
+                    :config="{
+                        inline: true,
+                        options: {
+                            single: __('Single'),
+                            multiple: __('Per-site'),
+                        }
+                    }"
+                />
             </div>
             <table class="grid-table" v-if="inMultipleMode">
                 <thead>
@@ -26,7 +31,8 @@
                                 dir="ltr"
                                 class="slug-field"
                                 :model-value="modelValue[site.handle]"
-                                @input="updateSiteValue(site.handle, $event)" />
+                                @update:model-value="updateSiteValue(site.handle, $event)"
+                            />
                         </td>
                     </tr>
                 </tbody>
@@ -34,7 +40,7 @@
         </div>
 
         <div v-if="!hasMultipleSites || !inMultipleMode">
-            <text-input :model-value="modelValue" @input="update" class="slug-field" dir="ltr" />
+            <text-input :model-value="modelValue" @update:model-value="update" class="slug-field" dir="ltr" />
         </div>
     </div>
 
@@ -108,7 +114,7 @@ export default {
         },
 
         update(value) {
-            this.$emit('input', value);
+            this.$emit('update:model-value', value);
         },
 
     }
