@@ -54,6 +54,17 @@ export default {
         }
     },
 
+    computed: {
+        storeValues() {
+            if (!this.$store.state.hasOwnProperty('publish')
+                || !this.$store.state.publish.hasOwnProperty(this.name)) {
+                return {}
+            }
+
+            return this.$store.state.publish[this.name].values
+        }
+    },
+
     created() {
         this.registerVuexModule();
         this.$events.$emit('publish-container-created', this);
@@ -199,14 +210,12 @@ export default {
                 actions: {
                     setFieldValue(context, payload) {
                         context.commit('setFieldValue', payload);
-                        vm.emitUpdatedEvent(context.state.values);
                     },
                     setFieldMeta(context, payload) {
                         context.commit('setFieldMeta', payload);
                     },
                     setValues(context, payload) {
                         context.commit('setValues', payload);
-                        vm.emitUpdatedEvent(context.state.values);
                     },
                     setMeta(context, payload) {
                         context.commit('setMeta', payload);
@@ -217,11 +226,6 @@ export default {
 
         removeVuexModule() {
             this.$store.unregisterModule(['publish', this.name]);
-        },
-
-        emitUpdatedEvent(values) {
-            this.$emit('updated', values);
-            this.dirty();
         },
 
         saving() {
@@ -270,6 +274,14 @@ export default {
             handler(after, before) {
                 if (_.isEqual(before, after)) return;
                 this.$store.commit(`publish/${this.name}/setValues`, after);
+            }
+        },
+
+        storeValues: {
+            deep: true,
+            handler(newValue) {
+                this.$emit('updated', newValue)
+                this.dirty();
             }
         },
 
