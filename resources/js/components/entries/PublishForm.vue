@@ -46,7 +46,7 @@
                 </save-button-options>
 
                 <button
-                    v-if="revisionsEnabled && !isCreating"
+                    v-if="revisionsEnabled && !isCreating && canManagePublishState"
                     class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
