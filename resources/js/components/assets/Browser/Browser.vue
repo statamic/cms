@@ -98,7 +98,7 @@
                                         </td>
                                         <td :colspan="columns.length" />
                                     </tr>
-                                    <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation && page === 1">
+                                    <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer group">
