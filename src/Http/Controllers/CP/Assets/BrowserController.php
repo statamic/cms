@@ -76,25 +76,21 @@ class BrowserController extends CpController
         $this->authorize('view', $container);
 
         $folder = $container->assetFolder($path);
-
         $perPage = $request->perPage ?? 15;
         $page = Paginator::resolveCurrentPage();
 
         $folders = $folder->assetFolders();
-        $totalAssets = $folder->queryAssets()->count();
         $totalFolders = $folders->count();
+        $folders = $folders->slice(($page - 1) * $perPage, $perPage);
+
+        $totalAssets = $folder->queryAssets()->count();
         $totalItems = $totalAssets + $totalFolders;
 
         $lastPageWithFolders = (int) ceil($totalFolders / $perPage);
         $foldersOnLastPage = $totalFolders % $perPage ?: $perPage;
+        $canShowAssets = ($perPage - $folders->count()) > 0;
 
-        $folders = $folders
-            ->slice(($page - 1) * $perPage, $perPage)
-            ->values();
-
-        $hasRoomForAssets = ($perPage - $folders->count()) > 0;
-
-        if ($hasRoomForAssets) {
+        if ($canShowAssets) {
             $query = $folder->queryAssets();
 
             if ($request->sort) {
@@ -119,7 +115,7 @@ class BrowserController extends CpController
             'data' => [
                 'assets' => FolderAsset::collection($assets ?? collect())->resolve(),
                 'folder' => array_merge((new Folder($folder))->resolve(), [
-                    'folders' => $folders,
+                    'folders' => $folders->values(),
                 ]),
             ],
             'links' => [
