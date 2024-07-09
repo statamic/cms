@@ -3,7 +3,6 @@
     <relationship-input
         ref="input"
         :name="name"
-        :value="value"
         :mode="config.mode"
         :can-edit="canEdit"
         :config="config"
@@ -27,9 +26,10 @@
         :tree="meta.tree"
         :initial-sort-column="meta.initialSortColumn"
         :initial-sort-direction="meta.initialSortDirection"
+        :model-value="modelValue"
+        @update:modelValue="update"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
-        @input="update"
         @item-data-updated="itemDataUpdated"
     />
 
@@ -139,7 +139,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return this.value.map(id => {
+            return this.modelValue.map(id => {
                 const item = _.findWhere(this.meta.data, { id });
                 return item ? item.title : id;
             });

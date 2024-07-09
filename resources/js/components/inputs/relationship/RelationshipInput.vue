@@ -72,7 +72,7 @@
                         :initial-columns="columns"
                         :initial-sort-column="initialSortColumn"
                         :initial-sort-direction="initialSortDirection"
-                        :initial-selections="value"
+                        :initial-selections="modelValue"
                         :max-selections="maxItems"
                         :search="search"
                         :exclusions="exclusions"
@@ -84,7 +84,7 @@
                 </template>
             </stack>
 
-            <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
+            <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(modelValue)" />
         </template>
     </div>
 
@@ -101,7 +101,10 @@ export default {
 
     props: {
         name: String,
-        value: { required: true },
+        modelValue: {
+            required: true,
+            default: () => [],
+        },
         config: Object,
         data: Array,
         maxItems: Number,
@@ -165,7 +168,7 @@ export default {
     computed: {
 
         items() {
-            return this.value.map(selection => {
+            return this.modelValue.map(selection => {
                 const data = _.find(this.data, (item) => item.id == selection);
 
                 if (! data) return { id: selection, title: selection };
@@ -175,7 +178,7 @@ export default {
         },
 
         maxItemsReached() {
-            return this.value.length >= this.maxItems;
+            return this.modelValue.length >= this.maxItems;
         },
 
         canSelectOrCreate() {
@@ -229,14 +232,14 @@ export default {
     methods: {
 
         update(selections) {
-            if (JSON.stringify(selections) == JSON.stringify(this.value)) return;
-            this.$emit('input', selections);
+            if (JSON.stringify(selections) == JSON.stringify(this.modelValue)) return;
+            this.$emit('update:model-value', selections);
         },
 
         remove(index) {
             this.update([
-                ...this.value.slice(0, index),
-                ...this.value.slice(index + 1),
+                ...this.modelValue.slice(0, index),
+                ...this.modelValue.slice(index + 1),
             ]);
         },
 
@@ -273,11 +276,11 @@ export default {
                 swapAnimation: { vertical: true },
                 plugins: [Plugins.SwapAnimation],
             }).on('drag:start', e => {
-                this.value.length === 1 ? e.cancel() : this.$emit('focus');
+                this.modelValue.length === 1 ? e.cancel() : this.$emit('focus');
             }).on('drag:stop', e => {
                 this.$emit('blur');
             }).on('sortable:stop', e => {
-                const val = [...this.value];
+                const val = [...this.modelValue];
                 val.splice(e.newIndex, 0, val.splice(e.oldIndex, 1)[0]);
                 this.update(val);
             });
@@ -285,7 +288,7 @@ export default {
 
         itemCreated(item) {
             this.$emit('item-data-updated', [...this.data, item]);
-            this.update([...this.value, item.id]);
+            this.update([...this.modelValue, item.id]);
         },
 
         selectFieldSelected(selectedItemData) {

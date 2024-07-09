@@ -5,10 +5,10 @@
         <relationship-fieldtype
             v-if="container"
             :handle="handle"
-            :value="value"
             :meta="relationshipMeta"
             :config="{ type: 'asset_folder' }"
-            @input="update"
+            :model-value="modelValue"
+            @update:model-value="update"
         />
     </div>
 </template>

@@ -64,6 +64,10 @@ export default {
         },
 
         depth() {
+            if (!this.stack) {
+                return 1
+            }
+
             return this.stack.data.depth;
         },
 

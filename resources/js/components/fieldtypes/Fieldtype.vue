@@ -3,7 +3,7 @@ export default {
     emits: ['update:model-value', 'meta-updated', 'replicator-preview-updated'],
 
     props: {
-        value: {
+        modelValue: {
             required: true
         },
         config: {
@@ -63,7 +63,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return this.value;
+            return this.modelValue;
         },
 
         fieldPathKeys() {

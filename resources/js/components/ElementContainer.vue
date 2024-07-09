@@ -1,33 +1,32 @@
 <script>
-    import ResizeObserver from 'resize-observer-polyfill';
+import ResizeObserver from 'resize-observer-polyfill';
+import { first_child } from '../node_helpers.js';
 
-    export default {
-        emits: ['resized'],
+export default {
+    emits: ['resized'],
 
-        data() {
-            return {
-                width: null
-            }
-        },
+    data() {
+        return {
+            width: null
+        }
+    },
 
-        render() {
-            return this.$slots.default({});
-        },
+    render() {
+        return this.$slots.default({});
+    },
 
-        mounted() {
-            const observer = new ResizeObserver(_.throttle(entries => {
-                this.width = entries[0].contentRect.width;
-            }, 200));
+    mounted() {
+        const observer = new ResizeObserver(_.throttle(entries => {
+            this.width = entries[0].contentRect.width;
+        }, 200));
 
-            console.log(this.$el);
+        observer.observe(first_child(this.$el.parentNode));
+    },
 
-            // observer.observe(this.$el);
-        },
-
-        watch: {
-            width(width) {
-                this.$emit('resized', { width });
-            }
+    watch: {
+        width(width) {
+            this.$emit('resized', { width });
         }
     }
+}
 </script>

@@ -3,7 +3,7 @@
     <div>
         <div v-if="hasMultipleSites">
             <div class="radio-fieldtype mb-2">
-                <radio-fieldtype :handle="`${handle}_mode`" :value="mode" @input="setMode" :config="{
+                <radio-fieldtype :handle="`${handle}_mode`" :model-value="mode" @input="setMode" :config="{
                     inline: true,
                     options: {
                         single: __('Single'),
@@ -25,7 +25,7 @@
                             <text-input
                                 dir="ltr"
                                 class="slug-field"
-                                :value="value[site.handle]"
+                                :model-value="modelValue[site.handle]"
                                 @input="updateSiteValue(site.handle, $event)" />
                         </td>
                     </tr>
@@ -34,7 +34,7 @@
         </div>
 
         <div v-if="!hasMultipleSites || !inMultipleMode">
-            <text-input :value="value" @input="update" class="slug-field" dir="ltr" />
+            <text-input :model-value="modelValue" @input="update" class="slug-field" dir="ltr" />
         </div>
     </div>
 
@@ -43,12 +43,12 @@
 <script>
 export default {
 
-    props: ['handle', 'value', 'state', 'columnHeader'],
+    props: ['handle', 'modelValue', 'state', 'columnHeader'],
 
     computed: {
 
         mode() {
-            return (this.value === null || typeof this.value === 'string') ? 'single' : 'multiple';
+            return (this.modelValue === null || typeof this.modelValue === 'string') ? 'single' : 'multiple';
         },
 
         sites() {
@@ -82,13 +82,13 @@ export default {
             let value;
 
             if (mode === 'single') {
-                this.multipleValue = this.value;
+                this.multipleValue = this.modelValue;
 
-                value = this.singleValue || Object.values(this.value)[0];
+                value = this.singleValue || Object.values(this.modelValue)[0];
             }
 
             if (mode === 'multiple') {
-                this.singleValue = this.value;
+                this.singleValue = this.modelValue;
 
                 if (this.multipleValue) {
                     value = this.multipleValue;
@@ -102,7 +102,7 @@ export default {
         },
 
         updateSiteValue(site, siteValue) {
-            let value = this.value;
+            let value = this.modelValue;
             value[site] = siteValue;
             this.update(value);
         },

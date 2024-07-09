@@ -329,7 +329,7 @@ export default {
 
     render() {
         return this.$slots.default({
-            values: this.$store.state.publish[this.name].values,
+            values: this.storeValues,
             container: {}, // @todo this was this._self, how to fix this?
             components: this.components,
             setFieldValue: this.setFieldValue,

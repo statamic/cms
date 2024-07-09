@@ -73,9 +73,9 @@
                                 v-if="!loading"
                                 handle="user.roles"
                                 :config="{ type: 'user_roles', mode: 'select' }"
-                                :value="value"
                                 :meta="meta"
-                                @input="user.roles = $event"
+                                :model-value="modelValue"
+                                @update:model-value="user.roles = $event"
                             />
                         </div>
                     </template>
@@ -95,9 +95,9 @@
                                 v-if="!loading"
                                 handle="user.groups"
                                 :config="{ type: 'user_groups', mode: 'select' }"
-                                :value="value"
                                 :meta="meta"
-                                @input="user.groups = $event"
+                                :model-value="modelValue"
+                                @update:model-value="user.groups = $event"
                             />
                         </div>
                     </template>

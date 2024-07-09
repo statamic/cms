@@ -2,10 +2,10 @@
     <div :class="classes">
         <publish-field-meta
             :config="config"
-            :initial-value="value"
+            :initial-value="modelValue"
             :initial-meta="meta"
         >
-            <template #default="{ meta, value, loading: loadingMeta }">
+            <template #default="{ meta, loading: loadingMeta }">
                 <div class="field-inner">
                     <!--                    <label-->
                     <!--                        v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId"-->
@@ -79,13 +79,13 @@
                         v-else
                         :is="fieldtypeComponent"
                         :config="config"
-                        :value="value"
                         :meta="meta"
                         :handle="config.handle"
                         :name-prefix="namePrefix"
                         :field-path-prefix="fieldPathPrefix"
                         :read-only="isReadOnly"
-                        @update:modelValue="$emit('update:modelValue', $event)"
+                        :model-value="modelValue"
+                        @update:model-value="$emit('update:model-value', $event)"
                         @meta-updated="$emit('meta-updated', $event)"
                         @focus="focused"
                         @blur="blurred"
@@ -123,7 +123,7 @@ export default {
             type: Object,
             required: true
         },
-        value: {
+        modelValue: {
             required: true
         },
         meta: {},

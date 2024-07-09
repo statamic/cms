@@ -50,7 +50,7 @@
                         handle-class="sortable-item"
                         :distance="5"
                         :mirror="false"
-                        :model-value="value"
+                        :model-value="modelValue"
                         @update:model-value="update"
                     >
                     <div class="vs__selected-options-outside flex flex-wrap">
@@ -96,7 +96,7 @@ export default {
 
     computed: {
         selectedOptions() {
-            let selections = this.value || [];
+            let selections = this.modelValue || [];
             if (typeof selections === 'string' || typeof selections === 'number') {
                 selections = [selections];
             }
@@ -140,8 +140,8 @@ export default {
         },
 
         currentLength() {
-            if (this.value) {
-                return (typeof this.value == 'string') ? 1 : this.value.length;
+            if (this.modelValue) {
+                return (typeof this.modelValue == 'string') ? 1 : this.modelValue.length;
             }
 
             return 0;

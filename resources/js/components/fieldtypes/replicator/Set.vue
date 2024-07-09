@@ -27,8 +27,8 @@
                     <toggle-fieldtype
                         handle="set-enabled"
                         class="toggle-sm rtl:ml-2 ltr:mr-2"
-                        @input="toggleEnabledState"
-                        :value="values.enabled"
+                        @update:model-value="toggleEnabledState"
+                        :model-value="values.enabled"
                         v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />

@@ -13,7 +13,7 @@
             :searchable="true"
             :push-tags="false"
             :multiple="false"
-            :model-value="value"
+            :model-value="modelValue"
             @update:model-value="update"
         >
             <template #no-options>

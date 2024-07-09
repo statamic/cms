@@ -24,7 +24,7 @@
                 <configure-tabs
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
-                    :enable-sidebar="false"/>
+                />
             </div>
         </template>
     </publish-container>

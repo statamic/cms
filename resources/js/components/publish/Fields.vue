@@ -8,12 +8,12 @@
             <publish-field
                 v-show="showField(field)"
                 :config="field"
-                :value="values[field.handle]"
                 :meta="meta[field.handle]"
                 :errors="errors[field.handle]"
                 :read-only="readOnly"
                 :syncable="isSyncableField(field)"
                 :name-prefix="namePrefix"
+                :model-value="values[field.handle]"
                 @update:model-value="$emit('updated', field.handle, $event)"
                 @meta-updated="$emit('meta-updated', field.handle, $event)"
                 @synced="$emit('synced', field.handle)"

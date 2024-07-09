@@ -28,10 +28,10 @@
                 v-if="option === 'entry'"
                 ref="entries"
                 handle="entry"
-                :value="selectedEntries"
                 :config="meta.entry.config"
                 :meta="meta.entry.meta"
-                @input="entriesSelected"
+                :model-value="selectedEntries"
+                @update:model-value="entriesSelected"
                 @meta-updated="meta.entry.meta = $event"
             />
 

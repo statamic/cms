@@ -24,7 +24,7 @@
             <component
                 :is="component"
                 :fields="fields"
-                :rows="value"
+                :rows="modelValue"
                 :meta="meta.existing"
                 :name="name"
                 :can-delete-rows="canDeleteRows"
@@ -60,8 +60,10 @@ import uniqid from 'uniqid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
 import ManagesRowMeta from './ManagesRowMeta';
+import Fieldtype from '../Fieldtype.vue';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [
         Fieldtype,
@@ -71,6 +73,13 @@ export default {
     components: {
         GridTable,
         GridStacked
+    },
+
+    props: {
+        modelValue: {
+            required: true,
+            default: () => [],
+        },
     },
 
     data() {
@@ -110,11 +119,11 @@ export default {
         },
 
         canAddRows() {
-            return ! this.isReadOnly && this.value.length < this.maxRows;
+            return ! this.isReadOnly && this.modelValue.length < this.maxRows;
         },
 
         canDeleteRows() {
-            return ! this.isReadOnly && this.value.length > this.minRows;
+            return ! this.isReadOnly && this.modelValue.length > this.minRows;
         },
 
         addRowButtonLabel() {
@@ -126,11 +135,11 @@ export default {
         },
 
         hasExcessRows() {
-            return (this.value.length - this.maxRows) > 0;
+            return (this.modelValue.length - this.maxRows) > 0;
         },
 
         hasNotEnoughRows() {
-            return (this.value.length - this.minRows) < 0;
+            return (this.modelValue.length - this.minRows) < 0;
         },
 
         isReorderable() {
@@ -140,7 +149,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return `${__(this.config.display)}: ${__n(':count row|:count rows', this.value.length)}`;
+            return `${__(this.config.display)}: ${__n(':count row|:count rows', this.modelValue.length)}`;
         }
 
     },
@@ -181,14 +190,14 @@ export default {
             row._id = id;
 
             this.updateRowMeta(id, this.meta.new);
-            this.update([...this.value, row]);
+            this.update([...this.modelValue, row]);
         },
 
         updated(index, row) {
             this.update([
-                ...this.value.slice(0, index),
+                ...this.modelValue.slice(0, index),
                 row,
-                ...this.value.slice(index + 1)
+                ...this.modelValue.slice(index + 1)
             ]);
         },
 
@@ -196,19 +205,19 @@ export default {
             if (! confirm(__('Are you sure?'))) return;
 
             this.update([
-                ...this.value.slice(0, index),
-                ...this.value.slice(index + 1)
+                ...this.modelValue.slice(0, index),
+                ...this.modelValue.slice(index + 1)
             ]);
         },
 
         duplicate(index) {
-            const row = clone(this.value[index]);
+            const row = clone(this.modelValue[index]);
             const old_id = row._id;
             row._id = uniqid();
 
             this.updateRowMeta(row._id, this.meta.existing[old_id]);
 
-            this.update([...this.value, row]);
+            this.update([...this.modelValue, row]);
         },
 
         sorted(rows) {
