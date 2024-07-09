@@ -6,21 +6,23 @@
 </template>
 
 <script>
-export default {
-    mixins: [Fieldtype],
+    import Fieldtype from './Fieldtype.vue';
 
-    computed: {
+    export default {
+        mixins: [Fieldtype],
 
-        inlineLabel(){
-            return this.value ? (this.config.inline_label_when_true || this.config.inline_label) : this.config.inline_label;
-        },
+        computed: {
 
-        replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            inlineLabel(){
+                return this.value ? (this.config.inline_label_when_true || this.config.inline_label) : this.config.inline_label;
+            },
 
-            return (this.value ? '✓' : '✗') + ' ' + __(this.config.display);
+            replicatorPreview() {
+                if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
+                return (this.value ? '✓' : '✗') + ' ' + __(this.config.display);
+            }
+
         }
-
-    }
-};
+    };
 </script>

@@ -27,6 +27,8 @@
 
 <script>
 export default {
+    emits: ['opened', 'closed'],
+
     props: {
         disabled: {
             type: Boolean,
@@ -42,7 +44,11 @@ export default {
         },
         class: {
             type: String,
-        }
+        },
+        editable: {
+            type: Boolean,
+            default: true
+        },
     },
     computed: {
         strategy() {

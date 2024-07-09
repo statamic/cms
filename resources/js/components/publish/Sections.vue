@@ -28,6 +28,8 @@
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
+    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
+
     mixins: [ValidatesFieldConditions],
 
     props: {
@@ -39,6 +41,7 @@ export default {
         syncable: Boolean,
         syncableFields: Array,
         namePrefix: String,
+        enableSidebar: Boolean
     },
 
     computed: {

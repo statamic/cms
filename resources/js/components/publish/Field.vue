@@ -113,6 +113,8 @@ import { marked } from 'marked';
 import PublishFieldMeta from '../publish/FieldMeta.vue';
 
 export default {
+    emits: ['meta-updated', 'input', 'focus', 'blur'],
+
     components: {
         PublishFieldMeta,
     },

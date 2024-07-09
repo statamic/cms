@@ -17,13 +17,15 @@
 </template>
 
 <script>
+    import Fieldtype from './Fieldtype.vue';
 
-export default {
+    export default {
+        emits: ['input', 'focus', 'blur'],
 
-    mixins: [Fieldtype],
-    props: {
-        prepend: { default: null },
-        append: { default: null },
-    }
-};
+        mixins: [Fieldtype],
+        props: {
+            prepend: { default: null },
+            append: { default: null },
+        }
+    };
 </script>

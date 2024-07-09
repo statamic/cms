@@ -11,9 +11,9 @@ export { default as PublishFields } from '../components/publish/Fields.vue';
 export { default as PublishFieldsContainer } from '../components/publish/FieldsContainer.vue'; // deprecated
 export { default as PublishField } from '../components/publish/Field.vue';
 export { default as PublishFieldMeta } from '../components/publish/FieldMeta.vue';
-// export { default as ConfigureTabs } from '../components/configure/Tabs.vue';
+export { default as ConfigureTabs } from '../components/configure/Tabs.vue';
 // export { default as PublishTabs } from '../components/publish/Tabs.vue';
-// export { default as PublishSections } from '../components/publish/Sections.vue';
+export { default as PublishSections } from '../components/publish/Sections.vue';
 // export { default as PublishValidationErrors } from '../components/publish/ValidationErrors.vue';
 // export { default as FormGroup } from '../components/publish/FormGroup.vue';
 
@@ -56,7 +56,7 @@ export { default as DropdownList } from '../components/DropdownList.vue';
 export { default as DropdownItem } from '../components/DropdownItem.vue';
 // export { default as ValidationErrors } from '../components/ValidationErrors.vue';
 // export { default as Slugify } from '../components/slugs/Slugify.vue';
-// export { default as ElementContainer } from '../components/ElementContainer.vue';
+export { default as ElementContainer } from '../components/ElementContainer.vue';
 export { default as Avatar } from '../components/Avatar.vue';
 export { default as Breadcrumb } from '../components/Breadcrumb.vue';
 // export { default as Breadcrumbs } from '../components/Breadcrumbs.vue';
@@ -75,7 +75,7 @@ export { default as FavoriteCreator } from '../components/FavoriteCreator.vue';
 export { default as KeyboardShortcutsModal } from '../components/modals/KeyboardShortcutsModal.vue';
 export { default as ResourceDeleter } from '../components/ResourceDeleter.vue';
 
-// export { default as Stack } from '../components/stacks/Stack.vue';
+export { default as Stack } from '../components/stacks/Stack.vue';
 // export { default as StackTest } from '../components/stacks/StackTest.vue';
 
 export { default as GlobalSearch } from '../components/GlobalSearch.vue';
@@ -112,11 +112,11 @@ export { default as Login } from '../components/login/Login.vue';
 export { default as CollectionView } from '../components/collections/View.vue';
 // export { default as CollectionBlueprintListing } from '../components/collections/BlueprintListing.vue';
 export { default as SessionExpiry } from '../components/SessionExpiry.vue';
-// export { default as NavigationListing } from '../components/navigation/Listing.vue';
+export { default as NavigationListing } from '../components/navigation/Listing.vue';
+export { default as NavigationView } from '../components/navigation/View.vue';
 // export { default as NavigationCreateForm } from '../components/navigation/CreateForm.vue';
-// export { default as NavigationEditForm } from '../components/navigation/EditForm.vue';
+export { default as NavigationEditForm } from '../components/navigation/EditForm.vue';
 // export { default as PreferencesEditForm } from '../components/preferences/EditForm.vue';
-// export { default as NavigationView } from '../components/navigation/View.vue';
 // export { default as TaxonomyCreateForm } from '../components/taxonomies/CreateForm.vue';
 // export { default as TaxonomyEditForm } from '../components/taxonomies/EditForm.vue';
 // export { default as TaxonomyBlueprintListing } from '../components/taxonomies/BlueprintListing.vue';

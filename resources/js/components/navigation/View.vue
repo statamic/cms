@@ -1,7 +1,5 @@
 <template>
-
     <div>
-
         <header class="mb-6" v-if="mounted">
             <breadcrumb :url="breadcrumbUrl" :title="__('Navigation')" />
 
@@ -86,7 +84,7 @@
                                  <p>{{ __('messages.navigation_link_to_entry_instructions') }}</p>
                             </div>
                         </a>
-                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                        <a :href="docsUrl" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
                             <svg-icon name="light/book-pages" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
                             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
                                 <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Read the Documentation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
@@ -180,6 +178,7 @@ import SiteSelector from '../SiteSelector.vue';
 import uniqid from 'uniqid';
 
 export default {
+    emits: ['edit-page', 'changed', 'saved', 'canceled'],
 
     components: {
         PageTree,
@@ -217,6 +216,8 @@ export default {
             pageDeletionConfirmCallback: null,
             preferencesPrefix: `navs.${this.handle}`,
             publishInfo: {},
+            editable: true,
+            docsUrl: null,
         }
     },
 
@@ -264,6 +265,9 @@ export default {
 
     mounted() {
         this.mounted = true;
+
+        // TODO(justkidding96): Check if this is the correct way to get the docs URL.
+        this.docsUrl = this.$config.get('docsUrl', null);
     },
 
     methods: {
