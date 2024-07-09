@@ -865,12 +865,12 @@ class CollectionTest extends TestCase
     }
 
     #[Test]
-    public function it_updates_entry_uris_through_the_repository()
+    public function it_updates_entry_uris_through_the_entry_repository()
     {
         $collection = (new Collection)->handle('test');
 
-        Facades\Collection::shouldReceive('updateEntryUris')->with($collection, null)->once()->ordered();
-        Facades\Collection::shouldReceive('updateEntryUris')->with($collection, ['one', 'two'])->once()->ordered();
+        Facades\Entry::shouldReceive('updateUris')->with($collection, null)->once()->ordered();
+        Facades\Entry::shouldReceive('updateUris')->with($collection, ['one', 'two'])->once()->ordered();
 
         $collection->updateEntryUris();
         $collection->updateEntryUris(['one', 'two']);
