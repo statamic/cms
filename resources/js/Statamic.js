@@ -38,6 +38,7 @@ import useProgressBar from './composables/useProgressBar';
 import useDirtyState from './composables/useDirtyState';
 import useEventBus from './composables/useEventBus';
 import registerFieldTypes from './bootstrap/fieldtypes.js';
+import filters from './bootstrap/filters.js'
 
 const echo = new Echo;
 const bard = new Bard;
@@ -100,6 +101,10 @@ export default {
 
     get $slug() {
         return slug;
+    },
+
+    get $filters() {
+        return this.$app.config.globalProperties.$filters;
     },
 
     component(name, component) {
@@ -175,6 +180,7 @@ export default {
         this.$app.config.globalProperties.$progress = useProgressBar();
         this.$app.config.globalProperties.$dirty = useDirtyState();
         this.$app.config.globalProperties.$modal = useVfm();
+        this.$app.config.globalProperties.$filters = filters;
 
         // Assign any global helper methods, available in all Vue components.
         Object.assign(this.$app.config.globalProperties, {

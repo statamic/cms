@@ -9,7 +9,7 @@
                     <span v-if="! isCreating"
                         class="little-dot rtl:ml-2 ltr:mr-2"
                         :class="{ 'bg-green-600': published, 'bg-gray-600': !published }" />
-                    <span v-html="$options.filters.striptags(title)" />
+                    <span v-html="$filters.striptags(title)" />
                 </div>
             </h1>
 

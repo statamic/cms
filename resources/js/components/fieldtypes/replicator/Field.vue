@@ -91,7 +91,7 @@ export default {
 
         instructions() {
             return this.field.instructions
-                ? this.$options.filters.markdown(__(this.field.instructions))
+                ? this.$filters.markdown(__(this.field.instructions))
                 : null
         },
 

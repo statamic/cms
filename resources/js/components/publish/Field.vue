@@ -231,9 +231,8 @@ export default {
         },
 
         labelText() {
-            return this.config.display;
-            // @todo(jelleroorda): fix
-            //  || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
+            return this.config.display
+                || this.$filters.titleize(this.$filters.deslugify(this.config.handle));
         },
 
         showLabelText() {

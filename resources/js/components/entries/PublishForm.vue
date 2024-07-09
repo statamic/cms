@@ -7,7 +7,7 @@
             <h1 class="flex-1">
                 <div class="flex items-center">
                     <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
-                    <span v-html="$options.filters.striptags(__(title))" />
+                    <span v-html="$filters.striptags(__(title))" />
                 </div>
             </h1>
 
