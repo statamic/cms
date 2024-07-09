@@ -104,11 +104,9 @@ class BrowserController extends CpController
 
             $this->applyQueryScopes($query, $request->all());
 
-            if ($page === $lastPageShowingSubfolders) {
-                $offset = 0;
-            } else {
-                $offset = $perPage * ($page - $lastPageShowingSubfolders) - $numberOfSubfoldersOnLastPage;
-            }
+            $offset = $page === $lastPageShowingSubfolders
+                ? 0
+                : $perPage * ($page - $lastPageShowingSubfolders) - $numberOfSubfoldersOnLastPage;
 
             $assets = $query
                 ->offset($offset)
