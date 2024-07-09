@@ -77,20 +77,23 @@ class BrowserController extends CpController
 
         $folder = $container->assetFolder($path);
 
+        $perPage = $request->perPage ?? 15;
+        $page = Paginator::resolveCurrentPage();
+
         $totalAssets = $folder->queryAssets()->count();
         $totalSubfolders = $folder->assetFolders()->count();
         $totalItems = $totalAssets + $totalSubfolders;
 
         $subfolders = $folder->assetFolders()
-            ->slice(($request->page - 1) * $request->perPage, $request->perPage)
+            ->slice(($page - 1) * $perPage, $perPage)
             ->values();
 
         $countOfSubfoldersFromPastPages = $subfolders->isEmpty()
             ? $totalSubfolders
             : $subfolders->count();
 
-        $countOfAssetsFromPastPages = $request->page > 1
-            ? ($request->perPage * ($request->page - 1)) - $countOfSubfoldersFromPastPages
+        $countOfAssetsFromPastPages = $page > 1
+            ? ($perPage * ($page - 1)) - $countOfSubfoldersFromPastPages
             : 0;
 
         $query = $folder->queryAssets();
@@ -105,7 +108,7 @@ class BrowserController extends CpController
 
         $assets = $query
             ->offset($countOfAssetsFromPastPages)
-            ->limit($request->perPage - $subfolders->count())
+            ->limit($perPage - $subfolders->count())
             ->get();
 
         return [
@@ -120,12 +123,12 @@ class BrowserController extends CpController
                 'folder_action' => cp_route('assets.folders.actions.run', $container->id()),
             ],
             'meta' => [
-                'current_page' => Paginator::resolveCurrentPage(),
-                'from' => $totalItems > 0 ? ($request->page - 1) * $request->perPage + 1 : null,
-                'last_page' => $totalItems > 0 ? max((int) ceil($totalItems / $request->perPage), 1) : null,
+                'current_page' => $page,
+                'from' => $totalItems > 0 ? ($page - 1) * $perPage + 1 : null,
+                'last_page' => $totalItems > 0 ? max((int) ceil($totalItems / $perPage), 1) : null,
                 'path' => Paginator::resolveCurrentPath(),
-                'per_page' => $request->perPage,
-                'to' => $totalItems > 0 ? ($request->page) * $request->perPage : null,
+                'per_page' => $perPage,
+                'to' => $totalItems > 0 ? $page * $perPage : null,
                 'total' => $totalItems,
             ],
         ];
