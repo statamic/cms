@@ -9,21 +9,22 @@ export default {
         portals: [] as Portal[],
     },
 
-    getters: {
-        stacks(state) {
-            return state.portals.filter(portal => portal.data?.type === 'stack');
-        }
-    },
-
     mutations: {
         add(state, portal: Portal) {
-            state.portals.push(portal);
+            state.portals = [
+                ...state.portals,
+                portal
+            ];
         },
 
         destroy(state, id) {
             const i = _.findIndex(state.portals, (portal: Portal) => portal.id === id);
 
-            state.portals.splice(i, 1);
+            const portals = [...state.portals]
+
+            portals.splice(i, 1);
+
+            state.portals = portals
         },
     },
 
@@ -36,12 +37,15 @@ export default {
             return portal;
         },
 
-        createStack({ dispatch, getters }, { data }) {
+        createStack({ dispatch, state }, { data }) {
+            // Note: we're not using the getter because that causes some weird caching to happen.
+            const stacks = state.portals.filter(p => p.isStack())
+
             return dispatch('create', {
                 name: 'stack',
                 data: {
                     type: 'stack',
-                    depth: getters.stacks.length + 1,
+                    depth: stacks.length + 1,
                     ...data,
                 }
             })

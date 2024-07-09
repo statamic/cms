@@ -45,11 +45,11 @@ export default {
         };
     },
 
-    async created() {
+    async mounted() {
         this.portal = await this.$store.dispatch('portals/create', { name: this.name });
     },
 
-    beforeDestroy() {
+    unmounted() {
         this.portal.destroy();
     }
 

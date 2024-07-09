@@ -68,7 +68,8 @@ export default {
     computed: {
 
         stacks() {
-            return this.$store.getters['portals/stacks'];
+            // Note: we're not using the getter because that causes some weird caching to happen.
+            return this.$store.state.portals.portals.filter(p => p.isStack())
         },
 
         portal() {
@@ -124,21 +125,25 @@ export default {
 
     },
 
-    async created() {
+    async mounted() {
+        this.visible = true;
+
+
         this.stack = await this.$store.dispatch('portals/createStack', {
             data: {
                 runCloseCallback: this.runCloseCallback
             }
         });
+        console.log('stack', this.stack);
+
 
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => this.isHovering = true);
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => this.isHovering = false);
         this.escBinding = this.$keys.bindGlobal('esc', this.close);
     },
 
-    destroyed() {
-        // @todo(jelleroorda): check whether this still works.
-        this.stack.destroy();
+    unmounted() {
+        this.$store.commit('portals/destroy', this.stack.id)
 
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseenter`);
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);
@@ -186,10 +191,6 @@ export default {
                 this.$emit('closed');
             });
         },
-    },
-
-    mounted() {
-        this.visible = true;
     },
 
 };

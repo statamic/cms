@@ -8,9 +8,13 @@ export default class Portal {
         this.data = data;
     }
 
+    isStack() {
+        return this.data?.type === 'stack'
+    }
+
     destroy() {
         const store = useStore()
 
-        store.dispatch('portals/destroy', this.id)
+        store.commit('portals/destroy', this.id)
     }
 }
