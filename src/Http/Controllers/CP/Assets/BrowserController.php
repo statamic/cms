@@ -80,14 +80,15 @@ class BrowserController extends CpController
         $perPage = $request->perPage ?? 15;
         $page = Paginator::resolveCurrentPage();
 
+        $folders = $folder->assetFolders();
         $totalAssets = $folder->queryAssets()->count();
-        $totalFolders = $folder->assetFolders()->count();
+        $totalFolders = $folders->count();
         $totalItems = $totalAssets + $totalFolders;
 
         $lastPageWithFolders = (int) ceil($totalFolders / $perPage);
         $foldersOnLastPage = $totalFolders % $perPage ?: $perPage;
 
-        $folders = $folder->assetFolders()
+        $folders = $folders
             ->slice(($page - 1) * $perPage, $perPage)
             ->values();
 
