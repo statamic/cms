@@ -76,7 +76,7 @@ class BrowserController extends CpController
         $this->authorize('view', $container);
 
         $folder = $container->assetFolder($path);
-        $perPage = $request->perPage ?? 15;
+        $perPage = $request->perPage ?? config('statamic.cp.pagination_size');
         $page = Paginator::resolveCurrentPage();
 
         $folders = $folder->assetFolders();
