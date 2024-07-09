@@ -12,6 +12,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
 use Statamic\Http\Resources\CP\Assets\Folder;
+use Statamic\Http\Resources\CP\Assets\FolderAsset;
 use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
 use Statamic\Support\Arr;
 
@@ -113,7 +114,7 @@ class BrowserController extends CpController
 
         return [
             'data' => [
-                'assets' => array_map(fn ($item) => $item['data'], AssetResource::collection($assets)->resolve()),
+                'assets' => FolderAsset::collection($assets)->resolve(),
                 'folder' => array_merge((new Folder($folder))->resolve(), [
                     'folders' => $subfolders,
                 ]),
