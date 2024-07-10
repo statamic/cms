@@ -14,7 +14,7 @@
     </div>
     <div>
         @if ( ! $submissions)
-            <p class="p-4 pt-2 text-sm text-gray-600">{{ __('This form is awaiting responses') }}</p>
+            <p class="p-4 text-sm text-gray-600">{{ __('This form is awaiting responses') }}</p>
         @else
             <table class="data-table">
                 @foreach($submissions as $submission)
