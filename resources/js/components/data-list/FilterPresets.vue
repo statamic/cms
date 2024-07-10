@@ -218,11 +218,6 @@ export default {
         },
 
         deletePreset() {
-            if (! this.showDeleteModal) {
-                this.showDeleteModal = true;
-                return;
-            }
-
             this.$preferences.remove(`${this.preferencesKey}.${this.activePreset}`)
                 .then(response => {
                     this.$emit('deleted', this.activePreset);
