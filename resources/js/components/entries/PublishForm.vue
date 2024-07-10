@@ -470,12 +470,13 @@ export default {
                     return __('Save & Publish');
             }
         },
+
         publishButtonText() {
             if (this.canManagePublishState) {
-                return __('Publish');
+                return `${__('Publish')}…`
             }
 
-            return __('Create Revision');
+            return `${__('Create Revision')}…`
         },
 
         isUnpublishing() {
