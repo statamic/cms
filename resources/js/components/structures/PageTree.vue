@@ -55,11 +55,11 @@
                         :show-blueprint="blueprints?.length > 1"
                         :editable="editable"
                         :root="isRoot(stat)"
-                        @edit="$emit('edit-page', page, store, $event)"
+                        @edit="$emit('edit-page', node, store, $event)"
                         @toggle-open="stat.open = !stat.open"
                         @removed="pageRemoved"
                         @children-orphaned="childrenOrphaned"
-                        @branch-clicked="$emit('branch-clicked', page)"
+                        @branch-clicked="$emit('branch-clicked', node)"
                         class="mb-px"
                     >
                         <template #branch-action="props">

@@ -86,8 +86,11 @@ export default {
             this.sharedState.selections = selections;
         },
 
-        'sharedState.selections': function (selections) {
-            this.$emit('selections-updated', selections);
+        'sharedState.selections': {
+            deep: true,
+            handler: function (selections) {
+                this.$emit('selections-updated', selections);
+            }
         },
 
         columns(columns) {

@@ -324,9 +324,12 @@ export default {
             this.request();
         },
 
-        selections() {
-            if (this.maxSelections === 1 && this.selections.length === 1) {
-                this.select();
+        selections: {
+            deep: true,
+            handler() {
+                if (this.maxSelections === 1 && this.selections.length === 1) {
+                    this.select();
+                }
             }
         },
 
@@ -466,6 +469,8 @@ export default {
         },
 
         checkboxClicked(row, index, $event) {
+            console.log(row, index, $event, 'hoi');
+
             if ($event.shiftKey && this.lastItemClicked !== null) {
                 this.selectRange(
                     Math.min(this.lastItemClicked, index),
