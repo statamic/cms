@@ -362,9 +362,18 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         })->values();
     }
 
+    public function isAssignedToCollection()
+    {
+        return $this->collection() && $this->collections()->contains($this->collection());
+    }
+
     public function toResponse($request)
     {
         if (! view()->exists($this->template())) {
+            throw new NotFoundHttpException;
+        }
+
+        if (! $this->isAssignedToCollection()) {
             throw new NotFoundHttpException;
         }
 
