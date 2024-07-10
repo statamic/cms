@@ -82,7 +82,7 @@ class BrowserController extends CpController
         $folders = $folder->assetFolders();
         $totalFolders = $folders->count();
         $folders = $folders->slice(($page - 1) * $perPage, $perPage);
-        $lastFolderPage = (int) ceil($totalFolders / $perPage);
+        $lastFolderPage = (int) ceil($totalFolders / $perPage) ?: 1;
 
         $totalAssets = $folder->queryAssets()->count();
         $totalItems = $totalAssets + $totalFolders;
