@@ -91,7 +91,6 @@
                   :container="container"
                   :folder="folder"
                   :selected="selectedAssets"
-                  :restrict-container-navigation="restrictAssetNavigation"
                   :restrict-folder-navigation="restrictAssetNavigation"
                   @selected="assetsSelected"
                   @closed="closeAssetSelector"

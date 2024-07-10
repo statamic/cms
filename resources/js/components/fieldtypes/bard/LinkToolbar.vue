@@ -168,7 +168,6 @@
             <asset-selector
                 :container="config.container"
                 :folder="config.folder || '/'"
-                :restrict-container-navigation="true"
                 :restrict-folder-navigation="config.restrict_assets"
                 :selected="[]"
                 :view-mode="'grid'"

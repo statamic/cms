@@ -47,7 +47,6 @@
                 <selector
                     :container="extension.options.bard.config.container"
                     :folder="extension.options.bard.config.folder || '/'"
-                    :restrict-container-navigation="true"
                     :restrict-folder-navigation="extension.options.bard.config.restrict_assets"
                     :selected="selections"
                     :view-mode="'grid'"
