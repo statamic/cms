@@ -128,14 +128,11 @@ export default {
     async mounted() {
         this.visible = true;
 
-
         this.stack = await this.$store.dispatch('portals/createStack', {
             data: {
                 runCloseCallback: this.runCloseCallback
             }
         });
-        console.log('stack', this.stack);
-
 
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => this.isHovering = true);
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => this.isHovering = false);

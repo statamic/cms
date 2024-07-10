@@ -30,7 +30,6 @@ export default {
         hasStacks: {
             deep: true,
             handler(hasStacks) {
-                console.log('hassstack', hasStacks);
                 hasStacks ? this.initStacks() : this.destroyStacks();
             }
         }

@@ -76,7 +76,8 @@
                             :resource-meta="meta"
                             :inline="true"
                             :scroll-to-top="false"
-                            @page-selected="setPage" />
+                            @page-selected="setPage"
+                        />
 
                         <div class="p-4 border-t dark:border-dark-200 flex items-center justify-between bg-gray-200 dark:bg-dark-500">
                             <div class="text-sm text-gray-700 dark:text-dark-150"
@@ -151,10 +152,12 @@
                                 </template>
 
                                 <template #branch-icon="{ branch }">
-                                    <svg-icon v-if="isRedirectBranch(branch)"
+                                    <svg-icon
+                                        v-if="isRedirectBranch(branch)"
                                         class="inline-block w-4 h-4 text-gray-500 dark:text-dark-175"
                                         name="light/external-link"
-                                        v-tooltip="__('Redirect')" />
+                                        v-tooltip="__('Redirect')"
+                                    />
                                 </template>
                             </page-tree>
                         </div>
