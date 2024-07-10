@@ -72,7 +72,6 @@ export default function registerFieldTypes(app) {
     app.component('text-fieldtype', TextFieldtype);
     app.component('textarea-fieldtype', TextareaFieldtype);
     app.component('slug-fieldtype', SlugFieldtype);
-    app.component('toggle-fieldtype', ToggleFieldtype);
 
     // app.component('array-fieldtype', ArrayFieldtype);
     // app.component('assets-fieldtype', AssetsFieldtype);

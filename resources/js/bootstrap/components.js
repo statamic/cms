@@ -107,7 +107,7 @@ export { default as Login } from '../components/login/Login.vue';
 // export { default as UserGroupListing } from '../components/user-groups/Listing.vue';
 // export { default as UserGroupPublishForm } from '../components/user-groups/PublishForm.vue';
 // export { default as CollectionCreateForm } from '../components/collections/CreateForm.vue';
-// export { default as CollectionScaffolder } from '../components/collections/Scaffolder.vue';
+export { default as CollectionScaffolder } from '../components/collections/Scaffolder.vue';
 export { default as CollectionEditForm } from '../components/collections/EditForm.vue';
 export { default as CollectionView } from '../components/collections/View.vue';
 // export { default as CollectionBlueprintListing } from '../components/collections/BlueprintListing.vue';
