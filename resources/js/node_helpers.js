@@ -145,3 +145,18 @@ export function data_of(txt) {
     }
     return data;
 }
+
+/**
+ * Pass this.$el from a vue component to this function.
+ * We will grab the first non-ignorable element.
+ *
+ * @param element the root element from Vue: this.$el
+ * @return returns an element or null if there's no node.
+ */
+export function vue_element(element) {
+    while (element && is_ignorable(element)) {
+        element = element.nextSibling
+    }
+
+    return element;
+}

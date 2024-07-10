@@ -1,18 +1,18 @@
 <script>
-import { Sortable, Plugins } from '@shopify/draggable'
-import { first_child } from '../../node_helpers.js';
+import { Sortable, Plugins } from '@shopify/draggable';
+import { vue_element } from '../../node_helpers.js';
 
 function move(items, oldIndex, newIndex) {
     const itemRemovedArray = [
         ...items.slice(0, oldIndex),
         ...items.slice(oldIndex + 1, items.length)
-    ]
+    ];
 
     return [
         ...itemRemovedArray.slice(0, newIndex),
         items[oldIndex],
         ...itemRemovedArray.slice(newIndex, itemRemovedArray.length)
-    ]
+    ];
 }
 
 export default {
@@ -36,7 +36,8 @@ export default {
             default: null,
         },
         options: {
-            default: () => {}
+            default: () => {
+            }
         },
         vertical: {
             type: Boolean
@@ -65,7 +66,7 @@ export default {
     data() {
         return {
             sortable: null,
-        }
+        };
     },
 
     computed: {
@@ -90,10 +91,16 @@ export default {
             }
 
             if (this.appendTo) {
-                options.mirror.appendTo = this.appendTo
+                options.mirror.appendTo = this.appendTo;
             }
 
             return options;
+        }
+    },
+
+    watch: {
+        disabled(disabled) {
+            disabled ? this.destroySortableList() : this.setupSortableList();
         }
     },
 
@@ -101,7 +108,7 @@ export default {
         return {
             itemClass: this.itemClass,
             handleClass: this.handleClass,
-        }
+        };
     },
 
     mounted() {
@@ -112,15 +119,21 @@ export default {
         this.setupSortableList();
     },
 
-    destroyed() {
-        this.sortable.destroy()
+    unmounted() {
+        this.sortable?.destroy();
     },
 
     methods: {
         setupSortableList() {
             // Since Vue components can now contain multiple children,
             // We'll get the first child of the vue component and make that the sortable container.
-            const firstChild = first_child(this.$el.parentNode)
+            const firstChild = vue_element(this.$el);
+
+            if (!firstChild) {
+                console.warn('Could not find a sortable root container, does your SortableList have a child element?')
+
+                return;
+            }
 
             this.sortable = new Sortable(firstChild, this.computedOptions);
 
@@ -128,8 +141,8 @@ export default {
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-                this.$emit('update:model-value', move(this.modelValue, oldIndex, newIndex))
-            })
+                this.$emit('update:model-value', move(this.modelValue, oldIndex, newIndex));
+            });
 
             if (this.mirror === false) {
                 this.sortable.on('mirror:create', (e) => e.cancel());
@@ -137,16 +150,10 @@ export default {
         },
 
         destroySortableList() {
-            this.sortable.destroy()
+            this.sortable.destroy();
         },
     },
-
-    watch: {
-        disabled(disabled) {
-            disabled ? this.destroySortableList() : this.setupSortableList();
-        },
-    },
-}
+};
 </script>
 
 <template>
