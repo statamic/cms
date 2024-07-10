@@ -152,7 +152,22 @@ class EntriesTest extends TestCase
         $this->makeEntry('e')->save();
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Cannot use [paginate] integer in combination with [chunk] param.');
+        $this->expectExceptionMessage('Cannot use [paginate] in combination with [chunk] param.');
+
+        $this->assertCount(3, $this->getEntries(['paginate' => true, 'chunk' => 2]));
+    }
+
+    #[Test]
+    public function it_should_throw_exception_if_trying_to_paginate_with_integer_and_chunk_at_same_time()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot use [paginate] in combination with [chunk] param.');
 
         $this->assertCount(3, $this->getEntries(['paginate' => 3, 'chunk' => 2]));
     }

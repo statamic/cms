@@ -44,12 +44,12 @@ trait GetsQueryResults
 
     protected function preventIncompatiblePaginationParameters()
     {
-        if ($this->params->int('paginate') && $this->params->int('limit')) {
+        if ($this->params->int('paginate') && $this->params->has('limit')) {
             throw new \Exception('Cannot use [paginate] integer in combination with [limit] param.');
         }
 
-        if ($this->params->int('paginate') && $this->params->int('chunk')) {
-            throw new \Exception('Cannot use [paginate] integer in combination with [chunk] param.');
+        if ($this->params->has('paginate') && $this->params->has('chunk')) {
+            throw new \Exception('Cannot use [paginate] in combination with [chunk] param.');
         }
 
         return $this;
