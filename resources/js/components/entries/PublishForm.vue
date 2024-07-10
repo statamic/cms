@@ -224,7 +224,7 @@
                         class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true">
-                        <span v-text="__('Publish')" />
+                        <span v-text="publishButtonText" />
                         <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
                     </button>
                 </template>
@@ -248,7 +248,7 @@
                 class="rtl:mr-2 ltr:ml-2 btn btn-lg justify-center btn-primary flex items-center w-1/2"
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
-                <span v-text="__('Publish')" />
+                <span v-text="publishButtonText" />
                 <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
             </button>
         </div>
