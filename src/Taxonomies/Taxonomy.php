@@ -364,7 +364,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
     public function isAssignedToCollection()
     {
-        return $this->collection() && $this->collections()->contains($this->collection());
+        return $this->collections()->contains($this->collection());
     }
 
     public function toResponse($request)
@@ -373,7 +373,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             throw new NotFoundHttpException;
         }
 
-        if (! $this->isAssignedToCollection()) {
+        if ($this->collection() && ! $this->isAssignedToCollection()) {
             throw new NotFoundHttpException;
         }
 
