@@ -347,7 +347,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     {
         $taxonomySlug = Str::replace('_', '-', $this->taxonomyHandle());
 
-        if (! $this->collection()) {
+        if (! $this->taxonomy()->isAssignedToCollection()) {
             return URL::tidy("/{$taxonomySlug}/{slug}");
         }
 
