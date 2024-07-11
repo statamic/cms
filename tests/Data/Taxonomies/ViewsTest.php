@@ -37,9 +37,9 @@ class ViewsTest extends TestCase
 
         $this->blogCollection = tap(Collection::make('blog')->sites(['en', 'fr'])->taxonomies(['tags']))->save();
 
-        Taxonomy::make('tags')->sites(['en', 'fr'])->title('Tags')->save();
+        Taxonomy::make('tags')->collection($this->blogCollection)->sites(['en', 'fr'])->title('Tags')->save();
 
-        tap(Term::make('test')->taxonomy('tags'), function ($term) {
+        tap(Term::make('test')->taxonomy('tags')->collection($this->blogCollection), function ($term) {
             $term->in('en')->slug('test')->set('title', 'Test');
             $term->in('fr')->slug('le-test')->set('title', 'Le Test');
         })->save();
