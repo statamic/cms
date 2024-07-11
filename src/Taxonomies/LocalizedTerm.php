@@ -3,37 +3,38 @@
 namespace Statamic\Taxonomies;
 
 use ArrayAccess;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Carbon;
-use Statamic\Contracts\Auth\Protect\Protectable;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Contracts\Data\BulkAugmentable;
-use Statamic\Contracts\Data\Localization;
-use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
-use Statamic\Contracts\Query\ContainsQueryableValues;
-use Statamic\Contracts\Search\Searchable as SearchableContract;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Contracts\Taxonomies\TermRepository;
-use Statamic\Data\ContainsSupplementalData;
-use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\Publishable;
-use Statamic\Data\TracksLastModified;
-use Statamic\Data\TracksQueriedColumns;
-use Statamic\Data\TracksQueriedRelations;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
-use Statamic\Facades\Antlers;
-use Statamic\Facades\Blink;
+use Statamic\Statamic;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Facades\Site;
-use Statamic\GraphQL\ResolvesValues;
-use Statamic\Http\Responses\DataResponse;
-use Statamic\Revisions\Revisable;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Antlers;
+use Illuminate\Support\Carbon;
+use Statamic\Data\Publishable;
 use Statamic\Routing\Routable;
 use Statamic\Search\Searchable;
-use Statamic\Statamic;
-use Statamic\Support\Str;
+use Statamic\Revisions\Revisable;
+use Statamic\GraphQL\ResolvesValues;
+use Statamic\Data\TracksLastModified;
+use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\TracksQueriedColumns;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
+use Statamic\Data\TracksQueriedRelations;
+use Statamic\Http\Responses\DataResponse;
+use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Data\ContainsSupplementalData;
+use Statamic\Contracts\Data\BulkAugmentable;
+use Illuminate\Contracts\Support\Responsable;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Contracts\Auth\Protect\Protectable;
+use Statamic\Contracts\Taxonomies\TermRepository;
+use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Search\Searchable as SearchableContract;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 
 class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
 {
@@ -344,14 +345,16 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function route()
     {
-        $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
+        $taxonomySlug = Str::replace('_', '-', $this->taxonomyHandle());
 
-        if ($this->collection()) {
-            $collectionUrl = $this->collection()->uri($this->locale()) ?? $this->collection()->handle();
-            $route = $collectionUrl.$route;
+        if (! $this->collection()) {
+            return URL::tidy("/{$taxonomySlug}/{slug}");
         }
 
-        return $route;
+        $collectionUri = $this->collection()->uri($this->locale())
+            ?? Str::replace('_', '-', $this->collection()->handle());
+
+        return URL::tidy("/{$collectionUri}/{$taxonomySlug}/{slug}");
     }
 
     public function routeData()
