@@ -4,9 +4,9 @@ namespace Tests\Revisions;
 
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Revisions\RevisionQueryBuilder;
 use Statamic\Revisions\Revision;
 use Statamic\Revisions\RevisionRepository;
-use Statamic\Contracts\Revisions\RevisionQueryBuilder;
 use Tests\TestCase;
 
 class RepositoryTest extends TestCase
@@ -49,13 +49,13 @@ class RepositoryTest extends TestCase
         $this->assertCount(3, $revisions);
         $this->assertContainsOnlyInstancesOf(Revision::class, $revisions);
 
-        $revisions = $builder->where('key','123')->get();
+        $revisions = $builder->where('key', '123')->get();
 
         $this->assertInstanceOf(Collection::class, $revisions);
         $this->assertCount(2, $revisions);
         $this->assertContainsOnlyInstancesOf(Revision::class, $revisions);
 
-        $revisions = $builder->where('key','1234')->get();
+        $revisions = $builder->where('key', '1234')->get();
 
         $this->assertInstanceOf(Collection::class, $revisions);
         $this->assertCount(0, $revisions);
