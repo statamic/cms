@@ -118,7 +118,6 @@
             <selector
                 :container="container"
                 :folder="folder"
-                :restrict-container-navigation="true"
                 :restrict-folder-navigation="restrictNavigation"
                 :selected="selectedAssets"
                 :view-mode="selectorViewMode"

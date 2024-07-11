@@ -5,6 +5,7 @@ namespace Tests\Auth\Eloquent;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Eloquent\Role as EloquentRole;
 use Statamic\Auth\Eloquent\RoleModel;
 use Statamic\Auth\Eloquent\User as EloquentUser;
@@ -85,7 +86,7 @@ class EloquentRoleTest extends TestCase
             );
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_a_role()
     {
         $role = $this->makeRole();
@@ -93,7 +94,7 @@ class EloquentRoleTest extends TestCase
         $this->assertInstanceOf(EloquentRole::class, $role);
     }
 
-    /** @test */
+    #[Test]
     public function it_assigns_a_role_to_a_user()
     {
         $role = $this->makeRole();
@@ -103,7 +104,7 @@ class EloquentRoleTest extends TestCase
         $this->assertEquals($user->roles()->first(), $role);
     }
 
-    /** @test */
+    #[Test]
     public function it_assigns_a_role_to_a_user_and_then_removes_it()
     {
         $role = $this->makeRole();

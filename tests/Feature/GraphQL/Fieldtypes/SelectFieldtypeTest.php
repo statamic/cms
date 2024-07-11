@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
-/** @group graphql */
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
+
+#[Group('graphql')]
 class SelectFieldtypeTest extends FieldtypeTestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_values_and_labels_of_single_select_field()
     {
         $field = [
@@ -60,7 +63,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_values_and_labels_of_multi_select_field()
     {
         $field = [

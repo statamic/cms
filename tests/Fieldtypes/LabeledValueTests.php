@@ -2,11 +2,13 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\LabeledValue;
 
 trait LabeledValueTests
 {
-    /** @test */
+    #[Test]
     public function it_augments_to_a_LabeledValue_object_with_options_with_keys()
     {
         $field = $this->field([
@@ -44,7 +46,7 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->label());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_LabeledValue_object_with_options_with_numeric_keys()
     {
         $field = $this->field([
@@ -103,7 +105,7 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->label());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_LabeledValue_object_with_options_without_keys()
     {
         $field = $this->field([
@@ -141,7 +143,7 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->label());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_LabeledValue_object_with_a_null_value()
     {
         $field = $this->field([
@@ -179,7 +181,7 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->label());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_LabeledValue_object_with_boolean_casting()
     {
         $field = $this->field([
@@ -212,7 +214,7 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->label());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_LabeledValue_object_with_boolean_casting_and_a_null_option()
     {
         $field = $this->field([
@@ -246,11 +248,8 @@ trait LabeledValueTests
         $this->assertEquals('missing', $augmented->label());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider noOptionsProvider
-     **/
+    #[Test]
+    #[DataProvider('noOptionsProvider')]
     public function it_augments_to_a_LabeledValue_object_with_no_options($options)
     {
         $field = $this->field([

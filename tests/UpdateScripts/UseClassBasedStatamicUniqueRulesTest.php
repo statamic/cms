@@ -2,6 +2,8 @@
 
 namespace Tests\UpdateScripts;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\UpdateScripts\UseClassBasedStatamicUniqueRules;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -21,7 +23,7 @@ class UseClassBasedStatamicUniqueRulesTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_is_registered()
     {
         $this->assertUpdateScriptRegistered(UseClassBasedStatamicUniqueRules::class);
@@ -35,11 +37,8 @@ class UseClassBasedStatamicUniqueRulesTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider examplePaths
-     */
+    #[Test]
+    #[DataProvider('examplePaths')]
     public function it_can_update_old_string_based_rules_in_file_based_blueprints($path)
     {
         File::put($path, <<<'BLUEPRINT'
@@ -74,11 +73,8 @@ BLUEPRINT;
         $this->assertEquals($expected, File::get($path));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider examplePaths
-     */
+    #[Test]
+    #[DataProvider('examplePaths')]
     public function it_doesnt_overzealously_try_to_replace_complicated_pipe_delimed_validate_rules($path)
     {
         File::put($path, <<<'BLUEPRINT'

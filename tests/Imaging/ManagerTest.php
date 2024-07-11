@@ -2,6 +2,7 @@
 
 namespace Tests\Imaging;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Imaging\ImageManipulator;
 use Statamic\Contracts\Imaging\Manipulator;
 use Statamic\Imaging\Manager;
@@ -18,7 +19,7 @@ class ManagerTest extends TestCase
         $this->manager = new Manager;
     }
 
-    /** @test */
+    #[Test]
     public function manipulator_is_returned()
     {
         $this->assertInstanceOf(
@@ -27,7 +28,7 @@ class ManagerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function manipulator_is_returned_when_no_item_is_passed()
     {
         $this->assertInstanceOf(
@@ -36,7 +37,7 @@ class ManagerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function manipulator_is_returned_when_no_params_are_passed()
     {
         $this->assertInstanceOf(
@@ -45,7 +46,7 @@ class ManagerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function url_is_returned_when_params_are_specified()
     {
         $this->assertTrue(
@@ -53,7 +54,7 @@ class ManagerTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_manipulation_presets()
     {
         config(['statamic.assets.image_manipulation.presets' => [
