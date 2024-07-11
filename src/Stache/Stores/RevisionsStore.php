@@ -50,7 +50,7 @@ class RevisionsStore extends BasicStore
     public function delete($item)
     {
         if ($item instanceof WorkingCopy) {
-            $this->deleteItemFromDisk($item);
+            File::delete($item->path()); // windows fix - deleteItemFromDisk didnt work
 
             return;
         }
