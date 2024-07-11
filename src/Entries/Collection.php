@@ -831,7 +831,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
                 return Blink::once($key, function () use ($taxonomies) {
                     return collect($taxonomies)->map(function ($taxonomy) {
-                        return Taxonomy::findByHandle($taxonomy)->collection($this);
+                        return Taxonomy::findByHandle($taxonomy)?->collection($this);
                     })->filter();
                 });
             })
