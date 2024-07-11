@@ -105,6 +105,10 @@ return [
             'directory' => storage_path('forms'),
         ],
 
+        'revisions' => [
+            'class' => Stores\RevisionsStore::class,
+        ],
+
     ],
 
     /*

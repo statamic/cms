@@ -16,7 +16,7 @@ class RepositoryTest extends TestCase
     {
         parent::setUp();
         config(['statamic.revisions.path' => __DIR__.'/__fixtures__']);
-        $this->repo = (new RevisionRepository);
+        $this->repo = (new RevisionRepository($this->app->make('stache')));
     }
 
     #[Test]
