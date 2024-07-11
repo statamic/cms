@@ -174,9 +174,10 @@ class TaxonomyTest extends TestCase
         $entry->shouldReceive('uri')->andReturn('/blog');
         Entry::shouldReceive('find')->with('blog-page')->andReturn($entry);
 
-        $collection = tap(Collection::make('blog')->mount('blog-page'))->save();
+        $taxonomy = tap((new Taxonomy)->handle('tags'))->save();
+        $collection = tap(Collection::make('blog')->taxonomies(['tags'])->mount('blog-page'))->save();
 
-        $taxonomy = (new Taxonomy)->handle('tags')->collection($collection);
+        $taxonomy = $taxonomy->collection($collection);
 
         $this->assertEquals('/blog/tags', $taxonomy->uri());
         $this->assertEquals('/blog/tags', $taxonomy->url());
