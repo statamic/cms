@@ -340,18 +340,16 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
     public function uri()
     {
-        $site = Site::current();
-
         $taxonomySlug = Str::replace('_', '-', $this->handle);
 
         if (! $this->isAssignedToCollection()) {
-            return URL::tidy("{$site->url()}/{$taxonomySlug}");
+            return URL::tidy("/{$taxonomySlug}");
         }
 
-        $collectionUri = $this->collection()->uri($site->handle())
+        $collectionUri = $this->collection()->uri(Site::current()->handle())
             ?? Str::replace('_', '-', $this->collection()->handle());
 
-        return URL::tidy("{$site->url()}/{$collectionUri}/{$taxonomySlug}");
+        return URL::tidy("/{$collectionUri}/{$taxonomySlug}");
     }
 
     public function collection($collection = null)
