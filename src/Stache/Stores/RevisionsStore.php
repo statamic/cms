@@ -31,7 +31,7 @@ class RevisionsStore extends BasicStore
     public function makeItemFromFile($path, $contents)
     {
         $yaml = YAML::parse(File::get($path));
-        $key = (string) Str::of($path)->beforeLast('/')->after($this->directory());
+        $key = (string) Str::of(Path::tidy($path))->beforeLast('/')->after(Path::tidy($this->directory()));
 
         return Revision::makeRevisionFromArray($key, $yaml);
     }
