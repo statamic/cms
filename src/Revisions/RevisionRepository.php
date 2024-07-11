@@ -2,10 +2,12 @@
 
 namespace Statamic\Revisions;
 
+use Illuminate\Support\Carbon;
 use Statamic\Contracts\Revisions\Revision as RevisionContract;
 use Statamic\Contracts\Revisions\RevisionQueryBuilder;
 use Statamic\Contracts\Revisions\RevisionRepository as Contract;
 use Statamic\Facades\File;
+use Statamic\Facades\YAML;
 use Statamic\Stache\Stache;
 
 class RevisionRepository implements Contract
@@ -65,6 +67,26 @@ class RevisionRepository implements Contract
     public function query()
     {
         return app(RevisionQueryBuilder::class);
+    }
+
+    // @deprecated - use makeRevisionFromArray
+    protected function makeRevisionFromFile($key, $path)
+    {
+        $yaml = YAML::parse(File::get($path));
+
+        return $this->makeRevisionFromArray($key, $yaml);
+    }
+
+    public function makeRevisionFromArray($key, $data = [])
+    {
+        return (new Revision)
+            ->key($key)
+            ->action($data['action'] ?? false)
+            ->id($date = $data['date'])
+            ->date(Carbon::createFromTimestamp($date))
+            ->user($data['user'] ?? false)
+            ->message($data['message'] ?? false)
+            ->attributes($data['attributes']);
     }
 
     public static function bindings(): array

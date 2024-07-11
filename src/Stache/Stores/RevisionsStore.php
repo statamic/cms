@@ -2,11 +2,10 @@
 
 namespace Statamic\Stache\Stores;
 
-use Illuminate\Support\Carbon;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades\Revision;
 use Statamic\Facades\YAML;
-use Statamic\Revisions\Revision;
 use Statamic\Revisions\WorkingCopy;
 use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
@@ -32,17 +31,9 @@ class RevisionsStore extends BasicStore
     public function makeItemFromFile($path, $contents)
     {
         $yaml = YAML::parse(File::get($path));
-
         $key = (string) Str::of($path)->beforeLast('/')->after($this->directory());
 
-        return (new Revision)
-            ->key($key)
-            ->action($yaml['action'] ?? false)
-            ->id($date = $yaml['date'])
-            ->date(Carbon::createFromTimestamp($date))
-            ->user($yaml['user'] ?? false)
-            ->message($yaml['message'] ?? false)
-            ->attributes($yaml['attributes']);
+        return Revision::makeRevisionFromArray($key, $yaml);
     }
 
     public function save($item)
