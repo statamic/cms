@@ -5,6 +5,8 @@ namespace Tests\Imaging\Manipulators;
 use Facades\Statamic\Imaging\Attributes;
 use Mockery;
 use Mockery\Mock;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Exceptions\AssetNotFoundException;
@@ -41,11 +43,7 @@ class GlideManipulatorTest extends TestCase
         return $manipulator;
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider libraryProvider
-     */
+    #[Test, DataProvider('libraryProvider')]
     public function it_uses_library_from_config($config, $expected)
     {
         $this->assertEquals($expected, $this->manipulator($config)->getServer()->getApi()->getImageManager()->config['driver']);
@@ -60,13 +58,13 @@ class GlideManipulatorTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_cache_disk()
     {
         $this->assertEquals(public_path('images/foo.jpg'), $this->manipulator(['cache' => public_path('images')])->getCacheDisk()->path('foo.jpg'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_custom_cache_disk()
     {
         config(['filesystems.disks.customdisk' => [
@@ -76,7 +74,7 @@ class GlideManipulatorTest extends TestCase
         $this->assertEquals(public_path('custom-location/foo.jpg'), $this->manipulator(['cache' => 'customdisk'])->getCacheDisk()->path('foo.jpg'));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_cache_is_undefined()
     {
         // We throw an exception rather than assuming a default location to prevent accidentally overwriting files.
@@ -87,7 +85,7 @@ class GlideManipulatorTest extends TestCase
         $this->manipulator(['cache' => null])->getCacheDisk();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_url_for_path()
     {
         $this->generator->shouldReceive('generateByPath')
@@ -99,7 +97,7 @@ class GlideManipulatorTest extends TestCase
         $this->assertEquals('/img/the-url-for-path', $url);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_url_for_absolute_url()
     {
         $this->generator->shouldReceive('generateByUrl')
@@ -111,7 +109,7 @@ class GlideManipulatorTest extends TestCase
         $this->assertEquals('/img/the-url-for-external', $url);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_url_for_asset()
     {
         $asset = new Asset;
@@ -127,7 +125,7 @@ class GlideManipulatorTest extends TestCase
         $this->assertEquals('/img/the-url-for-asset', $url);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_url_for_asset_id()
     {
         $asset = new Asset;
@@ -145,7 +143,7 @@ class GlideManipulatorTest extends TestCase
         $this->assertEquals('/img/the-url-for-id', $url);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_getting_url_with_invalid_asset_id()
     {
         $this->expectException(AssetNotFoundException::class);
@@ -159,11 +157,7 @@ class GlideManipulatorTest extends TestCase
         $this->assertEquals('/img/the-url-for-id', $url);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider prefixProvider
-     */
+    #[Test, DataProvider('prefixProvider')]
     public function the_url_is_prefixed_based_on_the_config($prefix, $expected)
     {
         $generator = $this->generator
@@ -188,7 +182,7 @@ class GlideManipulatorTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_attributes_for_path()
     {
         $this->generator->shouldReceive('generateByPath')
@@ -205,7 +199,7 @@ class GlideManipulatorTest extends TestCase
         $this->assertEquals(['test' => 'a'], $manipulator->getAttributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_attributes_for_absolute_url()
     {
         $this->generator->shouldReceive('generateByUrl')
@@ -222,7 +216,7 @@ class GlideManipulatorTest extends TestCase
         $this->assertEquals(['test' => 'b'], $manipulator->getAttributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_attributes_for_asset()
     {
         $asset = new Asset;
@@ -243,7 +237,7 @@ class GlideManipulatorTest extends TestCase
         $this->assertEquals(['test' => 'c'], $manipulator->getAttributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_attributes_for_asset_id()
     {
         $asset = new Asset;
@@ -266,7 +260,7 @@ class GlideManipulatorTest extends TestCase
         $this->assertEquals(['test' => 'd'], $manipulator->getAttributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_getting_attributes_with_invalid_asset_id()
     {
         $this->expectException(AssetNotFoundException::class);

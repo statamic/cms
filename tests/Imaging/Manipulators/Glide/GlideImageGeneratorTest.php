@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Manipulators\Watermark;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlideImageGenerated;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
@@ -39,7 +40,7 @@ class GlideImageGeneratorTest extends TestCase
         $this->clearGlideCache();
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_an_image_by_asset()
     {
         Event::fake();
@@ -89,7 +90,7 @@ class GlideImageGeneratorTest extends TestCase
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_cache_manifest_for_multiple_asset_manipulations()
     {
         Event::fake();
@@ -125,7 +126,7 @@ class GlideImageGeneratorTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_an_image_by_local_path()
     {
         Event::fake();
@@ -167,7 +168,7 @@ class GlideImageGeneratorTest extends TestCase
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_an_image_by_external_url()
     {
         Event::fake();
@@ -215,7 +216,7 @@ class GlideImageGeneratorTest extends TestCase
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function the_watermark_disk_is_the_public_directory_by_default()
     {
         $generator = $this->makeGenerator();
@@ -226,7 +227,7 @@ class GlideImageGeneratorTest extends TestCase
         $this->assertEquals(public_path().DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
     }
 
-    /** @test */
+    #[Test]
     public function the_watermark_disk_is_the_container_when_an_asset_is_provided()
     {
         // Make the asset to be used as the watermark.
@@ -246,7 +247,7 @@ class GlideImageGeneratorTest extends TestCase
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
     }
 
-    /** @test */
+    #[Test]
     public function the_watermark_disk_is_the_container_when_an_asset_encoded_url_string_is_provided()
     {
         // Make the asset to be used as the watermark.
@@ -266,7 +267,7 @@ class GlideImageGeneratorTest extends TestCase
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
     }
 
-    /** @test */
+    #[Test]
     public function the_watermark_disk_is_a_local_adapter_when_a_path_is_provided()
     {
         $generator = $this->makeGenerator();

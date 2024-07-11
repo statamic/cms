@@ -82,7 +82,7 @@ class ManagerTest extends TestCase
         ], $this->manager->manipulationPresets());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_default_manipulator()
     {
         $manipulator = \Mockery::mock(Manipulator::class);
@@ -92,7 +92,7 @@ class ManagerTest extends TestCase
         $this->assertEquals($manipulator, $this->manager->driver());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_specific_manipulator()
     {
         $manipulator = \Mockery::mock(Manipulator::class);

@@ -5,6 +5,8 @@ namespace Tests\Tags;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Imaging\Manipulator;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\AssetContainer;
@@ -16,7 +18,7 @@ class RenderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_outputs_a_url_to_a_manipulated_image()
     {
         // {{ render :src="img" w="100" }}
@@ -35,7 +37,7 @@ class RenderTest extends TestCase
         $this->assertEquals('the-url', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_a_url_to_a_manipulated_image_using_shorthand()
     {
         // {{ render:img w="100" }}
@@ -54,7 +56,7 @@ class RenderTest extends TestCase
         $this->assertEquals('the-url', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_a_url_to_a_manipulated_image_in_an_img_tag()
     {
         // {{ render :src="img" w="100" tag="true" alt="foo" }}
@@ -73,7 +75,7 @@ class RenderTest extends TestCase
         $this->assertEquals('<img src="the-url" alt="the alt text" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_a_url_to_a_manipulated_image_in_an_img_tag_using_shorthand()
     {
         // {{ render:img w="100" tag="true" alt="foo" }}
@@ -92,7 +94,7 @@ class RenderTest extends TestCase
         $this->assertEquals('<img src="the-url" alt="the alt text" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function when_using_a_tag_pair_it_will_include_variables()
     {
         // {{ render :src="img" w="100" }}
@@ -118,7 +120,7 @@ class RenderTest extends TestCase
         $this->assertEquals('the-url,the-width,the-height', $output);
     }
 
-    /** @test */
+    #[Test]
     public function when_using_a_tag_pair_it_will_include_variables_via_asset_object()
     {
         // {{ render :src="img" w="100" }}
@@ -150,7 +152,7 @@ class RenderTest extends TestCase
         $this->assertEquals('the-url,the-width,the-height,bar', $output);
     }
 
-    /** @test */
+    #[Test]
     public function when_using_a_tag_pair_it_will_include_variables_using_shorthand()
     {
         // {{ render :src="img" w="100" }}
@@ -176,7 +178,7 @@ class RenderTest extends TestCase
         $this->assertEquals('the-url,the-width,the-height', $output);
     }
 
-    /** @test */
+    #[Test]
     public function when_using_a_tag_pair_it_can_loop_over_items()
     {
         // {{ render :src="img" w="100" }}
@@ -215,7 +217,7 @@ EOF;
         $this->assertEquals(trim($expected), trim($output));
     }
 
-    /** @test */
+    #[Test]
     public function when_using_a_tag_pair_it_can_loop_over_items_using_shorthand()
     {
         $driver = Mockery::mock(Manipulator::class);
@@ -250,7 +252,7 @@ EOF;
         $this->assertEquals(trim($expected), trim($output));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_manipulated_urls_in_batches()
     {
         $driver = Mockery::mock(Manipulator::class);
@@ -314,7 +316,7 @@ EOF;
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_a_specific_manipulator()
     {
         $driver = Mockery::mock(Manipulator::class);
