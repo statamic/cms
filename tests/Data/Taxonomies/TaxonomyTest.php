@@ -183,6 +183,18 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('/blog-articles/tags', $taxonomy->url());
         $this->assertEquals('http://localhost/blog-articles/tags', $taxonomy->absoluteUrl());
     }
+
+    #[Test]
+    public function it_gets_the_url_with_a_collection_that_has_no_mount()
+    {
+        $taxonomy = tap((new Taxonomy)->handle('tags'))->save();
+        $collection = tap(Collection::make('blog_articles')->taxonomies(['tags']))->save();
+
+        $taxonomy = $taxonomy->collection($collection);
+
+        $this->assertEquals('/blog-articles/tags', $taxonomy->uri());
+        $this->assertEquals('/blog-articles/tags', $taxonomy->url());
+        $this->assertEquals('http://localhost/blog-articles/tags', $taxonomy->absoluteUrl());
     }
 
     #[Test]
