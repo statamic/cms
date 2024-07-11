@@ -342,7 +342,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     {
         $taxonomySlug = Str::replace('_', '-', $this->handle);
 
-        if (! $this->isAssignedToCollection()) {
+        if ($this->collection() && ! $this->isAssignedToCollection()) {
             return URL::tidy("/{$taxonomySlug}");
         }
 
@@ -369,7 +369,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
     public function isAssignedToCollection()
     {
-        return $this->collection() && $this->collections()->contains($this->collection());
+        return $this->collections()->contains($this->collection());
     }
 
     public function toResponse($request)
