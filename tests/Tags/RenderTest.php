@@ -11,6 +11,10 @@ use Statamic\Contracts\Imaging\Manipulator;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Image;
+use Statamic\Imaging\Manipulators\GlideManipulator;
+use Statamic\Imaging\Manipulators\Sources\AssetSource;
+use Statamic\Imaging\Manipulators\Sources\PathSource;
+use Statamic\Imaging\Manipulators\Sources\UrlSource;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -24,7 +28,7 @@ class RenderTest extends TestCase
         // {{ render :src="img" w="100" }}
 
         $driver = Mockery::mock(Manipulator::class);
-        $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'test.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
         $driver->shouldReceive('getUrl')->once()->andReturn('the-url');
@@ -43,7 +47,7 @@ class RenderTest extends TestCase
         // {{ render:img w="100" }}
 
         $driver = Mockery::mock(Manipulator::class);
-        $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'test.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
         $driver->shouldReceive('getUrl')->once()->andReturn('the-url');
@@ -62,7 +66,7 @@ class RenderTest extends TestCase
         // {{ render :src="img" w="100" tag="true" alt="foo" }}
 
         $driver = Mockery::mock(Manipulator::class);
-        $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'test.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
         $driver->shouldReceive('getUrl')->once()->andReturn('the-url');
@@ -81,7 +85,7 @@ class RenderTest extends TestCase
         // {{ render:img w="100" tag="true" alt="foo" }}
 
         $driver = Mockery::mock(Manipulator::class);
-        $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'test.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
         $driver->shouldReceive('getUrl')->once()->andReturn('the-url');
@@ -102,7 +106,7 @@ class RenderTest extends TestCase
         // {{ /render }}
 
         $driver = Mockery::mock(Manipulator::class);
-        $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'test.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
         $driver->shouldReceive('getUrl')->once()->andReturn('the-url');
@@ -134,7 +138,7 @@ class RenderTest extends TestCase
         $asset = tap($container->makeAsset('img/foo.jpg')->data(['foo' => 'bar']))->save();
 
         $driver = Mockery::mock(Manipulator::class);
-        $driver->shouldReceive('setSource')->with($asset)->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof AssetSource && $source->asset() === $asset)->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
         $driver->shouldReceive('getUrl')->once()->andReturn('the-url');
@@ -160,7 +164,7 @@ class RenderTest extends TestCase
         // {{ /render }}
 
         $driver = Mockery::mock(Manipulator::class);
-        $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'test.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
         $driver->shouldReceive('getUrl')->once()->andReturn('the-url');
@@ -187,8 +191,8 @@ class RenderTest extends TestCase
 
         $driver = Mockery::mock(Manipulator::class);
         $driver->shouldReceive('getAvailableParams')->twice()->andReturn(['w', 'h']);
-        $driver->shouldReceive('setSource')->with('one.jpg')->once()->andReturnSelf();
-        $driver->shouldReceive('setSource')->with('two.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'one.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'two.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->twice()->andReturnSelf();
         $driver->shouldReceive('getUrl')->twice()->andReturn('the-url', 'second-url');
         $driver->shouldReceive('getAttributes')->twice()->andReturn([
@@ -222,8 +226,8 @@ EOF;
     {
         $driver = Mockery::mock(Manipulator::class);
         $driver->shouldReceive('getAvailableParams')->twice()->andReturn(['w', 'h']);
-        $driver->shouldReceive('setSource')->with('one.jpg')->once()->andReturnSelf();
-        $driver->shouldReceive('setSource')->with('two.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'one.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'two.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->twice()->andReturnSelf();
         $driver->shouldReceive('getUrl')->twice()->andReturn('the-url', 'second-url');
         $driver->shouldReceive('getAttributes')->twice()->andReturn([
@@ -257,9 +261,9 @@ EOF;
     {
         $driver = Mockery::mock(Manipulator::class);
         $driver->shouldReceive('getAvailableParams')->times(3)->andReturn(['w', 'h']);
-        $driver->shouldReceive('setSource')->with('foo.jpg')->once()->andReturnSelf();
-        $driver->shouldReceive('setSource')->with('foo/bar.png')->once()->andReturnSelf();
-        $driver->shouldReceive('setSource')->with('http://absolute.com/some.gif')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'foo.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'foo/bar.png')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof UrlSource && $source->path() === 'http://absolute.com/some.gif')->once()->andReturnSelf();
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->times(3)->andReturnSelf();
         $driver->shouldReceive('getUrl')->times(3)->andReturn('url-one', 'url-two', 'url-three');
         Image::shouldReceive('driver')->times(3)->andReturn($driver);
@@ -295,7 +299,7 @@ EOF;
         // {{ render:data_url :src="img" w="100" }}
 
         $driver = Mockery::mock(Manipulator::class);
-        $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'test.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100', 'h' => '150'])->once()->andReturnSelf();
         $driver->shouldReceive('getDataUrl')->once()->andReturn('the-url');
@@ -320,13 +324,48 @@ EOF;
     public function it_can_use_a_specific_manipulator()
     {
         $driver = Mockery::mock(Manipulator::class);
-        $driver->shouldReceive('setSource')->with('test.jpg')->once()->andReturnSelf();
+        $driver->shouldReceive('setSource')->withArgs(fn ($source) => $source instanceof PathSource && $source->path() === 'test.jpg')->once()->andReturnSelf();
         $driver->shouldReceive('getAvailableParams')->once()->andReturn(['w', 'h']);
         $driver->shouldReceive('setParams')->with(['w' => '100'])->once()->andReturnSelf();
         $driver->shouldReceive('getUrl')->andReturn('the-url');
         Image::shouldReceive('driver')->with('imgix')->once()->andReturn($driver);
 
         $this->assertEquals('the-url', $this->parse('{{ render :src="img" w="100" using="imgix" }}', ['img' => 'test.jpg']));
+    }
+
+    #[Test, DataProvider('focalPointProvider')]
+    public function fit_crop_focal_param_will_automatically_append_focal_point($src, $defineFocalPoint, $expectedFit)
+    {
+        Storage::fake('test', ['url' => '/assets']);
+        $file = UploadedFile::fake()->image('foo.jpg', 30, 60); // creates a 723 byte image
+        Storage::disk('test')->putFileAs('', $file, 'foo.jpg');
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $asset = tap($container->makeAsset('foo.jpg')->data(['focus' => $defineFocalPoint ? '75-10-2' : null]))->save();
+
+        if ($src instanceof \Closure) {
+            $src = $src($asset);
+        }
+
+        $driver = Mockery::mock(GlideManipulator::class)->makePartial();
+        $driver->shouldReceive('setParams')->with(['fit' => $expectedFit])->once()->andReturnSelf();
+        $driver->shouldReceive('getUrl')->andReturn('the-url');
+        Image::shouldReceive('driver')->once()->andReturn($driver);
+
+        $this->assertEquals('the-url', $this->parse('{{ render:img fit="crop_focal" }}', ['img' => $src]));
+    }
+
+    public static function focalPointProvider()
+    {
+        return [
+            'path to non-asset' => ['something.jpg', false, 'crop-50-50-1'],
+            'path to asset with focal point' => ['assets/foo.jpg', true, 'crop-75-10-2'],
+            'path to asset without focal point' => ['foo.jpg', false, 'crop-50-50-1'],
+            'asset with focal point' => [fn ($asset) => $asset, true, 'crop-75-10-2'],
+            'asset without focal point' => [fn ($asset) => $asset, false, 'crop-50-50-1'],
+            'asset id with focal point' => [fn ($asset) => $asset->id(), true, 'crop-75-10-2'],
+            'asset id without focal point' => [fn ($asset) => $asset->id(), false, 'crop-50-50-1'],
+            'external url' => ['http://external.com/something.jpg', false, 'crop-50-50-1'],
+        ];
     }
 
     private function parse($string, $data = [])

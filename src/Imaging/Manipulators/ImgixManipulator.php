@@ -3,7 +3,6 @@
 namespace Statamic\Imaging\Manipulators;
 
 use Imgix\UrlBuilder;
-use Statamic\Facades\Asset;
 
 class ImgixManipulator extends Manipulator
 {
@@ -175,7 +174,7 @@ class ImgixManipulator extends Manipulator
 
     public function getUrl(): string
     {
-        $url = $this->getBuilder()->createURL($this->getSourcePath(), $this->params);
+        $url = $this->getBuilder()->createURL($this->source->path(), $this->params);
 
         return (string) str($url)->replace('bg-remove=1', 'bg-remove=true');
     }
@@ -187,22 +186,6 @@ class ImgixManipulator extends Manipulator
             signKey: $this->config['key'],
             includeLibraryParam: $this->config['ixlib'] ?? true,
         );
-    }
-
-    private function getSourcePath(): string
-    {
-        $source = $this->source;
-
-        if ($this->getSourceType() === SourceType::AssetId) {
-            $source = Asset::findOrFail($this->source);
-        }
-
-        return match ($this->getSourceType()) {
-            SourceType::AssetId,
-            SourceType::Asset => $source->path(),
-            SourceType::Url,
-            SourceType::Path => $source,
-        };
     }
 
     public function getDataUrl(): string

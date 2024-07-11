@@ -6,6 +6,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Imaging\Manipulator;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Image;
+use Statamic\Imaging\Manipulators\Sources\Source;
 
 class Render extends Tags
 {
@@ -29,7 +30,7 @@ class Render extends Tags
 
     private function url($source)
     {
-        return $this->driver()->setSource($source)->getUrl();
+        return $this->driver($source)->getUrl();
     }
 
     private function output($source)
@@ -51,7 +52,7 @@ class Render extends Tags
 
         return collect($source)->map(fn ($source) => [
             ...($source instanceof Augmentable ? $source->toAugmentedArray() : []),
-            'url' => ($driver = $this->driver()->setSource($source))->getUrl(),
+            'url' => ($driver = $this->driver($source))->getUrl(),
             ...$driver->getAttributes(),
         ]);
     }
@@ -76,8 +77,8 @@ class Render extends Tags
 
     public function dataUrl()
     {
-        return $this->driver()
-            ->setSource($this->params->get('src'))
+        return $this
+            ->driver($this->params->get('src'))
             ->getDataUrl();
     }
 
@@ -86,13 +87,19 @@ class Render extends Tags
         return $this->dataUrl();
     }
 
-    private function driver(): Manipulator
+    private function driver(mixed $source): Manipulator
     {
+        $source = Source::from($source);
+
         $driver = Image::driver($this->params->get('using'));
 
-        $allowed = $driver->getAvailableParams();
+        $params = $this->params->only($driver->getAvailableParams())->all();
 
-        return $driver->setParams($this->params->only($allowed)->all());
+        if (($params['fit'] ?? null) === 'crop_focal') {
+            $params['fit'] = ($asset = $source->asset()) ? 'crop-'.$asset->focus : 'crop-50-50-1';
+        }
+
+        return $driver->setSource($source)->setParams($params);
     }
 
     public function imgTag(string $url): string

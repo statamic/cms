@@ -7,8 +7,11 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\Server;
 use League\Glide\ServerFactory;
-use Statamic\Facades\Asset;
 use Statamic\Imaging\Manipulators\Glide\ImageGenerator;
+use Statamic\Imaging\Manipulators\Sources\AssetIdSource;
+use Statamic\Imaging\Manipulators\Sources\AssetSource;
+use Statamic\Imaging\Manipulators\Sources\PathSource;
+use Statamic\Imaging\Manipulators\Sources\UrlSource;
 
 class GlideManipulator extends Manipulator
 {
@@ -109,11 +112,10 @@ class GlideManipulator extends Manipulator
 
     private function generate(): string
     {
-        return match ($this->getSourceType()) {
-            SourceType::Path => $this->getGenerator()->generateByPath($this->source, $this->params),
-            SourceType::Url => $this->getGenerator()->generateByUrl($this->source, $this->params),
-            SourceType::Asset => $this->getGenerator()->generateByAsset($this->source, $this->params),
-            SourceType::AssetId => $this->getGenerator()->generateByAsset(Asset::findOrFail($this->source), $this->params),
+        return match (get_class($this->source)) {
+            PathSource::class => $this->getGenerator()->generateByPath($this->source->path(), $this->params),
+            UrlSource::class => $this->getGenerator()->generateByUrl($this->source->path(), $this->params),
+            AssetSource::class, AssetIdSource::class => $this->getGenerator()->generateByAsset($this->source->asset(), $this->params),
         };
     }
 

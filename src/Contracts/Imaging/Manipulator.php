@@ -2,14 +2,14 @@
 
 namespace Statamic\Contracts\Imaging;
 
-use Statamic\Contracts\Assets\Asset;
+use Statamic\Imaging\Manipulators\Sources\Source;
 
 interface Manipulator
 {
     /**
      * Sets the source image to be manipulated.
      */
-    public function setSource(string|Asset $source): self;
+    public function setSource(Source $source): self;
 
     /**
      * Defines the manipulations to be performed.
