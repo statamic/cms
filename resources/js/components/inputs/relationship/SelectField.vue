@@ -22,6 +22,12 @@
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')"
         >
+            <template #option="{ title, hint }">
+                <div class="flex justify-between">
+                    <div v-text="title" />
+                    <div v-if="hint" class="text-2xs text-gray-700" v-text="hint" />
+                </div>
+            </template>
             <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
             <template #search="{ events, attributes }" v-if="multiple">
                 <input

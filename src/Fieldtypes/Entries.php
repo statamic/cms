@@ -15,7 +15,7 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
+use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
@@ -146,7 +146,7 @@ class Entries extends Relationship
 
     public function getResourceCollection($request, $items)
     {
-        return (new EntriesResource($items))
+        return (new EntriesFieldtypeEntries($items, $this))
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
@@ -461,5 +461,12 @@ class Entries extends Relationship
             'expectsRoot' => $collection->structure()->expectsRoot(),
             'blueprints' => $blueprints,
         ]]);
+    }
+
+    public function getItemOptionHint($item): ?string
+    {
+        return collect([
+            count($this->getConfiguredCollections()) > 1 ? $item->collection()->title() : null,
+        ])->filter()->implode(', ');
     }
 }
