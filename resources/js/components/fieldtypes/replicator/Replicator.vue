@@ -159,13 +159,17 @@ export default {
 
         canPasteSet() {
             const data = this.$clipboard.get();
-            return this.canAddSet && data?.type === 'replicator' && data?.groupKey === this.meta.groupKey;
+            return this.canAddSet && data?.type === 'replicator' && Object.values(this.setConfigHashes).includes(data?.configHash);
         },
 
         setConfigs() {
             return reduce(this.groupConfigs, (sets, group) => {
                 return sets.concat(group.sets);
             }, []);
+        },
+
+        setConfigHashes() {
+            return this.meta.setConfigHashes;
         },
 
         groupConfigs() {
@@ -195,6 +199,10 @@ export default {
 
         setConfig(handle) {
             return _.find(this.setConfigs, { handle }) || {};
+        },
+
+        setConfigHash(handle) {
+            return this.setConfigHashes[handle];
         },
 
         updated(index, set) {
@@ -260,7 +268,7 @@ export default {
 
             this.$clipboard.set({
                 type: 'replicator',
-                groupKey: this.meta.groupKey,
+                configHash: this.setConfigHash(value.type),
                 value,
                 meta,
             });
@@ -292,6 +300,8 @@ export default {
             ]);
 
             this.expandSet(set._id);
+
+            this.$clipboard.clear();
         },
 
         updateSetPreviews(id, previews) {
