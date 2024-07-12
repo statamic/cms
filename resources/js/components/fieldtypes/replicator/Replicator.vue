@@ -300,8 +300,6 @@ export default {
             ]);
 
             this.expandSet(set._id);
-
-            this.$clipboard.clear();
         },
 
         updateSetPreviews(id, previews) {
