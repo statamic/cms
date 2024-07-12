@@ -84,6 +84,12 @@ SVG);
     }
 
     #[Test]
+    public function sanitizing_doesnt_remove_additional_params()
+    {
+        $this->assertStringStartsWith('<svg x-ref="svg" xmlns="', $this->tag('{{ svg src="users" x-ref="svg" }}'));
+    }
+
+    #[Test]
     public function sanitization_can_be_disabled()
     {
         $rawSvg = StaticStringy::collapseWhitespace(<<<'SVG'
