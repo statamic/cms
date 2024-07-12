@@ -60,9 +60,13 @@ class Svg extends Tags
 
         $svg = $this->sanitize($svg);
 
-        $svg = $this->mergeAdditionalParams($svg);
+        $attributes = $this->renderAttributesFromParams(except: ['src', 'title', 'desc', 'sanitize', 'allow_tags', 'allow_attrs']);
 
-        return $svg;
+        return str_replace(
+            '<svg',
+            collect(['<svg', $attributes])->filter()->implode(' '),
+            $svg
+        );
     }
 
     private function setTitleAndDesc($svg)
@@ -104,17 +108,6 @@ class Svg extends Tags
         return $sanitizer->sanitize($svg, [
             'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
         ]);
-    }
-
-    private function mergeAdditionalParams($svg)
-    {
-        $attributes = $this->renderAttributesFromParams(except: ['src', 'title', 'desc', 'sanitize', 'allow_tags', 'allow_attrs']);
-
-        return str_replace(
-            '<svg',
-            collect(['<svg', $attributes])->filter()->implode(' '),
-            $svg
-        );
     }
 
     private function setAllowedAttrs(DOMSanitizer $sanitizer)
