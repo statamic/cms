@@ -16,7 +16,7 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
+use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
@@ -152,7 +152,7 @@ class Entries extends Relationship
 
     public function getResourceCollection($request, $items)
     {
-        return (new EntriesResource($items))
+        return (new EntriesFieldtypeEntries($items, $this))
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
@@ -452,16 +452,12 @@ class Entries extends Relationship
 
     public function preload()
     {
-        $preloaded = array_merge(parent::preload(), [
-            'availableSites' => $this->availableSites(),
-        ]);
-
         $collection = count($this->getConfiguredCollections()) === 1
             ? Collection::findByHandle($this->getConfiguredCollections()[0])
             : null;
 
         if (! $collection || ! $collection->hasStructure()) {
-            return $preloaded;
+            return parent::preload();
         }
 
         $blueprints = $collection
@@ -474,13 +470,21 @@ class Entries extends Relationship
                 ];
             })->values();
 
-        return array_merge($preloaded, ['tree' => [
+        return array_merge(parent::preload(), ['tree' => [
             'title' => $collection->title(),
             'url' => cp_route('collections.tree.index', $collection),
             'showSlugs' => $collection->structure()->showSlugs(),
             'expectsRoot' => $collection->structure()->expectsRoot(),
             'blueprints' => $blueprints,
         ]]);
+    }
+
+    public function getItemOptionHint($item): ?string
+    {
+        return collect([
+            count($this->getConfiguredCollections()) > 1 ? $item->collection()->title() : null,
+            $this->canSelectAcrossSites() && count($this->availableSites()) > 1 ? $item->site()->name() : null,
+        ])->filter()->implode(', ');
     }
 
     private function addColumn(Columns $columns, string $columnKey): void

@@ -21,10 +21,10 @@
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')"
         >
-            <template #option="{ title, site }">
+            <template #option="{ title, hint }">
                 <div class="flex justify-between">
                     <div>{{ __(title) }}</div>
-                    <div v-if="showSiteLabel" class="text-2xs text-gray-700">{{ site.name }}</div>
+                    <div v-if="hint" class="text-2xs text-gray-700" v-text="hint" />
                 </div>
             </template>
             <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
@@ -118,10 +118,6 @@ export default {
                 columns: 'title,id',
             }
         },
-
-        showSiteLabel() {
-            return this.meta.availableSites.length > 1;
-        }
     },
 
     created() {
