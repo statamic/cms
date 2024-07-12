@@ -2,6 +2,7 @@
 
 namespace Tests\Licensing;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Addon;
 use Statamic\Licensing\AddonLicense;
 use Tests\TestCase;
@@ -20,32 +21,32 @@ class AddonLicenseTest extends TestCase
         return new AddonLicense('test/addon', $response);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_addons_name()
     {
         $this->assertEquals($this->license()->name(), 'Test Addon');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_addons_version()
     {
         $this->assertEquals($this->license()->version(), '1.2.3');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_addons_edition()
     {
         $this->assertEquals($this->license()->edition(), 'rad');
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_it_exists_on_the_marketplace()
     {
         $this->assertTrue($this->license(['exists' => true])->existsOnMarketplace());
         $this->assertFalse($this->license(['exists' => false])->existsOnMarketplace());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_invalid_reason_for_a_range_issue()
     {
         $license = $this->license([
@@ -59,7 +60,7 @@ class AddonLicenseTest extends TestCase
         $this->assertEquals($message, $license->invalidReason());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_invalid_reason_for_a_edition_issue()
     {
         $license = $this->license([
@@ -73,7 +74,7 @@ class AddonLicenseTest extends TestCase
         $this->assertEquals($message, $license->invalidReason());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_version_limit()
     {
         $license = $this->license(['version_limit' => 4]);

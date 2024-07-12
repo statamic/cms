@@ -78,6 +78,6 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Collections'),
-        'url' => 'collection'
+        'url' => Statamic::docsUrl('collections')
     ])
 @stop

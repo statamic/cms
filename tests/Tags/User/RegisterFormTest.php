@@ -2,9 +2,12 @@
 
 namespace Tests\Tags\User;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
+use Statamic\Facades\Role;
 use Statamic\Facades\User;
+use Statamic\Facades\UserGroup;
 use Statamic\Statamic;
 use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -19,7 +22,7 @@ class RegisterFormTest extends TestCase
         return Parse::template($tag, []);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form()
     {
         $output = $this->tag('{{ user:register_form }}{{ /user:register_form }}');
@@ -33,7 +36,7 @@ class RegisterFormTest extends TestCase
         $this->assertStringEndsWith('</form>', $aliased);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_params()
     {
         $output = $this->tag('{{ user:register_form redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /user:register_form }}');
@@ -43,7 +46,7 @@ class RegisterFormTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="/errors" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_redirects_to_anchor()
     {
         $output = $this->tag('{{ user:register_form redirect="#form" error_redirect="#form" }}{{ /user:register_form }}');
@@ -52,7 +55,7 @@ class RegisterFormTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_fields_array()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
@@ -76,7 +79,7 @@ EOT
         $this->assertEquals($expected, $actual[0]);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_fields_array_and_custom_blueprint()
     {
         $this->useCustomBlueprint();
@@ -104,7 +107,7 @@ EOT
         $this->assertEquals($expected, $actual[0]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_register_user_and_renders_errors()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
@@ -148,7 +151,7 @@ EOT
         $this->assertEquals($expected, $inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_register_user_and_renders_custom_validation_errors()
     {
         $this->useCustomBlueprint();
@@ -201,7 +204,7 @@ EOT
         $this->assertEquals($expected, $inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_register_user_and_render_success()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
@@ -242,7 +245,7 @@ EOT
         $this->assertEmpty($inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_register_user_and_follow_custom_redirect_with_success()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
@@ -274,7 +277,7 @@ EOT
         $this->assertEquals(['Registration successful.'], $success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_register_user_and_follow_custom_redirect_with_errors()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
@@ -320,7 +323,7 @@ EOT
         $this->assertEquals($expected, $inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=registration-successful&error_redirect=registration-failure');
@@ -337,6 +340,35 @@ EOT
 
         $this->assertStringContainsString($expectedRedirect, $output);
         $this->assertStringContainsString($expectedErrorRedirect, $output);
+    }
+
+    #[Test]
+    public function it_ensures_some_fields_arent_saved()
+    {
+        UserGroup::make('client')->title('Client')->save();
+        Role::make('admin')->title('Admin')->save();
+
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        $this
+            ->post('/!/auth/register', [
+                'email' => 'san@holo.com',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
+                'groups' => ['client'],
+                'roles' => ['admin'],
+                'super' => true,
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $user = User::findByEmail('san@holo.com');
+
+        $this->assertEquals($user->groups()->count(), 0);
+        $this->assertEquals($user->roles()->count(), 0);
+        $this->assertNull($user->get('super'));
+        $this->assertNull($user->get('password_confirmation'));
     }
 
     private function useCustomBlueprint()
@@ -382,7 +414,7 @@ EOT
             ->andReturn($blueprint);
     }
 
-    /** @test */
+    #[Test]
     public function it_fetches_form_data()
     {
         $form = Statamic::tag('user:register_form')->fetch();
@@ -393,7 +425,7 @@ EOT
         $this->assertArrayHasKey('_token', $form['params']);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_register_user_when_honeypot_is_present()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
@@ -428,7 +460,7 @@ EOT
         config()->set('statamic.users.registration_form_honeypot_field', null);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_register_user_when_honeypot_is_not_present()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
@@ -462,7 +494,7 @@ EOT
         config()->set('statamic.users.registration_form_honeypot_field', null);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_precognitive_requests()
     {
         if (! method_exists($this, 'withPrecognition')) {

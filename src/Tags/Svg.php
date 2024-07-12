@@ -54,19 +54,19 @@ class Svg extends Tags
             return '';
         }
 
-        $attributes = $this->renderAttributesFromParams(except: ['src', 'title', 'desc', 'sanitize']);
-
         if ($this->params->get('title') || $this->params->get('desc')) {
             $svg = $this->setTitleAndDesc($svg);
         }
 
-        $svg = str_replace(
+        $svg = $this->sanitize($svg);
+
+        $attributes = $this->renderAttributesFromParams(except: ['src', 'title', 'desc', 'sanitize', 'allow_tags', 'allow_attrs']);
+
+        return str_replace(
             '<svg',
             collect(['<svg', $attributes])->filter()->implode(' '),
             $svg
         );
-
-        return $this->sanitize($svg);
     }
 
     private function setTitleAndDesc($svg)

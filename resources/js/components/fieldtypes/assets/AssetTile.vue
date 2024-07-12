@@ -39,7 +39,7 @@
                 </template>
 
                 <div class="asset-controls" v-if="!readOnly">
-                    <div class="h-full w-full flex items-center justify-center space-x-1">
+                    <div class="h-full w-full flex items-center justify-center space-x-1 rtl:space-x-reverse">
                         <button @click="edit" class="btn btn-icon" :alt="__('Edit')">
                             <svg-icon name="micro/sharp-pencil" class="h-4 my-2" />
                         </button>
@@ -81,7 +81,7 @@
                 {{ label }}
             </div>
             <button
-                class="text-blue rtl:border-r ltr:border-l px-2 py-1 hover:bg-gray-200"
+                class="asset-meta-btn"
                 @click="edit"
                 v-if="showSetAlt && needsAlt"
             >

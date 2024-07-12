@@ -4,20 +4,21 @@ namespace Tests\Tokens;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Tokens\FileToken as Token;
 use Tests\TestCase;
 
 class TokenTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_uses_a_provided_token_string()
     {
         $token = new Token('foo', 'test');
         $this->assertEquals('foo', $token->token());
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_a_token_string_when_not_provided()
     {
         $generatedTokens = collect()->times($count = 10, function () {
@@ -27,7 +28,7 @@ class TokenTest extends TestCase
         $this->assertCount($count, $generatedTokens->unique());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_through_the_facade()
     {
         $token = new Token('test', 'test', ['foo' => 'bar']);
@@ -37,7 +38,7 @@ class TokenTest extends TestCase
         $this->assertEquals('passthru', $token->save()); // the repo save method will return true.
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_through_the_facade()
     {
         $token = new Token('test', 'test', ['foo' => 'bar']);
@@ -47,7 +48,7 @@ class TokenTest extends TestCase
         $this->assertEquals('passthru', $token->delete()); // the repo delete method will return true.
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_handled()
     {
         $this->app->bind('TestTokenHandler', function () {
@@ -74,7 +75,7 @@ class TokenTest extends TestCase
         $this->assertEquals('response', $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_expires_in_one_hour_by_default()
     {
         Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));
@@ -85,7 +86,7 @@ class TokenTest extends TestCase
         $this->assertTrue($token->expiry()->eq(Carbon::now()->addHour()));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_a_custom_expiry()
     {
         Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));
@@ -98,7 +99,7 @@ class TokenTest extends TestCase
         $this->assertTrue($token->expiry()->eq(Carbon::now()->addHours(3)));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_it_has_expired()
     {
         Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));

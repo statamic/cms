@@ -89,10 +89,11 @@ class InstallEloquentDriver extends Command
         return collect([
             'asset_containers' => 'Asset Containers',
             'assets' => 'Assets',
-            'blueprints' => 'Blueprints & Fieldsets',
+            'blueprints' => 'Blueprints',
             'collections' => 'Collections',
             'collection_trees' => 'Collection Trees',
             'entries' => 'Entries',
+            'fieldsets' => 'Fieldsets',
             'forms' => 'Forms',
             'form_submissions' => 'Form Submissions',
             'globals' => 'Globals',
@@ -122,6 +123,9 @@ class InstallEloquentDriver extends Command
 
                 case 'entries':
                     return config('statamic.eloquent-driver.entries.driver') === 'eloquent';
+
+                case 'fieldsets':
+                    return config('statamic.eloquent-driver.fieldsets.driver') === 'eloquent';
 
                 case 'forms':
                     return config('statamic.eloquent-driver.forms.driver') === 'eloquent';
@@ -221,7 +225,7 @@ class InstallEloquentDriver extends Command
 
         if (confirm('Would you like to import existing blueprints?')) {
             spin(
-                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-blueprints'),
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-blueprints --force --only-blueprints'),
                 message: 'Importing existing blueprints...'
             );
 
@@ -322,6 +326,30 @@ class InstallEloquentDriver extends Command
                 ? 'Configured & imported existing entries'
                 : 'Configured entries'
         );
+    }
+
+    protected function migrateFieldsets(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-fieldset-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('fieldsets');
+            },
+            message: 'Migrating fieldsets...'
+        );
+
+        $this->components->info('Configured fieldsets');
+
+        if (confirm('Would you like to import existing fieldsets?')) {
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-blueprints --force --only-fieldsets'),
+                message: 'Importing existing fieldsets...'
+            );
+
+            $this->components->info('Imported existing fieldsets');
+        }
     }
 
     protected function migrateForms(): void

@@ -52,7 +52,7 @@ class UserRegisterRequest extends FormRequest
     {
         return $this->blueprintFields->process()->values()
             ->only(array_keys($this->submittedValues))
-            ->except(['email', 'groups', 'roles', 'super']);
+            ->except(['email', 'groups', 'roles', 'super', 'password_confirmation']);
     }
 
     public function validator()

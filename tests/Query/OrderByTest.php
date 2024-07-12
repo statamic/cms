@@ -2,16 +2,15 @@
 
 namespace Tests\Query;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Query\OrderBy;
 use Tests\TestCase;
 
 class OrderByTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider parseProvider
-     **/
+    #[Test]
+    #[DataProvider('parseProvider')]
     public function it_parses_string($string, $sort, $dir)
     {
         $orderby = OrderBy::parse($string);
