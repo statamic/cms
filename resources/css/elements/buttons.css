@@ -292,7 +292,7 @@ td .btn-icon {
 }
 
 .super-btn {
-    @apply p-4 flex items-start hover:bg-gray-200 border border-transparent rounded-md space-x-4;
+    @apply p-4 flex items-start hover:bg-gray-200 border border-transparent rounded-md space-x-4 rtl:space-x-reverse;
     @apply dark:hover:bg-dark-575 dark:hover:border-dark-400;
 
     svg {

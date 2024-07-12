@@ -112,7 +112,7 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <div class="p-3 flex items-center space-x-2 rtl:space-x-reverse" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn w-full"
                                             v-if="showLivePreviewButton"
