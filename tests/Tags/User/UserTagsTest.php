@@ -4,6 +4,7 @@ namespace Tests\Tags\User;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
@@ -74,6 +75,26 @@ class UserTagsTest extends TestCase
         // test if it handles the value of a user_roles tag
         $this->assertEquals('yes', $this->tag('{{ user:is :roles="roles" }}yes{{ /user:is }}', ['roles' => Role::all()]));
         $this->assertEquals('', $this->tag('{{ user:isnt :roles="roles" }}yes{{ /user:isnt }}', ['roles' => Role::all()]));
+    }
+
+    #[Test]
+    public function user_is_can_be_used_in_conditions()
+    {
+        $this->setTestRoles([
+            'webmaster' => ['super'],
+        ]);
+
+        $this->actingAs(User::make()->assignRole('webmaster')->save());
+
+        $antlers = <<<'ANTLERS'
+{{ if {user:is role="webmaster|admin"} }}Yes{{ else }}No{{ /if }}
+ANTLERS;
+
+        $this->assertSame('Yes', (string) Antlers::parse($antlers));
+
+        $this->actingAs(User::make()->assignRole('not-a-webmaster')->save());
+
+        $this->assertSame('No', (string) Antlers::parse($antlers));
     }
 
     #[Test]

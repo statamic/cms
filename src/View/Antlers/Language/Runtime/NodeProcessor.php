@@ -1563,7 +1563,7 @@ class NodeProcessor
                         }
                         /** @var Tags $tag */
                         $tag = $this->loader->load($tagToLoad, [
-                            'parser' => $this->antlersParser,
+                            'parser' => $this->isConditionalProcessor ? null : $this->antlersParser,
                             'params' => $tagParameters,
                             'content' => $node->runtimeContent,
                             'context' => $tagActiveData,
