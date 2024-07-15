@@ -23,12 +23,12 @@
             @search:blur="$emit('blur')"
         >
             <template #option="{ title, hint, status }">
-                <div class="flex justify-between">
+                <div class="flex justify-between items-center">
                     <div class="flex items-center">
                         <div v-if="status" class="little-dot rtl:ml-2 ltr:mr-2 hidden@sm:block" :class="status" />
                         <div v-text="title" />
                     </div>
-                    <div v-if="hint" class="text-2xs text-gray-700" v-text="hint" />
+                    <div v-if="hint" class="text-4xs text-gray-600 uppercase whitespace-nowrap" v-text="hint" />
                 </div>
             </template>
             <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>

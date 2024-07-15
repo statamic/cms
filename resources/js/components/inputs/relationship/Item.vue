@@ -6,7 +6,7 @@
     >
         <div class="item-move" v-if="sortable">&nbsp;</div>
         <div class="item-inner">
-            <div v-if="statusIcon" class="little-dot rtl:ml-2 ltr:mr-2 hidden@sm:block" :class="item.status" />
+            <div v-if="statusIcon" class="little-dot rtl:ml-2 ltr:mr-2 hidden @sm:block" :class="item.status" />
 
             <div
                 v-if="item.invalid"
