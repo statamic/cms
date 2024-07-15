@@ -75,6 +75,10 @@ export default {
         GridStacked
     },
 
+    provide: {
+        isInGridField: true,
+    },
+
     props: {
         modelValue: {
             required: true,

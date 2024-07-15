@@ -40,10 +40,10 @@
                 v-if="option === 'asset'"
                 ref="assets"
                 handle="asset"
-                :value="selectedAssets"
                 :config="meta.asset.config"
                 :meta="meta.asset.meta"
-                @input="assetsSelected"
+                :model-value="selectedAssets"
+                @update:model-value="assetsSelected"
                 @meta-updated="meta.asset.meta = $event"
             />
 
@@ -53,10 +53,15 @@
 
 <script>
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import Fieldtype from './Fieldtype.vue';
 
 export default {
 
     mixins: [Fieldtype, PositionsSelectOptions],
+
+    provide: {
+        isInLinkField: true,
+    },
 
     data() {
 

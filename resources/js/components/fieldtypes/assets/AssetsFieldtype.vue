@@ -166,6 +166,7 @@ import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
+import Fieldtype from '../Fieldtype.vue';
 
 export default {
 
@@ -181,6 +182,20 @@ export default {
 
     mixins: [Fieldtype],
 
+    inject: {
+        isInBardField: {
+            name: 'isInBardField',
+            default: false,
+        },
+        isInGridField: {
+            name: 'isInGridField',
+            default: false,
+        },
+        isInLinkField: {
+            name: 'isInLinkField',
+            default: false,
+        }
+    },
 
     data() {
         return {
@@ -259,7 +274,7 @@ export default {
          * The asset browser expects an array of asset IDs to be passed in as a prop.
          */
         selectedAssets() {
-            return clone(this.value);
+            return clone(this.modelValue);
         },
 
         /**
@@ -288,54 +303,6 @@ export default {
          */
         queryScopes() {
             return this.config.query_scopes || [];
-        },
-
-        isInBardField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.constructor.name === 'BardFieldtype') {
-                    return true;
-                }
-
-                vm = parent;
-            }
-        },
-
-        isInGridField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.grid) {
-                    return true;
-                }
-
-                vm = parent;
-            }
-        },
-
-        isInLinkField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.$options.name === 'link-fieldtype') {
-                    return true;
-                }
-
-                vm = parent;
-            }
         },
 
         replicatorPreview() {
@@ -386,7 +353,7 @@ export default {
 
         initializeAssets() {
             if (! this.meta.data) {
-                this.loadAssets(this.value);
+                this.loadAssets(this.modelValue);
                 this.initializing = false;
                 return;
             }
@@ -491,8 +458,13 @@ export default {
         },
 
         idChanged(oldId, newId) {
-            const index = this.value.indexOf(oldId);
-            this.update([...this.value.slice(0, index), newId, ...this.value.slice(index + 1)]);
+            const index = this.modelValue.indexOf(oldId);
+
+            this.update([
+                ...this.modelValue.slice(0, index),
+                newId,
+                ...this.modelValue.slice(index + 1)
+            ]);
         },
 
     },
@@ -516,7 +488,7 @@ export default {
             this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
         },
 
-        value(value) {
+        modelValue(value) {
             if (_.isEqual(value, this.assetIds)) return;
 
             this.loadAssets(value);

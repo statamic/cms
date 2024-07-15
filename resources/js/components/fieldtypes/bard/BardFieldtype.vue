@@ -163,6 +163,10 @@ export default {
 
     inject: ['storeName'],
 
+    provide: {
+        isInBardField: true,
+    },
+
     data() {
         return {
             editor: null,
