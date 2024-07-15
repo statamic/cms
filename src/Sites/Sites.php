@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Collection;
 use Statamic\Events\SiteCreated;
 use Statamic\Events\SiteDeleted;
+use Statamic\Events\SiteSaved;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
@@ -141,13 +142,19 @@ class Sites
 
     public function save()
     {
+        // Track for `SiteCreated` and `SiteDeleted` events, before saving to file
         $newSites = $this->getNewSites();
         $deletedSites = $this->getDeletedSites();
 
+        // Save to file
         File::put($this->path(), YAML::dump($this->config()));
 
+        // Dispatch our tracked `SiteCreated` and `SiteDeleted` events
         $newSites->each(fn ($site) => SiteCreated::dispatch($site));
         $deletedSites->each(fn ($site) => SiteDeleted::dispatch($site));
+
+        // Dispatch `SiteSaved` events
+        $this->sites->each(fn ($site) => SiteSaved::dispatch($site));
     }
 
     public function blueprint()
