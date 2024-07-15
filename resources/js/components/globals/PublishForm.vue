@@ -153,7 +153,7 @@ export default {
         },
 
         somethingIsLoading() {
-            return ! this.$progress.isComplete();
+            return ! this.$progress.isComplete;
         },
 
         canSave() {
