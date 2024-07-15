@@ -2,7 +2,6 @@ import { createApp } from 'vue';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue'
 import Toast, { useToast, POSITION } from 'vue-toastification';
-import VueSelect from "vue-select";
 
 import { createVfm, ModalsContainer, useVfm } from 'vue-final-modal';
 import 'vue-final-modal/style.css'
@@ -39,6 +38,7 @@ import useDirtyState from './composables/useDirtyState';
 import useEventBus from './composables/useEventBus';
 import registerFieldTypes from './bootstrap/fieldtypes.js';
 import filters from './bootstrap/filters.js'
+import registerVueSelect from './bootstrap/vue-select/vue-select.js';
 
 const echo = new Echo;
 const bard = new Bard;
@@ -48,7 +48,7 @@ const reveal = new Reveal;
 const conditions = new FieldConditions;
 const callbacks = new Callbacks;
 const slug = new Slugs;
-const components = new Components()
+const components = new Components();
 
 export default {
     bootingCallbacks: [],
@@ -208,7 +208,7 @@ export default {
         // Load all Fieldtypes
         registerFieldTypes(this.$app)
 
-        this.$app.component('v-select', VueSelect);
+        registerVueSelect(this.$app)
 
         // Suppress the translation warnings
         this.$app.config.warnHandler = (msg, vm, trace) => {
