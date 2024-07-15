@@ -10,7 +10,7 @@ import TextFieldtype from '../components/fieldtypes/TextFieldtype.vue';
 import TextareaFieldtype from '../components/fieldtypes/TextareaFieldtype.vue';
 import SlugFieldtype from '../components/fieldtypes/SlugFieldtype.vue';
 // import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue';
-// import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue';
+import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue';
 // import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 // import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
 // import BardFieldtype from '../components/fieldtypes/bard/BardFieldtype.vue';
@@ -35,7 +35,7 @@ import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue';
 import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 // import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
 import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
-// import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
+import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
 // import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
 // import ListIndexFieldtype from '../components/fieldtypes/ListIndexFieldtype.vue';
 // import MarkdownFieldtype from '../components/fieldtypes/markdown/MarkdownFieldtype.vue';
@@ -74,7 +74,7 @@ export default function registerFieldTypes(app) {
     app.component('slug-fieldtype', SlugFieldtype);
 
     // app.component('array-fieldtype', ArrayFieldtype);
-    // app.component('assets-fieldtype', AssetsFieldtype);
+    app.component('assets-fieldtype', AssetsFieldtype);
     // app.component('assets-fieldtype-index', AssetsIndexFieldtype);
     // app.component('asset_folder-fieldtype', AssetFolderFieldtype);
     // app.component('bard-fieldtype', BardFieldtype);
@@ -99,7 +99,7 @@ export default function registerFieldTypes(app) {
     app.component('html-fieldtype', HtmlFieldtype);
     // app.component('icon-fieldtype', IconFieldtype);
     app.component('integer-fieldtype', IntegerFieldtype);
-    // app.component('link-fieldtype', LinkFieldtype);
+    app.component('link-fieldtype', LinkFieldtype);
     // app.component('list-fieldtype', ListFieldtype);
     // app.component('list-fieldtype-index', ListIndexFieldtype);
     // app.component('markdown-fieldtype', MarkdownFieldtype);

@@ -17,13 +17,13 @@ export default {
 
     props: {
         sites: { type: Array, required: true },
-        value: { type: String, required: true },
+        modelValue: { type: String, required: true },
     },
 
     computed: {
 
         site() {
-            return _.findWhere(this.sites, { handle: this.value });
+            return _.findWhere(this.sites, { handle: this.modelValue });
         }
 
     }

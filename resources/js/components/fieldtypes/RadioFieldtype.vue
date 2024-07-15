@@ -13,7 +13,7 @@
                     @input="update($event.target.value)"
                     :value="option.value"
                     :disabled="isReadOnly"
-                    :checked="value === option.value"
+                    :checked="modelValue === option.value"
                 />
                 {{ option.label || option.value }}
             </label>
@@ -36,8 +36,9 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            var option = _.findWhere(this.config.options, {value: this.value});
-            return (option) ? option.label : this.value;
+            var option = _.findWhere(this.config.options, { value: this.modelValue });
+
+            return (option) ? option.label : this.modelValue;
         },
     },
 

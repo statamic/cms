@@ -39,6 +39,7 @@ import { data_get } from '../../bootstrap/globals';
 import Fieldtype from './Fieldtype.vue';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [Fieldtype],
 

@@ -1,6 +1,6 @@
 <script>
 import ResizeObserver from 'resize-observer-polyfill';
-import { first_child } from '../node_helpers.js';
+import { vue_element } from '../node_helpers.js';
 
 export default {
     emits: ['resized'],
@@ -20,7 +20,7 @@ export default {
             this.width = entries[0].contentRect.width;
         }, 200));
 
-        observer.observe(first_child(this.$el.parentNode));
+        observer.observe(vue_element(this.$el));
     },
 
     watch: {

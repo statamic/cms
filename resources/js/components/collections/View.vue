@@ -35,8 +35,8 @@
                         v-if="sites.length > 1"
                         class="rtl:ml-4 ltr:mr-4"
                         :sites="sites"
-                        :value="site"
-                        @input="site = $event.handle"
+                        :model-value="site"
+                        @update:model-value="site = $event.handle"
                     />
 
                     <button
@@ -55,8 +55,8 @@
                         v-if="sites.length > 1 && reordering && site"
                         class="rtl:ml-4 ltr:mr-4"
                         :sites="sites"
-                        :value="site"
-                        @input="site = $event.handle"
+                        :model-value="site"
+                        @update:model-value="site = $event.handle"
                     />
 
                     <button class="btn rtl:ml-4 ltr:mr-4"

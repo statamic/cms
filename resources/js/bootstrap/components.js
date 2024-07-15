@@ -1,7 +1,7 @@
 
 // Core
 // export { default as AssetManager } from '../components/assets/AssetManager.vue';
-// export { default as AssetBrowser } from '../components/assets/Browser/Browser.vue';
+export { default as AssetBrowser } from '../components/assets/Browser/Browser.vue';
 export { default as UpdatesBadge } from '../components/UpdatesBadge.vue';
 
 // Publish
@@ -12,15 +12,15 @@ export { default as PublishFieldsContainer } from '../components/publish/FieldsC
 export { default as PublishField } from '../components/publish/Field.vue';
 export { default as PublishFieldMeta } from '../components/publish/FieldMeta.vue';
 export { default as ConfigureTabs } from '../components/configure/Tabs.vue';
-// export { default as PublishTabs } from '../components/publish/Tabs.vue';
+export { default as PublishTabs } from '../components/publish/Tabs.vue';
 export { default as PublishSections } from '../components/publish/Sections.vue';
 // export { default as PublishValidationErrors } from '../components/publish/ValidationErrors.vue';
-// export { default as FormGroup } from '../components/publish/FormGroup.vue';
+export { default as FormGroup } from '../components/publish/FormGroup.vue';
 
 // export { default as LivePreview } from '../components/live-preview/LivePreview.vue';
 // export { default as LivePreviewPopout } from '../components/live-preview/Popout.vue';
 
-// export { default as EntryPublishForm } from '../components/entries/PublishForm.vue';
+export { default as EntryPublishForm } from '../components/entries/PublishForm.vue';
 // export { default as TermPublishForm } from '../components/terms/PublishForm.vue';
 // export { default as UserPublishForm } from '../components/users/PublishForm.vue';
 
@@ -50,7 +50,7 @@ export { default as CollectionList } from '../components/collections/Listing.vue
 
 // Reusable
 export { default as SvgIcon } from '../components/SvgIcon.vue';
-// export { default as FileIcon } from '../components/FileIcon.vue';
+export { default as FileIcon } from '../components/FileIcon.vue';
 export { default as LoadingGraphic } from '../components/LoadingGraphic.vue';
 export { default as DropdownList } from '../components/DropdownList.vue';
 export { default as DropdownItem } from '../components/DropdownItem.vue';
