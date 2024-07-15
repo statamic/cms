@@ -21,7 +21,7 @@ class EntriesFieldtypeListedEntry extends ListedEntry
 
         if (
             in_array($this->fieldtype->config('mode'), ['select', 'typeahead'])
-            && ($hint = $this->fieldtype->getItemOptionHint($this->resource))
+            && ($hint = $this->fieldtype->getItemHint($this->resource))
         ) {
             $arr['hint'] = $hint;
         }

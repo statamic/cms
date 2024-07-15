@@ -463,7 +463,7 @@ class Entries extends Relationship
         ]]);
     }
 
-    public function getItemOptionHint($item): ?string
+    public function getItemHint($item): ?string
     {
         return collect([
             count($this->getConfiguredCollections()) > 1 ? __($item->collection()->title()) : null,

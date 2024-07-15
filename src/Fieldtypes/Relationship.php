@@ -231,7 +231,7 @@ abstract class Relationship extends Fieldtype
         })->values();
     }
 
-    public function getItemOptionHint($item): ?string
+    public function getItemHint($item): ?string
     {
         return null;
     }

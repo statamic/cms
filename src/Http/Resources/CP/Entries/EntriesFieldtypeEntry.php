@@ -23,7 +23,7 @@ class EntriesFieldtypeEntry extends JsonResource
             'title' => $this->resource->value('title'),
             'status' => $this->resource->status(),
             'edit_url' => $this->resource->editUrl(),
-            'hint' => $this->fieldtype->getItemOptionHint($this->resource),
+            'hint' => $this->fieldtype->getItemHint($this->resource),
         ];
 
         return ['data' => $data];
