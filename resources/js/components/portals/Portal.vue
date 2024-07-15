@@ -28,7 +28,7 @@ export default {
         },
         provide: {
             type: Object,
-            default: () => {},
+            default: () => ({}),
         },
         targetClass: {
             type: String
