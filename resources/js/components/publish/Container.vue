@@ -336,7 +336,7 @@ export default {
     render() {
         return this.$slots.default({
             values: this.storeValues,
-            container: {}, // @todo this was this._self, how to fix this?
+            container: this, // @todo this was this._self, how to fix this?
             components: this.components,
             setFieldValue: this.setFieldValue,
             setFieldMeta: this.setFieldMeta,
