@@ -169,6 +169,7 @@ import { SortableList } from '../../sortable/Sortable';
 import Fieldtype from '../Fieldtype.vue';
 
 export default {
+    emits: ['focus', 'blur'],
 
     components: {
         AssetTile,

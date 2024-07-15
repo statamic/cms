@@ -3,7 +3,13 @@ import uniqid from 'uniqid';
 import Component from '../Component';
 
 export default {
-    emits: ['publish-container-created', 'publish-container-destroyed', 'updated'],
+    emits: [
+        'publish-container-created',
+        'publish-container-destroyed',
+        'focus',
+        'blur',
+        'updated',
+    ],
 
     model: {
         prop: 'values',

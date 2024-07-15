@@ -26,7 +26,8 @@
                                 :value="extras[handle]"
                                 :loading="loading"
                                 @input="componentUpdated(handle, $event)"
-                                class="rtl:mr-4 ltr:ml-4" />
+                                class="rtl:mr-4 ltr:ml-4"
+                            />
 
                             <slot name="buttons" />
 
@@ -34,7 +35,8 @@
                                 type="button"
                                 class="btn-close"
                                 @click="close"
-                                v-html="'&times'" />
+                                v-html="'&times'"
+                            />
                         </div>
                     </div>
                 </transition>
@@ -165,7 +167,7 @@ export default {
         },
 
         livePreviewFieldsPortal() {
-            return `live-preview-fields-${this.storeName}`;
+            return `live-preview-fields-${this.name}`;
         },
 
         canPopOut() {
@@ -239,7 +241,9 @@ export default {
     methods: {
 
         update: _.debounce(function () {
-            if (source) source.abort();
+            if (source){
+                source.abort();
+            }
             source = new AbortController();
 
             this.loading = true;
@@ -272,7 +276,9 @@ export default {
         close() {
             if (this.poppedOut) this.closePopout();
 
-            this.animateOut().then(() => this.$emit('closed'));
+            this.animateOut().then(() => {
+                this.$emit('closed')
+            });
         },
 
         animateIn() {
@@ -355,7 +361,10 @@ export default {
         },
 
         componentUpdated(handle, value) {
-            Vue.set(this.extras, handle, value);
+            this.extras = {
+                ...this.extras,
+                [handle]: value,
+            }
         }
     }
 

@@ -73,6 +73,7 @@ import PositionsSelectOptions from '../../../mixins/PositionsSelectOptions';
 import { SortableList, SortableItem } from '../../sortable/Sortable';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [PositionsSelectOptions],
 
@@ -150,7 +151,7 @@ export default {
                 items = items === null ? [] : [items];
             }
 
-            this.$emit('input', items);
+            this.$emit('update:model-value', items);
         },
 
     }

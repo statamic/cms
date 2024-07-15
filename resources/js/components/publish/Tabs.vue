@@ -86,9 +86,9 @@
                     <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                         <div class="publish-tab">
                             <div class="publish-tab-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
-                                <!-- <v-portal :to="actionsPortal" :disabled="shouldShowSidebar">-->
-                                <!--     <slot name="actions" :should-show-sidebar="shouldShowSidebar" />-->
-                                <!-- </v-portal>-->
+                                 <v-portal :to="actionsPortal" :disabled="shouldShowSidebar">
+                                     <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
+                                 </v-portal>
                             </div>
 
                             <publish-sections

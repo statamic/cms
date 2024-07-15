@@ -18,14 +18,16 @@
                 v-text="__(placeholder)"
                 value=""
                 disabled
-                :selected="value === null" />
+                :selected="value === null"
+            />
 
             <option
                 v-for="option in options"
                 :key="option.value"
                 v-text="__(option.label)"
                 :value="option.value"
-                :selected="isOptionSelected(option)" />
+                :selected="isOptionSelected(option)"
+            />
 
         </select>
 
@@ -42,6 +44,7 @@
 <script>
 
 export default {
+    emits: ['update:model-value'],
 
     props: {
         name: {},
@@ -51,7 +54,7 @@ export default {
             required: false,
             default: () => __('Choose...')
         },
-        value: {},
+        modelValue: {},
         isReadOnly: { type: Boolean },
         resetOnChange: { default: false }
     },
@@ -67,7 +70,7 @@ export default {
         isOptionSelected(option) {
             return this.placeholder === false && this.value === undefined
                 ? option.value == this.options[0].value
-                : option.value == this.value;
+                : option.value == this.modelValue;
         },
 
         change(event) {
@@ -75,7 +78,7 @@ export default {
                 this.reset();
             }
 
-            this.$emit('input', event.target.value)
+            this.$emit('update:model-value', event.target.value)
         },
 
         reset() {

@@ -17,8 +17,8 @@ export { default as PublishSections } from '../components/publish/Sections.vue';
 // export { default as PublishValidationErrors } from '../components/publish/ValidationErrors.vue';
 export { default as FormGroup } from '../components/publish/FormGroup.vue';
 
-// export { default as LivePreview } from '../components/live-preview/LivePreview.vue';
-// export { default as LivePreviewPopout } from '../components/live-preview/Popout.vue';
+export { default as LivePreview } from '../components/live-preview/LivePreview.vue';
+export { default as LivePreviewPopout } from '../components/live-preview/Popout.vue';
 
 export { default as EntryPublishForm } from '../components/entries/PublishForm.vue';
 // export { default as TermPublishForm } from '../components/terms/PublishForm.vue';
