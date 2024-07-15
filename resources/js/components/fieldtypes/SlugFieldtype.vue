@@ -51,6 +51,8 @@ export default {
         }
     },
 
+    inject: ['storeName'],
+
     computed: {
 
         separator() {
@@ -58,16 +60,7 @@ export default {
         },
 
         store() {
-            let store;
-            let parent = this;
-
-            while (! parent.storeName) {
-                parent = parent.$parent;
-                store = parent.storeName;
-                if (parent === this.$root) return null;
-            }
-
-            return store;
+            return this.storeName
         },
 
         source() {
