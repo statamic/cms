@@ -466,7 +466,7 @@ class Entries extends Relationship
     public function getItemOptionHint($item): ?string
     {
         return collect([
-            count($this->getConfiguredCollections()) > 1 ? $item->collection()->title() : null,
+            count($this->getConfiguredCollections()) > 1 ? __($item->collection()->title()) : null,
         ])->filter()->implode(', ');
     }
 }
