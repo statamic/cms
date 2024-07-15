@@ -4,21 +4,23 @@ import { Upload } from 'upload';
 import uniqid from 'uniqid';
 
 export default {
+    expose: ['browse'],
 
     render() {
         const fileField = h('input', {
             class: { hidden: true },
-            attrs: { type: 'file', multiple: true },
-            ref: 'nativeFileField'
+            type: 'file',
+            multiple: true,
+            ref: 'nativeFileField',
         });
 
-        return h('div', { on: {
-            'dragenter': this.dragenter,
-            'dragover': this.dragover,
-            'dragleave': this.dragleave,
-            'drop': this.drop,
-        }}, [
-            h('div', { class: { 'pointer-events-none': this.dragging }}, [
+        return h('div', {
+            onDragenter: this.dragenter,
+            onDragover: this.dragover,
+            onDragleave: this.dragleave,
+            onDrop: this.drop,
+        }, [
+            h('div', { class: { 'pointer-events-none': this.dragging } }, [
                 fileField,
                 ...this.$slots.default({ dragging: this.enabled ? this.dragging : false })
             ])
@@ -56,8 +58,7 @@ export default {
         this.$refs.nativeFileField.addEventListener('change', this.addNativeFileFieldSelections);
     },
 
-
-    beforeDestroy() {
+    beforeUnmount() {
         this.$refs.nativeFileField.removeEventListener('change', this.addNativeFileFieldSelections);
     },
 
@@ -113,14 +114,28 @@ export default {
             const id = uniqid();
             const upload = this.makeUpload(id, file);
 
-            this.uploads.push({
-                id,
-                basename: file.name,
-                extension: file.name.split('.').pop(),
-                percent: 0,
-                errorMessage: null,
-                instance: upload
-            });
+            this.uploads = [
+                ...this.uploads,
+                {
+                    id,
+                    basename: file.name,
+                    extension: file.name.split('.').pop(),
+                    percent: 0,
+                    processing: false,
+                    errorMessage: null,
+                    instance: upload
+                }
+            ];
+        },
+
+        updateUpload(uploadId, callback) {
+            this.uploads = this.uploads.map(upload => {
+                if (upload.id !== uploadId) {
+                    return upload;
+                }
+
+                return callback(upload)
+            })
         },
 
         findUpload(id) {
@@ -141,7 +156,10 @@ export default {
             });
 
             upload.on('progress', progress => {
-                this.findUpload(id).percent = progress * 100;
+                this.updateUpload(id, (upload) => ({
+                    ...upload,
+                    percent: progress * 100
+                }))
             });
 
             return upload;
@@ -160,10 +178,19 @@ export default {
         },
 
         processUploadQueue() {
-            if (this.uploads.length === 0) return;
+            const unprocessedUploads = this.uploads.filter(u => !u.processing)
 
-            const upload = this.uploads[0];
+            if (unprocessedUploads.length === 0) {
+                return;
+            }
+
+            const upload = unprocessedUploads[0];
             const id = upload.id;
+
+            this.updateUpload(id, (upload) => ({
+                ...upload,
+                processing: true,
+            }))
 
             upload.instance.upload().then(response => {
                 let json = null;
@@ -182,12 +209,11 @@ export default {
 
         handleUploadSuccess(id, response) {
             this.$emit('upload-complete', response.data, this.uploads);
-            this.uploads.splice(this.findUploadIndex(id), 1);
 
+            this.uploads = this.uploads.filter((upload) => upload.id !== id);
         },
 
         handleUploadError(id, status, response) {
-            const upload = this.findUpload(id);
             let msg = response?.message;
 
             if (!msg) {
@@ -201,7 +227,12 @@ export default {
                     msg = Object.values(response.errors)[0][0]; // Get first validation message.
                 }
             }
-            upload.errorMessage = msg;
+
+            this.updateUpload(id, (upload) => ({
+                ...upload,
+                errorMessage: msg,
+            }))
+
             this.$emit('error', upload, this.uploads);
         },
     }
