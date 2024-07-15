@@ -467,6 +467,6 @@ class Entries extends Relationship
     {
         return collect([
             count($this->getConfiguredCollections()) > 1 ? __($item->collection()->title()) : null,
-        ])->filter()->implode(', ');
+        ])->filter()->implode(' • ');
     }
 }
