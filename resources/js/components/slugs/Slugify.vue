@@ -1,5 +1,6 @@
 <script>
 export default {
+    emits: ['slugifying', 'slugified'],
 
     model: {
         prop: 'to',
@@ -61,7 +62,7 @@ export default {
     },
 
     render() {
-        return this.$slots.default({});
+        return this.$slots.default(this.$attrs);
     },
 
     methods: {
