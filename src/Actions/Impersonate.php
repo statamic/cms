@@ -5,7 +5,6 @@ namespace Statamic\Actions;
 use Illuminate\Events\NullDispatcher;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Contracts\Auth\User as UserContract;
-use Statamic\Events\Event;
 use Statamic\Events\ImpersonationStarted;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\User;
