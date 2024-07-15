@@ -1,10 +1,11 @@
 <template>
     <div>
         <modal :model-value="show" class="modal-login" :shake="hasErrors">
-            <template slot="header">
+            <template #header>
                 {{ __('Log in to continue') }}
             </template>
-            <template slot="body">
+
+            <template #body>
                 <div class="mb-4">
                     <label :class="{ 'text-red-500': errors.password.length }">{{ __('Password for :username', { username: this.username }) }} <i class="required">*</i></label>
                     <input type="password" name="password" class="input-text" v-model="password" ref="password" @keydown.enter.prevent="submit" />
@@ -12,7 +13,8 @@
                     <small class="block text-red-500 mt-2" v-if="errors.password.length">{{ errors.password[0] }}</small>
                 </div>
             </template>
-            <template slot="footer">
+
+            <template #footer>
                 <button @click.prevent="submit" class="btn-primary">{{ __('Submit') }}</button>
             </template>
         </modal>

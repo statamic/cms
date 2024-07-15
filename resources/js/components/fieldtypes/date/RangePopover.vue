@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import Picker from './Picker';
+import Picker from './Picker.js';
 
 export default {
 

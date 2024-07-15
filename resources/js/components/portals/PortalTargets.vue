@@ -1,7 +1,7 @@
 <template>
     <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks }">
         <component
-            :is="portal.data?.type === 'stack' ? 'portal-target' : 'div'"
+            :is="portal.isStack() ? 'portal-target' : 'div'"
             v-for="(portal, i) in portals"
             :key="portal.id"
             :name="portal.id"
