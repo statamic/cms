@@ -3,6 +3,7 @@
 namespace Statamic\Sites;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
@@ -100,7 +101,7 @@ class Sites
     {
         $sites ??= $this->getSavedSites();
 
-        $this->sites = collect($sites)->map(fn ($site, $handle) => new Site($handle, $site));
+        $this->sites = $this->hydrateConfig($sites);
 
         return $this;
     }
@@ -240,6 +241,11 @@ class Sites
             ->map
             ->rawConfig()
             ->all();
+    }
+
+    protected function hydrateConfig($config): Collection
+    {
+        return collect($config)->map(fn ($site, $handle) => new Site($handle, $site));
     }
 
     /**
