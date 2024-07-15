@@ -45,7 +45,8 @@
                         :disabled="!treeIsDirty"
                         @click="saveTree"
                         v-text="__('Save Changes')"
-                        v-tooltip="deletedEntries.length ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length) : null" />
+                        v-tooltip="deletedEntries.length ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length) : null"
+                    />
 
                 </template>
 

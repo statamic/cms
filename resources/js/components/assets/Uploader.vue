@@ -1,5 +1,5 @@
 <script>
-import { h } from 'vue'
+import { h } from 'vue';
 import { Upload } from 'upload';
 import uniqid from 'uniqid';
 
@@ -25,7 +25,6 @@ export default {
         ]);
     },
 
-
     props: {
         enabled: {
             type: Boolean,
@@ -36,17 +35,14 @@ export default {
         url: { type: String, default: () => cp_url('assets') }
     },
 
-
     data() {
         return {
             dragging: false,
             uploads: []
-        }
+        };
     },
 
-
     computed: {
-
         extraData() {
             return {
                 container: this.container,
@@ -54,9 +50,7 @@ export default {
                 _token: Statamic.$config.get('csrfToken')
             };
         }
-
     },
-
 
     mounted() {
         this.$refs.nativeFileField.addEventListener('change', this.addNativeFileFieldSelections);
@@ -67,19 +61,14 @@ export default {
         this.$refs.nativeFileField.removeEventListener('change', this.addNativeFileFieldSelections);
     },
 
-
     watch: {
-
         uploads(uploads) {
             this.$emit('updated', uploads);
             this.processUploadQueue();
         }
-
     },
 
-
     methods: {
-
         browse() {
             this.$refs.nativeFileField.click();
         },
@@ -119,7 +108,7 @@ export default {
         },
 
         addFile(file) {
-            if (! this.enabled) return;
+            if (!this.enabled) return;
 
             const id = uniqid();
             const upload = this.makeUpload(id, file);
@@ -194,12 +183,14 @@ export default {
         handleUploadSuccess(id, response) {
             this.$emit('upload-complete', response.data, this.uploads);
             this.uploads.splice(this.findUploadIndex(id), 1);
+
         },
 
         handleUploadError(id, status, response) {
             const upload = this.findUpload(id);
             let msg = response?.message;
-            if (! msg) {
+
+            if (!msg) {
                 if (status === 413) {
                     msg = __('Upload failed. The file is larger than is allowed by your server.');
                 } else {
@@ -215,5 +206,5 @@ export default {
         },
     }
 
-}
+};
 </script>

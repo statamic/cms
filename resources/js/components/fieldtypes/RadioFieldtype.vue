@@ -6,7 +6,8 @@
             class="option"
         >
             <label>
-                <input type="radio"
+                <input
+                    type="radio"
                     ref="radio"
                     :name="name"
                     @input="update($event.target.value)"

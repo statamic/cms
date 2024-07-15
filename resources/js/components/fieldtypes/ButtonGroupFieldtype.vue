@@ -1,7 +1,8 @@
 <template>
     <div class="button-group-fieldtype-wrapper" :class="{'inline-mode': config.inline}">
         <div class="btn-group" ref="buttonGroup">
-            <button class="btn px-4"
+            <button
+                class="btn px-4"
                 v-for="(option, $index) in options"
                 :key="$index"
                 ref="button"

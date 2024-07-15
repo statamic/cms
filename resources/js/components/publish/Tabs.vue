@@ -40,7 +40,6 @@
                     <div class="fade-left" v-if="canScrollLeft" />
                     <div class="fade-right" :class="{ 'mr-8': showHiddenTabsDropdown }" v-if="canScrollRight" />
 
-
                     <dropdown-list class="rtl:mr-2 ltr:ml-2" v-cloak v-if="showHiddenTabsDropdown">
                         <dropdown-item
                             v-for="(tab, index) in mainTabs"
@@ -144,7 +143,7 @@ export default {
             tabsAreScrolled: false,
             canScrollLeft: false,
             canScrollRight: false,
-        }
+        };
     },
 
     computed: {
@@ -162,7 +161,7 @@ export default {
         },
 
         mainTabs() {
-            if (this.layoutReady && ! this.shouldShowSidebar) return this.tabs;
+            if (this.layoutReady && !this.shouldShowSidebar) return this.tabs;
 
             return this.tabs.filter(tab => tab.handle !== 'sidebar');
         },
@@ -176,7 +175,7 @@ export default {
         },
 
         showTabs() {
-            return this.layoutReady && this.numberOfTabs > 1
+            return this.layoutReady && this.numberOfTabs > 1;
         },
 
         showHiddenTabsDropdown() {
@@ -364,8 +363,7 @@ export default {
 
             if (side === 'left') {
                 this.$refs.tabs.scrollLeft = tab.offsetLeft - offset;
-            }
-            else {
+            } else {
                 this.$refs.tabs.scrollLeft = tab.offsetLeft + tab.offsetWidth - this.$refs.tabs.clientWidth + offset + 8;
             }
 
@@ -404,7 +402,7 @@ export default {
             });
 
             if (JSON.stringify(hidden) !== JSON.stringify(this.hiddenTabs)) {
-               this.hiddenTabs = hidden;
+                this.hiddenTabs = hidden;
             }
         },
 
@@ -428,5 +426,5 @@ export default {
         }
     }
 
-}
+};
 </script>

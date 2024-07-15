@@ -1,7 +1,12 @@
 <template>
     <div class="time-fieldtype-container">
         <div class="input-group">
-            <button class="input-group-prepend flex items-center" v-tooltip="__('Set to now')" @click="setToNow" v-if="!isReadOnly">
+            <button
+                class="input-group-prepend flex items-center"
+                v-tooltip="__('Set to now')"
+                @click="setToNow"
+                v-if="!isReadOnly"
+            >
                 <svg-icon name="light/time" class="w-4 h-4" />
             </button>
             <input
@@ -104,7 +109,7 @@ export default {
         //      03:20:4 -> 03:20:04
         //      3:2:4   -> 03:02:04
         updateActualValue() {
-            if (! this.inputValue) {
+            if (!this.inputValue) {
                 this.update(null);
                 return;
             }

@@ -22,9 +22,9 @@
                         v-if="!isReadOnly && showPicker"
                         class="assets-fieldtype-picker"
                         :class="{
-                        'is-expanded': expanded,
-                        'bard-drag-handle': isInBardField
-                    }"
+                            'is-expanded': expanded,
+                            'bard-drag-handle': isInBardField
+                        }"
                     >
 
                         <button
@@ -34,7 +34,8 @@
                             class="btn btn-with-icon"
                             @click="openSelector"
                             @keyup.space.enter="openSelector"
-                            tabindex="0">
+                            tabindex="0"
+                        >
                             <svg-icon name="folder-image" class="w-4 h-4 text-gray-800 dark:text-dark-150"></svg-icon>
                             {{ __('Browse') }}
                         </button>
@@ -78,8 +79,8 @@
                                     :show-set-alt="showSetAlt"
                                     @updated="assetUpdated"
                                     @removed="assetRemoved"
-                                    @id-changed="idChanged(asset.id, $event)">
-                                </asset-tile>
+                                    @id-changed="idChanged(asset.id, $event)"
+                                ></asset-tile>
                             </div>
                         </sortable-list>
 
@@ -95,7 +96,8 @@
                                     :mirror="false"
                                 >
                                     <tbody ref="assets">
-                                        <tr is="assetRow"
+                                        <tr
+                                            is="assetRow"
                                             class="asset-row"
                                             v-for="asset in assets"
                                             :key="asset.id"
@@ -105,8 +107,8 @@
                                             :show-set-alt="showSetAlt"
                                             @updated="assetUpdated"
                                             @removed="assetRemoved"
-                                            @id-changed="idChanged(asset.id, $event)">
-                                        </tr>
+                                            @id-changed="idChanged(asset.id, $event)"
+                                        ></tr>
                                     </tbody>
                                 </sortable-list>
                             </table>
@@ -126,8 +128,8 @@
                 :max-files="maxFiles"
                 :query-scopes="queryScopes"
                 @selected="assetsSelected"
-                @closed="closeSelector">
-            </selector>
+                @closed="closeSelector"
+            ></selector>
         </stack>
     </div>
 </template>
@@ -494,7 +496,6 @@ export default {
         },
 
     },
-
 
     watch: {
 

@@ -1,15 +1,15 @@
 import { createApp } from 'vue';
 import VueClickAway from 'vue3-click-away';
-import FloatingVue from 'floating-vue'
+import FloatingVue from 'floating-vue';
 import Toast, { useToast, POSITION } from 'vue-toastification';
 
 import { createVfm, ModalsContainer, useVfm } from 'vue-final-modal';
-import 'vue-final-modal/style.css'
+import 'vue-final-modal/style.css';
 
 // @todo(jack): Replace with own toast styles?
 // Or make a custom component instead:
 // https://github.com/Maronato/vue-toastification?tab=readme-ov-file#render-a-component
-import "vue-toastification/dist/index.css";
+import 'vue-toastification/dist/index.css';
 import 'floating-vue/dist/style.css';
 
 // import isLatLong from "validator/es/lib/isLatLong.js";
@@ -37,7 +37,7 @@ import useProgressBar from './composables/useProgressBar';
 import useDirtyState from './composables/useDirtyState';
 import useEventBus from './composables/useEventBus';
 import registerFieldTypes from './bootstrap/fieldtypes.js';
-import filters from './bootstrap/filters.js'
+import filters from './bootstrap/filters.js';
 import registerVueSelect from './bootstrap/vue-select/vue-select.js';
 
 const echo = new Echo;
@@ -96,7 +96,7 @@ export default {
     },
 
     get $toast() {
-        return this.$app.config.globalProperties.$toast
+        return this.$app.config.globalProperties.$toast;
     },
 
     get $slug() {
@@ -145,7 +145,7 @@ export default {
             portalName: 'v-portal',
         });
         this.$app.use(VueClickAway);
-        this.$app.use(FloatingVue, {disposeTimeout: 30000, distance: 10});
+        this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
         this.$app.use(Toast, {
             position: POSITION.BOTTOM_LEFT, timeout: 3500, transition: 'Vue-Toastification__slideBlurred',
         });
@@ -155,11 +155,11 @@ export default {
             inserted: function (el) {
                 el.focus();
             }
-        })
+        });
 
         // Modals
-        this.$app.use(createVfm())
-        this.$app.component('modals-container', ModalsContainer)
+        this.$app.use(createVfm());
+        this.$app.component('modals-container', ModalsContainer);
 
         // Vue.use(VModal, { componentName: 'v-modal' })
         // Vue.use(Vuex);
@@ -211,7 +211,7 @@ export default {
         });
 
         // Load all Fieldtypes
-        registerFieldTypes(this.$app)
+        registerFieldTypes(this.$app);
 
         registerVueSelect(this.$app)
 
