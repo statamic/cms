@@ -1,7 +1,6 @@
 <template>
-
-    <element-container @resized="containerWasResized">
-        <template #default>
+    <div>
+        <element-container @resized="containerWasResized">
             <div>
                 <!-- Tabs -->
                 <div v-if="showTabs" class="tabs-container flex items-center">
@@ -20,21 +19,22 @@
                         @mousewheel.prevent="scrollTabs"
                         @scroll="updateScrollHints"
                     >
-                        <button v-for="tab in mainTabs"
-                                class="tab-button"
-                                :ref="tab.handle + '-tab'"
-                                :key="tab.handle"
-                                :class="{
-                            'active': isActive(tab.handle),
-                            'has-error': tabHasError(tab.handle),
-                        }"
-                                role="tab"
-                                :id="tabId(tab.handle)"
-                                :aria-controls="tabPanelId(tab.handle)"
-                                :aria-selected="isActive(tab.handle)"
-                                :tabindex="isActive(tab.handle) ? 0 : -1"
-                                @click="setActive(tab.handle)"
-                                v-text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
+                        <button
+                            v-for="tab in mainTabs"
+                            class="tab-button"
+                            :ref="tab.handle + '-tab'"
+                            :key="tab.handle"
+                            :class="{
+                                'active': isActive(tab.handle),
+                                'has-error': tabHasError(tab.handle),
+                            }"
+                            role="tab"
+                            :id="tabId(tab.handle)"
+                            :aria-controls="tabPanelId(tab.handle)"
+                            :aria-selected="isActive(tab.handle)"
+                            :tabindex="isActive(tab.handle) ? 0 : -1"
+                            @click="setActive(tab.handle)"
+                            v-text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
                         />
                     </div>
                     <div class="fade-left" v-if="canScrollLeft" />
@@ -86,9 +86,9 @@
                     <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                         <div class="publish-tab">
                             <div class="publish-tab-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
-<!--                                <v-portal :to="actionsPortal" :disabled="shouldShowSidebar">-->
-<!--                                    <slot name="actions" :should-show-sidebar="shouldShowSidebar" />-->
-<!--                                </v-portal>-->
+                                <!-- <v-portal :to="actionsPortal" :disabled="shouldShowSidebar">-->
+                                <!--     <slot name="actions" :should-show-sidebar="shouldShowSidebar" />-->
+                                <!-- </v-portal>-->
                             </div>
 
                             <publish-sections
@@ -109,15 +109,17 @@
 
                 <portal-target :name="actionsPortal" class="publish-tab publish-tab-actions-footer" />
             </div>
-        </template>
-    </element-container>
+        </element-container>
+    </div>
 </template>
 
 <script>
 import { uniq } from 'underscore';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
+import { is_ignorable } from '../../node_helpers.js';
 
 export default {
+    emits: ['synced', 'desynced', 'focus', 'blur', 'updated', 'meta-updated'],
 
     inject: ['storeName'],
 
@@ -334,7 +336,9 @@ export default {
         },
 
         getTabNode(handle) {
-            return this.$refs.tabs.childNodes[this.tabIndex(handle)];
+            const childNodes = [...this.$refs.tabs.childNodes].filter(node => !is_ignorable(node))
+
+            return childNodes[this.tabIndex(handle)];
         },
 
         scrollTabs(event) {
@@ -396,6 +400,10 @@ export default {
             const hidden = [];
 
             this.$refs.tabs.childNodes.forEach((tab, index) => {
+                if (is_ignorable(tab)) {
+                    return;
+                }
+
                 if (this.tabIsOutsideView(tab, 20)) {
                     hidden.push(index);
                 }
