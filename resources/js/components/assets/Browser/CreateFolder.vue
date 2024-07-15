@@ -62,6 +62,7 @@ export default {
             this.$axios.post(url, payload).then(response => {
                 this.$toast.success(__('Folder created'));
                 this.$emit('created', response.data);
+                this.directory = this.initialDirectory
             }).catch(e => {
                 this.handleErrors(e);
             });
