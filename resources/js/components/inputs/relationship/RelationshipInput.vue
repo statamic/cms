@@ -98,6 +98,7 @@ import {Sortable, Plugins} from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
 
 export default {
+    emits: ['focus', 'blur', 'loading', 'item-data-updated'],
 
     props: {
         name: String,

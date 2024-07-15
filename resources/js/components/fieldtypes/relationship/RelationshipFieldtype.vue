@@ -40,6 +40,7 @@ import qs from 'qs';
 import Fieldtype from '../Fieldtype.vue';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [Fieldtype],
 
