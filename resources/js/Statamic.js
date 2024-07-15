@@ -193,6 +193,11 @@ export default {
             translate(key, replacements) { // TODO: Remove
                 return __(key, replacements);
             },
+            can(permission) {
+                const permissions = JSON.parse(atob(this.$config.get('permissions')));
+
+                return permissions.includes('super') || permissions.includes(permission);
+            },
             $wait(ms) {
                 return new Promise(resolve => {
                     setTimeout(resolve, ms);
