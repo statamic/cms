@@ -46,14 +46,14 @@ class Impersonate extends Action
         }
 
         try {
-            $impersonater = $guard->user();
+            $impersonator = $guard->user();
             $impersonated = $users->first();
 
             $guard->login($users->first());
-            session()->put('statamic_impersonated_by', $impersonater->getKey());
+            session()->put('statamic_impersonated_by', $impersonator->getKey());
             Toast::success(__('You are now impersonating').' '.$impersonated->name());
 
-            ImpersonationStarted::dispatch($impersonater, $impersonated);
+            ImpersonationStarted::dispatch($impersonator, $impersonated);
         } finally {
             if ($dispatcher) {
                 $guard->setDispatcher($dispatcher);
