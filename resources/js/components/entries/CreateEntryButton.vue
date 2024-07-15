@@ -1,6 +1,6 @@
 <template>
 
-    <dropdown-list class="inline-block" :disabled="!hasMultipleBlueprints">
+    <dropdown-list class="inline-block " :disabled="!hasMultipleBlueprints">
         <template v-slot:trigger>
             <button
                 :class="[buttonClass, {'flex items-center rtl:pl-4 ltr:pr-4': hasMultipleBlueprints }]"
@@ -12,8 +12,10 @@
         </template>
         <h6 v-text="__('Choose Blueprint')" class="p-2" />
 
-        <div v-for="blueprint in blueprints" :key="blueprint.handle">
-            <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
+        <div class="max-h-[75vh] overflow-y-auto">
+            <div v-for="blueprint in blueprints" :key="blueprint.handle"">
+                <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
+            </div>
         </div>
     </dropdown-list>
 
