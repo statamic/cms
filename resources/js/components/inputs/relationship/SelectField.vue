@@ -41,28 +41,6 @@
              <template #no-options>
                 <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
             </template>
-            <template #footer="{ deselect }" v-if="multiple">
-                <sortable-list
-                    item-class="sortable-item"
-                    handle-class="sortable-item"
-                    :value="items"
-                    :distance="5"
-                    :mirror="false"
-                    @input="input"
-                >
-                    <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="item in items" :key="item.id" class="vs__selected mt-2" :class="{ 'sortable-item': !readOnly }">
-                            {{ __(item.title) }}
-                            <button v-if="!readOnly" @click="deselect(item)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
-                                <span>×</span>
-                            </button>
-                            <button v-else type="button" class="vs__deselect">
-                                <span class="opacity-50">×</span>
-                            </button>
-                        </span>
-                    </div>
-                </sortable-list>
-            </template>
         </v-select>
     </div>
 
