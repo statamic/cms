@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Statamic\Events\LicensesSynced;
 use Statamic\Licensing\LicenseManager as Licenses;
 
 class LicensingController extends CpController
@@ -23,6 +24,8 @@ class LicensingController extends CpController
     public function refresh(Licenses $licenses)
     {
         $licenses->refresh();
+
+        LicensesSynced::dispatch();
 
         return redirect()
             ->cpRoute('utilities.licensing')
