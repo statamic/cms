@@ -16,7 +16,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
-use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
@@ -317,7 +317,7 @@ class Entries extends Relationship
             return $this->invalidItemArray($id);
         }
 
-        return (new EntryResource($entry))->resolve()['data'];
+        return (new EntryResource($entry, $this))->resolve()['data'];
     }
 
     protected function collect($value)
