@@ -8,7 +8,6 @@ use League\Glide\Server;
 use Statamic\Facades\Stache;
 use Statamic\Facades\StaticCache;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\StaticCaching\Cacher as StaticCacher;
 use Statamic\Support\Str;
 
 class CacheController extends CpController
@@ -67,7 +66,7 @@ class CacheController extends CpController
         return [
             'enabled' => (bool) $strategy,
             'strategy' => $strategy ?? __('Disabled'),
-            'count' => app(StaticCacher::class)->getUrls()->count(),
+            'count' => StaticCache::driver()->getUrls()->count(),
         ];
     }
 
