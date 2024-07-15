@@ -130,7 +130,7 @@ export default {
         }
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         if (this.pushQuery) {
             window.removeEventListener('popstate', this.popState);
         }

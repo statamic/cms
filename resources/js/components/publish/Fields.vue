@@ -31,6 +31,7 @@ import PublishField from './Field.vue';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
+    emits: ['focus', 'blur', 'synced', 'desynced', 'updated', 'meta-updated'],
 
     components: { PublishField },
 

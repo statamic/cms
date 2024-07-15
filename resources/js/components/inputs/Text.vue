@@ -3,6 +3,8 @@ import { onMounted, ref } from 'vue';
 
 import useLengthLimiter from '../../composables/useLengthLimiter';
 
+const $emit = defineEmits(['keydown', 'focus', 'blur'])
+
 const props = defineProps({
     name: {},
     disabled: { default: false },
