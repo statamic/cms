@@ -22,9 +22,12 @@
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')"
         >
-            <template #option="{ title, hint }">
+            <template #option="{ title, hint, status }">
                 <div class="flex justify-between">
-                    <div v-text="title" />
+                    <div class="flex items-center">
+                        <div v-if="status" class="little-dot rtl:ml-2 ltr:mr-2 hidden@sm:block" :class="status" />
+                        <div v-text="title" />
+                    </div>
                     <div v-if="hint" class="text-2xs text-gray-700" v-text="hint" />
                 </div>
             </template>
