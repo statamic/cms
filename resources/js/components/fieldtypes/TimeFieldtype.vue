@@ -26,6 +26,7 @@
 
 <script>
 import IMask from 'imask';
+import Fieldtype from './Fieldtype.vue';
 
 export default {
 
@@ -46,7 +47,7 @@ export default {
 
     data() {
         return {
-            inputValue: this.value,
+            inputValue: this.modelValue,
             mask: null,
         };
     },
@@ -58,7 +59,7 @@ export default {
         },
         // When the value is changed via the prop (e.g. through collaboration or other JS manually
         // setting the value) we'll want to make sure it's reflected correctly here.
-        value(value) {
+        modelValue(value) {
             this.inputValue = value;
             this.updateActualValue();
         },
@@ -88,7 +89,7 @@ export default {
         this.mask.on('accept', e => this.inputValue = this.mask.value);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.updateActualValue);
         this.mask.destroy();
     },
@@ -100,7 +101,7 @@ export default {
         },
 
         focus() {
-             this.$refs.time.focus();
+            this.$refs.time.focus();
         },
 
         // This will take the value of the input, add appropriate padding, and update the actual fieldtype value.
