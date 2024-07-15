@@ -4,6 +4,7 @@ namespace Statamic\Stache;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Events\StacheCleared;
 use Statamic\Extensions\FileStore;
 use Statamic\Facades\File;
 use Statamic\Stache\Stores\Store;
@@ -91,6 +92,8 @@ class Stache
         $this->duplicates()->clear();
 
         $this->cacheStore()->forget('stache::timing');
+
+        StacheCleared::dispatch();
 
         return $this;
     }
