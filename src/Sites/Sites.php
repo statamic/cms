@@ -5,6 +5,7 @@ namespace Statamic\Sites;
 use Closure;
 use Illuminate\Support\Collection;
 use Statamic\Events\SiteCreated;
+use Statamic\Events\SiteDeleted;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
@@ -141,10 +142,12 @@ class Sites
     public function save()
     {
         $newSites = $this->getNewSites();
+        $deletedSites = $this->getDeletedSites();
 
         File::put($this->path(), YAML::dump($this->config()));
 
         $newSites->each(fn ($site) => SiteCreated::dispatch($site));
+        $deletedSites->each(fn ($site) => SiteDeleted::dispatch($site));
     }
 
     public function blueprint()
@@ -260,6 +263,16 @@ class Sites
 
         return $this->hydrateConfig(
             collect($newSites)->diffKeys($currentSites)
+        );
+    }
+
+    protected function getDeletedSites(): Collection
+    {
+        $currentSites = $this->getSavedSites();
+        $newSites = $this->config();
+
+        return $this->hydrateConfig(
+            collect($currentSites)->diffKeys($newSites)
         );
     }
 
