@@ -4,6 +4,7 @@ namespace Statamic\Sites;
 
 use Closure;
 use Illuminate\Support\Collection;
+use Statamic\Events\SiteCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
@@ -139,7 +140,11 @@ class Sites
 
     public function save()
     {
+        $newSites = $this->getNewSites();
+
         File::put($this->path(), YAML::dump($this->config()));
+
+        $newSites->each(fn ($site) => SiteCreated::dispatch($site));
     }
 
     public function blueprint()
@@ -246,6 +251,16 @@ class Sites
     protected function hydrateConfig($config): Collection
     {
         return collect($config)->map(fn ($site, $handle) => new Site($handle, $site));
+    }
+
+    protected function getNewSites(): Collection
+    {
+        $currentSites = $this->getSavedSites();
+        $newSites = $this->config();
+
+        return $this->hydrateConfig(
+            collect($newSites)->diffKeys($currentSites)
+        );
     }
 
     /**
