@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use League\Glide\Server;
 use Statamic\Facades\Stache;
+use Statamic\Facades\StaticCache;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
 use Statamic\Support\Str;
@@ -96,7 +97,7 @@ class CacheController extends CpController
 
     protected function clearStaticCache()
     {
-        app(StaticCacher::class)->flush();
+        StaticCache::flush();
 
         return back()->withSuccess(__('Static page cache cleared.'));
     }
