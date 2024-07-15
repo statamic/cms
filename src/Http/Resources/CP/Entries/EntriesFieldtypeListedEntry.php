@@ -4,7 +4,7 @@ namespace Statamic\Http\Resources\CP\Entries;
 
 use Statamic\Fieldtypes\Entries as EntriesFieldtype;
 
-class EntriesFieldtypeEntry extends ListedEntry
+class EntriesFieldtypeListedEntry extends ListedEntry
 {
     private EntriesFieldtype $fieldtype;
 

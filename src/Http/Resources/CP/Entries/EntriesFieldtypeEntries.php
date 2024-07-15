@@ -8,7 +8,7 @@ use Statamic\Fieldtypes\Entries as EntriesFieldtype;
 class EntriesFieldtypeEntries extends Entries
 {
     private EntriesFieldtype $fieldtype;
-    public $collects = EntriesFieldtypeEntry::class;
+    public $collects = EntriesFieldtypeListedEntry::class;
 
     public function __construct($resource, EntriesFieldtype $fieldtype)
     {
