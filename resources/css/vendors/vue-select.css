@@ -17,7 +17,6 @@
 }
 
 .vs--disabled .vs__clear,
-.vs--disabled .vs__deselect,
 .vs--disabled .vs__dropdown-toggle,
 .vs--disabled .vs__open-indicator,
 .vs--disabled .vs__search,
@@ -172,7 +171,8 @@
 	@apply clickable;
 	@apply flex items-center text-sm rounded py-0 px-2 rtl:ml-2 ltr:mr-2;
 
-    &.sortable-item { @apply cursor-grab; }
+    &.sortable-item { @apply !cursor-grab; }
+
 }
 
 .vs__deselect {
