@@ -84,12 +84,10 @@
                                             v-if="mode === 'table' && ! containerIsEmpty"
                                             :allow-bulk-actions="true"
                                             :loading="loading"
-                                            :rows="rows"
                                             :toggle-selection-on-row-click="true"
                                             @sorted="sorted"
                                         >
-
-                                            <template slot="tbody-start">
+                                            <template #tbody-start>
                                                 <tr v-if="folder && folder.parent_path && !restrictFolderNavigation">
                                                     <td />
                                                     <td @click="selectFolder(folder.parent_path)">
@@ -270,7 +268,7 @@
         />
 
         <create-folder
-            v-if="creatingFolder"
+            v-model="creatingFolder"
             :container="container"
             :path="path"
             @closed="creatingFolder = false"
@@ -427,14 +425,12 @@ export default {
 
     mounted() {
         this.loadContainers();
-    },
 
-    created() {
         this.$events.$on('editor-action-started', this.actionStarted);
         this.$events.$on('editor-action-completed', this.actionCompleted);
     },
 
-    destroyed() {
+    beforeUnmount() {
         this.$events.$off('editor-action-started', this.actionStarted);
         this.$events.$off('editor-action-completed', this.actionCompleted);
     },
@@ -464,7 +460,9 @@ export default {
 
         initializing(isInitializing, wasInitializing) {
             if (wasInitializing && this.autofocusSearch) {
-                this.$nextTick(() => this.$refs.search.focus());
+                this.$nextTick(() => {
+                    this.$refs.search.focus()
+                })
             }
         },
 
@@ -542,7 +540,7 @@ export default {
 
         setMode(mode) {
             this.mode = mode;
-            this.setPreference('mode', mode == 'table' ? null : mode);
+            this.setPreference('mode', mode === 'table' ? null : mode);
         },
 
         edit(id) {
@@ -572,8 +570,7 @@ export default {
                 this.sortColumn = 'last_modified';
                 this.sortDirection = 'desc';
 
-                this.selectedAssets.push(asset.id);
-                this.$emit('selections-updated', this.selectedAssets);
+                this.$emit('selections-updated', [...this.selectedAssets, asset.id]);
             }
 
             this.loadAssets();
@@ -606,23 +603,28 @@ export default {
 
         toggleSelection(id, index, $event) {
             const i = this.selectedAssets.indexOf(id);
+
             this.$refs.browser.focus()
 
+            let newSelection = [...this.selectedAssets];
+
             if (this.maxFiles === 1) {
-                this.selectedAssets = [id];
+                newSelection = [id];
             } else if (i != -1) {
-                this.selectedAssets.splice(i, 1);
+                newSelection.splice(i, 1);
             } else if (! this.reachedSelectionLimit) {
                 if ($event.shiftKey && this.lastItemClicked !== null) {
-                    this.selectRange(
+                    newSelection = this.selectRange(
                         Math.min(this.lastItemClicked, index),
                         Math.max(this.lastItemClicked, index)
                     );
                 } else {
-                    this.selectedAssets.push(id);
+                    newSelection = [...this.selectedAssets, id];
                 }
             }
-            this.$emit('selections-updated', this.selectedAssets);
+
+            this.$emit('selections-updated', newSelection);
+
             this.lastItemClicked = index;
         },
 
@@ -631,13 +633,17 @@ export default {
         },
 
         selectRange(from, to) {
+            let newSelection = [...this.selectedAssets]
+
             for (var i = from; i <= to; i++ ) {
                 let asset = this.assets[i].id;
-                if (! this.selectedAssets.includes(asset) && ! this.reachedSelectionLimit) {
-                    this.selectedAssets.push(asset);
+
+                if (! newSelection.includes(asset) && newSelection.length < this.maxFiles) {
+                    newSelection = [...newSelection, asset];
                 }
-                this.$emit('selections-updated', this.selectedAssets);
-            };
+            }
+
+            return newSelection
         },
 
         shiftDown() {
