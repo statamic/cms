@@ -49,9 +49,9 @@
                     v-if="revisionsEnabled && !isCreating"
                     class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
                     :disabled="!canPublish"
-                    @click="confirmingPublish = true">
-                    <span>{{ __('Publish') }}…</span>
-                </button>
+                    @click="confirmingPublish = true"
+                    v-text="publishButtonText"
+                />
             </div>
 
             <slot name="action-buttons-right" />
@@ -112,7 +112,7 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <div class="p-3 flex items-center space-x-2 rtl:space-x-reverse" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn w-full"
                                             v-if="showLivePreviewButton"
@@ -224,7 +224,7 @@
                         class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true">
-                        <span v-text="__('Publish')" />
+                        <span v-text="publishButtonText" />
                         <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
                     </button>
                 </template>
@@ -248,7 +248,7 @@
                 class="rtl:mr-2 ltr:ml-2 btn btn-lg justify-center btn-primary flex items-center w-1/2"
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
-                <span v-text="__('Publish')" />
+                <span v-text="publishButtonText" />
                 <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
             </button>
         </div>
@@ -259,6 +259,7 @@
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"
+                :can-restore-revisions="!readOnly"
                 @closed="close"
             />
         </stack>
@@ -468,6 +469,14 @@ export default {
                 default:
                     return __('Save & Publish');
             }
+        },
+
+        publishButtonText() {
+            if (this.canManagePublishState) {
+                return `${__('Publish')}…`
+            }
+
+            return `${__('Create Revision')}…`
         },
 
         isUnpublishing() {
@@ -767,7 +776,10 @@ export default {
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.title = response.data.data.title;
+            clearTimeout(this.trackDirtyStateTimeout);
+            this.trackDirtyState = false;
             this.values = this.resetValuesFromResponse(response.data.data.values);
+            this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
             this.activeLocalization.title = response.data.data.title;
             this.activeLocalization.published = response.data.data.published;
             this.activeLocalization.status = response.data.data.status;
@@ -815,7 +827,10 @@ export default {
             if (response.data) {
                 this.title = response.data.title;
                 if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
                 this.values = this.resetValuesFromResponse(response.data.values);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;
                 this.activeLocalization.status = response.data.status;

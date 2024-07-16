@@ -2,12 +2,13 @@
 
 namespace Tests\Policies;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Nav as NavContract;
 use Statamic\Facades\Nav;
 
 class NavPolicyTest extends PolicyTestCase
 {
-    /** @test */
+    #[Test]
     public function index_is_allowed_if_any_nav_is_viewable()
     {
         $userWithAlfaPermission = $this->userWithPermissions(['view alfa nav']);
@@ -24,7 +25,7 @@ class NavPolicyTest extends PolicyTestCase
         $this->assertFalse($userWithoutPermission->can('index', NavContract::class));
     }
 
-    /** @test */
+    #[Test]
     public function index_is_allowed_if_any_nav_is_viewable_with_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de']);
@@ -46,7 +47,7 @@ class NavPolicyTest extends PolicyTestCase
         $this->assertFalse($userWithDePermission->can('index', NavContract::class));
     }
 
-    /** @test */
+    #[Test]
     public function navs_are_viewable_with_view_permissions()
     {
         $user = $this->userWithPermissions(['view alfa nav']);
@@ -60,7 +61,7 @@ class NavPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $navB));
     }
 
-    /** @test */
+    #[Test]
     public function navs_are_viewable_with_view_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de']);
@@ -82,7 +83,7 @@ class NavPolicyTest extends PolicyTestCase
         $this->assertFalse($userWithDePermission->can('view', $nav));
     }
 
-    /** @test */
+    #[Test]
     public function navs_are_editable_with_edit_permissions()
     {
         $user = $this->userWithPermissions(['edit alfa nav']);
@@ -96,7 +97,7 @@ class NavPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $navB));
     }
 
-    /** @test */
+    #[Test]
     public function navs_are_editable_with_edit_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de']);
@@ -121,7 +122,7 @@ class NavPolicyTest extends PolicyTestCase
 
     }
 
-    /** @test */
+    #[Test]
     public function navs_can_be_created_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);
@@ -131,7 +132,7 @@ class NavPolicyTest extends PolicyTestCase
         $this->assertFalse($forbiddenUser->can('create', NavContract::class));
     }
 
-    /** @test */
+    #[Test]
     public function navs_can_be_deleted_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);

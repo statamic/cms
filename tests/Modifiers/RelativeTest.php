@@ -3,12 +3,13 @@
 namespace Tests\Modifiers;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class RelativeTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_converts_a_date_to_relative()
     {
         Carbon::setTestNow('2024-06-30');
@@ -18,7 +19,7 @@ class RelativeTest extends TestCase
         $this->assertEquals('1 month ago', $this->modify($date));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_a_date_to_relative_without_modifiers()
     {
         Carbon::setTestNow('2024-06-30');

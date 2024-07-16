@@ -62,6 +62,8 @@ class ServiceProvider extends LaravelServiceProvider
                 $urls
             );
         });
+
+        $this->app->singleton(ResponseStatusTracker::class, fn () => new ResponseStatusTracker);
     }
 
     public function boot()
@@ -84,8 +86,11 @@ class ServiceProvider extends LaravelServiceProvider
             $url = '/__shared-errors/'.$status;
             $this->pathInfo = $url;
             $this->requestUri = $url;
+            app(Session::class)->setUrl($url);
 
             return $this;
         });
+
+        $this->app[ResponseStatusTracker::class]->registerMacros();
     }
 }

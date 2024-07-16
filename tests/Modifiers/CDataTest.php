@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class CDataTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_wraps_the_string_in_cdata_tags(): void
     {
         $modified = $this->modify('My Very Own Podcast');

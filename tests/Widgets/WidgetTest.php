@@ -2,13 +2,14 @@
 
 namespace Tests\Widgets;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Widgets\Widget;
 use Tests\TestCase;
 use Tests\TestDependency;
 
 class WidgetTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function widget_get_initialized_correctly()
     {
         $class = app(TestWidget::class);

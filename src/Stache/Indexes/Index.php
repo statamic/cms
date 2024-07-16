@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Indexes;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Stache;
 use Statamic\Statamic;
 
@@ -76,7 +75,7 @@ abstract class Index
 
         debugbar()->addMessage("Loading index: {$this->store->key()}/{$this->name}", 'stache');
 
-        $this->items = Cache::get($this->cacheKey());
+        $this->items = Stache::cacheStore()->get($this->cacheKey());
 
         if ($this->items === null) {
             $this->update();
@@ -106,12 +105,12 @@ abstract class Index
 
     public function isCached()
     {
-        return Cache::has($this->cacheKey());
+        return Stache::cacheStore()->has($this->cacheKey());
     }
 
     public function cache()
     {
-        Cache::forever($this->cacheKey(), $this->items);
+        Stache::cacheStore()->forever($this->cacheKey(), $this->items);
     }
 
     public function updateItem($item)
@@ -153,7 +152,7 @@ abstract class Index
         $this->loaded = false;
         $this->items = null;
 
-        Cache::forget($this->cacheKey());
+        Stache::cacheStore()->forget($this->cacheKey());
     }
 
     public static function currentlyLoading()

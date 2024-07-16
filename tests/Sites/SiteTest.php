@@ -2,6 +2,7 @@
 
 namespace Tests\Sites;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\Antlers;
 use Statamic\Sites\Site;
@@ -16,7 +17,7 @@ class SiteTest extends TestCase
         $app['config']->set('app.url', 'http://absolute-url-resolved-from-request.com');
     }
 
-    /** @test */
+    #[Test]
     public function gets_handle()
     {
         $site = new Site('en', []);
@@ -24,7 +25,7 @@ class SiteTest extends TestCase
         $this->assertEquals('en', $site->handle());
     }
 
-    /** @test */
+    #[Test]
     public function gets_name()
     {
         $site = new Site('en', ['name' => 'English']);
@@ -32,7 +33,7 @@ class SiteTest extends TestCase
         $this->assertEquals('English', $site->name());
     }
 
-    /** @test */
+    #[Test]
     public function gets_locale()
     {
         $site = new Site('en', ['locale' => 'en_US']);
@@ -40,7 +41,7 @@ class SiteTest extends TestCase
         $this->assertEquals('en_US', $site->locale());
     }
 
-    /** @test */
+    #[Test]
     public function gets_short_locale()
     {
         $this->assertEquals('en', (new Site('en', ['locale' => 'en']))->shortLocale());
@@ -48,7 +49,7 @@ class SiteTest extends TestCase
         $this->assertEquals('en', (new Site('en', ['locale' => 'en-US']))->shortLocale());
     }
 
-    /** @test */
+    #[Test]
     public function gets_lang()
     {
         $this->assertEquals('en', (new Site('en', ['locale' => 'en_US']))->lang());
@@ -58,7 +59,7 @@ class SiteTest extends TestCase
         $this->assertEquals('en-US', (new Site('en', ['locale' => 'en-US', 'lang' => 'en-US']))->lang());
     }
 
-    /** @test */
+    #[Test]
     public function gets_url_when_given_a_trailing_slash()
     {
         $site = new Site('en', ['url' => 'http://test.com/']);
@@ -66,7 +67,7 @@ class SiteTest extends TestCase
         $this->assertEquals('http://test.com', $site->url());
     }
 
-    /** @test */
+    #[Test]
     public function gets_url_when_not_given_a_trailing_slash()
     {
         $site = new Site('en', ['url' => 'http://test.com']);
@@ -74,7 +75,7 @@ class SiteTest extends TestCase
         $this->assertEquals('http://test.com', $site->url());
     }
 
-    /** @test */
+    #[Test]
     public function gets_url_given_a_relative_url()
     {
         $site = new Site('en', ['url' => '/']);
@@ -82,7 +83,7 @@ class SiteTest extends TestCase
         $this->assertEquals('/', $site->url());
     }
 
-    /** @test */
+    #[Test]
     public function gets_url_given_a_relative_url_and_subdirectory()
     {
         $site = new Site('en', ['url' => '/sub']);
@@ -90,7 +91,7 @@ class SiteTest extends TestCase
         $this->assertEquals('/sub', $site->url());
     }
 
-    /** @test */
+    #[Test]
     public function gets_url_given_a_relative_url_and_subdirectory_with_trailing_slash()
     {
         $site = new Site('en', ['url' => '/sub/']);
@@ -98,7 +99,7 @@ class SiteTest extends TestCase
         $this->assertEquals('/sub', $site->url());
     }
 
-    /** @test */
+    #[Test]
     public function gets_absolute_url()
     {
         $this->assertEquals(
@@ -144,7 +145,7 @@ class SiteTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_path()
     {
         tap(new Site('en', ['url' => 'http://test.com/']), function ($site) {
@@ -229,7 +230,7 @@ class SiteTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_is_augmentable()
     {
         $site = new Site('test', [
@@ -262,7 +263,7 @@ class SiteTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         $site = new Site('test', [
@@ -276,7 +277,7 @@ class SiteTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $site->{$key}));
     }
 
-    /** @test */
+    #[Test]
     public function it_casts_the_handle_to_a_string()
     {
         $site = new Site('test', []);
@@ -285,7 +286,7 @@ class SiteTest extends TestCase
         $this->assertEquals('test', Antlers::parse('{{ site }}', ['site' => $site]));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_direction()
     {
         $this->assertEquals('ltr', (new Site('irrelevant', ['locale' => 'en']))->direction());
@@ -297,11 +298,37 @@ class SiteTest extends TestCase
         $this->assertEquals('rtl', (new Site('irrelevant', ['locale' => 'ar_IRRELEVANT']))->direction());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_direction_from_custom_lang()
     {
         $site = new Site('reverse_elvish', ['locale' => 'en_US', 'lang' => 'ar']); // ar should be rtl lang
 
         $this->assertEquals('rtl', $site->direction());
+    }
+
+    #[Test]
+    public function it_gets_attributes()
+    {
+        $this->assertEquals([], (new Site('test', []))->attributes());
+
+        $site = new Site('test', ['attributes' => [
+            'alfa' => 'bravo',
+            'charlie' => [
+                'delta' => 'echo',
+            ],
+        ]]);
+
+        $this->assertEquals([
+            'alfa' => 'bravo',
+            'charlie' => [
+                'delta' => 'echo',
+            ],
+        ], $site->attributes());
+
+        $this->assertEquals('bravo', $site->attribute('alfa'));
+        $this->assertEquals(['delta' => 'echo'], $site->attribute('charlie'));
+        $this->assertEquals('echo', $site->attribute('charlie.delta'));
+        $this->assertNull($site->attribute('unknown'));
+        $this->assertNull($site->attribute('charlie.unknown'));
     }
 }

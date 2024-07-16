@@ -2,6 +2,7 @@
 
 namespace Tests\Search;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\Search\Comb\Index as CombIndex;
 use Statamic\Search\IndexManager;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class IndexManagerTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_indexes()
     {
         $this->setSites([

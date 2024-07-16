@@ -79,6 +79,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: fileinfo, exif, gd, pdo, sqlite, pdo_sqlite
+          ini-values: short_open_tag=on
           coverage: none
 
       - name: Install dependencies

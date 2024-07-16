@@ -2,6 +2,7 @@
 
 namespace Tests\View\Antlers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\View\View;
 use Tests\TestCase;
 
@@ -16,7 +17,7 @@ class BladeLayoutTest extends TestCase
         $app['config']->set('view.paths', $currentViews);
     }
 
-    /** @test */
+    #[Test]
     public function no_parse_extractions_are_replaced_when_extending_a_blade_layout()
     {
         $view = (new View)

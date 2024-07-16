@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -17,11 +19,8 @@ class ExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider filenamesProvider
-     */
+    #[Test]
+    #[DataProvider('filenamesProvider')]
     public function it_returns_the_extension_of_filename($expected, $input): void
     {
         $modified = $this->modify($input);

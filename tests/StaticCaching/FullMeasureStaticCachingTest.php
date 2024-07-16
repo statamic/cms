@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\NoCache\Session;
@@ -34,7 +35,7 @@ class FullMeasureStaticCachingTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_keep_parts_dynamic_using_nocache_tags()
     {
         // Use a tag that outputs something dynamic.
@@ -85,7 +86,7 @@ class FullMeasureStaticCachingTest extends TestCase
         ]), file_get_contents($this->dir.'/about_.html'));
     }
 
-    /** @test */
+    #[Test]
     public function javascript_doesnt_get_output_if_there_are_no_nocache_tags()
     {
         // Use a tag that outputs something dynamic.
@@ -130,7 +131,7 @@ class FullMeasureStaticCachingTest extends TestCase
         $this->assertEquals('<html><body>1</body></html>', file_get_contents($this->dir.'/about_.html'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_add_the_javascript_if_there_is_a_csrf_token()
     {
         $this->withFakeViews();

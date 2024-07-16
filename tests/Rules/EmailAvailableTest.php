@@ -2,6 +2,7 @@
 
 namespace Tests\Rules;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Statamic\Rules\EmailAvailable;
 use Tests\TestCase;
@@ -26,7 +27,7 @@ class EmailAvailableTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_handles()
     {
         $this->assertPasses('gandalf@lotr.com');
@@ -36,7 +37,7 @@ class EmailAvailableTest extends TestCase
         $this->assertFails('frodo@lotr.com');
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_helpful_validation_error()
     {
         $this->assertValidationErrorOutput(trans('statamic::validation.email_available'), 'frodo@lotr.com');
