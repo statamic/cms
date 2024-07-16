@@ -3,7 +3,6 @@
 namespace Statamic\Search;
 
 use Statamic\Contracts\Search\Searchable;
-use Statamic\Events\SearchIndexUpdated;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -60,8 +59,6 @@ abstract class Index
         $this->deleteIndex();
 
         $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
-
-        SearchIndexUpdated::dispatch($this);
 
         return $this;
     }
