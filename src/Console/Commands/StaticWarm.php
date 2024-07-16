@@ -55,8 +55,7 @@ class StaticWarm extends Command
         }
 
         $this->shouldQueue = (bool) $this->option('queue');
-        $this->queueConnection = $this->option('connection') ??
-            (config('statamic.static_caching.queue_connection') ?? config('queue.default'));
+        $this->queueConnection = $this->option('connection') ?? config('statamic.static_caching.queue_connection') ?? config('queue.default');
 
         if ($this->shouldQueue && $this->queueConnection === 'sync') {
             $this->components->error('The queue connection is set to "sync". Queueing will be disabled.');
