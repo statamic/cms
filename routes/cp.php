@@ -101,14 +101,17 @@ use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
 
 Route::group(['prefix' => 'auth'], function () {
-    Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [LoginController::class, 'login']);
-    Route::get('logout', [LoginController::class, 'logout'])->name('logout');
+    if (config('statamic.cp.auth.enabled', true)) {
+        Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+        Route::post('login', [LoginController::class, 'login']);
 
-    Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-    Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+        Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+        Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+        Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+    }
+
+    Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('token', CsrfTokenController::class)->name('token');
     Route::get('extend', ExtendSessionController::class)->name('extend');
@@ -162,6 +165,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::resource('revisions', EntryRevisionsController::class, [
                 'as' => 'collections.entries',
                 'only' => ['index', 'store', 'show'],
+            ])->names([
+                'index' => 'collections.entries.revisions.index',
+                'store' => 'collections.entries.revisions.store',
+                'show' => 'collections.entries.revisions.show',
             ]);
 
             Route::post('restore-revision', RestoreEntryRevisionController::class)->name('collections.entries.restore-revision');

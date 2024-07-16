@@ -71,7 +71,7 @@ class Nav extends Structure implements Contract
             ->getter(function ($collections) {
                 return collect($collections)->map(function ($collection) {
                     return Collection::findByHandle($collection);
-                });
+                })->filter();
             })
             ->args(func_get_args());
     }

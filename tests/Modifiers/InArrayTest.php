@@ -2,15 +2,15 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class InArrayTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_checks_if_an_array_contains_a_specific_value(): void
     {
         $input = [

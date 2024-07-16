@@ -4,7 +4,10 @@
 
 Statamic is the flat-first, Laravel + Git powered CMS designed for building beautiful, easy to manage websites.
 
-> **Note:** This repository contains the code for the core CMS package. To start your own website project with Statamic, visit the [Statamic application repository][app-repo].
+> [!NOTE]
+> This repository contains the code for the core Statamic Composer package, to be installed into an existing Laravel application. 
+> 
+> The [application repository][app-repo] is where you can find a Laravel application preconfigured with Statamic, which is used when creating a new project via the Statamic CLI tool.
 
 ## Learning Statamic
 

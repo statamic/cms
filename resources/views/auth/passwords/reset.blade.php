@@ -4,49 +4,53 @@
 
 @section('content')
 
-    <h1 class="mb-6 pt-20 text-center text-gray-800">{{ $title }}</h1>
 
-    <div class="card auth-card mx-auto">
+    <h1 class="mb-6 pt-20 text-center text-gray-800 dark:text-white/80">{{ $title }}</h1>
 
-        <form method="POST" action="{{ $action }}">
-            @csrf
+    <div class="max-w-xs rounded shadow-lg flex items-center justify-center relative mx-auto">
+        <div class="outside-shadow absolute inset-0"></div>
+        <div class="card auth-card">
 
-            <input type="hidden" name="token" value="{{ $token }}">
 
-            @if (request('redirect'))
-                <input type="hidden" name="redirect" value="{{ request('redirect') }}">
-            @endif
+            <form method="POST" action="{{ $action }}">
+                @csrf
 
-            <div class="mb-8">
-                <label for="email"  class="mb-2">{{ __('Email Address') }}</label>
+                <input type="hidden" name="token" value="{{ $token }}">
 
-                <input id="email" type="email" class="input-text input-text" name="email" value="{{ $email ?? old('email') }}" autofocus required>
+                @if (request('redirect'))
+                    <input type="hidden" name="redirect" value="{{ request('redirect') }}">
+                @endif
 
-                @error('email')
-                    <div class="text-red-500 text-xs mt-2">{{ $message }}</div>
-                @enderror
-            </div>
+                <div class="mb-8">
+                    <label for="email"  class="mb-2">{{ __('Email Address') }}</label>
 
-            <div class="mb-8">
-                <label for="password" class="mb-2">{{ __('Password') }}</label>
+                    <input id="email" type="email" class="input-text input-text" name="email" value="{{ $email ?? old('email') }}" autofocus required>
 
-                <input id="password" type="password" class="input-text input-text" name="password" required>
+                    @error('email')
+                        <div class="text-red-500 text-xs mt-2">{{ $message }}</div>
+                    @enderror
+                </div>
 
-                @error('password')
-                    <div class="text-red-500 text-xs mt-2">{{ $message }}</div>
-                @enderror
-            </div>
+                <div class="mb-8">
+                    <label for="password" class="mb-2">{{ __('Password') }}</label>
 
-            <div class="mb-8">
-                <label for="password-confirm" class="mb-2">{{ __('Confirm Password') }}</label>
+                    <input id="password" type="password" class="input-text input-text" name="password" required>
 
-                <input id="password-confirm" type="password" class="input-text input-text" name="password_confirmation" required>
-            </div>
+                    @error('password')
+                        <div class="text-red-500 text-xs mt-2">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            <button type="submit" class="btn-primary">{{ $title }}</button>
+                <div class="mb-8">
+                    <label for="password-confirm" class="mb-2">{{ __('Confirm Password') }}</label>
 
-        </form>
+                    <input id="password-confirm" type="password" class="input-text input-text" name="password_confirmation" required>
+                </div>
 
+                <button type="submit" class="btn-primary">{{ $title }}</button>
+
+            </form>
+        </div>
     </div>
 
 @endsection

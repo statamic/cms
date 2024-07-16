@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class ShrugTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_shruggs(): void
     {
         $modified = $this->modify('');

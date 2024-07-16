@@ -1,8 +1,8 @@
 <template>
 
-    <div class="bg-white h-full flex flex-col">
+    <div class="bg-white dark:bg-dark-800 h-full flex flex-col">
 
-        <div class="bg-gray-200 px-4 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
+        <div class="bg-gray-200 dark:bg-dark-600 px-4 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
             {{ __('Revision History') }}
             <button
                 type="button"
@@ -17,7 +17,7 @@
                 <loading-graphic />
             </div>
 
-            <div v-if="!loading && revisions.length === 0" class="p-4 text-gray text-sm">
+            <div v-if="!loading && revisions.length === 0" class="p-4 text-gray dark:text-dark-150 text-sm">
                 {{ __('No revisions') }}
             </div>
 
@@ -36,6 +36,7 @@
                         :revision="revision"
                         :restore-url="restoreUrl"
                         :reference="reference"
+                        :can-restore-revisions="canRestoreRevisions"
                         @working-copy-selected="close"
                     />
                 </div>
@@ -60,6 +61,7 @@ export default {
         indexUrl: String,
         restoreUrl: String,
         reference: String,
+        canRestoreRevisions: Boolean,
     },
 
     data() {

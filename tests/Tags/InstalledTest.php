@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
 use Tests\TestCase;
@@ -20,14 +21,14 @@ class InstalledTest extends TestCase
         return (string) Parse::template($tag, $data);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_package_is_installed_using_if_conditional()
     {
         $this->assertEquals('yes', $this->tag('{{ if {installed:hasselhoff/baywatch-embeds} }}yes{{ else }}no{{ /if }}'));
         $this->assertEquals('no', $this->tag('{{ if {installed:hasselhoff/lotr-embeds} }}yes{{ else }}no{{ /if }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_package_is_installed_using_tag_pair()
     {
         $this->assertEquals('yes', $this->tag('{{ installed:hasselhoff/baywatch-embeds }}yes{{ /installed:hasselhoff/baywatch-embeds }}'));

@@ -5,6 +5,8 @@ namespace Tests\Tokens;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\Token as Tokens;
 use Statamic\Http\Middleware\HandleToken;
@@ -21,11 +23,8 @@ class HandleTokenMiddlewareTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider validTokenProvider
-     **/
+    #[Test]
+    #[DataProvider('validTokenProvider')]
     public function it_should_handle_valid_tokens($paramToken, $headerToken)
     {
         $request = $this->request($paramToken, $headerToken);
@@ -54,11 +53,8 @@ class HandleTokenMiddlewareTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider invalidTokenProvider
-     **/
+    #[Test]
+    #[DataProvider('invalidTokenProvider')]
     public function it_should_not_handle_invalid_tokens($paramToken, $headerToken)
     {
         Tokens::shouldReceive('find')->with('invalid-token')->once()->andReturnNull();
@@ -81,7 +77,7 @@ class HandleTokenMiddlewareTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_should_not_handle_missing_tokens()
     {
         Tokens::shouldReceive('find')->never()->andReturnNull();

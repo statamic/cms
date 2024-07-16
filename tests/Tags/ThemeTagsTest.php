@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Path;
@@ -163,7 +164,7 @@ class ThemeTagsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_versioned_filename_for_mix()
     {
         File::shouldReceive('get')
@@ -176,7 +177,7 @@ class ThemeTagsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_versioned_filename_for_elixir()
     {
         File::shouldReceive('get')
@@ -193,7 +194,7 @@ class ThemeTagsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_regular_filename_if_file_isnt_in_mix_manifest()
     {
         File::shouldReceive('get')
@@ -206,7 +207,7 @@ class ThemeTagsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_regular_filename_if_file_isnt_in_elixir_manifest()
     {
         File::shouldReceive('get')
@@ -223,7 +224,7 @@ class ThemeTagsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_regular_filename_if_manifests_dont_exist()
     {
         File::shouldReceive('get')
