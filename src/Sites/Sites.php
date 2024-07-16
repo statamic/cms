@@ -127,17 +127,20 @@ class Sites
 
     protected function getSavedSites()
     {
-        $default = [
+        return File::exists($sitesPath = $this->path())
+            ? YAML::file($sitesPath)->parse()
+            : $this->getDefaultSite();
+    }
+
+    protected function getDefaultSite()
+    {
+        return [
             'default' => [
                 'name' => '{{ config:app:name }}',
                 'url' => '/',
                 'locale' => 'en_US',
             ],
         ];
-
-        return File::exists($sitesPath = $this->path())
-            ? YAML::file($sitesPath)->parse()
-            : $default;
     }
 
     public function save()
@@ -146,8 +149,7 @@ class Sites
         $newSites = $this->getNewSites();
         $deletedSites = $this->getDeletedSites();
 
-        // Save to file
-        File::put($this->path(), YAML::dump($this->config()));
+        $this->saveToStore();
 
         // Dispatch our tracked `SiteCreated` and `SiteDeleted` events
         $newSites->each(fn ($site) => SiteCreated::dispatch($site));
@@ -155,6 +157,12 @@ class Sites
 
         // Dispatch `SiteSaved` events
         $this->sites->each(fn ($site) => SiteSaved::dispatch($site));
+    }
+
+    protected function saveToStore()
+    {
+        // Save to file
+        File::put($this->path(), YAML::dump($this->config()));
     }
 
     public function blueprint()
