@@ -62,7 +62,7 @@ class ButtonGroupTest extends TestCase
         $this->assertEquals($values, $fields->validate());
     }
 
-    /** @test */
+    #[Test]
     public function does_not_throw_a_validation_error_when_label_is_missing_from_option()
     {
         $fieldtype = FieldtypeRepository::find('button_group');
