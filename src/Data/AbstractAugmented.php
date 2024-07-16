@@ -115,7 +115,7 @@ abstract class AbstractAugmented implements Augmented
         return $value;
     }
 
-    private function wrapDeferredValue($handle)
+    protected function wrapDeferredValue($handle)
     {
         return new Value(
             fn () => $this->getFromData($handle),
@@ -125,7 +125,7 @@ abstract class AbstractAugmented implements Augmented
         );
     }
 
-    private function wrapAugmentedMethodInvokable(string $method, string $handle)
+    protected function wrapAugmentedMethodInvokable(string $method, string $handle)
     {
         return new Value(
             fn () => $this->$method(),
@@ -135,7 +135,7 @@ abstract class AbstractAugmented implements Augmented
         );
     }
 
-    private function wrapDataMethodInvokable(string $method, string $handle)
+    protected function wrapDataMethodInvokable(string $method, string $handle)
     {
         return new Value(
             fn () => $this->data->$method(),
