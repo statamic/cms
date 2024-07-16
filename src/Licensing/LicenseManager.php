@@ -4,7 +4,7 @@ namespace Statamic\Licensing;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\MessageBag;
-use Statamic\Events\LicensesSynced;
+use Statamic\Events\LicensesRefreshed;
 use Statamic\Support\Arr;
 
 class LicenseManager
@@ -118,7 +118,7 @@ class LicenseManager
     {
         $this->outpost->clearCachedResponse();
 
-        LicensesSynced::dispatch();
+        LicensesRefreshed::dispatch();
     }
 
     public function usingLicenseKeyFile()

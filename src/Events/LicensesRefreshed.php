@@ -2,6 +2,6 @@
 
 namespace Statamic\Events;
 
-class LicensesSynced extends Event
+class LicensesRefreshed extends Event
 {
 }

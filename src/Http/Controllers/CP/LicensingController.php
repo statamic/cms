@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\Events\LicensesSynced;
 use Statamic\Licensing\LicenseManager as Licenses;
 
 class LicensingController extends CpController
