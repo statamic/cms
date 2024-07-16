@@ -33,7 +33,6 @@ class StaticWarm extends Command
 
     protected $signature = 'statamic:static:warm
         {--queue= : Queue the requests}
-        {--connection= : Specify the connection name for the queue, i.e. redis }
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
         {--insecure : Skip SSL verification}
@@ -55,7 +54,7 @@ class StaticWarm extends Command
         }
 
         $this->shouldQueue = (bool) $this->option('queue');
-        $this->queueConnection = $this->option('connection') ?? config('statamic.static_caching.queue_connection') ?? config('queue.default');
+        $this->queueConnection = config('statamic.static_caching.queue_connection') ?? config('queue.default');
 
         if ($this->shouldQueue && $this->queueConnection === 'sync') {
             $this->components->error('The queue connection is set to "sync". Queueing will be disabled.');
