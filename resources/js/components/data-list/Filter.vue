@@ -63,7 +63,7 @@ export default {
             let filteredValues = clone(values);
 
             Object.keys(values).forEach(key => {
-                if (_.isEmpty(values[key])) delete filteredValues[key];
+                if (values[key] === null || values[key] === undefined) delete filteredValues[key];
             });
 
             this.$emit('changed', filteredValues);

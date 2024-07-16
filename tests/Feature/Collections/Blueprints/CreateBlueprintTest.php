@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Collections\Blueprints;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Tests\FakesRoles;
@@ -13,7 +14,7 @@ class CreateBlueprintTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_the_form()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
@@ -27,7 +28,7 @@ class CreateBlueprintTest extends TestCase
             ->assertViewIs('statamic::collections.blueprints.create');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

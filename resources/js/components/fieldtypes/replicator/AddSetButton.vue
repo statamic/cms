@@ -9,7 +9,7 @@
                         class="btn-round flex items-center justify-center"
                         :class="{
                             'h-5 w-5': ! last,
-                            'mr-2': label.length > 0,
+                            'mr-2': label?.length > 0,
                         }"
                         @click="addSetButtonClicked"
                     >
@@ -19,7 +19,7 @@
                                 'w-2 h-2 text-gray-700 dark:text-dark-200 group-hover:text-black dark:group-hover:dark-text-100 transition duration-150': !last
                             }" />
                     </button>
-                    <span class="text-sm dark:text-dark-175">{{ label }}</span>
+                    <span class="text-sm dark:text-dark-175">{{ __(label) }}</span>
                 </div>
             </template>
         </set-picker>

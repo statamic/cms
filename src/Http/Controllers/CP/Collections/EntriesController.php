@@ -211,7 +211,12 @@ class EntriesController extends CpController
         $values = $values->except(['slug', 'published']);
 
         if ($entry->collection()->dated()) {
-            $entry->date($entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date')));
+            $date = $entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date'));
+            if ($entry->hasOrigin()) {
+                $entry->date(in_array('date', $request->input('_localized')) ? $date : null);
+            } else {
+                $entry->date($date);
+            }
         }
 
         if ($entry->hasOrigin()) {

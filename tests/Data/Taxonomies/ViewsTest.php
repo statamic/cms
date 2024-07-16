@@ -3,6 +3,7 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -44,13 +45,13 @@ class ViewsTest extends TestCase
         })->save();
     }
 
-    /** @test */
+    #[Test]
     public function the_taxonomy_url_404s_if_the_view_doesnt_exist()
     {
         $this->get('/tags')->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_the_taxonomy_url_if_the_view_exists()
     {
         $this->viewShouldReturnRaw('tags.index', '{{ title }} index');
@@ -58,13 +59,13 @@ class ViewsTest extends TestCase
         $this->get('/tags')->assertOk()->assertSee('Tags index');
     }
 
-    /** @test */
+    #[Test]
     public function the_term_url_404s_if_the_view_doesnt_exist()
     {
         $this->get('/tags/test')->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_the_term_url_if_the_view_exists()
     {
         $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
@@ -72,7 +73,7 @@ class ViewsTest extends TestCase
         $this->get('/tags/test')->assertOk()->assertSeeText('showing Test');
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_the_localized_term_url_if_the_view_exists()
     {
         $this->viewShouldReturnRaw('tags.show', 'showing {{ title }}');
@@ -80,7 +81,7 @@ class ViewsTest extends TestCase
         $this->get('/fr/tags/le-test')->assertOk()->assertSee('showing Le Test');
     }
 
-    /** @test */
+    #[Test]
     public function the_collection_specific_taxonomy_url_404s_if_the_view_doesnt_exist()
     {
         $this->mountBlogPageToBlogCollection();
@@ -88,7 +89,7 @@ class ViewsTest extends TestCase
         $this->get('/the-blog/tags/test')->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_the_collection_specific_taxonomy_url_if_the_view_exists()
     {
         $this->mountBlogPageToBlogCollection();
@@ -98,7 +99,7 @@ class ViewsTest extends TestCase
         $this->get('/the-blog/tags')->assertOk()->assertSee('Tags index');
     }
 
-    /** @test */
+    #[Test]
     public function the_collection_specific_term_url_404s_if_the_view_doesnt_exist()
     {
         $this->mountBlogPageToBlogCollection();
@@ -106,7 +107,7 @@ class ViewsTest extends TestCase
         $this->get('/the-blog/tags/test')->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_the_collection_specific_term_url_if_the_view_exists()
     {
         $this->mountBlogPageToBlogCollection();
@@ -116,7 +117,7 @@ class ViewsTest extends TestCase
         $this->get('/the-blog/tags/test')->assertOk()->assertSee('showing Test');
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_the_localized_collection_specific_taxonomy_url_if_the_view_exists()
     {
         $this->mountBlogPageToBlogCollection();
@@ -126,7 +127,7 @@ class ViewsTest extends TestCase
         $this->get('/fr/le-blog/tags')->assertOk()->assertSee('Tags index');
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_the_localized_collection_specific_term_url_if_the_view_exists()
     {
         $this->mountBlogPageToBlogCollection();
@@ -136,13 +137,13 @@ class ViewsTest extends TestCase
         $this->get('/fr/le-blog/tags/le-test')->assertOk()->assertSee('showing Le Test');
     }
 
-    /** @test */
+    #[Test]
     public function the_unmounted_collection_specific_taxonomy_url_404s_if_the_view_doesnt_exist()
     {
         $this->get('/blog/tags/test')->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_the_unmounted_collection_specific_taxonomy_url_if_the_view_exists()
     {
         $this->viewShouldReturnRaw('blog.tags.index', '{{ title }} index');
@@ -150,13 +151,13 @@ class ViewsTest extends TestCase
         $this->get('/blog/tags')->assertOk()->assertSee('Tags index');
     }
 
-    /** @test */
+    #[Test]
     public function the_unmounted_collection_specific_term_url_404s_if_the_view_doesnt_exist()
     {
         $this->get('/blog/tags/test')->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_the_unmounted_collection_specific_term_url_if_the_view_exists()
     {
         $this->viewShouldReturnRaw('blog.tags.show', 'showing {{ title }}');

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Navigation;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -11,7 +12,7 @@ class ViewNavigationListingTest extends TestCase
     use MocksStructures;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_a_list_of_nav_structures()
     {
         Facades\Nav::shouldReceive('all')->andReturn(collect([
@@ -31,7 +32,7 @@ class ViewNavigationListingTest extends TestCase
             ->assertDontSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_no_results_when_there_are_no_structures()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
@@ -44,7 +45,7 @@ class ViewNavigationListingTest extends TestCase
             ->assertSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_structures_the_user_cannot_access()
     {
         Facades\Nav::shouldReceive('all')->andReturn(collect([
@@ -64,7 +65,7 @@ class ViewNavigationListingTest extends TestCase
             ->assertDontSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_filter_out_structures_if_they_have_permission_to_configure()
     {
         Facades\Nav::shouldReceive('all')->andReturn(collect([
@@ -84,7 +85,7 @@ class ViewNavigationListingTest extends TestCase
             ->assertDontSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_when_there_are_no_permitted_structures()
     {
         Facades\Structure::shouldReceive('all')->andReturn(collect([
@@ -102,7 +103,7 @@ class ViewNavigationListingTest extends TestCase
             ->assertRedirect('/cp/original');
     }
 
-    /** @test */
+    #[Test]
     public function create_structure_button_is_visible_with_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure navs']]);
@@ -114,7 +115,7 @@ class ViewNavigationListingTest extends TestCase
             ->assertSee('Create Navigation');
     }
 
-    /** @test */
+    #[Test]
     public function create_structure_button_is_not_visible_without_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -126,7 +127,7 @@ class ViewNavigationListingTest extends TestCase
             ->assertDontSee('Create Navigation');
     }
 
-    /** @test */
+    #[Test]
     public function delete_button_is_visible_with_permission_to_configure()
     {
         Facades\Structure::shouldReceive('all')->andReturn(collect([
@@ -142,7 +143,7 @@ class ViewNavigationListingTest extends TestCase
             ->assertSee('Delete');
     }
 
-    /** @test */
+    #[Test]
     public function delete_button_is_not_visible_without_permission_to_configure()
     {
         $this->markTestIncomplete();

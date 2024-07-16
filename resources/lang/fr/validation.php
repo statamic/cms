@@ -135,7 +135,7 @@ return [
     'duplicate_field_handle' => 'Le champ avec l’identifiant :handle ne peut pas être utilisé plus d’une fois.',
     'duplicate_uri' => 'URI en doublon :value',
     'email_available' => 'Un utilisateur possédant cet email existe déjà.',
-    'fieldset_imported_recursively' => 'Le Fieldset :handle est importé de manière récursive.',
+    'fieldset_imported_recursively' => 'Le jeu de champs :handle est importé de manière récursive.',
     'one_site_without_origin' => 'Au moins un site ne doit pas avoir d’origine.',
     'options_require_keys' => 'Toutes les options doivent posséder une clef.',
     'origin_cannot_be_disabled' => 'Impossible de sélectionner une origine désactivée.',

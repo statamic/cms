@@ -3,11 +3,13 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Nav;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class NavsTest extends TestCase
 {
     use EnablesQueries;
@@ -15,7 +17,7 @@ class NavsTest extends TestCase
 
     protected $enabledQueries = ['navs'];
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'navs')->andReturnFalse()->once();
@@ -28,7 +30,7 @@ class NavsTest extends TestCase
             ->assertSee('Cannot query field \"navs\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_navs()
     {
         Nav::make('links')->title('Links')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
@@ -63,7 +65,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_only_allowed_sub_resources()
     {
         Nav::make('links')->title('Links')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {

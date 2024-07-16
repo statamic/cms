@@ -515,4 +515,22 @@ abstract class EloquentQueryBuilder implements Builder
             $this->orderBy($this->builder->getModel()->getQualifiedKeyName(), 'asc');
         }
     }
+
+    public function __serialize(): array
+    {
+        $this->builder->getQuery()->connection = null;
+        $this->builder->getQuery()->grammar = null;
+
+        return get_object_vars($this);
+    }
+
+    public function __unserialize($data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->$key = $value;
+        }
+
+        $this->builder->getQuery()->connection = $this->builder->getModel()->getConnection();
+        $this->builder->getQuery()->grammar = $this->builder->getQuery()->connection->getQueryGrammar();
+    }
 }
