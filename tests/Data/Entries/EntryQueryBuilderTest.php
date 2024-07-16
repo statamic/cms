@@ -901,7 +901,7 @@ class EntryQueryBuilderTest extends TestCase
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_found_using_first_or_fail()
     {
         Collection::make('posts')->save();
@@ -915,7 +915,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame($entry, $firstOrFail);
     }
 
-    /** @test */
+    #[Test]
     public function exception_is_thrown_when_entry_does_not_exist_using_first_or_fail()
     {
         $this->expectException(ItemNotFoundException::class);
@@ -926,7 +926,7 @@ class EntryQueryBuilderTest extends TestCase
             ->firstOrFail();
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_found_using_first_or()
     {
         Collection::make('posts')->save();
@@ -942,7 +942,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame($entry, $firstOrFail);
     }
 
-    /** @test */
+    #[Test]
     public function callback_is_called_when_entry_does_not_exist_using_first_or()
     {
         $firstOrFail = Entry::query()
@@ -955,7 +955,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame('fallback', $firstOrFail);
     }
 
-    /** @test */
+    #[Test]
     public function sole_entry_is_returned()
     {
         Collection::make('posts')->save();
@@ -969,7 +969,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame($entry, $sole);
     }
 
-    /** @test */
+    #[Test]
     public function exception_is_thrown_by_sole_when_multiple_entries_are_returned_from_query()
     {
         Collection::make('posts')->save();
@@ -983,7 +983,7 @@ class EntryQueryBuilderTest extends TestCase
             ->sole();
     }
 
-    /** @test */
+    #[Test]
     public function exception_is_thrown_by_sole_when_no_entries_are_returned_from_query()
     {
         $this->expectException(RecordsNotFoundException::class);
@@ -993,7 +993,7 @@ class EntryQueryBuilderTest extends TestCase
             ->sole();
     }
 
-    /** @test */
+    #[Test]
     public function exists_returns_true_when_results_are_found()
     {
         $this->createDummyCollectionAndEntries();
@@ -1001,7 +1001,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertTrue(Entry::query()->exists());
     }
 
-    /** @test */
+    #[Test]
     public function exists_returns_false_when_no_results_are_found()
     {
         $this->assertFalse(Entry::query()->exists());
