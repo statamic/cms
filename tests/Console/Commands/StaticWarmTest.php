@@ -74,10 +74,16 @@ class StaticWarmTest extends TestCase
     }
 
     #[Test, DataProvider('queueConnectionsProvider')]
-    public function it_queues_the_requests_with_appropriate_connection($configuredConnection, $defaultConnection, $expectedJobConnection)
-    {
+    public function it_queues_the_requests_with_appropriate_queue_and_connection(
+        $configuredQueue,
+        $configuredConnection,
+        $defaultConnection,
+        $expectedJobQueue,
+        $expectedJobConnection
+    ) {
         config([
             'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.warm_queue' => $configuredQueue,
             'statamic.static_caching.warm_queue_connection' => $configuredConnection,
             'queue.default' => $defaultConnection,
         ]);
@@ -88,14 +94,16 @@ class StaticWarmTest extends TestCase
             ->expectsOutputToContain('Adding 2 requests')
             ->assertExitCode(0);
 
-        Queue::assertPushed(StaticWarmJob::class, fn ($job) => $job->connection === $expectedJobConnection);
+        Queue::assertPushed(StaticWarmJob::class, fn ($job) => $job->connection === $expectedJobConnection && $job->queue === $expectedJobQueue);
     }
 
     public static function queueConnectionsProvider()
     {
         return [
-            [null, 'redis', 'redis'],
-            ['sqs', 'redis', 'sqs'],
+            [null, null, 'redis', null, 'redis'],
+            ['warm', null, 'redis', 'warm', 'redis'],
+            [null, 'sqs', 'redis', null, 'sqs'],
+            ['warm', 'sqs', 'redis', 'warm', 'sqs'],
         ];
     }
 
