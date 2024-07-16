@@ -6,6 +6,7 @@ use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
 use Algolia\AlgoliaSearch\SearchClient;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Arr;
+use Statamic\Events\SearchIndexUpdated;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\IndexNotFoundException;
@@ -62,6 +63,8 @@ class Index extends BaseIndex
         }
 
         $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
+
+        SearchIndexUpdated::dispatch($this);
 
         return $this;
     }
