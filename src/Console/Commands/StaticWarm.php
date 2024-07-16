@@ -124,21 +124,16 @@ class StaticWarm extends Command
         $promise->wait();
     }
 
-    private function client(): Client
-    {
-        return new Client([
-            'verify' => $this->shouldVerifySsl(),
-            'auth' => $this->option('user') && $this->option('password')
-                ? [$this->option('user'), $this->option('password')]
-                : null,
-        ]);
-    }
-
     private function concurrency(): int
     {
         $strategy = config('statamic.static_caching.strategy');
 
         return config("statamic.static_caching.strategies.$strategy.warm_concurrency", 25);
+    }
+
+    private function client(): Client
+    {
+        return new Client($this->clientConfig());
     }
 
     private function clientConfig(): array
