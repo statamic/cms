@@ -32,7 +32,7 @@ class StaticWarm extends Command
     use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
-        {--queue= : Queue the requests}
+        {--queue : Queue the requests}
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
         {--insecure : Skip SSL verification}
@@ -53,7 +53,7 @@ class StaticWarm extends Command
             return 1;
         }
 
-        $this->shouldQueue = (bool) $this->option('queue');
+        $this->shouldQueue = $this->option('queue');
         $this->queueConnection = config('statamic.static_caching.warm_queue_connection') ?? config('queue.default');
 
         if ($this->shouldQueue && $this->queueConnection === 'sync') {
