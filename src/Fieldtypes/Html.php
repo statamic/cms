@@ -20,6 +20,7 @@ class Html extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.html.config.html_instruct'),
                         'type' => 'code',
                         'mode' => 'htmlmixed',
+                        'mode_selectable' => false,
                     ],
                 ],
             ],

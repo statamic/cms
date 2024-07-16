@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Revisions\WorkingCopy;
 
@@ -10,6 +11,10 @@ class RestoreEntryRevisionController extends CpController
 {
     public function __invoke(Request $request, $collection, $entry)
     {
+        if (User::current()->cant('edit', $entry)) {
+            abort(403);
+        }
+
         if (! $target = $entry->revision($request->revision)) {
             dd('no such revision', $request->revision);
             // todo: handle invalid revision reference

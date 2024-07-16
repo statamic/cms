@@ -6,7 +6,7 @@
 
         <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true">
             <div class="-max-h-screen-px">
-            <div class="flex items-center p-6 bg-gray-200 border-b text-center">
+            <div class="flex items-center p-6 bg-gray-200 dark:bg-dark-700 border-b dark:border-dark-900 text-center">
                 {{ __('Resume Your Session') }}
             </div>
 
@@ -59,7 +59,8 @@ export default {
         warnAt: Number,
         lifetime: Number,
         email: String,
-        oauthProvider: String
+        oauthProvider: String,
+        auth: Object,
     },
 
     data() {
@@ -102,7 +103,7 @@ export default {
     watch: {
 
         count(count) {
-            this.isShowingLogin = this.remaining <= 0;
+            this.isShowingLogin = this.auth.enabled && this.remaining <= 0;
 
             // While we're in the warning period, we'll check every second so that any
             // activity in another tab is picked up and the count will get restarted.
@@ -145,7 +146,10 @@ export default {
             return this.$axios.get(cp_url('session-timeout')).then(response => {
                 this.count = this.remaining = response.data;
             }).catch(e => {
-                if (e.response.status === 401) this.remaining = 0;
+                if (e.response.status === 401) {
+                    this.remaining = 0;
+                    if (!this.auth.enabled) window.location = this.auth.redirect_to || '/';
+                }
                 throw e;
             }).finally(response => {
                 this.pinging = false;

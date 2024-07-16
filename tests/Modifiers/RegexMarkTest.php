@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class RegexMarkTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_marks_with_regex()
     {
         $value = 'Lorem, ipsum dolor sit amet';

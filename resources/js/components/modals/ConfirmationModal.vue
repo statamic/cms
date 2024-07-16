@@ -1,10 +1,10 @@
 <template>
     <modal name="confirmation-modal" @opened="$emit('opened')">
         <div class="confirmation-modal flex flex-col h-full">
-            <header v-if="title" class="text-lg font-semibold px-5 py-3 bg-gray-200 rounded-t-lg flex items-center justify-between border-b">
+            <header v-if="title" class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
                 {{ __(title) }}
             </header>
-            <div class="flex-1 px-5 py-6 text-gray">
+            <div class="flex-1 px-5 py-6 text-gray dark:text-dark-150">
                 <slot name="body">
                     <p v-if="bodyText" v-text="bodyText" />
                     <slot v-else>
@@ -12,8 +12,8 @@
                     </slot>
                 </slot>
             </div>
-            <div class="px-5 py-3 bg-gray-200 rounded-b-lg border-t flex items-center justify-end text-sm">
-                <button class="text-gray hover:text-gray-900" @click="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" />
+            <div class="px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-b-lg border-t dark:border-dark-900 flex items-center justify-end text-sm">
+                <button class="text-gray dark:text-dark-150 hover:text-gray-900 dark:hover:text-dark-100" @click="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" />
                 <button class="rtl:mr-4 ltr:ml-4" :class="buttonClass" :disabled="disabled" v-text="__(buttonText)" @click="$emit('confirm')" />
             </div>
         </div>

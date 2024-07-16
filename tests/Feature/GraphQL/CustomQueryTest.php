@@ -3,14 +3,17 @@
 namespace Tests\Feature\GraphQL;
 
 use GraphQL\Type\Definition\Type;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Queries\Query;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class CustomQueryTest extends TestCase
 {
-    /** @test **/
+    #[Test]
     public function custom_query_does_not_yet_exist()
     {
         $this
@@ -20,11 +23,8 @@ class CustomQueryTest extends TestCase
             ]]]);
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup addCustomQueryWithMethod
-     **/
+    #[Test]
+    #[DefineEnvironment('addCustomQueryWithMethod')]
     public function a_custom_query_can_be_added_to_the_default_schema()
     {
         $this
@@ -38,11 +38,8 @@ class CustomQueryTest extends TestCase
         GraphQL::addQuery(FooQuery::class);
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup addCustomQueryThroughConfig
-     **/
+    #[Test]
+    #[DefineEnvironment('addCustomQueryThroughConfig')]
     public function a_custom_query_can_be_added_to_the_default_schema_through_config()
     {
         $this

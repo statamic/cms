@@ -6,6 +6,8 @@ use BadMethodCallException;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
@@ -21,7 +23,7 @@ class LocalizedTermTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_the_reference()
     {
         $term = (new Term)->taxonomy('tags')->slug('foo');
@@ -30,7 +32,7 @@ class LocalizedTermTest extends TestCase
         $this->assertEquals('term::tags::foo::fr', (new LocalizedTerm($term, 'fr'))->reference());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_entry_count_through_the_repository()
     {
         $term = (new Term)->taxonomy('tags')->slug('foo');
@@ -44,7 +46,7 @@ class LocalizedTermTest extends TestCase
         $this->assertEquals(7, $localized->entriesCount());
     }
 
-    /** @test */
+    #[Test]
     public function if_the_value_is_explicitly_set_to_null_then_it_should_not_fall_back()
     {
         tap(Taxonomy::make('test')->sites(['en', 'fr']))->save();
@@ -75,7 +77,7 @@ class LocalizedTermTest extends TestCase
         $this->assertEquals('charlie', $localized->value('three'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         (new class extends Fieldtype
@@ -109,11 +111,8 @@ class LocalizedTermTest extends TestCase
         $this->assertEquals('delta (augmented)', $localized['charlie']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider queryBuilderProvider
-     **/
+    #[Test]
+    #[DataProvider('queryBuilderProvider')]
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
     {
         $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
@@ -154,7 +153,7 @@ class LocalizedTermTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function calling_unknown_method_throws_exception()
     {
         $this->expectException(BadMethodCallException::class);
@@ -164,7 +163,7 @@ class LocalizedTermTest extends TestCase
         (new Term)->taxonomy('tags')->in('en')->thisFieldDoesntExist();
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_an_array()
     {
         $fieldtype = new class extends Fieldtype
@@ -220,7 +219,7 @@ class LocalizedTermTest extends TestCase
         $this->assertEquals($keys, array_keys($array), 'toArray keys differ from selectedQueryColumns');
     }
 
-    /** @test */
+    #[Test]
     public function only_requested_relationship_fields_are_included_in_to_array()
     {
         $regularFieldtype = new class extends Fieldtype

@@ -18,7 +18,7 @@ use Statamic\Contracts\Forms\SubmissionRepository;
  * @method static save()
  * @method static delete()
  *
- * @see \Statamic\Contracts\Forms\FormRepository
+ * @see \Statamic\Contracts\Forms\SubmissionRepository
  */
 class FormSubmission extends Facade
 {

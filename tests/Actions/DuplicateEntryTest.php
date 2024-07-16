@@ -3,6 +3,8 @@
 namespace Tests\Actions;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\DuplicateEntry;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -17,7 +19,7 @@ class DuplicateEntryTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_duplicates_an_entry()
     {
         Collection::make('test')->save();
@@ -45,7 +47,7 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
-    /** @test */
+    #[Test]
     public function it_increments_the_number_if_duplicate_already_exists()
     {
         Collection::make('test')->save();
@@ -63,11 +65,8 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider authorizationProvider
-     */
+    #[Test]
+    #[DataProvider('authorizationProvider')]
     public function it_authorizes(
         bool $isMultisite,
         array $permissions,
@@ -125,11 +124,8 @@ class DuplicateEntryTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider bulkAuthorizationProvider
-     */
+    #[Test]
+    #[DataProvider('bulkAuthorizationProvider')]
     public function it_authorizes_in_bulk(
         bool $isMultisite,
         array $permissions,
@@ -191,7 +187,7 @@ class DuplicateEntryTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_respects_the_collection_not_requiring_slugs()
     {
         Collection::make('test')->requiresSlugs(false)->save();
@@ -223,7 +219,7 @@ class DuplicateEntryTest extends TestCase
         $this->assertEquals($id.'.md', basename($charlieDuplicate->path()));
     }
 
-    /** @test */
+    #[Test]
     public function it_duplicates_an_entry_with_localizations()
     {
         $this->setSites([
@@ -262,7 +258,7 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
-    /** @test */
+    #[Test]
     public function it_duplicates_an_entry_with_nested_localizations()
     {
         $this->setSites([
@@ -312,7 +308,7 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
-    /** @test */
+    #[Test]
     public function it_only_duplicates_authorized_localizations()
     {
         $this->setSites([
@@ -354,7 +350,7 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_duplicate_authorized_descendants_of_unauthorized_localizations()
     {
         // 🤯
@@ -405,7 +401,7 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
-    /** @test */
+    #[Test]
     public function it_duplicates_an_entry_from_a_non_default_site()
     {
         $this->setSites([
@@ -437,7 +433,7 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
-    /** @test */
+    #[Test]
     public function if_an_entry_has_an_origin_it_duplicates_the_root_origin()
     {
         $this->setSites([
@@ -470,7 +466,7 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
-    /** @test */
+    #[Test]
     public function if_an_entry_has_an_origin_and_the_root_origin_is_also_selected_it_only_duplicates_the_root_origin()
     {
         $this->setSites([

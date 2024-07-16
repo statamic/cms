@@ -3,6 +3,7 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
@@ -33,7 +34,7 @@ class ReorderEntriesTest extends TestCase
         $this->structure->makeTree('en')->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -47,7 +48,7 @@ class ReorderEntriesTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_the_collection_is_not_orderable()
     {
         $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
@@ -63,7 +64,7 @@ class ReorderEntriesTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function it_reorders_entries()
     {
         EntryFactory::id('1')->slug('one')->collection('test')->create();
@@ -94,7 +95,7 @@ class ReorderEntriesTest extends TestCase
         $this->assertEquals(1, Entry::find(3)->order());
     }
 
-    /** @test */
+    #[Test]
     public function it_reorders_paginated_entries()
     {
         EntryFactory::id('1')->slug('one')->collection('test')->create();
