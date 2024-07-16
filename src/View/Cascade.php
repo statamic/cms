@@ -138,13 +138,9 @@ class Cascade
     protected function hydrateGlobals()
     {
         foreach (GlobalSet::all() as $global) {
-            if (! $global->existsIn($this->site->handle())) {
-                continue;
+            if ($global = $global->in($this->site->handle())) {
+                $this->set($global->handle(), $global);
             }
-
-            $global = $global->in($this->site->handle());
-
-            $this->set($global->handle(), $global);
         }
 
         if ($mainGlobal = $this->get('global')) {

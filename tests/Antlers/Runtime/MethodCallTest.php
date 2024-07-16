@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Antlers\Fixtures\MethodClasses\CallCounter;
 use Tests\Antlers\Fixtures\MethodClasses\ClassOne;
 use Tests\Antlers\Fixtures\MethodClasses\StringLengthObject;

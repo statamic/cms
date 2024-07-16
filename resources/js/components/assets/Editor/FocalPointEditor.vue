@@ -40,7 +40,7 @@
                     <button type="button" class="btn mb-2 btn-primary" @click="select">{{ __('Finish') }}</button>
                 </div>
             </div>
-            <h6 class="p-4 text-center bg-gray-300 rounded-b">{{ __('messages.focal_point_previews_are_examples') }}</h6>
+            <h6 class="p-4 text-center bg-gray-300 dark:bg-dark-550 rounded-b dark:border-dark-200">{{ __('messages.focal_point_previews_are_examples') }}</h6>
         </div>
         <div v-for="n in 9" :key="n"
              :class="`frame frame-${n}`">

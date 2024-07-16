@@ -14,9 +14,9 @@
                             </button>
                         </template>
                         <dropdown-item :text="__('Duplicate')" @click="createPreset" />
-                        <dropdown-item :text="__('Rename')" @click="renamePreset" />
+                        <dropdown-item v-if="canRenamePreset(handle)" :text="__('Rename')" @click="renamePreset" />
                         <div class="divider" />
-                        <dropdown-item :text="__('Delete')" class="warning" @click="deletePreset" />
+                        <dropdown-item v-if="canDeletePreset(handle)" :text="__('Delete')" class="warning" @click="showDeleteModal = true" />
                     </dropdown-list>
                 </button>
                 <button class="pill-tab rtl:ml-1 ltr:mr-1" v-else @click="viewPreset(handle)">
@@ -142,6 +142,14 @@ export default {
             }
         },
 
+        canRenamePreset(handle) {
+            return !this.$preferences.hasDefault(`${this.preferencesKey}.${handle}`);
+        },
+
+        canDeletePreset(handle) {
+            return !this.$preferences.hasDefault(`${this.preferencesKey}.${handle}`);
+        },
+
         viewAll() {
             this.$emit('reset');
         },
@@ -168,24 +176,34 @@ export default {
                 return;
             }
 
-            this.$preferences.set(`${this.preferencesKey}.${presetHandle}`, this.presetPreferencesPayload)
-                .then(response => {
-                    if (this.showRenameModal) {
-                        this.$preferences.remove(`${this.preferencesKey}.${this.activePreset}`)
-                            .then(response => {
-                                this.$toast.success(__('View renamed'));
-                                this.$emit('deleted', this.activePreset);
-                                this.showRenameModal = false;
-                                this.refreshPresets();
-                            })
-                            .catch(error => {
-                                this.$toast.error(__('Unable to rename view'));
-                                this.showRenameModal = false;
-                            });
+            if (this.showRenameModal) {
+                let preference = this.$preferences.get(`${this.preferencesKey}`);
 
-                        return;
+                preference = Object.fromEntries(Object.entries(preference).map(([key, value]) => {
+                    if (key === this.activePreset) {
+                        return [this.savingPresetSlug, this.presetPreferencesPayload];
                     }
 
+                    return [key, value];
+                }));
+
+                this.$preferences.set(`${this.preferencesKey}`, preference)
+                    .then(response => {
+                        this.$toast.success(__('View renamed'));
+                        this.$emit('deleted', this.activePreset);
+                        this.showRenameModal = false;
+                        this.refreshPresets();
+                    })
+                    .catch(error => {
+                        this.$toast.error(__('Unable to rename view'));
+                        this.showRenameModal = false;
+                    });
+
+                return;
+            }
+
+            this.$preferences.set(`${this.preferencesKey}.${presetHandle}`, this.presetPreferencesPayload)
+                .then(response => {
                     this.$toast.success(__('View saved'));
                     this.showCreateModal = false;
                     this.savingPresetName = null;
@@ -200,11 +218,6 @@ export default {
         },
 
         deletePreset() {
-            if (! this.showDeleteModal) {
-                this.showDeleteModal = true;
-                return;
-            }
-
             this.$preferences.remove(`${this.preferencesKey}.${this.activePreset}`)
                 .then(response => {
                     this.$emit('deleted', this.activePreset);

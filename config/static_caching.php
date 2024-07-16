@@ -141,4 +141,19 @@ return [
 
     'queue_connection' => env('STATAMIC_STATIC_WARM_QUEUE_CONNECTION'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Shared Error Pages
+    |--------------------------------------------------------------------------
+    |
+    | You may choose to share the same statically generated error page across
+    | all errors. For example, the first time a 404 is encountered it will
+    | be generated and cached, and then served for all subsequent 404s.
+    |
+    | This is only supported for half measure.
+    |
+    */
+
+    'share_errors' => false,
+
 ];

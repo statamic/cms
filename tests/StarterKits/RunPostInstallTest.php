@@ -7,6 +7,7 @@ use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blink;
 use Tests\Fakes\Composer\FakeComposer;
 use Tests\TestCase;
@@ -37,7 +38,7 @@ class RunPostInstallTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_runs_post_install_hook_script()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
@@ -65,7 +66,7 @@ class RunPostInstallTest extends TestCase
         $this->assertFileDoesNotExist($this->kitVendorPath());
     }
 
-    /** @test */
+    #[Test]
     public function it_errors_gracefully_if_post_install_hook_cannot_be_found()
     {
         $this->simulateCliInstallWithoutTtySupport();
@@ -86,7 +87,7 @@ class RunPostInstallTest extends TestCase
         $this->assertFileExists($this->kitVendorPath());
     }
 
-    /** @test */
+    #[Test]
     public function it_errors_gracefully_if_starter_kit_package_doesnt_exist_in_vendor()
     {
         $this->simulateCliInstallWithoutTtySupport();

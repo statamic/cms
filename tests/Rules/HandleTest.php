@@ -2,6 +2,7 @@
 
 namespace Tests\Rules;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Rules\Handle;
 use Tests\TestCase;
 
@@ -11,7 +12,7 @@ class HandleTest extends TestCase
 
     protected static $customRule = Handle::class;
 
-    /** @test */
+    #[Test]
     public function it_validates_handles()
     {
         $this->assertPasses('foo');
@@ -36,7 +37,7 @@ class HandleTest extends TestCase
         $this->assertFails('foo_-_bar');
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_helpful_validation_error()
     {
         $this->assertValidationErrorOutput(trans('statamic::validation.handle'), '_bad_input');

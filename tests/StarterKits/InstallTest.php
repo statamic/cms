@@ -8,6 +8,7 @@ use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
@@ -42,7 +43,7 @@ class InstallTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_starter_kit()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
@@ -58,7 +59,7 @@ class InstallTest extends TestCase
         $this->assertFileExists(base_path('copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_from_custom_export_paths()
     {
         $this->setConfig([
@@ -96,7 +97,7 @@ class InstallTest extends TestCase
         $this->assertFileHasContent('Two.', $renamedFolder.'/two.txt');
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_from_github()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
@@ -115,7 +116,7 @@ class InstallTest extends TestCase
         $this->assertFileExists(base_path('copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_from_bitbucket()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
@@ -134,7 +135,7 @@ class InstallTest extends TestCase
         $this->assertFileExists(base_path('copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_from_gitlab()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
@@ -153,7 +154,7 @@ class InstallTest extends TestCase
         $this->assertFileExists(base_path('copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_successfully_without_pinging_cloud_when_local_option_is_passed()
     {
         Http::fake(function ($request) {
@@ -167,7 +168,7 @@ class InstallTest extends TestCase
         $this->assertFileExists(base_path('copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_restores_existing_repositories_after_successful_install()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
@@ -207,7 +208,7 @@ class InstallTest extends TestCase
         $this->assertEquals($expectedRepositories, $composerJson['repositories']);
     }
 
-    /** @test */
+    #[Test]
     public function it_fails_if_starter_kit_config_does_not_exist()
     {
         $this->files->delete($this->kitRepoPath('starter-kit.yaml'));
@@ -217,7 +218,7 @@ class InstallTest extends TestCase
         $this->assertFileDoesNotExist(base_path('copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_fails_if_an_export_path_doesnt_exist()
     {
         $this->setConfig([
@@ -232,7 +233,7 @@ class InstallTest extends TestCase
         $this->assertFileDoesNotExist(base_path('copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_folders()
     {
         $this->files->put($this->preparePath(base_path('content/collections/pages/contact.md')), 'Contact');
@@ -246,7 +247,7 @@ class InstallTest extends TestCase
         $this->assertFileExists(base_path('content/collections/pages/home.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_copy_files_not_defined_as_export_paths()
     {
         $this->assertFileDoesNotExist(base_path('copied.md'));
@@ -258,7 +259,7 @@ class InstallTest extends TestCase
         $this->assertFileDoesNotExist(base_path('not-copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_overwrites_files()
     {
         $this->assertFileExists(config_path('filesystems.php'));
@@ -269,7 +270,7 @@ class InstallTest extends TestCase
         $this->assertFileHasContent('bobsled_pics', config_path('filesystems.php'));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_copy_starter_kit_config_by_default()
     {
         $this->installCoolRunnings();
@@ -277,7 +278,7 @@ class InstallTest extends TestCase
         $this->assertFileDoesNotExist(base_path('starter-kit.yaml'));
     }
 
-    /** @test */
+    #[Test]
     public function it_copies_starter_kit_config_when_option_is_passed()
     {
         $this->installCoolRunnings(['--with-config' => true]);
@@ -295,7 +296,7 @@ EOT;
         $this->assertEquals($expected, $this->files->get($configPath));
     }
 
-    /** @test */
+    #[Test]
     public function it_copies_starter_kit_post_install_script_hook_when_with_config_option_is_passed()
     {
         $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), '<?php');
@@ -311,7 +312,7 @@ EOT;
         $this->assertFileHasContent('<?php', $hookPath);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_copy_starter_kit_post_install_script_hook_when_with_config_option_is_not_passed()
     {
         $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), '<?php');
@@ -326,7 +327,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('StarterKitPostInstall.php'));
     }
 
-    /** @test */
+    #[Test]
     public function it_overwrites_starter_kit_config_when_option_is_passed()
     {
         $this->files->put($configPath = base_path('starter-kit.yaml'), 'old config');
@@ -344,7 +345,7 @@ EOT;
         $this->assertEquals($expected, $this->files->get($configPath));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_clear_site_by_default()
     {
         $this->files->put($this->preparePath(base_path('content/collections/pages/contact.md')), 'Contact');
@@ -357,7 +358,7 @@ EOT;
         $this->assertFileExists(base_path('content/collections/blog/article.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_site_when_option_is_passed()
     {
         $this->files->put($this->preparePath(base_path('content/collections/pages/contact.md')), 'Contact');
@@ -370,7 +371,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('content/collections/blog'));
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_dependencies()
     {
         $this->setConfig([
@@ -399,7 +400,7 @@ EOT;
         $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_dev_dependencies()
     {
         $this->setConfig([
@@ -423,7 +424,7 @@ EOT;
         $this->assertComposerJsonHasPackageVersion('require-dev', 'statamic/ssg', '*');
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_both_types_of_dependencies()
     {
         $this->setConfig([
@@ -459,7 +460,7 @@ EOT;
         $this->assertComposerJsonHasPackageVersion('require-dev', 'statamic/ssg', '*');
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_dependency_versions_in_starter_kit_config_to_encourage_management_with_composer()
     {
         $this->setConfig([
@@ -493,7 +494,7 @@ EOT;
         $this->assertEquals($expected, $this->files->get(base_path('starter-kit.yaml')));
     }
 
-    /** @test */
+    #[Test]
     public function it_leaves_dependency_versions_in_starter_kit_config_if_dependencies_are_not_installed()
     {
         $this->setConfig([
@@ -528,7 +529,7 @@ EOT;
         $this->assertEquals($expected, $this->files->get(base_path('starter-kit.yaml')));
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_paid_starter_kit_with_valid_license_key()
     {
         Config::set('statamic.system.license_key', 'site-key');
@@ -556,7 +557,7 @@ EOT;
         $this->assertFileExists(base_path('copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_install_paid_starter_kit_with_invalid_license_key()
     {
         Config::set('statamic.system.license_key', 'site-key');
@@ -584,7 +585,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_runs_post_install_script_hook_when_available()
     {
         $mock = Mockery::mock();
@@ -600,7 +601,7 @@ EOT;
         $this->installCoolRunnings();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_register_and_run_newly_installed_command_in_post_install_hook()
     {
         Hook::shouldReceive('find')->andReturn(new StarterKitPostInstall);
@@ -612,7 +613,7 @@ EOT;
         $this->assertTrue(Blink::has('starter-kit-command-run'));
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_post_install_hook_instructions_when_tty_is_not_available_during_a_cli_install()
     {
         $mock = Mockery::mock();
@@ -638,7 +639,7 @@ EOT;
         $this->assertFileExists(base_path('vendor/statamic/cool-runnings'));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_caches_post_install_hook_instructions_when_not_being_run_as_a_cli_install()
     {
         $mock = Mockery::mock();
@@ -659,7 +660,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_branch_from_package_param_when_installing()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
@@ -682,7 +683,7 @@ EOT;
         $this->assertFileExists(base_path('copied.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_installs_branch_with_slash_without_failing_package_validation()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());

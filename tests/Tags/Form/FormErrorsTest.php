@@ -4,11 +4,12 @@ namespace Tests\Tags\Form;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FormSubmitted;
 
 class FormErrorsTest extends FormTestCase
 {
-    /** @test */
+    #[Test]
     public function it_renders_errors()
     {
         $this
@@ -37,7 +38,7 @@ EOT
         $this->assertEquals($expected, $errors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_use_of_sometimes_rule_for_conditionally_hidden_fields()
     {
         $this
@@ -51,7 +52,7 @@ EOT
             ->assertLocation('/');
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_errors_from_form_submitting_event()
     {
         Event::listen(FormSubmitted::class, function () {

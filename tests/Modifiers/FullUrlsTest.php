@@ -2,13 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class FullUrlsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_replaces_root_relative_urls_with_absolute_urls(): void
     {
         $domain = Site::current()->absoluteUrl();
