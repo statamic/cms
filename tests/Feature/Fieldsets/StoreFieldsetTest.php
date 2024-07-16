@@ -106,7 +106,7 @@ class StoreFieldsetTest extends TestCase
             ->assertSessionHasErrors('handle');
     }
 
-    /** @test */
+    #[Test]
     public function fieldset_gets_created_in_subdirectory()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
