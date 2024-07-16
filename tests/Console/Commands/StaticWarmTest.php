@@ -78,7 +78,7 @@ class StaticWarmTest extends TestCase
     {
         config([
             'statamic.static_caching.strategy' => 'half',
-            'statamic.static_caching.queue_connection' => $configuredConnection,
+            'statamic.static_caching.warm_queue_connection' => $configuredConnection,
             'queue.default' => $defaultConnection,
         ]);
 
