@@ -3,15 +3,15 @@
 namespace Tests\Modifiers;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class LimitTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_limits_arrays(): void
     {
         $arr = ['one', 'two', 'three', 'four', 'five'];
@@ -20,7 +20,7 @@ class LimitTest extends TestCase
         $this->assertEquals(['one', 'two', 'three'], $this->modify($arr, 3));
     }
 
-    /** @test */
+    #[Test]
     public function it_limits_collections(): void
     {
         $collection = collect(['one', 'two', 'three', 'four', 'five']);

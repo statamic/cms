@@ -4,6 +4,7 @@ namespace Tests\Data\Structures;
 
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
 use Statamic\Structures\Tree;
@@ -21,7 +22,7 @@ class PagesTest extends TestCase
         $stache->store('entries')->directory($dir.'/content/collections');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_list_of_pages()
     {
         $parent = Mockery::mock(Page::class);
@@ -48,7 +49,7 @@ class PagesTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $list[1]->pageData()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_flattened_pages()
     {
         $parent = Mockery::mock(Page::class);

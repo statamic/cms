@@ -4,6 +4,8 @@ namespace Tests\Composer;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Process\Process;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
 use Tests\TestCase;
@@ -44,11 +46,8 @@ class ComposerTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @group integration
-     *
-     * @test
-     */
+    #[Group('integration')]
+    #[Test]
     public function it_can_list_installed_packages_with_details()
     {
         $installed = Composer::installed();
@@ -64,32 +63,23 @@ class ComposerTest extends TestCase
         $this->assertTrue($installed->get('statamic/composer-test-example-dev-dependency')->dev);
     }
 
-    /**
-     * @group integration
-     *
-     * @test
-     */
+    #[Group('integration')]
+    #[Test]
     public function it_can_get_installed_version_of_a_package_directly_from_composer_lock()
     {
         $this->assertEquals('1.2.3', Composer::installedVersion('statamic/composer-test-example-dependency'));
     }
 
-    /**
-     * @group integration
-     *
-     * @test
-     */
+    #[Group('integration')]
+    #[Test]
     public function it_can_check_if_package_is_installed()
     {
         $this->assertTrue(Composer::isInstalled('statamic/composer-test-example-dependency'));
         $this->assertFalse(Composer::isInstalled('statamic/another-dependency'));
     }
 
-    /**
-     * @group integration
-     *
-     * @test
-     */
+    #[Group('integration')]
+    #[Test]
     public function it_can_get_installed_path_of_a_package()
     {
         $this->assertEquals(
@@ -103,11 +93,8 @@ class ComposerTest extends TestCase
         );
     }
 
-    /**
-     * @group integration
-     *
-     * @test
-     */
+    #[Group('integration')]
+    #[Test]
     public function it_gracefully_fails_when_lock_file_does_not_exist()
     {
         unlink($this->basePath('composer.lock'));
@@ -119,13 +106,11 @@ class ComposerTest extends TestCase
         $this->assertNull(Composer::installedVersion('statamic/composer-test-example-dependency'));
     }
 
+    #[Group('integration')]
+    #[Group('slow')]
+    #[Test]
     /**
      * This method is intentionally doing way too much, for the sake of test suite performance.
-     *
-     * @group integration
-     * @group slow
-     *
-     * @test
      */
     public function it_can_require_update_downgrade_and_remove_a_package()
     {
@@ -220,13 +205,11 @@ class ComposerTest extends TestCase
         $this->assertStringContainsString('Removing test/package', Cache::get('composer.test/package')['output']);
     }
 
+    #[Group('integration')]
+    #[Group('slow')]
+    #[Test]
     /**
      * This method is intentionally doing way too much, for the sake of test suite performance.
-     *
-     * @group integration
-     * @group slow
-     *
-     * @test
      */
     public function it_can_require_and_remove_multiple_packages_in_one_shot()
     {

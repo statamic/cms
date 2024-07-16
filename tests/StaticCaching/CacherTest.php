@@ -6,12 +6,13 @@ use Illuminate\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Tests\TestCase;
 
 class CacherTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function gets_config_values()
     {
         $cacher = $this->cacher([
@@ -22,7 +23,7 @@ class CacherTest extends TestCase
         $this->assertEquals('qux', $cacher->config('baz', 'qux'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_default_expiration()
     {
         $cacher = $this->cacher([
@@ -32,7 +33,7 @@ class CacherTest extends TestCase
         $this->assertEquals(10, $cacher->getDefaultExpiration());
     }
 
-    /** @test */
+    #[Test]
     public function gets_a_url()
     {
         $cacher = $this->cacher();
@@ -44,7 +45,7 @@ class CacherTest extends TestCase
         $this->assertEquals('http://example.com/test?foo=bar', $cacher->getUrl($request));
     }
 
-    /** @test */
+    #[Test]
     public function gets_a_url_with_query_strings_disabled()
     {
         $cacher = $this->cacher(['ignore_query_strings' => true]);
@@ -56,7 +57,7 @@ class CacherTest extends TestCase
         $this->assertEquals('http://example.com/test', $cacher->getUrl($request));
     }
 
-    /** @test */
+    #[Test]
     public function gets_the_base_url_using_the_deprecated_config_value()
     {
         $cacher = $this->cacher(['base_url' => 'http://example.com']);
@@ -64,7 +65,7 @@ class CacherTest extends TestCase
         $this->assertEquals('http://example.com', $cacher->getBaseUrl());
     }
 
-    /** @test */
+    #[Test]
     public function gets_the_base_url_using_the_deprecated_config_value_with_trailing_slash()
     {
         $cacher = $this->cacher(['base_url' => 'http://example.com/']);
@@ -72,7 +73,7 @@ class CacherTest extends TestCase
         $this->assertEquals('http://example.com', $cacher->getBaseUrl());
     }
 
-    /** @test */
+    #[Test]
     public function gets_the_base_url_when_sites_have_absolute_urls()
     {
         $this->setSites([
@@ -85,7 +86,7 @@ class CacherTest extends TestCase
         $this->assertEquals('http://example.com', $cacher->getBaseUrl());
     }
 
-    /** @test */
+    #[Test]
     public function gets_the_base_url_when_sites_have_absolute_urls_with_trailing_slashes()
     {
         $this->setSites([
@@ -98,7 +99,7 @@ class CacherTest extends TestCase
         $this->assertEquals('http://example.com', $cacher->getBaseUrl());
     }
 
-    /** @test */
+    #[Test]
     public function gets_the_base_url_when_sites_have_relative_urls()
     {
         $this->setSites([
@@ -113,7 +114,7 @@ class CacherTest extends TestCase
         $this->assertEquals('http://app.com/default', $cacher->getBaseUrl());
     }
 
-    /** @test */
+    #[Test]
     public function gets_the_base_url_when_sites_have_relative_urls_with_trailing_slashes()
     {
         $this->setSites([
@@ -128,7 +129,7 @@ class CacherTest extends TestCase
         $this->assertEquals('http://app.com/default', $cacher->getBaseUrl());
     }
 
-    /** @test */
+    #[Test]
     public function gets_the_base_url_when_site_is_just_a_slash()
     {
         $this->setSites([
@@ -143,7 +144,7 @@ class CacherTest extends TestCase
         $this->assertEquals('http://app.com', $cacher->getBaseUrl());
     }
 
-    /** @test */
+    #[Test]
     public function gets_domains()
     {
         $cache = app(Repository::class);
@@ -154,7 +155,7 @@ class CacherTest extends TestCase
         $this->assertEquals(['http://example.com'], $cacher->getDomains()->all());
     }
 
-    /** @test */
+    #[Test]
     public function caches_a_url()
     {
         $cache = app(Repository::class);
@@ -174,7 +175,7 @@ class CacherTest extends TestCase
         $this->assertEquals(['one' => '/one', 'two' => '/two'], $urls);
     }
 
-    /** @test */
+    #[Test]
     public function gets_urls()
     {
         $cache = app(Repository::class);
@@ -192,7 +193,7 @@ class CacherTest extends TestCase
         $this->assertEquals(['one' => '/one', 'two' => '/two'], $urls->all());
     }
 
-    /** @test */
+    #[Test]
     public function forgets_a_url()
     {
         $cache = app(Repository::class);
@@ -213,7 +214,7 @@ class CacherTest extends TestCase
         $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://example.org')->all());
     }
 
-    /** @test */
+    #[Test]
     public function flushes_urls()
     {
         $cache = app(Repository::class);
@@ -241,7 +242,7 @@ class CacherTest extends TestCase
         $this->assertEquals(0, $cacher->getDomains()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_asks_the_url_excluder_if_a_url_should_be_excluder()
     {
         $mock = Mockery::mock(UrlExcluder::class);
@@ -259,7 +260,7 @@ class CacherTest extends TestCase
         $this->assertFalse($cacher->isExcluded('/bar'));
     }
 
-    /** @test */
+    #[Test]
     public function it_invalidates_urls()
     {
         $cache = app(Repository::class);

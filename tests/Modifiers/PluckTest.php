@@ -5,6 +5,7 @@ namespace Tests\Modifiers;
 use ArrayAccess;
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasOrigin;
@@ -15,7 +16,7 @@ use Tests\TestCase;
 
 class PluckTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_plucks_values_from_array_of_items()
     {
         $items = $this->items();
@@ -29,7 +30,7 @@ class PluckTest extends TestCase
         $this->assertEquals(['food', 'drink'], $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_plucks_values_from_collections_of_items()
     {
         $items = Collection::make($this->items());
@@ -43,7 +44,7 @@ class PluckTest extends TestCase
         $this->assertEquals(['food', 'drink'], $modified->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_plucks_values_from_query_builder()
     {
         $builder = Mockery::mock(Builder::class);
@@ -58,7 +59,7 @@ class PluckTest extends TestCase
         $this->assertEquals(['food', 'drink'], $modified->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_plucks_values_from_array_of_items_with_origins()
     {
         $items = $this->itemsWithOrigins();
@@ -72,7 +73,7 @@ class PluckTest extends TestCase
         $this->assertEquals(['food', 'food', 'drink', 'drink'], $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_plucks_values_from_collections_of_items_with_origins()
     {
         $items = EntryCollection::make($this->itemsWithOrigins());
@@ -86,7 +87,7 @@ class PluckTest extends TestCase
         $this->assertEquals(['food', 'food', 'drink', 'drink'], $modified->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_plucks_values_from_array_of_items_of_type_array()
     {
         $items = $this->itemsOfTypeArray();
@@ -100,7 +101,7 @@ class PluckTest extends TestCase
         $this->assertEquals(['food', 'drink'], $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_plucks_values_from_collections_of_items_of_type_array()
     {
         $items = EntryCollection::make($this->itemsOfTypeArray());
@@ -114,7 +115,7 @@ class PluckTest extends TestCase
         $this->assertEquals(['food', 'drink'], $modified->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_plucks_values_from_array_of_items_of_type_arrayaccess()
     {
         $items = $this->itemsOfTypeArrayAccess();

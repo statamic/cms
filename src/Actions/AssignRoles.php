@@ -14,7 +14,7 @@ class AssignRoles extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof UserContract && Role::all()->isNotEmpty();
+        return $this->context['view'] === 'list' && $item instanceof UserContract && Role::all()->isNotEmpty();
     }
 
     public function authorize($authed, $user)

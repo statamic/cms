@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Action;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
@@ -22,7 +23,8 @@ use Symfony\Component\Mailer\Exception\TransportException;
 
 class UsersController extends CpController
 {
-    use QueriesFilters;
+    use ExtractsFromUserFields,
+        QueriesFilters;
 
     /**
      * @var UserContract
@@ -235,21 +237,12 @@ class UsersController extends CpController
             $blueprint->ensureField('super', ['type' => 'toggle', 'display' => __('permissions.super')]);
         }
 
-        $values = $user->data()
-            ->merge($user->computedData())
-            ->merge(['email' => $user->email()]);
-
-        $fields = $blueprint
-            ->removeField('password')
-            ->removeField('password_confirmation')
-            ->fields()
-            ->addValues($values->all())
-            ->preProcess();
+        [$values, $meta] = $this->extractFromFields($user, $blueprint);
 
         $viewData = [
             'title' => $user->email(),
-            'values' => $fields->values()->all(),
-            'meta' => $fields->meta(),
+            'values' => array_merge($values, ['id' => $user->id()]),
+            'meta' => $meta,
             'blueprint' => $user->blueprint()->toPublishArray(),
             'reference' => $user->reference(),
             'actions' => [
@@ -259,6 +252,7 @@ class UsersController extends CpController
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $request->user()->id === $user->id(),
+            'itemActions' => Action::for($user, ['view' => 'form']),
         ];
 
         if ($request->wantsJson()) {
@@ -274,7 +268,7 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
-        $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
+        $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->except('id'));
 
         $fields
             ->validator()
@@ -304,9 +298,14 @@ class UsersController extends CpController
 
         $save = $user->save();
 
+        [$values] = $this->extractFromFields($user, $user->blueprint());
+
         return [
             'title' => $user->title(),
             'saved' => is_bool($save) ? $save : true,
+            'data' => [
+                'values' => $values,
+            ],
         ];
     }
 }

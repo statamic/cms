@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Data;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Site;
@@ -25,7 +26,7 @@ class LinkTest extends TestCase
         return (string) Parse::template($tag, $data);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_datas_url()
     {
         $entry = $this->mock(Entry::class);
@@ -38,7 +39,7 @@ class LinkTest extends TestCase
         $this->assertEquals('/test', $this->tag('{{ link:123 absolute="false" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_datas_url_for_a_specific_site()
     {
         $entry = $this->mock(Entry::class);
@@ -51,7 +52,7 @@ class LinkTest extends TestCase
         $this->assertEquals('/test', $this->tag('{{ link:123 in="fr" absolute="false" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_datas_url_for_the_current_site()
     {
         Site::setCurrent('fr');
@@ -66,7 +67,7 @@ class LinkTest extends TestCase
         $this->assertEquals('/test', $this->tag('{{ link:123 absolute="false" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_datas_url_for_the_original_site_if_it_doesnt_exist_in_the_current_one()
     {
         Site::setCurrent('fr');
@@ -81,7 +82,7 @@ class LinkTest extends TestCase
         $this->assertEquals('/test', $this->tag('{{ link:123 absolute="false" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_nothing_if_it_doesnt_exist_in_the_requested_site()
     {
         $entry = $this->mock(Entry::class);
@@ -92,7 +93,7 @@ class LinkTest extends TestCase
         $this->assertEquals('', $this->tag('{{ link:123 in="fr" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_datas_absolute_url()
     {
         $entry = $this->mock(Entry::class);
@@ -104,7 +105,7 @@ class LinkTest extends TestCase
         $this->assertEquals('http://example.com/test', $this->tag('{{ link:123 absolute="true" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_datas_absolute_url_for_a_specific_site()
     {
         $entry = $this->mock(Entry::class);
@@ -116,7 +117,7 @@ class LinkTest extends TestCase
         $this->assertEquals('http://example.com/test', $this->tag('{{ link:123 in="fr" absolute="true" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_datas_absolute_url_for_the_current_site()
     {
         Site::setCurrent('fr');
@@ -130,7 +131,7 @@ class LinkTest extends TestCase
         $this->assertEquals('http://example.com/test', $this->tag('{{ link:123 absolute="true" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_datas_absolute_url_for_the_original_site_if_it_doesnt_exist_in_the_current_one()
     {
         Site::setCurrent('fr');
@@ -144,7 +145,7 @@ class LinkTest extends TestCase
         $this->assertEquals('http://example.com/test', $this->tag('{{ link:123 absolute="true" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_nothing_if_data_doesnt_exist()
     {
         Data::shouldReceive('find')->with('123')->andReturnNull();
@@ -152,7 +153,7 @@ class LinkTest extends TestCase
         $this->assertEquals('', $this->tag('{{ link:123 }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_statamic_website_using_macroable()
     {
         Link::macro('statamic', function () {

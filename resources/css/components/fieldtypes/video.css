@@ -1,5 +1,5 @@
 .video-fieldtype-container {
-    @apply bg-gray-200 p-4 border rounded;
+    @apply bg-gray-200 dark:bg-dark-700 p-4 border dark:border-dark-950 rounded;
 }
 
 .video-fieldtype .video-preview-wrapper {

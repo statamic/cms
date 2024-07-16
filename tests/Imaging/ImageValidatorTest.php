@@ -3,11 +3,12 @@
 namespace Tests\Imaging;
 
 use Facades\Statamic\Imaging\ImageValidator;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ImageValidatorTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_checks_if_image_has_valid_extension_and_mimetype()
     {
         config(['statamic.assets.image_manipulation.driver' => 'imagick']);
@@ -49,7 +50,7 @@ class ImageValidatorTest extends TestCase
         $this->assertFalse(ImageValidator::isValidImage('jpg', 'application/vnd.microsoft.portable-executable')); // exe file
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_image_extension_is_allowed_for_manipulation_with_gd_driver()
     {
         config(['statamic.assets.image_manipulation.driver' => 'gd']);
@@ -71,7 +72,7 @@ class ImageValidatorTest extends TestCase
         $this->assertFalse(ImageValidator::isValidExtension('eps'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_image_extension_is_allowed_for_manipulation_with_imagick_driver()
     {
         config(['statamic.assets.image_manipulation.driver' => 'imagick']);
@@ -91,7 +92,7 @@ class ImageValidatorTest extends TestCase
         $this->assertFalse(ImageValidator::isValidExtension('eps'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_custom_image_extension_is_allowed_for_manipulation_with_proper_config()
     {
         config(['statamic.assets.image_manipulation.driver' => 'imagick']);

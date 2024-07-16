@@ -4,8 +4,28 @@
             v-for="(option, $index) in options"
             :key="$index"
             class="option"
+            :class="{
+                'selected': value === option.value,
+                'disabled': isReadOnly
+            }"
         >
             <label>
+                <svg-icon
+                    name="regular/radio-deselected"
+                    class="radio-icon"
+                    :aria-hidden="value === option.value"
+                    @click="update($event.target.value)"
+                    v-show="value !== option.value"
+                    v-cloak
+                />
+                <svg-icon
+                    name="regular/radio-selected"
+                    class="radio-icon"
+                    :aria-hidden="value !== option.value"
+                    @click="update($event.target.value)"
+                    v-show="value === option.value"
+                    v-cloak
+                />
                 <input type="radio"
                     ref="radio"
                     :name="name"

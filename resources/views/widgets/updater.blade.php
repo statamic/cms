@@ -1,9 +1,9 @@
 @php use function Statamic\trans as __; @endphp
 
 <div class="card p-0 h-full">
-    <header class="flex justify-between items-center p-4 border-b">
+    <header class="flex justify-between items-center p-4 border-b dark:bg-dark-650 dark:border-b dark:border-dark-900">
         <h2 class="flex items-center">
-            <div class="h-6 w-6 rtl:ml-2 ltr:mr-2 text-gray-800">
+            <div class="h-6 w-6 rtl:ml-2 ltr:mr-2 text-gray-800 dark:text-dark-200">
                 @cp_svg('icons/light/loading-bar')
             </div>
             <span>{{ __('Updates') }}</span>
