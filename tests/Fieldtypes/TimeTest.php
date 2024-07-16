@@ -5,6 +5,8 @@ namespace Tests\Fieldtypes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Time;
 use Tests\TestCase;
@@ -21,11 +23,8 @@ class TimeTest extends TestCase
         Carbon::setTestNow(Carbon::createFromFormat('Y-m-d H:i', '2010-12-25 13:43'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider processProvider
-     */
+    #[Test]
+    #[DataProvider('processProvider')]
     public function it_processes_on_save($config, $value, $expected)
     {
         $this->assertSame($expected, $this->fieldtype($config)->process($value));
@@ -57,11 +56,8 @@ class TimeTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider validationProvider
-     */
+    #[Test]
+    #[DataProvider('validationProvider')]
     public function it_validates($config, $input, $passes)
     {
         $field = $this->fieldtype($config)->field();

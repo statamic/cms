@@ -121,7 +121,7 @@ class FileCacher extends AbstractCacher
             ->getUrls($domain)
             ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
             ->each(function ($value, $key) use ($site, $domain) {
-                $this->writer->delete($this->getFilePath($value, $site));
+                $this->writer->delete($this->getFilePath($domain.$value, $site));
                 $this->forgetUrl($key, $domain);
             });
 

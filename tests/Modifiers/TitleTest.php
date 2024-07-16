@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class TitleTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_converts_to_a_title(): void
     {
         $string = 'create your first PR to statamic CMS';

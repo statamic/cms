@@ -4,13 +4,15 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Tests\Feature\GraphQL\EnablesQueries;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class CollectionsFieldtypeTest extends TestCase
 {
     use EnablesQueries;
@@ -27,7 +29,7 @@ class CollectionsFieldtypeTest extends TestCase
         Collection::make('events')->title('Events')->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_collections()
     {
         $article = Blueprint::makeFromFields([
@@ -72,7 +74,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_single_collection()
     {
         $article = Blueprint::makeFromFields([

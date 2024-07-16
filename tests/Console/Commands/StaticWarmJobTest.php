@@ -2,18 +2,18 @@
 
 namespace Tests\Console\Commands;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StaticWarmJob;
 use Tests\TestCase;
 
 class StaticWarmJobTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_sends_a_get_request()
     {
         $mock = new MockHandler([
@@ -22,16 +22,14 @@ class StaticWarmJobTest extends TestCase
 
         $handlerStack = HandlerStack::create($mock);
 
-        $client = new Client(['handler' => $handlerStack]);
+        $job = new StaticWarmJob(new Request('GET', '/about'), ['handler' => $handlerStack]);
 
-        $job = new StaticWarmJob(new Request('GET', '/about'));
-
-        $job->handle($client);
+        $job->handle();
 
         $this->assertEquals('/about', $mock->getLastRequest()->getUri()->getPath());
     }
 
-    /** @test */
+    #[Test]
     public function it_sends_a_get_request_and_dispatches_static_warm_job_for_page_with_pagination()
     {
         Queue::fake();

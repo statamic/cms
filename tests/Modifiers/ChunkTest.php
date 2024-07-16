@@ -4,16 +4,16 @@ namespace Tests\Modifiers;
 
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class ChunkTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_breaks_a_collection_into_smaller_chunks(): void
     {
         $collection = $this->collectionWithSixItems();
@@ -28,7 +28,7 @@ class ChunkTest extends TestCase
         $this->assertCount(3, $chunkTwo);
     }
 
-    /** @test */
+    #[Test]
     public function it_breaks_a_collection_into_six_chunks(): void
     {
         $collection = $this->collectionWithSixItems();
@@ -37,7 +37,7 @@ class ChunkTest extends TestCase
         $this->assertCount(1, $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_return_no_chunks_when_param_is_zero_or_negative(): void
     {
         $collection = $this->collectionWithSixItems();
@@ -49,7 +49,7 @@ class ChunkTest extends TestCase
         $this->assertCount(0, $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_chunks_values_from_query_builder()
     {
         $builder = Mockery::mock(Builder::class);

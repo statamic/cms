@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Modifiers\Modify;
@@ -9,7 +10,7 @@ use Tests\TestCase;
 
 class BardHtmlTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_extracts_bard_html()
     {
         $data = [
@@ -49,7 +50,7 @@ class BardHtmlTest extends TestCase
         $this->assertEquals($expected, $this->modify($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_bard_html_from_single_node()
     {
         $data = [
@@ -64,7 +65,7 @@ class BardHtmlTest extends TestCase
         $this->assertEquals($expected, $this->modify($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_bard_html_from_value_object()
     {
         $data = new Value([
@@ -75,6 +76,16 @@ class BardHtmlTest extends TestCase
                 ],
             ],
         ], 'content', new Bard());
+
+        $expected = '<p>This is a paragraph.</p>';
+
+        $this->assertEquals($expected, $this->modify($data));
+    }
+
+    #[Test]
+    public function it_returns_string()
+    {
+        $data = '<p>This is a paragraph.</p>';
 
         $expected = '<p>This is a paragraph.</p>';
 

@@ -16,6 +16,7 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
 use Statamic\Entries\Entry;
 use Statamic\Facades;
+use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
@@ -85,7 +86,7 @@ class StaticWarm extends Command
             $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
 
             foreach ($requests as $request) {
-                StaticWarmJob::dispatch($request)->onQueue($queue);
+                StaticWarmJob::dispatch($request, $this->clientConfig())->onQueue($queue);
             }
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
@@ -138,6 +139,16 @@ class StaticWarm extends Command
         $strategy = config('statamic.static_caching.strategy');
 
         return config("statamic.static_caching.strategies.$strategy.warm_concurrency", 25);
+    }
+
+    private function clientConfig(): array
+    {
+        return [
+            'verify' => $this->shouldVerifySsl(),
+            'auth' => $this->option('user') && $this->option('password')
+                ? [$this->option('user'), $this->option('password')]
+                : null,
+        ];
     }
 
     public function outputSuccessLine(Response $response, $index): void
@@ -198,6 +209,8 @@ class StaticWarm extends Command
             ->merge($this->additionalUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
+                Site::resolveCurrentUrlUsing(fn () => $uri);
+
                 return $cacher->isExcluded($uri);
             })
             ->sort()
@@ -216,6 +229,9 @@ class StaticWarm extends Command
     protected function entryUris(): Collection
     {
         $this->line('[ ] Entries...');
+
+        // "Warm" the structure trees
+        Facades\Collection::whereStructured()->each(fn ($collection) => $collection->structure()->trees()->each->tree());
 
         $entries = Facades\Entry::all()->map(function (Entry $entry) {
             if (! $entry->published() || $entry->private()) {
@@ -246,7 +262,7 @@ class StaticWarm extends Command
                 return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
                     // Needed because Taxonomy uses the current site. If the Taxonomy
                     // class ever gets its own localization logic we can remove this.
-                    Facades\Site::setCurrent($site);
+                    Site::setCurrent($site);
 
                     return $taxonomy->absoluteUrl();
                 });

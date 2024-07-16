@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Concerns;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
@@ -18,7 +19,7 @@ class RendersAttributesTest extends TestCase
         $this->tag = new FakeTagWithRendersAttributes;
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_attributes_from_array()
     {
         $this->assertEquals('', $this->tag->renderAttributes([]));
@@ -35,7 +36,7 @@ class RendersAttributesTest extends TestCase
         $this->assertEquals('class="m-0 mb-2" :name="first_name" disabled="true" autocomplete="true" focusable="false"', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_attributes_from_params()
     {
         $this->assertEquals('', $this->tag->renderAttributesFromParams());
@@ -56,7 +57,7 @@ class RendersAttributesTest extends TestCase
         $this->assertEquals('class="m-0 mb-2" name="Han" src="avatar.jpg" focusable="false" disabled="true" autocomplete="true"', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_render_attributes_for_known_params_unless_attr_prepended()
     {
         $output = $this->tag
@@ -80,7 +81,7 @@ class RendersAttributesTest extends TestCase
         $this->assertEquals('class="m-0 mb-2" src="avatar.jpg"', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_render_falsy_attributes()
     {
         $this->assertEquals('', $this->tag->renderAttributesFromParams());

@@ -3,6 +3,7 @@
 namespace Tests\View\Antlers;
 
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\View\Events\ViewRendered;
 use Statamic\View\View;
 use Tests\FakesViews;
@@ -19,7 +20,7 @@ class ViewTest extends TestCase
         $this->withFakeViews();
     }
 
-    /** @test */
+    #[Test]
     public function combines_two_views()
     {
         Event::fake();
@@ -38,7 +39,7 @@ class ViewTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function a_layout_can_be_in_the_layouts_directory()
     {
         $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template.antlers.html'));
@@ -52,7 +53,7 @@ class ViewTest extends TestCase
         $this->assertEquals('Layout: bar | Template: bar', $view->render());
     }
 
-    /** @test */
+    #[Test]
     public function template_is_rendered_alone_if_no_layout_is_provided()
     {
         $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template.antlers.html'));
@@ -64,7 +65,7 @@ class ViewTest extends TestCase
         $this->assertEquals('Template: bar', $view->render());
     }
 
-    /** @test */
+    #[Test]
     public function a_non_antlers_template_will_not_attempt_to_load_the_layout()
     {
         Event::fake();
@@ -83,7 +84,7 @@ class ViewTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function template_with_noparse_is_left_unparsed()
     {
         $this->viewShouldReturnRaw('partial-with-noparse', file_get_contents(__DIR__.'/fixtures/partial-with-noparse.antlers.html'));
@@ -98,7 +99,7 @@ class ViewTest extends TestCase
         $this->assertEquals('Layout: bar | Template: {{ foo }} | Partial: {{ foo }}', $view->render());
     }
 
-    /** @test */
+    #[Test]
     public function layout_with_noparse_is_left_unparsed()
     {
         $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template.antlers.html'));
@@ -112,7 +113,7 @@ class ViewTest extends TestCase
         $this->assertEquals('Layout: {{ foo }} | Template: bar', $view->render());
     }
 
-    /** @test */
+    #[Test]
     public function layout_and_template_with_noparse_is_left_unparsed()
     {
         $this->viewShouldReturnRaw('partial-with-noparse', file_get_contents(__DIR__.'/fixtures/partial-with-noparse.antlers.html'));
@@ -127,7 +128,7 @@ class ViewTest extends TestCase
         $this->assertEquals('Layout: {{ foo }} | Template: {{ foo }} | Partial: {{ foo }}', $view->render());
     }
 
-    /** @test */
+    #[Test]
     public function gets_first()
     {
         $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-noparse.antlers.html'));
@@ -139,7 +140,7 @@ class ViewTest extends TestCase
         $this->assertEquals('template', $view->template());
     }
 
-    /** @test */
+    #[Test]
     public function gets_data()
     {
         $view = (new View)->with(['foo' => 'bar']);
@@ -151,7 +152,7 @@ class ViewTest extends TestCase
         $this->assertEquals(['baz' => 'qux'], $view->data());
     }
 
-    /** @test */
+    #[Test]
     public function gets_template()
     {
         $view = (new View)->template('foo');
@@ -159,7 +160,7 @@ class ViewTest extends TestCase
         $this->assertEquals('foo', $view->template());
     }
 
-    /** @test */
+    #[Test]
     public function gets_layout()
     {
         $view = (new View)->layout('foo');
@@ -167,7 +168,7 @@ class ViewTest extends TestCase
         $this->assertEquals('foo', $view->layout());
     }
 
-    /** @test */
+    #[Test]
     public function view_data_can_be_accessed_from_template_and_layout()
     {
         $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-front-matter.antlers.html'));
@@ -190,7 +191,7 @@ EOT;
         $this->assertStringEqualsStringIgnoringLineEndings($expected, trim($view->render()));
     }
 
-    /** @test */
+    #[Test]
     public function current_view_data_wins()
     {
         $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-front-matter.antlers.html')."\n{{ partial:partial }}");

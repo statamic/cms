@@ -2,6 +2,7 @@
 
 namespace Tests\UpdateScripts;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\UpdateScripts\MigrateSitesConfigToYaml;
@@ -33,13 +34,13 @@ class MigrateSitesConfigToYamlTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_is_registered()
     {
         $this->assertUpdateScriptRegistered(MigrateSitesConfigToYaml::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_migrate_vanilla_sites_config()
     {
         File::put(config_path('statamic/sites.php'), <<<'CONFIG'
@@ -84,7 +85,7 @@ CONFIG);
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_migrate_modified_single_site_config()
     {
         File::put(config_path('statamic/sites.php'), <<<'CONFIG'
@@ -114,7 +115,7 @@ CONFIG);
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_migrate_modified_multisite_config()
     {
         File::put(config_path('statamic/sites.php'), <<<'CONFIG'
@@ -154,7 +155,7 @@ CONFIG);
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_migrate_dynamic_config_function_calls()
     {
         File::put(config_path('statamic/sites.php'), <<<'CONFIG'
@@ -194,7 +195,7 @@ CONFIG);
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_migrate_dynamic_whitelisted_env_function_calls()
     {
         File::put(config_path('statamic/sites.php'), <<<'CONFIG'
@@ -224,7 +225,7 @@ CONFIG);
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_warns_when_it_detects_other_non_whitelisted_env_calls()
     {
         File::put(config_path('statamic/sites.php'), <<<'CONFIG'
@@ -259,7 +260,7 @@ CONFIG);
         $this->assertStringContainsString('CUSTOM_URL', $warnings->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_append_multisite_config_to_bottom_if_the_nicer_str_replace_fails()
     {
         // For example, maybe they removed their comment blocks from their system.php config for some reason...
@@ -316,7 +317,7 @@ return [
 CONFIG, File::get(config_path('statamic/system.php')));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_text_direction_since_this_no_longer_does_anything_in_sites_yaml()
     {
         File::put(config_path('statamic/sites.php'), <<<'CONFIG'

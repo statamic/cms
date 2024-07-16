@@ -3,6 +3,7 @@
 namespace Tests\StarterKits;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\YAML;
 use Tests\TestCase;
 
@@ -51,7 +52,7 @@ class ExportTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_stub_out_a_new_config()
     {
         $this->assertFileDoesNotExist($this->configPath);
@@ -62,7 +63,7 @@ class ExportTest extends TestCase
         $this->assertFileHasContent('# export_paths:', $this->configPath);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_export_files()
     {
         $this->setExportPaths([
@@ -82,7 +83,7 @@ class ExportTest extends TestCase
         $this->assertFileHasContent('<body', $composerJson);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_export_folders()
     {
         $this->setExportPaths([
@@ -103,7 +104,7 @@ class ExportTest extends TestCase
         $this->assertFileDoesNotExist($this->exportPath('resources/js'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_export_as_to_different_destination_path()
     {
         $paths = $this->cleanPaths([
@@ -146,7 +147,7 @@ class ExportTest extends TestCase
         $this->cleanPaths($paths);
     }
 
-    /** @test */
+    #[Test]
     public function it_copies_export_config()
     {
         $this->setExportPaths([
@@ -161,7 +162,7 @@ class ExportTest extends TestCase
         $this->assertFileHasContent('export_paths:', $starterKitConfig);
     }
 
-    /** @test */
+    #[Test]
     public function it_copies_post_install_script_hook_when_available()
     {
         $this->setExportPaths([
@@ -178,7 +179,7 @@ class ExportTest extends TestCase
         $this->assertFileHasContent('<?php', $postInstallHook);
     }
 
-    /** @test */
+    #[Test]
     public function it_exports_all_dependencies_from_versionless_array()
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
@@ -232,7 +233,7 @@ EOT
             , $this->files->get($this->exportPath('composer.json')));
     }
 
-    /** @test */
+    #[Test]
     public function it_exports_only_non_dev_dependencies_from_versionless_array()
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
@@ -269,7 +270,7 @@ EOT
         $this->assertExportedConfigDoesNotHave('dependencies_dev');
     }
 
-    /** @test */
+    #[Test]
     public function it_exports_only_dev_dependencies_from_versionless_array()
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
@@ -304,7 +305,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_overrides_all_dependencies_from_composer_json()
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
@@ -348,7 +349,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_overrides_non_dev_dependencies_from_composer_json()
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
@@ -385,7 +386,7 @@ EOT
         $this->assertExportedConfigDoesNotHave('dependencies_dev');
     }
 
-    /** @test */
+    #[Test]
     public function it_overrides_dev_dependencies_from_composer_json()
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
@@ -421,7 +422,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_export_opinionated_app_composer_json()
     {
         $this->setExportPaths([
@@ -435,7 +436,7 @@ EOT
         $this->assertFileDoesNotExist($this->exportPath('composer.json'));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_export_as_with_opinionated_app_composer_json()
     {
         $this->setExportPaths([
@@ -451,7 +452,7 @@ EOT
         $this->assertFileDoesNotExist($this->exportPath('composer.json'));
     }
 
-    /** @test */
+    #[Test]
     public function it_exports_basic_composer_json_file()
     {
         $this->setExportPaths([
@@ -477,7 +478,7 @@ EOT
             , $this->files->get($this->exportPath('composer.json')));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_existing_composer_json_file()
     {
         $this->files->makeDirectory($this->exportPath);

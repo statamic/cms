@@ -67,9 +67,9 @@ abstract class FormTestCase extends TestCase
         ], $headers));
     }
 
-    protected function tag($tag)
+    protected function tag($tag, $params = [])
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, $params);
     }
 
     protected function createForm($blueprintContents = null, $handle = null)

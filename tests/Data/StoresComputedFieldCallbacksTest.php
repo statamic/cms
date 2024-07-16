@@ -2,12 +2,13 @@
 
 namespace Tests\Data;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Data\StoresComputedFieldCallbacks;
 use Tests\TestCase;
 
 class StoresComputedFieldCallbacksTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_store_computed_callback()
     {
         $repository = new FakeRepository;

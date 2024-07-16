@@ -2,7 +2,7 @@
     <table :data-size="relativeColumnsSize" ref="table" tabindex="0" class="data-table" :class="{ 'select-none' : shifting }" @keydown.shift="shiftDown" @keyup="clearShift">
         <thead v-if="allowBulkActions || visibleColumns.length > 1">
             <tr>
-                <th :class="{'checkbox-column': ! reorderable, 'handle-column': reorderable}" v-if="allowBulkActions || reorderable">
+                <th class="rounded-none" :class="{'checkbox-column': ! reorderable, 'handle-column': reorderable}" v-if="allowBulkActions || reorderable">
                     <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions && !singleSelect" />
                 </th>
                 <th
@@ -14,7 +14,7 @@
                         'cursor-not-allowed': !sortable,
                         'rtl:text-left ltr:text-right rtl:pl-8 ltr:pr-8': column.numeric,
                     }"
-                    class="group"
+                    class="group rounded-none"
                     @click.prevent="changeSortColumn(column.field)"
                 >
                     <span v-text="__(column.label)" />
@@ -26,7 +26,7 @@
                     <template v-if="type === 'entries'">{{ __('Collection') }}</template>
                     <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
                 </th>
-                <th class="actions-column" />
+                <th class="actions-column rounded-none" />
             </tr>
         </thead>
         <sortable-list
@@ -66,7 +66,7 @@
                     </slot>
                 </td>
                 <td class="type-column" v-if="type">
-                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-1 py-px text-2xs uppercase bg-gray-200 text-gray">
+                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-1 py-px text-2xs uppercase bg-gray-200 dark:bg-dark-400 text-gray dark:text-dark-150">
                         <template v-if="type === 'entries'">{{ __(row.collection.title) }}</template>
                         <template v-if="type === 'terms'">{{ __(row.taxonomy.title) }}</template>
                     </span>
