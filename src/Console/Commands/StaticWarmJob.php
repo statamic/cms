@@ -14,21 +14,16 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
+    public $uniqueId;
     public $tries = 1;
-    private $id;
 
     public function __construct(public Request $request, public array $clientConfig)
     {
-        $this->id = $request->getUri()->getHost().$request->getUri()->getPath();
+        $this->uniqueId = (string) $request->getUri();
     }
 
     public function handle()
     {
         (new Client($this->clientConfig))->send($this->request);
-    }
-
-    public function uniqueId(): string
-    {
-        return $this->id;
     }
 }
