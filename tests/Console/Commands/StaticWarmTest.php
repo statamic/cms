@@ -26,7 +26,7 @@ class StaticWarmTest extends TestCase
     public function it_exits_with_error_when_static_caching_is_disabled()
     {
         $this->artisan('statamic:static:warm')
-            ->expectsOutput('Static caching is not enabled.')
+            ->expectsOutputToContain('Static caching is not enabled.')
             ->assertExitCode(1);
     }
 
@@ -46,7 +46,7 @@ class StaticWarmTest extends TestCase
         config(['statamic.static_caching.strategy' => 'half']);
 
         $this->artisan('statamic:static:warm', ['--queue' => true])
-            ->expectsOutput('The queue connection is set to "sync". Queueing will be disabled.')
+            ->expectsOutputToContain('The queue connection is set to "sync". Queueing will be disabled.')
             ->assertExitCode(0);
     }
 
