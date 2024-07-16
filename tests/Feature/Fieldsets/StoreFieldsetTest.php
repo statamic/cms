@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Fieldsets;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Tests\Fakes\FakeFieldsetRepository;
@@ -21,7 +22,7 @@ class StoreFieldsetTest extends TestCase
         FieldsetRepository::swap(new FakeFieldsetRepository);
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -41,7 +42,7 @@ class StoreFieldsetTest extends TestCase
         $this->assertNull(Facades\Fieldset::find('test'));
     }
 
-    /** @test */
+    #[Test]
     public function fieldset_gets_created()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
@@ -61,6 +62,48 @@ class StoreFieldsetTest extends TestCase
             'fields' => [],
         ], $fieldset->contents());
         $this->assertEquals('test', $fieldset->handle());
+    }
+
+    #[Test]
+    public function title_is_required()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->assertCount(0, Facades\Fieldset::all());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->submit(['title' => ''])
+            ->assertRedirect('/original')
+            ->assertSessionHasErrors('title');
+    }
+
+    #[Test]
+    public function handle_is_required()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->assertCount(0, Facades\Fieldset::all());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->submit(['handle' => ''])
+            ->assertRedirect('/original')
+            ->assertSessionHasErrors('handle');
+    }
+
+    #[Test]
+    public function handle_must_be_alpha_dash()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->assertCount(0, Facades\Fieldset::all());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->submit(['handle' => 'two words'])
+            ->assertRedirect('/original')
+            ->assertSessionHasErrors('handle');
     }
 
     /** @test */
@@ -83,48 +126,6 @@ class StoreFieldsetTest extends TestCase
             'fields' => [],
         ], $fieldset->contents());
         $this->assertEquals('components.test', $fieldset->handle());
-    }
-
-    /** @test */
-    public function title_is_required()
-    {
-        $user = tap(Facades\User::make()->makeSuper())->save();
-        $this->assertCount(0, Facades\Fieldset::all());
-
-        $this
-            ->from('/original')
-            ->actingAs($user)
-            ->submit(['title' => ''])
-            ->assertRedirect('/original')
-            ->assertSessionHasErrors('title');
-    }
-
-    /** @test */
-    public function handle_is_required()
-    {
-        $user = tap(Facades\User::make()->makeSuper())->save();
-        $this->assertCount(0, Facades\Fieldset::all());
-
-        $this
-            ->from('/original')
-            ->actingAs($user)
-            ->submit(['handle' => ''])
-            ->assertRedirect('/original')
-            ->assertSessionHasErrors('handle');
-    }
-
-    /** @test */
-    public function handle_must_be_alpha_dash()
-    {
-        $user = tap(Facades\User::make()->makeSuper())->save();
-        $this->assertCount(0, Facades\Fieldset::all());
-
-        $this
-            ->from('/original')
-            ->actingAs($user)
-            ->submit(['handle' => 'two words'])
-            ->assertRedirect('/original')
-            ->assertSessionHasErrors('handle');
     }
 
     private function submit($params = [])

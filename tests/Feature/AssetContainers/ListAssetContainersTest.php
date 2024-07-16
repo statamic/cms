@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\AssetContainers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -13,7 +14,7 @@ class ListAssetContainersTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_lists_containers_you_have_access_to_when_requested_as_json()
     {
         $this->setTestRoles(['test' => ['access cp', 'view two assets', 'view three assets']]);
@@ -29,7 +30,7 @@ class ListAssetContainersTest extends TestCase
             ->assertJson($this->containerArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_a_view_when_requested_normally()
     {
         $this->setTestRoles(['test' => ['access cp', 'view two assets', 'view three assets']]);

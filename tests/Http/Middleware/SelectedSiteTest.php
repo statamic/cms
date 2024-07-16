@@ -3,6 +3,7 @@
 namespace Tests\Http\Middleware;
 
 use Illuminate\Http\Request;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\SelectedSite;
@@ -16,9 +17,7 @@ class SelectedSiteTest extends TestCase
 {
     use FakesRoles, PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_sets_selected_site_first_authorized_one()
     {
         $this->setSites([
@@ -47,9 +46,7 @@ class SelectedSiteTest extends TestCase
         $this->assertEquals('fr', Site::selected()->handle());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_doesnt_do_anything_when_there_are_no_authorized_sites()
     {
         // If the user doesn't have permission to access any sites, then... ¯\_(ツ)_/¯
@@ -84,9 +81,7 @@ class SelectedSiteTest extends TestCase
         $this->assertEquals('de', Site::selected()->handle());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function middleware_attached_to_routes()
     {
         /** @var Router $router */

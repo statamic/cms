@@ -5,6 +5,7 @@ namespace Tests\Feature\Entries;
 use Facades\Statamic\CP\LivePreview;
 use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
@@ -17,7 +18,7 @@ class PreviewEntryTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_creates_a_token_with_entry_for_creation()
     {
         Collection::make('blog')->routes('/blog/{slug}')->save();
@@ -54,7 +55,7 @@ class PreviewEntryTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_a_token_with_entry_for_editing()
     {
         Collection::make('blog')->routes('/blog/{slug}')->save();
@@ -96,7 +97,7 @@ class PreviewEntryTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_existing_token_with_entry_for_editing()
     {
         Collection::make('blog')->routes('/blog/{slug}')->save();
@@ -139,7 +140,7 @@ class PreviewEntryTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_live_preview_to_true_if_theres_no_additional_data()
     {
         Collection::make('blog')->routes('/blog/{slug}')->save();

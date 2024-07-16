@@ -11,8 +11,10 @@
             </button>
         </template>
 
-        <div v-for="blueprint in blueprints" :key="blueprint.handle">
-            <dropdown-item :text="blueprint.title" @click="select(blueprint.handle)" />
+        <div class="max-h-[75vh] overflow-y-auto">
+            <div v-for="blueprint in blueprints" :key="blueprint.handle">
+                <dropdown-item :text="blueprint.title" @click="select(blueprint.handle)" />
+            </div>
         </div>
     </dropdown-list>
 

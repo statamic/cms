@@ -42,6 +42,7 @@ class TermsQuery extends Query
             'page' => GraphQL::int(),
             'filter' => GraphQL::type(JsonArgument::NAME),
             'sort' => GraphQL::listOf(GraphQL::string()),
+            'site' => GraphQL::string(),
         ];
     }
 
@@ -57,6 +58,10 @@ class TermsQuery extends Query
 
         if ($sort = $args['sort'] ?? null) {
             $this->sortQuery($query, $sort);
+        }
+
+        if ($site = $args['site'] ?? null) {
+            $query->where('site', $site);
         }
 
         return $query->paginate($args['limit'] ?? 1000);
