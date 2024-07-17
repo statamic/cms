@@ -18,9 +18,5 @@ export default {
     components: {
         WidthSelector,
     },
-
-    methods: {
-
-    }
 };
 </script>
