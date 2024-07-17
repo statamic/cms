@@ -17,7 +17,7 @@ import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue
 // import BardSet from '../components/fieldtypes/bard/Set.vue';
 // import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
-// import CheckboxesFieldtype from '../components/fieldtypes/CheckboxesFieldtype.vue';
+import CheckboxesFieldtype from '../components/fieldtypes/CheckboxesFieldtype.vue';
 import CodeFieldtype from '../components/fieldtypes/CodeFieldtype.vue';
 import Routes from '../components/collections/Routes.vue';
 import TitleFormats from '../components/collections/TitleFormats.vue';
@@ -81,7 +81,7 @@ export default function registerFieldTypes(app) {
     // app.component('bard-fieldtype-set', BardSet);
     // app.component('bard_buttons_setting-fieldtype', BardButtonsSettingFieldtype);
     app.component('button_group-fieldtype', ButtonGroupFieldtype);
-    // app.component('checkboxes-fieldtype', CheckboxesFieldtype);
+    app.component('checkboxes-fieldtype', CheckboxesFieldtype);
     app.component('code-fieldtype', CodeFieldtype);
     app.component('collection_routes-fieldtype', Routes);
     app.component('collection_title_formats-fieldtype', TitleFormats);
