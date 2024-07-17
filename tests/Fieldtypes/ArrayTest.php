@@ -5,7 +5,6 @@ namespace Fieldtypes;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Tests\TestCase;
-use Facades\Statamic\Fields\FieldRepository;
 
 class ArrayTest extends TestCase
 {

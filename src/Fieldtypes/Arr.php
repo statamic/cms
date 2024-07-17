@@ -3,7 +3,6 @@
 namespace Statamic\Fieldtypes;
 
 use Closure;
-use Illuminate\Support\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\ArrayType;
