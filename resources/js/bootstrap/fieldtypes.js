@@ -1,4 +1,4 @@
-// import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
+import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 // import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 import Select from '../components/inputs/Select.vue';
@@ -129,7 +129,7 @@ export default function registerFieldTypes(app) {
     // app.component('set-field', SetField);
     //
     //
-    // app.component('revealer-fieldtype', RevealerFieldtype);
+    app.component('revealer-fieldtype', RevealerFieldtype);
     // app.component('status-fieldtype', StatusFieldtype);
     app.component('template-fieldtype', TemplateFieldtype);
 }
