@@ -285,7 +285,7 @@ class AssetContainersController extends CpController
                         'display' => __('Process Source Images'),
                         'instructions' => __('statamic::messages.asset_container_source_preset_instructions'),
                         'label_html' => true,
-                        'options' => $this->expandedGlidePresetOptions(),
+                        'options' => $this->expandedGlidePresetOptions()->all(),
                         'clearable' => true,
                     ],
                     'warm_intelligent' => [
@@ -300,7 +300,7 @@ class AssetContainersController extends CpController
                         'instructions' => __('statamic::messages.asset_container_warm_presets_instructions'),
                         'multiple' => true,
                         'label_html' => true,
-                        'options' => $this->expandedGlidePresetOptions(),
+                        'options' => $this->expandedGlidePresetOptions()->all(),
                         'if' => [
                             'warm_intelligent' => false,
                         ],

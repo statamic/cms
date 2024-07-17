@@ -360,7 +360,7 @@ class SitesConfigTest extends TestCase
                 'url' => '/ar/',
                 'locale' => 'ar_EG',
                 'attributes' => [
-                    'theme' => 'standard',
+                    ['key' => 'theme', 'value' => 'standard'],
                 ],
             ],
         ];
