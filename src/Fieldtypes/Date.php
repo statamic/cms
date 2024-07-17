@@ -70,6 +70,43 @@ class Date extends Fieldtype
                 ],
             ],
             [
+                'display' => __('Calendar'),
+                'fields' => [
+                    'calendar_locale' => [
+                        'display' => __('Locale'),
+                        'instructions' => __('statamic::fieldtypes.date.config.locale'),
+                        'type' => 'text',
+                    ],
+                    'timezone' => [
+                        'display' => __('Set Timezone'),
+                        'instructions' => __('statamic::fieldtypes.date.config.timezone'),
+                        'type' => 'text',
+                    ],
+                    'calendar' => [
+                        'display' => __('Calendar'),
+                        'instructions' => __('statamic::fieldtypes.date.config.calendar'),
+                        'type' => 'select',
+                        'clearable' => true,
+                        'placeholder' => __('Select Calendar'),
+                        'options' => [
+                            'gregory' => __('Gregory'),
+                            'buddhist' => __('Buddhist'),
+                            'ethiopic' => __('Ethiopian'),
+                            'ethioaa' => __('Ethiopian (Amete Alem)'),
+                            'coptic' => __('Coptic'),
+                            'hebrew' => __('Hebrew'),
+                            'indian' => __('Indian'),
+                            'islamic-civil' => __('Civil Islamic'),
+                            'islamic-tbla' => __('Tabular Islamic'),
+                            'islamic-umalqura' => __('Umm al-Qura'),
+                            'japanese' => __('Japanese'),
+                            'persian' => __('Persian'),
+                            'roc' => __('Republic of China'),
+                        ]
+                    ]
+                ]
+            ],
+            [
                 'display' => __('Timepicker'),
                 'fields' => [
                     'time_enabled' => [
