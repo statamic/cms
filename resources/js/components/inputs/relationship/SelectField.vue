@@ -98,7 +98,7 @@ export default {
                 paginate: false,
                 columns: 'title,id',
             }
-        },
+        }
     },
 
     created() {
