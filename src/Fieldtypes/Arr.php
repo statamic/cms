@@ -3,9 +3,11 @@
 namespace Statamic\Fieldtypes;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\ArrayType;
+use Statamic\Support\Arr as SupportArr;
 
 class Arr extends Fieldtype
 {
@@ -47,7 +49,16 @@ class Arr extends Fieldtype
 
     public function preProcess($data)
     {
-        return array_replace($this->blankKeyed(), $data ?? []);
+        // When using the legacy format, return the data as is.
+        if (! is_array(SupportArr::first($data))) {
+            return $data ?? [];
+        }
+
+        return collect($data)
+            ->mapWithKeys(fn ($item) => [
+                (string) $item['key'] => $item['value'],
+            ])
+            ->all();
     }
 
     public function preProcessConfig($data)
@@ -58,9 +69,11 @@ class Arr extends Fieldtype
     public function process($data)
     {
         return collect($data)
-            ->when($this->isKeyed(), function ($data) {
-                return $data->filter();
-            })
+            ->map(fn ($value, $key) => [
+                'key' => $key,
+                'value' => $value,
+            ])
+            ->values()
             ->all();
     }
 
@@ -72,8 +85,12 @@ class Arr extends Fieldtype
     protected function blankKeyed()
     {
         return collect($this->config('keys'))
-            ->map(function () {
-                return null;
+            ->mapWithKeys(function ($value, $index) {
+                if (! is_array($value)) {
+                    return [$index => null];
+                }
+
+                return [$value['key'] => $value['value']];
             })
             ->all();
     }
