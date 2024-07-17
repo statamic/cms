@@ -2,8 +2,4 @@
     input[name='url'] {
         direction: ltr;
     }
-
-    .vc-arrow {
-        transform: rotate(180deg);
-    }
 }
