@@ -129,10 +129,10 @@ class Sites
     {
         return File::exists($sitesPath = $this->path())
             ? YAML::file($sitesPath)->parse()
-            : $this->getDefaultSite();
+            : $this->getDefaultSiteConfig();
     }
 
-    protected function getDefaultSite()
+    protected function getDefaultSiteConfig()
     {
         return [
             'default' => [
