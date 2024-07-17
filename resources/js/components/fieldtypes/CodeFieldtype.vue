@@ -1,23 +1,21 @@
 <template>
-
-<portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
-<element-container @resized="refresh">
-    <div class="code-fieldtype-container" :class="[themeClass, {'code-fullscreen': fullScreenMode }]">
-        <div class="code-fieldtype-toolbar">
-            <div>
-                <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" :is-read-only="isReadOnly" class="text-xs leading-none" />
-                <div v-else v-text="modeLabel" class="text-xs font-mono text-gray-700"></div>
+    <portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
+        <element-container @resized="refresh">
+            <div class="code-fieldtype-container" :class="[themeClass, {'code-fullscreen': fullScreenMode }]">
+                <div class="code-fieldtype-toolbar">
+                    <div>
+                        <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" :is-read-only="isReadOnly" class="text-xs leading-none" />
+                        <div v-else v-text="modeLabel" class="text-xs font-mono text-gray-700"></div>
+                    </div>
+                    <button @click="fullScreenMode = !fullScreenMode" class="btn-icon h-8 leading-none flex items-center justify-center text-gray-800 dark:text-dark-150" v-tooltip="__('Toggle Fullscreen Mode')">
+                        <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="!fullScreenMode" />
+                        <svg-icon name="arrows-shrink" class="h-3.5 w-3.5" v-show="fullScreenMode" />
+                    </button>
+                </div>
+                <div ref="codemirror" id="codemirror-bro"></div>
             </div>
-            <button @click="fullScreenMode = !fullScreenMode" class="btn-icon h-8 leading-none flex items-center justify-center text-gray-800 dark:text-dark-150" v-tooltip="__('Toggle Fullscreen Mode')">
-                <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="!fullScreenMode" />
-                <svg-icon name="arrows-shrink" class="h-3.5 w-3.5" v-show="fullScreenMode" />
-            </button>
-        </div>
-        <div ref="codemirror"></div>
-    </div>
-</element-container>
-</portal>
-
+        </element-container>
+    </portal>
 </template>
 
 <script>
@@ -55,6 +53,9 @@ import 'codemirror/mode/xml/xml'
 import 'codemirror/mode/yaml/yaml'
 import 'codemirror/mode/yaml-frontmatter/yaml-frontmatter'
 
+import Fieldtype from './Fieldtype.vue';
+import { markRaw, shallowRef } from 'vue';
+
 export default {
 
     mixins: [Fieldtype],
@@ -89,7 +90,7 @@ export default {
                 { value: 'xml', label: 'XML' },
                 { value: 'yaml-frontmatter', label: 'YAML' },
             ],
-            mode: this.value.mode || this.config.mode,
+            mode: this.modelValue.mode || this.config.mode,
             fullScreenMode: false,
         }
     },
@@ -107,7 +108,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return this.value.code ? truncate(this.value.code, 60) : '';
+            return this.modelValue.code ? truncate(this.modelValue.code, 60) : '';
         },
         readOnlyOption() {
             return this.isReadOnly ? 'nocursor' : false;
@@ -134,8 +135,8 @@ export default {
     },
 
     watch: {
-        value(value, oldValue) {
-            if (value.code == this.codemirror.doc.getValue()) return;
+        modelValue(value) {
+            if (value.code === this.codemirror.doc.getValue()) return;
             if (! value.code) value.code = '';
 
             this.codemirror.doc.setValue(value.code);
@@ -145,16 +146,23 @@ export default {
         },
         mode(mode) {
             this.codemirror.setOption('mode', mode);
-            this.updateDebounced({code: this.value.code, mode: this.mode});
+            this.updateDebounced({code: this.modelValue.code, mode: this.mode});
         },
-        fullScreenMode: {
-            immediate: true,
-            handler: function (fullscreen) {
-                this.$nextTick(() => {
-                    this.$nextTick(() => this.initCodeMirror());
-                });
-            }
+        fullScreenMode(fullscreen) {
+            this.codemirror.setOption('fullScreen', fullscreen);
         },
+    },
+
+    async mounted() {
+        await this.$nextTick()
+        await this.$nextTick()
+
+        this.initCodeMirror()
+    },
+
+    unmounted() {
+        // this.codemirror.destroy()
+        this.$events.$off('tab-switched', this.refresh);
     },
 
     methods: {
@@ -167,8 +175,8 @@ export default {
             })
         },
         initCodeMirror() {
-            this.codemirror = CodeMirror(this.$refs.codemirror, {
-                value: this.value.code || '',
+            this.codemirror = markRaw(CodeMirror(this.$refs.codemirror, {
+                value: this.modelValue.code || '',
                 mode: this.mode,
                 direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
                 addModeClass: true,
@@ -182,7 +190,7 @@ export default {
                 theme: this.exactTheme,
                 inputStyle: 'contenteditable',
                 rulers: this.rulers,
-            });
+            }));
 
             this.codemirror.on('change', (cm) => {
                 this.updateDebounced({code: cm.doc.getValue(), mode: this.mode});
