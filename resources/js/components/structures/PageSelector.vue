@@ -14,6 +14,7 @@
             :columns="columns"
             :can-create="false"
             :can-reorder="false"
+            :max-items="maxItems"
             @item-data-updated="itemDataUpdated"
         />
 
@@ -27,6 +28,10 @@ export default {
     props: {
         site: String,
         collections: Array,
+        maxItems: {
+            type: Number,
+            required: false,
+        },
     },
 
     data() {

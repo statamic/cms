@@ -128,6 +128,7 @@
             ref="selector"
             :site="site"
             :collections="collections"
+            :max-items="maxPagesSelection"
             @selected="entriesSelected"
         />
 
@@ -250,6 +251,22 @@ export default {
 
         direction() {
             return this.$config.get('direction', 'ltr');
+        },
+
+        fields () {
+            return this.blueprint.tabs.reduce((fields, tab) => {
+                return tab.sections.reduce((fields, section) => {
+                    return fields.concat(section.fields);
+                }, []);
+            }, []);
+        },
+
+        maxPagesSelection() {
+            if (this.fields.filter(field => field.validate?.includes('required')).length > 0) {
+                return 1;
+            }
+
+            return null
         },
 
     },
