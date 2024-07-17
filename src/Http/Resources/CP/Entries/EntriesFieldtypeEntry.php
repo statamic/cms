@@ -2,30 +2,30 @@
 
 namespace Statamic\Http\Resources\CP\Entries;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Fieldtypes\Entries as EntriesFieldtype;
 
-class EntriesFieldtypeEntry extends ListedEntry
+class EntriesFieldtypeEntry extends JsonResource
 {
     private EntriesFieldtype $fieldtype;
 
-    public function fieldtype(EntriesFieldtype $fieldtype): self
+    public function __construct($resource, EntriesFieldtype $fieldtype)
     {
         $this->fieldtype = $fieldtype;
 
-        return $this;
+        parent::__construct($resource);
     }
 
     public function toArray($request)
     {
-        $arr = parent::toArray($request);
+        $data = [
+            'id' => $this->resource->id(),
+            'title' => $this->resource->value('title'),
+            'status' => $this->resource->status(),
+            'edit_url' => $this->resource->editUrl(),
+            'hint' => $this->fieldtype->getItemHint($this->resource),
+        ];
 
-        if (
-            in_array($this->fieldtype->config('mode'), ['select', 'typeahead'])
-            && ($hint = $this->fieldtype->getItemOptionHint($this->resource))
-        ) {
-            $arr['hint'] = $hint;
-        }
-
-        return $arr;
+        return ['data' => $data];
     }
 }

@@ -1,16 +1,16 @@
 <?php
 
-namespace Statamic\Http\Resources\CP\Entries;
+namespace Statamic\Http\Resources\CP\Taxonomies;
 
 use Illuminate\Pagination\AbstractPaginator;
-use Statamic\Fieldtypes\Entries as EntriesFieldtype;
+use Statamic\Fieldtypes\Terms as TermsFieldtype;
 
-class EntriesFieldtypeEntries extends Entries
+class TermsFieldtypeTerms extends Terms
 {
-    private EntriesFieldtype $fieldtype;
-    public $collects = EntriesFieldtypeListedEntry::class;
+    private TermsFieldtype $fieldtype;
+    public $collects = TermsFieldtypeListedTerm::class;
 
-    public function __construct($resource, EntriesFieldtype $fieldtype)
+    public function __construct($resource, TermsFieldtype $fieldtype)
     {
         $this->fieldtype = $fieldtype;
 
