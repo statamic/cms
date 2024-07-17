@@ -216,6 +216,7 @@ export default {
             showPageDeletionConfirmation: false,
             pageBeingDeleted: null,
             pageDeletionConfirmCallback: null,
+            removePageOnCancel: false,
             preferencesPrefix: `navs.${this.handle}`,
             publishInfo: {},
         }
@@ -318,6 +319,7 @@ export default {
             this.$refs.tree.addPages(pages, this.targetParent);
 
             if (pages.length === 1) {
+                this.removePageOnCancel = true;
                 this.editPage(pages[0], this.$refs.tree.$refs.tree, this.$refs.tree.$refs.tree.store);
             }
         },
@@ -349,6 +351,11 @@ export default {
         },
 
         closePageEditor() {
+            if (this.removePageOnCancel) {
+                this.$refs.tree.$refs[`branch-${this.editingPage.page.id}`].remove();
+                this.removePageOnCancel = false;
+            }
+
             this.editingPage = false;
         },
 
