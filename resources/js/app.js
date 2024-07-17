@@ -37,7 +37,7 @@ import VModal from "vue-js-modal";
 import Vuex from 'vuex';
 import StatamicStore from './store';
 import vSelect from 'vue-select'
-import VCalendar from 'v-calendar';
+import VCalendar from 'v-calendars';
 
 // Customize vSelect UI components
 vSelect.props.components.default = () => ({
