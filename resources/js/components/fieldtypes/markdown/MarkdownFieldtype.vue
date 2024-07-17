@@ -1,118 +1,166 @@
 <template>
-<portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
-<element-container @resized="refresh">
-    <div class="markdown-fieldtype-wrapper @container/markdown" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
-
-        <uploader
-            ref="uploader"
-            :enabled="assetsEnabled"
-            :container="container"
-            :path="folder"
-            @updated="uploadsUpdated"
-            @upload-complete="uploadComplete"
-        >
-            <template #default="{ dragging }">
-                <div>
-                    <div class="markdown-toolbar">
-                        <div class="markdown-modes">
-                            <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
-                            <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />
-                        </div>
-                        <div class="markdown-buttons" v-if="! isReadOnly">
-                            <button
-                                v-for="button in buttons"
-                                v-tooltip="button.text"
-                                :aria-label="button.text"
-                                @click="button.command(editor)"
-                            >
-                                <svg-icon :name="button.svg" class="w-4 h-4" />
-                            </button>
-                            <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
-                                <svg-icon name="dark-mode" class="w-4 h-4" />
-                            </button>
-                            <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')" :aria-label="__('Toggle Fullscreen Mode')">
-                                <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
-                                <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="drag-notification" v-show="dragging">
-                        <svg-icon name="upload" class="h-12 w-12 mb-4" />
-                        {{ __('Drop File to Upload') }}
-                    </div>
-
-                    <uploads
-                        v-if="uploads.length"
-                        :uploads="uploads"
-                        class="-mt-px"
-                    />
-
-                    <div :class="`mode-wrap mode-${mode}`" @click="focus">
-                        <div class="markdown-writer"
-                             ref="writer"
-                             v-show="mode == 'write'"
-                             @dragover="draggingFile = true"
-                             @dragleave="draggingFile = false"
-                             @drop="draggingFile = false"
-                             @keydown="shortcut">
-
-                            <div class="editor" ref="codemirror"></div>
-
-                            <div class="helpers">
-                                <div class="flex w-full">
-                                    <div class="markdown-cheatsheet-helper">
-                                        <button class="text-link flex items-center" @click="showCheatsheet = true" :aria-label="__('Show Markdown Cheatsheet')">
-                                            <svg-icon name="markdown-icon" class="w-6 h-4 items-start rtl:ml-2 ltr:mr-2" />
-                                            <span>{{ __('Markdown Cheatsheet') }}</span>
-                                        </button>
-                                    </div>
+    <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
+        <element-container @resized="refresh">
+            <div
+                class="markdown-fieldtype-wrapper @container/markdown"
+                :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }"
+            >
+                <uploader
+                    ref="uploader"
+                    :enabled="assetsEnabled"
+                    :container="container"
+                    :path="folder"
+                    @updated="uploadsUpdated"
+                    @upload-complete="uploadComplete"
+                >
+                    <template #default="{ dragging }">
+                        <div>
+                            <div class="markdown-toolbar">
+                                <div class="markdown-modes">
+                                    <button
+                                        @click="mode = 'write'" :class="{ 'active': mode == 'write' }"
+                                        v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'"
+                                    />
+                                    <button
+                                        @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }"
+                                        v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'"
+                                    />
                                 </div>
-                                <div v-if="fullScreenMode" class="flex items-center rtl:pl-2 ltr:pr-2">
-                                    <div class="whitespace-nowrap rtl:ml-4 ltr:mr-4"><span v-text="count.words" /> {{ __('Words') }}</div>
-                                    <div class="whitespace-nowrap"><span v-text="count.characters" /> {{ __('Characters') }}</div>
+
+                                <div class="markdown-buttons" v-if="! isReadOnly">
+                                    <button
+                                        v-for="button in buttons"
+                                        v-tooltip="button.text"
+                                        :aria-label="button.text"
+                                        @click="button.command(editor)"
+                                    >
+                                        <svg-icon :name="button.svg" class="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        @click="toggleDarkMode"
+                                        v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')"
+                                        :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode"
+                                    >
+                                        <svg-icon name="dark-mode" class="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')"
+                                        :aria-label="__('Toggle Fullscreen Mode')"
+                                    >
+                                        <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
+                                        <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
+                                    </button>
                                 </div>
                             </div>
 
-                            <div class="drag-notification" v-if="assetsEnabled && draggingFile">
+                            <div class="drag-notification" v-show="dragging">
                                 <svg-icon name="upload" class="h-12 w-12 mb-4" />
                                 {{ __('Drop File to Upload') }}
                             </div>
+
+                            <uploads
+                                v-if="uploads.length"
+                                :uploads="uploads"
+                                class="-mt-px"
+                            />
+
+                            <div :class="`mode-wrap mode-${mode}`" @click="focus">
+                                <div
+                                    class="markdown-writer"
+                                    ref="writer"
+                                    v-show="mode == 'write'"
+                                    @dragover="draggingFile = true"
+                                    @dragleave="draggingFile = false"
+                                    @drop="draggingFile = false"
+                                    @keydown="shortcut"
+                                >
+                                    <div class="editor" ref="codemirror"></div>
+
+                                    <div class="helpers">
+                                        <div class="flex w-full">
+                                            <div class="markdown-cheatsheet-helper">
+                                                <button
+                                                    class="text-link flex items-center" @click="showCheatsheet = true"
+                                                    :aria-label="__('Show Markdown Cheatsheet')"
+                                                >
+                                                    <svg-icon
+                                                        name="markdown-icon"
+                                                        class="w-6 h-4 items-start rtl:ml-2 ltr:mr-2"
+                                                    />
+                                                    <span>{{ __('Markdown Cheatsheet') }}</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div v-if="fullScreenMode" class="flex items-center rtl:pl-2 ltr:pr-2">
+                                            <div class="whitespace-nowrap rtl:ml-4 ltr:mr-4"><span
+                                                v-text="count.words"
+                                            /> {{ __('Words') }}
+                                            </div>
+                                            <div class="whitespace-nowrap"><span v-text="count.characters" />
+                                                {{ __('Characters') }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="drag-notification" v-if="assetsEnabled && draggingFile">
+                                        <svg-icon name="upload" class="h-12 w-12 mb-4" />
+                                        {{ __('Drop File to Upload') }}
+                                    </div>
+                                </div>
+
+                                <div
+                                    v-show="mode == 'preview'"
+                                    v-html="markdownPreviewText"
+                                    class="markdown-preview prose-sm @md/markdown:prose-base"
+                                ></div>
+                            </div>
                         </div>
+                    </template>
+                </uploader>
 
-                        <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview prose-sm @md/markdown:prose-base"></div>
+                <stack
+                    v-if="showAssetSelector && ! isReadOnly"
+                    name="markdown-asset-selector"
+                    @closed="closeAssetSelector"
+                >
+                    <selector
+                        :container="container"
+                        :folder="folder"
+                        :selected="selectedAssets"
+                        :restrict-folder-navigation="restrictAssetNavigation"
+                        @selected="assetsSelected"
+                        @closed="closeAssetSelector"
+                    />
+                </stack>
+
+                <stack
+                    name="markdownCheatSheet"
+                    v-if="showCheatsheet"
+                    @closed="showCheatsheet = false"
+                >
+                    <div class="h-full overflow-auto p-6 bg-white dark:bg-dark-600 relative">
+                        <button
+                            class="btn-close absolute top-0 rtl:left-0 ltr:right-0 mt-4 rtl:ml-8 ltr:mr-8"
+                            @click="showCheatsheet = false"
+                            :aria-label="__('Close Markdown Cheatsheet')"
+                        >
+                            &times;
+                        </button>
+
+                        <div class="max-w-md mx-auto my-8 prose">
+                            <h2 v-text="__('Markdown Cheatsheet')"></h2>
+                            <div v-html="__('markdown.cheatsheet')"></div>
+                        </div>
                     </div>
-                </div>
-            </template>
-        </uploader>
-
-        <stack v-if="showAssetSelector && ! isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
-            <selector
-                  :container="container"
-                  :folder="folder"
-                  :selected="selectedAssets"
-                  :restrict-folder-navigation="restrictAssetNavigation"
-                  @selected="assetsSelected"
-                  @closed="closeAssetSelector"
-            />
-        </stack>
-
-        <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
-            <div class="h-full overflow-auto p-6 bg-white dark:bg-dark-600 relative">
-                <button class="btn-close absolute top-0 rtl:left-0 ltr:right-0 mt-4 rtl:ml-8 ltr:mr-8" @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;</button>
-                <div class="max-w-md mx-auto my-8 prose">
-                    <h2 v-text="__('Markdown Cheatsheet')"></h2>
-                    <div v-html="__('markdown.cheatsheet')"></div>
-                </div>
+                </stack>
             </div>
-        </stack>
-
-    </div>
-</element-container>
-</portal>
+        </element-container>
+    </portal>
 </template>
 
 <script>
+import { markRaw } from 'vue';
 import { marked } from 'marked';
 import PlainTextRenderer from 'marked-plaintext';
 
@@ -135,8 +183,11 @@ import { availableButtons } from './buttons';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
+
 // Keymaps
-import 'codemirror/keymap/sublime'
+import 'codemirror/keymap/sublime';
+
+import Fieldtype from '../Fieldtype.vue';
 
 /**
  * `ucs2decode` function from the punycode.js library.
@@ -179,7 +230,6 @@ function ucs2decode(string) {
 }
 
 export default {
-
     mixins: [Fieldtype],
 
     components: {
@@ -188,9 +238,9 @@ export default {
         Uploads,
     },
 
-    data: function() {
+    data() {
         return {
-            data: this.value || '',
+            data: this.modelValue || '',
             buttons: [],
             mode: 'write',
             selections: null,
@@ -213,29 +263,20 @@ export default {
     },
 
     watch: {
-
         data(data) {
             this.updateDebounced(data);
             this.updateCount(data);
         },
-
-        fullScreenMode: {
-            immediate: true,
-            handler: function (fullscreen) {
-                this.$nextTick(() => {
-                    this.$nextTick(() => this.initCodeMirror());
-                });
-            }
+        fullScreenMode(fullscreen) {
+            // Actually toggling full screen adds a .CodeMirror-fullscreen class which breaks it with position: fixed;
+            // this.codemirror.setOption('fullScreen', fullscreen);
         },
-
         mode(mode) {
             if (mode === 'preview') this.updateMarkdownPreview();
         },
-
         readOnly(readOnly) {
             this.codemirror.setOption('readOnly', readOnly ? 'nocursor' : false);
         },
-
     },
 
     mounted() {
@@ -246,14 +287,37 @@ export default {
         }
 
         let el = document.querySelector(`label[for="${this.fieldId}"]`);
+
         if (el) {
             el.addEventListener('click', () => {
                 this.codemirror.focus();
             });
         }
+
+        // Wait so the ref container is properly mounted etc.
+        this.$nextTick(() => {
+            this.$nextTick(() => {
+                this.initCodeMirror();
+            });
+        });
+    },
+
+    beforeUnmount() {
+        this.$events.$off('livepreview.opened', this.throttledResizeEvent);
+        this.$events.$off('livepreview.closed', this.throttledResizeEvent);
+        this.$events.$off('livepreview.resizing', this.throttledResizeEvent);
     },
 
     methods: {
+        trackHeightUpdates() {
+            this.$events.$on('livepreview.opened', this.throttledResizeEvent);
+            this.$events.$on('livepreview.closed', this.throttledResizeEvent);
+            this.$events.$on('livepreview.resizing', this.throttledResizeEvent);
+        },
+
+        throttledResizeEvent: _.throttle(function () {
+            window.dispatchEvent(new Event('resize'));
+        }, 100),
 
         closeFullScreen() {
             this.fullScreenMode = false;
@@ -276,10 +340,10 @@ export default {
         },
 
         toggleDarkMode() {
-            this.darkMode = ! this.darkMode;
+            this.darkMode = !this.darkMode;
         },
 
-        getText: function(selection) {
+        getText: function (selection) {
             var i = _.indexOf(this.selections, selection);
 
             return this.codemirror.getSelections()[i];
@@ -289,21 +353,21 @@ export default {
             var self = this;
             var replacements = [];
             let elements = {
-                "bold": {
-                    "pattern": /^\*{2}(.*)\*{2}$/,
-                    "delimiter": "**"
+                'bold': {
+                    'pattern': /^\*{2}(.*)\*{2}$/,
+                    'delimiter': '**'
                 },
-                "code": {
-                    "pattern": /^\`(.*)\`$/,
-                    "delimiter": "`"
+                'code': {
+                    'pattern': /^\`(.*)\`$/,
+                    'delimiter': '`'
                 },
-                "italic": {
-                    "pattern": /^\_(.*)\_$/,
-                    "delimiter": "_"
+                'italic': {
+                    'pattern': /^\_(.*)\_$/,
+                    'delimiter': '_'
                 },
-                "strikethrough": {
-                    "pattern": /^\~\~(.*)\~\~$/,
-                    "delimiter": "~~"
+                'strikethrough': {
+                    'pattern': /^\~\~(.*)\~\~$/,
+                    'delimiter': '~~'
                 }
             };
 
@@ -325,9 +389,9 @@ export default {
             var self = this;
             var replacements = [];
             let elements = {
-                "code": {
-                    "pattern": /^\`\`\`(.*)\n(.*)\n\`\`\`$/,
-                    "delimiter": "\`\`\`"
+                'code': {
+                    'pattern': /^\`\`\`(.*)\n(.*)\n\`\`\`$/,
+                    'delimiter': '\`\`\`'
                 },
             };
 
@@ -336,7 +400,7 @@ export default {
                 let delimiter = elements[type]['delimiter'];
                 let replacement = (text.match(elements[type]['pattern']))
                     ? self.removeInline(selection, delimiter)
-                    : delimiter + "\n" + text + "\n" + delimiter;
+                    : delimiter + '\n' + text + '\n' + delimiter;
 
                 replacements.push(replacement);
             });
@@ -350,26 +414,26 @@ export default {
             var text = this.getText(selection);
             var blockLength = delimiter.length;
 
-            return text.substring(blockLength, text.length-blockLength);
+            return text.substring(blockLength, text.length - blockLength);
         },
 
         toggleLine(type) {
-            let startPoint = this.codemirror.getCursor("start");
-            let endPoint = this.codemirror.getCursor("end");
+            let startPoint = this.codemirror.getCursor('start');
+            let endPoint = this.codemirror.getCursor('end');
             let patterns = {
-                "quote": /^(\s*)\>\s+/,
-                "unordered-list": /^(\s*)(\*|\-|\+)\s+/,
-                "ordered-list": /^(\s*)\d+\.\s+/
+                'quote': /^(\s*)\>\s+/,
+                'unordered-list': /^(\s*)(\*|\-|\+)\s+/,
+                'ordered-list': /^(\s*)\d+\.\s+/
             };
             let map = {
-                "quote": "> ",
-                "unordered-list": "- ",
-                "ordered-list": "1. "
+                'quote': '> ',
+                'unordered-list': '- ',
+                'ordered-list': '1. '
             };
 
             for (let i = startPoint.line; i <= endPoint.line; i++) {
                 let text = this.codemirror.getLine(i);
-                text = this.isInside(type) ? text.replace(patterns[type], "$1") : map[type] + text;
+                text = this.isInside(type) ? text.replace(patterns[type], '$1') : map[type] + text;
 
                 this.codemirror.replaceRange(text, { line: i, ch: 0 }, { line: i, ch: Infinity });
             }
@@ -379,12 +443,12 @@ export default {
 
         // Get the state of the current position to see what elements it may be inside
         getState(position) {
-            position = position || this.codemirror.getCursor("start");
+            position = position || this.codemirror.getCursor('start');
             let state = this.codemirror.getTokenAt(position);
 
-            if(!state.type) return {};
+            if (!state.type) return {};
 
-            let types = state.type.split(" ");
+            let types = state.type.split(' ');
 
             let ret = {},
                 data, text;
@@ -392,31 +456,31 @@ export default {
             for (var i = 0; i < types.length; i++) {
                 data = types[i];
 
-                if (data === "strong") {
+                if (data === 'strong') {
                     ret.bold = true;
-                } else if(data === "variable-2") {
+                } else if (data === 'variable-2') {
                     text = this.codemirror.getLine(position.line);
                     if (/^\s*\d+\.\s/.test(text)) {
-                        ret["ordered-list"] = true;
+                        ret['ordered-list'] = true;
                     } else {
-                        ret["unordered-list"] = true;
+                        ret['unordered-list'] = true;
                     }
-                } else if (data === "atom") {
+                } else if (data === 'atom') {
                     ret.quote = true;
-                } else if (data === "em") {
+                } else if (data === 'em') {
                     ret.italic = true;
-                } else if (data === "quote") {
+                } else if (data === 'quote') {
                     ret.quote = true;
-                } else if (data === "strikethrough") {
+                } else if (data === 'strikethrough') {
                     ret.strikethrough = true;
-                } else if (data === "comment") {
+                } else if (data === 'comment') {
                     ret.code = true;
-                } else if (data === "link") {
+                } else if (data === 'link') {
                     ret.link = true;
-                } else if (data === "tag") {
+                } else if (data === 'tag') {
                     ret.image = true;
                 } else if (data.match(/^header(\-[1-6])?$/)) {
-                    ret[data.replace("header", "heading")] = true;
+                    ret[data.replace('header', 'heading')] = true;
                 }
             }
 
@@ -433,21 +497,21 @@ export default {
             let cursor = doc.getCursor();
             let line = doc.getLine(cursor.line);
             let pos = { line: cursor.line };
-            let table = "|     |     |\n| --- | --- |\n|     |     |";
+            let table = '|     |     |\n| --- | --- |\n|     |     |';
 
             if (line.length === 0) {
                 doc.replaceRange(table, pos);
                 this.codemirror.focus();
                 this.codemirror.setCursor(cursor.line, 2);
             } else {
-                doc.replaceRange("\n\n" + table, pos);
+                doc.replaceRange('\n\n' + table, pos);
                 this.codemirror.focus();
                 this.codemirror.setCursor(cursor.line + 2, 2);
             }
         },
 
-        insertImage: function(url, alt) {
-            var cm = this.codemirror.doc
+        insertImage: function (url, alt) {
+            var cm = this.codemirror.doc;
 
             var selection = '';
             if (cm.somethingSelected()) {
@@ -459,14 +523,14 @@ export default {
             var url = url || '';
 
             // Replace the string
-            var str = '![' + selection + ']('+ url +')';
+            var str = '![' + selection + '](' + url + ')';
 
             cm.replaceSelection(str, 'start');
             // Select the text
             var line = cm.getCursor().line;
             var start = cm.getCursor().ch + 2; // move past the ![
             var end = start + selection.length;
-            cm.setSelection({line:line,ch:start}, {line:line,ch:end});
+            cm.setSelection({ line: line, ch: start }, { line: line, ch: end });
 
             this.codemirror.focus();
         },
@@ -477,13 +541,13 @@ export default {
          * @param  String url  URL of the image
          * @param  String alt  Alt text
          */
-        appendImage: function(url, alt) {
+        appendImage: function (url, alt) {
             alt = alt || '';
-            this.data += '\n\n!['+alt+']('+url+')';
+            this.data += '\n\n![' + alt + '](' + url + ')';
         },
 
-        insertLink: function(url, text) {
-            var cm = this.codemirror.doc
+        insertLink: function (url, text) {
+            var cm = this.codemirror.doc;
 
             var selection = '';
             if (cm.somethingSelected()) {
@@ -492,42 +556,42 @@ export default {
                 selection = text;
             }
 
-            if (! url) {
+            if (!url) {
                 url = prompt(__('Enter URL'), 'https://');
-                if (! url) {
+                if (!url) {
                     return;
                 }
             }
 
             // Replace the string
-            var str = '[' + selection + ']('+ url +')';
+            var str = '[' + selection + '](' + url + ')';
             cm.replaceSelection(str, 'start');
 
             // Select the text
             var line = cm.getCursor().line;
             var start = cm.getCursor().ch + 1; // move past the first [
             var end = start + selection.length;
-            cm.setSelection({line:line,ch:start}, {line:line,ch:end});
+            cm.setSelection({ line: line, ch: start }, { line: line, ch: end });
 
             this.codemirror.focus();
         },
 
-        appendLink: function(url, text) {
+        appendLink: function (url, text) {
             text = text || '';
-            this.data += '\n\n['+text+']('+url+')';
+            this.data += '\n\n[' + text + '](' + url + ')';
         },
 
         /**
          * Open the asset selector
          */
-        addAsset: function() {
+        addAsset: function () {
             this.showAssetSelector = true;
         },
 
         /**
          * Execute a keyboard shortcut, when applicable
          */
-        shortcut: function(e) {
+        shortcut: function (e) {
             var key = e.keyCode;
             var mod = e.metaKey === true || e.ctrlKey === true;
 
@@ -590,11 +654,11 @@ export default {
             this.$axios.post(cp_url('assets-fieldtype'), { assets }).then(response => {
                 _(response.data).each((asset) => {
                     var alt = asset.values.alt || '';
-                    var url = encodeURI('statamic://'+asset.reference);
+                    var url = encodeURI('statamic://' + asset.reference);
                     if (asset.isImage) {
-                        this[method+'Image'](url, alt);
+                        this[method + 'Image'](url, alt);
                     } else {
-                        this[method+'Link'](url, alt);
+                        this[method + 'Link'](url, alt);
                     }
                 });
             });
@@ -626,21 +690,6 @@ export default {
             this.codemirror.focus();
         },
 
-        trackHeightUpdates() {
-            const update = () => { window.dispatchEvent(new Event('resize')) };
-            const throttled = _.throttle(update, 100);
-
-            this.$root.$on('livepreview.opened', throttled);
-            this.$root.$on('livepreview.closed', throttled);
-            this.$root.$on('livepreview.resizing', throttled);
-
-            this.$once('hook:beforeDestroy', () => {
-                this.$root.$off('livepreview.opened', throttled);
-                this.$root.$off('livepreview.closed', throttled);
-                this.$root.$off('livepreview.resizing', throttled);
-            });
-        },
-
         updateMarkdownPreview() {
             this.$axios
                 .post(this.meta.previewUrl, { value: this.data, config: this.config })
@@ -651,7 +700,7 @@ export default {
         initCodeMirror() {
             var self = this;
 
-            self.codemirror = CodeMirror(this.$refs.codemirror, {
+            self.codemirror = markRaw(CodeMirror(this.$refs.codemirror, {
                 value: self.data,
                 mode: 'gfm',
                 dragDrop: false,
@@ -665,10 +714,10 @@ export default {
                 inputStyle: 'contenteditable',
                 spellcheck: true,
                 extraKeys: {
-                    "Enter": "newlineAndIndentContinueMarkdownList",
-                    "Cmd-Left": "goLineLeftSmart"
+                    'Enter': 'newlineAndIndentContinueMarkdownList',
+                    'Cmd-Left': 'goLineLeftSmart'
                 }
-            });
+            }));
 
             self.codemirror.on('change', function (cm) {
                 self.data = cm.doc.getValue();
@@ -683,7 +732,7 @@ export default {
             });
 
             // Update CodeMirror if we change the value independent of CodeMirror
-            this.$watch('value', function(val) {
+            this.$watch('modelValue', function (val) {
                 if (val !== self.codemirror.doc.getValue()) {
                     self.codemirror.doc.setValue(val);
                 }
@@ -693,9 +742,9 @@ export default {
         },
 
         refresh() {
-            this.$nextTick(function() {
+            this.$nextTick(function () {
                 this.codemirror.refresh();
-            })
+            });
         },
 
         initToolbarButtons() {
@@ -721,11 +770,11 @@ export default {
     },
 
     computed: {
-        assetsEnabled: function() {
+        assetsEnabled: function () {
             return Boolean(this.config && this.config.container);
         },
 
-        container: function() {
+        container: function () {
             return this.config.container;
         },
 
@@ -733,7 +782,7 @@ export default {
             return this;
         },
 
-        folder: function() {
+        folder: function () {
             return this.config.folder || '/';
         },
 
@@ -742,10 +791,10 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return marked(this.data || '', { renderer: new PlainTextRenderer })
-                .replace(/<\/?[^>]+(>|$)/g, "");
+                .replace(/<\/?[^>]+(>|$)/g, '');
         }
     }
 

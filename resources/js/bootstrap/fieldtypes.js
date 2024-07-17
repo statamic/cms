@@ -38,7 +38,7 @@ import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
 // import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
 // import ListIndexFieldtype from '../components/fieldtypes/ListIndexFieldtype.vue';
-// import MarkdownFieldtype from '../components/fieldtypes/markdown/MarkdownFieldtype.vue';
+import MarkdownFieldtype from '../components/fieldtypes/markdown/MarkdownFieldtype.vue';
 // import MarkdownButtonsSettingFieldtype from '../components/fieldtypes/markdown/MarkdownButtonsSettingFieldtype.vue';
 import RadioFieldtype from '../components/fieldtypes/RadioFieldtype.vue';
 import RangeFieldtype from '../components/fieldtypes/RangeFieldtype.vue';
@@ -102,7 +102,7 @@ export default function registerFieldTypes(app) {
     app.component('link-fieldtype', LinkFieldtype);
     // app.component('list-fieldtype', ListFieldtype);
     // app.component('list-fieldtype-index', ListIndexFieldtype);
-    // app.component('markdown-fieldtype', MarkdownFieldtype);
+    app.component('markdown-fieldtype', MarkdownFieldtype);
     // app.component('markdown_buttons_setting-fieldtype', MarkdownButtonsSettingFieldtype);
     app.component('radio-fieldtype', RadioFieldtype);
     app.component('range-fieldtype', RangeFieldtype);
