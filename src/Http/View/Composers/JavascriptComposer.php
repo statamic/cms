@@ -72,6 +72,10 @@ class JavascriptComposer
             'permissions' => $this->permissions($user),
             'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
             'customSvgIcons' => Icon::getCustomSvgIcons(),
+            'firstDayOfWeek' => Site::selected()->attributes()['firstDayOfWeek'] ?? null,
+            'timezone' => Site::selected()->attributes()['timezone'] ?? null,
+            'calendar' => Site::selected()->attributes()['calendar'] ?? null,
+            'calendarLocale' => Site::selected()->attributes()['calendarLocale'] ?? null,
         ];
     }
 
