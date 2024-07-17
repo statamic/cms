@@ -316,6 +316,10 @@ export default {
             });
 
             this.$refs.tree.addPages(pages, this.targetParent);
+
+            if (pages.length === 1) {
+                this.editPage(pages[0], this.$refs.tree.$refs.tree, this.$refs.tree.$refs.tree.store);
+            }
         },
 
         isEntryBranch(branch) {
