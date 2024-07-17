@@ -55,9 +55,11 @@
                     ></resource-deleter>
                 </dropdown-item>
             @endcan
-            @foreach ($actions as $action)
-                <dropdown-item text="{{ $action->title() }}" ></dropdown-item>
-            @endforeach
+            <data-list-inline-actions
+                item="{{ $collection->handle() }}"
+                url="https://google.com"
+                :actions="{{ $actions }}"
+            />
 
         </template>
         @endif
