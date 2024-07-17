@@ -55,6 +55,10 @@
                     ></resource-deleter>
                 </dropdown-item>
             @endcan
+            @foreach ($actions as $action)
+                <dropdown-item text="{{ $action->title() }}" ></dropdown-item>
+            @endforeach
+
         </template>
         @endif
     </collection-view>
