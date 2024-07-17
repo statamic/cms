@@ -47,8 +47,32 @@ class Arr extends Fieldtype
         ];
     }
 
+    public function preload(): array
+    {
+        return [
+            'keys' => collect($this->config('keys'))
+                ->mapWithKeys(function ($value, $index) {
+                    $key = is_array($value) ? $value['key'] : $index;
+                    $label = is_array($value) ? $value['value'] : $value;
+
+                    return [$key => $label];
+                }),
+        ];
+    }
+
     public function preProcess($data)
     {
+        if ($this->isKeyed()) {
+            return collect($this->config('keys'))
+                ->mapWithKeys(function ($value, $index) use ($data) {
+                    $key = is_array($value) ? $value['key'] : $index;
+                    $value = collect($data)->where('key', $key)->pluck('value')->first();
+
+                    return [$key => $value ?? null];
+                })
+                ->all();
+        }
+
         // When using the legacy format, return the data as is.
         if (! is_array(SupportArr::first($data))) {
             return $data ?? [];
@@ -80,19 +104,6 @@ class Arr extends Fieldtype
     protected function isKeyed()
     {
         return (bool) $this->config('keys');
-    }
-
-    protected function blankKeyed()
-    {
-        return collect($this->config('keys'))
-            ->mapWithKeys(function ($value, $index) {
-                if (! is_array($value)) {
-                    return [$index => null];
-                }
-
-                return [$value['key'] => $value['value']];
-            })
-            ->all();
     }
 
     public function toGqlType()
