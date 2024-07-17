@@ -194,6 +194,8 @@ class Multisite extends Command
 
     private function clearStache(): self
     {
+        Config::set('statamic.system.multisite', false);
+
         $this->components->task(
             description: 'Clearing Stache...',
             task: function () {
