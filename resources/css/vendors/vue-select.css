@@ -83,11 +83,6 @@
 	padding: 8px 12px !important;
 }
 
-.vs--single .vs__selected {
-    display: block !important;
-    width: 100%;
-}
-
 .vs--single.vs--unsearchable .vs__selected-options {
 	@apply clickable;
     @apply flex flex-1 rounded-s relative h-full border-0;
