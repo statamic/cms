@@ -45,6 +45,12 @@
             @can('edit', $collection)
                 <dropdown-item :text="__('Scaffold Views')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>
             @endcan
+            <data-list-inline-actions
+                item="{{ $collection->handle() }}"
+                url="{{ cp_route('collections.actions.run', ['collection' => $collection->handle()]) }}"
+                :actions="{{ $actions }}"
+                @completed="actionCompleted"
+            ></data-list-inline-actions>
             @can('delete', $collection)
                 <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">
                     <resource-deleter
@@ -55,12 +61,6 @@
                     ></resource-deleter>
                 </dropdown-item>
             @endcan
-            <data-list-inline-actions
-                item="{{ $collection->handle() }}"
-                url="{{ cp_route('collections.actions.run', ['collection' => $collection->handle()]) }}"
-                :actions="{{ $actions }}"
-                v-on:completed="actionCompleted"
-            ></data-list-inline-actions>
 
         </template>
         @endif
