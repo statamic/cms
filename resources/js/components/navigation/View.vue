@@ -267,7 +267,7 @@ export default {
                 return 1;
             }
 
-            return null
+            return
         },
 
     },
