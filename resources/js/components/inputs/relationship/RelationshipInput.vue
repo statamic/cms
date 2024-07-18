@@ -5,7 +5,6 @@
         <relationship-select-field
             v-if="!initializing && usesSelectField"
             :config="config"
-            :meta="meta"
             :items="items"
             :multiple="maxItems > 1"
             :typeahead="mode === 'typeahead'"
@@ -103,7 +102,6 @@ export default {
         name: String,
         value: { required: true },
         config: Object,
-        meta: Object,
         data: Array,
         maxItems: Number,
         itemComponent: {

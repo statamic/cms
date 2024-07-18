@@ -75,7 +75,6 @@ export default {
         multiple: Boolean,
         taggable: Boolean,
         config: Object,
-        meta: Object,
         readOnly: Boolean,
         site: String,
     },
