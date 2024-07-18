@@ -148,6 +148,7 @@ class Sites
                 'handle' => 'name',
                 'field' => [
                     'type' => 'text',
+                    'instructions' => __('statamic::messages.site_configure_name_instructions'),
                     'required' => true,
                     'width' => 50,
                 ],
@@ -158,6 +159,7 @@ class Sites
                     'type' => 'slug',
                     'separator' => '_',
                     'generate' => true,
+                    'instructions' => __('statamic::messages.site_configure_handle_instructions'),
                     'show_regenerate' => true,
                     'from' => 'name',
                     'required' => true,
@@ -168,28 +170,35 @@ class Sites
                 'handle' => 'url',
                 'field' => [
                     'type' => 'text',
+                    'instructions' => __('statamic::messages.site_configure_url_instructions'),
                     'required' => true,
+                    'width' => 33,
                 ],
             ],
             [
                 'handle' => 'locale',
                 'field' => [
                     'type' => 'text',
+                    'instructions' => __('statamic::messages.site_configure_locale_instructions'),
                     'required' => true,
-                    'width' => 50,
+                    'width' => 33,
                 ],
             ],
             [
                 'handle' => 'lang',
                 'field' => [
                     'type' => 'text',
-                    'width' => 50,
+                    'instructions' => __('statamic::messages.site_configure_lang_instructions'),
+                    'width' => 33,
                 ],
             ],
             [
                 'handle' => 'attributes',
                 'field' => [
+                    'display' => __('Custom Attributes'),
+                    'instructions' => __('statamic::messages.site_configure_attributes_instructions'),
                     'type' => 'array',
+                    'add_button' => __('Add Attribute'),
                 ],
             ],
         ];

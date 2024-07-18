@@ -186,9 +186,9 @@ return [
     | Fake SQL Queries
     |--------------------------------------------------------------------------
     |
-    | When enabled, Statamic's query builders will emit events that appear
-    | the same way as any other query. This can be useful for debugging.
-    | The generated SQL statements are approximations and not exact.
+    | Enable while using the flat-file Stache driver to show fake "SQL" query
+    | approximations in your database debugging tools — including Debugbar,
+    | Laravel Telescope, and Ray with the ray()->showQueries() helper.
     |
     */
 

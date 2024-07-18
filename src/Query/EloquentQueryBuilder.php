@@ -440,6 +440,8 @@ abstract class EloquentQueryBuilder implements Builder
      */
     public function chunk($count, callable $callback)
     {
+        $this->enforceOrderBy();
+
         $page = 1;
 
         do {
@@ -483,6 +485,8 @@ abstract class EloquentQueryBuilder implements Builder
             throw new InvalidArgumentException('The chunk size should be at least 1');
         }
 
+        $this->enforceOrderBy();
+
         return LazyCollection::make(function () use ($chunkSize) {
             $page = 1;
 
@@ -498,5 +502,17 @@ abstract class EloquentQueryBuilder implements Builder
                 }
             }
         });
+    }
+
+    /**
+     * Add a generic "order by" clause if the query doesn't already have one.
+     *
+     * @return void
+     */
+    protected function enforceOrderBy()
+    {
+        if (empty($this->builder->query->orders) && empty($this->builder->query->unionOrders)) {
+            $this->orderBy($this->builder->getModel()->getQualifiedKeyName(), 'asc');
+        }
     }
 }

@@ -27,6 +27,7 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Support\Arr;
+use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Stringy\StaticStringy as Stringy;
@@ -487,7 +488,7 @@ class CoreModifiers extends Modifier
      */
     public function ddd($value)
     {
-        ddd($value);
+        ddd(Dumper::resolve($value));
     }
 
     /**
@@ -495,7 +496,7 @@ class CoreModifiers extends Modifier
      */
     public function debug($value)
     {
-        debug($value);
+        debug(Dumper::resolve($value));
     }
 
     /**
@@ -544,7 +545,7 @@ class CoreModifiers extends Modifier
      */
     public function dd($value)
     {
-        function_exists('ddd') ? ddd($value) : dd($value);
+        dd(Dumper::resolve($value));
     }
 
     /**
@@ -552,7 +553,7 @@ class CoreModifiers extends Modifier
      */
     public function dump($value)
     {
-        dump($value);
+        dump(Dumper::resolve($value));
     }
 
     /**
@@ -767,7 +768,7 @@ class CoreModifiers extends Modifier
 
         // Convert the item to an array, since we'll want access to all the
         // available data. Then grab the requested variable from there.
-        $array = $item instanceof Augmentable ? $item->toAugmentedArray() : $item->toArray();
+        $array = $item instanceof Augmentable ? $item->toDeferredAugmentedArray() : $item->toArray();
 
         if ($arrayValue = Arr::get($array, $var)) {
             return $arrayValue;
@@ -838,7 +839,7 @@ class CoreModifiers extends Modifier
     {
         // Make the array just from the params, so it only augments the values that might be needed.
         $keys = explode(':', $groupBy);
-        $context = $item->toAugmentedArray($keys);
+        $context = $item->toDeferredAugmentedArray($keys);
 
         return Antlers::parser()->getVariable($groupBy, $context);
     }
@@ -2057,7 +2058,7 @@ class CoreModifiers extends Modifier
         }
 
         if ($value instanceof Collection) {
-            $value = $value->toAugmentedArray();
+            $value = $value->toDeferredAugmentedArray();
         }
 
         return Arr::addScope($value, $scope);

@@ -195,6 +195,10 @@ export default {
         },
 
         editConfirmed() {
+            if (! this.editingSection.handle) {
+                this.editingSection.handle = snake_case(this.editingSection.display)
+            }
+
             this.$emit('updated', {...this.section, ...this.editingSection});
             this.editingSection = false;
         },

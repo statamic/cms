@@ -1,5 +1,51 @@
 # Release Notes
 
+## 5.0.0 (2024-05-09)
+
+### What's new
+- Official 5.0 release! 🎉
+
+### What's fixed
+- Allow opting out of svg tag sanitization [#10020](https://github.com/statamic/cms/issues/10020) by @jasonvarga
+- Use `Statamic.$slug` helper instead of `$slugify` [#10018](https://github.com/statamic/cms/issues/10018) by @duncanmcclean
+
+
+
+## 5.0.0-beta.4 (2024-05-07)
+
+### What's changed
+- Prevent excessive nocache cache growth. [#9999](https://github.com/statamic/cms/issues/9999) by @JohnathonKoster
+- Ensures values are resolved when checking Antlers parsing settings. [#10003](https://github.com/statamic/cms/issues/10003) by @JohnathonKoster
+
+
+
+## 5.0.0-beta.3 (2024-05-04)
+
+### What's changed
+- Fix 404s due to entry uri caching changes. [#9998](https://github.com/statamic/cms/issues/9998) by @jasonvarga
+- Fix please command `--help` listing. [#9977](https://github.com/statamic/cms/issues/9977) by @jesseleite
+
+
+
+## 5.0.0-beta.2 (2024-05-03)
+
+### What's changed
+- Prevent falsey values from returning blueprint defaults. [#9990](https://github.com/statamic/cms/issues/9990) by @JohnathonKoster
+- Extract whereSite query method to trait. [#9991](https://github.com/statamic/cms/issues/9991) by @jasonvarga
+- Multi site config help text. [#9986](https://github.com/statamic/cms/issues/9986) by @jackmcdade
+- Improve the fake sql config code comment. [#9985](https://github.com/statamic/cms/issues/9985) by @jackmcdade
+
+
+
+## 5.0.0-beta.1 (2024-05-02)
+
+### What's changed
+- Augmentation performance improvements. [#9636](https://github.com/statamic/cms/issues/9636) by @JohnathonKoster
+- Offline License Validation. [#9975](https://github.com/statamic/cms/issues/9975) by @duncanmcclean
+- Entry URI caching. [#9844](https://github.com/statamic/cms/issues/9844) by @jasonvarga
+
+
+
 ## 5.0.0-alpha.6 (2024-04-26)
 
 ### What's changed

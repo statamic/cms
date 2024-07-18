@@ -1354,7 +1354,7 @@ class EntryTest extends TestCase
 
         $entry->saveQuietly();
 
-        $cached = Cache::get('stache::items::entries::blog::1')['entry'];
+        $cached = Cache::get('stache::items::entries::blog::1');
         $reflection = new ReflectionClass($cached);
         $property = $reflection->getProperty('withEvents');
         $property->setAccessible(true);

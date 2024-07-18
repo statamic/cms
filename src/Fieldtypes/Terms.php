@@ -356,6 +356,7 @@ class Terms extends Relationship
 
         return [
             'id' => $id,
+            'reference' => $term->reference(),
             'title' => $term->value('title'),
             'published' => $term->published(),
             'private' => $term->private(),
