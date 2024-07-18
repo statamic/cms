@@ -13,7 +13,7 @@
                         <dropdown-item v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" :redirect="collection.blueprints_url" />
                         <dropdown-item v-if="collection.editable" :text="__('Scaffold Views')" :redirect="collection.scaffold_url" />
                         <data-list-inline-actions
-                            :item="`${collection.id}`"
+                            :item="collection.id"
                             :url="collection.actions_url"
                             :actions="collection.actions"
                             @completed="actionCompleted"
