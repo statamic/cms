@@ -4,6 +4,7 @@ namespace Tests\Assets;
 
 use Illuminate\Contracts\Bus\Dispatcher;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetUploaded;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 
 class GeneratePresetImageManipulationsOnUpload extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_subscribes()
     {
         $events = Mockery::mock(Dispatcher::class);
@@ -25,11 +26,8 @@ class GeneratePresetImageManipulationsOnUpload extends TestCase
         (new GeneratePresetImageManipulations($generator))->subscribe($events);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider presetProvider
-     */
+    #[Test]
+    #[DataProvider('presetProvider')]
     public function presets_are_generated_for_images($event, $extension, $shouldGenerate)
     {
         $generator = Mockery::mock(PresetGenerator::class);

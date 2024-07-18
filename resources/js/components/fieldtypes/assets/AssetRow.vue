@@ -1,5 +1,5 @@
 <template>
-    <tr class="cursor-grab bg-white hover:bg-gray-100">
+    <tr class="cursor-grab bg-white dark:bg-dark-750 hover:bg-gray-100 dark:hover:bg-dark-700">
         <td class="flex items-center h-full">
             <div
                 v-if="canShowSvg"
@@ -32,7 +32,7 @@
         </td>
         <td class="w-24" v-if="showSetAlt">
             <button
-                class="asset-set-alt text-blue px-4 text-sm hover:text-black"
+                class="asset-set-alt text-blue dark:text-dark-blue-100 px-4 text-sm hover:text-black dark:hover:text-dark-100"
                 @click="editOrOpen"
                 v-if="needsAlt"
             >
@@ -41,7 +41,7 @@
         </td>
         <td class="p-0 w-8 rtl:text-left ltr:text-right align-middle" v-if="!readOnly">
             <button
-                class="flex items-center p-1 w-6 h-8 text-lg antialiased text-gray-600 hover:text-gray-900"
+                class="flex items-center p-1 w-6 h-8 text-lg antialiased text-gray-600 dark:text-dark-150 hover:text-gray-900 dark:hover:text-dark-100"
                 @click="remove"
                 :aria-label="__('Remove Asset')"
             >

@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -19,11 +21,8 @@ class IsArrayTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider arrayProvider
-     */
+    #[Test]
+    #[DataProvider('arrayProvider')]
     public function it_returns_true_if_value_is_array($expected, $input): void
     {
         $modified = $this->modify($input);

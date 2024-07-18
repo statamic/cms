@@ -5,25 +5,25 @@ namespace Statamic\Console\Commands;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 
-class StaticWarmJob implements ShouldQueue
+class StaticWarmJob implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
-    public Request $request;
-
+    public $uniqueId;
     public $tries = 1;
 
-    public function __construct(Request $request)
+    public function __construct(public Request $request, public array $clientConfig)
     {
-        $this->request = $request;
+        $this->uniqueId = (string) $request->getUri();
     }
 
-    public function handle(Client $client)
+    public function handle()
     {
-        $client->send($this->request);
+        (new Client($this->clientConfig))->send($this->request);
     }
 }

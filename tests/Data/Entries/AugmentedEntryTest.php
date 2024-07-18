@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Query\Builder;
@@ -19,7 +20,7 @@ use Tests\Data\AugmentedTestCase;
 
 class AugmentedEntryTest extends AugmentedTestCase
 {
-    /** @test */
+    #[Test]
     public function it_has_a_parent_method()
     {
         $entry = Mockery::mock(Entry::class);
@@ -31,7 +32,7 @@ class AugmentedEntryTest extends AugmentedTestCase
         $this->assertEquals('the parent', $augmented->get('parent'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_values()
     {
         Carbon::setTestNow('2020-04-15 13:00:00');
@@ -123,7 +124,7 @@ class AugmentedEntryTest extends AugmentedTestCase
         $this->assertAugmentedCorrectly($expectations, $augmented);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_mount_from_the_value_first_if_it_exists()
     {
         $mount = tap(Collection::make('a'))->save();
@@ -144,7 +145,7 @@ class AugmentedEntryTest extends AugmentedTestCase
         $this->assertEquals('b', $augmented->get('mount')->value());
     }
 
-    /** @test */
+    #[Test]
     public function authors_is_just_the_value_if_its_not_in_the_blueprint()
     {
         $entry = EntryFactory::id('entry-id')
@@ -165,7 +166,7 @@ class AugmentedEntryTest extends AugmentedTestCase
         $this->assertEquals('joe and bob', $augmented->get('authors')->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_authors_from_the_value_if_its_in_the_blueprint()
     {
         $blueprint = Blueprint::makeFromFields(['authors' => ['type' => 'users']]);
@@ -197,7 +198,7 @@ class AugmentedEntryTest extends AugmentedTestCase
         $this->assertEquals(['user-1', 'user-2'], $authors->get()->map->id()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_evaluated_computed_callbacks_when_getting_keys()
     {
         $computedCallbackCount = 0;

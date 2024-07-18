@@ -17,6 +17,8 @@
         :can-edit-password="{{ Statamic\Support\Str::bool($canEditPassword) }}"
         :can-edit-blueprint="{{ Statamic\Support\Str::bool($user->can('configure fields')) }}"
         :requires-current-password="{{ Statamic\Support\Str::bool($requiresCurrentPassword) }}"
+        :initial-item-actions="{{ json_encode($itemActions) }}"
+        item-action-url="{{ cp_route('users.actions.run') }}"
     ></user-publish-form>
 
 @endsection

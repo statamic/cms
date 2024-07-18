@@ -15,9 +15,10 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
-use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
+use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
@@ -105,6 +106,11 @@ class Entries extends Relationship
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
                         'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
                 ],
             ],
@@ -140,7 +146,7 @@ class Entries extends Relationship
 
     public function getResourceCollection($request, $items)
     {
-        return (new EntriesResource($items))
+        return (new EntriesFieldtypeEntries($items, $this))
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
@@ -311,7 +317,7 @@ class Entries extends Relationship
             return $this->invalidItemArray($id);
         }
 
-        return (new EntryResource($entry))->resolve()['data'];
+        return (new EntryResource($entry, $this))->resolve()['data'];
     }
 
     protected function collect($value)
@@ -455,5 +461,12 @@ class Entries extends Relationship
             'expectsRoot' => $collection->structure()->expectsRoot(),
             'blueprints' => $blueprints,
         ]]);
+    }
+
+    public function getItemHint($item): ?string
+    {
+        return collect([
+            count($this->getConfiguredCollections()) > 1 ? __($item->collection()->title()) : null,
+        ])->filter()->implode(' • ');
     }
 }
