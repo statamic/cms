@@ -13,7 +13,7 @@ class EntriesIndexQuery
         //
     }
 
-    public function paginate(int $perPage)
+    public function paginate(?int $perPage)
     {
         $payload = $this->runHooksWith('query', [
             'query' => $this->query,
