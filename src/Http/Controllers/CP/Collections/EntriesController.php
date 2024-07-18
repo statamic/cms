@@ -13,6 +13,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\User;
+use Statamic\Hooks\CP\EntriesIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
@@ -20,12 +21,10 @@ use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Support\Traits\Hookable;
 
 class EntriesController extends CpController
 {
     use ExtractsFromEntryFields,
-        Hookable,
         QueriesFilters;
 
     public function index(FilteredRequest $request, $collection)
@@ -51,9 +50,7 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $query = $this->runHooks('index-query', $query);
-
-        $entries = $query->paginate(request('perPage'));
+        $entries = (new EntriesIndexQuery($query))->paginate(request('perPage'));
 
         if (request('search') && $collection->hasSearchIndex()) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());
