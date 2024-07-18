@@ -28,6 +28,7 @@ export default {
     props: {
         site: String,
         collections: Array,
+        canSelectAcrossSites: Boolean,
         maxItems: {
             type: Number,
             required: false,
@@ -39,6 +40,7 @@ export default {
             config: {
                 type: 'entries',
                 collections: this.collections,
+                select_across_sites: this.canSelectAcrossSites,
             },
             columns: [
                 { label: __('Title'), field: 'title' },

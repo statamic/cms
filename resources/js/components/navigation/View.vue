@@ -129,6 +129,7 @@
             :site="site"
             :collections="collections"
             :max-items="maxPagesSelection"
+            :can-select-across-sites="canSelectAcrossSites"
             @selected="entriesSelected"
         />
 
@@ -203,7 +204,8 @@ export default {
         site: { type: String, required: true },
         sites: { type: Array, required: true },
         blueprint: { type: Object, required: true },
-        canEdit: { type: Boolean, required: true }
+        canEdit: { type: Boolean, required: true },
+        canSelectAcrossSites: { type: Boolean, required: true }
     },
 
     data() {
