@@ -20,6 +20,7 @@
         reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
         initial-site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
+        ref="collectionView"
 
         @if ($collection->hasStructure())
         :structured="{{ Statamic\Support\Str::bool($user->can('reorder', $collection)) }}"
@@ -57,9 +58,10 @@
             @endcan
             <data-list-inline-actions
                 item="{{ $collection->handle() }}"
-                url="https://google.com"
+                url="{{ cp_route('collections.actions.run', ['collection' => $collection->handle()]) }}"
                 :actions="{{ $actions }}"
-            />
+                v-on:completed="$refs.collectionView.actionCompleted()"
+            ></data-list-inline-actions>
 
         </template>
         @endif

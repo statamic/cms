@@ -39,13 +39,4 @@ class ActionRepository
             ->filter->authorizeBulk(User::current(), $items)
             ->values();
     }
-
-    public function forListing(object $resource, $context = [])
-    {
-        return $this->all()
-            ->each->context($context)
-            ->filter->visibleToListing($resource)
-            // ->filter->authorizeBulk(User::current(), $items)
-            ->values();
-    }
 }

@@ -46,11 +46,6 @@ abstract class Action implements Arrayable
         return $items->count() === $allowedOnItems->count();
     }
 
-    public function visibleToListing(object $resource)
-    {
-        return false;
-    }
-
     public function authorize($user, $item)
     {
         return true;

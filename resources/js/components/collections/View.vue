@@ -168,8 +168,11 @@ import PageTree from '../structures/PageTree.vue';
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
+import HasActions from '../data-list/HasActions';
 
 export default {
+
+    mixins: [HasActions],
 
     components: {
         PageTree,
