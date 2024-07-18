@@ -1,5 +1,16 @@
 # Release Notes
 
+## 5.16.0 (2024-07-17)
+
+### What's new
+- Ability for relationship/entries fieldtype to add "hints" [#10447](https://github.com/statamic/cms/issues/10447) by @jasonvarga
+
+### What's fixed
+- Improve multisite fresh-run detection logic [#10469](https://github.com/statamic/cms/issues/10469) by @jesseleite
+- Clarify difference between `default()` and `getFallbackConfig()` site methods [#10470](https://github.com/statamic/cms/issues/10470) by @jesseleite
+
+
+
 ## 5.15.0 (2024-07-17)
 
 ### What's new

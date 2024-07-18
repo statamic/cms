@@ -14,6 +14,7 @@
             :columns="columns"
             :can-create="false"
             :can-reorder="false"
+            :max-items="maxItems"
             @item-data-updated="itemDataUpdated"
         />
 
@@ -28,6 +29,10 @@ export default {
         site: String,
         collections: Array,
         canSelectAcrossSites: Boolean,
+        maxItems: {
+            type: Number,
+            required: false,
+        },
     },
 
     data() {
