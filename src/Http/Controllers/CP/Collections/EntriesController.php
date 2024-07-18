@@ -50,7 +50,7 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $entries = (new EntriesIndexQuery($query))->paginate(request('perPage'));
+        $entries = (new EntriesIndexQuery($query, $collection))->paginate(request('perPage'));
 
         if (request('search') && $collection->hasSearchIndex()) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());

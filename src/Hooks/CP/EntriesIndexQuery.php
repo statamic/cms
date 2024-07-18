@@ -8,15 +8,18 @@ class EntriesIndexQuery
 {
     use Hookable;
 
-    public function __construct(private $query)
+    public function __construct(private $query, private $collection)
     {
         //
     }
 
     public function paginate(int $perPage)
     {
-        $query = $this->runHooks('query', $this->query);
+        $payload = $this->runHooksWith('query', [
+            'query' => $this->query,
+            'collection' => $this->collection,
+        ]);
 
-        return $query->paginate($perPage);
+        return $payload->query->paginate($perPage);
     }
 }
