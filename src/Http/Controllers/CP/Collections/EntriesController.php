@@ -25,8 +25,8 @@ use Statamic\Support\Traits\Hookable;
 class EntriesController extends CpController
 {
     use ExtractsFromEntryFields,
-        QueriesFilters,
-        Hookable;
+        Hookable,
+        QueriesFilters;
 
     public function index(FilteredRequest $request, $collection)
     {
