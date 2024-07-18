@@ -351,6 +351,10 @@ export default {
         editPage(page, vm, store, $event) {
             const url = page.edit_url;
             $event.metaKey ? window.open(url) : window.location = url;
+        },
+
+        afterActionSuccessfullyCompleted(response) {
+            // should reload in there but if we do, we lose the toast
         }
 
     }
