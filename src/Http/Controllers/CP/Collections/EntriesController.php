@@ -20,11 +20,13 @@ use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 
 class EntriesController extends CpController
 {
     use ExtractsFromEntryFields,
-        QueriesFilters;
+        QueriesFilters,
+        Hookable;
 
     public function index(FilteredRequest $request, $collection)
     {
@@ -48,6 +50,8 @@ class EntriesController extends CpController
         if ($sortField) {
             $query->orderBy($sortField, $sortDirection);
         }
+
+        $query = $this->runHooks('index-query', $query);
 
         $entries = $query->paginate(request('perPage'));
 
