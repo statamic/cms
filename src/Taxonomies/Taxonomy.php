@@ -372,6 +372,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             throw new NotFoundHttpException;
         }
 
+        if ($this->collection() && ! $this->collection()->sites()->contains(Site::current())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new \Statamic\Http\Responses\DataResponse($this))
             ->with([
                 'terms' => $termQuery = $this->queryTerms(),
