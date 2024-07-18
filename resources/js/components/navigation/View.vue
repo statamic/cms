@@ -318,7 +318,7 @@ export default {
 
             this.$refs.tree.addPages(pages, this.targetParent);
 
-            if (pages.length === 1) {
+            if (this.maxPagesSelection === 1) {
                 this.removePageOnCancel = true;
                 this.editPage(pages[0], this.$refs.tree.$refs.tree, this.$refs.tree.$refs.tree.store);
             }
