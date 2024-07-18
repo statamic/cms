@@ -20,7 +20,6 @@
         reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
         initial-site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
-        ref="collectionView"
 
         @if ($collection->hasStructure())
         :structured="{{ Statamic\Support\Str::bool($user->can('reorder', $collection)) }}"
@@ -36,7 +35,7 @@
             || auth()->user()->can('delete', $collection)
             || auth()->user()->can('configure fields')
         )
-        <template #twirldown>
+        <template #twirldown="{ actionCompleted }">
             @can('edit', $collection)
                 <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
             @endcan
@@ -60,7 +59,7 @@
                 item="{{ $collection->handle() }}"
                 url="{{ cp_route('collections.actions.run', ['collection' => $collection->handle()]) }}"
                 :actions="{{ $actions }}"
-                v-on:completed="$refs.collectionView.actionCompleted()"
+                v-on:completed="actionCompleted"
             ></data-list-inline-actions>
 
         </template>

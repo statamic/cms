@@ -10,7 +10,7 @@
                 <h1 class="flex-1" v-text="__(title)" />
 
                 <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="!!this.$scopedSlots.twirldown">
-                    <slot name="twirldown" />
+                    <slot name="twirldown" :actionCompleted="actionCompleted" />
                 </dropdown-list>
 
                 <div class="btn-group rtl:ml-4 ltr:mr-4" v-if="canUseStructureTree && !treeIsDirty">
@@ -168,7 +168,7 @@ import PageTree from '../structures/PageTree.vue';
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
-import HasActions from '../data-list/HasActions';
+import HasActions from '../publish/HasActions';
 
 export default {
 
