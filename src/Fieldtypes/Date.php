@@ -102,9 +102,9 @@ class Date extends Fieldtype
                             'japanese' => __('Japanese'),
                             'persian' => __('Persian'),
                             'roc' => __('Republic of China'),
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
             [
                 'display' => __('Timepicker'),
