@@ -11,6 +11,7 @@
             :multiple="multiple"
             :options="options"
             :get-option-key="(option) => option.id"
+            :get-option-label="(option) => __(option.title)"
             :create-option="(value) => ({ title: value, id: value })"
             :placeholder="__(config.placeholder) || __('Choose...')"
             :searchable="true"
