@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
+use Statamic\Events\UserPasswordChanged;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
@@ -27,6 +28,8 @@ class PasswordController extends CpController
         $request->validate($rules);
 
         $user->password($request->password)->save();
+
+        UserPasswordChanged::dispatch($user);
 
         return response('', 204);
     }

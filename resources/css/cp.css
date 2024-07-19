@@ -63,6 +63,7 @@
 @import "components/fieldtypes/hidden";
 @import "components/fieldtypes/markdown";
 @import "components/fieldtypes/partial";
+@import "components/fieldtypes/radio";
 @import "components/fieldtypes/relationship";
 @import "components/fieldtypes/replicator";
 @import "components/fieldtypes/section";

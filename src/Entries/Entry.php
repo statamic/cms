@@ -1031,6 +1031,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return (string) Antlers::parse($format, array_merge($this->routeData(), [
+            'config' => config()->all(),
             'site' => $this->site(),
             'uri' => $this->uri(),
             'url' => $this->url(),

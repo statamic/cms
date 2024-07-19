@@ -30,7 +30,6 @@
             </div>
 
             <div class="hidden md:flex items-center">
-
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
@@ -45,13 +44,19 @@
                     />
                 </save-button-options>
 
-                <button
+                <save-button-options
                     v-if="revisionsEnabled && !isCreating"
-                    class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
-                    :disabled="!canPublish"
-                    @click="confirmingPublish = true"
-                    v-text="publishButtonText"
-                />
+                    :show-options="!isInline"
+                    button-class="btn-primary"
+                    :preferences-prefix="preferencesPrefix"
+                >
+                    <button
+                        class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
+                        :disabled="!canPublish"
+                        @click="confirmingPublish = true"
+                        v-text="publishButtonText"
+                    />
+                </save-button-options>
             </div>
 
             <slot name="action-buttons-right" />
@@ -112,7 +117,7 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <div class="p-3 flex items-center space-x-2 rtl:space-x-reverse" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn w-full"
                                             v-if="showLivePreviewButton"
@@ -775,16 +780,34 @@ export default {
             this.$refs.container.saved();
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
-            this.title = response.data.data.title;
-            clearTimeout(this.trackDirtyStateTimeout);
-            this.trackDirtyState = false;
-            this.values = this.resetValuesFromResponse(response.data.data.values);
-            this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
-            this.activeLocalization.title = response.data.data.title;
-            this.activeLocalization.published = response.data.data.published;
-            this.activeLocalization.status = response.data.data.status;
-            this.permalink = response.data.data.permalink
-            this.$nextTick(() => this.$emit('saved', response));
+
+            let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
+
+            // If the user has opted to create another entry, redirect them to create page.
+            if (!this.isInline && nextAction === 'create_another') {
+                window.location = this.createAnotherUrl;
+            }
+
+            // If the user has opted to go to listing (default/null option), redirect them there.
+            else if (!this.isInline && nextAction === null) {
+                window.location = this.listingUrl;
+            }
+
+            // Otherwise, leave them on the edit form and emit an event. We need to wait until after
+            // the hooks are resolved because if this form is being shown in a stack, we only
+            // want to close it once everything's done.
+            else {
+                this.title = response.data.data.title;
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
+                this.values = this.resetValuesFromResponse(response.data.data.values);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
+                this.activeLocalization.title = response.data.data.title;
+                this.activeLocalization.published = response.data.data.published;
+                this.activeLocalization.status = response.data.data.status;
+                this.permalink = response.data.data.permalink
+                this.$nextTick(() => this.$emit('saved', response));
+            }
         },
 
         setFieldValue(handle, value) {

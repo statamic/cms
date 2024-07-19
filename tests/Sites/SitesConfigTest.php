@@ -2,8 +2,12 @@
 
 namespace Tests\Sites;
 
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\SiteCreated;
+use Statamic\Events\SiteDeleted;
+use Statamic\Events\SiteSaved;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
@@ -435,5 +439,76 @@ class SitesConfigTest extends TestCase
             ->assertJson(['errors' => [
                 'sites' => ['This field is required.'],
             ]]);
+    }
+
+    #[Test]
+    public function it_dispatches_site_saved_events()
+    {
+        Event::fake();
+
+        Site::save();
+
+        Event::assertDispatched(SiteSaved::class, 2);
+
+        Event::assertDispatched(function (SiteSaved $event) {
+            return $event->site->handle() === 'english';
+        });
+
+        Event::assertDispatched(function (SiteSaved $event) {
+            return $event->site->handle() === 'french';
+        });
+    }
+
+    #[Test]
+    public function it_dispatches_site_created_events()
+    {
+        Event::fake();
+
+        Site::setSites(
+            collect(Site::config())
+                ->put('german', ['name' => 'German', 'url' => '/de/'])
+                ->put('polish', ['name' => 'Polish', 'url' => '/pl/'])
+                ->all()
+        )->save();
+
+        Event::assertDispatched(SiteCreated::class, 2);
+
+        Event::assertDispatched(function (SiteCreated $event) {
+            return $event->site->handle() === 'german';
+        });
+
+        Event::assertDispatched(function (SiteCreated $event) {
+            return $event->site->handle() === 'polish';
+        });
+
+        // We're saving a total of 4 sites to yaml after the above changes, so we should see 4 `SiteSaved` events as well
+        Event::assertDispatched(SiteSaved::class, 4);
+    }
+
+    #[Test]
+    public function it_dispatches_site_deleted_events()
+    {
+        Event::fake();
+
+        Site::setSites(
+            collect(Site::config())
+                ->put('german', ['name' => 'German', 'url' => '/de/'])
+                ->forget('english')
+                ->forget('french')
+                ->all()
+        )->save();
+
+        Event::assertDispatched(SiteDeleted::class, 2);
+
+        Event::assertDispatched(function (SiteDeleted $event) {
+            return $event->site->handle() === 'english';
+        });
+
+        Event::assertDispatched(function (SiteDeleted $event) {
+            return $event->site->handle() === 'french';
+        });
+
+        // We're saving a total of 1 site to yaml after the above changes, so we should see 1 `SiteSaved` event as well
+        Event::assertDispatched(SiteSaved::class, 1);
     }
 }
