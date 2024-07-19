@@ -373,6 +373,10 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
             throw new NotFoundHttpException;
         }
 
+        if ($this->collection() && ! $this->taxonomy()->isAssignedToCollection()) {
+            throw new NotFoundHttpException;
+        }
+
         return (new DataResponse($this))->toResponse($request);
     }
 
