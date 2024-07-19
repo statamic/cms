@@ -16,6 +16,7 @@ use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Facades\User;
 use Statamic\Policies;
+use Statamic\Statamic;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -83,13 +84,15 @@ class AuthServiceProvider extends ServiceProvider
             return new UserProvider;
         });
 
-        Gate::before(function ($user, $ability) {
-            return optional(User::fromUser($user))->isSuper() ? true : null;
-        });
+        if (Statamic::isCpRoute()) {
+            Gate::before(function ($user, $ability) {
+                return optional(User::fromUser($user))->isSuper() ? true : null;
+            });
 
-        Gate::after(function ($user, $ability) {
-            return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
-        });
+            Gate::after(function ($user, $ability) {
+                return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
+            });
+        }
 
         foreach ($this->policies as $key => $policy) {
             Gate::policy($key, $policy);
