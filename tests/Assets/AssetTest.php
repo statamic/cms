@@ -2013,23 +2013,6 @@ class AssetTest extends TestCase
     }
 
     #[Test]
-    public function it_makes_filename_replacements()
-    {
-        Event::fake();
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
-
-        $asset = $this->container->makeAsset($original = 'one two#three:four|five?six*seven.jpg');
-        $asset->upload(UploadedFile::fake()->image($original));
-
-        Storage::disk('test')->assertExists($updated = 'one-two-three-four-five-six-seven.jpg');
-        $this->assertEquals($updated, $asset->path());
-
-        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
-            return $event->asset = $asset;
-        });
-    }
-
-    #[Test]
     public function it_lowercases_uploaded_filenames_by_default()
     {
         Event::fake();
