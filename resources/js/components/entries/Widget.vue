@@ -31,6 +31,7 @@
                     :resource-meta="meta"
                     @page-selected="selectPage"
                     :scroll-to-top="false"
+                    :show-page-links="false"
                 />
             </div>
         </data-list>
