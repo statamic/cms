@@ -84,15 +84,17 @@ class AuthServiceProvider extends ServiceProvider
             return new UserProvider;
         });
 
-        if (Statamic::isCpRoute()) {
-            Gate::before(function ($user, $ability) {
+        Gate::before(function ($user, $ability) {
+            if (Statamic::isCpRoute()) {
                 return optional(User::fromUser($user))->isSuper() ? true : null;
-            });
+            }
+        });
 
-            Gate::after(function ($user, $ability) {
+        Gate::after(function ($user, $ability) {
+            if (Statamic::isCpRoute()) {
                 return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
-            });
-        }
+            }
+        });
 
         foreach ($this->policies as $key => $policy) {
             Gate::policy($key, $policy);
