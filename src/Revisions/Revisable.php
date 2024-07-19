@@ -3,6 +3,7 @@
 namespace Statamic\Revisions;
 
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Statamic;
 
@@ -71,10 +72,28 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
+        if ($item instanceof Entry) {
+            $parent = $item->get('parent');
+
+            $item->remove('parent');
+        }
+
         $item
             ->published(true)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
+
+        if ($item instanceof Entry && $item->collection()->hasStructure() && $parent) {
+            $tree = $item->collection()->structure()->in($item->locale());
+
+            if (optional($tree->find($parent))->isRoot()) {
+                $parent = null;
+            }
+
+            $tree
+                ->move($this->id(), $parent)
+                ->save();
+        }
 
         $item
             ->makeRevision()

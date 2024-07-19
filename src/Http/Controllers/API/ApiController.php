@@ -25,6 +25,10 @@ class ApiController extends Controller
      */
     protected function abortIfUnpublished($item)
     {
+        if (request()->isLivePreview()) {
+            return;
+        }
+
         throw_if($item->published() === false, new NotFoundHttpException);
     }
 
@@ -101,6 +105,8 @@ class ApiController extends Controller
                     $value = true;
                 } elseif ($value === 'false') {
                     $value = false;
+                } elseif (is_numeric($value)) {
+                    $value = Str::contains($value, '.') ? (float) $value : (int) $value;
                 }
 
                 if (Str::contains($filter, ':')) {

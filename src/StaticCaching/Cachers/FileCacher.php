@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
+use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -70,7 +71,7 @@ class FileCacher extends AbstractCacher
     }
 
     /**
-     * @return string
+     * @return Page
      */
     public function getCachedPage(Request $request)
     {
@@ -82,7 +83,7 @@ class FileCacher extends AbstractCacher
             Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
         }
 
-        return File::get($path);
+        return new Page(File::get($path));
     }
 
     public function hasCachedPage(Request $request)
@@ -120,7 +121,7 @@ class FileCacher extends AbstractCacher
             ->getUrls($domain)
             ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
             ->each(function ($value, $key) use ($site, $domain) {
-                $this->writer->delete($this->getFilePath($value, $site));
+                $this->writer->delete($this->getFilePath($domain.$value, $site));
                 $this->forgetUrl($key, $domain);
             });
 
@@ -206,7 +207,7 @@ class FileCacher extends AbstractCacher
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            url: window.location.href,
+            url: window.location.href.split('#')[0],
             sections: Object.keys(map)
         })
     })

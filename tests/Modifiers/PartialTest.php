@@ -2,15 +2,15 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class PartialTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_injects_variable_data_into_a_partial_and_renders_it(): void
     {
         $this->app->bind('filesystems.paths.resources', function () {
@@ -25,7 +25,7 @@ class PartialTest extends TestCase
         $expected = "<h1>Bubble Guppies</h1>\n<p>Science died a little bit today.</p>\n\n";
 
         $modified = $this->modify($data, ['demo'], []);
-        $this->assertEquals($expected, (string) $modified);
+        $this->assertStringEqualsStringIgnoringLineEndings($expected, (string) $modified);
     }
 
     private function modify($value, array $params, array $context)

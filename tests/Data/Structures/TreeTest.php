@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Structures;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Structures\Nav;
@@ -28,7 +29,7 @@ class TreeTest extends TestCase
         $stache->store('entries')->directory($dir.'/content/collections');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_route_from_the_structure()
     {
         $structure = $this->mock(Structure::class);
@@ -41,7 +42,7 @@ class TreeTest extends TestCase
         $this->assertEquals('/the-route/{slug}', $tree->route());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_edit_url()
     {
         $structure = $this->mock(Structure::class);
@@ -52,7 +53,7 @@ class TreeTest extends TestCase
         $this->assertEquals('/edit-url', $tree->editUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_delete_url()
     {
         $structure = $this->mock(Structure::class);
@@ -63,10 +64,10 @@ class TreeTest extends TestCase
         $this->assertEquals('/delete-url', $tree->deleteUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_show_url_from_the_structure()
     {
-        Site::shouldReceive('hasMultiple')->once()->andReturnFalse();
+        Site::shouldReceive('multiEnabled')->once()->andReturnFalse();
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('showUrl')->with([])->once()->andReturn('/show-url');
 
@@ -77,10 +78,10 @@ class TreeTest extends TestCase
         $this->assertEquals('/show-url', $tree->showUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_show_url_with_the_site_query_param_when_there_are_multiple_sites()
     {
-        Site::shouldReceive('hasMultiple')->once()->andReturnTrue();
+        Site::shouldReceive('multiEnabled')->once()->andReturnTrue();
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('showUrl')->with(['site' => 'the-locale'])->once()->andReturn('/show-url');
 
@@ -91,7 +92,7 @@ class TreeTest extends TestCase
         $this->assertEquals('/show-url', $tree->showUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_parent()
     {
         $tree = $this->tree();
@@ -99,10 +100,10 @@ class TreeTest extends TestCase
         $parent = $tree->parent();
 
         $this->assertInstanceOf(Page::class, $parent);
-        $this->assertEquals(Entry::find('pages-home'), $parent->entry());
+        $this->assertEquals(Entry::find('pages-home')->id(), $parent->entry()->id());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_root()
     {
         $tree = $this->tree();
@@ -112,7 +113,7 @@ class TreeTest extends TestCase
         $this->assertEquals($root, $tree->root());
     }
 
-    /** @test */
+    #[Test]
     public function a_tree_not_expecting_a_root_will_have_no_root()
     {
         $tree = $this->tree();
@@ -122,7 +123,7 @@ class TreeTest extends TestCase
         $this->assertNull($tree->root());
     }
 
-    /** @test */
+    #[Test]
     public function a_tree_expecting_a_root_but_with_no_branches_has_no_root()
     {
         $tree = $this->tree();
@@ -132,7 +133,7 @@ class TreeTest extends TestCase
         $this->assertNull($tree->root());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_child_pages_including_the_root()
     {
         $pages = $this->tree()->pages();
@@ -144,7 +145,7 @@ class TreeTest extends TestCase
         $this->assertEquals(['test' => 'about'], $pages->all()[1]->pageData()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_find_a_page_by_id()
     {
         $page = $this->tree()->find('pages-directors');
@@ -152,7 +153,7 @@ class TreeTest extends TestCase
         $this->assertEquals('Custom Directors Title', $page->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_appends_an_entry()
     {
         $tree = $this->tree();
@@ -189,7 +190,7 @@ class TreeTest extends TestCase
         ], $tree->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_appends_an_entry_to_another_page()
     {
         $tree = $this->tree();
@@ -226,7 +227,7 @@ class TreeTest extends TestCase
         ], $tree->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_moves_an_entry_to_another_page()
     {
         $tree = $this->tree();
@@ -264,7 +265,7 @@ class TreeTest extends TestCase
         ], $tree->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_get_moved_if_its_already_in_the_target()
     {
         $tree = $this->tree($arr = [
@@ -295,10 +296,9 @@ class TreeTest extends TestCase
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/3148
      */
+    #[Test]
     public function it_doesnt_get_moved_to_root_if_its_already_there_and_the_target_is_null()
     {
         $tree = $this->tree()->tree($arr = [
@@ -327,10 +327,9 @@ class TreeTest extends TestCase
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/1548
      **/
+    #[Test]
     public function it_can_move_the_root()
     {
         $tree = $this->tree([
@@ -380,7 +379,7 @@ class TreeTest extends TestCase
         ], $tree->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_fixes_indexes_when_moving()
     {
         $tree = $this->tree([
@@ -421,7 +420,7 @@ class TreeTest extends TestCase
         ], $tree->tree());
     }
 
-    /** @test */
+    #[Test]
     public function the_structure_validates_the_tree_when_getting_it_the_first_time()
     {
         $structure = $this->mock(Structure::class);
@@ -452,7 +451,7 @@ class TreeTest extends TestCase
         $tree->tree();
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_move_into_root_if_structure_expects_root()
     {
         $this->expectExceptionMessage('Root page cannot have children');
@@ -480,7 +479,7 @@ class TreeTest extends TestCase
         $tree->move('pages-board', 'pages-home');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_move_into_root_if_structure_does_not_expect_root()
     {
         $tree = $this->tree();

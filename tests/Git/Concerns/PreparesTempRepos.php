@@ -38,7 +38,7 @@ trait PreparesTempRepos
 
         $process = Process::create($path);
 
-        $process->run('git init');
+        $process->run('git init -b master');
         $process->run('git add --all');
         $process->run('git -c "user.name=Tests" -c "user.email=tests@example.com" commit -m "Initial commit."');
 

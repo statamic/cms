@@ -2,8 +2,10 @@
 
 namespace Statamic\View;
 
+use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Statamic\Facades\Cascade;
+use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
@@ -12,6 +14,7 @@ use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\LiteralReplacementManager;
 use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\Events\ViewRendered;
+use Statamic\View\Interop\Stacks;
 
 class View
 {
@@ -86,8 +89,9 @@ class View
     public function render(): string
     {
         $cascade = $this->gatherData();
+        $usingLayout = $this->shouldUseLayout();
 
-        if ($this->shouldUseLayout()) {
+        if ($usingLayout) {
             GlobalRuntimeState::$containsLayout = true;
             $contents = view($this->templateViewName(), $cascade);
 
@@ -101,6 +105,15 @@ class View
             GlobalRuntimeState::$containsLayout = false;
             GlobalRuntimeState::$shareVariablesTemplateTrigger = '';
 
+            $factory = app('view');
+
+            // Put the sections back. The ->render() will have flushed the sections.
+            Cascade::sections()->each(function ($content, $section) use ($factory) {
+                $factory->startSection($section, new HtmlString((string) $content));
+            });
+
+            Stacks::restoreStacks();
+
             $contents = view($this->layoutViewName(), array_merge($cascade, GlobalRuntimeState::$layoutVariables, [
                 'template_content' => $contents,
             ]));
@@ -112,12 +125,18 @@ class View
 
         ViewRendered::dispatch($this);
 
+        if ($usingLayout) {
+            GlobalRuntimeState::$renderingLayout = true;
+        }
+
         $renderedContents = $contents->render();
 
-        if (config('statamic.antlers.version') == 'runtime') {
-            $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
-            $renderedContents = StackReplacementManager::processReplacements($renderedContents);
+        if ($usingLayout) {
+            GlobalRuntimeState::$renderingLayout = false;
         }
+
+        $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
+        $renderedContents = StackReplacementManager::processReplacements($renderedContents);
 
         return $renderedContents;
     }
@@ -183,6 +202,7 @@ class View
     {
         return $this->cascade = $this->cascade ?? Cascade::instance()
             ->withContent($this->cascadeContent)
+            ->withSite(Site::current())
             ->hydrate()
             ->toArray();
     }

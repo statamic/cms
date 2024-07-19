@@ -2,12 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class HasUpperCaseTest extends TestCase
 {
-    public function strings(): array
+    public static function stringsProvider(): array
     {
         return [
             'string_with_one_uppercase_char' => [true, "i don't know what we're yellinG about!"],
@@ -17,11 +19,8 @@ class HasUpperCaseTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider strings
-     */
+    #[Test]
+    #[DataProvider('stringsProvider')]
     public function it_returns_true_if_the_string_has_uppercase_char_false_if_does_not($expected, $input): void
     {
         $modified = $this->modify($input);

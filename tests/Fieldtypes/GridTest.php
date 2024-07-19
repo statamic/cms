@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldRepository;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 
 class GridTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_preprocesses_the_values()
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -61,7 +62,7 @@ class GridTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_the_values_recursively()
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -174,7 +175,7 @@ class GridTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_the_values()
     {
         FieldRepository::shouldReceive('find')
@@ -220,7 +221,7 @@ class GridTest extends TestCase
         ], $field->process()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_the_values_recursively_if_ids_inside_sets_are_allowed()
     {
         config()->set('statamic.system.row_id_handle', '_id');
@@ -328,7 +329,7 @@ class GridTest extends TestCase
         ], $field->process()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_the_values_recursively()
     {
         FieldRepository::shouldReceive('find')
@@ -434,7 +435,7 @@ class GridTest extends TestCase
         ], $field->process()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preloads_preprocessed_default_values()
     {
         $field = (new Field('test', [
@@ -451,7 +452,7 @@ class GridTest extends TestCase
         $this->assertSame($expected, $field->fieldtype()->preload()['defaults']);
     }
 
-    /** @test */
+    #[Test]
     public function it_augments()
     {
         (new class extends Fieldtype
@@ -483,7 +484,7 @@ class GridTest extends TestCase
         ], collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_with_custom_row_id_handle()
     {
         config(['statamic.system.row_id_handle' => '_id']);
@@ -520,11 +521,81 @@ class GridTest extends TestCase
         ], collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_a_queryable_value()
     {
         $this->assertNull((new Grid)->toQueryableValue(null));
         $this->assertNull((new Grid)->toQueryableValue([]));
         $this->assertEquals([['foo' => 'bar']], (new Grid)->toQueryableValue([['foo' => 'bar']]));
+    }
+
+    #[Test]
+    public function it_generates_field_path_prefix()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public static function handle()
+            {
+                return 'custom';
+            }
+
+            public function preProcess($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function process($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+
+            public function preload()
+            {
+                return ['fieldPathPrefix' => $this->field()->fieldPathPrefix()];
+            }
+
+            public function augment($value)
+            {
+                return $this->field()->fieldPathPrefix();
+            }
+        };
+
+        $fieldtype::register();
+
+        $field = (new Field('test', [
+            'type' => 'grid',
+            'fields' => [
+                ['handle' => 'words', 'field' => ['type' => 'custom']],
+            ],
+        ]))->setValue([
+            [
+                '_id' => 'set-id-1',
+                'type' => 'one',
+                'words' => 'test',
+            ],
+            [
+                '_id' => 'set-id-2',
+                'type' => 'one',
+                'words' => 'test',
+            ],
+        ]);
+
+        $value = $field->augment()->value()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = $field->preProcess()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = $field->process()->value();
+        $this->assertEquals('test.0.words', $value[0]['words']);
+        $this->assertEquals('test.1.words', $value[1]['words']);
+
+        $value = $field->fieldtype()->preload();
+        $this->assertEquals('test.0.words', $value['existing']['set-id-1']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.1.words', $value['existing']['set-id-2']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.-1.words', $value['new']['words']['fieldPathPrefix']);
+        $this->assertEquals('test.-1.words', $value['defaults']['words']);
     }
 }

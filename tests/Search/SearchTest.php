@@ -3,6 +3,8 @@
 namespace Tests\Search;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Index;
 use Statamic\Search\IndexManager;
@@ -11,11 +13,8 @@ use Tests\TestCase;
 
 class SearchTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider saveProvider
-     */
+    #[Test]
+    #[DataProvider('saveProvider')]
     public function it_updates_indexes($updateMock)
     {
         $index = Mockery::mock(Index::class);
@@ -31,7 +30,7 @@ class SearchTest extends TestCase
         $search->updateWithinIndexes($item);
     }
 
-    public function saveProvider()
+    public static function saveProvider()
     {
         return [
             'contains entry' => [
@@ -67,11 +66,8 @@ class SearchTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider deleteProvider
-     */
+    #[Test]
+    #[DataProvider('deleteProvider')]
     public function it_deletes_from_indexes($updateMock)
     {
         $index = Mockery::mock(Index::class);
@@ -87,7 +83,7 @@ class SearchTest extends TestCase
         $search->deleteFromIndexes($item);
     }
 
-    public function deleteProvider()
+    public static function deleteProvider()
     {
         return [
             'index exists' => [

@@ -6,9 +6,11 @@ use Statamic\CP\Column;
 use Statamic\Data\DataCollection;
 use Statamic\Facades;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Scope;
 use Statamic\Fieldtypes\Relationship;
 use Statamic\GraphQL\Types\FormType;
 use Statamic\Query\ItemQueryBuilder;
+use Statamic\Query\Scopes\Filter;
 
 class Fieldtype extends Relationship
 {
@@ -31,11 +33,28 @@ class Fieldtype extends Relationship
                 'display' => __('Max Items'),
                 'default' => 1,
                 'instructions' => __('statamic::fieldtypes.form.config.max_items'),
+                'force_in_config' => true,
+            ],
+            'mode' => [
+                'display' => __('UI Mode'),
+                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                'type' => 'radio',
+                'default' => 'default',
+                'options' => [
+                    'default' => __('Stack Selector'),
+                    'select' => __('Select Dropdown'),
+                    'typeahead' => __('Typeahead Field'),
+                ],
             ],
             'query_scopes' => [
                 'display' => __('Query Scopes'),
                 'instructions' => __('statamic::fieldtypes.form.config.query_scopes'),
                 'type' => 'taggable',
+                'options' => Scope::all()
+                    ->reject(fn ($scope) => $scope instanceof Filter)
+                    ->map->handle()
+                    ->values()
+                    ->all(),
             ],
         ];
     }
@@ -57,7 +76,7 @@ class Fieldtype extends Relationship
     {
         if ($form = Facades\Form::find($id)) {
             return [
-                'title' => $form->title(),
+                'title' => __($form->title()),
                 'id' => $form->handle(),
             ];
         }
@@ -85,7 +104,7 @@ class Fieldtype extends Relationship
         $formFields = function ($form) {
             return [
                 'id' => $form->handle(),
-                'title' => $form->title(),
+                'title' => __($form->title()),
                 'submissions' => $form->submissions()->count(),
             ];
         };

@@ -3,11 +3,12 @@
 namespace Tests\Feature\Collections;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 
-class ShowStructuredCollectionTest extends ShowCollectionTest
+class ShowStructuredCollectionTest extends ShowCollectionTestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -19,7 +20,7 @@ class ShowStructuredCollectionTest extends ShowCollectionTest
         return $collection;
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_the_structure_tree_if_you_have_permission()
     {
         $this->withoutExceptionHandling();

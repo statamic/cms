@@ -300,7 +300,7 @@ class Tags extends BaseTags
             throw new \Exception("Cannot find JS driver class for [{$handle}]!");
         }
 
-        $instance = new $class($form, $options);
+        $instance = new $class($form, $options, $this->params);
 
         if (! $instance instanceof JsDriver) {
             throw new \Exception("JS driver must implement [Statamic\Forms\JsDrivers\JsDriver] interface!");

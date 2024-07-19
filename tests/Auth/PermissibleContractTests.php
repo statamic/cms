@@ -3,6 +3,8 @@
 namespace Tests\Auth;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
 use Statamic\Contracts\Auth\Role as RoleContract;
@@ -14,9 +16,13 @@ trait PermissibleContractTests
 {
     abstract protected function createPermissible();
 
-    /** @test */
+    #[Test]
     public function it_gets_and_assigns_roles()
     {
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to this test.
+        Event::fake();
+
         $roleA = new class extends Role
         {
             public function handle(?string $handle = null)
@@ -75,9 +81,13 @@ trait PermissibleContractTests
         $this->assertEquals($user, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_a_role_assignment()
     {
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to this test.
+        Event::fake();
+
         $roleA = new class extends Role
         {
             public function handle(?string $handle = null)
@@ -121,9 +131,13 @@ trait PermissibleContractTests
         $this->assertEquals($user, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_it_has_a_role()
     {
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to this test.
+        Event::fake();
+
         $roleA = new class extends Role
         {
             public function handle(?string $handle = null)
@@ -158,7 +172,7 @@ trait PermissibleContractTests
         $this->assertFalse($user->hasRole('b'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_checks_permissions()
     {
         $directRole = RoleAPI::make('direct')->addPermission([
@@ -225,9 +239,13 @@ trait PermissibleContractTests
         $this->assertTrue($superUser->hasPermission('super'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_it_has_super_permissions_through_roles_and_groups()
     {
+        // Prevent the anonymous role classes throwing errors when getting serialized
+        // during event handling unrelated to this test.
+        Event::fake();
+
         $superRole = new class extends Role
         {
             public function handle(?string $handle = null)
@@ -275,7 +293,7 @@ trait PermissibleContractTests
         $this->assertFalse($nonSuperUserThroughGroup->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_it_has_super_permissions_on_itself()
     {
         $user = $this->createPermissible()->save();
@@ -285,7 +303,7 @@ trait PermissibleContractTests
         $this->assertEquals($user, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_to_groups()
     {
         $groupA = (new UserGroup)->handle('a');
@@ -326,7 +344,7 @@ trait PermissibleContractTests
         $this->assertTrue($user->isInGroup($groupC));
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_all_the_groups()
     {
         $groupA = (new UserGroup)->handle('a');

@@ -3,7 +3,7 @@
         <div class="breadcrumb flex" v-if="showingAddon">
             <button
                 @click="showingAddon = false"
-                class="flex-initial flex p-2 -m-2 items-center text-xs text-gray-700 hover:text-gray-900"
+                class="flex-initial flex p-2 -m-2 items-center text-xs text-gray-700 dark:text-dark-175 hover:text-gray-900 dark:hover:text-dark-100"
             >
                 <svg-icon name="micro/chevron-right" class="h-6 w-4 rotate-180" />
                 <span v-text="__('Addons')" />
@@ -26,7 +26,7 @@
             <div class="" slot-scope="{ rows: addons }">
 
                 <div class="card p-0">
-                    <div class="border-b px-4 text-sm">
+                    <div class="border-b dark:border-dark-900 px-4 text-sm">
                         <button
                             class="data-list-filter-link"
                             :class="{ active: filter === 'all' }"
@@ -50,15 +50,15 @@
                 </div>
 
                 <div class="addon-grid my-8" :class="{ 'opacity-50': loading }">
-                    <div class="addon-card bg-white text-gray-800 h-full shadow rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
-                        <span class="badge absolute top-0 left-0 mt-2 ml-2" v-if="addon.installed">Installed</span>
+                    <div class="addon-card bg-white dark:bg-dark-600 text-gray-800 dark:text-dark-150 h-full shadow dark:shadow-dark rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
+                        <span class="badge absolute top-0 rtl:right-0 ltr:left-0 mt-2 rtl:mr-2 ltr:ml-2" v-if="addon.installed">Installed</span>
                         <div class="h-48 rounded-t bg-cover bg-center" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
                         <div class="px-6 mb-4 relative text-center">
                             <a :href="addon.seller.website" class="relative">
-                                <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 bg-white relative -mt-8 border-2 border-white inline">
+                                <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 bg-white dark:bg-dark-600 relative -mt-8 border-2 border-white dark:border-dark-600 inline">
                             </a>
                             <div class="addon-card-title mb-2 text-lg font-bold text-center">{{ addon.name }}</div>
-                            <p class="text-gray mb-4" v-text="getPriceRange(addon)" />
+                            <p class="text-gray dark:text-dark-175 mb-4" v-text="getPriceRange(addon)" />
                             <p v-text="addon.summary" class="text-sm"></p>
                         </div>
                     </div>

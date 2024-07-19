@@ -81,7 +81,7 @@ class Validator
         foreach ($overrides as $field => $fieldRules) {
             $fieldRules = self::explodeRules($fieldRules);
 
-            if (array_has($original, $field)) {
+            if (Arr::has($original, $field)) {
                 $original[$field] = array_merge($original[$field], $fieldRules);
             } else {
                 $original[$field] = $fieldRules;
@@ -124,14 +124,44 @@ class Validator
 
     private function parse($rule)
     {
-        if (! is_string($rule) ||
-            ! Str::contains($rule, '{') ||
-            Str::startsWith($rule, 'regex:') ||
-            Str::startsWith($rule, 'not_regex:')
-        ) {
-            return $rule;
+        if (is_string($rule) && Str::startsWith($rule, 'new ')) {
+            return $this->parseClassBasedRule($rule);
         }
 
+        if (is_string($rule) && Str::contains($rule, '{') && ! Str::startsWith($rule, ['regex:', 'not_regex:'])) {
+            return $this->parseStringBasedRule($rule);
+        }
+
+        return $rule;
+    }
+
+    private function parseClassBasedRule($rule)
+    {
+        $rule = preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
+            $value = Arr::get($this->replacements, $match[1]);
+
+            if ($value === null) {
+                return 'null';
+            }
+
+            if ($value === true) {
+                return 'true';
+            }
+
+            if ($value === false) {
+                return 'false';
+            }
+
+            return is_string($value) ? "'{$value}'" : $value;
+        }, $rule);
+
+        [$class, $arguments] = (new ClassRuleParser)->parse($rule);
+
+        return new $class(...$arguments);
+    }
+
+    private function parseStringBasedRule($rule)
+    {
         $rule = str_replace('{this}.', $this->context['prefix'] ?? '', $rule);
 
         return preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {

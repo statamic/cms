@@ -5,6 +5,7 @@ namespace Statamic\Assets;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetRepository as Contract;
 use Statamic\Contracts\Assets\QueryBuilder;
+use Statamic\Exceptions\AssetNotFoundException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -47,17 +48,28 @@ class AssetRepository implements Contract
         $siteUrl = rtrim(Site::current()->absoluteUrl(), '/');
         $containerUrl = $container->url();
 
-        if (starts_with($containerUrl, '/')) {
+        if (Str::startsWith($containerUrl, '/')) {
             $containerUrl = $siteUrl.$containerUrl;
         }
 
-        if (starts_with($containerUrl, $siteUrl)) {
+        if (Str::startsWith($containerUrl, $siteUrl)) {
             $url = $siteUrl.$url;
         }
 
-        $path = str_after($url, $containerUrl);
+        $path = Str::after($url, $containerUrl);
 
         return $container->asset($path);
+    }
+
+    public function findOrFail(string $id): Asset
+    {
+        $asset = $this->find($id);
+
+        if (! $asset) {
+            throw new AssetNotFoundException($id);
+        }
+
+        return $asset;
     }
 
     protected function resolveContainerFromUrl($url)
@@ -65,8 +77,8 @@ class AssetRepository implements Contract
         return AssetContainer::all()->sortByDesc(function ($container) {
             return strlen($container->url());
         })->first(function ($container, $id) use ($url) {
-            return starts_with($url, $container->url())
-                || starts_with(URL::makeAbsolute($url), $container->url());
+            return Str::startsWith($url, $container->url())
+                || Str::startsWith(URL::makeAbsolute($url), $container->url());
         });
     }
 

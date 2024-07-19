@@ -2,17 +2,16 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Text;
 use Tests\TestCase;
 
 class TextTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider processValues
-     **/
+    #[Test]
+    #[DataProvider('processValuesProvider')]
     public function it_processes_values($mode, $values)
     {
         $field = (new Text)->setField(new Field('test', [
@@ -27,7 +26,7 @@ class TextTest extends TestCase
         $this->assertSame($values[4], $field->process(null));
     }
 
-    public function processValues()
+    public static function processValuesProvider()
     {
         return [
             'text' => ['text', ['test', '3', '3test', '3.14', null]],

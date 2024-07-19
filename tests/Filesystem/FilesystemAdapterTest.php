@@ -3,6 +3,7 @@
 namespace Tests\Filesystem;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Path;
 use Statamic\Filesystem\FilesystemAdapter;
 use Tests\TestCase;
@@ -44,7 +45,7 @@ class FilesystemAdapterTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_normalizes_relative_paths()
     {
         $dir = Path::tidy($this->tempDir);
@@ -53,7 +54,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($dir.'/foo/bar.txt', $this->adapter->normalizePath('foo\bar.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_normalizes_absolute_paths()
     {
         $dir = Path::tidy($this->tempDir);
@@ -63,7 +64,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($dir.'/foo/bar.txt', $this->adapter->normalizePath($this->tempDir.'\foo\bar.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_normalizes_absolute_paths_outside_the_root()
     {
         // unix
@@ -85,7 +86,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals('C:/path/to/foo/bar.txt', $this->adapter->normalizePath('C:\path\to/foo/bar.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_a_path_is_within_the_root()
     {
         $this->assertTrue($this->adapter->isWithinRoot('relative/test.txt'));
@@ -100,7 +101,7 @@ class FilesystemAdapterTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_files_from_outside_of_the_root_and_outputs_absolute_paths()
     {
         mkdir($this->outsideRoot.'/sub', 0755, true);
@@ -115,7 +116,7 @@ class FilesystemAdapterTest extends TestCase
         ], $this->adapter->getFiles($dir.'/sub')->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_explicitly_request_absolute_paths()
     {
         mkdir($this->tempDir.'/sub/sub', 0755, true);

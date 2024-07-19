@@ -3,6 +3,7 @@
 namespace Tests\Search;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
@@ -12,7 +13,7 @@ use Tests\TestCase;
 
 class UpdateItemIndexesTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_updates_indexes_on_save()
     {
         $item = Mockery::mock(Searchable::class);
@@ -26,7 +27,7 @@ class UpdateItemIndexesTest extends TestCase
         $listener->update($event);
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_indexes_on_delete()
     {
         $item = Mockery::mock(Searchable::class);
@@ -40,13 +41,13 @@ class UpdateItemIndexesTest extends TestCase
         $listener->delete($event);
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_term_localizations_when_saving_a_term()
     {
         $this->markTestIncomplete(); // todo
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_term_localizations_when_deleting_a_term()
     {
         $this->markTestIncomplete(); // todo

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Navigation;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Nav;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -13,7 +14,7 @@ class DeleteNavigationTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -32,7 +33,7 @@ class DeleteNavigationTest extends TestCase
         $this->assertCount(1, Nav::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_the_navigation()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure navs']]);

@@ -15,7 +15,18 @@ return [
     |
     */
 
-    'watcher' => env('STATAMIC_STACHE_WATCHER', true),
+    'watcher' => env('STATAMIC_STACHE_WATCHER', 'auto'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Store
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure which Cache Store the Stache uses.
+    |
+    */
+
+    'cache_store' => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -87,6 +98,11 @@ return [
         'users' => [
             'class' => Stores\UsersStore::class,
             'directory' => base_path('users'),
+        ],
+
+        'form-submissions' => [
+            'class' => Stores\SubmissionsStore::class,
+            'directory' => storage_path('forms'),
         ],
 
     ],

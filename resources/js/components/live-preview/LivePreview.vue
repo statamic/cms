@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <v-portal :to="livePreviewFieldsPortal" :disabled="!previewing">
+        <v-portal :to="livePreviewFieldsPortal" :disabled="!portalEnabled">
             <provider :variables="provides">
                 <slot name="default" />
             </provider>
@@ -12,12 +12,12 @@
 
                 <transition name="live-preview-header-slide">
                     <div v-show="headerVisible" class="live-preview-header">
-                        <div class="text-base text-gray-700 font-medium mr-4">{{ __('Live Preview') }}</div>
+                        <div class="text-base text-gray-700 dark:text-dark-150 font-medium rtl:ml-4 ltr:mr-4">{{ __('Live Preview') }}</div>
                         <div class="flex items-center">
                             <button v-if="canPopOut && !poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">{{ __('Pop in') }}</button>
-                            <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="ml-4" />
-                            <select-input :options="targetSelectOptions" v-model="target" class="ml-4" v-if="targets.length > 1" />
+                            <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="rtl:mr-4 ltr:ml-4" />
+                            <select-input :options="targetSelectOptions" v-model="target" class="rtl:mr-4 ltr:ml-4" v-if="targets.length > 1" />
 
                             <component
                                 v-for="(component, handle) in inputs"
@@ -26,7 +26,7 @@
                                 :value="extras[handle]"
                                 :loading="loading"
                                 @input="componentUpdated(handle, $event)"
-                                class="ml-4" />
+                                class="rtl:mr-4 ltr:ml-4" />
 
                             <slot name="buttons" />
 
@@ -101,6 +101,7 @@ export default {
 
     data() {
         return {
+            portalEnabled: false,
             panesVisible: false,
             headerVisible: false,
             editorWidth: null,
@@ -185,7 +186,13 @@ export default {
 
     watch: {
 
-        previewing(enabled) {
+        previewing(enabled, wasEnabled) {
+            if (wasEnabled && !enabled) {
+                this.$nextTick(() => this.portalEnabled = false);
+            } else {
+                this.portalEnabled = enabled;
+            }
+
             if (!enabled) return;
 
             this.update();

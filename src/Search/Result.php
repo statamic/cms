@@ -106,6 +106,11 @@ class Result implements ContainsQueryableValues, Contract
         ])->merge($this->index->extraAugmentedResultData($this));
     }
 
+    public function toDeferredAugmentedArray($keys = null)
+    {
+        return $this->toAugmentedCollection($keys);
+    }
+
     public function newAugmentedInstance(): Augmented
     {
         if ($this->searchable instanceof Augmentable) {

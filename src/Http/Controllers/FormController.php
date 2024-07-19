@@ -10,6 +10,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Asset;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
@@ -50,7 +51,9 @@ class FormController extends Controller
         try {
             throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
 
-            $values = array_merge($values, $submission->uploadFiles($assets));
+            $uploadedAssets = $submission->uploadFiles($assets);
+
+            $values = array_merge($values, $uploadedAssets);
 
             $submission->data(
                 $fields->addValues($values)->process()->values()
@@ -60,8 +63,14 @@ class FormController extends Controller
             // If they want to add validation errors, they can throw an exception.
             throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException);
         } catch (ValidationException $e) {
+            $this->removeUploadedAssets($uploadedAssets);
+
             return $this->formFailure($params, $e->errors(), $form->handle());
         } catch (SilentFormFailureException $e) {
+            if (isset($uploadedAssets)) {
+                $this->removeUploadedAssets($uploadedAssets);
+            }
+
             return $this->formSuccess($params, $submission, true);
         }
 
@@ -92,19 +101,25 @@ class FormController extends Controller
      * The steps for a failed form submission.
      *
      * @param  array  $params
-     * @param  array  $submission
+     * @param  array  $errors
      * @param  string  $form
      * @return Response|RedirectResponse
      */
     private function formFailure($params, $errors, $form)
     {
-        if (request()->ajax()) {
+        $request = request();
+
+        if ($request->ajax()) {
             return response([
                 'errors' => (new MessageBag($errors))->all(),
                 'error' => collect($errors)->map(function ($errors, $field) {
                     return $errors[0];
                 })->all(),
             ], 400);
+        }
+
+        if ($request->isPrecognitive() || $request->wantsJson()) {
+            throw ValidationException::withMessages($errors);
         }
 
         $redirect = Arr::get($params, '_error_redirect');
@@ -155,5 +170,21 @@ class FormController extends Controller
         }
 
         return $redirect;
+    }
+
+    /**
+     * Remove any uploaded assets
+     *
+     * Triggered by a validation exception or silent failure
+     */
+    private function removeUploadedAssets(array $assets)
+    {
+        collect($assets)
+            ->flatten()
+            ->each(function ($id) {
+                if ($asset = Asset::find($id)) {
+                    $asset->delete();
+                }
+            });
     }
 }

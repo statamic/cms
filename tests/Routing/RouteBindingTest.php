@@ -5,6 +5,9 @@ use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Entries\Collection;
@@ -114,13 +117,9 @@ class RouteBindingTest extends TestCase
         $app['config']->set('statamic.routes.bindings', false);
     }
 
-    /**
-     * @test
-     *
-     * @define-env bindingsEnabled
-     *
-     * @dataProvider statamicRouteProvider
-     */
+    #[Test]
+    #[DefineEnvironment('bindingsEnabled')]
+    #[DataProvider('statamicRouteProvider')]
     public function binds_route_parameters_in_statamic_routes(
         $uri,
         $expectationCallback = null
@@ -137,13 +136,9 @@ class RouteBindingTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     *
-     * @define-env bindingsDisabled
-     *
-     * @dataProvider statamicRouteProvider
-     */
+    #[Test]
+    #[DefineEnvironment('bindingsDisabled')]
+    #[DataProvider('statamicRouteProvider')]
     public function binds_route_parameters_in_statamic_routes_with_bindings_disabled(
         $uri,
         $expectationCallback = null
@@ -160,13 +155,9 @@ class RouteBindingTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     *
-     * @define-env bindingsEnabled
-     *
-     * @dataProvider frontendRouteProvider
-     */
+    #[Test]
+    #[DefineEnvironment('bindingsEnabled')]
+    #[DataProvider('frontendRouteProvider')]
     public function binds_route_parameters_in_frontend_routes(
         $uri,
         ?Closure $enabledCallback = null,
@@ -184,13 +175,9 @@ class RouteBindingTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     *
-     * @define-env bindingsDisabled
-     *
-     * @dataProvider frontendRouteProvider
-     */
+    #[Test]
+    #[DefineEnvironment('bindingsDisabled')]
+    #[DataProvider('frontendRouteProvider')]
     public function binds_route_parameters_in_frontend_routes_with_bindings_disabled(
         $uri,
         ?Closure $enabledCallback = null,
@@ -232,7 +219,7 @@ class RouteBindingTest extends TestCase
         Facades\Form::make('contact')->title('Contact Us')->save();
     }
 
-    public function statamicRouteProvider()
+    public static function statamicRouteProvider()
     {
 
         return [
@@ -543,7 +530,7 @@ class RouteBindingTest extends TestCase
         ];
     }
 
-    public function frontendRouteProvider()
+    public static function frontendRouteProvider()
     {
         return [
 
@@ -920,25 +907,17 @@ class RouteBindingTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @define-env bindingsDisabled
-     *
-     * @dataProvider bypassForBroadcastingProvider
-     */
+    #[Test]
+    #[DefineEnvironment('bindingsDisabled')]
+    #[DataProvider('bypassForBroadcastingProvider')]
     public function it_bypasses_binding_for_broadcasting($binding)
     {
         $this->bypassForBroadcasting($binding);
     }
 
-    /**
-     * @test
-     *
-     * @define-env bindingsEnabled
-     *
-     * @dataProvider bypassForBroadcastingProvider
-     */
+    #[Test]
+    #[DefineEnvironment('bindingsEnabled')]
+    #[DataProvider('bypassForBroadcastingProvider')]
     public function it_bypasses_binding_for_broadcasting_with_bindings_enabled($binding)
     {
         $this->bypassForBroadcasting($binding);
@@ -956,7 +935,7 @@ class RouteBindingTest extends TestCase
         $this->assertEquals('test', $value);
     }
 
-    public function bypassForBroadcastingProvider()
+    public static function bypassForBroadcastingProvider()
     {
         return collect([
             'collection',

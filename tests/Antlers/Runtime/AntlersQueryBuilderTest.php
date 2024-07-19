@@ -4,12 +4,13 @@ namespace Tests\Antlers\Runtime;
 
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Tests\Antlers\Fixtures\Addon\Modifiers\IsBuilder;
-use Tests\Antlers\Fixtures\Addon\Tags\VarTest;
+use Tests\Antlers\Fixtures\Addon\Tags\VarTestTags as VarTest;
 use Tests\Antlers\ParserTestCase;
 
 class AntlersQueryBuilderTest extends ParserTestCase

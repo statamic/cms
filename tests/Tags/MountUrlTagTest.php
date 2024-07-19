@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
@@ -13,13 +14,13 @@ class MountUrlTagTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_collection_mount()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::make('pages')->sites(['english', 'french'])->routes([
             'english' => 'pages/{slug}',
