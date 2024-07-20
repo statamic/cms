@@ -25,7 +25,7 @@
                     </p>
                     <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
                 </div>
-                <div class="hidden md:block w-1/2 rtl:pr-16 ltr:pl-16">
+                <div class="hidden md:block w-1/2 ps-16">
                     @cp_svg('empty/navigation')
                 </div>
             </div>
@@ -56,7 +56,7 @@
             <table class="data-table">
                 <tr>
                     <td class="w-64 font-bold">
-                        <span class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-500' }} rtl:ml-2 ltr:mr-2"></span>
+                        <span class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-500' }} me-2"></span>
                         {{ $site->key() ?? __('No license key') }}
                     </td>
                     <td class="relative">
@@ -65,7 +65,7 @@
                             <span class="text-2xs">({{ trans_choice('and :count more', $site->additionalDomainCount()) }})</span>
                         @endif
                     </td>
-                    <td class="rtl:text-left ltr:text-right text-red-500">{{ $site->invalidReason() }}</td>
+                    <td class="text-end text-red-500">{{ $site->invalidReason() }}</td>
                 </tr>
             </table>
         </div>
@@ -75,11 +75,11 @@
             <table class="data-table">
                 <tr>
                     <td class="w-64 font-bold">
-                        <span class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-500' }} rtl:ml-2 ltr:mr-2"></span>
+                        <span class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-500' }} me-2"></span>
                         {{ __('Statamic') }} @if ($statamic->pro())<span class="text-pink">{{ __('Pro') }}</span>@else {{ __('Free') }} @endif
                     </td>
                     <td>{{ $statamic->version() }}</td>
-                    <td class="rtl:text-left ltr:text-right text-red-500">{{ $statamic->invalidReason() }}</td>
+                    <td class="text-end text-red-500">{{ $statamic->invalidReason() }}</td>
                 </tr>
             </table>
         </div>
@@ -92,13 +92,13 @@
             <table class="data-table">
                 @foreach ($addons as $addon)
                     <tr>
-                        <td class="w-64 rtl:ml-2 ltr:mr-2">
-                            <span class="little-dot {{ $addon->valid() ? 'bg-green-600' : 'bg-red-500' }} rtl:ml-2 ltr:mr-2"></span>
+                        <td class="w-64 me-2">
+                            <span class="little-dot {{ $addon->valid() ? 'bg-green-600' : 'bg-red-500' }} me-2"></span>
                             <span class="font-bold"><a href="{{ $addon->addon()->marketplaceUrl() }}" class="text-gray dark:text-dark-175 hover:text-blue dark:hover:text-dark-blue-100">{{ $addon->name() }}</a></span>
                             @if ($addon->edition())<span class="badge uppercase font-bold text-gray-600 dark:text-dark-200">{{ $addon->edition() ?? '' }}</span>@endif
                         </td>
                         <td>{{ $addon->version() }}</td>
-                        <td class="rtl:text-left ltr:text-right text-red-500">{{ $addon->invalidReason() }}</td>
+                        <td class="text-end text-red-500">{{ $addon->invalidReason() }}</td>
                     </tr>
                 @endforeach
             </table>
@@ -111,8 +111,8 @@
             <table class="data-table">
                 @foreach ($unlistedAddons as $addon)
                     <tr>
-                        <td class="w-64 font-bold rtl:ml-2 ltr:mr-2">
-                            <span class="little-dot bg-green-600 rtl:ml-2 ltr:mr-2"></span>
+                        <td class="w-64 font-bold me-2">
+                            <span class="little-dot bg-green-600 me-2"></span>
                             {{ $addon->name() }}
                         </td>
                         <td>{{ $addon->version() }}</td>
@@ -123,10 +123,10 @@
         @endif
 
         <div class="mt-10 py-4 border-t dark:border-dark-950 flex items-center">
-            <a href="{{ $site->url() }}" target="_blank" class="btn btn-primary rtl:ml-4 ltr:mr-4">{{ __('Edit Site') }}</a>
-            @if ($addToCartUrl) <a href="{{ $addToCartUrl }}" target="_blank" class="btn rtl:ml-4 ltr:mr-4">{{ __('Buy Licenses') }}</a> @endif
+            <a href="{{ $site->url() }}" target="_blank" class="btn btn-primary me-4">{{ __('Edit Site') }}</a>
+            @if ($addToCartUrl) <a href="{{ $addToCartUrl }}" target="_blank" class="btn me-4">{{ __('Buy Licenses') }}</a> @endif
             <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn">{{ __('Sync') }}</a>
-            <p class="rtl:mr-4 ltr:ml-4 text-2xs text-gray dark:text-dark-175">{{ __('statamic::messages.licensing_sync_instructions') }}</p>
+            <p class="ms-4 text-2xs text-gray dark:text-dark-175">{{ __('statamic::messages.licensing_sync_instructions') }}</p>
         </div>
 
     @endif

@@ -1,10 +1,10 @@
 @php use function Statamic\trans as __; @endphp
 
 <div class="global-header">
-    <div class="lg:min-w-xl rtl:pr-2 ltr:pl-2 rtl:md:pr-6 ltr:md:pl-6 h-full flex items-center">
-        <button class="nav-toggle hidden md:flex rtl:mr-1 ltr:ml-1 shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@cp_svg('icons/light/burger', 'h-4 w-4')</button>
-        <button class="nav-toggle md:hidden rtl:mr-1 ltr:ml-1 shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen" aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('icons/light/burger', 'h-4 w-4')</button>
-        <button class="nav-toggle md:hidden rtl:mr-1 ltr:ml-1 shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('icons/light/close', 'h-3 w-3')</button>
+    <div class="lg:min-w-xl ps-2 md:ps-6 h-full flex items-center">
+        <button class="nav-toggle hidden md:flex ms-1 shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@cp_svg('icons/light/burger', 'h-4 w-4')</button>
+        <button class="nav-toggle md:hidden ms-1 shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen" aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('icons/light/burger', 'h-4 w-4')</button>
+        <button class="nav-toggle md:hidden ms-1 shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('icons/light/close', 'h-3 w-3')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block shrink-0">
                 @if ($customLogo)
@@ -71,14 +71,14 @@
             @if (config('statamic.cp.link_to_docs'))
             <dropdown-item external-link="https://statamic.dev" class="flex items-center">
                 <span>{{ __('Documentation') }}</span>
-                <i class="w-3 block rtl:mr-2 ltr:ml-2">@cp_svg('icons/light/external-link')</i>
+                <i class="w-3 block ms-2">@cp_svg('icons/light/external-link')</i>
             </dropdown-item>
             @endif
 
             @if (config('statamic.cp.support_url'))
             <dropdown-item external-link="{{ config('statamic.cp.support_url') }}" class="flex items-center">
                 <span>{{ __('Support') }}</span>
-                <i class="w-3 block rtl:mr-2 ltr:ml-2">@cp_svg('icons/light/external-link')</i>
+                <i class="w-3 block ms-2">@cp_svg('icons/light/external-link')</i>
             </dropdown-item>
             @endif
 

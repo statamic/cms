@@ -40,16 +40,16 @@ a {
     }
 
     #main .workspace {
-        padding-left: 14rem ; [dir="rtl"] & { padding-right: 14rem ; padding-left: 0 ; }
+        padding-inline-start: 14rem;
     }
 
     #main.nav-closed {
         .nav-main {
-            left: -14rem ; [dir="rtl"] & { left: auto ; right: -14rem ; }
+            inset-inline-start: -14rem;
         }
 
         .workspace {
-            padding-left: 0 ; [dir="rtl"] & { padding-right: 0 ; padding-left: 0 ; }
+            padding-inline-start: 0;
         }
     }
 }

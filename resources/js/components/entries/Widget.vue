@@ -17,7 +17,7 @@
                 <data-list-table :loading="loading">
                     <template slot="cell-title" slot-scope="{ row: entry }">
                         <div class="flex items-center">
-                            <span class="little-dot rtl:ml-2 ltr:mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
+                            <span class="little-dot me-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
                             <a :href="entry.edit_url">{{ entry.title }}</a>
                         </div>
                     </template>

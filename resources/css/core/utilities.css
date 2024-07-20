@@ -34,7 +34,7 @@
     }
 
     &.loading-basic {
-        @apply ltr:text-left rtl:text-right;
+        @apply text-start;
         padding: 0;
 
         .icon {
@@ -71,7 +71,7 @@
     i {
         position: relative;
         top: -1px;
-        margin-right: 10px ; [dir="rtl"] & { margin-left: 10px ; margin-right: 0 ; }
+        margin-inline-end: 10px;
     }
 }
 

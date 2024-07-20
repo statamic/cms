@@ -1,11 +1,11 @@
 .toasted-container.bottom-right {
     bottom: 32px !important;
-    right: 32px !important;
+    inset-inline-end: 32px !important;
 }
 
 .toasted-container.bottom-left {
     bottom: 32px !important;
-    left: 32px !important;
+    inset-inline-start: 32px !important;
 }
 
 .toasted-container {
@@ -17,7 +17,7 @@
     height: 48px;
 
     i {
-        @apply flex items-center rtl:rounded-r ltr:rounded-l rtl:ml-4 ltr:mr-4 h-full px-4 text-white;
+        @apply flex items-center rounded-s me-4 h-full px-4 text-white;
     }
 
     &.success i {
@@ -33,7 +33,7 @@
     }
 
     .action {
-        @apply font-normal text-xl px-4 h-full text-gray-600 dark:text-dark-150 m-0 rtl:mr-2 ltr:ml-2 flex items-center;
+        @apply font-normal text-xl px-4 h-full text-gray-600 dark:text-dark-150 m-0 ms-2 flex items-center;
         &:hover {
             @apply no-underline text-gray-900 dark:text-dark-100;
         }

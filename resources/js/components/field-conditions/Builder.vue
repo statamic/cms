@@ -17,12 +17,12 @@
                     v-model="type"
                     :options="typeOptions"
                     :placeholder="false"
-                    class="rtl:mr-4 ltr:ml-4" />
+                    class="ms-4" />
 
                 <text-input
                     v-if="hasConditions && isCustom"
                     v-model="customMethod"
-                    class="rtl:mr-4 ltr:ml-4 flex-1" />
+                    class="ms-4 flex-1" />
             </div>
 
             <condition

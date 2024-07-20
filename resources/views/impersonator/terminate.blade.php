@@ -7,13 +7,13 @@
     z-index: 100;
     align-items: center;
     bottom: 0;
-    right: 0 ; [dir="rtl"] & { right: auto ; left: 0 ; }
+    inset-inline-end: 0;
     padding: 6px 10px;
     color: #726e23;
     font-size: 14px;
     border-radius: 4px 0 0 0;
     background: #fbfab0;
-    border-left: 1px solid #e8dc1e;
+    border-inline-start: 1px solid #e8dc1e;
     border-top: 1px solid #e8dc1e;
     text-decoration: none;
     transform: translateX(calc(100% - 35px));
@@ -24,7 +24,7 @@
     transform: translateX(0);
   }
   #__impersonator-link__ svg {
-    margin-right: 10px ; [dir="rtl"] & { margin-left: 10px ; margin-right: 0 ; }
+    margin-inline-end: 10px;
   }
 </style>
 

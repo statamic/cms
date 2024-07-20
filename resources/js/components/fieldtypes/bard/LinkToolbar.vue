@@ -6,7 +6,7 @@
 
                 <div class="flex">
 
-                    <div class="h-8 mb-4 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 border dark:border-dark-200 rounded shadow-inner flex items-center rtl:ml-1 ltr:mr-1">
+                    <div class="h-8 mb-4 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 border dark:border-dark-200 rounded shadow-inner flex items-center me-1">
                         <select
                             class="input w-auto text-sm px-1"
                             v-model="linkType">
@@ -63,11 +63,11 @@
 
                             <loading-graphic v-if="isLoading" :inline="true" />
 
-                            <div v-else class="flex-1 flex items-center rtl:ml-2 ltr:mr-2 truncate">
+                            <div v-else class="flex-1 flex items-center me-2 truncate">
                                 <img
                                     v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
                                     :src="itemData.asset.thumbnail || itemData.asset.url"
-                                    class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 rtl:ml-2 ltr:mr-2 object-cover lazyloaded"
+                                    class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 me-2 object-cover lazyloaded"
                                 >
                                 {{ displayValue }}
                             </div>
@@ -112,7 +112,7 @@
                 </div>
 
                 <label for="target-blank" class="mt-4 flex items-center font-normal cursor-pointer text-gray-800 dark:text-dark-150 hover:text-black dark:hover:text-dark-100" v-if="canHaveTarget">
-                    <input class="checkbox rtl:ml-2 ltr:mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
+                    <input class="checkbox me-2" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
             </div>

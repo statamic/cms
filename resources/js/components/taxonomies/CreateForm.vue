@@ -16,7 +16,7 @@
             <div class="mb-4">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Handle') }}</label>
                 <div class="relative">
-                    <loading-graphic inline text="" v-if="slug.busy" class="absolute top-3 right-3"/>
+                    <loading-graphic inline text="" v-if="slug.busy" class="absolute top-3 end-3"/>
                     <input type="text" v-model="handle" class="input-text" tabindex="2">
                 </div>
                 <div class="text-2xs text-gray-600 mt-2 flex items-center">

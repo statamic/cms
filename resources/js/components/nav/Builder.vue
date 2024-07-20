@@ -8,41 +8,41 @@
             <div class="flex items-center">
                 <h1 class="flex-1">{{ __(title) }}</h1>
 
-                <dropdown-list class="rtl:ml-2 ltr:mr-2">
+                <dropdown-list class="me-2">
                     <dropdown-item :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"></dropdown-item>
                 </dropdown-list>
 
-                <a @click="discardChanges" class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline" v-if="isDirty" v-text="__('Discard changes')" />
+                <a @click="discardChanges" class="text-2xs text-blue me-4 underline" v-if="isDirty" v-text="__('Discard changes')" />
 
                 <dropdown-list>
                     <template #trigger>
-                        <button class="btn flex items-center rtl:pl-4 ltr:pr-4">
+                        <button class="btn flex items-center pe-4">
                             {{ __('Add Item') }}
-                            <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-4 ltr:ml-4" />
+                            <svg-icon name="micro/chevron-down-xs" class="w-2 ms-4" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="addItem(topLevelTreeData)" />
                     <dropdown-item :text="__('Add Section')" @click="addSection" />
                 </dropdown-list>
 
-                <div class="rtl:mr-4 ltr:ml-4 rtl:text-right ltr:text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                <div class="ms-4 text-start" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary rtl:pr-4 ltr:pl-4"
+                        class="btn-primary ps-4"
                         :class="{ 'disabled': !changed }"
                         :disabled="!changed"
                         @click="save"
                         v-text="__('Save Changes')" />
 
-                    <dropdown-list v-if="hasSaveAsOptions" class="rtl:mr-0 ltr:ml-0">
+                    <dropdown-list v-if="hasSaveAsOptions" class="ms-0">
                         <template #trigger>
-                            <button class="btn-primary rtl:rounded-r-none ltr:rounded-l-none flex items-center">
+                            <button class="btn-primary rounded-s-none flex items-center">
                                 <svg-icon name="micro/chevron-down-xs" class="w-2" />
                             </button>
                         </template>
                         <h6 class="p-2">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group">
-                            <div class="flex items-start rtl:pl-4 ltr:pr-4">
-                                <svg-icon :name="option.icon" class="text-gray shrink-0 rtl:ml-2 ltr:mr-2 w-4 group-hover:text-white" />
+                            <div class="flex items-start pe-4">
+                                <svg-icon :name="option.icon" class="text-gray shrink-0 me-2 w-4 group-hover:text-white" />
                                 <span class="whitespace-normal">{{ __(option.label) }}</span>
                             </div>
                         </dropdown-item>
@@ -53,12 +53,12 @@
 
         <div class="mb-2 flex justify-end">
             <a
-                class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
+                class="text-2xs text-blue me-4 underline"
                 v-text="__('Expand All')"
                 @click="expandAll"
             />
             <a
-                class="text-2xs text-blue rtl:ml-2 ltr:mr-2 underline"
+                class="text-2xs text-blue me-2 underline"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />

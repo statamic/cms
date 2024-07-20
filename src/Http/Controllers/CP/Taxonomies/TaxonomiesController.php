@@ -254,7 +254,7 @@ class TaxonomiesController extends CpController
                         'type' => 'html',
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <span class="rtl:ml-4 ltr:mr-4">'.$taxonomy->termBlueprints()->map(fn ($bp) => __($bp->title()))->join(', ').'</span>'.
+                            '   <span class="me-4">'.$taxonomy->termBlueprints()->map(fn ($bp) => __($bp->title()))->join(', ').'</span>'.
                             '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],

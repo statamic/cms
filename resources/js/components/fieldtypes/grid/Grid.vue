@@ -6,9 +6,9 @@
     <div class="grid-fieldtype-container" :class="{'grid-fullscreen bg-white dark:bg-dark-600': fullScreenMode }">
 
         <template v-if="config.fullscreen || !config.hide_display">
-            <header class="bg-gray-200 dark:bg-dark-550 border-b dark:border-dark-900 py-3 rtl:pr-3 ltr:pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
+            <header class="bg-gray-200 dark:bg-dark-550 border-b dark:border-dark-900 py-3 ps-3 flex items-center justify-between relative" v-if="fullScreenMode">
                 <h2 v-text="__(config.display)" />
-                <button class="btn-close absolute top-2 rtl:left-5 ltr:right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
+                <button class="btn-close absolute top-2 end-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
             </header>
         </template>
 

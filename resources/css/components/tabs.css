@@ -10,11 +10,11 @@
     }
 
     .fade-left {
-        @apply rtl:right-0 ltr:left-0 rtl:bg-gradient-to-l ltr:bg-gradient-to-r;
+        @apply start-0 rtl:bg-gradient-to-l ltr:bg-gradient-to-r;
     }
 
     .fade-right {
-        @apply rtl:left-0 ltr:right-0 rtl:bg-gradient-to-r ltr:bg-gradient-to-l;
+        @apply end-0 rtl:bg-gradient-to-r ltr:bg-gradient-to-l;
     }
 }
 
@@ -25,7 +25,7 @@
 .tabs {
     @apply flex space-x-2 rtl:space-x-reverse overflow-hidden relative w-full max-w-full;
     &-scrolled {
-        @apply rtl:pr-0 ltr:pl-0 rtl:mr-0 ltr:ml-0;
+        @apply ps-0 ms-0;
     }
 }
 
@@ -66,7 +66,7 @@
 }
 
 .button-tab {
-    @apply text-gray-700 inline-block focus:outline-none px-2 py-1 rtl:ml-1 ltr:mr-1;
+    @apply text-gray-700 inline-block focus:outline-none px-2 py-1 me-1;
 
     &:hover {
         @apply text-blue;

@@ -33,7 +33,7 @@
                 </div>
             </slot>
         </div>
-        <div class="text-xs rtl:mr-2 ltr:ml-2" :class="limitIndicatorColor" v-if="limit">
+        <div class="text-xs ms-2" :class="limitIndicatorColor" v-if="limit">
             <span v-text="currentLength"></span>/<span v-text="limit"></span>
         </div>
     </div>

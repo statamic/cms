@@ -3,12 +3,12 @@
 
         <div class="mb-2 flex justify-end">
             <a
-                class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
+                class="text-2xs text-blue me-4 underline"
                 v-text="__('Expand All')"
                 @click="expandAll"
             />
             <a
-                class="text-2xs text-blue rtl:ml-2 ltr:mr-2 underline"
+                class="text-2xs text-blue me-2 underline"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />

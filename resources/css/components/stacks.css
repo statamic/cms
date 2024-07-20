@@ -71,11 +71,6 @@
 
 @media all and (max-width: 980px) {
     .stacks-on-stacks .stack-container {
-        left: 0 !important;
-
-        [dir='rtl'] & {
-            left: unset !important;
-            right: 0 !important;
-        }
+        inset-inline-start: 0 !important;
     }
 }

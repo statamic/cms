@@ -11,7 +11,7 @@
     }
 
     .inline-label {
-        @apply rtl:mr-2 ltr:ml-2 font-normal text-gray-700 dark:text-dark-175;
+        @apply ms-2 font-normal text-gray-700 dark:text-dark-175;
         a {
             @apply text-gray-800 dark:text-dark-150 underline;
             &:hover {
@@ -52,7 +52,7 @@
 
 .toggle-knob {
     @apply absolute top-px outline-none bg-white rounded-full;
-    right: 0 ; [dir="rtl"] & { right: auto ; left: 0 ; }
+    inset-inline-end: 0;
     width: 20px;
     height: 20px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .4);
@@ -120,7 +120,7 @@
 .publish-sidebar .toggle-fieldtype {
     @apply flex items-center justify-between flex-wrap;
     .field-inner > label { margin: 0; }
-    .toggle-fieldtype-wrapper { margin-left: 8px ; [dir="rtl"] & { margin-right: 8px ; margin-left: 0 ; } }
+    .toggle-fieldtype-wrapper { margin-inline-start: 8px; }
     .help-block { margin-top: 4px !important; }
 }
 

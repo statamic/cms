@@ -4,13 +4,13 @@
         <div class="blueprint-section-card card dark:bg-dark-800 p-0 h-full flex rounded-t flex-col">
 
             <div class="bg-gray-200 dark:bg-dark-600 border-b dark:border-none text-sm flex rounded-t">
-                <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 ltr:border-r rtl:border-l dark:border-dark-900"></div>
+                <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-e dark:border-dark-900"></div>
                 <div class="p-2 flex-1 flex items-center">
                     <a class="flex items-center flex-1 group" @click="edit">
-                        <svg-icon :name="iconName(section.icon)" :directory="iconBaseDirectory" class="h-4 w-4 rtl:ml-2 ltr:mr-2 text-gray-700 dark:text-dark-150 group-hover:text-blue-500 dark:group-hover:text-dark-blue-100" />
-                        <div class="rtl:ml-2 ltr:mr-2" v-text="__(section.display)" />
+                        <svg-icon :name="iconName(section.icon)" :directory="iconBaseDirectory" class="h-4 w-4 me-2 text-gray-700 dark:text-dark-150 group-hover:text-blue-500 dark:group-hover:text-dark-blue-100" />
+                        <div class="me-2" v-text="__(section.display)" />
                     </a>
-                    <button class="flex items-center text-gray-700 dark:text-dark-175 hover:text-gray-950 dark:hover:text-dark-100 rtl:ml-3 ltr:mr-3" @click="edit">
+                    <button class="flex items-center text-gray-700 dark:text-dark-175 hover:text-gray-950 dark:hover:text-dark-100 me-3" @click="edit">
                         <svg-icon class="h-4 w-4" name="pencil" />
                     </button>
                     <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-700 dark:text-dark-175 hover:text-gray-950 dark:hover:text-dark-100">

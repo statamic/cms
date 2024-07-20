@@ -3,7 +3,7 @@
     @apply dark:border-dark-900 dark:bg-dark-550 dark:shadow-dark-sm;
 
     .item-move {
-        @apply w-4 self-stretch bg-gray-200 rtl:border-l ltr:border-r rtl:rounded-r ltr:rounded-l p-2 cursor-grab;
+        @apply w-4 self-stretch bg-gray-200 border-e rounded-s p-2 cursor-grab;
         @apply dark:border-dark-900 dark:bg-dark-550;
         background-image: url('../../svg/icons/light/drag-dots.svg');
         background-repeat: no-repeat;

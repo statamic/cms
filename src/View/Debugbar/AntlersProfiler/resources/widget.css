@@ -80,7 +80,7 @@
     height: 15px !important;
     background: red !important;
     border-radius: 50% !important;
-    margin-right: 5px !important;
+    margin-inline-end: 5px !important;
 }
 
 .antlers-trace-button:hover {

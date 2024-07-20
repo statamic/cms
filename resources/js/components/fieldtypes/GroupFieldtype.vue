@@ -11,12 +11,12 @@
             >
                 <header
                     v-if="fullScreenMode"
-                    class="relative flex items-center justify-between py-3 rtl:pr-3 ltr:pl-3 bg-gray-200 border-b"
+                    class="relative flex items-center justify-between py-3 ps-3 bg-gray-200 border-b"
                 >
                     <h2 v-text="__(config.display)" />
                     <button
                         @click="fullScreenMode = false"
-                        class="absolute btn-close top-2 rtl:left-5 ltr:right-5"
+                        class="absolute btn-close top-2 end-5"
                         :aria-label="__('Exit Fullscreen Mode')"
                     >&times;</button>
                 </header>
@@ -67,11 +67,11 @@
 
 <style>
     .group-fieldtype-button-wrapper {
-        @apply flex rtl:left-6 ltr:right-6 absolute top-5 sm:top-7;
+        @apply flex end-6 absolute top-5 sm:top-7;
     }
 
     .replicator-set .group-fieldtype-button-wrapper {
-        @apply top-5 rtl:left-4 ltr:right-4;
+        @apply top-5 end-4;
     }
 </style>
 

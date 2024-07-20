@@ -6,12 +6,12 @@
         <div class="flex items-center mb-6">
             <h1 class="flex-1">
                 <div class="flex items-center">
-                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                    <span v-if="! isCreating" class="little-dot me-2" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
                     <span v-html="$options.filters.striptags(__(title))" />
                 </div>
             </h1>
 
-            <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint || hasItemActions">
+            <dropdown-list class="me-4" v-if="canEditBlueprint || hasItemActions">
                 <dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
                 <li class="divider" />
                 <data-list-inline-actions
@@ -25,8 +25,8 @@
                 />
             </dropdown-list>
 
-            <div class="pt-px text-2xs text-gray-600 flex rtl:ml-4 ltr:mr-4" v-if="readOnly">
-                <svg-icon name="light/lock" class="w-4 rtl:ml-1 ltr:mr-1 -mt-1" /> {{ __('Read Only') }}
+            <div class="pt-px text-2xs text-gray-600 flex me-4" v-if="readOnly">
+                <svg-icon name="light/lock" class="w-4 me-1 -mt-1" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden md:flex items-center">
@@ -51,7 +51,7 @@
                     :preferences-prefix="preferencesPrefix"
                 >
                     <button
-                        class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
+                        class="ms-4 btn-primary flex items-center"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true"
                         v-text="publishButtonText"
@@ -122,7 +122,7 @@
                                             class="flex items-center justify-center btn w-full"
                                             v-if="showLivePreviewButton"
                                             @click="openLivePreview">
-                                            <svg-icon name="light/synchronize" class="h-4 w-4 rtl:ml-2 ltr:mr-2 shrink-0" />
+                                            <svg-icon name="light/synchronize" class="h-4 w-4 me-2 shrink-0" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
@@ -130,7 +130,7 @@
                                             v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
-                                            <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2 shrink-0" />
+                                            <svg-icon name="light/external-link" class="w-4 h-4 me-2 shrink-0" />
                                             <span>{{ __('Visit URL') }}</span>
                                         </a>
                                     </div>
@@ -171,7 +171,7 @@
                                             class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
                                             v-if="!isCreating && revisionsEnabled"
                                             @click="showRevisionHistory = true">
-                                            <svg-icon name="light/history" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
+                                            <svg-icon name="light/history" class="h-4 w-4 me-2" />
                                             <span>{{ __('View History') }}</span>
                                         </button>
                                 </div>
@@ -189,7 +189,7 @@
                                         @click="localizationSelected(option)"
                                     >
                                         <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
-                                            <span class="little-dot rtl:ml-2 ltr:mr-2" :class="{
+                                            <span class="little-dot me-2" :class="{
                                                 'bg-green-600': option.published,
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
@@ -198,7 +198,7 @@
                                             <loading-graphic
                                                 :size="14"
                                                 text=""
-                                                class="rtl:mr-2 ltr:ml-2"
+                                                class="ms-2"
                                                 v-if="localizing && localizing.handle === option.handle" />
                                         </div>
                                         <div class="badge-sm bg-orange dark:bg-orange-dark" v-if="option.origin" v-text="__('Origin')" />
@@ -214,7 +214,7 @@
                 <template v-slot:buttons>
                    <button
                         v-if="!readOnly"
-                        class="rtl:mr-4 ltr:ml-4"
+                        class="ms-4"
                         :class="{
                             'btn': revisionsEnabled,
                             'btn-primary': isCreating || !revisionsEnabled,
@@ -226,11 +226,11 @@
 
                     <button
                         v-if="revisionsEnabled && !isCreating"
-                        class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
+                        class="ms-4 btn-primary flex items-center"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true">
                         <span v-text="publishButtonText" />
-                        <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
+                        <svg-icon name="micro/chevron-down-xs" class="ms-2 w-2" />
                     </button>
                 </template>
             </live-preview>
@@ -242,7 +242,7 @@
                 class="btn-lg"
                 :class="{
                     'btn-primary w-full': ! revisionsEnabled,
-                    'btn w-1/2 rtl:ml-4 ltr:mr-4': revisionsEnabled,
+                    'btn w-1/2 me-4': revisionsEnabled,
                 }"
                 :disabled="!canSave"
                 @click.prevent="save"
@@ -250,11 +250,11 @@
 
             <button
                 v-if="revisionsEnabled"
-                class="rtl:mr-2 ltr:ml-2 btn btn-lg justify-center btn-primary flex items-center w-1/2"
+                class="ms-2 btn btn-lg justify-center btn-primary flex items-center w-1/2"
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
                 <span v-text="publishButtonText" />
-                <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
+                <svg-icon name="micro/chevron-down-xs" class="ms-2 w-2" />
             </button>
         </div>
 

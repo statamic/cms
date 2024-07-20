@@ -28,7 +28,7 @@
                 @if ($licenses->isOnTestDomain())
                     <div class="flex items-center justify-between">
                         <span>
-                            <b class="rtl:ml-2 ltr:mr-2">{{ __('Trial Mode') }}:</b>
+                            <b class="me-2">{{ __('Trial Mode') }}:</b>
                             @if ($licenses->onlyAddonsAreInvalid())
                                 {{ __('statamic::messages.licensing_trial_mode_alert_addons') }}
                             @elseif ($licenses->onlyStatamicIsInvalid())
@@ -38,7 +38,7 @@
                             @endif
                         </span>
                         <div class="flex">
-                            <button @click="hideBanner" class="rtl:ml-4 ltr:mr-4 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
+                            <button @click="hideBanner" class="me-4 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
                             <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Manage Licenses') }}">
                                 {{ __('Manage Licenses') }} @rarr
@@ -60,7 +60,7 @@
                             {{ __('statamic::messages.licensing_production_alert') }}
                         @endif
                         <div class="flex">
-                            <button @click="hideBanner" class="rtl:ml-4 ltr:mr-4 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
+                            <button @click="hideBanner" class="me-4 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
                                 <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Manage Licenses') }}">
                                     {{ __('Manage Licenses') }} @rarr

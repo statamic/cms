@@ -8,7 +8,7 @@
             <div class="flex-1 px-4 py-6 text-gray dark:text-dark-150">
                 <p class="mb-4" v-text="__('Are you sure you want to delete this entry?')" />
                 <label class="flex items-center" v-if="children">
-                    <input type="checkbox" class="rtl:ml-2 ltr:mr-2" v-model="shouldDeleteChildren" />
+                    <input type="checkbox" class="me-2" v-model="shouldDeleteChildren" />
                     {{ __n('Delete child entry|Delete :count child entries', children) }}
                 </label>
             </div>
@@ -16,7 +16,7 @@
                 <button class="text-gray dark:text-dark-150 hover:text-gray-900 dark:hover:text-dark-100"
                     @click="$emit('cancel')"
                     v-text="__('Cancel')" />
-                <button class="rtl:mr-4 ltr:ml-4 btn-danger"
+                <button class="ms-4 btn-danger"
                     @click="$emit('confirm', shouldDeleteChildren)"
                     v-text="__('Delete')" />
             </div>

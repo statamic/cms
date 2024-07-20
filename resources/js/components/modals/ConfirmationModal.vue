@@ -14,7 +14,7 @@
             </div>
             <div class="px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-b-lg border-t dark:border-dark-900 flex items-center justify-end text-sm">
                 <button class="text-gray dark:text-dark-150 hover:text-gray-900 dark:hover:text-dark-100" @click="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" />
-                <button class="rtl:mr-4 ltr:ml-4" :class="buttonClass" :disabled="disabled" v-text="__(buttonText)" @click="$emit('confirm')" />
+                <button class="ms-4" :class="buttonClass" :disabled="disabled" v-text="__(buttonText)" @click="$emit('confirm')" />
             </div>
         </div>
     </modal>
