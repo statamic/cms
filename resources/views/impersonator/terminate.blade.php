@@ -11,7 +11,8 @@
     padding: 6px 10px;
     color: #726e23;
     font-size: 14px;
-    border-radius: 4px 0 0 0;
+    border-radius: 0;
+    border-start-start-radius: 4px;
     background: #fbfab0;
     border-inline-start: 1px solid #e8dc1e;
     border-top: 1px solid #e8dc1e;
@@ -19,6 +20,9 @@
     transform: translateX(calc(100% - 35px));
     transition: transform 0.21s cubic-bezier(0.11, 0, 0.5, 0);
     box-shadow: -1px -2px 4px 0 rgba(20,20,20,.02);
+  }
+  [dir='rtl'] #__impersonator-link__ {
+      transform: translateX(calc(-100% + 35px));
   }
   #__impersonator-link__:hover {
     transform: translateX(0);
