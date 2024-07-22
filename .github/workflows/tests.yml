@@ -1,6 +1,5 @@
 name: Run Tests
 
-
 on:
   push:
     branches:
