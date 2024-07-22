@@ -2,40 +2,6 @@
    DATE & TIME FIELDTYPES
    ========================================================================== */
 
-.vc-container.vc-is-dark,
-.vc-container {
-    @apply dark:text-dark-150 dark:bg-dark-600 dark:border-dark-300;
-
-    .vc-title {
-        @apply dark:text-dark-150;
-    }
-
-    .vc-arrow {
-        @apply dark:hover:bg-dark-900;
-    }
-
-    .vc-weekday {
-        @apply dark:text-blue-300;
-    }
-
-    .vc-nav-popover-container {
-        @apply dark:bg-dark-700 dark:border-dark-650 dark:text-dark-150;
-
-        .vc-nav-title,
-        .vc-nav-item,
-        .vc-nav-arrow {
-            @apply dark:text-dark-150 dark:hover:bg-dark-900 dark:hover:text-dark-100;
-        }
-
-        .vc-nav-item.is-active {
-            @apply dark:text-dark-100 dark:bg-dark-800;
-        }
-        .vc-nav-item.is-current {
-            @apply dark:border-dark-200;
-        }
-    }
-}
-
 .daterange {
 	outline: none;
 	width: 100%;
