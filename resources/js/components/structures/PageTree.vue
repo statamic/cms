@@ -45,6 +45,7 @@
 
                 <template #default="{ node, stat }">
                     <tree-branch
+                        :ref="`branch-${node.id}`"
                         :page="node"
                         :stat="stat"
                         :depth="stat.level"

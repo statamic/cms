@@ -126,6 +126,8 @@
             ref="selector"
             :site="site"
             :collections="collections"
+            :max-items="maxPagesSelection"
+            :can-select-across-sites="canSelectAcrossSites"
             @selected="entriesSelected"
         />
 
@@ -201,7 +203,8 @@ export default {
         site: { type: String, required: true },
         sites: { type: Array, required: true },
         blueprint: { type: Object, required: true },
-        canEdit: { type: Boolean, required: true }
+        canEdit: { type: Boolean, required: true },
+        canSelectAcrossSites: { type: Boolean, required: true }
     },
 
     data() {
@@ -214,6 +217,7 @@ export default {
             showPageDeletionConfirmation: false,
             pageBeingDeleted: null,
             pageDeletionConfirmCallback: null,
+            removePageOnCancel: false,
             preferencesPrefix: `navs.${this.handle}`,
             publishInfo: {},
             editable: true,
@@ -251,6 +255,22 @@ export default {
 
         direction() {
             return this.$config.get('direction', 'ltr');
+        },
+
+        fields () {
+            return this.blueprint.tabs.reduce((fields, tab) => {
+                return tab.sections.reduce((fields, section) => {
+                    return fields.concat(section.fields);
+                }, []);
+            }, []);
+        },
+
+        maxPagesSelection() {
+            if (this.fields.filter(field => field.validate?.includes('required')).length > 0) {
+                return 1;
+            }
+
+            return
         },
 
     },
@@ -303,6 +323,11 @@ export default {
             });
 
             this.$refs.tree.addPages(pages, this.targetParent);
+
+            if (this.maxPagesSelection === 1) {
+                this.removePageOnCancel = true;
+                this.editPage(pages[0], this.$refs.tree.$refs.tree, this.$refs.tree.$refs.tree.store);
+            }
         },
 
         isEntryBranch(branch) {
@@ -332,6 +357,11 @@ export default {
         },
 
         closePageEditor() {
+            if (this.removePageOnCancel) {
+                this.$refs.tree.$refs[`branch-${this.editingPage.page.id}`].remove();
+                this.removePageOnCancel = false;
+            }
+
             this.editingPage = false;
         },
 

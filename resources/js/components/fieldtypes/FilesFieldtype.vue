@@ -18,7 +18,7 @@
                         <span>{{ __('Drop File to Upload') }}</span>
                     </div>
 
-                    <div class="assets-fieldtype-picker py-4" :class="{ 'is-expanded': value?.length }">
+                    <div class="assets-fieldtype-picker py-4" :class="{ 'is-expanded': value.length }">
                         <p class="asset-upload-control text-xs text-gray-600 rtl:mr-0 ltr:ml-0">
                             <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                                 {{ __('Upload file') }}
@@ -32,7 +32,7 @@
                         :uploads="uploads"
                     />
 
-                    <div v-if="value?.length" class="asset-table-listing">
+                    <div v-if="value.length" class="asset-table-listing">
                         <table class="table-fixed">
                             <tbody>
                                 <tr

@@ -4,6 +4,7 @@ namespace Statamic\Search\Commands;
 
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Events\SearchIndexUpdated;
 use Statamic\Facades\Search;
 use Statamic\Support\Str;
 
@@ -23,6 +24,9 @@ class Update extends Command
     {
         foreach ($this->getIndexes() as $index) {
             $index->update();
+
+            SearchIndexUpdated::dispatch($index);
+
             $this->info("Index <comment>{$index->name()}</comment> updated.");
         }
     }

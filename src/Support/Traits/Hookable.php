@@ -4,6 +4,7 @@ namespace Statamic\Support\Traits;
 
 use Closure;
 use Illuminate\Pipeline\Pipeline;
+use Statamic\Hooks\Payload;
 
 trait Hookable
 {
@@ -45,5 +46,10 @@ trait Hookable
             ->send($payload)
             ->through($closures->all())
             ->thenReturn();
+    }
+
+    protected function runHooksWith(string $name, array $payload)
+    {
+        return $this->runHooks($name, new Payload($payload));
     }
 }

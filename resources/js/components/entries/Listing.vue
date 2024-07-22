@@ -38,7 +38,7 @@
                                 :placeholder="searchPlaceholder"
                             />
 
-                            <div class="flex space-x-2 mt-2">
+                            <div class="flex space-x-2 rtl:space-x-reverse mt-2">
                                 <button
                                     class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Reset')" v-show="isDirty"
                                     @click="$refs.presets.refreshPreset()"

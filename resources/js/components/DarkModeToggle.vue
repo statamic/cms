@@ -7,17 +7,17 @@
         </template>
 
         <template #default>
-            <dropdown-item @click="prefer('light')" class="flex items-center space-x-2">
+            <dropdown-item @click="prefer('light')" class="flex items-center space-x-2 rtl:space-x-reverse">
                 <svg-icon name="regular/light-mode" class="h-4 w-4"></svg-icon>
                 <span>{{ __('Light') }}</span>
             </dropdown-item>
 
-            <dropdown-item @click="prefer('dark')" class="flex items-center space-x-2">
+            <dropdown-item @click="prefer('dark')" class="flex items-center space-x-2 rtl:space-x-reverse">
                 <svg-icon name="regular/dark-mode" class="h-4 w-4"></svg-icon>
                 <span>{{ __('Dark') }}</span>
             </dropdown-item>
 
-            <dropdown-item @click="prefer('auto')" class="flex items-center space-x-2">
+            <dropdown-item @click="prefer('auto')" class="flex items-center space-x-2 rtl:space-x-reverse">
                 <svg-icon name="regular/system" class="h-4 w-4"></svg-icon>
                 <span>{{ __('System') }}</span>
             </dropdown-item>
