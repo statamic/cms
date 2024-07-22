@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -426,6 +427,44 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function live_preview_token_bypasses_entry_status_check()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Collection::make('pages')->save();
+        $entry = tap(Facades\Entry::make()->collection('pages')->id('dance')->published(false)->set('title', 'Dance')->slug('dance'))->save();
+
+        $this->get('/api/collections/pages/entries/dance')->assertJson([
+            'message' => 'Not found.',
+        ]);
+
+        LivePreview::tokenize('test-token', $entry);
+
+        $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
+    }
+
+    #[Test]
+    public function non_live_preview_tokens_doesnt_bypass_entry_status_check()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Collection::make('pages')->save();
+        $entry = tap(Facades\Entry::make()->collection('pages')->id('dance')->published(false)->set('title', 'Dance')->slug('dance'))->save();
+
+        $this->get('/api/collections/pages/entries/dance')->assertJson([
+            'message' => 'Not found.',
+        ]);
+
+        Token::make('test-token', FakeTokenHandler::class)->save();
+
+        $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
+            'message' => 'Not found.',
+        ]);
+    }
+
+    #[Test]
     public function it_replaces_terms_using_live_preview_token()
     {
         Facades\Config::set('statamic.api.resources.taxonomies', true);
@@ -542,5 +581,13 @@ class APITest extends TestCase
             ->get($endpoint)
             ->assertNotFound()
             ->assertJson(['message' => 'Not found.']);
+    }
+}
+
+class FakeTokenHandler
+{
+    public function handle(\Statamic\Contracts\Tokens\Token $token, \Illuminate\Http\Request $request, \Closure $next)
+    {
+        return $next($token);
     }
 }

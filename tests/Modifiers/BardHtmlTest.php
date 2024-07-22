@@ -82,6 +82,16 @@ class BardHtmlTest extends TestCase
         $this->assertEquals($expected, $this->modify($data));
     }
 
+    #[Test]
+    public function it_returns_string()
+    {
+        $data = '<p>This is a paragraph.</p>';
+
+        $expected = '<p>This is a paragraph.</p>';
+
+        $this->assertEquals($expected, $this->modify($data));
+    }
+
     public function modify($arr, ...$args)
     {
         return Modify::value($arr)->bard_html($args)->fetch();
