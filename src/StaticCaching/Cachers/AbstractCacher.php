@@ -2,12 +2,14 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
+use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Site;
-use Statamic\Jobs\StaticRecacheJob;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
@@ -288,7 +290,19 @@ abstract class AbstractCacher implements Cacher
      */
     public function recacheUrl($path, $domain = null)
     {
-        StaticRecacheJob::dispatch($path, $domain);
+        $domain ??= app(Cacher::class)->getBaseUrl();
+
+        $url = $domain.$path;
+
+        $param = '__recache='.Hash::make($url);
+
+        $url .= (str_contains($url, '?') ? '&' : '?').$param;
+
+        $request = new GuzzleRequest('GET', $url);
+
+        StaticWarmJob::dispatch($request, [])
+            ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
+            ->onQueue(config('statamic.static_caching.warm_queue'));
     }
 
     /**

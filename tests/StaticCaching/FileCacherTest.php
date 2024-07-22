@@ -3,6 +3,7 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -336,7 +337,7 @@ class FileCacherTest extends TestCase
 
         $cacher->recacheUrl('/one', 'http://example.com');
 
-        Queue::assertPushed(\Statamic\Jobs\StaticRecacheJob::class);
+        Queue::assertPushed(\Statamic\Console\Commands\StaticWarmJob::class);
     }
 
     public static function invalidateEventProvider()

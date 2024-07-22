@@ -259,7 +259,7 @@ class DefaultInvalidatorTest extends \Tests\TestCase
         $this->assertNull($invalidator->invalidate($form));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_recache_when_background_recache_token_is_disabled()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
@@ -288,7 +288,7 @@ class DefaultInvalidatorTest extends \Tests\TestCase
         $this->assertNull($invalidator->invalidateAndRecache($entry));
     }
 
-    /** @test */
+    #[Test]
     public function it_recaches_when_background_recache_token_is_enabled()
     {
         config()->set('statamic.static_caching.background_recache', true);
