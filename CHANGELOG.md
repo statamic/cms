@@ -1,5 +1,24 @@
 # Release Notes
 
+## 5.17.0 (2024-07-22)
+
+### What's new
+- Add hook to query on entries listing [#10479](https://github.com/statamic/cms/issues/10479) by @duncanmcclean
+- Ability to select entries from other sites [#9229](https://github.com/statamic/cms/issues/9229) by @aerni
+
+### What's fixed
+- Fix taxonomy routes on multi-site [#10398](https://github.com/statamic/cms/issues/10398) by @aerni
+- Only output terms in the current locale [#10433](https://github.com/statamic/cms/issues/10433) by @aerni
+- Replace characters in asset filename to ensure they are valid on Windows [#10423](https://github.com/statamic/cms/issues/10423) by @pc-pdx
+- Fix Table Fieldtype in dark mode [#10484](https://github.com/statamic/cms/issues/10484) by @duncanmcclean
+- Handle `required` fields when adding entries to nav [#10468](https://github.com/statamic/cms/issues/10468) by @duncanmcclean
+- Add dark mode to saving overlay on ChangePassword component [#10473](https://github.com/statamic/cms/issues/10473) by @duncanmcclean
+- Prevent showing selected items in relationship field dropdown mode with max items 1 [#10477](https://github.com/statamic/cms/issues/10477) by @jasonvarga
+- Persian translation [#10486](https://github.com/statamic/cms/issues/10486) by @peimn
+- German translations [#10480](https://github.com/statamic/cms/issues/10480) by @helloDanuk
+
+
+
 ## 5.16.0 (2024-07-17)
 
 ### What's new
