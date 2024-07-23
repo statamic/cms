@@ -3,6 +3,7 @@
 namespace Statamic\Search\Comb;
 
 use Statamic\Search\Comb\Exceptions\Exception as CombException;
+use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
 use Statamic\Search\Comb\Exceptions\TooManyResults;
@@ -826,11 +827,18 @@ class Comb
      *
      * @param  string  $query  Query to test
      *
+     * @throws NoQuery
      * @throws NotEnoughCharacters
      */
     private function testValidQuery($query)
     {
-        if (strlen($query) < $this->min_characters) {
+        $length = strlen($query);
+
+        if ($length === 0) {
+            throw new NoQuery('No query given.');
+        }
+
+        if ($length < $this->min_characters) {
             throw new NotEnoughCharacters('Not enough characters entered.');
         }
     }
