@@ -37,4 +37,6 @@ abstract class Dictionary
     {
         return $this->fields;
     }
+
+    abstract public function getGqlType();
 }

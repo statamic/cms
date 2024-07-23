@@ -4,6 +4,7 @@ namespace Statamic\Dictionaries;
 
 use Illuminate\Support\Collection;
 use Statamic\Facades\File;
+use Statamic\GraphQL\Types\CurrencyDictionaryType;
 
 class Currencies extends Dictionary
 {
@@ -30,5 +31,10 @@ class Currencies extends Dictionary
     private function getCurrencies(): Collection
     {
         return collect(json_decode(File::get(__DIR__.'/../../resources/dictionaries/currencies.json'), true));
+    }
+
+    public function getGqlType()
+    {
+        return new CurrencyDictionaryType;
     }
 }

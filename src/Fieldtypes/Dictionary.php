@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Exceptions\DictionaryNotFoundException;
 use Statamic\Exceptions\UndefinedDictionaryException;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Arr;
 
@@ -89,7 +90,7 @@ class Dictionary extends Fieldtype
     public function augment($value)
     {
         if (is_null($value)) {
-            return [];
+            return null;
         }
 
         $dictionary = $this->dictionary();
@@ -133,5 +134,18 @@ class Dictionary extends Fieldtype
         }
 
         return $dictionary;
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type($this->dictionary()->getGqlType()->name);
+
+        return $this->multiple() ? GraphQL::listOf($type) : $type;
+
+    }
+
+    public function addGqlTypes()
+    {
+        GraphQL::addType($this->dictionary()->getGqlType());
     }
 }
