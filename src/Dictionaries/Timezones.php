@@ -2,6 +2,9 @@
 
 namespace Statamic\Dictionaries;
 
+use DateTimeZone;
+use Illuminate\Support\Carbon;
+
 class Timezones extends Dictionary
 {
     public function options(?string $search = null): array
@@ -14,6 +17,19 @@ class Timezones extends Dictionary
 
     public function get(string $key): array
     {
-        return $key;
+        return [
+            'name' => $key,
+            'offset' => $this->getOffset($key),
+        ];
+    }
+
+    private function getOffset(string $tz): string
+    {
+        $tz = new DateTimeZone($tz);
+        $utcTime = Carbon::now('UTC');
+        $offsetInSecs = $tz->getOffset($utcTime);
+        $hoursAndSec = gmdate('H:i', abs($offsetInSecs));
+
+        return stripos($offsetInSecs, '-') === false ? "+{$hoursAndSec}" : "-{$hoursAndSec}";
     }
 }
