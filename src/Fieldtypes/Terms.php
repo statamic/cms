@@ -487,7 +487,7 @@ class Terms extends Relationship
         return Term::query()
             ->when($taxonomies, fn ($query) => $query->whereIn('taxonomy', $taxonomies));
     }
-  
+
     public function getItemHint($item): ?string
     {
         return collect([
