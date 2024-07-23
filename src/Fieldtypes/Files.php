@@ -6,7 +6,6 @@ use Statamic\Fields\Fieldtype;
 
 class Files extends Fieldtype
 {
-    protected $defaultValue = [];
     protected $selectable = false;
     protected $selectableInForms = true;
     protected $categories = ['media'];
@@ -28,6 +27,11 @@ class Files extends Fieldtype
         return [
             'uploadUrl' => cp_route('files.upload'),
         ];
+    }
+
+    public function preProcess($data)
+    {
+        return $data ?? [];
     }
 
     public function process($values)

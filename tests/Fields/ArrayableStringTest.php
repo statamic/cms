@@ -3,12 +3,13 @@
 namespace Tests\Fields;
 
 use Illuminate\Contracts\Support\Arrayable;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\ArrayableString;
 use Tests\TestCase;
 
 class ArrayableStringTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_value_and_extra()
     {
         $obj = new ArrayableString('foo', ['label' => 'Foo']);
@@ -17,7 +18,7 @@ class ArrayableStringTest extends TestCase
         $this->assertEquals(['label' => 'Foo'], $obj->extra());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_a_string()
     {
         $this->assertSame('world', (new ArrayableString('world'))->__toString());
@@ -25,7 +26,7 @@ class ArrayableStringTest extends TestCase
         $this->assertSame('4', (new ArrayableString(4))->__toString());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_an_array()
     {
         $val = new ArrayableString('foo', ['one' => 'a', 'two' => 'b']);
@@ -38,7 +39,7 @@ class ArrayableStringTest extends TestCase
         ], $val->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_json()
     {
         $val = new ArrayableString('foo', ['one' => 'a', 'two' => 'b']);

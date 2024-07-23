@@ -5,6 +5,7 @@ namespace Tests\Feature\Assets;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\ReuploadAsset as ReuploadAssetAction;
 use Statamic\Assets\ReplacementFile;
 use Statamic\Contracts\Assets\Asset;
@@ -18,7 +19,7 @@ use Tests\TestCase;
 
 class ReuploadAssetTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_replaces_the_file_when_reuploading()
     {
         // Place an image in the filesystem that would have previously been uploaded using the files fieldtype in the modal.
@@ -42,7 +43,7 @@ class ReuploadAssetTest extends TestCase
         ], $response);
     }
 
-    /** @test */
+    #[Test]
     public function validation_fails_when_attempting_to_replace_with_a_different_file_extension()
     {
         $asset = Mockery::mock(Asset::class);
@@ -62,7 +63,7 @@ class ReuploadAssetTest extends TestCase
         $this->fail('Validation exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function glide_cache_is_cleared_and_presets_are_regenerated_when_reuploading()
     {
         Storage::fake('test');

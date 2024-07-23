@@ -4,6 +4,7 @@ namespace Tests\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class MakeFieldtypeTest extends TestCase
@@ -28,7 +29,7 @@ class MakeFieldtypeTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_generate_a_fieldtype()
     {
         $this->assertFileDoesNotExist(base_path('app/Fieldtypes/KnightRider.php'));
@@ -44,7 +45,7 @@ class MakeFieldtypeTest extends TestCase
         // @TODO: Test for webpack/cp.js injection or output instructions
     }
 
-    /** @test */
+    #[Test]
     public function it_will_not_overwrite_an_existing_fieldtype()
     {
         $path = base_path('app/Fieldtypes/KnightRider.php');
@@ -61,7 +62,7 @@ class MakeFieldtypeTest extends TestCase
         $this->assertStringContainsString('overwritten fieldtype', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function using_force_option_will_overwrite_original_fieldtype()
     {
         $path = base_path('app/Fieldtypes/KnightRider.php');
@@ -76,7 +77,7 @@ class MakeFieldtypeTest extends TestCase
         $this->assertStringNotContainsString('overwritten fieldtype', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_fieldtype_into_an_addon()
     {
         $path = base_path('addons/yoda/bag-odah');

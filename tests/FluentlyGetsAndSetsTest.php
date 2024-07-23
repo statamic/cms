@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -16,7 +17,7 @@ class FluentlyGetsAndSetsTest extends TestCase
         $this->entry = new Entry;
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_and_set_a_protected_property()
     {
         $this->assertNull($this->entry->blueprint());
@@ -26,7 +27,7 @@ class FluentlyGetsAndSetsTest extends TestCase
         $this->assertEquals('post', $this->entry->blueprint());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_and_set_back_to_null()
     {
         $this->assertEquals('Jesse', $this->entry->publishedBy());
@@ -36,7 +37,7 @@ class FluentlyGetsAndSetsTest extends TestCase
         $this->assertNull($this->entry->publishedBy());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_and_set_with_custom_get_and_set_logic()
     {
         $this->assertNull($this->entry->title());
@@ -46,7 +47,7 @@ class FluentlyGetsAndSetsTest extends TestCase
         $this->assertEquals('Lol Cats', $this->entry->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_and_set_via_magic_getter()
     {
         // A class that has __get and __set methods.
@@ -62,7 +63,7 @@ class FluentlyGetsAndSetsTest extends TestCase
         $this->assertEquals('foo', $entry->template());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_run_custom_after_setter_logic()
     {
         $this->assertNull($this->entry->route());
@@ -73,7 +74,7 @@ class FluentlyGetsAndSetsTest extends TestCase
         $this->assertEquals('login', $this->entry->url);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_fluently()
     {
         $this->entry

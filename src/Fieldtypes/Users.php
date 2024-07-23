@@ -5,10 +5,12 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\UserType;
 use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
@@ -61,6 +63,11 @@ class Users extends Relationship
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
                         'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
                 ],
             ],

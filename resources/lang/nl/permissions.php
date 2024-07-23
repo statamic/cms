@@ -6,6 +6,8 @@ return [
     'group_cp' => 'Control Panel',
     'access_cp' => 'Toegang tot het Control Panel',
     'access_cp_desc' => 'Geeft gebruikers toegang tot het control panel, maar dit betekent niet persé dat ze alles kunnen aanpassen.',
+    'configure_sites' => 'Configureer sites',
+    'configure_sites_desc' => 'De mogelijkheid om sites te configureren als multi-site is ingeschakeld.',
     'configure_fields' => 'Configureer velden',
     'configure_fields_desc' => 'De mogelijkheid om blueprints, fieldsets en andere velden te wijzigen.',
     'configure_addons' => 'Configureer add-ons',
