@@ -16,7 +16,7 @@
         "james-heinrich/getid3": "^1.9.21",
         "laravel/framework": "^10.40 || ^11.0",
         "laravel/prompts": "^0.1.16",
-        "league/commonmark": "^2.2",
+        "league/commonmark": ">=2.2 <2.5",
         "league/csv": "^9.0",
         "league/glide": "^2.3",
         "maennchen/zipstream-php": "^3.1",
