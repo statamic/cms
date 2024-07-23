@@ -24,7 +24,7 @@ abstract class Dictionary
     /**
      * Returns a single option.
      */
-    abstract public function get(string $key): string|array;
+    abstract public function get(string $key): array;
 
     public function context($context)
     {

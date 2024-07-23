@@ -22,7 +22,7 @@ class Currencies extends Dictionary
             ->all();
     }
 
-    public function get(string $key): string|array
+    public function get(string $key): array
     {
         return $this->getCurrencies()->firstWhere('code', $key);
     }

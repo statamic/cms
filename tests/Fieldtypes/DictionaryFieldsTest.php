@@ -138,7 +138,7 @@ class FakeDictionary extends Dictionary
         return [];
     }
 
-    public function get(string $key): string|array
+    public function get(string $key): array
     {
         return [];
     }

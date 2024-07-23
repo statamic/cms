@@ -24,7 +24,7 @@ class Countries extends Dictionary
             ->all();
     }
 
-    public function get(string $key): string|array
+    public function get(string $key): array
     {
         return $this->getCountries()->firstWhere('iso3', $key);
     }

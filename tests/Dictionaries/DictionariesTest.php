@@ -102,7 +102,7 @@ class FakeDictionary extends Dictionary
             ->all();
     }
 
-    public function get(string $key): string|array
+    public function get(string $key): array
     {
         return $this->data()->firstWhere('id', $key);
     }
