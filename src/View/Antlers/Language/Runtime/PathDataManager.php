@@ -699,7 +699,7 @@ class PathDataManager
                     intval($pathItem->originalContent) == $pathItem->originalContent) {
                     $numericIndex = intval($pathItem->originalContent);
 
-                    if (array_key_exists($numericIndex, $this->reducedVar)) {
+                    if (is_array($this->reducedVar) && array_key_exists($numericIndex, $this->reducedVar)) {
                         $this->reducedVar = $this->reducedVar[$numericIndex];
                     } else {
                         $this->reducedVar = null;
