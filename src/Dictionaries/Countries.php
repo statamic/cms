@@ -4,7 +4,6 @@ namespace Statamic\Dictionaries;
 
 use Illuminate\Support\Collection;
 use Statamic\Facades\File;
-use Statamic\GraphQL\Types\CountryDictionaryType;
 
 class Countries extends Dictionary
 {
@@ -45,10 +44,5 @@ class Countries extends Dictionary
     private function getCountries(): Collection
     {
         return collect(json_decode(File::get(__DIR__.'/../../resources/dictionaries/countries.json'), true));
-    }
-
-    public function getGqlType()
-    {
-        return new CountryDictionaryType;
     }
 }

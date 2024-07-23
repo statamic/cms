@@ -4,7 +4,6 @@ namespace Statamic\Dictionaries;
 
 use DateTimeZone;
 use Illuminate\Support\Carbon;
-use Statamic\GraphQL\Types\TimezoneDictionaryType;
 
 class Timezones extends Dictionary
 {
@@ -32,10 +31,5 @@ class Timezones extends Dictionary
         $hoursAndSec = gmdate('H:i', abs($offsetInSecs));
 
         return stripos($offsetInSecs, '-') === false ? "+{$hoursAndSec}" : "-{$hoursAndSec}";
-    }
-
-    public function getGqlType()
-    {
-        return new TimezoneDictionaryType;
     }
 }
