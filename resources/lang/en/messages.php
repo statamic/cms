@@ -69,7 +69,7 @@ return [
     'collections_sort_direction_instructions' => 'The default sort direction.',
     'collections_preview_target_refresh_instructions' => 'Automatically refresh the preview while editing. Disabling this will use postMessage.',
     'collections_taxonomies_instructions' => 'Connect entries in this collection to taxonomies. Fields will be automatically added to publish forms.',
-    'dictionaries_countries_region_instructions' => 'Select a region to filter the list of countries.',
+    'dictionaries_countries_region_instructions' => 'Optionally filter the countries by region.',
     'duplicate_action_warning_localization' => 'This entry is a localization. The origin entry will be duplicated.',
     'duplicate_action_warning_localizations' => 'One or more selected entries are localizations. In those cases, the origin entry will be duplicated instead.',
     'duplicate_action_localizations_confirmation' => 'Are you sure you want to run this action? Localizations will also be duplicated.',
