@@ -10,17 +10,16 @@ class Currencies extends Dictionary
     public function options(?string $search = null): array
     {
         return $this->getCurrencies()
-            ->when($search ?? false, function ($collection) use ($search) {
-                return $collection->filter(function (array $currency) use ($search) {
-                    return str_contains(strtolower($currency['name']), strtolower($search))
-                        || str_contains(strtolower($currency['code']), strtolower($search))
-                        || $currency['symbol'] === $search;
-                });
-            })
-            ->mapWithKeys(function (array $currency) {
-                return [$currency['code'] => "{$currency['name']} ({$currency['code']})"];
-            })
+            ->when($search, fn ($collection) => $collection->filter(fn ($item) => $this->matchesSearchQuery($search, $item)))
+            ->mapWithKeys(fn (array $currency) => [$currency['code'] => "{$currency['name']} ({$currency['code']})"])
             ->all();
+    }
+
+    protected function matchesSearchQuery($query, $item)
+    {
+        return str_contains(strtolower($item['name']), strtolower($query))
+            || str_contains(strtolower($item['code']), strtolower($query))
+            || $item['symbol'] === $query;
     }
 
     public function get(string $key): array
