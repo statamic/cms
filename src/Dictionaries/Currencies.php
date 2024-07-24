@@ -38,7 +38,7 @@ class Currencies extends Dictionary
     {
         return [
             ...parent::getGqlFields(),
-            'decimal_digits' => [
+            'decimals' => [
                 'type' => GraphQL::nonNull(GraphQL::int()),
             ],
         ];

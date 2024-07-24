@@ -89,7 +89,7 @@ class CurrenciesTest extends TestCase
             'name' => 'US Dollar',
             'code' => 'USD',
             'symbol' => '$',
-            'decimal_digits' => 2,
+            'decimals' => 2,
         ], (new Currencies)->get('USD'));
     }
 }
