@@ -8,13 +8,13 @@
             :calculate-position="positionOptions"
             :name="name"
             :clearable="config.clearable"
-            :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
+            :disabled="config.disabled || isReadOnly || (multiple && limitReached)"
             :options="normalizeInputOptions(options)"
             :placeholder="__(config.placeholder)"
             :searchable="true"
             :taggable="config.taggable"
             :push-tags="config.push_tags"
-            :multiple="config.multiple"
+            :multiple="multiple"
             :reset-on-options-change="resetOnOptionsChange"
             :close-on-select="true"
             :value="selectedOptions"
@@ -23,8 +23,8 @@
             @search="search"
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')">
-            <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
-            <template #search="{ events, attributes }" v-if="config.multiple">
+            <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
+            <template #search="{ events, attributes }" v-if="multiple">
                 <input
                     :placeholder="__(config.placeholder)"
                     class="vs__search"
@@ -44,7 +44,7 @@
             <template #no-options>
                 <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
             </template>
-            <template #footer="{ deselect }" v-if="config.multiple">
+            <template #footer="{ deselect }" v-if="multiple">
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
@@ -68,7 +68,7 @@
                 </sortable-list>
             </template>
         </v-select>
-        <div class="text-xs rtl:mr-2 ltr:ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items">
+        <div class="text-xs rtl:mr-2 ltr:ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items > 1">
             <span v-text="currentLength"></span>/<span v-text="config.max_items"></span>
         </div>
     </div>
@@ -101,6 +101,10 @@ export default {
     },
 
     computed: {
+        multiple() {
+            return this.config.max_items !== 1;
+        },
+
         selectedOptions() {
             let selections = this.value || [];
 
@@ -180,7 +184,7 @@ export default {
         },
 
         vueSelectUpdated(value) {
-            if (this.config.multiple) {
+            if (this.multiple) {
                 this.update(value.map(v => v.value));
                 value.forEach((option) => this.selectedOptionData.push(option));
             } else {

@@ -35,7 +35,7 @@ class DictionariesTest extends TestCase
     #[Test]
     public function it_augments_a_single_option()
     {
-        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries']));
+        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries', 'max_items' => 1]));
 
         $fieldtype = FieldtypeRepository::find('dictionary');
         $fieldtype->setField($field);
@@ -55,7 +55,7 @@ class DictionariesTest extends TestCase
     #[Test]
     public function it_augments_multiple_options()
     {
-        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries', 'multiple' => true]));
+        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries']));
 
         $fieldtype = FieldtypeRepository::find('dictionary');
         $fieldtype->setField($field);

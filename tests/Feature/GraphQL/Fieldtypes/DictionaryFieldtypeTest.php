@@ -23,27 +23,27 @@ class DictionaryFieldtypeTest extends FieldtypeTestCase
             ],
             'country' => [
                 'value' => 'USA',
-                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'countries']],
+                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'countries'], 'max_items' => 1],
             ],
             'countries' => [
                 'value' => ['AUS', 'USA'],
-                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'countries'], 'multiple' => true],
+                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'countries']],
             ],
             'timezone' => [
                 'value' => 'America/New_York',
-                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'timezones']],
+                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'timezones'], 'max_items' => 1],
             ],
             'timezones' => [
                 'value' => ['Australia/Sydney', 'America/New_York'],
-                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'timezones'], 'multiple' => true],
+                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'timezones']],
             ],
             'currency' => [
                 'value' => 'USD',
-                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'currencies']],
+                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'currencies'], 'max_items' => 1],
             ],
             'currencies' => [
                 'value' => ['GBP', 'USD'],
-                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'currencies'], 'multiple' => true],
+                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'currencies']],
             ],
         ]);
 

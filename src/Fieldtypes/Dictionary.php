@@ -36,12 +36,6 @@ class Dictionary extends Fieldtype
                         'type' => 'text',
                         'default' => '',
                     ],
-                    'multiple' => [
-                        'display' => __('Multiple'),
-                        'instructions' => __('statamic::fieldtypes.select.config.multiple'),
-                        'type' => 'toggle',
-                        'default' => false,
-                    ],
                     'max_items' => [
                         'display' => __('Max Items'),
                         'instructions' => __('statamic::messages.max_items_instructions'),
@@ -113,7 +107,7 @@ class Dictionary extends Fieldtype
 
     protected function multiple(): bool
     {
-        return $this->config('multiple');
+        return $this->config('max_items') !== 1;
     }
 
     public function dictionary(): \Statamic\Dictionaries\Dictionary
