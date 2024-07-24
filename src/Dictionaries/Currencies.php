@@ -14,7 +14,8 @@ class Currencies extends Dictionary
             ->when($search ?? false, function ($collection) use ($search) {
                 return $collection->filter(function (array $currency) use ($search) {
                     return str_contains(strtolower($currency['name']), strtolower($search))
-                        || str_contains(strtolower($currency['code']), strtolower($search));
+                        || str_contains(strtolower($currency['code']), strtolower($search))
+                        || $currency['symbol'] === $search;
                 });
             })
             ->mapWithKeys(function (array $currency) {

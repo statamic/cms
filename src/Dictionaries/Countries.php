@@ -15,7 +15,8 @@ class Countries extends Dictionary
             })
             ->when($search ?? false, function ($collection) use ($search) {
                 return $collection->filter(function (array $country) use ($search) {
-                    return str_contains(strtolower($country['name']), strtolower($search));
+                    return str_contains(strtolower($country['name']), strtolower($search))
+                        || str_contains(strtolower($country['iso3']), strtolower($search));
                 });
             })
             ->mapWithKeys(function (array $country) {
