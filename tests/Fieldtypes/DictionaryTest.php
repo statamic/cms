@@ -7,7 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Tests\TestCase;
 
-class DictionariesTest extends TestCase
+class DictionaryTest extends TestCase
 {
     #[Test]
     public function it_returns_preload_data()
