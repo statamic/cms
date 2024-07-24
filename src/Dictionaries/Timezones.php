@@ -12,19 +12,14 @@ class Timezones extends Dictionary
         $searchingOffset = $this->isSearchingOffset($search);
 
         return collect(timezone_identifiers_list())
-            ->map(function ($tz) {
-                return [
-                    'tz' => $tz,
-                    'offset' => $this->getOffset($tz),
-                ];
-            })
+            ->map(fn ($tz) => $this->get($tz))
             ->when($search, function ($collection) use ($search, $searchingOffset) {
-                return $collection->filter(function ($timezone) use ($search, $searchingOffset) {
-                    return str_contains(strtolower($timezone['tz']), strtolower($search))
-                        || ($searchingOffset && str_contains($timezone['offset'], $search));
+                return $collection->filter(function ($tz) use ($search, $searchingOffset) {
+                    return str_contains(strtolower($tz['name']), strtolower($search))
+                        || ($searchingOffset && str_contains($tz['offset'], $search));
                 });
             })
-            ->mapWithKeys(fn ($tz) => [$tz['tz'] => $tz['tz'].' ('.$tz['offset'].')'])
+            ->mapWithKeys(fn ($tz) => [$tz['name'] => $tz['name'].' ('.$tz['offset'].')'])
             ->all();
     }
 
