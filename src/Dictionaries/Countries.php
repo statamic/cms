@@ -9,18 +9,12 @@ class Countries extends Dictionary
     public function options(?string $search = null): array
     {
         return $this->getCountries()
-            ->when($this->context['region'] ?? false, function ($collection) {
-                return $collection->where('region', $this->context['region']);
-            })
-            ->when($search ?? false, function ($collection) use ($search) {
-                return $collection->filter(function (array $country) use ($search) {
-                    return str_contains(strtolower($country['name']), strtolower($search))
-                        || str_contains(strtolower($country['iso3']), strtolower($search));
-                });
-            })
-            ->mapWithKeys(function (array $country) {
-                return [$country['iso3'] => "{$country['emoji']} {$country['name']}"];
-            })
+            ->when($this->context['region'] ?? false, fn ($collection) => $collection->where('region', $this->context['region']))
+            ->when($search, fn ($collection) => $collection->filter(function (array $country) use ($search) {
+                return str_contains(strtolower($country['name']), strtolower($search))
+                    || str_contains(strtolower($country['iso3']), strtolower($search));
+            }))
+            ->mapWithKeys(fn (array $country) => [$country['iso3'] => "{$country['emoji']} {$country['name']}"])
             ->all();
     }
 
