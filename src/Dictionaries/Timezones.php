@@ -11,7 +11,7 @@ class Timezones extends Dictionary
     {
         $searchingOffset = $this->isSearchingOffset($search);
 
-        return collect(timezone_identifiers_list())
+        return collect(DateTimeZone::listIdentifiers())
             ->map(fn ($tz) => $this->get($tz))
             ->when($search, function ($collection) use ($search, $searchingOffset) {
                 return $collection->filter(function ($tz) use ($search, $searchingOffset) {
