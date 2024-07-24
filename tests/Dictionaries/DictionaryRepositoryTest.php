@@ -4,14 +4,16 @@ namespace Tests\Dictionaries;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Dictionaries\Dictionary;
-use Statamic\Facades\Dictionary as DictionaryFacade;
+use Statamic\Dictionaries\DictionaryRepository;
 use Tests\TestCase;
 
-class DictionariesTest extends TestCase
+class DictionaryRepositoryTest extends TestCase
 {
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->repo = new DictionaryRepository;
 
         FakeDictionary::register();
     }
@@ -19,7 +21,7 @@ class DictionariesTest extends TestCase
     #[Test]
     public function can_get_all_dictionaries()
     {
-        $all = DictionaryFacade::all();
+        $all = $this->repo->all();
 
         $this->assertCount(4, $all); // The built-in dictionaries + our fake one
         $this->assertEveryItem($all, fn ($item) => $item instanceof Dictionary);
@@ -28,51 +30,16 @@ class DictionariesTest extends TestCase
     #[Test]
     public function can_get_a_dictionary()
     {
-        $find = DictionaryFacade::find('fake_dictionary');
+        $find = $this->repo->find('fake_dictionary');
 
         $this->assertInstanceOf(Dictionary::class, $find);
         $this->assertSame('fake_dictionary', $find->handle());
     }
 
     #[Test]
-    public function can_get_options()
-    {
-        $dictionary = DictionaryFacade::find('fake_dictionary');
-
-        $this->assertEquals([
-            'foo' => 'Foo',
-            'bar' => 'Bar',
-            'baz' => 'Baz',
-            'qux' => 'Qux',
-        ], $dictionary->options());
-    }
-
-    #[Test]
-    public function can_get_options_with_search_query()
-    {
-        $dictionary = DictionaryFacade::find('fake_dictionary');
-
-        $this->assertEquals([
-            'bar' => 'Bar',
-            'baz' => 'Baz',
-        ], $dictionary->options('ba'));
-    }
-
-    #[Test]
-    public function can_get_option()
-    {
-        $dictionary = DictionaryFacade::find('fake_dictionary');
-
-        $this->assertEquals([
-            'name' => 'Foo',
-            'id' => 'foo',
-        ], $dictionary->get('foo'));
-    }
-
-    #[Test]
     public function ensure_context_is_passed_to_dictionary()
     {
-        $dictionary = DictionaryFacade::find('fake_dictionary', [
+        $dictionary = $this->repo->find('fake_dictionary', [
             'sort_in_alphabetical_order' => true,
         ]);
 
