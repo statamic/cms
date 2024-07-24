@@ -9,10 +9,28 @@ class Timezones extends Dictionary
 {
     public function options(?string $search = null): array
     {
+        $searchingOffset = $this->isSearchingOffset($search);
+
         return collect(timezone_identifiers_list())
-            ->filter(fn ($timezone) => $search ? str_contains(strtolower($timezone), strtolower($search)) : true)
-            ->mapWithKeys(fn ($timezone) => [$timezone => $timezone])
+            ->map(function ($tz) {
+                return [
+                    'tz' => $tz,
+                    'offset' => $this->getOffset($tz),
+                ];
+            })
+            ->when($search, function ($collection) use ($search, $searchingOffset) {
+                return $collection->filter(function ($timezone) use ($search, $searchingOffset) {
+                    return str_contains(strtolower($timezone['tz']), strtolower($search))
+                        || ($searchingOffset && str_contains($timezone['offset'], $search));
+                });
+            })
+            ->mapWithKeys(fn ($tz) => [$tz['tz'] => $tz['tz'].' ('.$tz['offset'].')'])
             ->all();
+    }
+
+    private function isSearchingOffset($query): bool
+    {
+        return is_numeric($query) || preg_match('/^[+-]\d+$/', $query);
     }
 
     public function get(string $key): array

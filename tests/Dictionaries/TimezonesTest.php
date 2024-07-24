@@ -18,12 +18,12 @@ class TimezonesTest extends TestCase
 
         $this->assertCount(419, $options);
         $this->assertEquals([
-            'Africa/Abidjan' => 'Africa/Abidjan',
-            'Africa/Accra' => 'Africa/Accra',
-            'Africa/Addis_Ababa' => 'Africa/Addis_Ababa',
-            'Pacific/Wake' => 'Pacific/Wake',
-            'Pacific/Wallis' => 'Pacific/Wallis',
-            'UTC' => 'UTC',
+            'Africa/Abidjan' => 'Africa/Abidjan (+00:00)',
+            'Africa/Accra' => 'Africa/Accra (+00:00)',
+            'Africa/Addis_Ababa' => 'Africa/Addis_Ababa (+03:00)',
+            'Pacific/Wake' => 'Pacific/Wake (+12:00)',
+            'Pacific/Wallis' => 'Pacific/Wallis (+12:00)',
+            'UTC' => 'UTC (+00:00)',
         ], [...Arr::take($options, 3), ...Arr::take($options, -3)]);
     }
 
@@ -31,6 +31,9 @@ class TimezonesTest extends TestCase
     #[DataProvider('searchProvider')]
     public function it_searches_options($query, $expected)
     {
+        // UTC offsets can change during daylight saving time, so we need to freeze time.
+        Carbon::setTestNow('2024-07-23');
+
         $this->assertEquals($expected, (new Timezones)->options($query));
     }
 
@@ -40,8 +43,57 @@ class TimezonesTest extends TestCase
             'new' => [
                 'new',
                 [
-                    'America/New_York' => 'America/New_York',
-                    'America/North_Dakota/New_Salem' => 'America/North_Dakota/New_Salem',
+                    'America/New_York' => 'America/New_York (-04:00)',
+                    'America/North_Dakota/New_Salem' => 'America/North_Dakota/New_Salem (-05:00)',
+                ],
+            ],
+            'ten' => [
+                '10',
+                [
+                    'Antarctica/DumontDUrville' => 'Antarctica/DumontDUrville (+10:00)',
+                    'Antarctica/Macquarie' => 'Antarctica/Macquarie (+10:00)',
+                    'Asia/Ust-Nera' => 'Asia/Ust-Nera (+10:00)',
+                    'Asia/Vladivostok' => 'Asia/Vladivostok (+10:00)',
+                    'Australia/Brisbane' => 'Australia/Brisbane (+10:00)',
+                    'Australia/Hobart' => 'Australia/Hobart (+10:00)',
+                    'Australia/Lindeman' => 'Australia/Lindeman (+10:00)',
+                    'Australia/Lord_Howe' => 'Australia/Lord_Howe (+10:30)',
+                    'Australia/Melbourne' => 'Australia/Melbourne (+10:00)',
+                    'Australia/Sydney' => 'Australia/Sydney (+10:00)',
+                    'Pacific/Chuuk' => 'Pacific/Chuuk (+10:00)',
+                    'Pacific/Guam' => 'Pacific/Guam (+10:00)',
+                    'Pacific/Honolulu' => 'Pacific/Honolulu (-10:00)',
+                    'Pacific/Port_Moresby' => 'Pacific/Port_Moresby (+10:00)',
+                    'Pacific/Rarotonga' => 'Pacific/Rarotonga (-10:00)',
+                    'Pacific/Saipan' => 'Pacific/Saipan (+10:00)',
+                    'Pacific/Tahiti' => 'Pacific/Tahiti (-10:00)',
+                ],
+            ],
+            'plus ten' => [
+                '+10',
+                [
+                    'Antarctica/DumontDUrville' => 'Antarctica/DumontDUrville (+10:00)',
+                    'Antarctica/Macquarie' => 'Antarctica/Macquarie (+10:00)',
+                    'Asia/Ust-Nera' => 'Asia/Ust-Nera (+10:00)',
+                    'Asia/Vladivostok' => 'Asia/Vladivostok (+10:00)',
+                    'Australia/Brisbane' => 'Australia/Brisbane (+10:00)',
+                    'Australia/Hobart' => 'Australia/Hobart (+10:00)',
+                    'Australia/Lindeman' => 'Australia/Lindeman (+10:00)',
+                    'Australia/Lord_Howe' => 'Australia/Lord_Howe (+10:30)',
+                    'Australia/Melbourne' => 'Australia/Melbourne (+10:00)',
+                    'Australia/Sydney' => 'Australia/Sydney (+10:00)',
+                    'Pacific/Chuuk' => 'Pacific/Chuuk (+10:00)',
+                    'Pacific/Guam' => 'Pacific/Guam (+10:00)',
+                    'Pacific/Port_Moresby' => 'Pacific/Port_Moresby (+10:00)',
+                    'Pacific/Saipan' => 'Pacific/Saipan (+10:00)',
+                ],
+            ],
+            'minus ten' => [
+                '-10',
+                [
+                    'Pacific/Honolulu' => 'Pacific/Honolulu (-10:00)',
+                    'Pacific/Rarotonga' => 'Pacific/Rarotonga (-10:00)',
+                    'Pacific/Tahiti' => 'Pacific/Tahiti (-10:00)',
                 ],
             ],
         ];
