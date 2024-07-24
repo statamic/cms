@@ -4,26 +4,14 @@ namespace Statamic\Dictionaries;
 
 use Illuminate\Support\Collection;
 
-class Countries extends Dictionary
+class Countries extends BasicDictionary
 {
-    public function options(?string $search = null): array
-    {
-        return $this->getCountries()
-            ->when($this->context['region'] ?? false, fn ($collection) => $collection->where('region', $this->context['region']))
-            ->when($search, fn ($collection) => $collection->filter(fn ($item) => $this->matchesSearchQuery($search, $item)))
-            ->mapWithKeys(fn (array $country) => [$country['iso3'] => "{$country['emoji']} {$country['name']}"])
-            ->all();
-    }
+    protected string $valueKey = 'iso3';
+    protected array $searchable = ['name', 'iso3'];
 
-    protected function matchesSearchQuery($query, $item)
+    protected function getItemLabel(array $item): string
     {
-        return str_contains(strtolower($item['name']), strtolower($query))
-            || str_contains(strtolower($item['iso3']), strtolower($query));
-    }
-
-    public function get(string $key): array
-    {
-        return $this->getCountries()->firstWhere('iso3', $key);
+        return "{$item['emoji']} {$item['name']}";
     }
 
     protected function fieldItems()
@@ -33,14 +21,21 @@ class Countries extends Dictionary
                 'display' => __('Region'),
                 'instructions' => __('statamic::messages.dictionaries_countries_region_instructions'),
                 'type' => 'select',
-                'options' => $this->getCountries()->unique('region')->pluck('region', 'region')->filter()->all(),
+                'options' => $this->getItems()->unique('region')->pluck('region', 'region')->filter()->all(),
             ],
         ];
     }
 
-    private function getCountries(): Collection
+    protected function getFilteredItems(): Collection
     {
-        return collect([
+        return $this
+            ->collectItems()
+            ->when($this->context['region'] ?? false, fn ($collection) => $collection->where('region', $this->context['region']));
+    }
+
+    protected function getItems(): array
+    {
+        return [
             ['name' => 'Afghanistan', 'iso3' => 'AFG', 'iso2' => 'AF', 'region' => 'Asia', 'subregion' => 'Southern Asia', 'emoji' => '🇦🇫'],
             ['name' => 'Aland Islands', 'iso3' => 'ALA', 'iso2' => 'AX', 'region' => 'Europe', 'subregion' => 'Northern Europe', 'emoji' => '🇦🇽'],
             ['name' => 'Albania', 'iso3' => 'ALB', 'iso2' => 'AL', 'region' => 'Europe', 'subregion' => 'Southern Europe', 'emoji' => '🇦🇱'],
@@ -291,6 +286,6 @@ class Countries extends Dictionary
             ['name' => 'Yemen', 'iso3' => 'YEM', 'iso2' => 'YE', 'region' => 'Asia', 'subregion' => 'Western Asia', 'emoji' => '🇾🇪'],
             ['name' => 'Zambia', 'iso3' => 'ZMB', 'iso2' => 'ZM', 'region' => 'Africa', 'subregion' => 'Eastern Africa', 'emoji' => '🇿🇲'],
             ['name' => 'Zimbabwe', 'iso3' => 'ZWE', 'iso2' => 'ZW', 'region' => 'Africa', 'subregion' => 'Eastern Africa', 'emoji' => '🇿🇼'],
-        ]);
+        ];
     }
 }

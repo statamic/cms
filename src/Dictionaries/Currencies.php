@@ -2,29 +2,15 @@
 
 namespace Statamic\Dictionaries;
 
-use Illuminate\Support\Collection;
 use Statamic\Facades\GraphQL;
 
-class Currencies extends Dictionary
+class Currencies extends BasicDictionary
 {
-    public function options(?string $search = null): array
-    {
-        return $this->getCurrencies()
-            ->when($search, fn ($collection) => $collection->filter(fn ($item) => $this->matchesSearchQuery($search, $item)))
-            ->mapWithKeys(fn (array $currency) => [$currency['code'] => "{$currency['name']} ({$currency['code']})"])
-            ->all();
-    }
+    protected string $valueKey = 'code';
 
-    protected function matchesSearchQuery($query, $item)
+    protected function getItemLabel(array $item): string
     {
-        return str_contains(strtolower($item['name']), strtolower($query))
-            || str_contains(strtolower($item['code']), strtolower($query))
-            || $item['symbol'] === $query;
-    }
-
-    public function get(string $key): array
-    {
-        return $this->getCurrencies()->firstWhere('code', $key);
+        return "{$item['name']} ({$item['code']})";
     }
 
     protected function getGqlFields(): array
@@ -37,9 +23,9 @@ class Currencies extends Dictionary
         ];
     }
 
-    private function getCurrencies(): Collection
+    protected function getItems(): array
     {
-        return collect([
+        return [
             ['code' => 'AED', 'name' => 'United Arab Emirates Dirham', 'symbol' => 'د.إ.‏', 'decimals' => 2],
             ['code' => 'AFN', 'name' => 'Afghan Afghani', 'symbol' => '؋', 'decimals' => 0],
             ['code' => 'ALL', 'name' => 'Albanian Lek', 'symbol' => 'Lek', 'decimals' => 0],
@@ -159,6 +145,6 @@ class Currencies extends Dictionary
             ['code' => 'ZAR', 'name' => 'South African Rand', 'symbol' => 'R', 'decimals' => 2],
             ['code' => 'ZMK', 'name' => 'Zambian Kwacha', 'symbol' => 'ZK', 'decimals' => 0],
             ['code' => 'ZWL', 'name' => 'Zimbabwean Dollar', 'symbol' => 'ZWL$', 'decimals' => 0],
-        ]);
+        ];
     }
 }

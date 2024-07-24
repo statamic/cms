@@ -2,45 +2,20 @@
 
 namespace DummyNamespace;
 
-use Illuminate\Support\Collection;
-use Statamic\Dictionaries\Dictionary;
+use Statamic\Dictionaries\BasicDictionary;
 
-class DummyClass extends Dictionary
+class DummyClass extends BasicDictionary
 {
-    /**
-     * Returns a key/value array of options.
-     *
-     * @param string|null $search
-     * @return array
-     */
-    public function options(?string $search = null): array
-    {
-        return $this->getItems()
-            ->when($search ?? false, function ($collection) use ($search) {
-                return $collection->filter(fn ($item) => str_contains($item['name'], $search));
-            })
-            ->mapWithKeys(fn ($item) => [$item['slug'] => $item['name']])
-            ->all();
-    }
+    protected string $valueKey = 'abbr';
+    protected string $labelKey = 'name';
 
-    /**
-     * Returns a single option.
-     *
-     * @param string $key
-     * @return string|array
-     */
-    public function get(string $key): string|array
+    protected function getItems(): array
     {
-        return $this->getItems()->firstWhere('slug', $key);
-    }
-
-    private function getItems(): Collection
-    {
-        return collect([
-            ['name' => 'January', 'slug' => 'january'],
-            ['name' => 'February', 'slug' => 'february'],
-            ['name' => 'March', 'slug' => 'march'],
+        return [
+            ['name' => 'Alabama', 'abbr' => 'AL', 'capital' => 'Montgomery'],
+            ['name' => 'Alaska', 'abbr' => 'AK', 'capital' => 'Juneau'],
+            ['name' => 'Arizona', 'abbr' => 'AZ', 'capital' => 'Phoenix'],
             // ...
-        ]);
+        ];
     }
 }
