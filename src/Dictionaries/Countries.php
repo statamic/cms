@@ -10,12 +10,15 @@ class Countries extends Dictionary
     {
         return $this->getCountries()
             ->when($this->context['region'] ?? false, fn ($collection) => $collection->where('region', $this->context['region']))
-            ->when($search, fn ($collection) => $collection->filter(function (array $country) use ($search) {
-                return str_contains(strtolower($country['name']), strtolower($search))
-                    || str_contains(strtolower($country['iso3']), strtolower($search));
-            }))
+            ->when($search, fn ($collection) => $collection->filter(fn ($item) => $this->matchesSearchQuery($search, $item)))
             ->mapWithKeys(fn (array $country) => [$country['iso3'] => "{$country['emoji']} {$country['name']}"])
             ->all();
+    }
+
+    protected function matchesSearchQuery($query, $item)
+    {
+        return str_contains(strtolower($item['name']), strtolower($query))
+            || str_contains(strtolower($item['iso3']), strtolower($query));
     }
 
     public function get(string $key): array
