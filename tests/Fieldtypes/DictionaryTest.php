@@ -3,13 +3,82 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Dictionaries\Countries;
 use Statamic\Dictionaries\Item;
+use Statamic\Exceptions\DictionaryNotFoundException;
+use Statamic\Exceptions\UndefinedDictionaryException;
 use Statamic\Fields\Field;
 use Tests\TestCase;
 
 class DictionaryTest extends TestCase
 {
+    #[Test]
+    #[DataProvider('dictionaryConfigProvider')]
+    public function it_gets_the_dictionary($dictionaryConfig, $expectedContext)
+    {
+        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => $dictionaryConfig]));
+        $fieldtype = FieldtypeRepository::find('dictionary');
+        $fieldtype->setField($field);
+
+        $dictionary = $fieldtype->dictionary();
+        $this->assertInstanceOf(Countries::class, $dictionary);
+        $this->assertEquals($expectedContext, $dictionary->context());
+    }
+
+    public static function dictionaryConfigProvider()
+    {
+        return [
+            'string' => [
+                'countries',
+                [],
+            ],
+            'array' => [
+                ['type' => 'countries', 'foo' => 'bar', 'baz' => 'qux'],
+                ['foo' => 'bar', 'baz' => 'qux'],
+            ],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('undefinedDictionaryConfigProvider')]
+    public function it_throw_exception_when_dictionary_is_undefined($dictionaryConfig)
+    {
+        $this->expectException(UndefinedDictionaryException::class);
+        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => $dictionaryConfig]));
+        $fieldtype = FieldtypeRepository::find('dictionary');
+        $fieldtype->setField($field);
+        $fieldtype->dictionary();
+    }
+
+    public static function undefinedDictionaryConfigProvider()
+    {
+        return [
+            'string' => [null],
+            'array' => [['foo' => 'bar']],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('invalidDictionaryConfigProvider')]
+    public function it_throws_exception_when_invalid_dictionary_is_defined($dictionaryConfig)
+    {
+        $this->expectException(DictionaryNotFoundException::class);
+        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => $dictionaryConfig]));
+        $fieldtype = FieldtypeRepository::find('dictionary');
+        $fieldtype->setField($field);
+        $fieldtype->dictionary();
+    }
+
+    public static function invalidDictionaryConfigProvider()
+    {
+        return [
+            'string' => ['invalid'],
+            'array' => [['type' => 'invalid']],
+        ];
+    }
+
     #[Test]
     public function it_returns_preload_data()
     {

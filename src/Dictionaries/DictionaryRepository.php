@@ -30,6 +30,6 @@ class DictionaryRepository
             return $dictionary;
         }
 
-        return $dictionary->context($context);
+        return $dictionary->setContext($context);
     }
 }

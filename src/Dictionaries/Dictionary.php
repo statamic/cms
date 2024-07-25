@@ -28,11 +28,16 @@ abstract class Dictionary
      */
     abstract public function get(string $key): ?Item;
 
-    public function context($context)
+    public function setContext(array $context): self
     {
         $this->context = $context;
 
         return $this;
+    }
+
+    public function context(): array
+    {
+        return $this->context;
     }
 
     protected function fieldItems()

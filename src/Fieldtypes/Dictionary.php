@@ -2,9 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Dictionaries\Dictionary as DictionaryInstance;
 use Statamic\Dictionaries\Item;
 use Statamic\Exceptions\DictionaryNotFoundException;
 use Statamic\Exceptions\UndefinedDictionaryException;
+use Statamic\Facades\Dictionary as Dictionaries;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Arr;
@@ -122,24 +124,19 @@ class Dictionary extends Fieldtype
         return $this->config('max_items') !== 1;
     }
 
-    public function dictionary(): \Statamic\Dictionaries\Dictionary
+    public function dictionary(): DictionaryInstance
     {
-        if (! $this->config('dictionary')) {
-            throw new UndefinedDictionaryException();
+        $config = is_array($config = $this->config('dictionary')) ? $config : ['type' => $config];
+
+        if (! $handle = Arr::pull($config, 'type')) {
+            throw new UndefinedDictionaryException;
         }
 
-        $config = $this->config('dictionary');
-
-        $handle = is_array($config) ? Arr::get($config, 'type') : $config;
-        $context = is_array($config) ? Arr::except($config, 'type') : [];
-
-        $dictionary = \Statamic\Facades\Dictionary::find($handle, $context);
-
-        if (! $dictionary) {
-            throw new DictionaryNotFoundException($handle);
+        if ($dictionary = Dictionaries::find($handle, $config)) {
+            return $dictionary;
         }
 
-        return $dictionary;
+        throw new DictionaryNotFoundException($handle);
     }
 
     public function toGqlType()
