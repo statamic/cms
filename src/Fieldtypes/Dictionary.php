@@ -45,12 +45,6 @@ class Dictionary extends Fieldtype
                         'min' => 1,
                         'type' => 'integer',
                     ],
-                    'searchable' => [
-                        'display' => __('Searchable'),
-                        'instructions' => __('statamic::fieldtypes.select.config.searchable'),
-                        'type' => 'toggle',
-                        'default' => true,
-                    ],
                 ],
             ],
             [
