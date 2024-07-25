@@ -34,12 +34,10 @@
                 >
             </template>
             <template #option="{ label }">
-                <div v-if="config.label_html" v-html="label"></div>
-                <template v-else v-text="label"></template>
+                <div v-html="label" />
             </template>
             <template #selected-option="{ label }">
-                <div v-if="config.label_html" v-html="label"></div>
-                <template v-else v-text="label"></template>
+                <div v-html="label" />
             </template>
             <template #no-options>
                 <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
@@ -55,8 +53,7 @@
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item" :class="{'invalid': option.invalid}">
-                            <div v-if="config.label_html" v-html="option.label"></div>
-                            <template v-else>{{ __(option.label) }}</template>
+                            <div v-html="option.label" />
                             <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                                 <span>×</span>
                             </button>
