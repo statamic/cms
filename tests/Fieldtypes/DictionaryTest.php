@@ -79,7 +79,6 @@ class DictionaryTest extends TestCase
         $this->assertEquals([
             [
                 'name' => 'United States',
-                'label' => 'United States',
                 'key' => 'USA',
                 'iso3' => 'USA',
                 'iso2' => 'US',
@@ -91,7 +90,6 @@ class DictionaryTest extends TestCase
             ],
             [
                 'name' => 'United Kingdom',
-                'label' => 'United Kingdom',
                 'key' => 'GBR',
                 'iso3' => 'GBR',
                 'iso2' => 'GB',
@@ -142,7 +140,6 @@ class DictionaryTest extends TestCase
         $this->assertEquals([
             [
                 'name' => 'United States',
-                'label' => 'United States',
                 'key' => 'USA',
                 'iso3' => 'USA',
                 'iso2' => 'US',
