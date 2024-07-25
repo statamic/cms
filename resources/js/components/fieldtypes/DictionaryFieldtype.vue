@@ -5,17 +5,14 @@
             :input-id="fieldId"
             class="flex-1"
             append-to-body
+            searchable
+            close-on-select
             :calculate-position="positionOptions"
             :name="name"
             :disabled="config.disabled || isReadOnly || (multiple && limitReached)"
             :options="normalizeInputOptions(options)"
             :placeholder="__(config.placeholder)"
-            :searchable="true"
-            :taggable="config.taggable"
-            :push-tags="config.push_tags"
             :multiple="multiple"
-            :reset-on-options-change="resetOnOptionsChange"
-            :close-on-select="true"
             :value="selectedOptions"
             @input="vueSelectUpdated"
             @focus="$emit('focus')"
@@ -121,18 +118,6 @@ export default {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
             return this.selectedOptions.map(option => option.label).join(', ');
-        },
-
-        resetOnOptionsChange() {
-            // Reset logic should only happen when the config value is true.
-            // Nothing should be reset when it's false or undefined.
-            if (this.config.reset_on_options_change !== true) return false;
-
-            // Reset the value if the value doesn't exist in the new set of options.
-            return (options, old, val) => {
-                let opts = options.map(o => o.value);
-                return !val.some(v => opts.includes(v.value));
-            };
         },
 
         limitReached() {
