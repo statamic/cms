@@ -29,7 +29,7 @@ class CountriesTest extends TestCase
     #[Test]
     public function it_filters_options_by_region()
     {
-        $options = (new Countries)->context(['region' => 'Oceania'])->options();
+        $options = (new Countries)->context(['region' => 'oceania'])->options();
 
         $this->assertCount(27, $options);
         $this->assertEquals([

@@ -8,6 +8,14 @@ class Countries extends BasicDictionary
 {
     protected string $valueKey = 'iso3';
     protected array $searchable = ['name', 'iso3'];
+    private array $regions = [
+        'africa' => 'Africa',
+        'americas' => 'Americas',
+        'asia' => 'Asia',
+        'europe' => 'Europe',
+        'oceania' => 'Oceania',
+        'polar' => 'Polar',
+    ];
 
     protected function getItemLabel(array $item): string
     {
@@ -21,7 +29,7 @@ class Countries extends BasicDictionary
                 'display' => __('Region'),
                 'instructions' => __('statamic::messages.dictionaries_countries_region_instructions'),
                 'type' => 'select',
-                'options' => $this->getItems()->unique('region')->pluck('region', 'region')->filter()->all(),
+                'options' => $this->regions,
             ],
         ];
     }
@@ -30,7 +38,7 @@ class Countries extends BasicDictionary
     {
         return $this
             ->collectItems()
-            ->when($this->context['region'] ?? false, fn ($collection) => $collection->where('region', $this->context['region']));
+            ->when($this->context['region'] ?? false, fn ($collection, $region) => $collection->where('region', $this->regions[$region]));
     }
 
     protected function getItems(): array
