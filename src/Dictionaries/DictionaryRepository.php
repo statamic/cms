@@ -20,14 +20,8 @@ class DictionaryRepository
             return null;
         }
 
-        $dictionary = app($dictionary);
-
-        if (! $dictionary) {
+        if (! $dictionary = app($dictionary)) {
             return null;
-        }
-
-        if (! method_exists($dictionary, 'context')) {
-            return $dictionary;
         }
 
         return $dictionary->setContext($context);
