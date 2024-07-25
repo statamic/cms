@@ -65,4 +65,27 @@ class DictionaryFieldtypeTest extends FieldtypeTestCase
             'currencies' => [['name' => 'British Pound Sterling', 'code' => 'GBP', 'symbol' => '£'], ['name' => 'US Dollar', 'code' => 'USD', 'symbol' => '$']],
         ]);
     }
+
+    #[Test]
+    public function it_filters_out_invalid_values()
+    {
+        $this->createEntryWithFields([
+            'timezone' => [
+                'value' => 'Somewhere/Nowhere',
+                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'timezones'], 'max_items' => 1],
+            ],
+            'timezones' => [
+                'value' => ['Somewhere/Nowhere', 'America/New_York'],
+                'field' => ['type' => 'dictionary', 'dictionary' => ['type' => 'timezones']],
+            ],
+        ]);
+
+        $this->assertGqlEntryHas('
+            timezone { name }
+            timezones { name }
+        ', [
+            'timezone' => null,
+            'timezones' => [['name' => 'America/New_York']],
+        ]);
+    }
 }

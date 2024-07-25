@@ -114,6 +114,47 @@ class DictionaryTest extends TestCase
     }
 
     #[Test]
+    public function invalid_value_augments_to_null()
+    {
+        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries', 'max_items' => 1]));
+        $fieldtype = FieldtypeRepository::find('dictionary');
+        $fieldtype->setField($field);
+
+        $augmented = $fieldtype->augment('invalid');
+        $this->assertInstanceOf(Item::class, $augmented);
+        $this->assertNull($augmented->value());
+        $this->assertNull($augmented->label());
+    }
+
+    #[Test]
+    public function it_filters_out_invalid_values_when_augmenting_multiple()
+    {
+        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries']));
+
+        $fieldtype = FieldtypeRepository::find('dictionary');
+        $fieldtype->setField($field);
+
+        $augment = $fieldtype->augment(['USA', 'Invalid']);
+
+        $this->assertCount(1, $augment);
+        $this->assertEveryItemIsInstanceOf(Item::class, $augment);
+        $this->assertEquals([
+            [
+                'name' => 'United States',
+                'label' => 'United States',
+                'key' => 'USA',
+                'iso3' => 'USA',
+                'iso2' => 'US',
+                'region' => 'Americas',
+                'subregion' => 'Northern America',
+                'emoji' => '🇺🇸',
+                'value' => 'USA',
+                'label' => '🇺🇸 United States',
+            ],
+        ], collect($augment)->toArray());
+    }
+
+    #[Test]
     public function it_returns_extra_renderable_field_data()
     {
         $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries']));

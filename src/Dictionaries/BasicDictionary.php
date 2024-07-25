@@ -10,7 +10,7 @@ abstract class BasicDictionary extends Dictionary
     protected string $valueKey = 'value';
     protected string $labelKey = 'label';
 
-    public function get(string $key): Item
+    public function get(string $key): ?Item
     {
         return $this->collectItems()->get($key);
     }

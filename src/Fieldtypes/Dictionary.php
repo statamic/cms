@@ -93,10 +93,12 @@ class Dictionary extends Fieldtype
         if ($this->multiple()) {
             return collect($value)->map(function ($value) use ($dictionary) {
                 return $dictionary->get($value);
-            })->all();
+            })->filter()->all();
         }
 
-        return $value ? $dictionary->get($value) : new Item(null, null, []);
+        $item = $value ? $dictionary->get($value) : null;
+
+        return $item ?? new Item(null, null, []);
     }
 
     public function extraRenderableFieldData(): array

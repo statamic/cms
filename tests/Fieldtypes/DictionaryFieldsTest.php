@@ -139,7 +139,7 @@ class FakeDictionary extends Dictionary
         return [];
     }
 
-    public function get(string $key): Item
+    public function get(string $key): ?Item
     {
         return [];
     }

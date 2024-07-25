@@ -26,7 +26,7 @@ abstract class Dictionary
     /**
      * Returns a single option.
      */
-    abstract public function get(string $key): Item;
+    abstract public function get(string $key): ?Item;
 
     public function context($context)
     {
