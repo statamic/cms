@@ -64,7 +64,7 @@ class FakeDictionary extends Dictionary
                 return $collection->filter(fn ($item) => str_contains($item['id'], $search));
             })
             ->mapWithKeys(fn ($item) => [$item['id'] => $item['name']])
-            ->when($this->context['sort_in_alphabetical_order'] ?? false, function ($collection) {
+            ->when($this->config['sort_in_alphabetical_order'] ?? false, function ($collection) {
                 return $collection->sortBy('id');
             })
             ->all();

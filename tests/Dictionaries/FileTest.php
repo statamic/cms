@@ -30,7 +30,7 @@ class FileTest extends TestCase
         );
 
         $options = (new File)
-            ->setContext(['filename' => 'items.'.$extension])
+            ->setConfig(['filename' => 'items.'.$extension])
             ->options();
 
         $this->assertCount(3, $options);
@@ -59,7 +59,7 @@ class FileTest extends TestCase
         );
 
         $options = (new File)
-            ->setContext([
+            ->setConfig([
                 'filename' => 'items.'.$extension,
                 'value' => 'id',
                 'label' => 'name',
@@ -92,7 +92,7 @@ class FileTest extends TestCase
         );
 
         $options = (new File)
-            ->setContext([
+            ->setConfig([
                 'filename' => 'items.'.$extension,
                 'label' => '{{ emoji }} {{ name }}!',
             ])
@@ -129,7 +129,7 @@ class FileTest extends TestCase
             YAML::dump($arr)
         );
 
-        $dictionary = (new File)->setContext(['filename' => 'items.yaml']);
+        $dictionary = (new File)->setConfig(['filename' => 'items.yaml']);
 
         $this->assertEquals($expected, $dictionary->options($query));
     }
@@ -168,7 +168,7 @@ class FileTest extends TestCase
         );
 
         $item = (new File)
-            ->setContext(['filename' => 'items.yaml'])
+            ->setConfig(['filename' => 'items.yaml'])
             ->get('banana');
 
         $this->assertInstanceOf(Item::class, $item);

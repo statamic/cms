@@ -16,7 +16,7 @@ class DictionaryTest extends TestCase
 {
     #[Test]
     #[DataProvider('dictionaryConfigProvider')]
-    public function it_gets_the_dictionary($dictionaryConfig, $expectedContext)
+    public function it_gets_the_dictionary($dictionaryConfig, $expectedConfig)
     {
         $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => $dictionaryConfig]));
         $fieldtype = FieldtypeRepository::find('dictionary');
@@ -24,7 +24,7 @@ class DictionaryTest extends TestCase
 
         $dictionary = $fieldtype->dictionary();
         $this->assertInstanceOf(Countries::class, $dictionary);
-        $this->assertEquals($expectedContext, $dictionary->context());
+        $this->assertEquals($expectedConfig, $dictionary->config());
     }
 
     public static function dictionaryConfigProvider()

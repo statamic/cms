@@ -16,7 +16,7 @@ abstract class Dictionary
     protected static $binding = 'dictionaries';
 
     protected $fields = [];
-    protected $context = [];
+    protected $config = [];
 
     /**
      * Returns a key/value array of options.
@@ -28,16 +28,16 @@ abstract class Dictionary
      */
     abstract public function get(string $key): ?Item;
 
-    public function setContext(array $context): self
+    public function setConfig(array $config): self
     {
-        $this->context = $context;
+        $this->config = $config;
 
         return $this;
     }
 
-    public function context(): array
+    public function config(): array
     {
-        return $this->context;
+        return $this->config;
     }
 
     protected function fieldItems()

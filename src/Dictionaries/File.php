@@ -25,16 +25,16 @@ class File extends BasicDictionary
         ];
     }
 
-    public function setContext(array $context): Dictionary
+    public function setConfig(array $config): Dictionary
     {
-        if ($value = $context['value'] ?? null) {
+        if ($value = $config['value'] ?? null) {
             $this->valueKey = $value;
         }
-        if ($label = $context['label'] ?? null) {
+        if ($label = $config['label'] ?? null) {
             $this->labelKey = $label;
         }
 
-        return parent::setContext($context);
+        return parent::setConfig($config);
     }
 
     protected function getItemLabel(array $item): string
@@ -48,7 +48,7 @@ class File extends BasicDictionary
 
     protected function getItems(): array
     {
-        $path = resource_path('dictionaries').'/'.$this->context['filename'];
+        $path = resource_path('dictionaries').'/'.$this->config['filename'];
         $extension = pathinfo($path, PATHINFO_EXTENSION);
 
         return match ($extension) {

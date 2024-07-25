@@ -20,10 +20,11 @@ class DictionaryRepository
             return null;
         }
 
+        /** @var $dictionary Dictionary */
         if (! $dictionary = app($dictionary)) {
             return null;
         }
 
-        return $dictionary->setContext($context);
+        return $dictionary->setConfig($context);
     }
 }

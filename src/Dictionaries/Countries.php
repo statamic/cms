@@ -38,7 +38,7 @@ class Countries extends BasicDictionary
     {
         return $this
             ->collectItems()
-            ->when($this->context['region'] ?? false, fn ($collection, $region) => $collection->where('region', $this->regions[$region]));
+            ->when($this->config['region'] ?? false, fn ($collection, $region) => $collection->where('region', $this->regions[$region]));
     }
 
     protected function getItems(): array
