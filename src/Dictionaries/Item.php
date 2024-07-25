@@ -9,8 +9,11 @@ class Item extends LabeledValue implements \ArrayAccess
 {
     public function __construct($value, $label, array $extra)
     {
-        parent::__construct($value, $label);
-        $this->extra = array_merge($this->extra, $extra);
+        parent::__construct($value, null);
+        $this->extra = array_merge(
+            $extra,
+            ['label' => $label]
+        );
     }
 
     public function data(): array

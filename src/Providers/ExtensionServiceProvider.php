@@ -53,6 +53,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $dictionaries = [
         Dictionaries\Countries::class,
         Dictionaries\Currencies::class,
+        Dictionaries\File::class,
         Dictionaries\Timezones::class,
     ];
 
