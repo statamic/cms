@@ -14,7 +14,7 @@ class DictionaryTest extends TestCase
     public function it_returns_preload_data()
     {
         $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries']));
-        $field->setValue(['USA', 'AUS', 'CAN', 'DEU', 'GBR']);
+        $field->setValue(['USA', 'AUS', 'CAN', 'BLA', 'DEU', 'GBR']);
 
         $fieldtype = FieldtypeRepository::find('dictionary');
         $fieldtype->setField($field);
@@ -24,11 +24,12 @@ class DictionaryTest extends TestCase
         $this->assertArraySubset([
             'url' => 'http://localhost/cp/fieldtypes/dictionaries/countries',
             'selectedOptions' => [
-                ['value' => 'AUS', 'label' => '🇦🇺 Australia'],
-                ['value' => 'CAN', 'label' => '🇨🇦 Canada'],
-                ['value' => 'DEU', 'label' => '🇩🇪 Germany'],
-                ['value' => 'GBR', 'label' => '🇬🇧 United Kingdom'],
-                ['value' => 'USA', 'label' => '🇺🇸 United States'],
+                ['value' => 'USA', 'label' => '🇺🇸 United States', 'invalid' => false],
+                ['value' => 'AUS', 'label' => '🇦🇺 Australia', 'invalid' => false],
+                ['value' => 'CAN', 'label' => '🇨🇦 Canada', 'invalid' => false],
+                ['value' => 'BLA', 'label' => 'BLA', 'invalid' => true],
+                ['value' => 'DEU', 'label' => '🇩🇪 Germany', 'invalid' => false],
+                ['value' => 'GBR', 'label' => '🇬🇧 United Kingdom', 'invalid' => false],
             ],
         ], $preload);
     }
