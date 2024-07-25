@@ -7,7 +7,6 @@
             append-to-body
             :calculate-position="positionOptions"
             :name="name"
-            :clearable="config.clearable"
             :disabled="config.disabled || isReadOnly || (multiple && limitReached)"
             :options="normalizeInputOptions(options)"
             :placeholder="__(config.placeholder)"
