@@ -5,6 +5,7 @@ namespace Tests\Dictionaries;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Dictionaries\Item;
 use Statamic\Dictionaries\Timezones;
 use Statamic\Support\Arr;
 use Tests\TestCase;
@@ -105,9 +106,11 @@ class TimezonesTest extends TestCase
         // UTC offsets can change during daylight saving time, so we need to freeze time.
         Carbon::setTestNow('2024-07-23');
 
+        $item = (new Timezones)->get('America/New_York');
+        $this->assertInstanceOf(Item::class, $item);
         $this->assertEquals([
             'name' => 'America/New_York',
             'offset' => '-04:00',
-        ], (new Timezones)->get('America/New_York'));
+        ], $item->data());
     }
 }

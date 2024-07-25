@@ -5,6 +5,7 @@ namespace Tests\Dictionaries;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Dictionaries\Currencies;
+use Statamic\Dictionaries\Item;
 use Tests\TestCase;
 
 class CurrenciesTest extends TestCase
@@ -94,11 +95,13 @@ class CurrenciesTest extends TestCase
     #[Test]
     public function it_gets_array_from_value()
     {
+        $item = (new Currencies)->get('USD');
+        $this->assertInstanceOf(Item::class, $item);
         $this->assertEquals([
             'name' => 'US Dollar',
             'code' => 'USD',
             'symbol' => '$',
             'decimals' => 2,
-        ], (new Currencies)->get('USD'));
+        ], $item->data());
     }
 }

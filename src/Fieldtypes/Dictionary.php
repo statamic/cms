@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Dictionaries\Item;
 use Statamic\Exceptions\DictionaryNotFoundException;
 use Statamic\Exceptions\UndefinedDictionaryException;
 use Statamic\Facades\GraphQL;
@@ -83,8 +84,8 @@ class Dictionary extends Fieldtype
 
     public function augment($value)
     {
-        if (is_null($value)) {
-            return null;
+        if ($this->multiple() && is_null($value)) {
+            return [];
         }
 
         $dictionary = $this->dictionary();
@@ -95,7 +96,7 @@ class Dictionary extends Fieldtype
             })->all();
         }
 
-        return $dictionary->get($value);
+        return $value ? $dictionary->get($value) : new Item(null, null, []);
     }
 
     public function extraRenderableFieldData(): array
@@ -134,8 +135,33 @@ class Dictionary extends Fieldtype
     {
         $type = GraphQL::type($this->dictionary()->getGqlType()->name);
 
-        return $this->multiple() ? GraphQL::listOf($type) : $type;
+        return $this->multiple()
+            ? $this->multiSelectGqlType($type)
+            : $this->singleSelectGqlType($type);
+    }
 
+    private function singleSelectGqlType($type)
+    {
+        return [
+            'type' => $type,
+            'resolve' => function ($item, $args, $context, $info) {
+                $resolved = $item->resolveGqlValue($info->fieldName);
+
+                return is_null($resolved->value()) ? null : $resolved;
+            },
+        ];
+    }
+
+    private function multiSelectGqlType($type)
+    {
+        return [
+            'type' => GraphQL::listOf($type),
+            'resolve' => function ($item, $args, $context, $info) {
+                $resolved = $item->resolveGqlValue($info->fieldName);
+
+                return empty($resolved) ? null : $resolved;
+            },
+        ];
     }
 
     public function addGqlTypes()

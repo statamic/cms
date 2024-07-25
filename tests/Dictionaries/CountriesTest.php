@@ -5,6 +5,7 @@ namespace Tests\Dictionaries;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Dictionaries\Countries;
+use Statamic\Dictionaries\Item;
 use Statamic\Support\Arr;
 use Tests\TestCase;
 
@@ -85,6 +86,8 @@ class CountriesTest extends TestCase
     #[Test]
     public function it_gets_array_from_value()
     {
+        $item = (new Countries)->get('AUS');
+        $this->assertInstanceOf(Item::class, $item);
         $this->assertEquals([
             'name' => 'Australia',
             'iso3' => 'AUS',
@@ -92,6 +95,6 @@ class CountriesTest extends TestCase
             'region' => 'Oceania',
             'subregion' => 'Australia and New Zealand',
             'emoji' => '🇦🇺',
-        ], (new Countries)->get('AUS'));
+        ], $item->data());
     }
 }

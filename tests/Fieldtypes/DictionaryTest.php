@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Dictionaries\Item;
 use Statamic\Fields\Field;
 use Tests\TestCase;
 
@@ -40,16 +41,26 @@ class DictionaryTest extends TestCase
         $fieldtype = FieldtypeRepository::find('dictionary');
         $fieldtype->setField($field);
 
-        $augment = $fieldtype->augment('USA');
-
+        $augmented = $fieldtype->augment('USA');
+        $this->assertInstanceOf(Item::class, $augmented);
+        $this->assertEquals('USA', $augmented->value());
+        $this->assertEquals('🇺🇸 United States', $augmented->label());
         $this->assertEquals([
+            'key' => 'USA',
             'name' => 'United States',
             'iso3' => 'USA',
             'iso2' => 'US',
             'region' => 'Americas',
             'subregion' => 'Northern America',
             'emoji' => '🇺🇸',
-        ], $augment);
+            'value' => 'USA',
+            'label' => '🇺🇸 United States',
+        ], $augmented->toArray());
+
+        $augmented = $fieldtype->augment(null);
+        $this->assertInstanceOf(Item::class, $augmented);
+        $this->assertNull($augmented->value());
+        $this->assertNull($augmented->label());
     }
 
     #[Test]
@@ -62,24 +73,44 @@ class DictionaryTest extends TestCase
 
         $augment = $fieldtype->augment(['USA', 'GBR']);
 
+        $this->assertEveryItemIsInstanceOf(Item::class, $augment);
+
         $this->assertEquals([
             [
                 'name' => 'United States',
+                'label' => 'United States',
+                'key' => 'USA',
                 'iso3' => 'USA',
                 'iso2' => 'US',
                 'region' => 'Americas',
                 'subregion' => 'Northern America',
                 'emoji' => '🇺🇸',
+                'value' => 'USA',
+                'label' => '🇺🇸 United States',
             ],
             [
                 'name' => 'United Kingdom',
+                'label' => 'United Kingdom',
+                'key' => 'GBR',
                 'iso3' => 'GBR',
                 'iso2' => 'GB',
                 'region' => 'Europe',
                 'subregion' => 'Northern Europe',
                 'emoji' => '🇬🇧',
+                'value' => 'GBR',
+                'label' => '🇬🇧 United Kingdom',
             ],
-        ], $augment);
+        ], collect($augment)->toArray());
+    }
+
+    #[Test]
+    public function it_augments_to_empty_array_when_null_and_configured_for_multiple()
+    {
+        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries']));
+        $fieldtype = FieldtypeRepository::find('dictionary');
+        $fieldtype->setField($field);
+
+        $this->assertEquals([], $fieldtype->augment(null));
     }
 
     #[Test]

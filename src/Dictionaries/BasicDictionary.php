@@ -10,9 +10,9 @@ abstract class BasicDictionary extends Dictionary
     protected string $valueKey = 'value';
     protected string $labelKey = 'label';
 
-    public function get(string $key): array
+    public function get(string $key): Item
     {
-        return $this->collectItems()->firstWhere($this->valueKey, $key);
+        return $this->collectItems()->get($key);
     }
 
     public function options(?string $search = null): array
@@ -20,7 +20,7 @@ abstract class BasicDictionary extends Dictionary
         return $this
             ->getFilteredItems()
             ->when($search, fn ($collection) => $collection->filter(fn ($item) => $this->matchesSearchQuery($search, $item)))
-            ->mapWithKeys(fn (array $item) => [$this->getItemValue($item) => $this->getItemLabel($item)])
+            ->mapWithKeys(fn (Item $item) => [$item->value() => $item->label()])
             ->all();
     }
 
@@ -31,7 +31,11 @@ abstract class BasicDictionary extends Dictionary
 
     protected function collectItems(): Collection
     {
-        return collect($this->getItems());
+        return collect($this->getItems())->mapWithKeys(function ($arr) {
+            $item = new Item($key = $this->getItemValue($arr), $this->getItemLabel($arr), $arr);
+
+            return [$key => $item];
+        });
     }
 
     protected function getItemValue(array $item): string
@@ -44,11 +48,11 @@ abstract class BasicDictionary extends Dictionary
         return $item[$this->labelKey];
     }
 
-    protected function matchesSearchQuery(string $query, array $item): bool
+    protected function matchesSearchQuery(string $query, Item $item): bool
     {
         $query = strtolower($query);
 
-        foreach ($item as $key => $value) {
+        foreach ($item->data() as $key => $value) {
             if (! empty($this->searchable) && ! in_array($key, $this->searchable)) {
                 continue;
             }

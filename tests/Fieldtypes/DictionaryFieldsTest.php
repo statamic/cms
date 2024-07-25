@@ -5,6 +5,7 @@ namespace Tests\Fieldtypes;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Dictionaries\Dictionary;
+use Statamic\Dictionaries\Item;
 use Statamic\Fields\Field;
 use Tests\TestCase;
 
@@ -138,7 +139,7 @@ class FakeDictionary extends Dictionary
         return [];
     }
 
-    public function get(string $key): array
+    public function get(string $key): Item
     {
         return [];
     }
