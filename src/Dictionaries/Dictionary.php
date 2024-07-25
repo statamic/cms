@@ -55,7 +55,20 @@ abstract class Dictionary
         $firstOption = collect($this->options())->keys()->first();
 
         return collect($this->get($firstOption))
-            ->map(fn () => ['type' => GraphQL::nonNull(GraphQL::string())])
+            ->map(fn ($value) => ['type' => GraphQL::nonNull($this->getInferredGqlType($value))])
             ->all();
+    }
+
+    private function getInferredGqlType($value)
+    {
+        if (is_int($value)) {
+            return GraphQL::int();
+        }
+
+        if (is_bool($value)) {
+            return GraphQL::boolean();
+        }
+
+        return GraphQL::string();
     }
 }

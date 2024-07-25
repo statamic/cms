@@ -2,8 +2,6 @@
 
 namespace Statamic\Dictionaries;
 
-use Statamic\Facades\GraphQL;
-
 class Currencies extends BasicDictionary
 {
     protected string $valueKey = 'code';
@@ -11,16 +9,6 @@ class Currencies extends BasicDictionary
     protected function getItemLabel(array $item): string
     {
         return "{$item['name']} ({$item['code']})";
-    }
-
-    protected function getGqlFields(): array
-    {
-        return [
-            ...parent::getGqlFields(),
-            'decimals' => [
-                'type' => GraphQL::nonNull(GraphQL::int()),
-            ],
-        ];
     }
 
     protected function getItems(): array
