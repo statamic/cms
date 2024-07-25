@@ -54,7 +54,7 @@
                     @input="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item">
+                        <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item" :class="{'invalid': option.invalid}">
                             <div v-if="config.label_html" v-html="option.label"></div>
                             <template v-else>{{ __(option.label) }}</template>
                             <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
@@ -117,7 +117,7 @@ export default {
 
                 if (! option) return {value, label: value};
 
-                return {value: option.value, label: option.label};
+                return {value: option.value, label: option.label, invalid: option.invalid};
             });
         },
 

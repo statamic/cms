@@ -74,12 +74,21 @@ class Dictionary extends Fieldtype
     {
         return [
             'url' => cp_route('dictionary-fieldtype', $this->dictionary()->handle()),
-            'selectedOptions' => collect($this->dictionary()->options())
-                ->only($this->field->value())
-                ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
-                ->values()
-                ->all(),
+            'selectedOptions' => $this->getItemData($this->field->value()),
         ];
+    }
+
+    private function getItemData($values)
+    {
+        return collect($values)->map(function ($key) {
+            $item = $this->dictionary()->get($key);
+
+            return [
+                'value' => $item?->value() ?? $key,
+                'label' => $item?->label() ?? $key,
+                'invalid' => ! $item,
+            ];
+        })->values()->all();
     }
 
     public function augment($value)
