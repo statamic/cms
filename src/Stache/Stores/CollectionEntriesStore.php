@@ -251,4 +251,43 @@ class CollectionEntriesStore extends ChildStore
 
         return $return;
     }
+
+    public function updateUris($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('uri'), $ids);
+        $this->updateEntriesWithinStore($ids);
+    }
+
+    public function updateOrders($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('order'), $ids);
+    }
+
+    public function updateParents($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('parent'), $ids);
+    }
+
+    private function updateEntriesWithinIndex($index, $ids)
+    {
+        if (empty($ids)) {
+            return $index->update();
+        }
+
+        collect($ids)
+            ->map(fn ($id) => Entry::find($id))
+            ->filter()
+            ->each(fn ($entry) => $index->updateItem($entry));
+    }
+
+    private function updateEntriesWithinStore($ids)
+    {
+        if (empty($ids)) {
+            $ids = $this->paths()->keys();
+        }
+
+        $entries = $this->withoutBlinkingEntryUris(fn () => collect($ids)->map(fn ($id) => Entry::find($id))->filter());
+
+        $entries->each(fn ($entry) => $this->cacheItem($entry));
+    }
 }
