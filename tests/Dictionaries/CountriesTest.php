@@ -6,7 +6,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Dictionaries\Countries;
 use Statamic\Dictionaries\Item;
-use Statamic\Support\Arr;
 use Tests\TestCase;
 
 class CountriesTest extends TestCase
@@ -23,7 +22,7 @@ class CountriesTest extends TestCase
             'ALB' => '🇦🇱 Albania',
             'DZA' => '🇩🇿 Algeria',
             'ASM' => '🇦🇸 American Samoa',
-        ], Arr::take($options, 5));
+        ], array_slice($options, 0, 5));
     }
 
     #[Test]
@@ -38,7 +37,7 @@ class CountriesTest extends TestCase
             'CXR' => '🇨🇽 Christmas Island',
             'CCK' => '🇨🇨 Cocos (Keeling) Islands',
             'COK' => '🇨🇰 Cook Islands',
-        ], Arr::take($options, 5));
+        ], array_slice($options, 0, 5));
     }
 
     #[Test]

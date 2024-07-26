@@ -7,7 +7,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Dictionaries\Item;
 use Statamic\Dictionaries\Timezones;
-use Statamic\Support\Arr;
 use Tests\TestCase;
 
 class TimezonesTest extends TestCase
@@ -25,7 +24,7 @@ class TimezonesTest extends TestCase
             'Pacific/Wake' => 'Pacific/Wake (+12:00)',
             'Pacific/Wallis' => 'Pacific/Wallis (+12:00)',
             'UTC' => 'UTC (+00:00)',
-        ], [...Arr::take($options, 3), ...Arr::take($options, -3)]);
+        ], [...array_slice($options, 0, 3), ...array_slice($options, -3, 3)]);
     }
 
     #[Test]
