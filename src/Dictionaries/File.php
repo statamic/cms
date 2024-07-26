@@ -34,6 +34,7 @@ class File extends BasicDictionary
         if ($value = $config['value'] ?? null) {
             $this->valueKey = $value;
         }
+
         if ($label = $config['label'] ?? null) {
             $this->labelKey = $label;
         }
