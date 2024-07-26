@@ -64,6 +64,22 @@ class File extends BasicDictionary
         return match ($extension) {
             'json' => json_decode(file_get_contents($path), true),
             'yaml' => YAML::file($path)->parse(),
+            'csv' => $this->fromCsv($path),
         };
+    }
+
+    private function fromCsv(string $path): array
+    {
+        $rows = [];
+
+        if (($handle = fopen($path, 'r')) !== false) {
+            $headers = fgetcsv($handle, 1000, ',');
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                $rows[] = array_combine($headers, $data);
+            }
+            fclose($handle);
+        }
+
+        return $rows;
     }
 }
