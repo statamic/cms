@@ -54,6 +54,11 @@ class File extends BasicDictionary
     protected function getItems(): array
     {
         $path = resource_path('dictionaries').'/'.$this->config['filename'];
+
+        if (! file_exists($path)) {
+            throw new \Exception('Dictionary file ['.$path.'] does not exist.');
+        }
+
         $extension = pathinfo($path, PATHINFO_EXTENSION);
 
         return match ($extension) {
