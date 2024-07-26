@@ -11,16 +11,20 @@ class File extends BasicDictionary
     {
         return [
             'filename' => [
-                'type' => 'text',
+                'type' => 'slug',
+                'display' => __('Filename'),
+                'instructions' => __('statamic::fieldtypes.dictionary.file.config.filename'),
+                'validate' => ['required'],
             ],
             'label' => [
                 'type' => 'text',
                 'display' => __('Label'),
-                'instructions' => 'Antlers is supported.',
+                'instructions' => __('statamic::fieldtypes.dictionary.file.config.label'),
             ],
             'value' => [
                 'type' => 'text',
                 'display' => __('Value'),
+                'instructions' => __('statamic::fieldtypes.dictionary.file.config.value'),
             ],
         ];
     }
