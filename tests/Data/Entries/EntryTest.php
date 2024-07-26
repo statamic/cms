@@ -8,6 +8,7 @@ use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
@@ -34,6 +35,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Sites\Site;
+use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
@@ -2571,5 +2573,69 @@ class EntryTest extends TestCase
             ['2', '2'],
             ['7', '7'],
         ], $events->map(fn ($event) => [$event->entry->id(), $event->initiator->id()])->all());
+    }
+
+    #[Test]
+    public function entry_stache_maintains_sync_with_cli_commands()
+    {
+        // Using the filesystem cache may make it easier for us to simulate this issue.
+        config(['cache.default' => 'file']);
+        Cache::clear();
+
+        // Register an Artisan command that checks the number of entries found and
+        // asserts that they all have a valid title.
+        $testInstance = $this;
+        Artisan::command('testing:entry-stache-test-one {--expected=}', function ($expected) use ($testInstance) {
+            // Fetch entries and make sure that they all have titles.
+            $entriesBefore = Collection::find('test')->queryEntries()->get();
+            $testInstance->assertEquals($expected, $entriesBefore->count());
+            // NOTE: Must confirm that all entries have valid titles as empty entries
+            //       are one other symptom of out-of-sync stache.
+            $testInstance->assertEmpty($entriesBefore->pluck('title')->reject(fn ($title) => (bool) $title));
+        });
+
+        // Create a collection.
+        $collection = tap(Collection::make('test'))->save();
+
+        // Create some entries.
+        EntryFactory::id('alfa-id')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
+        EntryFactory::id('bravo-id')->collection('test')->slug('bravo')->data(['title' => 'Bravo'])->create();
+        EntryFactory::id('charlie-id')->collection('test')->slug('charlie')->data(['title' => 'Charlie'])->create();
+        EntryFactory::id('donkus-id')->collection('test')->slug('donkus')->data(['title' => 'Donkus'])->create();
+        EntryFactory::id('eggbert-id')->collection('test')->slug('eggbert')->data(['title' => 'Eggbert'])->create();
+
+        // NOTE: In order to simulate the stache behaviour when a long-running CLI command is being
+        //       executed we do the following:
+        //       1. Run a CLI command that checks the number of entries.
+        //       2. Save the serialised state of the `EntryQueryBuilder`.
+        //          - The `EntryQueryBuilder` contains the stache store instance.
+        //          - This represents what will be in memory for the running CLI command.
+        //       3. Delete some entries outside of the CLI command.
+        //          - This represents someone deleting entries via the admin panel.
+        //       4. Restore the `EntryQueryBuilder` instance from the serialised data.
+        //       5. Run the CLI command again and confirm that there are now less entries.
+
+        // 1. Run a CLI command that checks the number of entries.
+        $this->artisan('testing:entry-stache-test-one --expected=5');
+
+        // 2. Save the serialised state of the `EntryQueryBuilder`.
+        $serialisedQueryBuilder = serialize(app(EntryQueryBuilder::class));
+
+        // 3. Delete some entries outside of the CLI command.
+        Collection::find('test')->queryEntries()->whereIn('slug', [
+            'donkus',
+            'eggbert',
+        ])->get()->each->delete();
+
+        // 4. Restore the `EntryQueryBuilder` instance from the serialised data.
+        $this->app->bind(EntryQueryBuilder::class, function () use ($serialisedQueryBuilder) {
+            return unserialize($serialisedQueryBuilder);
+        });
+
+        // 5. Run the CLI command again and confirm that there are now less entries.
+        // NOTE: Uncomment the following line so that `Statamic::isWorker()` returns `true`
+        //       and this test will then pass.
+        // \Illuminate\Support\Facades\Request::swap(new \Tests\Fakes\FakeArtisanRequest('queue:work'));
+        $this->artisan('testing:entry-stache-test-one --expected=3');
     }
 }

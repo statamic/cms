@@ -162,58 +162,58 @@ class StacheTest extends TestCase
         ];
     }
 
-    #[Test]
-    public function stache_maintains_sync_with_cli_commands()
-    {
-        // Using the filesystem cache may make it easier for us to simulate this issue.
-        config(['cache.default' => 'file']);
-        Cache::clear();
+    // #[Test]
+    // public function stache_maintains_sync_with_cli_commands()
+    // {
+    //     // Using the filesystem cache may make it easier for us to simulate this issue.
+    //     config(['cache.default' => 'file']);
+    //     Cache::clear();
 
-        // Register an artisan command to simulate stache being out of sync with CLI commands.
-        Artisan::command('testing:stache-sync', function () {
-            // Serialise the entry query builder so that it can be replaced with what
-            // _would_ be in memory for a separate process/thread.
-            $serialisedQueryBuilder = serialize(app(\Statamic\Stache\Query\EntryQueryBuilder::class));
+    //     // Register an artisan command to simulate stache being out of sync with CLI commands.
+    //     Artisan::command('testing:stache-sync', function () {
+    //         // Serialise the entry query builder so that it can be replaced with what
+    //         // _would_ be in memory for a separate process/thread.
+    //         $serialisedQueryBuilder = serialize(app(\Statamic\Stache\Query\EntryQueryBuilder::class));
 
-            // Delete a couple of entries.
-            CollectionFacade::find('test')->queryEntries()->whereIn('slug', [
-                'donkus',
-                'eggbert',
-            ])->get()->each->delete();
+    //         // Delete a couple of entries.
+    //         CollectionFacade::find('test')->queryEntries()->whereIn('slug', [
+    //             'donkus',
+    //             'eggbert',
+    //         ])->get()->each->delete();
 
-            // Swap in the original `EntryQueryBuilder`.
-            app()->bind(\Statamic\Stache\Query\EntryQueryBuilder::class, function () use ($serialisedQueryBuilder) {
-                return unserialize($serialisedQueryBuilder);
-            });
-        });
+    //         // Swap in the original `EntryQueryBuilder`.
+    //         app()->bind(\Statamic\Stache\Query\EntryQueryBuilder::class, function () use ($serialisedQueryBuilder) {
+    //             return unserialize($serialisedQueryBuilder);
+    //         });
+    //     });
 
-        CollectionFacade::make('test')->save();
-        $collection = CollectionFacade::find('test');
+    //     CollectionFacade::make('test')->save();
+    //     $collection = CollectionFacade::find('test');
 
-        // Create some entries.
-        EntryFactory::id('alfa-id')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
-        EntryFactory::id('bravo-id')->collection('test')->slug('bravo')->data(['title' => 'Bravo'])->create();
-        EntryFactory::id('charlie-id')->collection('test')->slug('charlie')->data(['title' => 'Charlie'])->create();
-        EntryFactory::id('donkus-id')->collection('test')->slug('donkus')->data(['title' => 'Donkus'])->create();
-        EntryFactory::id('eggbert-id')->collection('test')->slug('eggbert')->data(['title' => 'Eggbert'])->create();
+    //     // Create some entries.
+    //     EntryFactory::id('alfa-id')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
+    //     EntryFactory::id('bravo-id')->collection('test')->slug('bravo')->data(['title' => 'Bravo'])->create();
+    //     EntryFactory::id('charlie-id')->collection('test')->slug('charlie')->data(['title' => 'Charlie'])->create();
+    //     EntryFactory::id('donkus-id')->collection('test')->slug('donkus')->data(['title' => 'Donkus'])->create();
+    //     EntryFactory::id('eggbert-id')->collection('test')->slug('eggbert')->data(['title' => 'Eggbert'])->create();
 
-        // Fetch entries and make sure that they all have titles.
-        $entriesBefore = $collection->queryEntries()->get();
-        $this->assertEquals(5, $entriesBefore->count());
-        $this->assertEmpty($entriesBefore->pluck('title')->reject(fn ($title) => (bool) $title));
+    //     // Fetch entries and make sure that they all have titles.
+    //     $entriesBefore = $collection->queryEntries()->get();
+    //     $this->assertEquals(5, $entriesBefore->count());
+    //     $this->assertEmpty($entriesBefore->pluck('title')->reject(fn ($title) => (bool) $title));
 
-        // $serialisedQueryBuilder = serialize(app(\Statamic\Stache\Query\EntryQueryBuilder::class));
+    //     // $serialisedQueryBuilder = serialize(app(\Statamic\Stache\Query\EntryQueryBuilder::class));
 
-        $this->artisan('testing:stache-sync');
+    //     $this->artisan('testing:stache-sync');
 
-        // $this->app->bind(\Statamic\Stache\Query\EntryQueryBuilder::class, function () use ($serialisedQueryBuilder) {
-        //     return unserialize($serialisedQueryBuilder);
-        // });
+    //     // $this->app->bind(\Statamic\Stache\Query\EntryQueryBuilder::class, function () use ($serialisedQueryBuilder) {
+    //     //     return unserialize($serialisedQueryBuilder);
+    //     // });
 
-        // \Illuminate\Support\Facades\Request::swap(new \Tests\Fakes\FakeArtisanRequest('queue:work'));
+    //     // \Illuminate\Support\Facades\Request::swap(new \Tests\Fakes\FakeArtisanRequest('queue:work'));
 
-        $entriesAfter = $collection->queryEntries()->get();
-        $this->assertEquals(3, $entriesAfter->count());
-        $this->assertEmpty($entriesAfter->pluck('title')->reject(fn ($title) => (bool) $title));
-    }
+    //     $entriesAfter = $collection->queryEntries()->get();
+    //     $this->assertEquals(3, $entriesAfter->count());
+    //     $this->assertEmpty($entriesAfter->pluck('title')->reject(fn ($title) => (bool) $title));
+    // }
 }
