@@ -10,6 +10,7 @@ use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class DefaultInvalidator implements Invalidator
 {
@@ -68,7 +69,11 @@ class DefaultInvalidator implements Invalidator
         });
 
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls")
+            collect(Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"))->map(function (string $rule) use ($entry) {
+                return ! isset(parse_url($rule)['scheme'])
+                    ? Str::removeRight($entry->site()->url(), '/').Str::ensureLeft($rule, '/')
+                    : $rule;
+            })->values()->all()
         );
     }
 
