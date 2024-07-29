@@ -13,7 +13,6 @@ abstract class Dictionary
 {
     use HasFields, HasHandle, HasTitle, RegistersItself;
 
-    protected static $binding = 'dictionaries';
 
     protected $fields = [];
     protected $config = [];
