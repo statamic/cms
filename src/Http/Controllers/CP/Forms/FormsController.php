@@ -358,9 +358,9 @@ class FormsController extends CpController
 
         foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
             $merged = false;
-            foreach ($fields as $fieldHandle => $fieldConfig) {
-                if ($fieldConfig['display'] == $config['display']) {
-                    $fields[$fieldHandle]['fields'] += $config['fields'];
+            foreach ($fields as $sectionHandle => $section) {
+                if ($section['display'] == $config['display']) {
+                    $fields[$sectionHandle]['fields'] += $config['fields'];
                     $merged = true;
                 }
             }
