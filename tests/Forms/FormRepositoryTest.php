@@ -5,7 +5,6 @@ namespace Tests\Forms;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Exceptions\FormNotFoundException;
-use Statamic\Facades\Form as FormAPI;
 use Statamic\Forms\FormRepository;
 use Statamic\Stache\Stache;
 use Tests\TestCase;
@@ -47,7 +46,7 @@ class FormRepositoryTest extends TestCase
     /** @test */
     public function it_registers_config()
     {
-        FormAPI::appendConfigFields('test_form', 'Test Config', [
+        $this->repo->appendConfigFields('test_form', 'Test Config', [
             'another_config' => [
                 'handle' => 'another_config',
                 'field' => [
@@ -62,14 +61,14 @@ class FormRepositoryTest extends TestCase
             ],
         ]);
 
-        $this->assertNotNull(FormAPI::extraConfigFor('test_form'));
-        $this->assertEmpty(FormAPI::extraConfigFor('another_form'));
+        $this->assertNotNull($this->repo->extraConfigFor('test_form'));
+        $this->assertEmpty($this->repo->extraConfigFor('another_form'));
     }
 
     /** @test */
     public function it_registers_wildcard_config()
     {
-        FormAPI::appendConfigFields('*', 'Test Config', [
+        $this->repo->appendConfigFields('*', 'Test Config', [
             'another_config' => [
                 'handle' => 'another_config',
                 'field' => [
@@ -84,7 +83,7 @@ class FormRepositoryTest extends TestCase
             ],
         ]);
 
-        $this->assertNotNull(FormAPI::extraConfigFor('test_form'));
-        $this->assertNotNull(FormAPI::extraConfigFor('another_form'));
+        $this->assertNotNull($this->repo->extraConfigFor('test_form'));
+        $this->assertNotNull($this->repo->extraConfigFor('another_form'));
     }
 }
