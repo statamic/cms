@@ -103,6 +103,7 @@ class Dictionary extends Fieldtype
     public function extraRenderableFieldData(): array
     {
         return [
+            'multiple' => $this->multiple(),
             'options' => $this->dictionary()->options(),
         ];
     }
