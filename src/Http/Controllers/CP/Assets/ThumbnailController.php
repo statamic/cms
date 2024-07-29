@@ -7,6 +7,7 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
 use Statamic\Http\Controllers\Controller;
+use Statamic\Imaging\Manipulators\Sources\Source;
 use Statamic\Statamic;
 
 class ThumbnailController extends Controller
@@ -86,7 +87,7 @@ class ThumbnailController extends Controller
             }
 
             $path = Image::driver()
-                ->setSource($this->asset)
+                ->setSource(Source::from($this->asset))
                 ->setParams($preset ? ['p' => $preset] : [])
                 ->getUrl();
         } finally {
