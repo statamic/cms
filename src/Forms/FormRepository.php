@@ -94,7 +94,7 @@ class FormRepository implements Contract
         ];
     }
 
-    public function getConfigFor($handle)
+    public function extraConfigFor($handle)
     {
         $reserved = ['title', 'honeypot', 'store', 'email'];
 

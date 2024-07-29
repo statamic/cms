@@ -356,7 +356,7 @@ class FormsController extends CpController
 
         ];
 
-        foreach (Form::getConfigFor($form->handle()) as $handle => $config) {
+        foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
             $merged = false;
             foreach ($fields as $fieldHandle => $fieldConfig) {
                 if ($fieldConfig['display'] == $config['display']) {

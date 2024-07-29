@@ -62,8 +62,8 @@ class FormRepositoryTest extends TestCase
             ],
         ]);
 
-        $this->assertNotNull(FormAPI::getConfigFor('test_form'));
-        $this->assertEmpty(FormAPI::getConfigFor('another_form'));
+        $this->assertNotNull(FormAPI::extraConfigFor('test_form'));
+        $this->assertEmpty(FormAPI::extraConfigFor('another_form'));
     }
 
     /** @test */
@@ -84,7 +84,7 @@ class FormRepositoryTest extends TestCase
             ],
         ]);
 
-        $this->assertNotNull(FormAPI::getConfigFor('test_form'));
-        $this->assertNotNull(FormAPI::getConfigFor('another_form'));
+        $this->assertNotNull(FormAPI::extraConfigFor('test_form'));
+        $this->assertNotNull(FormAPI::extraConfigFor('another_form'));
     }
 }
