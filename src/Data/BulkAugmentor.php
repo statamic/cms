@@ -36,13 +36,10 @@ class BulkAugmentor
      */
     private function augment($items)
     {
-        $count = count($items);
-
         $referenceKeys = [];
         $referenceFields = [];
 
-        for ($i = 0; $i < $count; $i++) {
-            $item = $items[$i];
+        foreach ($items as $i => $item) {
             $reference = $this->getAugmentationReference($item);
 
             if (! $this->isTree) {
@@ -58,8 +55,7 @@ class BulkAugmentor
             $referenceFields[$reference] = $augmented->blueprintFields();
         }
 
-        for ($i = 0; $i < $count; $i++) {
-            $item = $items[$i];
+        foreach ($items as $i => $item) {
             $reference = $this->getAugmentationReference($item);
             $fields = $referenceFields[$reference];
             $keys = $referenceKeys[$reference];
@@ -80,9 +76,7 @@ class BulkAugmentor
 
         $items = [];
 
-        for ($i = 0; $i < count($tree); $i++) {
-            $item = $tree[$i];
-
+        foreach ($tree as $i => $item) {
             $items[] = $item['page'];
             $this->originalValues[$i] = $item;
         }
@@ -94,8 +88,7 @@ class BulkAugmentor
     {
         $items = [];
 
-        for ($i = 0; $i < count($this->originalValues); $i++) {
-            $original = $this->originalValues[$i];
+        foreach ($this->originalValues as $i => $original) {
             $augmented = $this->augmentedValues[$i];
 
             $items[] = call_user_func_array($callable, [$original, $augmented, $i]);

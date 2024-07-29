@@ -47,6 +47,7 @@ class RenameAsset extends Action
         return [
             'filename' => [
                 'type' => 'text',
+                'display' => __('Filename'),
                 'validate' => 'required', // TODO: Better filename validation
                 'classes' => 'mousetrap',
                 'focus' => true,

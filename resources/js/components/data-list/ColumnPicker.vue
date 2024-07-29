@@ -11,15 +11,15 @@
         <modal v-if="open" name="column-picker" @closed="open = false" draggable=".modal-drag-handle" click-to-close>
             <div class="flex flex-col h-full -max-h-screen-px">
 
-                <header class="modal-drag-handle p-4 bg-gray-200 border-b flex items-center justify-between cursor-grab active:cursor-grabbing">
+                <header class="modal-drag-handle p-4 bg-gray-200 dark:bg-dark-650 border-b dark:border-dark-900 flex items-center justify-between cursor-grab active:cursor-grabbing">
                     <h2>{{ __('Customize Columns') }}</h2>
                     <button class="btn-close" @click="open = false" :aria-label="__('Close Editor')">&times;</button>
                 </header>
 
-                <div class="flex grow min-h-0 rounded-t-md bg-gray-100">
+                <div class="flex grow min-h-0 rounded-t-md bg-gray-100 dark:bg-dark-600">
                     <!-- Available Columns -->
-                    <div class="outline-none rtl:text-right ltr:text-left w-1/2 rtl:border-l ltr:border-r flex flex-col">
-                        <header v-text="__('Available Columns')" class="border-b py-2 px-3 text-sm bg-white font-medium"/>
+                    <div class="outline-none rtl:text-right ltr:text-left w-1/2 rtl:border-l ltr:border-r dark:border-dark-900 flex flex-col">
+                        <header v-text="__('Available Columns')" class="border-b dark:border-dark-900 py-2 px-3 text-sm bg-white dark:bg-dark-700 font-medium"/>
                         <div class="flex flex-1 flex-col space-y-1 py-2 px-3 select-none shadow-inner overflow-y-scroll">
                             <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field" v-if="hiddenColumns.length">
                                 <label class="flex items-center cursor-pointer">
@@ -32,7 +32,7 @@
 
                     <!-- Displayed Columns -->
                     <div class="w-1/2 flex flex-col">
-                        <header v-text="__('Displayed Columns')" class="border-b px-3 py-2 text-sm bg-white rtl:rounded-tr-md ltr:rounded-tl-md font-medium flex-none"/>
+                        <header v-text="__('Displayed Columns')" class="border-b dark:border-dark-900 px-3 py-2 text-sm bg-white dark:bg-dark-700 font-medium flex-none"/>
                         <div class="grow overflow-y-scroll shadow-inner">
                             <sortable-list
                                 v-model="selectedColumns"
@@ -57,7 +57,7 @@
                     </div>
                 </div>
 
-                <footer class="px-3 py-2 border-t flex items-center justify-end" v-if="preferencesKey">
+                <footer class="px-3 py-2 border-t dark:bg-dark-700 dark:border-dark-900 flex items-center justify-end" v-if="preferencesKey">
                     <button class="btn" v-text="__('Reset')" @click="reset" :disabled="saving" />
                     <button class="rtl:mr-3 ltr:ml-3 btn-primary" v-text="__('Save')" @click="save" :disabled="saving" />
                 </footer>

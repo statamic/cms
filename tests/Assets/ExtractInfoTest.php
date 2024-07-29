@@ -2,6 +2,7 @@
 
 namespace Tests\Assets;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Assets\ExtractInfo;
@@ -25,7 +26,7 @@ class ExtractInfoTest extends TestCase
             ->disk('test');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_extract_basic_id3_info_from_text_asset()
     {
         $asset = (new Asset)->container($this->container)->path('a.txt');

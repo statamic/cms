@@ -3,6 +3,7 @@
 namespace Tests\Data\Structures;
 
 use Facades\Statamic\Structures\BranchIds;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Nav;
@@ -27,7 +28,7 @@ class NavTreeTest extends TestCase
         $stache->store('nav-trees')->directory($this->directory = $this->fakeStacheDirectory.$this->directory.'');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_and_set_the_handle()
     {
         $tree = new NavTree;
@@ -39,7 +40,7 @@ class NavTreeTest extends TestCase
         $this->assertEquals('test', $tree->handle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_structure()
     {
         $nav = Nav::make();
@@ -55,14 +56,14 @@ class NavTreeTest extends TestCase
         $this->assertSame($nav, Blink::get($blinkKey));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_path()
     {
         $tree = Nav::make('links')->makeTree('en');
         $this->assertEquals($this->directory.'/links.yaml', $tree->path());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_path_when_using_multisite()
     {
         $this->setSites([
@@ -73,7 +74,7 @@ class NavTreeTest extends TestCase
         $this->assertEquals($this->directory.'/en/links.yaml', $tree->path());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_ensure_ids_have_been_generated()
     {
         BranchIds::shouldReceive('ensure')
@@ -93,7 +94,7 @@ class NavTreeTest extends TestCase
         $this->assertEquals(['tree' => $updatedTree], YAML::file($tree->path())->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_save_tree_when_ensuring_ids_if_nothing_changed()
     {
         BranchIds::shouldReceive('ensure')

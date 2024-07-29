@@ -294,6 +294,13 @@ class User extends BaseUser
         return $this;
     }
 
+    public function merge($data)
+    {
+        $this->data($this->data()->merge($data));
+
+        return $this;
+    }
+
     public function getRememberToken()
     {
         return $this->model()->getRememberToken();

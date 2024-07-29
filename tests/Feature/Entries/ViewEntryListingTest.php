@@ -3,6 +3,7 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Collection;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -14,7 +15,7 @@ class ViewEntryListingTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_entries_index()
     {
         $this->setTestRoles(['test' => [
@@ -42,7 +43,7 @@ class ViewEntryListingTest extends TestCase
         $this->assertEquals(['one', 'two', 'three'], $entries->pluck('slug')->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_only_entries_in_index_for_sites_user_can_access()
     {
         $this->setSites([

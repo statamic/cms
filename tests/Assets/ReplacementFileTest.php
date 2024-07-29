@@ -3,12 +3,13 @@
 namespace Tests\Assets;
 
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\ReplacementFile;
 use Tests\TestCase;
 
 class ReplacementFileTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_path_and_extension()
     {
         $file = new ReplacementFile('foo/bar/baz.jpg');
@@ -16,7 +17,7 @@ class ReplacementFileTest extends TestCase
         $this->assertEquals('jpg', $file->extension());
     }
 
-    /** @test */
+    #[Test]
     public function it_writes_the_file_to_another_disk()
     {
         $originDisk = Storage::fake('local');
