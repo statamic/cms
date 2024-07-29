@@ -26,7 +26,7 @@ class FileTest extends TestCase
 
         Filesystem::put(
             resource_path('dictionaries').'/items.'.$extension,
-            $fileDumpCallback($arr)
+            $fileDumpCallback($arr, 'value', 'label')
         );
 
         $options = (new File)
@@ -55,7 +55,7 @@ class FileTest extends TestCase
 
         Filesystem::put(
             resource_path('dictionaries').'/items.'.$extension,
-            $fileDumpCallback($arr)
+            $fileDumpCallback($arr, 'id', 'name')
         );
 
         $options = (new File)
@@ -88,7 +88,7 @@ class FileTest extends TestCase
 
         Filesystem::put(
             resource_path('dictionaries').'/items.'.$extension,
-            $fileDumpCallback($arr)
+            $fileDumpCallback($arr, 'value', 'name')
         );
 
         $options = (new File)
@@ -109,8 +109,9 @@ class FileTest extends TestCase
     public static function optionProvider()
     {
         return [
-            'yaml' => ['yaml', fn ($arr) => YAML::dump($arr)],
-            'json' => ['json', fn ($arr) => json_encode($arr)],
+            'yaml' => ['yaml', fn ($arr, $value, $label) => YAML::dump($arr)],
+            'json' => ['json', fn ($arr, $value, $label) => json_encode($arr)],
+            'csv' => ['csv', fn ($arr, $value, $label) => "{$value},{$label},emoji".PHP_EOL.implode(PHP_EOL, array_map(fn ($item) => implode(',', $item), $arr))],
         ];
     }
 
