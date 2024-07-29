@@ -101,19 +101,25 @@ class FormController extends Controller
      * The steps for a failed form submission.
      *
      * @param  array  $params
-     * @param  array  $submission
+     * @param  array  $errors
      * @param  string  $form
      * @return Response|RedirectResponse
      */
     private function formFailure($params, $errors, $form)
     {
-        if (request()->ajax() || request()->wantsJson()) {
+        $request = request();
+
+        if ($request->ajax()) {
             return response([
                 'errors' => (new MessageBag($errors))->all(),
                 'error' => collect($errors)->map(function ($errors, $field) {
                     return $errors[0];
                 })->all(),
             ], 400);
+        }
+
+        if ($request->isPrecognitive() || $request->wantsJson()) {
+            throw ValidationException::withMessages($errors);
         }
 
         $redirect = Arr::get($params, '_error_redirect');

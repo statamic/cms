@@ -2,6 +2,7 @@
 
 namespace Tests\Stache\Repositories;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Tree;
 use Statamic\Stache\Repositories\NavTreeRepository;
 use Statamic\Stache\Stache;
@@ -26,7 +27,7 @@ class NavTreeRepositoryTest extends TestCase
         $this->repo = new NavTreeRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_nav_tree()
     {
         $this->store
@@ -37,7 +38,7 @@ class NavTreeRepositoryTest extends TestCase
         $this->assertSame($tree, $this->repo->find('links', 'en'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_nav_tree_through_the_store()
     {
         $tree = $this->mock(Tree::class);

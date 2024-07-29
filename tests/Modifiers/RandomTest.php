@@ -3,17 +3,16 @@
 namespace Tests\Modifiers;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class RandomTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider inputsProvider
-     */
+    #[Test]
+    #[DataProvider('inputsProvider')]
     public function it_returns_one_random_item($input): void
     {
         $this->assertFalse(
@@ -24,10 +23,12 @@ class RandomTest extends TestCase
 
     public static function inputsProvider()
     {
+        $range = range(1, 5000);
+
         return [
-            'array' => [range('a', 'z')],
-            'collection' => [collect(range('a', 'z'))],
-            'query builder' => [Mockery::mock(Builder::class)->shouldReceive('get')->andReturn(collect(range('a', 'z')))->getMock()],
+            'array' => [$range],
+            'collection' => [collect($range)],
+            'query builder' => [Mockery::mock(Builder::class)->shouldReceive('get')->andReturn(collect($range))->getMock()],
         ];
     }
 

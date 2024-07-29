@@ -2,13 +2,14 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Toggle;
 use Tests\TestCase;
 
 class ToggleTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_augments_to_a_boolean()
     {
         $field = (new Toggle)->setField(new Field('test', ['type' => 'toggle']));
@@ -18,7 +19,7 @@ class ToggleTest extends TestCase
         $this->assertTrue($field->augment(true));
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_to_a_boolean_only_when_value_is_actually_set_or_submitted()
     {
         $field = (new Toggle)->setField(new Field('test', ['type' => 'toggle']));
