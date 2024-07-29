@@ -190,11 +190,11 @@ export default {
             });
         },
 
-        search(search, loading) {
+        search: _.debounce(function (search, loading) {
             loading(true);
 
             this.request({ search }).then(response => loading(false));
-        },
+        }, 300),
     }
 };
 </script>
