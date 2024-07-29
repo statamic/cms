@@ -183,7 +183,7 @@ class ImgixManipulator extends Manipulator
     {
         return new UrlBuilder(
             $this->config['domain'],
-            signKey: $this->config['key'],
+            signKey: $this->config['key'] ?? null,
             includeLibraryParam: $this->config['ixlib'] ?? true,
         );
     }
