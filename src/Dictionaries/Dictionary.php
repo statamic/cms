@@ -13,18 +13,11 @@ abstract class Dictionary
 {
     use HasFields, HasHandle, HasTitle, RegistersItself;
 
+    protected array $fields = [];
+    protected array $config = [];
 
-    protected $fields = [];
-    protected $config = [];
-
-    /**
-     * Returns a key/value array of options.
-     */
     abstract public function options(?string $search = null): array;
 
-    /**
-     * Returns a single option.
-     */
     abstract public function get(string $key): ?Item;
 
     public function setConfig(array $config): self
