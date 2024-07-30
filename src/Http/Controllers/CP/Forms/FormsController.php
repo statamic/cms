@@ -366,7 +366,7 @@ class FormsController extends CpController
             }
 
             if (! $merged) {
-                $fields[] = $config;
+                $fields[$handle] = $config;
             }
         }
 
