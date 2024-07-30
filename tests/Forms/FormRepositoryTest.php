@@ -47,43 +47,37 @@ class FormRepositoryTest extends TestCase
     public function it_registers_config()
     {
         $this->repo->appendConfigFields('test_form', 'Test Config', [
-            'another_config' => [
-                'handle' => 'another_config',
-                'field' => [
-                    'type' => 'text',
-                ],
-            ],
-            'some_config' => [
-                'handle' => 'some_config',
-                'field' => [
-                    'type' => 'text',
-                ],
-            ],
+            'alfa' => ['type' => 'text'],
+            'bravo' => ['type' => 'text'],
         ]);
 
-        $this->assertNotNull($this->repo->extraConfigFor('test_form'));
-        $this->assertEmpty($this->repo->extraConfigFor('another_form'));
-    }
-
-    /** @test */
-    public function it_registers_wildcard_config()
-    {
-        $this->repo->appendConfigFields('*', 'Test Config', [
-            'another_config' => [
-                'handle' => 'another_config',
-                'field' => [
-                    'type' => 'text',
-                ],
-            ],
-            'some_config' => [
-                'handle' => 'some_config',
-                'field' => [
-                    'type' => 'text',
-                ],
-            ],
+        $this->repo->appendConfigFields('*', 'This Goes Everywhere', [
+            ['charlie' => ['type' => 'text']],
         ]);
 
-        $this->assertNotNull($this->repo->extraConfigFor('test_form'));
-        $this->assertNotNull($this->repo->extraConfigFor('another_form'));
+        $this->assertEquals([
+            'test_config' => [
+                'display' => 'Test Config',
+                'fields' => [
+                    'alfa' => ['type' => 'text'],
+                    'bravo' => ['type' => 'text'],
+                ],
+            ],
+            'this_goes_everywhere' => [
+                'display' => 'This Goes Everywhere',
+                'fields' => [
+                    ['charlie' => ['type' => 'text']],
+                ],
+            ],
+        ], $this->repo->extraConfigFor('test_form'));
+
+        $this->assertEquals([
+            'this_goes_everywhere' => [
+                'display' => 'This Goes Everywhere',
+                'fields' => [
+                    ['charlie' => ['type' => 'text']],
+                ],
+            ],
+        ], $this->repo->extraConfigFor('another_form'));
     }
 }

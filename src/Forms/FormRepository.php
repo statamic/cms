@@ -105,7 +105,7 @@ class FormRepository implements Contract
             ->flatMap(function ($config) use ($reserved) {
 
                 return [
-                    Str::slugify($config['display']) => [
+                    Str::snake($config['display']) => [
                         'display' => $config['display'],
                         'fields' => collect($config['fields'])
                             ->filter(fn ($field, $index) => ! in_array($field['handle'] ?? $index, $reserved))
