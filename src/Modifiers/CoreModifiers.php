@@ -2897,7 +2897,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Filters the data by a given key / value pair.
+     * Filters the data by a given key that matches an array of values.
      *
      * @param  array  $value
      * @param  array  $params
