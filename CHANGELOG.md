@@ -1,5 +1,18 @@
 # Release Notes
 
+## 5.18.0 (2024-07-30)
+
+### What's new
+- Dictionaries [#10380](https://github.com/statamic/cms/issues/10380) by @duncanmcclean
+- Make it possible to add to form configuration screen [#8491](https://github.com/statamic/cms/issues/8491) by @ryanmitchell
+
+### What's fixed
+- Avoid extending already-extended file cache store [#10526](https://github.com/statamic/cms/issues/10526) by @jasonvarga
+- Prevent error when redirecting to first asset container [#10521](https://github.com/statamic/cms/issues/10521) by @duncanmcclean
+- Percentage symbols get replaced with dashes in asset filenames [#10523](https://github.com/statamic/cms/issues/10523) by @vluijkx
+
+
+
 ## 5.17.1 (2024-07-29)
 
 ### What's fixed
