@@ -2897,6 +2897,23 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Filters the data by a given key that matches an array of values.
+     *
+     * @param  array  $value
+     * @param  array  $params
+     * @return array
+     */
+    public function whereIn($value, $params)
+    {
+        $key = Arr::get($params, 0);
+        $arr = Arr::get($params, 1);
+
+        $collection = collect($value)->whereIn($key, $arr);
+
+        return $collection->values()->all();
+    }
+
+    /**
      * Attempts to prevent widows in a string by adding
      * <nobr> tags between the last two words of each paragraph.
      *
