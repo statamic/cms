@@ -61,6 +61,8 @@ return [
                 'id' => env('ALGOLIA_APP_ID', ''),
                 'secret' => env('ALGOLIA_SECRET', ''),
             ],
+
+            'prefix' => env('ALGOLIA_PREFIX', ''),
         ],
 
     ],

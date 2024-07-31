@@ -119,6 +119,8 @@ class IndexManager extends Manager
 
         $client = SearchClient::create($credentials['id'], $credentials['secret']);
 
+        $name = config('statamic.search.drivers.algolia.prefix').$name;
+
         return new AlgoliaIndex($client, $name, $config, $locale);
     }
 
