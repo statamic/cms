@@ -58,6 +58,8 @@ export default class Slug {
         custom["'"] = ""; // Remove apostrophes in all languages
         custom["’"] = ""; // Remove smart single quotes
         custom[" - "] = " "; // Prevent `Block - Hero` turning into `block_-_hero`
+        custom['('] = ''; // Remove parentheses
+        custom[')'] = ''; // Remove parentheses
 
         return speakingUrl(this.#string, {
             separator: this.#separator,
