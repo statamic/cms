@@ -68,7 +68,11 @@ export default {
         dismiss() {
             this.$emit('cancel')
         },
-        submit() {
+        submit(e) {
+            if (e?.target?.nodeName === 'BUTTON') {
+                return;
+            }
+
             this.$emit('confirm')
         }
     },
