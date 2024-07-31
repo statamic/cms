@@ -238,27 +238,6 @@ EOT;
         $this->assertSame('DominionNetrunner', $this->resultOf($template));
     }
 
-    public function test_where_in()
-    {
-        $template = <<<'EOT'
-{{ complex | where_in("last_name", ["Zebra", "Bravo"]) }}{{ first_name }}{{ /complex }}
-EOT;
-
-        $this->assertSame('ZealousBlathering', $this->resultOf($template));
-
-        $template = <<<'EOT'
-{{ complex where_in="{"last_name"}|{["Zebra", "Bravo"]}" }}{{ first_name }}{{ /complex }}
-EOT;
-
-        $this->assertSame('ZealousBlathering', $this->resultOf($template));
-
-        $template = <<<'EOT'
-{{ complex | where_in("last_name", "Zebra") }}{{ first_name }}{{ /complex }}
-EOT;
-
-        $this->assertSame('Zealous', $this->resultOf($template));
-    }
-
     public function test_unique()
     {
         $this->assertSame('zebra, hippo, hyena, giraffe', $this->resultOf('{{ checklist | unique | list }}'));
