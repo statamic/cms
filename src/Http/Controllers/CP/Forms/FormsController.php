@@ -33,7 +33,7 @@ class FormsController extends CpController
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
-                    'submissions' => $form->submissions()->count(),
+                    'submissions' => $form->querySubmissions()->count(),
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
                     'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
