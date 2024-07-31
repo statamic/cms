@@ -2,12 +2,12 @@
 
 namespace Tests\Search;
 
+use Illuminate\Support\Facades\Config;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Search\Algolia\Index;
 use Statamic\Search\Algolia\Query;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Config;
 
 class AlgoliaQueryTest extends TestCase
 {
