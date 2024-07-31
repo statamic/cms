@@ -59,7 +59,8 @@ export default {
         warnAt: Number,
         lifetime: Number,
         email: String,
-        oauthProvider: String
+        oauthProvider: String,
+        auth: Object,
     },
 
     data() {
@@ -102,7 +103,7 @@ export default {
     watch: {
 
         count(count) {
-            this.isShowingLogin = this.remaining <= 0;
+            this.isShowingLogin = this.auth.enabled && this.remaining <= 0;
 
             // While we're in the warning period, we'll check every second so that any
             // activity in another tab is picked up and the count will get restarted.
@@ -145,7 +146,10 @@ export default {
             return this.$axios.get(cp_url('session-timeout')).then(response => {
                 this.count = this.remaining = response.data;
             }).catch(e => {
-                if (e.response.status === 401) this.remaining = 0;
+                if (e.response.status === 401) {
+                    this.remaining = 0;
+                    if (!this.auth.enabled) window.location = this.auth.redirect_to || '/';
+                }
                 throw e;
             }).finally(response => {
                 this.pinging = false;

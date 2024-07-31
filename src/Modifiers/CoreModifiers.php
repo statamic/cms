@@ -270,6 +270,10 @@ class CoreModifiers extends Modifier
             return '';
         }
 
+        if (is_string($value)) {
+            return strip_tags($value);
+        }
+
         if (Arr::isAssoc($value)) {
             $value = [$value];
         }
@@ -296,6 +300,11 @@ class CoreModifiers extends Modifier
         if ($value instanceof Value) {
             $value = $value->raw();
         }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
         if (Arr::isAssoc($value)) {
             $value = [$value];
         }
@@ -2906,13 +2915,35 @@ class CoreModifiers extends Modifier
     public function where($value, $params)
     {
         $key = Arr::get($params, 0);
-        $val = Arr::get($params, 1);
+        $opr = Arr::get($params, 1);
+        $val = Arr::get($params, 2);
 
-        if (! $val && Str::contains($key, ':')) {
-            [$key, $val] = explode(':', $key);
+        if (! $opr && Str::contains($key, ':')) {
+            [$key, $opr] = explode(':', $key);
+        }
+        if (! $val) {
+            $val = $opr;
+            $opr = '==';
         }
 
-        $collection = collect($value)->where($key, $val);
+        $collection = collect($value)->where($key, $opr, $val);
+
+        return $collection->values()->all();
+    }
+
+    /**
+     * Filters the data by a given key that matches an array of values.
+     *
+     * @param  array  $value
+     * @param  array  $params
+     * @return array
+     */
+    public function whereIn($value, $params)
+    {
+        $key = Arr::get($params, 0);
+        $arr = Arr::get($params, 1);
+
+        $collection = collect($value)->whereIn($key, $arr);
 
         return $collection->values()->all();
     }

@@ -58,11 +58,13 @@
 @import "components/fieldtypes/checkboxes";
 @import "components/fieldtypes/code";
 @import "components/fieldtypes/datetime";
+@import "components/fieldtypes/dictionary-fields";
 @import "components/fieldtypes/environment";
 @import "components/fieldtypes/grid";
 @import "components/fieldtypes/hidden";
 @import "components/fieldtypes/markdown";
 @import "components/fieldtypes/partial";
+@import "components/fieldtypes/radio";
 @import "components/fieldtypes/relationship";
 @import "components/fieldtypes/replicator";
 @import "components/fieldtypes/section";

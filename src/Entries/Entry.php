@@ -559,7 +559,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     return null;
                 }
 
-                $date = $date ?? $this->lastModified();
+                $date = $date ?? optional($this->origin())->date() ?? $this->lastModified();
 
                 if (! $this->hasTime()) {
                     $date->startOfDay();
@@ -813,10 +813,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             $localization->afterSave($callback);
         }
 
-        if ($this->collection()->dated()) {
-            $localization->date($this->date());
-        }
-
         return $localization;
     }
 
@@ -1035,6 +1031,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return (string) Antlers::parse($format, array_merge($this->routeData(), [
+            'config' => config()->all(),
             'site' => $this->site(),
             'uri' => $this->uri(),
             'url' => $this->url(),

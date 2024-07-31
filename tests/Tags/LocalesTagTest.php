@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Parse;
 use Statamic\Fields\Value;
@@ -62,7 +63,7 @@ EOT;
         return (string) Parse::template($tag, $context);
     }
 
-    /** @test */
+    #[Test]
     public function it_loops_over_the_entry_for_each_site()
     {
         (new EntryFactory)
@@ -141,7 +142,7 @@ HTML;
         $this->assertEquals($expected, $this->tag($this->template('{{ locales }}'), ['id' => '1']));
     }
 
-    /** @test */
+    #[Test]
     public function it_skips_a_site_in_the_loop_if_the_entry_doesnt_exist()
     {
         (new EntryFactory)
@@ -164,7 +165,7 @@ HTML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_falls_back_to_the_sites_details_if_the_entry_doesnt_exist_and_the_all_param_is_used()
     {
         (new EntryFactory)
@@ -236,7 +237,7 @@ HTML;
         $this->assertEquals($expected, $this->tag($this->template('{{ locales all="true" }}'), ['id' => '1']));
     }
 
-    /** @test */
+    #[Test]
     public function it_skips_a_site_in_the_loop_if_the_entry_is_a_draft()
     {
         (new EntryFactory)
@@ -267,7 +268,7 @@ HTML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_falls_back_to_the_sites_details_if_the_entry_is_a_draft_and_the_all_param_is_used()
     {
         (new EntryFactory)
@@ -347,7 +348,7 @@ HTML;
         $this->assertEquals($expected, $this->tag($this->template('{{ locales all="true" }}'), ['id' => '1']));
     }
 
-    /** @test */
+    #[Test]
     public function it_skips_its_own_locale_when_self_param_is_false()
     {
         (new EntryFactory)
@@ -377,7 +378,7 @@ HTML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_the_entry_in_a_given_site()
     {
         (new EntryFactory)
@@ -400,7 +401,7 @@ HTML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_nothing_if_the_entry_doesnt_exist_in_a_given_site()
     {
         (new EntryFactory)
@@ -416,7 +417,7 @@ HTML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_displays_nothing_when_there_are_no_results()
     {
         (new EntryFactory)
@@ -432,7 +433,7 @@ HTML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_displays_nothing_when_context_id_is_null()
     {
         $entry = (new EntryFactory)
@@ -449,7 +450,7 @@ HTML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_prefers_page_id_over_id()
     {
         (new EntryFactory)
@@ -465,7 +466,7 @@ HTML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_prefers_id_param_over_page_id()
     {
         (new EntryFactory)

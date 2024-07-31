@@ -163,4 +163,19 @@ class EntryRepository implements RepositoryContract
             return $this->substitutionsById[$item->id()] ?? $item;
         });
     }
+
+    public function updateUris($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateUris($ids);
+    }
+
+    public function updateOrders($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateOrders($ids);
+    }
+
+    public function updateParents($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateParents($ids);
+    }
 }

@@ -19,8 +19,8 @@
 
         <loading-graphic v-if="initializing" :inline="true" />
 
-        <template v-if="!initializing && !usesSelectField">
-            <div ref="items" class="relationship-input-items space-y-1 outline-none">
+        <template v-if="shouldShowSelectedItems">
+            <div ref="items" class="relationship-input-items space-y-1 outline-none" :class="{ 'mt-4': usesSelectField && items.length }">
                 <component
                     :is="itemComponent"
                     v-for="(item, i) in items"
@@ -178,11 +178,19 @@ export default {
         },
 
         canSelectOrCreate() {
-            return !this.readOnly && !this.maxItemsReached;
+            return !this.usesSelectField && !this.readOnly && !this.maxItemsReached;
         },
 
         usesSelectField() {
             return ['select', 'typeahead'].includes(this.mode);
+        },
+
+        shouldShowSelectedItems() {
+            if (this.initializing) return false;
+
+            if (this.usesSelectField && this.maxItems === 1) return false;
+
+            return true;
         }
 
     },
@@ -288,7 +296,7 @@ export default {
         },
 
         selectFieldSelected(selectedItemData) {
-            this.$emit('item-data-updated', selectedItemData.map(item => ({ id: item.id, title: item.title })));
+            this.$emit('item-data-updated', selectedItemData);
             this.update(selectedItemData.map(item => item.id));
         },
 

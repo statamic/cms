@@ -9,10 +9,9 @@
 
     <div class="max-w-xs rounded shadow-lg flex items-center justify-center relative mx-auto">
         <div class="outside-shadow absolute inset-0"></div>
-        <div class="card auth-card">
+        <div class="card auth-card" x-data="{ busy: false }" v-pre>
 
-
-            <form method="POST" action="{{ $action }}">
+            <form method="POST" action="{{ $action }}" x-on:submit="busy = true">
                 @csrf
 
                 <input type="hidden" name="token" value="{{ $token }}">
@@ -47,7 +46,7 @@
                     <input id="password-confirm" type="password" class="input-text input-text" name="password_confirmation" required>
                 </div>
 
-                <button type="submit" class="btn-primary">{{ $title }}</button>
+                <button type="submit" class="btn-primary" :disabled="busy">{{ $title }}</button>
 
             </form>
         </div>

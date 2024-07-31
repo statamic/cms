@@ -3,6 +3,7 @@
 namespace Tests\API;
 
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -26,7 +27,7 @@ class ConfigTest extends TestCase
         Facades\Form::all()->each->delete();
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_all_collections_resources()
     {
         Facades\Collection::make('pages')->structureContents(['expects_root' => false])->save();
@@ -44,7 +45,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointSuccessful('/api/collections/articles/entries/dance');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_disable_all_collections_resources()
     {
         Facades\Collection::make('pages')->structureContents(['expects_root' => false])->save();
@@ -62,7 +63,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/collections/articles/entries/dance');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_disable_resources_with_null()
     {
         // Exact same test as above, but using null instead of false. It would
@@ -84,7 +85,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/collections/articles/entries/dance');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_disable_resources_with_unexpected_value()
     {
         // Exact same test as above, but using a weird string instead of false.
@@ -107,7 +108,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/collections/articles/entries/dance');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_some_collections_resources()
     {
         Facades\Collection::make('pages')->structureContents(['expects_root' => false])->save();
@@ -125,7 +126,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/collections/articles/entries/dance');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_all_navs_resources()
     {
         $this->makeNav('footer')->save();
@@ -137,7 +138,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointSuccessful('/api/navs/docs/tree');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_disable_all_navs_resources()
     {
         $this->makeNav('footer')->save();
@@ -149,7 +150,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/navs/docs/tree');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_some_navs_resources()
     {
         $this->makeNav('footer')->save();
@@ -161,7 +162,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/navs/docs/tree');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_all_taxonomies_resources()
     {
         Facades\Taxonomy::make('topics')->save();
@@ -178,7 +179,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointSuccessful('/api/taxonomies/colours/terms/red');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_disable_all_taxonomies_resources()
     {
         Facades\Taxonomy::make('topics')->save();
@@ -195,7 +196,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/taxonomies/colours/terms/red');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_some_taxonomies_resources()
     {
         Facades\Taxonomy::make('topics')->save();
@@ -212,7 +213,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/taxonomies/colours/terms/red');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_all_globals_resources()
     {
         $this->makeGlobalSet('settings')->save();
@@ -227,7 +228,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointSuccessful('/api/globals/social');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_disable_all_globals_resources()
     {
         $this->makeGlobalSet('settings')->save();
@@ -240,7 +241,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/globals/social');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_some_globals_resources()
     {
         $this->makeGlobalSet('settings')->save();
@@ -256,7 +257,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointSuccessful('/api/globals/social');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_all_assets_resources()
     {
         Facades\AssetContainer::make('main')->disk('test')->save();
@@ -271,7 +272,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointSuccessful('/api/assets/avatars/file.txt');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_disable_all_assets_resources()
     {
         Facades\AssetContainer::make('main')->disk('test')->save();
@@ -286,7 +287,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/assets/avatars/file.txt');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_some_assets_resources()
     {
         Facades\AssetContainer::make('main')->disk('test')->save();
@@ -301,7 +302,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointSuccessful('/api/assets/avatars/file.txt');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_all_forms_resources()
     {
         Facades\Form::make('contact')->save();
@@ -316,7 +317,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointSuccessful('/api/forms/survey');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_disable_all_forms_resources()
     {
         Facades\Form::make('contact')->save();
@@ -329,7 +330,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/forms/survey');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_some_forms_resources()
     {
         Facades\Form::make('contact')->save();
@@ -345,7 +346,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointSuccessful('/api/forms/survey');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_all_users()
     {
         Facades\User::make()->id('one')->save();
@@ -358,7 +359,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointSuccessful('/api/users/one');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_disable_all_users()
     {
         Facades\User::make()->id('one')->save();
@@ -369,7 +370,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/users/one');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_all_collection_entries_by_term()
     {
         Facades\Taxonomy::make('topics')->save();
@@ -390,7 +391,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointDataCount('/api/taxonomies/colours/terms/red/entries', 1);
     }
 
-    /** @test */
+    #[Test]
     public function config_can_disable_all_collection_entries_by_term()
     {
         Facades\Taxonomy::make('topics')->save();
@@ -409,7 +410,7 @@ class ConfigTest extends TestCase
         $this->assertEndpointNotFound('/api/taxonomies/colours/terms/red/entries');
     }
 
-    /** @test */
+    #[Test]
     public function config_can_enable_some_collection_entries_by_term()
     {
         Facades\Taxonomy::make('topics')->save();
