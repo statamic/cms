@@ -14,14 +14,17 @@ class SlugTest extends TestCase
 
     #[Test]
     #[DataProvider('slugProvider')]
-    public function it_generates_a_slug($string, $separator, $language, $expected)
+    public function it_generates_a_slug($string, $separator, $language, $replacements, $expected)
     {
+        $this->withoutExceptionHandling();
+
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
             ->postJson('/cp/slug', [
                 'string' => $string,
                 'separator' => $separator,
                 'language' => $language,
+                'replacements' => $replacements,
             ])
             ->assertOk()
             ->assertContent($expected);
@@ -30,15 +33,16 @@ class SlugTest extends TestCase
     public static function slugProvider()
     {
         return [
-            'single word' => ['one', '-', 'en', 'one'],
-            'multiple words' => ['one two three', '-', 'en', 'one-two-three'],
-            'apples' => ["Apple's", '-', 'en', 'apples'],
-            'smart quotes' => ['Statamic’s latest feature: “Duplicator”', '-', 'en', 'statamics-latest-feature-duplicator'],
-            'hyphens separated by spaces' => ['Block - Hero', '-', 'en', 'block-hero'],
-            'chinese characters' => ['你好，世界', '-', 'ch', 'ni-hao-shi-jie'],
-            'german characters' => ['Björn Müller', '-', 'de', 'bjoern-mueller'],
-            'arabic characters' => ['صباح الخير', '-', 'ar', 'sbah-alkhyr'],
-            'alternate separator' => ['one two three', '_', 'en', 'one_two_three'],
+            'single word' => ['one', '-', 'en', [], 'one'],
+            'multiple words' => ['one two three', '-', 'en', [], 'one-two-three'],
+            'apples' => ["Apple's", '-', 'en', [], 'apples'],
+            'smart quotes' => ['Statamic’s latest feature: “Duplicator”', '-', 'en', [], 'statamics-latest-feature-duplicator'],
+            'hyphens' => ['JSON-LD', '_', 'en', ['-' => '_'], 'json_ld'],
+            'hyphens separated by spaces' => ['Block - Hero', '-', 'en', [], 'block-hero'],
+            'chinese characters' => ['你好，世界', '-', 'ch', [], 'ni-hao-shi-jie'],
+            'german characters' => ['Björn Müller', '-', 'de', [], 'bjoern-mueller'],
+            'arabic characters' => ['صباح الخير', '-', 'ar', [], 'sbah-alkhyr'],
+            'alternate separator' => ['one two three', '_', 'en', [], 'one_two_three'],
         ];
     }
 }

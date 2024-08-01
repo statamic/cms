@@ -5,6 +5,7 @@ export default class Slug {
     busy = false;
     #string;
     #separator = '-';
+    #replacements = {};
     #language;
     #debounced;
     #controller;
@@ -16,6 +17,12 @@ export default class Slug {
 
     separatedBy(separator) {
         if (separator) this.#separator = separator;
+
+        return this;
+    }
+
+    withReplacements(replacements) {
+        if (replacements) this.#replacements = replacements;
 
         return this;
     }
@@ -59,6 +66,14 @@ export default class Slug {
         custom["’"] = ""; // Remove smart single quotes
         custom[" - "] = " "; // Prevent `Block - Hero` turning into `block_-_hero`
 
+        if (this.#replacements) {
+            Object.entries(this.#replacements).forEach(([key, value]) => {
+                custom[key] = value;
+            });
+        }
+
+        console.log(custom)
+
         return speakingUrl(this.#string, {
             separator: this.#separator,
             lang: this.#language,
@@ -84,7 +99,8 @@ export default class Slug {
         const payload = {
             string: this.#string,
             separator: this.#separator,
-            language: this.#language
+            language: this.#language,
+            replacements: this.#replacements,
         };
 
         if (this.#controller) this.#controller.abort();

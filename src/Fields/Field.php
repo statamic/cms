@@ -492,6 +492,9 @@ class Field implements Arrayable
                 'from' => 'display',
                 'async' => false,
                 'separator' => '_',
+                'replacements' => [
+                    '-' => '_',
+                ],
                 'validate' => [
                     'required',
                     new Handle,
