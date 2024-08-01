@@ -327,7 +327,7 @@ final class Installer
 
         $this->modules = collect([$topLevelConfigModule])
             ->merge($optionalModules)
-            ->map(fn ($config) => new ModuleInstaller($config, $this))
+            ->map(fn ($config) => new Module($config, $this))
             ->each(fn ($module) => $module->validate());
 
         return $this;

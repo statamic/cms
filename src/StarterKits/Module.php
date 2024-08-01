@@ -10,7 +10,7 @@ use Statamic\Facades\Path;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
 
-final class ModuleInstaller
+final class Module
 {
     use Concerns\InteractsWithFilesystem;
 
