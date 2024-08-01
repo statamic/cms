@@ -71,8 +71,6 @@ export default class Slug {
             });
         }
 
-        console.log(custom)
-
         return speakingUrl(this.#string, {
             separator: this.#separator,
             lang: this.#language,
