@@ -16,8 +16,6 @@ class SlugTest extends TestCase
     #[DataProvider('slugProvider')]
     public function it_generates_a_slug($string, $separator, $language, $replacements, $expected)
     {
-        $this->withoutExceptionHandling();
-
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
             ->postJson('/cp/slug', [
