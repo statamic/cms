@@ -341,6 +341,17 @@
         strong {
             font-weight: 900;
         }
+
+        a {
+            @apply text-blue dark:text-dark-blue-100 underline break-words;
+        }
+
+        a:active,
+        a:focus,
+        a:hover {
+            outline: 0;
+            text-decoration: underline;
+        }
     }
 
     h1 { font-size: 2em }
