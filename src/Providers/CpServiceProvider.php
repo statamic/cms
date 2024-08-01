@@ -46,11 +46,13 @@ class CpServiceProvider extends ServiceProvider
 
         $this->registerMiddlewareGroups();
 
-        AuthenticateSession::redirectUsing(function () {
-            return config('statamic.cp.auth.enabled', true)
-                ? cp_route('login')
-                : config('statamic.cp.auth.redirect_to', '/');
-        });
+        if (method_exists(AuthenticateSession::class, 'redirectUsing')) {
+            AuthenticateSession::redirectUsing(function () {
+                return config('statamic.cp.auth.enabled', true)
+                    ? cp_route('login')
+                    : config('statamic.cp.auth.redirect_to', '/');
+            });
+        }
     }
 
     public function register()
