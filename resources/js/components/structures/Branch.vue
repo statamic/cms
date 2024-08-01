@@ -120,7 +120,7 @@ export default {
                 case 'published':
                     return 'bg-green-600';
                 case 'draft':
-                    return 'bg-gray-400';
+                    return 'bg-gray-400 dark:bg-dark-200';
                 default:
                     return 'bg-transparent border border-gray-600';
             }
