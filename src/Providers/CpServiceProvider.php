@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Routing\Router;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -44,6 +45,12 @@ class CpServiceProvider extends ServiceProvider
         Sets::setIconsDirectory();
 
         $this->registerMiddlewareGroups();
+
+        AuthenticateSession::redirectUsing(function () {
+            return config('statamic.cp.auth.enabled', true)
+                ? cp_route('login')
+                : config('statamic.cp.auth.redirect_to', '/');
+        });
     }
 
     public function register()
