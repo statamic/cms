@@ -64,7 +64,6 @@ export default class Slug {
         const custom = Statamic.$config.get(`charmap.${this.#language}`) ?? {};
         custom["'"] = ""; // Remove apostrophes in all languages
         custom["’"] = ""; // Remove smart single quotes
-        custom[" - "] = " "; // Prevent `Block - Hero` turning into `block_-_hero`
 
         if (this.#replacements) {
             Object.entries(this.#replacements).forEach(([key, value]) => {
