@@ -121,7 +121,7 @@ class Structure extends Tags
 
     public function toArray($tree, $parent = null, $depth = 1)
     {
-        $pages = BulkAugmentor::tree($tree)->map(function ($item, $data, $index) use ($depth, $tree, $parent) {
+        $pages = BulkAugmentor::tree($tree, $this->params->explode('select'))->map(function ($item, $data, $index) use ($depth, $tree, $parent) {
             $page = $item['page'];
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $page, $depth + 1);
 
