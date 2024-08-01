@@ -67,6 +67,7 @@ export default class Slug {
         let custom = charmap[this.#language] ?? {};
         custom["'"] = ""; // Remove apostrophes in all languages
         custom["’"] = ""; // Remove smart single quotes
+        custom[" - "] = " "; // Prevent `Block - Hero` turning into `block_-_hero`
         custom['('] = ''; // Remove parentheses
         custom[')'] = ''; // Remove parentheses
         custom = symbols
