@@ -3,6 +3,7 @@
 namespace Tests\StaticCaching;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Facades\Form;
 use Statamic\StaticCaching\Invalidate;
@@ -19,7 +20,7 @@ class InvalidateTest extends TestCase
         Mockery::close();
     }
 
-    /** @test */
+    #[Test]
     public function it_invalidates_a_form_when_its_blueprint_is_saved()
     {
         $form = tap(Form::make('contact'))->save();

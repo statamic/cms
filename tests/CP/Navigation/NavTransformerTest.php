@@ -3,6 +3,7 @@
 namespace Tests\CP\Navigation;
 
 use Facades\Statamic\CP\Navigation\NavItemIdHasher;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Navigation\NavTransformer;
 use Statamic\Facades;
 use Statamic\Support\Str;
@@ -34,13 +35,13 @@ class NavTransformerTest extends TestCase
         return NavTransformer::fromVue($submission);
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_no_manipulations_to_an_empty_array_to_allow_overriding_of_preferences_at_higher_levels()
     {
         $this->assertEquals([], $this->transform([]));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_new_items()
     {
         $transformed = $this->transform([
@@ -72,7 +73,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_new_item_children()
     {
         $transformed = $this->transform([
@@ -117,7 +118,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_move_an_item_to_another_section()
     {
         $transformed = $this->transform([
@@ -143,7 +144,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_alias_item_to_another_section()
     {
         $transformed = $this->transform([
@@ -169,7 +170,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_alias_item_to_same_section()
     {
         $transformed = $this->transform([
@@ -195,7 +196,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function aliasing_multiple_of_the_same_item_produces_unique_ids()
     {
         $transformed = $this->transform([
@@ -228,7 +229,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_move_item_into_another_items_children()
     {
         $transformed = $this->transform([
@@ -267,7 +268,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_alias_item_into_another_items_children()
     {
         $transformed = $this->transform([
@@ -306,7 +307,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function aliasing_multiple_of_the_same_item_to_an_items_children_produces_unique_ids()
     {
         $transformed = $this->transform([
@@ -352,7 +353,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_move_a_child_item_out_to_its_own_parent_item()
     {
         $transformed = $this->transform([
@@ -378,7 +379,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_alias_a_child_item_out_to_its_own_parent_item()
     {
         $transformed = $this->transform([
@@ -404,7 +405,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function aliasing_multiple_of_the_same_child_item_produces_unique_ids()
     {
         $transformed = $this->transform([
@@ -437,7 +438,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_modify_items()
     {
         $transformed = $this->transform([
@@ -489,7 +490,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_modify_item_children()
     {
         $transformed = $this->transform([
@@ -554,7 +555,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_modify_moved_items()
     {
         $transformed = $this->transform([
@@ -595,7 +596,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_modify_moved_children()
     {
         $transformed = $this->transform([
@@ -649,7 +650,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_modify_aliased_items()
     {
         $transformed = $this->transform([
@@ -690,7 +691,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_modify_aliased_children()
     {
         $transformed = $this->transform([
@@ -744,7 +745,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_hide_an_item()
     {
         $transformed = $this->transform([
@@ -770,7 +771,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_hide_a_child_item()
     {
         $transformed = $this->transform([
@@ -809,7 +810,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reorder_items()
     {
         $transformed = $this->transform([
@@ -840,7 +841,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reorder_custom_and_modified_items()
     {
         $transformed = $this->transform([
@@ -892,7 +893,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_new_section()
     {
         $transformed = $this->transform([
@@ -923,7 +924,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_new_section_with_special_characters_in_display()
     {
         $transformed = $this->transform([
@@ -954,7 +955,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_ignores_new_section_which_contain_no_manipulations()
     {
         $transformed = $this->transform([
@@ -967,7 +968,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals([], $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_rename_a_section()
     {
         $transformed = $this->transform([
@@ -986,7 +987,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_hide_a_section()
     {
         $transformed = $this->transform([
@@ -1003,7 +1004,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_hide_a_section_containing_item_manipulations()
     {
         $transformed = $this->transform([
@@ -1033,7 +1034,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reorder_sections()
     {
         $transformed = $this->transform([
@@ -1058,7 +1059,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reorder_custom_and_modified_sections()
     {
         $transformed = $this->transform([
@@ -1114,7 +1115,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_ignores_items_with_no_manipulations()
     {
         $transformed = $this->transform([
@@ -1170,7 +1171,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_unique_hash_to_an_id()
     {
         $id = NavTransformer::uniqueId('test::id');
@@ -1179,13 +1180,13 @@ class NavTransformerTest extends TestCase
         $this->assertTrue((bool) preg_match('/.*[^\:]:[^\:]{6}$/', $id));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_unique_hash_from_an_id()
     {
         $this->assertEquals('test::id', NavTransformer::removeUniqueIdHash('test::id:587bac'));
     }
 
-    /** @test */
+    #[Test]
     public function it_intelligently_handles_url_modifications()
     {
         $transformed = $this->transform([
@@ -1248,7 +1249,7 @@ class NavTransformerTest extends TestCase
         $this->assertEquals($expected, $transformed);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_transform_complex_json_payload_copied_from_actual_vue_submission()
     {
         $transformed = $this->transform(json_decode('[{"display":"Top Level","display_original":"Top Level","action":false,"items":[{"id":"top_level::dashboard","manipulations":[],"children":[]},{"id":"content::collections::posts","manipulations":{"action":"@alias"},"children":[]},{"id":"tools::updates","manipulations":{"action":"@move"},"children":[]},{"id":"new_top_level_item","manipulations":{"action":"@create","display":"New Top Level Item","url":"\/new-top-level-item"},"children":[{"id":"new_child_item","manipulations":{"action":"@create","display":"New Child Item","url":"\/new-child-item"},"children":[]}]}]},{"display":"Fields","display_original":"Fields","action":false,"items":[{"id":"fields::blueprints","manipulations":{"display":"Blueprints Renamed","action":"@modify"},"children":[]},{"id":"fields::fieldsets","manipulations":[],"children":[]}]},{"display":"Content Renamed","display_original":"Content","action":false,"items":[{"id":"content::collections::pages","manipulations":{"action":"@move"},"children":[]},{"id":"content::collections","manipulations":{"action":"@modify"},"children":[{"id":"content::collections::posts","manipulations":{"display":"Posterinos","action":"@modify"},"children":[]}]},{"id":"content::navigation","manipulations":[],"children":[{"id":"content::navigation::nav_test","manipulations":[],"children":[]}]},{"id":"content::taxonomies","manipulations":[],"children":[]},{"id":"content::assets","manipulations":[],"children":[{"id":"content::assets::assets","manipulations":[],"children":[]},{"id":"content::assets::essthree","manipulations":[],"children":[]}]}]},{"display":"Custom Section","display_original":"Custom Section","action":"@create","items":[{"id":"custom_section::new_item","manipulations":{"action":"@create","display":"New Item","url":"\/new-item"},"children":[]},{"id":"content::taxonomies::tags","manipulations":{"action":"@move"},"children":[]},{"id":"content::globals","manipulations":{"action":"@move"},"children":[{"id":"content::globals::global","manipulations":[],"children":[]}]}]},{"display":"Tools","display_original":"Tools","action":false,"items":[{"id":"tools::forms","manipulations":[],"children":[{"id":"tools::forms::test","manipulations":[],"children":[]}]},{"id":"tools::addons","manipulations":[],"children":[]},{"id":"tools::utilities","manipulations":[],"children":[{"id":"tools::utilities::cache","manipulations":[],"children":[]},{"id":"tools::utilities::email","manipulations":[],"children":[]},{"id":"tools::utilities::licensing","manipulations":[],"children":[]},{"id":"tools::utilities::php_info","manipulations":[],"children":[]},{"id":"tools::utilities::search","manipulations":[],"children":[]}]}]},{"display":"Users","display_original":"Users","action":false,"items":[{"id":"users::users","manipulations":[],"children":[]},{"id":"users::groups","manipulations":[],"children":[]},{"id":"users::permissions","manipulations":[],"children":[{"id":"users::permissions::author","manipulations":[],"children":[]},{"id":"users::permissions::not_social_media_manager","manipulations":[],"children":[]},{"id":"users::permissions::social_media_manager","manipulations":[],"children":[]}]}]}]', true));

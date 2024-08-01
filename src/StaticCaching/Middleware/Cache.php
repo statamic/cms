@@ -3,20 +3,21 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache as AppCache;
 use Illuminate\Support\Facades\Log;
-use Statamic\Facades\File;
+use Statamic\Facades\StaticCache;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
-use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\NoLock;
-use Symfony\Component\Lock\Store\FlockStore;
+use Statamic\StaticCaching\ResponseStatus;
 
 class Cache
 {
@@ -29,6 +30,8 @@ class Cache
      * @var Session
      */
     protected $nocache;
+
+    private int $lockFor = 30;
 
     public function __construct(Cacher $cacher, Session $nocache)
     {
@@ -44,12 +47,6 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
-        $lock = $this->createLock($request);
-
-        while (! $lock->acquire()) {
-            sleep(1);
-        }
-
         try {
             if ($response = $this->attemptToGetCachedResponse($request)) {
                 return $response;
@@ -58,10 +55,17 @@ class Cache
             Log::debug("Static cache region [{$e->getRegion()}] not found on [{$request->fullUrl()}]. Serving uncached response.");
         }
 
+        $lock = $this->createLock($request);
+
+        return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
+    }
+
+    private function handleRequest($request, Closure $next)
+    {
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
-            $lock->acquire(true);
+            $this->copyError($request, $response);
 
             $this->makeReplacementsAndCacheResponse($request, $response);
 
@@ -73,6 +77,21 @@ class Cache
         return $response;
     }
 
+    private function copyError($request, $response)
+    {
+        $status = $response->getStatusCode();
+
+        if (! config('statamic.static_caching.share_errors')) {
+            return;
+        }
+
+        $request = Request::createFrom($request)->fakeStaticCacheStatus($status);
+
+        if (! $this->cacher->hasCachedPage($request)) {
+            $this->cacher->cachePage($request, $response);
+        }
+    }
+
     private function attemptToGetCachedResponse($request)
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
@@ -80,6 +99,8 @@ class Cache
             $response = $cachedPage->toResponse($request);
 
             $this->makeReplacements($response);
+
+            $response->setStaticCacheResponseStatus(ResponseStatus::HIT);
 
             return $response;
         }
@@ -139,7 +160,9 @@ class Cache
             return false;
         }
 
-        if ($response->getStatusCode() !== 200 || $response->getContent() == '') {
+        $statuses = $this->cacher instanceof ApplicationCacher ? [200, 404] : [200];
+
+        if (! in_array($response->getStatusCode(), $statuses) || $response->getContent() == '') {
             return false;
         }
 
@@ -150,18 +173,17 @@ class Cache
         return true;
     }
 
-    private function createLock($request)
+    private function createLock($request): Lock
     {
+        $key = 'static-cache-lock';
+
         if ($this->cacher instanceof NullCacher) {
-            return new NoLock;
+            $store = AppCache::store('null');
+        } else {
+            $store = StaticCache::cacheStore();
+            $key .= '-'.$this->cacher->getUrl($request);
         }
 
-        File::makeDirectory($dir = storage_path('statamic/static-caching-locks'));
-
-        $locks = new LockFactory(new FlockStore($dir));
-
-        $key = $this->cacher->getUrl($request);
-
-        return $locks->createLock($key, 30);
+        return $store->lock($key, $this->lockFor);
     }
 }

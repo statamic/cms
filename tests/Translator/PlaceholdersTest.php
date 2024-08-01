@@ -2,12 +2,13 @@
 
 namespace Tests\Translator;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Statamic\Translator\Placeholders;
 
 class PlaceholdersTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_adds_placeholders()
     {
         $this->assertEquals('foo <span class="notranslate">:bar</span>', $this->wrap('foo :bar'));
@@ -19,7 +20,7 @@ class PlaceholdersTest extends TestCase
         $this->assertEquals('<span class="notranslate">:foo</span> foo <span class="notranslate">:bar</span> bar', $this->wrap(':foo foo :bar bar'));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_placeholders()
     {
         $this->assertEquals('foo :bar', $this->unwrap('foo <span class="notranslate">:bar</span>'));

@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\TemplateFolder;
@@ -27,7 +28,7 @@ class TemplateFolderTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_a_list_of_directories()
     {
         $this->createFiles();

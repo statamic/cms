@@ -39,9 +39,9 @@
         "doctrine/dbal": "^3.6",
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
-        "laravel/pint": "^1.0",
+        "laravel/pint": "1.16.0",
         "mockery/mockery": "^1.3.3",
-        "orchestra/testbench": "^8.0 || ^9.0",
+        "orchestra/testbench": "^8.14 || ^9.0",
         "phpunit/phpunit": "^10.0"
     },
     "config": {

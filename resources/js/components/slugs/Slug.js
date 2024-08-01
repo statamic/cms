@@ -54,17 +54,36 @@ export default class Slug {
     }
 
     #createSynchronously() {
-        const custom = Statamic.$config.get(`charmap.${this.#language}`) ?? {};
+        const symbols = Statamic.$config.get('asciiReplaceExtraSymbols');
+        const charmap = Statamic.$config.get('charmap');
+        let custom = charmap[this.#language] ?? {};
         custom["'"] = ""; // Remove apostrophes in all languages
         custom["’"] = ""; // Remove smart single quotes
         custom[" - "] = " "; // Prevent `Block - Hero` turning into `block_-_hero`
+        custom['('] = ''; // Remove parentheses
+        custom[')'] = ''; // Remove parentheses
+        custom = symbols
+            ? this.#replaceCurrencySymbols(custom, charmap)
+            : this.#removeCurrencySymbols(custom, charmap);
 
         return speakingUrl(this.#string, {
             separator: this.#separator,
             lang: this.#language,
             custom,
-            symbols: Statamic.$config.get('asciiReplaceExtraSymbols')
+            symbols
         });
+    }
+
+    #replaceCurrencySymbols(custom, charmap) {
+        return { ...custom, ...charmap.currency };
+    }
+
+    #removeCurrencySymbols(custom, charmap) {
+        for (const key in charmap.currency_short) {
+            custom[key] = '';
+        }
+
+        return custom;
     }
 
     #createAsynchronously() {

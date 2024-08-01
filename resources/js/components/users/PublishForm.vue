@@ -6,10 +6,11 @@
             <breadcrumb :url="cp_url('users')" :title="__('Users')" />
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
-                    <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint">
-                        <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                    <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint || hasItemActions">
+                        <dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
                         <li class="divider" />
                         <data-list-inline-actions
+                            v-if="hasItemActions"
                             :item="values.id"
                             :url="itemActionUrl"
                             :actions="itemActions"

@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Form;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
 use Statamic\Statamic;
@@ -15,7 +16,7 @@ class FormCreateCustomDriverTest extends FormTestCase
         CustomDriver::register();
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_js_driver_in_form_data()
     {
         $this->assertStringContainsString(
@@ -24,7 +25,7 @@ class FormCreateCustomDriverTest extends FormTestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function custom_driver_can_add_to_form_data()
     {
         $output = $this->tag(<<<'EOT'
@@ -39,7 +40,7 @@ EOT
         $this->assertStringContainsString($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function custom_driver_can_add_to_form_attributes()
     {
         $output = $this->tag('{{ form:contact js="custom_driver" }}{{ /form:contact }}');
@@ -51,7 +52,7 @@ EOT
         $this->assertStringContainsString($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function custom_driver_can_add_to_renderable_field_data()
     {
         $output = $this->tag(<<<'EOT'
@@ -68,7 +69,7 @@ EOT
         $this->assertStringContainsString($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function custom_driver_can_add_to_renderable_field_attributes()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
@@ -84,7 +85,7 @@ EOT
         $this->assertStringContainsString($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_required_show_field_output_in_renderable_field_data()
     {
         CustomDriverWithoutShowField::register();
@@ -94,7 +95,7 @@ EOT
         $this->tag('{{ form:contact js="custom_driver_without_show_field" }}<span>{{ js_driver }}</span>{{ /form:contact }}');
     }
 
-    /** @test */
+    #[Test]
     public function custom_driver_get_show_field_js_in_dynamic_fields_array()
     {
         $output = $this->tag(<<<'EOT'
@@ -111,7 +112,7 @@ EOT
         $this->assertStringContainsString($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function custom_driver_get_show_field_js_at_top_level_for_when_hardcoding_field_html()
     {
         $output = $this->tag(<<<'EOT'
@@ -126,7 +127,7 @@ EOT
         $this->assertStringContainsString($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function custom_driver_can_render_component_around_form()
     {
         $output = $this->tag('{{ form:contact js="custom_driver" }}{{ /form:contact }}');
@@ -135,7 +136,7 @@ EOT
         $this->assertStringContainsString('</form></custom-form-wrapper-component>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_render_method_returns_html_var()
     {
         $this->expectExceptionMessage('JS driver requires [$html] to be returned in [render()] output!');
@@ -145,7 +146,7 @@ EOT
         $this->tag('{{ form:contact js="custom_driver_with_bad_render_method" }}{{ /form:contact }}');
     }
 
-    /** @test */
+    #[Test]
     public function custom_driver_can_get_initial_form_data()
     {
         $driver = new CustomDriver(Form::find('contact'));
@@ -162,7 +163,7 @@ EOT
         $this->assertEquals($expected, $initialData);
     }
 
-    /** @test */
+    #[Test]
     public function custom_driver_getting_initial_data_respects_old_data()
     {
         $this

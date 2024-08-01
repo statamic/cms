@@ -4,12 +4,13 @@ namespace Tests\Composer;
 
 use Facades\GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\Test;
 
 trait ChangelogTests
 {
     abstract protected function changelog();
 
-    /** @test */
+    #[Test]
     public function it_can_get_changelog_contents()
     {
         config(['statamic.cp.date_format' => 'Y: F jS']);
@@ -50,7 +51,7 @@ trait ChangelogTests
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_latest_release()
     {
         Client::shouldReceive('request')
