@@ -24,6 +24,7 @@ class BladeDirective
         }
 
         $view = $expression;
+
         $context = array_merge($data, $params);
 
         if (! Cache::isBeingUsedOnCurrentRoute()) {
