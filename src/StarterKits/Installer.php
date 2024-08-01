@@ -13,7 +13,6 @@ use Statamic\Console\NullConsole;
 use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
@@ -23,18 +22,22 @@ use function Laravel\Prompts\spin;
 
 final class Installer
 {
-    protected $package;
+    use Concerns\InteractsWithFilesystem;
+
+    public $package;
+    public $withConfig;
+    public $withoutDependencies;
+    public $force;
+    public $console;
+    public $usingSubProcess;
+
     protected $branch;
     protected $licenseManager;
     protected $files;
     protected $fromLocalRepo;
-    protected $withConfig;
-    protected $withoutDependencies;
     protected $withUser;
-    protected $usingSubProcess;
-    protected $force;
-    protected $console;
     protected $url;
+    protected $modules;
     protected $disableCleanup;
 
     /**
@@ -182,14 +185,12 @@ final class Installer
             ->prepareRepository()
             ->requireStarterKit()
             ->ensureConfig()
-            ->ensureExportPathsExist()
-            ->ensureCompatibleDependencies()
-            ->installFiles()
-            ->copyStarterKitConfig()
-            ->copyStarterKitHooks()
-            ->installDependencies()
+            ->instantiateModules()
+            ->installModules()
+            ->copyStarterKitConfig() // TODO handle modules
+            ->copyStarterKitHooks() // TODO handle modules
             ->makeSuperUser()
-            ->runPostInstallHook()
+            ->runPostInstallHooks() // TODO handle modules
             ->reticulateSplines()
             ->removeStarterKit()
             ->removeRepository()
@@ -318,79 +319,23 @@ final class Installer
         return $this;
     }
 
-    /**
-     * Ensure export paths exist.
-     *
-     * @return $this
-     *
-     * @throws StarterKitException
-     */
-    protected function ensureExportPathsExist()
+    protected function instantiateModules()
     {
-        $this
-            ->exportPaths()
-            ->reject(function ($path) {
-                return $this->files->exists($this->starterKitPath($path));
-            })
-            ->each(function ($path) {
-                throw new StarterKitException("Starter kit path [{$path}] does not exist.");
-            });
+        $topLevelConfigModule = $this->config()->except('modules');
+
+        $optionalModules = $this->config('modules');
+
+        $this->modules = collect([$topLevelConfigModule])
+            ->merge($optionalModules)
+            ->map(fn ($config) => new ModuleInstaller($config, $this))
+            ->each(fn ($module) => $module->validate());
 
         return $this;
     }
 
-    /**
-     * Ensure compatible dependencies by performing a dry-run.
-     *
-     * @return $this
-     */
-    protected function ensureCompatibleDependencies()
+    protected function installModules()
     {
-        if ($this->withoutDependencies || $this->force) {
-            return $this;
-        }
-
-        if ($packages = $this->installableDependencies('dependencies')) {
-            $this->ensureCanRequireDependencies($packages);
-        }
-
-        if ($packages = $this->installableDependencies('dependencies_dev')) {
-            $this->ensureCanRequireDependencies($packages, true);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Install starter kit files.
-     *
-     * @return $this
-     */
-    protected function installFiles()
-    {
-        $this->console->info('Installing files...');
-
-        $this->installableFiles()->each(function ($toPath, $fromPath) {
-            $this->copyFile($fromPath, $toPath);
-        });
-
-        return $this;
-    }
-
-    /**
-     * Copy starter kit file.
-     *
-     * @param  mixed  $fromPath
-     * @param  mixed  $toPath
-     * @return $this
-     */
-    protected function copyFile($fromPath, $toPath)
-    {
-        $displayPath = str_replace(Path::tidy(base_path().'/'), '', $toPath);
-
-        $this->console->line("Installing file [{$displayPath}]");
-
-        $this->files->copy($fromPath, $this->preparePath($toPath));
+        $this->modules->each(fn ($module) => $module->install());
 
         return $this;
     }
@@ -407,12 +352,12 @@ final class Installer
         }
 
         if ($this->withoutDependencies) {
-            return $this->copyFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'));
+            return $this->installFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'), $this->console);
         }
 
         $this->console->line('Installing file [starter-kit.yaml]');
 
-        $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        $config = $this->config();
 
         $dependencies = collect()
             ->merge($config->get('dependencies'))
@@ -446,77 +391,9 @@ final class Installer
 
         collect($hooks)
             ->filter(fn ($hook) => $this->files->exists($this->starterKitPath($hook)))
-            ->each(fn ($hook) => $this->copyFile($this->starterKitPath($hook), base_path($hook)));
+            ->each(fn ($hook) => $this->installFile($this->starterKitPath($hook), base_path($hook), $this->console));
 
         return $this;
-    }
-
-    /**
-     * Install starter kit dependencies.
-     *
-     * @return $this
-     */
-    protected function installDependencies()
-    {
-        if ($this->withoutDependencies) {
-            return $this;
-        }
-
-        if ($packages = $this->installableDependencies('dependencies')) {
-            $this->requireDependencies($packages);
-        }
-
-        if ($packages = $this->installableDependencies('dependencies_dev')) {
-            $this->requireDependencies($packages, true);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Ensure dependencies are installable by performing a dry-run.
-     *
-     * @param  array  $packages
-     * @param  bool  $dev
-     */
-    protected function ensureCanRequireDependencies($packages, $dev = false)
-    {
-        $requireMethod = $dev ? 'requireMultipleDev' : 'requireMultiple';
-
-        try {
-            Composer::withoutQueue()->throwOnFailure()->{$requireMethod}($packages, '--dry-run');
-        } catch (ProcessException $exception) {
-            $this->rollbackWithError('Cannot install due to dependency conflict.', $exception->getMessage());
-        }
-    }
-
-    /**
-     * Install starter kit dependency permanently into app.
-     *
-     * @param  array  $packages
-     * @param  bool  $dev
-     */
-    protected function requireDependencies($packages, $dev = false)
-    {
-        if ($dev) {
-            $this->console->info('Installing development dependencies...');
-        } else {
-            $this->console->info('Installing dependencies...');
-        }
-
-        $args = array_merge(['require'], $this->normalizePackagesArrayToRequireArgs($packages));
-
-        if ($dev) {
-            $args[] = '--dev';
-        }
-
-        try {
-            Composer::withoutQueue()->throwOnFailure()->runAndOperateOnOutput($args, function ($output) {
-                return $this->outputFromSymfonyProcess($output);
-            });
-        } catch (ProcessException $exception) {
-            $this->console->error('Error installing dependencies.');
-        }
     }
 
     /**
@@ -544,7 +421,7 @@ final class Installer
      *
      * @throws StarterKitException
      */
-    public function runPostInstallHook($throwExceptions = false)
+    public function runPostInstallHooks($throwExceptions = false)
     {
         $postInstallHook = Hook::find($this->starterKitPath('StarterKitPostInstall.php'));
 
@@ -728,7 +605,7 @@ EOT;
      *
      * @throws StarterKitException
      */
-    protected function rollbackWithError($error, $output = null)
+    public function rollbackWithError($error, $output = null)
     {
         $this
             ->removeStarterKit()
@@ -773,124 +650,6 @@ EOT;
     }
 
     /**
-     * Clean up symfony process output and output to cli.
-     *
-     * TODO: Move to trait and reuse in MakeAddon?
-     *
-     * @return string
-     */
-    private function outputFromSymfonyProcess(string $output)
-    {
-        // Remove terminal color codes.
-        $output = preg_replace('/\\e\[[0-9]+m/', '', $output);
-
-        // Remove new lines.
-        $output = preg_replace('/[\r\n]+$/', '', $output);
-
-        // If not a blank line, output to terminal.
-        if (! empty(trim($output))) {
-            $this->console->line($output);
-        }
-
-        return $output;
-    }
-
-    /**
-     * Get `export_paths` paths from config.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function exportPaths()
-    {
-        $config = YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml')));
-
-        return collect($config['export_paths'] ?? []);
-    }
-
-    /**
-     * Get `export_as` paths (to be renamed on install) from config.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function exportAsPaths()
-    {
-        $config = YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml')));
-
-        return collect($config['export_as'] ?? []);
-    }
-
-    /**
-     * Get installable files.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function installableFiles()
-    {
-        $installableFromExportPaths = $this
-            ->exportPaths()
-            ->flatMap(function ($path) {
-                return $this->expandConfigExportPaths($path);
-            });
-
-        $installableFromExportAsPaths = $this
-            ->exportAsPaths()
-            ->flip()
-            ->flatMap(function ($to, $from) {
-                return $this->expandConfigExportPaths($to, $from);
-            });
-
-        return collect()
-            ->merge($installableFromExportPaths)
-            ->merge($installableFromExportAsPaths);
-    }
-
-    /**
-     * Expand config export path to `[$from => $to]` array format, normalizing directories to files.
-     *
-     * @param  string  $to
-     * @param  string  $from
-     * @return \Illuminate\Support\Collection
-     */
-    protected function expandConfigExportPaths($to, $from = null)
-    {
-        $to = Path::tidy($this->starterKitPath($to));
-        $from = Path::tidy($from ? $this->starterKitPath($from) : $to);
-
-        $paths = collect([$from => $to]);
-
-        if ($this->files->isDirectory($from)) {
-            $paths = collect($this->files->allFiles($from))
-                ->map->getPathname()
-                ->mapWithKeys(function ($path) use ($from, $to) {
-                    return [$path => str_replace($from, $to, $path)];
-                });
-        }
-
-        return $paths->mapWithKeys(function ($to, $from) {
-            return [Path::tidy($from) => Path::tidy(str_replace("/vendor/{$this->package}", '', $to))];
-        });
-    }
-
-    /**
-     * Prepare path directory.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    protected function preparePath($path)
-    {
-        $directory = $this->files->isDirectory($path)
-            ? $path
-            : preg_replace('/(.*)\/[^\/]*/', '$1', Path::tidy($path));
-
-        if (! $this->files->exists($directory)) {
-            $this->files->makeDirectory($directory, 0755, true);
-        }
-
-        return Path::tidy($path);
-    }
-
-    /**
      * Get starter kit config.
      *
      * @return mixed
@@ -904,35 +663,5 @@ EOT;
         }
 
         return $config;
-    }
-
-    /**
-     * Get installable dependencies from appropriate require key in composer.json.
-     *
-     * @param  string  $configKey
-     * @return array
-     */
-    protected function installableDependencies($configKey)
-    {
-        return collect($this->config($configKey))->filter(function ($version, $package) {
-            return Str::contains($package, '/');
-        })->all();
-    }
-
-    /**
-     * Normalize packages array to require args, with version handling if `package => version` array structure is passed.
-     *
-     * @return array
-     */
-    private function normalizePackagesArrayToRequireArgs(array $packages)
-    {
-        return collect($packages)
-            ->map(function ($value, $key) {
-                return Str::contains($key, '/')
-                    ? "{$key}:{$value}"
-                    : "{$value}";
-            })
-            ->values()
-            ->all();
     }
 }
