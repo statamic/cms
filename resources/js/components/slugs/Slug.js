@@ -66,9 +66,7 @@ export default class Slug {
         custom["’"] = ""; // Remove smart single quotes
 
         if (this.#replacements) {
-            Object.entries(this.#replacements).forEach(([key, value]) => {
-                custom[key] = value;
-            });
+            Object.assign(custom, this.#replacements)
         }
 
         return speakingUrl(this.#string, {
