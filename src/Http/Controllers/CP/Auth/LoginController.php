@@ -101,9 +101,11 @@ class LoginController extends CpController
 
     public function redirectPath()
     {
+        $cp = cp_route('index');
         $referer = request('referer');
+        $referredFromCp = Str::startsWith($referer, $cp) && ! Str::startsWith($referer, $cp.'/auth/');
 
-        return Str::contains($referer, '/'.config('statamic.cp.route')) ? $referer : cp_route('index');
+        return $referredFromCp ? $referer : $cp;
     }
 
     protected function authenticated(Request $request, $user)
