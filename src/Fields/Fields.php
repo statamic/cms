@@ -264,6 +264,8 @@ class Fields
             $field->setConfig(array_merge($field->config(), $overrides));
         }
 
+        $field = clone $field;
+
         return $field
             ->setParent($this->parent)
             ->setParentField($this->parentField, $this->parentIndex)
@@ -300,8 +302,10 @@ class Fields
             }
 
             return $fields;
-        })->each(function ($field) {
-            $field
+        })->map(function ($field) {
+            $field = clone $field;
+
+            return $field
                 ->setParent($this->parent)
                 ->setParentField($this->parentField, $this->parentIndex);
         })->all();

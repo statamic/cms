@@ -1,5 +1,247 @@
 # Release Notes
 
+## 5.19.0 (2024-08-01)
+
+### What's new
+- Ability to set default table fieldtype data [#10540](https://github.com/statamic/cms/issues/10540) by @jackmcdade
+- Bring back select param on nav tag [#10226](https://github.com/statamic/cms/issues/10226) by @jasonvarga
+- Bring back select modifier [#10219](https://github.com/statamic/cms/issues/10219) by @jasonvarga
+- Add where_in modifier [#10529](https://github.com/statamic/cms/issues/10529) by @andjsch
+
+### What's fixed
+- Fix template & layout fields in Live Preview [#10542](https://github.com/statamic/cms/issues/10542) by @duncanmcclean
+- Minor dark mode adjustments [#10544](https://github.com/statamic/cms/issues/10544) by @heidkaemper
+- Copy moment file in translate generate [#10547](https://github.com/statamic/cms/issues/10547) by @peimn
+- Prevent parentheses and currencies in js slug [#10538](https://github.com/statamic/cms/issues/10538) by @jasonvarga
+- Use form submission query count instead of collection count [#10534](https://github.com/statamic/cms/issues/10534) by @dnwjn
+- Dutch translations [#10550](https://github.com/statamic/cms/issues/10550) by @FrankGREV
+- Persian translation [#10545](https://github.com/statamic/cms/issues/10545) by @peimn
+- Turkish translation [#10543](https://github.com/statamic/cms/issues/10543) by @peimn
+- French translations [#10539](https://github.com/statamic/cms/issues/10539) by @ebeauchamps
+
+
+
+## 5.18.0 (2024-07-30)
+
+### What's new
+- Dictionaries [#10380](https://github.com/statamic/cms/issues/10380) by @duncanmcclean
+- Make it possible to add to form configuration screen [#8491](https://github.com/statamic/cms/issues/8491) by @ryanmitchell
+
+### What's fixed
+- Avoid extending already-extended file cache store [#10526](https://github.com/statamic/cms/issues/10526) by @jasonvarga
+- Prevent error when redirecting to first asset container [#10521](https://github.com/statamic/cms/issues/10521) by @duncanmcclean
+- Percentage symbols get replaced with dashes in asset filenames [#10523](https://github.com/statamic/cms/issues/10523) by @vluijkx
+
+
+
+## 5.17.1 (2024-07-29)
+
+### What's fixed
+- BulkAugmentor handles iterables that don't have sequential numeric keys [#10512](https://github.com/statamic/cms/issues/10512) by @kingsven
+- Correct issue where search result supplemental data is not available [#10386](https://github.com/statamic/cms/issues/10386) by @JohnathonKoster
+- Prevent using `type` as a handle for fields in sets [#10507](https://github.com/statamic/cms/issues/10507) by @duncanmcclean
+- Fix button group and radio previews [#10501](https://github.com/statamic/cms/issues/10501) by @jacksleight
+- Add frontMatter method to docblock for Parse facade [#10509](https://github.com/statamic/cms/issues/10509) by @godismyjudge95
+- Don't enforce a query length on comb searches [#10496](https://github.com/statamic/cms/issues/10496) by @ryanmitchell
+- Fix the "Learn More" translation and link [#10497](https://github.com/statamic/cms/issues/10497) by @peimn
+- Remove metadata in EntriesTest [#10491](https://github.com/statamic/cms/issues/10491) by @ryanmitchell
+- Fix Date Picker dark mode bg color [#10499](https://github.com/statamic/cms/issues/10499) by @jackmcdade
+- Sync datetime dark mode with control panel [#10488](https://github.com/statamic/cms/issues/10488) by @peimn
+- Turkish translations [#10518](https://github.com/statamic/cms/issues/10518) by @peimn
+
+
+
+## 5.17.0 (2024-07-22)
+
+### What's new
+- Add hook to query on entries listing [#10479](https://github.com/statamic/cms/issues/10479) by @duncanmcclean
+- Ability to select entries from other sites [#9229](https://github.com/statamic/cms/issues/9229) by @aerni
+
+### What's fixed
+- Fix taxonomy routes on multi-site [#10398](https://github.com/statamic/cms/issues/10398) by @aerni
+- Only output terms in the current locale [#10433](https://github.com/statamic/cms/issues/10433) by @aerni
+- Replace characters in asset filename to ensure they are valid on Windows [#10423](https://github.com/statamic/cms/issues/10423) by @pc-pdx
+- Fix Table Fieldtype in dark mode [#10484](https://github.com/statamic/cms/issues/10484) by @duncanmcclean
+- Handle `required` fields when adding entries to nav [#10468](https://github.com/statamic/cms/issues/10468) by @duncanmcclean
+- Add dark mode to saving overlay on ChangePassword component [#10473](https://github.com/statamic/cms/issues/10473) by @martyf
+- Prevent showing selected items in relationship field dropdown mode with max items 1 [#10477](https://github.com/statamic/cms/issues/10477) by @jasonvarga
+- Persian translation [#10486](https://github.com/statamic/cms/issues/10486) by @peimn
+- German translations [#10480](https://github.com/statamic/cms/issues/10480) by @helloDanuk
+
+
+
+## 5.16.0 (2024-07-17)
+
+### What's new
+- Ability for relationship/entries fieldtype to add "hints" [#10447](https://github.com/statamic/cms/issues/10447) by @jasonvarga
+
+### What's fixed
+- Improve multisite fresh-run detection logic [#10469](https://github.com/statamic/cms/issues/10469) by @jesseleite
+- Clarify difference between `default()` and `getFallbackConfig()` site methods [#10470](https://github.com/statamic/cms/issues/10470) by @jesseleite
+
+
+
+## 5.15.0 (2024-07-17)
+
+### What's new
+- Ability to specify the queue connection for the static:warm command [#8634](https://github.com/statamic/cms/issues/8634) by @grantholle
+- Show "after saving" actions when revisions are enabled [#9357](https://github.com/statamic/cms/issues/9357) by @duncanmcclean
+- Add site events [#10460](https://github.com/statamic/cms/issues/10460) by @jesseleite
+- Add a bunch of various events [#10459](https://github.com/statamic/cms/issues/10459) by @duncanmcclean
+- Track sites.yaml path in git integration config [#10463](https://github.com/statamic/cms/issues/10463) by @jesseleite
+- Display custom logo as plain text [#10350](https://github.com/statamic/cms/issues/10350) by @daun
+- Make `config` available to live preview targets [#10443](https://github.com/statamic/cms/issues/10443) by @ryanmitchell
+- Make the `<?xml` tag allowed when using PHP short open tags [#10389](https://github.com/statamic/cms/issues/10389) by @JohnathonKoster
+- Radio Fieldtype gets custom button icons [#10453](https://github.com/statamic/cms/issues/10453) by @jackmcdade
+
+### What's fixed
+- Prevent double login causing 419 CSRF token mismatch [#10465](https://github.com/statamic/cms/issues/10465) by @jasonvarga
+- Refactor sites to allow eloquent storage [#10461](https://github.com/statamic/cms/issues/10461) by @ryanmitchell
+- Prevent redundant static:warm queued jobs [#10405](https://github.com/statamic/cms/issues/10405) by @robdekort
+- Prevent updating time fieldtype value if it hasn't changed [#10409](https://github.com/statamic/cms/issues/10409) by @duncanmcclean
+- Fix styling issues with the `save-button-options` component [#10464](https://github.com/statamic/cms/issues/10464) by @duncanmcclean
+- Allow using `value` as a field handle [#10462](https://github.com/statamic/cms/issues/10462) by @duncanmcclean
+- Use StaticCache facade in Cache Manager utility [#10456](https://github.com/statamic/cms/issues/10456) by @duncanmcclean
+- Add missing dark mode styles for license request failed warning [#10448](https://github.com/statamic/cms/issues/10448) by @heidkaemper
+- Hide data list pagination page links on collection widget [#10458](https://github.com/statamic/cms/issues/10458) by @jackmcdade
+- Fix select fieldtype disabled cursor [#10457](https://github.com/statamic/cms/issues/10457) by @jackmcdade
+- Fix Replicator Preview images being too tall [#10455](https://github.com/statamic/cms/issues/10455) by @jackmcdade
+- Make Blueprint Picker scrollable [#10454](https://github.com/statamic/cms/issues/10454) by @jackmcdade
+- Clean up reference updater localization mapping logic [#10446](https://github.com/statamic/cms/issues/10446) by @jesseleite
+- Reverse spaces in RTL [#10184](https://github.com/statamic/cms/issues/10184) by @peimn
+- Merge additional params after SVG sanitization [#10400](https://github.com/statamic/cms/issues/10400) by @heidkaemper
+- Fix files fieldtype [#10441](https://github.com/statamic/cms/issues/10441) by @duncanmcclean
+- Warm structure trees during static warm [#10412](https://github.com/statamic/cms/issues/10412) by @jasonvarga
+- Prevent dark mode gradient affecting custom logos [#10444](https://github.com/statamic/cms/issues/10444) by @duncanmcclean
+
+
+
+## 5.14.0 (2024-07-10)
+
+### What's new
+- Folders are now included in asset browser pagination rather than all being dumped at the top of the first page [#10419](https://github.com/statamic/cms/issues/10419) by @duncanmcclean
+- The Assets area of the CP no longer uses tabs. Each container gets their own page. [#10392](https://github.com/statamic/cms/issues/10392) by @duncanmcclean
+- Prevent incompatible pagination parameter combinations [#10415](https://github.com/statamic/cms/issues/10415) by @jesseleite
+- The static cache lock now uses actual cache locks so they can be customized [#10370](https://github.com/statamic/cms/issues/10370) by @jasonvarga
+
+### What's fixed
+- Tweak collection & form widgets border style in light mode [#10426](https://github.com/statamic/cms/issues/10426) by @rezbouchabou
+- Use `Create Revision` instead of `Publish` in form when missing publish permission [#10424](https://github.com/statamic/cms/issues/10424) by @edalzell
+- Fix toggle fields in data list filters [#10393](https://github.com/statamic/cms/issues/10393) by @duncanmcclean
+- Fix augmentable not resolved in transient values [#10417](https://github.com/statamic/cms/issues/10417) by @aerni
+- Open modal instead of immediate deletion on click [#10425](https://github.com/statamic/cms/issues/10425) by @justkidding96
+- Move updating from collection repo to entry repo [#10383](https://github.com/statamic/cms/issues/10383) by @jasonvarga
+- Change method visibility in `AbstractAugmented` class [#10414](https://github.com/statamic/cms/issues/10414) by @aerni
+- Allow for undefined file type in ContainerAssetsStore [#10374](https://github.com/statamic/cms/issues/10374) by @aerni
+- Fix updater widget icon in dark mode [#10394](https://github.com/statamic/cms/issues/10394) by @rezbouchabou
+- French translations [#10406](https://github.com/statamic/cms/issues/10406) by @ebeauchamps
+- Arabic translations [#10408](https://github.com/statamic/cms/issues/10408) by @rezbouchabou
+
+
+
+## 5.13.0 (2024-07-05)
+
+### What's new
+- Arabic translations [#10391](https://github.com/statamic/cms/issues/10391) by @rezbouchabou
+- Support operators in where modifier [#10377](https://github.com/statamic/cms/issues/10377) by @jacksleight
+
+### What's fixed
+- Fix list fieldtype rendering in listings [#10379](https://github.com/statamic/cms/issues/10379) by @ryanmitchell
+- Fix dirty state after entry action or revision publish [#10381](https://github.com/statamic/cms/issues/10381) by @jacksleight
+- Fix static:warm not working when using queues and auth together [#10395](https://github.com/statamic/cms/issues/10395) by @duncanmcclean
+- Fix CSS for dark mode CP login background [#10399](https://github.com/statamic/cms/issues/10399) by @heidkaemper
+- Add negative bottom margin to Textarea's character counter [#10390](https://github.com/statamic/cms/issues/10390) by @jackmcdade
+- Improve Asset Fieldtype Dark Mode UI [#10388](https://github.com/statamic/cms/issues/10388) by @jackmcdade
+- Rename "Delete" to "Remove" for clarity. [#10387](https://github.com/statamic/cms/issues/10387) by @jackmcdade
+- Refactor frontend formFailure to handle precognitive and fetch exceptions [#10376](https://github.com/statamic/cms/issues/10376) by @ryanmitchell
+- Fix unauthorized page logout redirect [#10378](https://github.com/statamic/cms/issues/10378) by @bensherred
+- Fix user filtering for role or group when using eloquent and a custom table name [#10358](https://github.com/statamic/cms/issues/10358) by @faltjo
+
+
+
+## 5.12.0 (2024-06-28)
+
+### What's new
+- Ability to disable CP authentication [#8960](https://github.com/statamic/cms/issues/8960) by @duncanmcclean
+- Add UI for listing field sortable config [#10259](https://github.com/statamic/cms/issues/10259) by @ryanmitchell
+
+### What's fixed
+- Localized entry dates fall back to the origin [#10282](https://github.com/statamic/cms/issues/10282) by @arthurperton
+- Support strings in `bard_text` & `bard_html` modifiers [#10369](https://github.com/statamic/cms/issues/10369) by @edalzell
+- Allow accessing drafts via the REST API with Live Preview [#10229](https://github.com/statamic/cms/issues/10229) by @duncanmcclean
+- Make Asset::clearCaches protected [#10342](https://github.com/statamic/cms/issues/10342) by @ryanmitchell
+- Fix HTML fieldtype [#10364](https://github.com/statamic/cms/issues/10364) by @jacksleight
+- French translations [#10366](https://github.com/statamic/cms/issues/10366) by @ebeauchamps
+- Clarify Statamic repository differences in README [#10368](https://github.com/statamic/cms/issues/10368) by @steveparks
+
+
+
+## 5.11.0 (2024-06-24)
+
+### What's new
+- Auto stache watcher setting [#10354](https://github.com/statamic/cms/issues/10354) by @jasonvarga
+- Allow configuring the Stache's Cache Store [#10303](https://github.com/statamic/cms/issues/10303) by @riasvdv
+
+### What's fixed
+- Custom file cache store adjustments [#10362](https://github.com/statamic/cms/issues/10362) by @jasonvarga
+- Hide "Restore Revision" button when user is missing relevant permissions [#10314](https://github.com/statamic/cms/issues/10314) by @duncanmcclean
+- Remove old logic from support details command [#10360](https://github.com/statamic/cms/issues/10360) by @jasonvarga
+- Resolve some deprecatation warnings [#10346](https://github.com/statamic/cms/issues/10346) by @martinoak
+- Move test suite from metadata to attributes [#10351](https://github.com/statamic/cms/issues/10351) by @ryanmitchell
+- Hide "Rename" and "Delete" options for default filter presets [#10320](https://github.com/statamic/cms/issues/10320) by @duncanmcclean
+
+
+
+## 5.10.0 (2024-06-20)
+
+### What's new
+- Add site `attribute` method [#10327](https://github.com/statamic/cms/issues/10327) by @ajnsn
+
+### What's fixed
+- Fix performance regression by caching fieldtype configs [#10325](https://github.com/statamic/cms/issues/10325) by @jasonvarga
+- CSS improvements [#10284](https://github.com/statamic/cms/issues/10284) by @martinoak
+- Fix broken revision links on unpublished entries [#10330](https://github.com/statamic/cms/issues/10330) by @faltjo
+- Update some translations [#10343](https://github.com/statamic/cms/issues/10343) by @jasonvarga
+- Fix linking to addon fields [#10324](https://github.com/statamic/cms/issues/10324) by @edalzell
+- Fix nocache tags on shared error pages [#10340](https://github.com/statamic/cms/issues/10340) by @jacksleight
+- Migrate from vue-countable [#10287](https://github.com/statamic/cms/issues/10287) by @Cannonb4ll
+- Prevent entries being selected when collapsing/expending entries in Tree View [#10322](https://github.com/statamic/cms/issues/10322) by @duncanmcclean
+- Ensure `install:broadcasting` is run when installing into Laravel 11 application [#10335](https://github.com/statamic/cms/issues/10335) by @duncanmcclean
+- French translations [#10337](https://github.com/statamic/cms/issues/10337) by @ebeauchamps
+
+
+
+## 5.9.0 (2024-06-19)
+
+### What's new
+- Static cache response statuses [#10334](https://github.com/statamic/cms/issues/10334) by @jasonvarga
+- Allow defining a store in the cache tag [#10318](https://github.com/statamic/cms/issues/10318) by @riasvdv
+
+### What's fixed
+- Prevent logging "remote: Processed 1 references in total" Git errors [#10332](https://github.com/statamic/cms/issues/10332) by @duncanmcclean
+- Fix "Reupload Asset" action [#10333](https://github.com/statamic/cms/issues/10333) by @duncanmcclean
+- Lock pint version [#10326](https://github.com/statamic/cms/issues/10326) by @jasonvarga
+- Split fieldsets out in install eloquent command [#10310](https://github.com/statamic/cms/issues/10310) by @ryanmitchell
+- Fix using `hook` as field name [#10319](https://github.com/statamic/cms/issues/10319) by @duncanmcclean
+- Bump braces from 3.0.2 to 3.0.3 [#10315](https://github.com/statamic/cms/issues/10315) by @dependabot
+- Bump ws from 8.13.0 to 8.17.1 [#10316](https://github.com/statamic/cms/issues/10316) by @dependabot
+
+
+
+## 5.8.0 (2024-06-17)
+
+### What's new
+- 404s get included in the full measure static cache [#10294](https://github.com/statamic/cms/issues/10294) by @jasonvarga
+- More Flat Camp quotes [#10307](https://github.com/statamic/cms/issues/10307) by @jackmcdade
+- Even more [#10288](https://github.com/statamic/cms/issues/10288) by @robdekort
+- And more still [#10300](https://github.com/statamic/cms/issues/10300) by @edalzell
+
+### What's fixed
+- Prevent additional augmented search result data from being lost [#10301](https://github.com/statamic/cms/issues/10301) by @JohnathonKoster
+- Fix nested field path prefixes [#10313](https://github.com/statamic/cms/issues/10313) by @jacksleight
+
+
+
 ## 5.7.3 (2024-06-13)
 
 ### What's fixed

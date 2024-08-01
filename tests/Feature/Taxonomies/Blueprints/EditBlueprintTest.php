@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Taxonomies\Blueprints;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Taxonomy;
 use Tests\FakesRoles;
@@ -13,7 +14,7 @@ class EditBlueprintTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -29,7 +30,7 @@ class EditBlueprintTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function it_provides_the_blueprint()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);

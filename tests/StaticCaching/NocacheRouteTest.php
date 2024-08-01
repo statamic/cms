@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\StaticCaching\NoCache\Session;
 use Tests\FakesContent;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -12,7 +13,7 @@ class NocacheRouteTest extends TestCase
     use FakesContent;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_nocache_regions_via_a_route()
     {
         // Use a tag that outputs something dynamic.

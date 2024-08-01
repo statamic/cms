@@ -1,11 +1,11 @@
 <template>
     <portal name="table-fullscreen" :disabled="!fullScreenMode" target-class="table-fieldtype">
-        <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white': fullScreenMode }">
-            <header class="bg-gray-200 border-b py-3 rtl:pr-3 ltr:pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
+        <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white dark:bg-dark-700': fullScreenMode }">
+            <header class="bg-gray-200 dark:bg-dark-550 border-b dark:border-dark-900 py-3 rtl:pr-3 ltr:pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
                 <h2 v-text="__(config.display)" />
                 <button class="btn-close absolute top-2 rtl:left-5 ltr:right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
             </header>
-            <section :class="{'p-4': fullScreenMode}">
+            <section :class="{'p-4 dark:bg-dark-700': fullScreenMode}">
                 <table class="table-fieldtype-table" v-if="rowCount">
                     <thead>
                         <tr>

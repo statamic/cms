@@ -4,6 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\Path;
@@ -35,7 +36,7 @@ class CollectionsStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_only_gets_top_level_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
@@ -58,7 +59,7 @@ class CollectionsStoreTest extends TestCase
         $this->assertTrue(file_exists($this->tempDir.'/top-level-non-yaml-file.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_collection_instances_from_files()
     {
         $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', 'title: Example');
@@ -68,7 +69,7 @@ class CollectionsStoreTest extends TestCase
         $this->assertEquals('Example', $item->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_normalizes_preview_target_url_into_format()
     {
         // it's just nicer to write "url" into yaml than "format".
@@ -89,7 +90,7 @@ YAML;
         ], $item->previewTargets()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_filename_as_the_item_key()
     {
         $this->assertEquals(
@@ -98,7 +99,7 @@ YAML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         $collection = CollectionAPI::make('new');

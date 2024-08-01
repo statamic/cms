@@ -4,6 +4,8 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Facades;
@@ -35,7 +37,7 @@ class AssetContainersStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
@@ -59,7 +61,7 @@ class AssetContainersStoreTest extends TestCase
         $this->assertTrue(file_exists($this->tempDir.'/three.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_asset_container_instances_from_files()
     {
         config(['filesystems.disks.test' => ['driver' => 'local', 'root' => __DIR__.'/../../Assets/__fixtures__/container']]);
@@ -93,7 +95,7 @@ EOL;
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_handle_as_the_item_key()
     {
         $this->assertEquals(
@@ -102,7 +104,7 @@ EOL;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         Facades\Stache::shouldReceive('store')
@@ -113,6 +115,8 @@ EOL;
         Facades\Stache::shouldReceive('shouldUpdateIndexes')->andReturnTrue();
         Facades\Stache::shouldReceive('duplicates')->andReturn(optional());
         Facades\Stache::shouldReceive('store')->with('users')->andReturn((new UsersStore((new Stache)->sites(['en']), app('files')))->directory($this->tempDir));
+        Facades\Stache::shouldReceive('isWatcherEnabled')->andReturnTrue();
+        Facades\Stache::shouldReceive('cacheStore')->andReturn(Cache::store());
 
         $container = Facades\AssetContainer::make('new')
             ->title('New Container');

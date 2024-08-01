@@ -60,7 +60,7 @@ button {
     }
 
     &.active, &.active:hover {
-        box-shadow: inset 2px 2px 3px 0px rgba(25,30,35,.1);
+        box-shadow: inset 2px 2px 3px 0 rgba(25,30,35,.1);
         background: theme('colors.gray.400');
         border-color: #aeb9c3 !important;
 
@@ -292,11 +292,11 @@ td .btn-icon {
 }
 
 .super-btn {
-    @apply p-4 flex items-start hover:bg-gray-200 border border-transparent rounded-md space-x-4;
+    @apply p-4 flex items-start hover:bg-gray-200 border border-transparent rounded-md space-x-4 rtl:space-x-reverse;
     @apply dark:hover:bg-dark-575 dark:hover:border-dark-400;
 
     svg {
-        @apply h-8 w-8 text-gray-800 dark:text-dark-175;
+        @apply h-8 w-8 text-gray-800 dark:text-dark-200;
     }
 
     h3 {
