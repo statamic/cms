@@ -21,19 +21,11 @@ class PreviewController extends CpController
 
         $fields = $data->blueprint()
             ->fields()
-            ->addValues($preview = $request->input('preview', []))
+            ->addValues($request->input('preview', []))
             ->process();
 
-        foreach (Arr::except($fields->values()->all(), ['slug', 'template', 'layout']) as $key => $value) {
+        foreach (Arr::except($fields->values()->all(), ['slug']) as $key => $value) {
             $data->setSupplement($key, $value);
-        }
-
-        if (isset($preview['template'])) {
-            $data->template($preview['template']);
-        }
-
-        if (isset($preview['layout'])) {
-            $data->layout($preview['layout']);
         }
 
         return $this->tokenizeAndReturn($request, $data);
