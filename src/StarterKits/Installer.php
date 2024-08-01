@@ -117,6 +117,12 @@ final class Installer
         return $this;
     }
 
+    /**
+     * Set interactive mode.
+     *
+     * @param  bool  $isInteractive
+     * @return $this
+     */
     public function isInteractive($isInteractive = false)
     {
         Prompt::interactive($isInteractive);
