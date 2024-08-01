@@ -1,5 +1,56 @@
 # Release Notes
 
+## 5.19.0 (2024-08-01)
+
+### What's new
+- Ability to set default table fieldtype data [#10540](https://github.com/statamic/cms/issues/10540) by @jackmcdade
+- Bring back select param on nav tag [#10226](https://github.com/statamic/cms/issues/10226) by @jasonvarga
+- Bring back select modifier [#10219](https://github.com/statamic/cms/issues/10219) by @jasonvarga
+- Add where_in modifier [#10529](https://github.com/statamic/cms/issues/10529) by @andjsch
+
+### What's fixed
+- Fix template & layout fields in Live Preview [#10542](https://github.com/statamic/cms/issues/10542) by @duncanmcclean
+- Minor dark mode adjustments [#10544](https://github.com/statamic/cms/issues/10544) by @heidkaemper
+- Copy moment file in translate generate [#10547](https://github.com/statamic/cms/issues/10547) by @peimn
+- Prevent parentheses and currencies in js slug [#10538](https://github.com/statamic/cms/issues/10538) by @jasonvarga
+- Use form submission query count instead of collection count [#10534](https://github.com/statamic/cms/issues/10534) by @dnwjn
+- Dutch translations [#10550](https://github.com/statamic/cms/issues/10550) by @FrankGREV
+- Persian translation [#10545](https://github.com/statamic/cms/issues/10545) by @peimn
+- Turkish translation [#10543](https://github.com/statamic/cms/issues/10543) by @peimn
+- French translations [#10539](https://github.com/statamic/cms/issues/10539) by @ebeauchamps
+
+
+
+## 5.18.0 (2024-07-30)
+
+### What's new
+- Dictionaries [#10380](https://github.com/statamic/cms/issues/10380) by @duncanmcclean
+- Make it possible to add to form configuration screen [#8491](https://github.com/statamic/cms/issues/8491) by @ryanmitchell
+
+### What's fixed
+- Avoid extending already-extended file cache store [#10526](https://github.com/statamic/cms/issues/10526) by @jasonvarga
+- Prevent error when redirecting to first asset container [#10521](https://github.com/statamic/cms/issues/10521) by @duncanmcclean
+- Percentage symbols get replaced with dashes in asset filenames [#10523](https://github.com/statamic/cms/issues/10523) by @vluijkx
+
+
+
+## 5.17.1 (2024-07-29)
+
+### What's fixed
+- BulkAugmentor handles iterables that don't have sequential numeric keys [#10512](https://github.com/statamic/cms/issues/10512) by @kingsven
+- Correct issue where search result supplemental data is not available [#10386](https://github.com/statamic/cms/issues/10386) by @JohnathonKoster
+- Prevent using `type` as a handle for fields in sets [#10507](https://github.com/statamic/cms/issues/10507) by @duncanmcclean
+- Fix button group and radio previews [#10501](https://github.com/statamic/cms/issues/10501) by @jacksleight
+- Add frontMatter method to docblock for Parse facade [#10509](https://github.com/statamic/cms/issues/10509) by @godismyjudge95
+- Don't enforce a query length on comb searches [#10496](https://github.com/statamic/cms/issues/10496) by @ryanmitchell
+- Fix the "Learn More" translation and link [#10497](https://github.com/statamic/cms/issues/10497) by @peimn
+- Remove metadata in EntriesTest [#10491](https://github.com/statamic/cms/issues/10491) by @ryanmitchell
+- Fix Date Picker dark mode bg color [#10499](https://github.com/statamic/cms/issues/10499) by @jackmcdade
+- Sync datetime dark mode with control panel [#10488](https://github.com/statamic/cms/issues/10488) by @peimn
+- Turkish translations [#10518](https://github.com/statamic/cms/issues/10518) by @peimn
+
+
+
 ## 5.17.0 (2024-07-22)
 
 ### What's new

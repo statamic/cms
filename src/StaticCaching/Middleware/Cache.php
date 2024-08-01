@@ -186,4 +186,9 @@ class Cache
 
         return $store->lock($key, $this->lockFor);
     }
+
+    public static function isBeingUsedOnCurrentRoute()
+    {
+        return in_array(static::class, app('router')->gatherRouteMiddleware(request()->route()));
+    }
 }
