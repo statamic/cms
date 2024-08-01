@@ -57,7 +57,7 @@ export default class Slug {
         const custom = Statamic.$config.get(`charmap.${this.#language}`) ?? {};
         custom["'"] = ""; // Remove apostrophes in all languages
         custom["’"] = ""; // Remove smart single quotes
-        custom['-'] = "_"; // Remove hyphens
+        custom[" - "] = " "; // Prevent `Block - Hero` turning into `block_-_hero`
 
         return speakingUrl(this.#string, {
             separator: this.#separator,
