@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes\Link;
 
+use Illuminate\Support\Arr;
 use Statamic\Fields\ArrayableString;
 
 class ArrayableLink extends ArrayableString
@@ -26,17 +27,14 @@ class ArrayableLink extends ArrayableString
 
     public function url()
     {
-        $value = $this->value;
-
-        if (is_object($this->value)) {
-            $extra = $this->extra();
-            if (in_array('select_across_sites', $extra) && $extra['select_across_sites']) {
-                $value = $this->value->absoluteUrl();
-            } else {
-                $value = $this->value?->url();
-            }
+        if (! is_object($this->value)) {
+            return $this->value;
         }
 
-        return $value;
+        if (Arr::get($this->extra(), 'select_across_sites')) {
+            return $this->value->absoluteUrl();
+        }
+
+        return $this->value?->url();
     }
 }

@@ -212,14 +212,14 @@ class Link extends Fieldtype
 
     private function availableSites()
     {
-        if (!Site::hasMultiple()) {
+        if (! Site::hasMultiple()) {
             return [];
         }
 
-        $configuredSites = collect($this->getConfiguredCollections())->flatMap(fn($collection) => \Statamic\Facades\Collection::find($collection)->sites());
+        $configuredSites = collect($this->getConfiguredCollections())->flatMap(fn ($collection) => \Statamic\Facades\Collection::find($collection)->sites());
 
         return Site::authorized()
-            ->when(isset($configuredSites), fn($sites) => $sites->filter(fn($site) => $configuredSites->contains($site->handle())))
+            ->when(isset($configuredSites), fn ($sites) => $sites->filter(fn ($site) => $configuredSites->contains($site->handle())))
             ->map->handle()
             ->values()
             ->all();
