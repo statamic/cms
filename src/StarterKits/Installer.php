@@ -48,7 +48,7 @@ final class Installer
 
         $this->licenseManager = $licenseManager;
 
-        $this->console = $console ?? new Nullconsole;
+        $this->console = $console ?? new NullConsole;
 
         $this->files = app(Filesystem::class);
     }
