@@ -26,6 +26,17 @@ class ArrayableLink extends ArrayableString
 
     public function url()
     {
-        return is_object($this->value) ? $this->value?->url() : $this->value;
+        $value = $this->value;
+
+        if (is_object($this->value)) {
+            $extra = $this->extra();
+            if (in_array('select_across_sites', $extra) && $extra['select_across_sites']) {
+                $value = $this->value->absoluteUrl();
+            } else {
+                $value = $this->value?->url();
+            }
+        }
+
+        return $value;
     }
 }
