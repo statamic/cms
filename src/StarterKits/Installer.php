@@ -185,6 +185,8 @@ final class Installer
             ->ensureExportPathsExist()
             ->ensureCompatibleDependencies()
             ->installFiles()
+            ->copyStarterKitConfig()
+            ->copyStarterKitHooks()
             ->installDependencies()
             ->makeSuperUser()
             ->runPostInstallHook()
@@ -372,11 +374,6 @@ final class Installer
             $this->copyFile($fromPath, $toPath);
         });
 
-        if ($this->withConfig) {
-            $this->copyStarterKitConfig();
-            $this->copyStarterKitHooks();
-        }
-
         return $this;
     }
 
@@ -385,6 +382,7 @@ final class Installer
      *
      * @param  mixed  $fromPath
      * @param  mixed  $toPath
+     * @return $this
      */
     protected function copyFile($fromPath, $toPath)
     {
@@ -393,15 +391,19 @@ final class Installer
         $this->console->line("Installing file [{$displayPath}]");
 
         $this->files->copy($fromPath, $this->preparePath($toPath));
+
+        return $this;
     }
 
     /**
      * Copy starter kit config without versions, to encourage dependency management using composer.
+     *
+     * @return $this
      */
     protected function copyStarterKitConfig()
     {
         if (! $this->withConfig) {
-            return;
+            return $this;
         }
 
         if ($this->withoutDependencies) {
@@ -425,15 +427,19 @@ final class Installer
         }
 
         $this->files->put(base_path('starter-kit.yaml'), YAML::dump($config->all()));
+
+        return $this;
     }
 
     /**
      * Copy starter kit hook scripts.
+     *
+     * @return $this
      */
     protected function copyStarterKitHooks()
     {
         if (! $this->withConfig) {
-            return;
+            return $this;
         }
 
         $hooks = ['StarterKitPostInstall.php'];
@@ -441,6 +447,8 @@ final class Installer
         collect($hooks)
             ->filter(fn ($hook) => $this->files->exists($this->starterKitPath($hook)))
             ->each(fn ($hook) => $this->copyFile($this->starterKitPath($hook), base_path($hook)));
+
+        return $this;
     }
 
     /**
