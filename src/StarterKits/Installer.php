@@ -6,7 +6,6 @@ use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Console\Command;
-use Illuminate\Console\View\Components\Line;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Laravel\Prompts\Prompt;
