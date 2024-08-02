@@ -13,28 +13,29 @@ use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\YAML;
+use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\spin;
 
 final class Installer
 {
-    use Concerns\InteractsWithFilesystem;
+    use FluentlyGetsAndSets, InteractsWithFilesystem;
 
-    public $package;
-    public $withConfig;
-    public $withoutDependencies;
-    public $force;
-    public $console;
-    public $usingSubProcess;
-
+    protected $package;
     protected $branch;
     protected $licenseManager;
     protected $files;
     protected $fromLocalRepo;
+    protected $withConfig;
+    protected $withoutDependencies;
     protected $withUserPrompt;
+    protected $usingSubProcess;
+    protected $force;
+    protected $console;
     protected $url;
     protected $modules;
     protected $disableCleanup;
@@ -54,81 +55,85 @@ final class Installer
     }
 
     /**
-     * Instantiate starter kit installer.
+     * Get or set whether to install from specific branch.
      */
-    public static function package(string $package, ?Command $console = null, ?LicenseManager $licenseManager = null): self
+    public function branch(?string $branch = null): self|bool
     {
-        return new self($package, $console, $licenseManager);
-    }
-
-    /**
-     * Install from specific branch.
-     */
-    public function branch(?string $branch = null): self
-    {
-        $this->branch = $branch;
+        return $this->fluentlyGetOrSet('branch')->args(func_get_args());
 
         return $this;
     }
 
     /**
-     * Install from local repo configured in composer config.json.
+     * Get or set whether to install from local repo configured in composer config.json.
      */
-    public function fromLocalRepo(bool $fromLocalRepo = false): self
+    public function fromLocalRepo(bool $fromLocalRepo = false): self|bool
     {
-        $this->fromLocalRepo = $fromLocalRepo;
+        return $this->fluentlyGetOrSet('fromLocalRepo')->args(func_get_args());
 
         return $this;
     }
 
     /**
-     * Install with starter-kit config for local development purposes.
+     * Get or set whether to install with starter-kit config for local development purposes.
      */
-    public function withConfig(bool $withConfig = false): self
+    public function withConfig(bool $withConfig = false): self|bool
     {
-        $this->withConfig = $withConfig;
+        return $this->fluentlyGetOrSet('withConfig')->args(func_get_args());
 
         return $this;
     }
 
     /**
-     * Install without dependencies.
+     * Get or set whether to install without dependencies.
      */
-    public function withoutDependencies(bool $withoutDependencies = false): self
+    public function withoutDependencies(?bool $withoutDependencies = false): self|bool
     {
-        $this->withoutDependencies = $withoutDependencies;
+        return $this->fluentlyGetOrSet('withoutDependencies')->args(func_get_args());
+    }
+
+    /**
+     * Get or set whether to install with super user prompt.
+     */
+    public function withUserPrompt(bool $withUserPrompt = false): self|bool
+    {
+        return $this->fluentlyGetOrSet('withUserPrompt')->args(func_get_args());
 
         return $this;
     }
 
     /**
-     * Install with super user prompt.
+     * Get or set whether to install using sub-process.
      */
-    public function withUserPrompt(bool $withUserPrompt = false): self
+    public function usingSubProcess(bool $usingSubProcess = false): self|bool
     {
-        $this->withUserPrompt = $withUserPrompt;
+        return $this->fluentlyGetOrSet('usingSubProcess')->args(func_get_args());
 
         return $this;
     }
 
     /**
-     * Install using sub-process.
+     * Get or set whether to force install and allow dependency errors.
      */
-    public function usingSubProcess(bool $usingSubProcess = false): self
+    public function force(bool $force = false): self|bool
     {
-        $this->usingSubProcess = $usingSubProcess;
-
-        return $this;
+        return $this->fluentlyGetOrSet('force')->args(func_get_args());
     }
 
     /**
-     * Force install and allow dependency errors.
+     * Get starter kit package.
      */
-    public function force(bool $force = false): self
+    public function package(): string
     {
-        $this->force = $force;
+        return $this->package;
+    }
 
-        return $this;
+    /**
+     * Get console command instance.
+     */
+    public function console(): Command|NullConsole
+    {
+        return $this->console;
     }
 
     /**
@@ -306,7 +311,7 @@ final class Installer
         }
 
         if ($this->withoutDependencies) {
-            return $this->installFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'), $this->console);
+            return $this->installFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'), $this->console());
         }
 
         $this->console->line('Installing file [starter-kit.yaml]');
@@ -343,7 +348,7 @@ final class Installer
 
         collect($hooks)
             ->filter(fn ($hook) => $this->files->exists($this->starterKitPath($hook)))
-            ->each(fn ($hook) => $this->installFile($this->starterKitPath($hook), base_path($hook), $this->console));
+            ->each(fn ($hook) => $this->installFile($this->starterKitPath($hook), base_path($hook), $this->console()));
 
         return $this;
     }

@@ -61,7 +61,7 @@ class StarterKitInstall extends Command
             $this->clearSite();
         }
 
-        $installer = StarterKitInstaller::package($package, $this, $licenseManager)
+        $installer = (new StarterKitInstaller($package, $this, $licenseManager))
             ->branch($branch)
             ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))

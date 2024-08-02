@@ -53,10 +53,10 @@ final class Module
      */
     protected function installFiles(): self
     {
-        $this->installer->console->info('Installing files...');
+        $this->installer->console()->info('Installing files...');
 
         $this->installableFiles()->each(function ($toPath, $fromPath) {
-            $this->installFile($fromPath, $toPath, $this->installer->console);
+            $this->installFile($fromPath, $toPath, $this->installer->console());
         });
 
         return $this;
@@ -67,7 +67,7 @@ final class Module
      */
     protected function installDependencies(): self
     {
-        if ($this->installer->withoutDependencies) {
+        if ($this->installer->withoutDependencies()) {
             return $this;
         }
 
@@ -136,8 +136,10 @@ final class Module
                 ]);
         }
 
+        $package = $this->installer->package();
+
         return $paths->mapWithKeys(fn ($to, $from) => [
-            Path::tidy($from) => Path::tidy(str_replace("/vendor/{$this->installer->package}", '', $to)),
+            Path::tidy($from) => Path::tidy(str_replace("/vendor/{$package}", '', $to)),
         ]);
     }
 
@@ -147,9 +149,9 @@ final class Module
     protected function requireDependencies(array $packages, bool $dev = false): void
     {
         if ($dev) {
-            $this->installer->console->info('Installing development dependencies...');
+            $this->installer->console()->info('Installing development dependencies...');
         } else {
-            $this->installer->console->info('Installing dependencies...');
+            $this->installer->console()->info('Installing dependencies...');
         }
 
         $args = array_merge(['require'], $this->normalizePackagesArrayToRequireArgs($packages));
@@ -163,7 +165,7 @@ final class Module
                 return $this->outputFromSymfonyProcess($output);
             });
         } catch (ProcessException $exception) {
-            $this->installer->console->error('Error installing dependencies.');
+            $this->installer->console()->error('Error installing dependencies.');
         }
     }
 
@@ -180,7 +182,7 @@ final class Module
 
         // If not a blank line, output to terminal.
         if (! empty(trim($output))) {
-            $this->installer->console->line($output);
+            $this->installer->console()->line($output);
         }
 
         return $output;
@@ -218,7 +220,7 @@ final class Module
      */
     protected function ensureCompatibleDependencies(): self
     {
-        if ($this->installer->withoutDependencies || $this->installer->force) {
+        if ($this->installer->withoutDependencies() || $this->installer->force()) {
             return $this;
         }
 
@@ -267,7 +269,9 @@ final class Module
      */
     protected function starterKitPath(?string $path = null): string
     {
-        return collect([base_path("vendor/{$this->installer->package}"), $path])->filter()->implode('/');
+        $package = $this->installer->package();
+
+        return collect([base_path("vendor/{$package}"), $path])->filter()->implode('/');
     }
 
     /**
