@@ -6,7 +6,6 @@
         :separator="separator"
         :language="language"
         :async="config.async"
-        :replacements="config.replacements"
         @slugifying="syncing = true"
         @slugified="syncing = false"
         v-model="slug"

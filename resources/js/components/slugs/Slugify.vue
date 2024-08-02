@@ -21,15 +21,11 @@ export default {
         async: {
             type: Boolean,
             default: true
-        },
-        replacements: {
-            type: Object,
-            default: {},
-        },
+        }
     },
 
     data() {
-        let slugifier = this.$slug.in(this.language).separatedBy(this.separator).withReplacements(this.replacements);
+        let slugifier = this.$slug.in(this.language).separatedBy(this.separator);
         if (this.async) slugifier.async();
 
         return {

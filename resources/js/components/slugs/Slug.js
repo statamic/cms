@@ -5,7 +5,6 @@ export default class Slug {
     busy = false;
     #string;
     #separator = '-';
-    #replacements = {};
     #language;
     #debounced;
     #controller;
@@ -17,12 +16,6 @@ export default class Slug {
 
     separatedBy(separator) {
         if (separator) this.#separator = separator;
-
-        return this;
-    }
-
-    withReplacements(replacements) {
-        if (replacements) this.#replacements = replacements;
 
         return this;
     }
@@ -74,9 +67,7 @@ export default class Slug {
             ? this.#replaceCurrencySymbols(custom, charmap)
             : this.#removeCurrencySymbols(custom, charmap);
 
-        if (this.#replacements) {
-            Object.assign(custom, this.#replacements)
-        }
+        if (this.#separator !== '-') custom['-'] = this.#separator; // Replace dashes with custom separator
 
         return speakingUrl(this.#string, {
             separator: this.#separator,
@@ -115,8 +106,7 @@ export default class Slug {
         const payload = {
             string: this.#string,
             separator: this.#separator,
-            language: this.#language,
-            replacements: this.#replacements,
+            language: this.#language
         };
 
         if (this.#controller) this.#controller.abort();
