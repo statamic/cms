@@ -56,7 +56,7 @@ class StarterKitExport extends Command
     /**
      * Ask to stub out starter kit config.
      */
-    protected function askToStubStarterKitConfig()
+    protected function askToStubStarterKitConfig(): void
     {
         $stubPath = __DIR__.'/stubs/starter-kits/starter-kit.yaml.stub';
         $newPath = base_path($config = 'starter-kit.yaml');
@@ -75,10 +75,8 @@ class StarterKitExport extends Command
 
     /**
      * Get absolute path.
-     *
-     * @return string
      */
-    protected function getAbsolutePath()
+    protected function getAbsolutePath(): string
     {
         $path = $this->argument('path');
 
@@ -89,10 +87,8 @@ class StarterKitExport extends Command
 
     /**
      * Ask to create export path.
-     *
-     * @param  string  $path
      */
-    protected function askToCreateExportPath($path)
+    protected function askToCreateExportPath(string $path): void
     {
         if ($this->input->isInteractive()) {
             if (! confirm("Path [{$path}] does not exist. Would you like to create it now?", true)) {

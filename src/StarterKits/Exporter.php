@@ -3,6 +3,7 @@
 namespace Statamic\StarterKits;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
@@ -24,11 +25,9 @@ class Exporter
     /**
      * Export starter kit.
      *
-     * @param  string  $absolutePath
-     *
      * @throws StarterKitException
      */
-    public function export($absolutePath)
+    public function export(string $absolutePath): void
     {
         $this->exportPath = $absolutePath;
 
@@ -49,10 +48,8 @@ class Exporter
 
     /**
      * Export files and folders.
-     *
-     * @return $this
      */
-    protected function exportFiles()
+    protected function exportFiles(): self
     {
         $this
             ->exportPaths()
@@ -78,11 +75,9 @@ class Exporter
     /**
      * Ensure export path exists.
      *
-     * @param  string  $path
-     *
      * @throws StarterKitException
      */
-    protected function ensureExportPathExists($path)
+    protected function ensureExportPathExists(string $path)
     {
         if (! $this->files->exists(base_path($path))) {
             throw new StarterKitException("Export path [{$path}] does not exist.");
@@ -91,11 +86,8 @@ class Exporter
 
     /**
      * Copy path to new export path location.
-     *
-     * @param  string  $fromPath
-     * @param  string  $toPath
      */
-    protected function copyPath($fromPath, $toPath = null)
+    protected function copyPath(string $fromPath, ?string $toPath = null): void
     {
         $toPath = $toPath
             ? "{$this->exportPath}/{$toPath}"
@@ -112,11 +104,8 @@ class Exporter
 
     /**
      * Prepare path directory.
-     *
-     * @param  string  $fromPath
-     * @param  string  $toPath
      */
-    protected function preparePath($fromPath, $toPath)
+    protected function preparePath(string $fromPath, string $toPath): void
     {
         $directory = $this->files->isDirectory($fromPath)
             ? $toPath
@@ -129,10 +118,8 @@ class Exporter
 
     /**
      * Get starter kit config.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    protected function config()
+    protected function config(): Collection
     {
         return collect(YAML::parse($this->files->get(base_path('starter-kit.yaml'))));
     }
@@ -140,11 +127,9 @@ class Exporter
     /**
      * Get starter kit `export_paths` paths from config.
      *
-     * @return \Illuminate\Support\Collection
-     *
      * @throws StarterKitException
      */
-    protected function exportPaths()
+    protected function exportPaths(): Collection
     {
         $paths = collect($this->config()->get('export_paths'));
 
@@ -160,11 +145,9 @@ class Exporter
     /**
      * Get starter kit 'export_as' paths (to be renamed on export) from config.
      *
-     * @return \Illuminate\Support\Collection
-     *
      * @throws StarterKitException
      */
-    protected function exportAsPaths()
+    protected function exportAsPaths(): Collection
     {
         $paths = collect($this->config()->get('export_as'));
 
@@ -177,10 +160,8 @@ class Exporter
 
     /**
      * Export starter kit config.
-     *
-     * @return $this
      */
-    protected function exportConfig()
+    protected function exportConfig(): self
     {
         $config = $this->config();
 
@@ -193,10 +174,8 @@ class Exporter
 
     /**
      * Export starter kit hooks.
-     *
-     * @return $this
      */
-    protected function exportHooks()
+    protected function exportHooks(): self
     {
         $hooks = ['StarterKitPostInstall.php'];
 
@@ -209,11 +188,8 @@ class Exporter
 
     /**
      * Export dependencies from composer.json.
-     *
-     * @param  \Illuminate\Support\Collection  $config
-     * @return \Illuminate\Support\Collection
      */
-    protected function exportDependenciesFromComposerJson($config)
+    protected function exportDependenciesFromComposerJson(Collection $config): Collection
     {
         $exportableDependencies = $this->getExportableDependenciesFromConfig($config);
 
@@ -234,11 +210,8 @@ class Exporter
 
     /**
      * Get exportable dependencies without versions from config.
-     *
-     * @param  \Illuminate\Support\Collection  $config
-     * @return \Illuminate\Support\Collection
      */
-    protected function getExportableDependenciesFromConfig($config)
+    protected function getExportableDependenciesFromConfig(Collection $config): Collection
     {
         if ($this->hasDependenciesWithoutVersions($config)) {
             return collect($config->get('dependencies') ?? []);
@@ -252,11 +225,8 @@ class Exporter
 
     /**
      * Check if config has dependencies without versions.
-     *
-     * @param  \Illuminate\Support\Collection  $config
-     * @return bool
      */
-    protected function hasDependenciesWithoutVersions($config)
+    protected function hasDependenciesWithoutVersions(Collection $config): bool
     {
         if (! $config->has('dependencies')) {
             return false;
@@ -267,12 +237,8 @@ class Exporter
 
     /**
      * Export dependencies from composer.json using specific require key.
-     *
-     * @param  string  $requireKey
-     * @param  \Illuminate\Support\Collection  $exportableDependencies
-     * @return \Illuminate\Support\Collection
      */
-    protected function exportDependenciesFromComposerRequire($requireKey, $exportableDependencies)
+    protected function exportDependenciesFromComposerRequire(string $requireKey, Collection $exportableDependencies): mixed
     {
         $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
 
@@ -288,10 +254,8 @@ class Exporter
 
     /**
      * Export composer.json.
-     *
-     * @return $this
      */
-    protected function exportComposerJson()
+    protected function exportComposerJson(): self
     {
         $composerJson = $this->prepareComposerJsonFromStub()->all();
 
@@ -305,10 +269,8 @@ class Exporter
 
     /**
      * Prepare composer.json from stub.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    protected function prepareComposerJsonFromStub()
+    protected function prepareComposerJsonFromStub(): Collection
     {
         $stub = $this->getComposerJsonStub();
 
@@ -326,10 +288,8 @@ class Exporter
 
     /**
      * Get composer.json stub.
-     *
-     * @return string
      */
-    protected function getComposerJsonStub()
+    protected function getComposerJsonStub(): string
     {
         $stubPath = __DIR__.'/../Console/Commands/stubs/starter-kits/composer.json.stub';
 

@@ -42,10 +42,8 @@ final class Installer
 
     /**
      * Instantiate starter kit installer.
-     *
-     * @param  mixed  $console
      */
-    public function __construct(string $package, $console = null, ?LicenseManager $licenseManager = null)
+    public function __construct(string $package, ?Command $console = null, ?LicenseManager $licenseManager = null)
     {
         $this->package = $package;
 
@@ -58,22 +56,16 @@ final class Installer
 
     /**
      * Instantiate starter kit installer.
-     *
-     * @param  mixed  $console
-     * @return static
      */
-    public static function package(string $package, ?Command $console = null, ?LicenseManager $licenseManager = null)
+    public static function package(string $package, ?Command $console = null, ?LicenseManager $licenseManager = null): self
     {
         return new self($package, $console, $licenseManager);
     }
 
     /**
      * Install from specific branch.
-     *
-     * @param  string|null  $branch
-     * @return $this
      */
-    public function branch($branch = null)
+    public function branch(?string $branch = null): self
     {
         $this->branch = $branch;
 
@@ -82,11 +74,8 @@ final class Installer
 
     /**
      * Install from local repo configured in composer config.json.
-     *
-     * @param  bool  $fromLocalRepo
-     * @return $this
      */
-    public function fromLocalRepo($fromLocalRepo = false)
+    public function fromLocalRepo(bool $fromLocalRepo = false): self
     {
         $this->fromLocalRepo = $fromLocalRepo;
 
@@ -95,11 +84,8 @@ final class Installer
 
     /**
      * Install with starter-kit config for local development purposes.
-     *
-     * @param  bool  $withConfig
-     * @return $this
      */
-    public function withConfig($withConfig = false)
+    public function withConfig(bool $withConfig = false): self
     {
         $this->withConfig = $withConfig;
 
@@ -108,11 +94,8 @@ final class Installer
 
     /**
      * Install without dependencies.
-     *
-     * @param  bool  $withoutDependencies
-     * @return $this
      */
-    public function withoutDependencies($withoutDependencies = false)
+    public function withoutDependencies(bool $withoutDependencies = false): self
     {
         $this->withoutDependencies = $withoutDependencies;
 
@@ -120,12 +103,9 @@ final class Installer
     }
 
     /**
-     * Set interactive mode.
-     *
-     * @param  bool  $isInteractive
-     * @return $this
+     * Set interactive mode on Laravel Prompts.
      */
-    public function isInteractive($isInteractive = false)
+    public function isInteractive(bool $isInteractive = false): self
     {
         Prompt::interactive($isInteractive);
 
@@ -134,11 +114,8 @@ final class Installer
 
     /**
      * Install with super user.
-     *
-     * @param  bool  $withUser
-     * @return $this
      */
-    public function withUser($withUser = false)
+    public function withUser(bool $withUser = false): self
     {
         $this->withUser = $withUser;
 
@@ -147,11 +124,8 @@ final class Installer
 
     /**
      * Install using sub-process.
-     *
-     * @param  bool  $usingSubProcess
-     * @return $this
      */
-    public function usingSubProcess($usingSubProcess = false)
+    public function usingSubProcess(bool $usingSubProcess = false): self
     {
         $this->usingSubProcess = $usingSubProcess;
 
@@ -160,11 +134,8 @@ final class Installer
 
     /**
      * Force install and allow dependency errors.
-     *
-     * @param  bool  $force
-     * @return $this
      */
-    public function force($force = false)
+    public function force(bool $force = false): self
     {
         $this->force = $force;
 
@@ -176,7 +147,7 @@ final class Installer
      *
      * @throws StarterKitException
      */
-    public function install()
+    public function install(): void
     {
         $this
             ->validateLicense()
@@ -201,9 +172,9 @@ final class Installer
     /**
      * Check with license manager to determine whether or not to continue with installation.
      *
-     * @return $this
+     * @throws StarterKitException
      */
-    protected function validateLicense()
+    protected function validateLicense(): self
     {
         if (! $this->licenseManager->isValid()) {
             throw new StarterKitException;
@@ -214,10 +185,8 @@ final class Installer
 
     /**
      * Backup composer.json file.
-     *
-     * @return $this
      */
-    protected function backupComposerJson()
+    protected function backupComposerJson(): self
     {
         $this->files->copy(base_path('composer.json'), base_path('composer.json.bak'));
 
@@ -226,10 +195,8 @@ final class Installer
 
     /**
      * Detect repository url.
-     *
-     * @return $this
      */
-    protected function detectRepositoryUrl()
+    protected function detectRepositoryUrl(): self
     {
         if ($this->fromLocalRepo) {
             return $this;
@@ -252,10 +219,8 @@ final class Installer
 
     /**
      * Prepare repository.
-     *
-     * @return $this
      */
-    protected function prepareRepository()
+    protected function prepareRepository(): self
     {
         if ($this->fromLocalRepo || ! $this->url) {
             return $this;
@@ -280,10 +245,8 @@ final class Installer
 
     /**
      * Require starter kit dependency.
-     *
-     * @return $this
      */
-    protected function requireStarterKit()
+    protected function requireStarterKit(): self
     {
         spin(
             function () {
@@ -306,11 +269,9 @@ final class Installer
     /**
      * Ensure starter kit has config.
      *
-     * @return $this
-     *
      * @throws StarterKitException
      */
-    protected function ensureConfig()
+    protected function ensureConfig(): self
     {
         if (! $this->files->exists($this->starterKitPath('starter-kit.yaml'))) {
             throw new StarterKitException('Starter kit config [starter-kit.yaml] does not exist.');
@@ -319,7 +280,10 @@ final class Installer
         return $this;
     }
 
-    protected function instantiateModules()
+    /**
+     * Instantiate and validate modules.
+     */
+    protected function instantiateModules(): self
     {
         $topLevelConfigModule = $this->config()->except('modules');
 
@@ -333,7 +297,10 @@ final class Installer
         return $this;
     }
 
-    protected function installModules()
+    /**
+     * Install all the modules.
+     */
+    protected function installModules(): self
     {
         $this->modules->each(fn ($module) => $module->install());
 
@@ -342,10 +309,8 @@ final class Installer
 
     /**
      * Copy starter kit config without versions, to encourage dependency management using composer.
-     *
-     * @return $this
      */
-    protected function copyStarterKitConfig()
+    protected function copyStarterKitConfig(): self
     {
         if (! $this->withConfig) {
             return $this;
@@ -378,10 +343,8 @@ final class Installer
 
     /**
      * Copy starter kit hook scripts.
-     *
-     * @return $this
      */
-    protected function copyStarterKitHooks()
+    protected function copyStarterKitHooks(): self
     {
         if (! $this->withConfig) {
             return $this;
@@ -398,10 +361,8 @@ final class Installer
 
     /**
      * Make super user.
-     *
-     * @return $this
      */
-    public function makeSuperUser()
+    public function makeSuperUser(): self
     {
         if (! $this->withUser) {
             return $this;
@@ -417,11 +378,9 @@ final class Installer
     /**
      * Run post-install hook, if one exists in the starter kit.
      *
-     * @return $this
-     *
      * @throws StarterKitException
      */
-    public function runPostInstallHooks($throwExceptions = false)
+    public function runPostInstallHooks(bool $throwExceptions = false): self
     {
         $postInstallHook = Hook::find($this->starterKitPath('StarterKitPostInstall.php'));
 
@@ -448,10 +407,8 @@ final class Installer
 
     /**
      * Cache post install instructions for parent process (ie. statamic/cli installer).
-     *
-     * @return $this
      */
-    protected function cachePostInstallInstructions()
+    protected function cachePostInstallInstructions(): self
     {
         $path = $this->preparePath(storage_path('statamic/tmp/cli/post-install-instructions.txt'));
 
@@ -470,10 +427,8 @@ EOT;
 
     /**
      * Register starter kit installed command for post install hook.
-     *
-     * @param  string  $commandClass
      */
-    protected function registerInstalledCommand($commandClass)
+    protected function registerInstalledCommand(string $commandClass): void
     {
         $app = $this->console->getApplication();
 
@@ -489,11 +444,9 @@ EOT;
     }
 
     /**
-     * Reticulate splines.
-     *
-     * @return $this
+     * Reticulate splines, to prevent multiple Bézier curves from conjoining at the Maxis point of the starter kit install.
      */
-    protected function reticulateSplines()
+    protected function reticulateSplines(): self
     {
         spin(
             function () {
@@ -509,10 +462,8 @@ EOT;
 
     /**
      * Remove starter kit dependency.
-     *
-     * @return $this
      */
-    public function removeStarterKit()
+    public function removeStarterKit(): self
     {
         if ($this->disableCleanup) {
             return $this;
@@ -532,10 +483,8 @@ EOT;
 
     /**
      * Remove composer.json backup.
-     *
-     * @return $this
      */
-    protected function removeComposerJsonBackup()
+    protected function removeComposerJsonBackup(): self
     {
         $this->files->delete(base_path('composer.json.bak'));
 
@@ -544,10 +493,8 @@ EOT;
 
     /**
      * Complete starter kit install, expiring license key and/or incrementing install count.
-     *
-     * @return $this
      */
-    protected function completeInstall()
+    protected function completeInstall(): self
     {
         $this->licenseManager->completeInstall();
 
@@ -556,10 +503,8 @@ EOT;
 
     /**
      * Remove repository.
-     *
-     * @return $this
      */
-    protected function removeRepository()
+    protected function removeRepository(): self
     {
         if ($this->fromLocalRepo || ! $this->url) {
             return $this;
@@ -587,10 +532,8 @@ EOT;
 
     /**
      * Restore composer.json file.
-     *
-     * @return $this
      */
-    protected function restoreComposerJson()
+    protected function restoreComposerJson(): self
     {
         $this->files->copy(base_path('composer.json.bak'), base_path('composer.json'));
 
@@ -600,12 +543,9 @@ EOT;
     /**
      * Rollback with error.
      *
-     * @param  string  $error
-     * @param  string|null  $output
-     *
      * @throws StarterKitException
      */
-    public function rollbackWithError($error, $output = null)
+    public function rollbackWithError(string $error, ?string $output = null): void
     {
         $this
             ->removeStarterKit()
@@ -621,11 +561,8 @@ EOT;
 
     /**
      * Remove the `require [--dev] [--dry-run] [--prefer-source]...` stuff from the end of composer error output.
-     *
-     * @param  string  $output
-     * @return string
      */
-    protected function tidyComposerErrorOutput($output)
+    protected function tidyComposerErrorOutput(string $output): string
     {
         if (Str::contains($output, 'github.com') && Str::contains($output, ['access', 'permission', 'credential', 'authenticate'])) {
             return collect([
@@ -641,20 +578,16 @@ EOT;
 
     /**
      * Get starter kit vendor path.
-     *
-     * @return string
      */
-    protected function starterKitPath($path = null)
+    protected function starterKitPath(?string $path = null): string
     {
         return collect([base_path("vendor/{$this->package}"), $path])->filter()->implode('/');
     }
 
     /**
      * Get starter kit config.
-     *
-     * @return mixed
      */
-    protected function config($key = null)
+    protected function config(?string $key = null): mixed
     {
         $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
 

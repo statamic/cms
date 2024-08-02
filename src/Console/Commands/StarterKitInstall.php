@@ -93,10 +93,8 @@ class StarterKitInstall extends Command
 
     /**
      * Get composer package (and optional branch).
-     *
-     * @return string
      */
-    protected function getPackageAndBranch()
+    protected function getPackageAndBranch(): array
     {
         $package = $this->argument('package') ?: text('Package');
 
@@ -125,7 +123,10 @@ class StarterKitInstall extends Command
         return false;
     }
 
-    private function oldCliToolInstallationDetected()
+    /**
+     * Detect older Statamic CLI installation.
+     */
+    private function oldCliToolInstallationDetected(): bool
     {
         return (! $this->input->isInteractive()) // CLI tool never runs interactively.
             && (! $this->option('cli-install'))  // Updated CLI tool passes this option.

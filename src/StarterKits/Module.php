@@ -17,9 +17,7 @@ final class Module
     protected $files;
 
     /**
-     * Instantiate starter kit module installer.
-     *
-     * @return \Illuminate\Support\Collection
+     * Instantiate starter kit module.
      */
     public function __construct(protected Collection $config, protected Installer $installer)
     {
@@ -27,36 +25,11 @@ final class Module
     }
 
     /**
-     * Get module config.
-     *
-     * @param  string|null  $key
-     * @return \Illuminate\Support\Collection
-     */
-    protected function config($key = null)
-    {
-        if ($key) {
-            return $this->config->get($key);
-        }
-
-        return $this->config;
-    }
-
-    /**
-     * Get starter kit vendor path.
-     *
-     * @return string
-     */
-    protected function starterKitPath($path = null)
-    {
-        return collect([base_path("vendor/{$this->installer->package}"), $path])->filter()->implode('/');
-    }
-
-    /**
      * Validate starter kit module.
      *
      * @throws StarterKitException
      */
-    public function validate()
+    public function validate(): void
     {
         $this
             ->ensureExportPathsExist()
@@ -68,7 +41,7 @@ final class Module
      *
      * @throws StarterKitException
      */
-    public function install()
+    public function install(): void
     {
         $this
             ->installFiles()
@@ -77,10 +50,8 @@ final class Module
 
     /**
      * Install starter kit module files.
-     *
-     * @return $this
      */
-    protected function installFiles()
+    protected function installFiles(): self
     {
         $this->installer->console->info('Installing files...');
 
@@ -93,10 +64,8 @@ final class Module
 
     /**
      * Install starter kit module dependencies.
-     *
-     * @return $this
      */
-    protected function installDependencies()
+    protected function installDependencies(): self
     {
         if ($this->installer->withoutDependencies) {
             return $this;
@@ -115,10 +84,8 @@ final class Module
 
     /**
      * Get installable files.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    protected function installableFiles()
+    protected function installableFiles(): Collection
     {
         $installableFromExportPaths = $this
             ->exportPaths()
@@ -136,32 +103,24 @@ final class Module
 
     /**
      * Get `export_paths` paths from config.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    protected function exportPaths()
+    protected function exportPaths(): Collection
     {
         return collect($this->config('export_paths') ?? []);
     }
 
     /**
      * Get `export_as` paths (to be renamed on install) from config.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    protected function exportAsPaths()
+    protected function exportAsPaths(): Collection
     {
         return collect($this->config('export_as') ?? []);
     }
 
     /**
      * Expand config export path to `[$from => $to]` array format, normalizing directories to files.
-     *
-     * @param  string  $to
-     * @param  string  $from
-     * @return \Illuminate\Support\Collection
      */
-    protected function expandConfigExportPaths($to, $from = null)
+    protected function expandConfigExportPaths(string $to, ?string $from = null): Collection
     {
         $to = Path::tidy($this->starterKitPath($to));
         $from = Path::tidy($from ? $this->starterKitPath($from) : $to);
@@ -184,11 +143,8 @@ final class Module
 
     /**
      * Install dependency permanently into app.
-     *
-     * @param  array  $packages
-     * @param  bool  $dev
      */
-    protected function requireDependencies($packages, $dev = false)
+    protected function requireDependencies(array $packages, bool $dev = false): void
     {
         if ($dev) {
             $this->installer->console->info('Installing development dependencies...');
@@ -213,10 +169,8 @@ final class Module
 
     /**
      * Clean up symfony process output and output to cli.
-     *
-     * @return string
      */
-    protected function outputFromSymfonyProcess(string $output)
+    protected function outputFromSymfonyProcess(string $output): string
     {
         // Remove terminal color codes.
         $output = preg_replace('/\\e\[[0-9]+m/', '', $output);
@@ -234,11 +188,8 @@ final class Module
 
     /**
      * Get installable dependencies from appropriate require key in composer.json.
-     *
-     * @param  string  $configKey
-     * @return array
      */
-    protected function installableDependencies($configKey)
+    protected function installableDependencies(string $configKey): array
     {
         return collect($this->config($configKey))
             ->filter(fn ($version, $package) => Str::contains($package, '/'))
@@ -248,11 +199,9 @@ final class Module
     /**
      * Ensure export paths exist.
      *
-     * @return $this
-     *
      * @throws StarterKitException
      */
-    protected function ensureExportPathsExist()
+    protected function ensureExportPathsExist(): self
     {
         $this
             ->exportPaths()
@@ -266,10 +215,8 @@ final class Module
 
     /**
      * Ensure compatible dependencies by performing a dry-run.
-     *
-     * @return $this
      */
-    protected function ensureCompatibleDependencies()
+    protected function ensureCompatibleDependencies(): self
     {
         if ($this->installer->withoutDependencies || $this->installer->force) {
             return $this;
@@ -288,11 +235,8 @@ final class Module
 
     /**
      * Ensure dependencies are installable by performing a dry-run.
-     *
-     * @param  array  $packages
-     * @param  bool  $dev
      */
-    protected function ensureCanRequireDependencies($packages, $dev = false)
+    protected function ensureCanRequireDependencies(array $packages, bool $dev = false): void
     {
         $requireMethod = $dev ? 'requireMultipleDev' : 'requireMultiple';
 
@@ -305,10 +249,8 @@ final class Module
 
     /**
      * Normalize packages array to require args, with version handling if `package => version` array structure is passed.
-     *
-     * @return array
      */
-    protected function normalizePackagesArrayToRequireArgs(array $packages)
+    protected function normalizePackagesArrayToRequireArgs(array $packages): array
     {
         return collect($packages)
             ->map(function ($value, $key) {
@@ -318,5 +260,25 @@ final class Module
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * Get starter kit vendor path.
+     */
+    protected function starterKitPath(?string $path = null): string
+    {
+        return collect([base_path("vendor/{$this->installer->package}"), $path])->filter()->implode('/');
+    }
+
+    /**
+     * Get module config.
+     */
+    protected function config(?string $key = null): mixed
+    {
+        if ($key) {
+            return $this->config->get($key);
+        }
+
+        return $this->config;
     }
 }
