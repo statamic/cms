@@ -39,6 +39,7 @@
                 :can-delete="canDeleteRows"
                 :can-add-rows="canAddRows"
                 @updated="(row, value) => $emit('updated', row, value)"
+                @duplicate="(row) => $emit('duplicate', row)"
                 @meta-updated="$emit('meta-updated', row._id, $event)"
                 @removed="(row) => $emit('removed', row)"
                 @focus="$emit('focus')"
