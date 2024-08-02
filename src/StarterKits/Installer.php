@@ -15,10 +15,12 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\select;
 use function Laravel\Prompts\spin;
 
 final class Installer
@@ -275,20 +277,69 @@ final class Installer
     }
 
     /**
-     * Instantiate and validate modules.
+     * Instantiate and validate modules that are to be installed.
      */
     protected function instantiateModules(): self
     {
-        $topLevelConfigModule = $this->config()->except('modules');
+        $topLevelConfig = $this->config()->except('modules')->all();
 
-        $optionalModules = $this->config('modules');
+        $nestedConfigs = $this->config('modules');
 
-        $this->modules = collect([$topLevelConfigModule])
-            ->merge($optionalModules)
-            ->map(fn ($config) => new Module($config, $this))
+        $this->modules = collect(['top_level' => $topLevelConfig])
+            ->merge($nestedConfigs)
+            ->map(fn ($config, $key) => $this->instantiateModule($config, $key))
+            ->filter()
             ->each(fn ($module) => $module->validate());
 
         return $this;
+    }
+
+    /**
+     * Instantiate individual module.
+     */
+    protected function instantiateModule(array $config, string $key): Module|bool
+    {
+        $shouldPrompt = true;
+
+        if ($key === 'top_level') {
+            $shouldPrompt = false;
+        }
+
+        if (Arr::has($config, 'options')) {
+            return $this->instantiateOptionsModule($config, $key);
+        }
+
+        if (Arr::get($config, 'prompt') === false) {
+            $shouldPrompt = false;
+        }
+
+        if ($shouldPrompt && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$key}] module?"), false)) {
+            return false;
+        }
+
+        return new Module(collect($config), $this);
+    }
+
+    /**
+     * Instantiate individual module.
+     */
+    protected function instantiateOptionsModule(array $config, string $key): Module|bool
+    {
+        $options = collect($config['options'])
+            ->map(fn ($option, $key) => Arr::get($option, 'display', ucfirst($key)))
+            ->prepend(Arr::get($config, 'skip_display', 'No'), $skipModule = 'skip_module')
+            ->all();
+
+        $choice = select(
+            label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$key}] modules?"),
+            options: $options,
+        );
+
+        if ($choice === $skipModule) {
+            return false;
+        }
+
+        return new Module(collect($config['options'][$choice]), $this);
     }
 
     /**
