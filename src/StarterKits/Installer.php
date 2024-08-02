@@ -35,7 +35,7 @@ final class Installer
     protected $licenseManager;
     protected $files;
     protected $fromLocalRepo;
-    protected $withUser;
+    protected $withUserPrompt;
     protected $url;
     protected $modules;
     protected $disableCleanup;
@@ -113,11 +113,11 @@ final class Installer
     }
 
     /**
-     * Install with super user.
+     * Install with super user prompt.
      */
-    public function withUser(bool $withUser = false): self
+    public function withUserPrompt(bool $withUserPrompt = false): self
     {
-        $this->withUser = $withUser;
+        $this->withUserPrompt = $withUserPrompt;
 
         return $this;
     }
@@ -364,7 +364,7 @@ final class Installer
      */
     public function makeSuperUser(): self
     {
-        if (! $this->withUser) {
+        if (! $this->withUserPrompt) {
             return $this;
         }
 
