@@ -8,7 +8,6 @@ use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
-use Laravel\Prompts\Prompt;
 use Statamic\Console\NullConsole;
 use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
@@ -98,16 +97,6 @@ final class Installer
     public function withoutDependencies(bool $withoutDependencies = false): self
     {
         $this->withoutDependencies = $withoutDependencies;
-
-        return $this;
-    }
-
-    /**
-     * Set interactive mode on Laravel Prompts.
-     */
-    public function isInteractive(bool $isInteractive = false): self
-    {
-        Prompt::interactive($isInteractive);
 
         return $this;
     }

@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Laravel\Prompts\Prompt;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
@@ -56,8 +57,8 @@ class StarterKitInstall extends Command
             return;
         }
 
-        if ($cleared = $this->shouldClear()) {
-            $this->call('statamic:site:clear', ['--no-interaction' => true]);
+        if ($cleared = $this->shouldClearSite()) {
+            $this->clearSite();
         }
 
         $installer = StarterKitInstaller::package($package, $this, $licenseManager)
@@ -65,8 +66,7 @@ class StarterKitInstall extends Command
             ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
-            ->isInteractive($isInteractive = $this->input->isInteractive())
-            ->withUserPrompt($cleared && $isInteractive && ! $this->option('cli-install'))
+            ->withUserPrompt($cleared && $this->input->isInteractive() && ! $this->option('cli-install'))
             ->usingSubProcess($this->option('cli-install'))
             ->force($this->option('force'));
 
@@ -109,10 +109,8 @@ class StarterKitInstall extends Command
 
     /**
      * Check if should clear site first.
-     *
-     * @return bool
      */
-    protected function shouldClear()
+    protected function shouldClearSite(): bool
     {
         if ($this->option('clear-site')) {
             return true;
@@ -121,6 +119,18 @@ class StarterKitInstall extends Command
         }
 
         return false;
+    }
+
+    /**
+     * Clear site, and re-set prompt interactivity for future prompts.
+     *
+     * See: https://github.com/statamic/cli/issues/62
+     */
+    protected function clearSite(): void
+    {
+        $this->call('statamic:site:clear', ['--no-interaction' => true]);
+
+        Prompt::interactive($this->input->isInteractive());
     }
 
     /**
