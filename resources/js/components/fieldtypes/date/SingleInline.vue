@@ -21,7 +21,7 @@ export default {
     computed: {
 
         darkMode() {
-            return this.$preferences.get('theme') === 'dark'
+            return Statamic.darkMode;
         },
 
         pickerBindings() {
