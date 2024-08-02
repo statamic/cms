@@ -53,8 +53,6 @@ final class Module
      */
     protected function installFiles(): self
     {
-        $this->installer->console()->info('Installing files...');
-
         $this->installableFiles()->each(function ($toPath, $fromPath) {
             $this->installFile($fromPath, $toPath, $this->installer->console());
         });
@@ -148,12 +146,6 @@ final class Module
      */
     protected function requireDependencies(array $packages, bool $dev = false): void
     {
-        if ($dev) {
-            $this->installer->console()->info('Installing development dependencies...');
-        } else {
-            $this->installer->console()->info('Installing dependencies...');
-        }
-
         $args = array_merge(['require'], $this->normalizePackagesArrayToRequireArgs($packages));
 
         if ($dev) {

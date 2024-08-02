@@ -296,6 +296,8 @@ final class Installer
      */
     protected function installModules(): self
     {
+        $this->console->info('Installing starter kit...');
+
         $this->modules->each(fn ($module) => $module->install());
 
         return $this;
