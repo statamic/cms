@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'any.config.antlers' => "Bu sahənin məzmununda Antlers ayrıştırmasını aktiv edin.",
+    'any.config.antlers' => 'Bu sahənin məzmununda Antlers ayrıştırmasını aktiv edin.',
     'any.config.cast_booleans' => 'Doğru və yanlış dəyərləri olan seçimlər boolean olaraq saxlanacaq.',
     'any.config.mode' => 'Özünüzə uyğun UI stilini seçin.',
     'array.config.keys' => 'Massiv açarlarını (dəyişənləri) və isteğe bağlı etiketləri təyin edin.',
@@ -77,8 +77,8 @@ return [
     'date.title' => 'Tarix',
     'dictionary.config.dictionary' => 'Seçimləri almaq istədiyiniz lüğət.',
     'dictionary.file.config.filename' => 'Seçimlərinizi ehtiva edən fayl adı, `resources/dictionaries` qovluğuna nisbətən.',
-    'dictionary.file.config.label' => "Seçimlərin etiketlərini ehtiva edən açar. Varsayılan olaraq `label`'dir. Alternativ olaraq, Antlers istifadə edə bilərsiniz.",
-    'dictionary.file.config.value' => "Seçimlərin dəyərlərini ehtiva edən açar. Varsayılan olaraq `value`'dir.",
+    'dictionary.file.config.label' => 'Seçimlərin etiketlərini ehtiva edən açar. Varsayılan olaraq `label`\'dir. Alternativ olaraq, Antlers istifadə edə bilərsiniz.',
+    'dictionary.file.config.value' => 'Seçimlərin dəyərlərini ehtiva edən açar. Varsayılan olaraq `value`\'dir.',
     'entries.config.collections' => 'İstifadəçinin seçə biləcəyi kolleksiyaları seçin.',
     'entries.config.create' => 'Yeni girişlərin yaradılmasına icazə ver.',
     'entries.config.query_scopes' => 'Seçilə bilən girişləri alarkən tətbiq olunacaq sorgu əhatələrini seçin.',
