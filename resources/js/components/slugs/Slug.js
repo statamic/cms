@@ -56,6 +56,7 @@ export default class Slug {
     #createSynchronously() {
         const symbols = Statamic.$config.get('asciiReplaceExtraSymbols');
         const charmap = Statamic.$config.get('charmap');
+
         let custom = charmap[this.#language] ?? {};
         custom["'"] = ""; // Remove apostrophes in all languages
         custom["’"] = ""; // Remove smart single quotes
@@ -65,6 +66,8 @@ export default class Slug {
         custom = symbols
             ? this.#replaceCurrencySymbols(custom, charmap)
             : this.#removeCurrencySymbols(custom, charmap);
+
+        if (this.#separator !== '-') custom['-'] = this.#separator; // Replace dashes with custom separator
 
         return speakingUrl(this.#string, {
             separator: this.#separator,
