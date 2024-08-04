@@ -55,7 +55,6 @@
                                 @meta-updated="updateMeta(field.handle, $event)"
                                 @focus="$emit('focus')"
                                 @blur="$emit('blur')"
-                                class="p-4"
                             />
                         </div>
                     </div>
