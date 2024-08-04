@@ -21,7 +21,7 @@ import CheckboxesFieldtype from '../components/fieldtypes/CheckboxesFieldtype.vu
 import CodeFieldtype from '../components/fieldtypes/CodeFieldtype.vue';
 import Routes from '../components/collections/Routes.vue';
 import TitleFormats from '../components/collections/TitleFormats.vue';
-// import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
+import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
 import DateFieldtype from '../components/fieldtypes/DateFieldtype.vue';
 // import FieldDisplayFieldtype from '../components/fieldtypes/FieldDisplayFieldtype.vue';
 // import FieldsFieldtype from '../components/fieldtypes/grid/FieldsFieldtype.vue';
@@ -47,11 +47,11 @@ import RelationshipIndexFieldtype from '../components/fieldtypes/relationship/Re
 // import Replicator from '../components/fieldtypes/replicator/Replicator.vue';
 // import ReplicatorSet from '../components/fieldtypes/replicator/Set.vue';
 // import ReplicatorIndex from '../components/fieldtypes/replicator/ReplicatorIndex.vue';
-// import SectionFieldtype from '../components/fieldtypes/SectionFieldtype.vue';
+import SectionFieldtype from '../components/fieldtypes/SectionFieldtype.vue';
 import SelectFieldtype from '../components/fieldtypes/SelectFieldtype.vue';
 // import SetsFieldtype from '../components/fieldtypes/replicator/SetsFieldtype.vue';
 import TableFieldtype from '../components/fieldtypes/TableFieldtype.vue';
-// import TagsFieldtype from '../components/fieldtypes/TagsFieldtype.vue';
+import TagsFieldtype from '../components/fieldtypes/TagsFieldtype.vue';
 // import TagsIndexFieldtype from '../components/fieldtypes/TagsIndexFieldtype.vue';
 // import TemplateFolderFieldtype from '../components/fieldtypes/TemplateFolderFieldtype.vue';
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
@@ -59,7 +59,7 @@ import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue';
 // import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.vue';
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
-// @todo was already commented: import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue';
+import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue';
 // import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
 // import SetField from '../components/fieldtypes/replicator/Field.vue';
 
@@ -85,7 +85,7 @@ export default function registerFieldTypes(app) {
     app.component('code-fieldtype', CodeFieldtype);
     app.component('collection_routes-fieldtype', Routes);
     app.component('collection_title_formats-fieldtype', TitleFormats);
-    // app.component('color-fieldtype', ColorFieldtype);
+    app.component('color-fieldtype', ColorFieldtype);
     // app.component('date-fieldtype', DateFieldtype);
     // app.component('field_display-fieldtype', FieldDisplayFieldtype);
     // app.component('fields-fieldtype', FieldsFieldtype);
@@ -111,11 +111,11 @@ export default function registerFieldTypes(app) {
     // app.component('replicator-fieldtype', Replicator);
     // app.component('replicator-fieldtype-set', ReplicatorSet);
     // app.component('replicator-fieldtype-index', ReplicatorIndex);
-    // app.component('section-fieldtype', SectionFieldtype);
+    app.component('section-fieldtype', SectionFieldtype);
     app.component('select-fieldtype', SelectFieldtype);
     // app.component('sets-fieldtype', SetsFieldtype);
     app.component('table-fieldtype', TableFieldtype);
-    // app.component('tags-fieldtype', TagsFieldtype);
+    app.component('tags-fieldtype', TagsFieldtype);
     // app.component('tags-fieldtype-index', TagsIndexFieldtype);
     // app.component('taggable-fieldtype-index', TagsIndexFieldtype);
     // app.component('template_folder-fieldtype', TemplateFolderFieldtype);
@@ -124,7 +124,7 @@ export default function registerFieldTypes(app) {
     // app.component('toggle-fieldtype-index', ToggleIndexFieldtype);
     app.component('width-fieldtype', WidthFieldtype);
     app.component('video-fieldtype', VideoFieldtype);
-    // app.component('yaml-fieldtype', YamlFieldtype);
+    app.component('yaml-fieldtype', YamlFieldtype);
     // app.component('set-picker', SetPicker);
     // app.component('set-field', SetField);
     //

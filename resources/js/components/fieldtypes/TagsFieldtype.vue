@@ -12,11 +12,12 @@
         :select-on-key-codes="[9, 13, 188]"
         :taggable="true"
         :append-to-body="true"
-        :model-value="value"
+        :model-value="modelValue"
         :dropdown-should-open="({ open }) => open && config.options.length > 0"
         @update:model-value="update"
         @search:focus="$emit('focus')"
-        @search:blur="$emit('blur')">
+        @search:blur="$emit('blur')"
+    >
             <template #selected-option-container><i class="hidden"></i></template>
             <template #search="{ events, attributes }">
                 <input
@@ -41,7 +42,7 @@
                     @update:model-value="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="tag in value" :key="tag" class="vs__selected mt-2 sortable-item">
+                        <span v-for="tag in modelValue" :key="tag" class="vs__selected mt-2 sortable-item">
                             {{ tag }}
                             <button @click="deselect(tag)" type="button" :aria-label="__('Remove tag')" class="vs__deselect">
                                 <span>×</span>
@@ -60,17 +61,17 @@
 </style>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js'
 import { SortableList, SortableItem } from '../sortable/Sortable';
 
 export default {
+    mixins: [Fieldtype, HasInputOptions],
 
     components: {
         SortableList,
         SortableItem,
     },
-
-    mixins: [Fieldtype, HasInputOptions],
 
     methods: {
         focus() {
@@ -80,11 +81,10 @@ export default {
         onPaste(event) {
             const pastedValue = event.clipboardData.getData('text');
 
-            this.update([...this.value, ...pastedValue.split(',')]);
+            this.update([...this.modelValue, ...pastedValue.split(',')]);
 
             event.preventDefault();
         },
     },
-
 };
 </script>

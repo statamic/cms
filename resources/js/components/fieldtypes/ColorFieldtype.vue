@@ -11,8 +11,8 @@
                             <div class="inline-block cursor-pointer rounded m-0 p-[2px]">
                                 <div
                                     class="rounded-sm w-8 h-8"
-                                    :class="{ 'border dark:border-dark-900': !value, 'cursor-not-allowed': isReadOnly }"
-                                    :style="{ 'background-color': value }"
+                                    :class="{ 'border dark:border-dark-900': !modelValue, 'cursor-not-allowed': isReadOnly }"
+                                    :style="{ 'background-color': modelValue }"
                                 />
                             </div>
                         </div>
@@ -28,7 +28,7 @@
                                 @click="() => { update(swatch); closePopover(); }"
                             >
                                 <div
-                                    v-if="swatch === value"
+                                    v-if="swatch === modelValue"
                                     class="flex items-center justify-center h-full w-full"
                                 >
                                     <div class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center">
@@ -75,51 +75,39 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
+
 export default {
-
     mixins: [Fieldtype],
-
     data () {
         return {
-            customColor: this.value
+            customColor: this.modelValue
         }
     },
-
     watch: {
-
-        value(value) {
+        modelValue(value) {
             this.customColor = value;
         },
-
     },
-
     computed: {
-
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return this.value
+            return this.modelValue
                 ? `<span class="little-dot" style="background-color:${this.value}"></span>`
                 : null;
         }
-
     },
-
     methods: {
-
         customColorSelected(event) {
             this.customColor = event.target.value;
         },
-
         commitCustomColor() {
             this.update(this.customColor);
         },
-
         resetColor() {
             this.update(null);
         },
-
     }
-
 };
 </script>

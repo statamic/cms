@@ -29,7 +29,7 @@ import IMask from 'imask';
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
+    emits: ['focus', 'blur'],
     mixins: [Fieldtype],
 
     props: {
@@ -53,7 +53,7 @@ export default {
     },
 
     watch: {
-        // We use this instead of v-model or :value because the mask library wants to be in control of the value.
+        // We use this instead of v-model or :model-value because the mask library wants to be in control of the value.
         inputValue(value) {
             this.mask.value = value;
         },
@@ -122,7 +122,8 @@ export default {
 
             let newValue = parts.join(':');
 
-            if (this.value !== newValue) this.update(newValue);
+            if (this.modelValue !== newValue) this.update(newValue);
+
             this.inputValue = newValue;
         },
 
