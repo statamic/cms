@@ -1,27 +1,32 @@
 <template>
     <div class="array-fieldtype-container">
-
         <div v-if="isSingle" class="flex items-center">
             <div class="input-group">
                 <div class="input-group-prepend flex items-center">
-                     <select class="bg-transparent appearance-none shadow-none outline-none border-0 text-sm" @input="setKey($event.target.value)">
+                     <select
+                         class="bg-transparent appearance-none shadow-none outline-none border-0 text-sm"
+                         @input="setKey($event.target.value)"
+                     >
                         <option
                             v-for="(element, index) in keyedData"
                             v-text="config.keys[element.key] || element.key"
                             :key="element._id"
                             :value="element.key"
-                            :selected="element.key === selectedKey" />
+                            :selected="element.key === selectedKey"
+                        />
                     </select>
+
                     <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-2 ltr:ml-2" />
                 </div>
-                    <input
-                        type="text"
-                        class="input-text"
-                        v-for="(element, index) in keyedData"
-                        :key="element._id"
-                        v-if="element.key === selectedKey"
-                        :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly"
-                    />
+
+                <input
+                    type="text"
+                    class="input-text"
+                    v-for="(element, index) in keyedData"
+                    :key="element._id"
+                    v-if="element.key === selectedKey"
+                    :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly"
+                />
             </div>
         </div>
 
@@ -86,8 +91,7 @@
                     :danger="true"
                     @confirm="deleteValue(deleting)"
                     @cancel="deleteCancelled"
-                >
-                </confirmation-modal>
+                ></confirmation-modal>
             </div>
         </template>
 
@@ -109,8 +113,8 @@ export default {
 
     data() {
         return {
-            data: this.objectToSortable(this.value || []),
-            selectedKey:  Object.keys(this.value)[0],
+            data: this.objectToSortable(this.modelValue || []),
+            selectedKey:  Object.keys(this.modelValue)[0],
             deleting: false
         }
     },
@@ -123,8 +127,9 @@ export default {
             }
         },
 
-        value(value) {
+        modelValue(value) {
             if (JSON.stringify(value) == JSON.stringify(this.sortableToObject(this.data))) return;
+
             this.data = this.objectToSortable(value);
         }
     },
@@ -173,7 +178,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return _.reduce(this.value, (carry, value, key) => {
+            return _.reduce(this.modelValue, (carry, value, key) => {
                 let str = `${key}: ${value}`;
                 if (carry) str = carry + ', ' + str;
                 return str;

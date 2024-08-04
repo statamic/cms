@@ -9,7 +9,7 @@ import RelationshipInput from '../components/inputs/relationship/RelationshipInp
 import TextFieldtype from '../components/fieldtypes/TextFieldtype.vue';
 import TextareaFieldtype from '../components/fieldtypes/TextareaFieldtype.vue';
 import SlugFieldtype from '../components/fieldtypes/SlugFieldtype.vue';
-// import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue';
+import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue';
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue';
 // import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 // import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
@@ -30,13 +30,13 @@ import FloatFieldtype from '../components/fieldtypes/FloatFieldtype.vue';
 // import Sites from '../components/globals/Sites.vue';
 import Grid from '../components/fieldtypes/grid/Grid.vue';
 // import GridIndex from '../components/fieldtypes/grid/GridIndex.vue';
-// import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
+import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
 import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue';
 import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
 import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
-// import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
+import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
 // import ListIndexFieldtype from '../components/fieldtypes/ListIndexFieldtype.vue';
 import MarkdownFieldtype from '../components/fieldtypes/markdown/MarkdownFieldtype.vue';
 // import MarkdownButtonsSettingFieldtype from '../components/fieldtypes/markdown/MarkdownButtonsSettingFieldtype.vue';
@@ -50,7 +50,7 @@ import RelationshipIndexFieldtype from '../components/fieldtypes/relationship/Re
 // import SectionFieldtype from '../components/fieldtypes/SectionFieldtype.vue';
 import SelectFieldtype from '../components/fieldtypes/SelectFieldtype.vue';
 // import SetsFieldtype from '../components/fieldtypes/replicator/SetsFieldtype.vue';
-// import TableFieldtype from '../components/fieldtypes/TableFieldtype.vue';
+import TableFieldtype from '../components/fieldtypes/TableFieldtype.vue';
 // import TagsFieldtype from '../components/fieldtypes/TagsFieldtype.vue';
 // import TagsIndexFieldtype from '../components/fieldtypes/TagsIndexFieldtype.vue';
 // import TemplateFolderFieldtype from '../components/fieldtypes/TemplateFolderFieldtype.vue';
@@ -73,7 +73,7 @@ export default function registerFieldTypes(app) {
     app.component('textarea-fieldtype', TextareaFieldtype);
     app.component('slug-fieldtype', SlugFieldtype);
 
-    // app.component('array-fieldtype', ArrayFieldtype);
+    app.component('array-fieldtype', ArrayFieldtype);
     app.component('assets-fieldtype', AssetsFieldtype);
     // app.component('assets-fieldtype-index', AssetsIndexFieldtype);
     // app.component('asset_folder-fieldtype', AssetFolderFieldtype);
@@ -94,13 +94,13 @@ export default function registerFieldTypes(app) {
     // app.component('global_set_sites-fieldtype', Sites);
     app.component('grid-fieldtype', Grid);
     // app.component('grid-fieldtype-index', GridIndex);
-    // app.component('group-fieldtype', GroupFieldtype);
+    app.component('group-fieldtype', GroupFieldtype);
     // app.component('hidden-fieldtype', HiddenFieldtype);
     app.component('html-fieldtype', HtmlFieldtype);
     app.component('icon-fieldtype', IconFieldtype);
     app.component('integer-fieldtype', IntegerFieldtype);
     app.component('link-fieldtype', LinkFieldtype);
-    // app.component('list-fieldtype', ListFieldtype);
+    app.component('list-fieldtype', ListFieldtype);
     // app.component('list-fieldtype-index', ListIndexFieldtype);
     app.component('markdown-fieldtype', MarkdownFieldtype);
     // app.component('markdown_buttons_setting-fieldtype', MarkdownButtonsSettingFieldtype);
@@ -114,7 +114,7 @@ export default function registerFieldTypes(app) {
     // app.component('section-fieldtype', SectionFieldtype);
     app.component('select-fieldtype', SelectFieldtype);
     // app.component('sets-fieldtype', SetsFieldtype);
-    // app.component('table-fieldtype', TableFieldtype);
+    app.component('table-fieldtype', TableFieldtype);
     // app.component('tags-fieldtype', TagsFieldtype);
     // app.component('tags-fieldtype-index', TagsIndexFieldtype);
     // app.component('taggable-fieldtype-index', TagsIndexFieldtype);

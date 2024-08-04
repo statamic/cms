@@ -1,58 +1,60 @@
 <template>
+    <portal name="grid-fullscreen" :disabled="!fullScreenMode" :provide="provide">
+        <element-container @resized="containerWidth = $event.width">
+            <div
+                class="grid-fieldtype-container"
+                :class="{'grid-fullscreen bg-white dark:bg-dark-600': fullScreenMode }"
+            >
+                <template v-if="config.fullscreen || !config.hide_display">
+                    <header
+                        class="bg-gray-200 dark:bg-dark-550 border-b dark:border-dark-900 py-3 rtl:pr-3 ltr:pl-3 flex items-center justify-between relative"
+                        v-if="fullScreenMode"
+                    >
+                        <h2 v-text="__(config.display)" />
+                        <button
+                            class="btn-close absolute top-2 rtl:left-5 ltr:right-5" @click="fullScreenMode = false"
+                            :aria-label="__('Exit Fullscreen Mode')"
+                        >&times;</button>
+                    </header>
+                </template>
 
-<portal name="grid-fullscreen" :disabled="!fullScreenMode" :provide="provide">
+                <section :class="{'p-4': fullScreenMode}">
+                    <small v-if="hasExcessRows" class="help-block text-red-500">
+                        {{ __('Max Rows') }}: {{ maxRows }}
+                    </small>
+                    <small v-else-if="hasNotEnoughRows" class="help-block text-red-500">
+                        {{ __('Min Rows') }}: {{ minRows }}
+                    </small>
 
-    <element-container @resized="containerWidth = $event.width">
-    <div class="grid-fieldtype-container" :class="{'grid-fullscreen bg-white dark:bg-dark-600': fullScreenMode }">
+                    <component
+                        :is="component"
+                        :fields="fields"
+                        :rows="modelValue"
+                        :meta="meta.existing"
+                        :name="name"
+                        :can-delete-rows="canDeleteRows"
+                        :can-add-rows="canAddRows"
+                        :allow-fullscreen="config.fullscreen"
+                        :hide-display="config.hide_display"
+                        @updated="updated"
+                        @meta-updated="updateRowMeta"
+                        @removed="removed"
+                        @duplicate="duplicate"
+                        @sorted="sorted"
+                        @focus="focused = true"
+                        @blur="blurred"
+                    />
 
-        <template v-if="config.fullscreen || !config.hide_display">
-            <header class="bg-gray-200 dark:bg-dark-550 border-b dark:border-dark-900 py-3 rtl:pr-3 ltr:pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
-                <h2 v-text="__(config.display)" />
-                <button class="btn-close absolute top-2 rtl:left-5 ltr:right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
-            </header>
-        </template>
-
-        <section :class="{'p-4': fullScreenMode}">
-
-            <small v-if="hasExcessRows" class="help-block text-red-500">
-                {{ __('Max Rows') }}: {{ maxRows }}
-            </small>
-            <small v-else-if="hasNotEnoughRows" class="help-block text-red-500">
-                {{ __('Min Rows') }}: {{ minRows }}
-            </small>
-
-            <component
-                :is="component"
-                :fields="fields"
-                :rows="modelValue"
-                :meta="meta.existing"
-                :name="name"
-                :can-delete-rows="canDeleteRows"
-                :can-add-rows="canAddRows"
-                :allow-fullscreen="config.fullscreen"
-                :hide-display="config.hide_display"
-                @updated="updated"
-                @meta-updated="updateRowMeta"
-                @removed="removed"
-                @duplicate="duplicate"
-                @sorted="sorted"
-                @focus="focused = true"
-                @blur="blurred"
-            />
-
-            <button
-                class="btn"
-                v-if="canAddRows"
-                v-text="__(addRowButtonLabel)"
-                @click.prevent="addRow" />
-
-        </section>
-
-    </div>
-    </element-container>
-
-</portal>
-
+                    <button
+                        class="btn"
+                        v-if="canAddRows"
+                        v-text="__(addRowButtonLabel)"
+                        @click.prevent="addRow"
+                    />
+                </section>
+            </div>
+        </element-container>
+    </portal>
 </template>
 
 <script>
@@ -95,7 +97,7 @@ export default {
                 grid: this.makeGridProvide(),
                 storeName: this.storeName,
             },
-        }
+        };
     },
 
     inject: ['storeName'],
@@ -123,11 +125,11 @@ export default {
         },
 
         canAddRows() {
-            return ! this.isReadOnly && this.modelValue.length < this.maxRows;
+            return !this.isReadOnly && this.modelValue.length < this.maxRows;
         },
 
         canDeleteRows() {
-            return ! this.isReadOnly && this.modelValue.length > this.minRows;
+            return !this.isReadOnly && this.modelValue.length > this.minRows;
         },
 
         addRowButtonLabel() {
@@ -147,11 +149,11 @@ export default {
         },
 
         isReorderable() {
-            return !this.isReadOnly && this.config.reorderable && this.maxRows > 1
+            return !this.isReadOnly && this.config.reorderable && this.maxRows > 1;
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return `${__(this.config.display)}: ${__n(':count row|:count rows', this.modelValue.length)}`;
         }
@@ -206,7 +208,7 @@ export default {
         },
 
         removed(index) {
-            if (! confirm(__('Are you sure?'))) return;
+            if (!confirm(__('Are you sure?'))) return;
 
             this.update([
                 ...this.modelValue.slice(0, index),
@@ -260,5 +262,5 @@ export default {
 
     }
 
-}
+};
 </script>

@@ -5,14 +5,14 @@
         <relationship-select-field
             v-if="!initializing && usesSelectField"
             :config="config"
-            :items="items"
             :multiple="maxItems > 1"
             :typeahead="mode === 'typeahead'"
             :taggable="taggable"
             :read-only="readOnly"
             :url="selectionsUrl"
             :site="site"
-            @input="selectFieldSelected"
+            :items="items"
+            @update:model-value="selectFieldSelected"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         />

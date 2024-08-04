@@ -5,6 +5,7 @@
                 <h2 v-text="__(config.display)" />
                 <button class="btn-close absolute top-2 rtl:left-5 ltr:right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
             </header>
+
             <section :class="{'p-4 dark:bg-dark-700': fullScreenMode}">
                 <table class="table-fieldtype-table" v-if="rowCount">
                     <thead>
@@ -40,7 +41,14 @@
                             <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
                                 <td class="table-drag-handle" v-if="!isReadOnly"></td>
                                 <td v-for="(cell, cellIndex) in row.value.cells">
-                                    <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
+                                    <input
+                                        type="text"
+                                        v-model="row.value.cells[cellIndex]"
+                                        class="input-text"
+                                        :readonly="isReadOnly"
+                                        @focus="$emit('focus')"
+                                        @blur="$emit('blur')"
+                                    />
                                 </td>
                                 <td class="row-controls" v-if="canDeleteRows">
                                     <button @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75" :aria-label="__('Delete Row')">&times;</button>
@@ -50,11 +58,11 @@
                     </sortable-list>
                 </table>
 
-                <button class="btn" @click="addRow" :disabled="atRowMax" v-if="canAddRows">
+                <button v-if="canAddRows" class="btn" @click="addRow" :disabled="atRowMax">
                     {{ __('Add Row') }}
                 </button>
 
-                <button class="btn rtl:mr-2 ltr:ml-2" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
+                <button v-if="canAddColumns" class="btn rtl:mr-2 ltr:ml-2" @click="addColumn" :disabled="atColumnMax">
                     {{ __('Add Column') }}
                 </button>
             </section>
@@ -67,8 +75,7 @@
                 :danger="true"
                 @confirm="deleteRow(deletingRow)"
                 @cancel="deleteCancelled"
-            >
-            </confirmation-modal>
+            ></confirmation-modal>
 
             <confirmation-modal
                 :model-value="deletingColumn !== false"
@@ -78,8 +85,7 @@
                 :danger="true"
                 @confirm="deleteColumn(deletingColumn)"
                 @cancel="deleteCancelled"
-            >
-            </confirmation-modal>
+            ></confirmation-modal>
         </div>
     </portal>
 </template>
@@ -87,6 +93,7 @@
 <script>
 import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
 import SortableKeyValue from '../sortable/SortableKeyValue';
+import Fieldtype from './Fieldtype.vue';
 
 export default {
 
@@ -99,7 +106,7 @@ export default {
 
     data: function () {
         return {
-            data: this.arrayToSortable(this.value || []),
+            data: this.arrayToSortable(this.modelValue || []),
             deletingRow: false,
             deletingColumn: false,
             fullScreenMode: false

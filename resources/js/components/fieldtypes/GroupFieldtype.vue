@@ -20,6 +20,7 @@
                         :aria-label="__('Exit Fullscreen Mode')"
                     >&times;</button>
                 </header>
+
                 <section :class="{ 'p-4': fullScreenMode }">
                     <div
                         v-if="!fullScreenMode"
@@ -45,12 +46,12 @@
                                 v-show="showField(field, fieldPath(field.handle))"
                                 :field="field"
                                 :meta="meta[field.handle]"
-                                :value="value[field.handle]"
                                 :parent-name="name"
                                 :set-index="0"
                                 :errors="errors(field.handle)"
                                 :field-path="fieldPath(field.handle)"
                                 :read-only="isReadOnly"
+                                :model-value="modelValue[field.handle]"
                                 @updated="updated(field.handle, $event)"
                                 @meta-updated="updateMeta(field.handle, $event)"
                                 @focus="$emit('focus')"
@@ -100,7 +101,7 @@ export default {
     inject: ['storeName'],
     computed: {
         values() {
-            return this.value;
+            return this.modelValue;
         },
         fields() {
             return this.config.fields;
@@ -108,7 +109,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return Object.values(this.value).join(', ');
+            return Object.values(this.modelValue).join(', ');
         }
     },
     methods: {
@@ -151,13 +152,16 @@ export default {
 
         updated(handle, value) {
             this.update({
-                ...this.value,
+                ...this.modelValue,
                 [handle]: value,
             });
         },
 
         updateMeta(handle, value) {
-            this.$emit('meta-updated', { ...this.meta, [handle]: value });
+            this.$emit('meta-updated', {
+                ...this.meta,
+                [handle]: value
+            });
         },
 
         fieldPath(handle) {
