@@ -9,7 +9,7 @@
                 v-for="width in widths"
                 :key="width"
                 @mouseenter.stop="hoveringOver = width"
-                @click="$emit('input', width)"
+                @click="$emit('update:model-value', width)"
                 :class="[
                     'field-width-notch',
                     'notch-' + width,
@@ -23,9 +23,8 @@
 
 <script>
 export default {
-
     props: [
-        'value',
+        'modelValue',
         'initialWidths'
     ],
 
@@ -44,7 +43,7 @@ export default {
                 return this.hoveringOver;
             }
 
-            return this.value;
+            return this.modelValue;
         }
 
     }

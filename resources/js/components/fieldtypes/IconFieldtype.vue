@@ -17,7 +17,8 @@
             :create-option="(value) => ({ value, label: value })"
             @update:model-value="vueSelectUpdated"
             @search:focus="$emit('focus')"
-            @search:blur="$emit('blur')">
+            @search:blur="$emit('blur')"
+        >
             <template #option="option">
                 <div class="flex items-center">
                     <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="w-5 h-5" />
@@ -38,8 +39,10 @@
 
 <script>
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import Fieldtype from './Fieldtype.vue';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [Fieldtype, PositionsSelectOptions],
 
@@ -57,7 +60,7 @@ export default {
         },
 
         selectedOption() {
-            return this.options.find(option => option.value === this.value);
+            return this.options.find(option => option.value === this.modelValue);
         }
     },
 

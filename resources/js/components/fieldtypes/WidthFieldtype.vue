@@ -1,8 +1,8 @@
 <template>
     <width-selector
         :name="name"
-        :value="value"
-        @input="updateDebounced"
+        :model-value="modelValue"
+        @update:model-value="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
         :initial-widths="config.options"
@@ -11,6 +11,7 @@
 
 <script>
 import WidthSelector from '../fields/WidthSelector.vue';
+import Fieldtype from './Fieldtype.vue';
 
 export default {
     mixins: [Fieldtype],
@@ -18,9 +19,5 @@ export default {
     components: {
         WidthSelector,
     },
-
-    methods: {
-
-    }
 };
 </script>

@@ -1,24 +1,21 @@
 <template>
-
     <div class="select-input-container">
-
         <select
             v-if="display"
             class="select-input"
             :name="name"
             @change="change"
-            :value="value"
+            :value="modelValue"
             :disabled="isReadOnly"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         >
-
             <option
                 v-if="placeholder"
                 v-text="__(placeholder)"
                 value=""
                 disabled
-                :selected="value === null"
+                :selected="modelValue === null"
             />
 
             <option
@@ -28,7 +25,6 @@
                 :value="option.value"
                 :selected="isOptionSelected(option)"
             />
-
         </select>
 
         <div class="select-input-toggle">
@@ -36,13 +32,10 @@
                 <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
             </svg>
         </div>
-
      </div>
-
 </template>
 
 <script>
-
 export default {
     emits: ['update:model-value'],
 
@@ -66,7 +59,6 @@ export default {
     },
 
     methods: {
-
         isOptionSelected(option) {
             return this.placeholder === false && this.value === undefined
                 ? option.value == this.options[0].value
@@ -85,8 +77,6 @@ export default {
             this.display = false;
             this.$nextTick(() => this.display = true);
         }
-
     }
-
 }
 </script>

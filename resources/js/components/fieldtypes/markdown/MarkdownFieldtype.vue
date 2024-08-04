@@ -230,6 +230,8 @@ function ucs2decode(string) {
 }
 
 export default {
+    emits: ['focus', 'blur'],
+
     mixins: [Fieldtype],
 
     components: {

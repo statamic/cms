@@ -57,6 +57,7 @@ import Fieldtype from './Fieldtype.vue';
 import { markRaw, shallowRef } from 'vue';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [Fieldtype],
 

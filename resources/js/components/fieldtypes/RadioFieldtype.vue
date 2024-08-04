@@ -5,7 +5,7 @@
             :key="$index"
             class="option"
             :class="{
-                'selected': value === option.value,
+                'selected': modelValue === option.value,
                 'disabled': isReadOnly
             }"
         >
@@ -13,17 +13,17 @@
                 <svg-icon
                     name="regular/radio-deselected"
                     class="radio-icon"
-                    :aria-hidden="value === option.value"
+                    :aria-hidden="modelValue === option.value"
                     @click="update($event.target.value)"
-                    v-show="value !== option.value"
+                    v-show="modelValue !== option.value"
                     v-cloak
                 />
                 <svg-icon
                     name="regular/radio-selected"
                     class="radio-icon"
-                    :aria-hidden="value !== option.value"
+                    :aria-hidden="modelValue !== option.value"
                     @click="update($event.target.value)"
-                    v-show="value === option.value"
+                    v-show="modelValue === option.value"
                     v-cloak
                 />
                 <input
