@@ -35,6 +35,7 @@ final class Installer
     protected $withConfig;
     protected $withoutDependencies;
     protected $withUserPrompt;
+    protected $isInteractive;
     protected $usingSubProcess;
     protected $force;
     protected $console;
@@ -102,6 +103,14 @@ final class Installer
         return $this->fluentlyGetOrSet('withUserPrompt')->args(func_get_args());
 
         return $this;
+    }
+
+    /**
+     * Get or set whether command is being run interactively.
+     */
+    public function isInteractive($isInteractive = false): self|bool|null
+    {
+        return $this->fluentlyGetOrSet('isInteractive')->args(func_get_args());
     }
 
     /**
@@ -313,7 +322,9 @@ final class Installer
             $shouldPrompt = false;
         }
 
-        if ($shouldPrompt && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$key}] module?"), false)) {
+        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$key}] module?"), false)) {
+            return false;
+        } elseif ($shouldPrompt && ! $this->isInteractive) {
             return false;
         }
 

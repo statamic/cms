@@ -67,6 +67,7 @@ class StarterKitInstall extends Command
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
             ->withUserPrompt($cleared && $this->input->isInteractive() && ! $this->option('cli-install'))
+            ->isInteractive($this->input->isInteractive())
             ->usingSubProcess($this->option('cli-install'))
             ->force($this->option('force'));
 
