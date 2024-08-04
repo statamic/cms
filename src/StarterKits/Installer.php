@@ -60,7 +60,7 @@ final class Installer
     /**
      * Get or set whether to install from specific branch.
      */
-    public function branch(?string $branch = null): self|bool
+    public function branch(?string $branch = null): self|bool|null
     {
         return $this->fluentlyGetOrSet('branch')->args(func_get_args());
 
@@ -70,7 +70,7 @@ final class Installer
     /**
      * Get or set whether to install from local repo configured in composer config.json.
      */
-    public function fromLocalRepo(bool $fromLocalRepo = false): self|bool
+    public function fromLocalRepo(bool $fromLocalRepo = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('fromLocalRepo')->args(func_get_args());
 
@@ -80,7 +80,7 @@ final class Installer
     /**
      * Get or set whether to install with starter-kit config for local development purposes.
      */
-    public function withConfig(bool $withConfig = false): self|bool
+    public function withConfig(bool $withConfig = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('withConfig')->args(func_get_args());
 
@@ -90,7 +90,7 @@ final class Installer
     /**
      * Get or set whether to install without dependencies.
      */
-    public function withoutDependencies(?bool $withoutDependencies = false): self|bool
+    public function withoutDependencies(?bool $withoutDependencies = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('withoutDependencies')->args(func_get_args());
     }
@@ -98,7 +98,7 @@ final class Installer
     /**
      * Get or set whether to install with super user prompt.
      */
-    public function withUserPrompt(bool $withUserPrompt = false): self|bool
+    public function withUserPrompt(bool $withUserPrompt = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('withUserPrompt')->args(func_get_args());
 
@@ -116,7 +116,7 @@ final class Installer
     /**
      * Get or set whether to install using sub-process.
      */
-    public function usingSubProcess(bool $usingSubProcess = false): self|bool
+    public function usingSubProcess(bool $usingSubProcess = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('usingSubProcess')->args(func_get_args());
 
@@ -126,7 +126,7 @@ final class Installer
     /**
      * Get or set whether to force install and allow dependency errors.
      */
-    public function force(bool $force = false): self|bool
+    public function force(bool $force = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('force')->args(func_get_args());
     }

@@ -4,6 +4,7 @@ namespace Statamic\StarterKits\Concerns;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Console\NullConsole;
 use Statamic\Facades\Path;
 
 trait InteractsWithFilesystem
@@ -11,7 +12,7 @@ trait InteractsWithFilesystem
     /**
      * Install starter kit file.
      */
-    protected function installFile(string $fromPath, string $toPath, Command $console): self
+    protected function installFile(string $fromPath, string $toPath, Command|NullConsole $console): self
     {
         $displayPath = str_replace(Path::tidy(base_path().'/'), '', $toPath);
 
