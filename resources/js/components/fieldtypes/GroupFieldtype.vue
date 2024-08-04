@@ -37,8 +37,8 @@
                             />
                         </button>
                     </div>
-                    <div class="mb-4 border dark:border-dark-900 rounded shadow-sm replicator-set">
-                        <div class="replicator-set-body publish-fields @container">
+                    <div :class="{ 'mb-4 border dark:border-dark-900 rounded shadow-sm replicator-set': config.border }">
+                        <div class="publish-fields @container" :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }">
                             <set-field
                                 v-for="field in fields"
                                 :key="field.handle"
