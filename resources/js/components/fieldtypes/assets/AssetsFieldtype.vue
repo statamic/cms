@@ -41,7 +41,9 @@
                             <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                                 {{ __('Upload file') }}
                             </button>
-                            <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
+                            <span
+                                v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"
+                            ></span>
                             <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
                         </p>
                     </div>
@@ -52,7 +54,6 @@
                     />
 
                     <template v-if="expanded">
-
                         <sortable-list
                             v-if="displayMode === 'grid'"
                             v-model="assets"
@@ -66,7 +67,10 @@
                             :animate="false"
                             append-to="body"
                         >
-                            <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden rounded-t-none" ref="assets">
+                            <div
+                                class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden rounded-t-none"
+                                ref="assets"
+                            >
                                 <asset-tile
                                     v-for="asset in assets"
                                     :key="asset.id"
@@ -131,24 +135,24 @@
 </template>
 
 <style>
-    .asset-listing-uploads {
-        border: 1px dashed #ccc;
-        border-top: 0;
+.asset-listing-uploads {
+    border: 1px dashed #ccc;
+    border-top: 0;
+    margin: 0;
+    padding: 10px 20px;
+
+    table {
         margin: 0;
-        padding: 10px 20px;
-
-        table {
-            margin: 0;
-        }
-
-        thead {
-            display: none;
-        }
-
-        tr:first-child {
-            border-top: 0;
-        }
     }
+
+    thead {
+        display: none;
+    }
+
+    tr:first-child {
+        border-top: 0;
+    }
+}
 
 </style>
 
@@ -172,7 +176,6 @@ export default {
         Uploads,
         SortableList,
     },
-
 
     mixins: [Fieldtype],
 
@@ -241,7 +244,7 @@ export default {
          * The maximum number of files allowed.
          */
         maxFiles() {
-            if (! this.config.max_files) return Infinity;
+            if (!this.config.max_files) return Infinity;
 
             return parseInt(this.config.max_files);
         },
@@ -300,7 +303,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return replicatorPreviewHtml(_.map(this.assets, (asset) => {
                 return (asset.isImage || asset.isSvg) ?
@@ -310,35 +313,35 @@ export default {
         },
 
         showPicker() {
-            if (! this.canBrowse && ! this.canUpload) return false
+            if (!this.canBrowse && !this.canUpload) return false;
 
-            if (this.maxFilesReached && ! this.isFullWidth) return false
+            if (this.maxFilesReached && !this.isFullWidth) return false;
 
-            if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false
+            if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false;
 
-            return true
+            return true;
         },
 
         isFullWidth() {
-            return ! (this.config.width && this.config.width < 100)
+            return !(this.config.width && this.config.width < 100);
         },
 
         showSetAlt() {
-            return this.config.show_set_alt && ! this.isReadOnly;
+            return this.config.show_set_alt && !this.isReadOnly;
         },
 
         canBrowse() {
-            return this.can('configure asset containers') || this.can('view '+ this.container +' assets')
+            return this.can('configure asset containers') || this.can('view ' + this.container + ' assets');
         },
 
         canUpload() {
-            return this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload '+ this.container +' assets'))
+            return this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload ' + this.container + ' assets'));
         },
 
     },
 
     events: {
-        'close-selector' () {
+        'close-selector'() {
             this.closeSelector();
         }
     },
@@ -346,7 +349,7 @@ export default {
     methods: {
 
         initializeAssets() {
-            if (! this.meta.data) {
+            if (!this.meta.data) {
                 this.loadAssets(this.modelValue);
                 this.initializing = false;
                 return;
@@ -367,7 +370,7 @@ export default {
          * Accepts an array of asset URLs and/or IDs.
          */
         loadAssets(assets) {
-            if (! assets || ! assets.length) {
+            if (!assets || !assets.length) {
                 this.loading = false;
                 this.assets = [];
                 return;
@@ -418,8 +421,9 @@ export default {
          * When an asset remove button was clicked.
          */
         assetRemoved(asset) {
-            const index = _(this.assets).findIndex({ id: asset.id });
-            this.assets.splice(index, 1);
+            this.update(
+                this.modelValue.filter(id => id !== asset.id)
+            );
         },
 
         /**
@@ -505,5 +509,5 @@ export default {
         this.initializeAssets();
     }
 
-}
+};
 </script>
