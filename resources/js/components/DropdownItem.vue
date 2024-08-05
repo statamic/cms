@@ -19,15 +19,13 @@ export default {
         },
     },
     methods: {
-        selectAndClose($event) {
+        selectAndClose() {
             if (this.href) {
                 return;
             }
 
-            this.$emit('click', $event);
-
-            this.popover.close()
+            this.popover.close();
         },
     }
-}
+};
 </script>
