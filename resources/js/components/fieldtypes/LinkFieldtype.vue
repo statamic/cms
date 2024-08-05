@@ -52,8 +52,6 @@
 </template>
 
 <script>
-import { data_get } from '../../bootstrap/globals';
-
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 
 export default {
