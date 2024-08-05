@@ -36,7 +36,7 @@ export default class Slug {
     async() {
         this.#async = true;
 
-        this.#debounced = _.debounce(function (resolve, reject) {
+        this.#debounced = _.debounce((resolve, reject) => {
             return this.#performRequest()
                 .then(slug => resolve(slug))
                 .catch(e => reject(e));

@@ -55,7 +55,7 @@ export { default as LoadingGraphic } from '../components/LoadingGraphic.vue';
 export { default as DropdownList } from '../components/DropdownList.vue';
 export { default as DropdownItem } from '../components/DropdownItem.vue';
 // export { default as ValidationErrors } from '../components/ValidationErrors.vue';
-// export { default as Slugify } from '../components/slugs/Slugify.vue';
+export { default as Slugify } from '../components/slugs/Slugify.vue';
 export { default as ElementContainer } from '../components/ElementContainer.vue';
 export { default as Avatar } from '../components/Avatar.vue';
 export { default as Breadcrumb } from '../components/Breadcrumb.vue';

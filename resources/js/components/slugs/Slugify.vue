@@ -27,6 +27,7 @@ export default {
 
     data() {
         let slugifier = this.$slug.in(this.language).separatedBy(this.separator);
+
         if (this.async) slugifier.async();
 
         return {
@@ -66,7 +67,6 @@ export default {
     },
 
     methods: {
-
         reset() {
             if (! this.enabled) return Promise.resolve();
 
@@ -78,7 +78,6 @@ export default {
                 this.shouldSlugify = true;
                 if (this.slug === initialSlug) this.$emit('slugified', this.slug);
             });
-
         },
 
         slugify() {
