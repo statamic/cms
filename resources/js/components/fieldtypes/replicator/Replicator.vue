@@ -1,126 +1,194 @@
 <template>
+    <portal
+        name="replicator-fullscreen"
+        :disabled="!fullScreenMode"
+        :provide="provide"
+    >
+        <!-- These wrappers allow any css that expected the field to
+             be within the context of a publish form to continue working
+             once it has been portaled out. -->
+        <div :class="{ 'publish-fields': fullScreenMode }">
+            <div :class="{ wrapperClasses: fullScreenMode }">
+                <div
+                    class="replicator-fieldtype-container"
+                    :class="{'replicator-fullscreen bg-gray-200 dark:bg-dark-700': fullScreenMode }"
+                >
+                    <header
+                        v-if="fullScreenMode"
+                        class="bg-white dark:bg-dark-550 fixed top-0 inset-x-0 border-b dark:border-dark-900 p-3 rtl:pr-4 ltr:pl-4 flex items-center justify-between shadow z-max"
+                    >
+                        <h2 v-text="__(config.display)" class="flex-1" />
+                        <div class="flex items-center">
+                            <div class="btn-group">
+                                <button
+                                    @click="expandAll"
+                                    class="btn btn-icon flex items-center"
+                                    v-tooltip="__('Expand Sets')"
+                                    v-if="config.collapse !== 'accordion' && modelValue.length > 0"
+                                >
+                                    <svg-icon
+                                        name="arrows-horizontal-expand"
+                                        class="h-3.5 px-1 text-gray-750 dark:text-dark-175"
+                                    />
+                                </button>
 
-<portal name="replicator-fullscreen" :disabled="!fullScreenMode" :provide="provide">
-<!-- These wrappers allow any css that expected the field to
-     be within the context of a publish form to continue working
-     once it has been portaled out. -->
-<div :class="{ 'publish-fields': fullScreenMode }">
-<div :class="{ wrapperClasses: fullScreenMode }">
-<div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-gray-200 dark:bg-dark-700': fullScreenMode }">
+                                <button
+                                    @click="collapseAll"
+                                    class="btn btn-icon flex items-center"
+                                    v-tooltip="__('Collapse Sets')"
+                                    v-if="config.collapse !== 'accordion' && modelValue.length > 0"
+                                >
+                                    <svg-icon
+                                        name="arrows-horizontal-collapse"
+                                        class="h-3.5 px-1 text-gray-750 dark:text-dark-175"
+                                    />
+                                </button>
+                            </div>
 
-    <header class="bg-white dark:bg-dark-550 fixed top-0 inset-x-0 border-b dark:border-dark-900 p-3 rtl:pr-4 ltr:pl-4 flex items-center justify-between shadow z-max" v-if="fullScreenMode">
-        <h2 v-text="__(config.display)" class="flex-1" />
-            <div class="flex items-center">
-                <div class="btn-group">
-                    <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
-                        <svg-icon name="arrows-horizontal-expand" class="h-3.5 px-1 text-gray-750 dark:text-dark-175" />
-                    </button>
-                    <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
-                        <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-1 text-gray-750 dark:text-dark-175" />
-                    </button>
+                            <button
+                                class="btn-close rtl:mr-2 ltr:ml-2"
+                                @click="fullScreenMode = false"
+                                :aria-label="__('Exit Fullscreen Mode')"
+                            >&times;
+                            </button>
+                        </div>
+                    </header>
+
+                    <section :class="{'mt-12 p-4 bg-gray-200 dark:bg-dark-700': fullScreenMode}">
+                        <div
+                            v-if="! fullScreenMode"
+                            class="flex justify-end"
+                            :class="{'absolute top-3 rtl:left-3 ltr:right-3 @md:right-6': !config.hide_display}"
+                        >
+                            <div class="btn-group">
+                                <button
+                                    @click="expandAll"
+                                    class="btn btn-icon flex items-center"
+                                    v-tooltip="__('Expand Sets')"
+                                    v-if="config.collapse !== 'accordion' && modelValue.length > 0"
+                                >
+                                    <svg-icon
+                                        name="arrows-horizontal-expand"
+                                        class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175"
+                                    />
+                                </button>
+
+                                <button
+                                    @click="collapseAll"
+                                    class="btn btn-icon flex items-center"
+                                    v-tooltip="__('Collapse Sets')"
+                                    v-if="config.collapse !== 'accordion' && modelValue.length > 0"
+                                >
+                                    <svg-icon
+                                        name="arrows-horizontal-collapse"
+                                        class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175"
+                                    />
+                                </button>
+
+                                <button
+                                    v-if="config.fullscreen"
+                                    @click="fullScreenMode = !fullScreenMode"
+                                    class="btn btn-icon flex items-center"
+                                    v-tooltip="__('Toggle Fullscreen Mode')"
+                                >
+                                    <svg-icon
+                                        name="expand-bold"
+                                        class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175"
+                                        v-show="! fullScreenMode"
+                                    />
+                                    <svg-icon
+                                        name="shrink-all"
+                                        class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175"
+                                        v-show="fullScreenMode"
+                                    />
+                                </button>
+                            </div>
+                        </div>
+
+                        <sortable-list
+                            :vertical="true"
+                            :item-class="sortableItemClass"
+                            :handle-class="sortableHandleClass"
+                            append-to="body"
+                            constrain-dimensions
+                            :model-value="modelValue"
+                            @update:model-value="sorted($event)"
+                            @dragstart="$emit('focus')"
+                            @dragend="$emit('blur')"
+                        >
+                            <template #default>
+                                <div class="replicator-set-container">
+                                    <replicator-set
+                                        v-for="(set, index) in modelValue"
+                                        :key="set._id"
+                                        :index="index"
+                                        :values="set"
+                                        :meta="meta.existing[set._id]"
+                                        :config="setConfig(set.type)"
+                                        :parent-name="name"
+                                        :sortable-item-class="sortableItemClass"
+                                        :sortable-handle-class="sortableHandleClass"
+                                        :is-read-only="isReadOnly"
+                                        :collapsed="collapsed.includes(set._id)"
+                                        :field-path-prefix="fieldPathPrefix || handle"
+                                        :has-error="setHasError(index)"
+                                        :previews="previews[set._id]"
+                                        :show-field-previews="config.previews"
+                                        :can-add-set="canAddSet"
+                                        @collapsed="collapseSet(set._id)"
+                                        @expanded="expandSet(set._id)"
+                                        @duplicated="duplicateSet(set._id)"
+                                        @updated="updated"
+                                        @meta-updated="updateSetMeta(set._id, $event)"
+                                        @removed="removed(set, index)"
+                                        @focus="focused = true"
+                                        @blur="blurred"
+                                        @previews-updated="updateSetPreviews(set._id, $event)"
+                                    >
+                                        <template v-slot:picker>
+                                            <add-set-button
+                                                class="between"
+                                                :groups="groupConfigs"
+                                                :sets="setConfigs"
+                                                :index="index"
+                                                :enabled="canAddSet"
+                                                @added="addSet"
+                                            />
+                                        </template>
+                                    </replicator-set>
+                                </div>
+                            </template>
+                        </sortable-list>
+
+                        <add-set-button
+                            v-if="canAddSet"
+                            class="mt-3"
+                            :last="true"
+                            :groups="groupConfigs"
+                            :sets="setConfigs"
+                            :index="modelValue.length"
+                            :label="config.button_label"
+                            @added="addSet"
+                        />
+                    </section>
                 </div>
-                <button class="btn-close rtl:mr-2 ltr:ml-2" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
-            </div>
-    </header>
-
-    <section :class="{'mt-12 p-4 bg-gray-200 dark:bg-dark-700': fullScreenMode}">
-
-        <div class="flex justify-end" :class="{'absolute top-3 rtl:left-3 ltr:right-3 @md:right-6': !config.hide_display}" v-if="! fullScreenMode">
-            <div class="btn-group">
-                <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
-                    <svg-icon name="arrows-horizontal-expand" class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175" />
-                </button>
-                <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
-                    <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175" />
-                </button>
-                <button v-if="config.fullscreen" @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
-                    <svg-icon name="expand-bold" class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175" v-show="! fullScreenMode" />
-                    <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175" v-show="fullScreenMode" />
-                </button>
             </div>
         </div>
-
-        <sortable-list
-            :vertical="true"
-            :item-class="sortableItemClass"
-            :handle-class="sortableHandleClass"
-            append-to="body"
-            constrain-dimensions
-            :model-value="value"
-            @update:model-value="sorted($event)"
-            @dragstart="$emit('focus')"
-            @dragend="$emit('blur')"
-        >
-            <template #default="{}">
-                <div class="replicator-set-container">
-                    <replicator-set
-                        v-for="(set, index) in value"
-                        :key="set._id"
-                        :index="index"
-                        :values="set"
-                        :meta="meta.existing[set._id]"
-                        :config="setConfig(set.type)"
-                        :parent-name="name"
-                        :sortable-item-class="sortableItemClass"
-                        :sortable-handle-class="sortableHandleClass"
-                        :is-read-only="isReadOnly"
-                        :collapsed="collapsed.includes(set._id)"
-                        :field-path-prefix="fieldPathPrefix || handle"
-                        :has-error="setHasError(index)"
-                        :previews="previews[set._id]"
-                        :show-field-previews="config.previews"
-                        :can-add-set="canAddSet"
-                        @collapsed="collapseSet(set._id)"
-                        @expanded="expandSet(set._id)"
-                        @duplicated="duplicateSet(set._id)"
-                        @updated="updated"
-                        @meta-updated="updateSetMeta(set._id, $event)"
-                        @removed="removed(set, index)"
-                        @focus="focused = true"
-                        @blur="blurred"
-                        @previews-updated="updateSetPreviews(set._id, $event)"
-                    >
-                        <template v-slot:picker>
-                            <add-set-button
-                                class="between"
-                                :groups="groupConfigs"
-                                :sets="setConfigs"
-                                :index="index"
-                                :enabled="canAddSet"
-                                @added="addSet" />
-                        </template>
-                    </replicator-set>
-                </div>
-            </template>
-        </sortable-list>
-
-        <add-set-button v-if="canAddSet"
-            class="mt-3"
-            :last="true"
-            :groups="groupConfigs"
-            :sets="setConfigs"
-            :index="value.length"
-            :label="config.button_label"
-            @added="addSet" />
-
-    </section>
-
-</div>
-</div>
-</div>
-</portal>
-
+    </portal>
 </template>
 
 <script>
 import uniqid from 'uniqid';
+import reduce from 'underscore/modules/reduce';
+
 import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
-import reduce from 'underscore/modules/reduce';
+import Fieldtype from '../Fieldtype.vue';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [Fieldtype, ManagesSetMeta],
 
@@ -142,15 +210,14 @@ export default {
                 storeName: this.storeName,
                 replicatorSets: this.config.sets
             }
-        }
+        };
     },
 
     computed: {
-
         canAddSet() {
             if (this.isReadOnly) return false;
 
-            return !this.config.max_sets || this.value.length < this.config.max_sets;
+            return !this.config.max_sets || this.modelValue.length < this.config.max_sets;
         },
 
         setConfigs() {
@@ -176,26 +243,32 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
+            return `${__(this.config.display)}: ${__n(':count set|:count sets', this.modelValue.length)}`;
         }
     },
 
     methods: {
-
         setConfig(handle) {
             return _.find(this.setConfigs, { handle }) || {};
         },
 
         updated(index, set) {
-            this.update([...this.value.slice(0, index), set, ...this.value.slice(index + 1)]);
+            this.update([
+                ...this.modelValue.slice(0, index),
+                set,
+                ...this.modelValue.slice(index + 1)
+            ]);
         },
 
         removed(set, index) {
             this.removeSetMeta(set._id);
 
-            this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
+            this.update([
+                ...this.modelValue.slice(0, index),
+                ...this.modelValue.slice(index + 1)
+            ]);
         },
 
         sorted(value) {
@@ -215,17 +288,17 @@ export default {
             this.updateSetMeta(set._id, this.meta.new[handle]);
 
             this.update([
-                ...this.value.slice(0, index),
+                ...this.modelValue.slice(0, index),
                 set,
-                ...this.value.slice(index)
+                ...this.modelValue.slice(index)
             ]);
 
             this.expandSet(set._id);
         },
 
         duplicateSet(old_id) {
-            const index = this.value.findIndex(v => v._id === old_id);
-            const old = this.value[index];
+            const index = this.modelValue.findIndex(v => v._id === old_id);
+            const old = this.modelValue[index];
             const set = {
                 ...old,
                 _id: uniqid(),
@@ -236,9 +309,9 @@ export default {
             this.updateSetMeta(set._id, this.meta.existing[old_id]);
 
             this.update([
-                ...this.value.slice(0, index + 1),
+                ...this.modelValue.slice(0, index + 1),
                 set,
-                ...this.value.slice(index + 1)
+                ...this.modelValue.slice(index + 1)
             ]);
 
             this.expandSet(set._id);
@@ -250,13 +323,13 @@ export default {
 
         collapseSet(id) {
             if (!this.collapsed.includes(id)) {
-                this.collapsed.push(id)
+                this.collapsed.push(id);
             }
         },
 
         expandSet(id) {
             if (this.config.collapse === 'accordion') {
-                this.collapsed = this.value.map(v => v._id).filter(v => v !== id);
+                this.collapsed = this.modelValue.map(v => v._id).filter(v => v !== id);
                 return;
             }
 
@@ -267,7 +340,7 @@ export default {
         },
 
         collapseAll() {
-            this.collapsed = _.pluck(this.value, '_id');
+            this.collapsed = _.pluck(this.modelValue, '_id');
         },
 
         expandAll() {
@@ -294,7 +367,6 @@ export default {
     },
 
     watch: {
-
         focused(focused, oldFocused) {
             if (focused === oldFocused) return;
 
@@ -308,22 +380,25 @@ export default {
         },
 
         collapsed(collapsed) {
-            this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+            this.updateMeta({
+                ...this.meta,
+                collapsed: clone(collapsed)
+            });
         },
 
         previews: {
             deep: true,
             handler(value) {
                 if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
-                    return
+                    return;
                 }
+
                 const meta = this.meta;
                 meta.previews = value;
+
                 this.updateMeta(meta);
             }
         },
-
     }
-
-}
+};
 </script>
