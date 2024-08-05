@@ -128,4 +128,15 @@ class Arr extends Fieldtype
             }
         }];
     }
+
+    public function augment($value)
+    {
+        if (is_array(SupportArr::first($value))) {
+            return collect($value)
+                ->mapWithKeys(fn ($item) => [$item['key'] => $item['value']])
+                ->all();
+        }
+
+        return $value;
+    }
 }
