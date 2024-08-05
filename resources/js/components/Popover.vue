@@ -95,6 +95,11 @@ const provide = computed(() => ({
         close: close,
     }
 }))
+
+defineExpose({
+    open,
+    close,
+})
 </script>
 
 <template>
