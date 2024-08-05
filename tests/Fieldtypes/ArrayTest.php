@@ -279,6 +279,10 @@ class ArrayTest extends TestCase
     public static function dynamicProcessProvider()
     {
         return [
+            'null' => [
+                null,
+                null,
+            ],
             'string keys' => [
                 [
                     'food' => 'burger',
@@ -344,6 +348,11 @@ class ArrayTest extends TestCase
     public static function keyedProcessProvider()
     {
         return [
+            'null' => [
+                ['foo' => 'Foo'],
+                null,
+                null,
+            ],
             'associative array options, associative array value' => [
                 [
                     'food' => 'Food',

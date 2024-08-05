@@ -96,6 +96,10 @@ class Arr extends Fieldtype
 
     public function process($data)
     {
+        if (empty($data)) {
+            return null;
+        }
+
         $isMulti = false;
         foreach (array_keys($data) as $key) {
             if (is_numeric($key)) {
