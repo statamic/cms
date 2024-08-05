@@ -14,25 +14,22 @@
 </template>
 
 <script>
-export default {
+import Fieldtype from './Fieldtype.vue'
 
+export default {
     mixins: [Fieldtype],
 
     inject: ['storeName'],
 
     computed: {
-
         container() {
             return data_get(this.$store.state.publish[this.storeName].values.container, '0', null);
         },
-
         relationshipMeta() {
             return {...this.meta, ...{
                 getBaseSelectionsUrlParameters: { container: this.container }
             }};
         }
-
     }
-
 };
 </script>

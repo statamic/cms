@@ -21,7 +21,8 @@ Any instances of `v-on-clickaway` should be replaced with `v-click-away`.
 Not available for vue 3. What to do?
 https://euvl.github.io/vue-js-modal/Properties.html#properties-2
 
-Use another nice accessible modal?
+-> $modal.show() -> $modal.open()
+-> $modal.hide() -> $modal.close()
 
 ## vue-toasted replaced with vue-toastification (in progress)
 Vue-toasted is only available for vue 2. We still need to style the new toasts.

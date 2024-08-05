@@ -78,7 +78,7 @@ export default {
         return bard;
     },
 
-    $hooks() {
+    get $hooks() {
         return hooks;
     },
 
@@ -86,7 +86,7 @@ export default {
         return reveal;
     },
 
-    $conditions() {
+    get $conditions() {
         return conditions;
     },
 

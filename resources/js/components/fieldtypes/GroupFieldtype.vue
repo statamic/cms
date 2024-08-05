@@ -82,6 +82,7 @@ import SetField from './replicator/Field.vue';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
+    emits: ['focus', 'blur'],
     mixins: [
         Fieldtype,
         ValidatesFieldConditions,

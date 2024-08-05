@@ -1,4 +1,5 @@
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
+// @todo(jasonvarga): Port, or can we remove this? Is this old school status stuff that has been replaced by published?
 // import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 import Select from '../components/inputs/Select.vue';
@@ -11,7 +12,7 @@ import TextareaFieldtype from '../components/fieldtypes/TextareaFieldtype.vue';
 import SlugFieldtype from '../components/fieldtypes/SlugFieldtype.vue';
 import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue';
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue';
-// import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
+import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 // import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
 // import BardFieldtype from '../components/fieldtypes/bard/BardFieldtype.vue';
 // import BardSet from '../components/fieldtypes/bard/Set.vue';
@@ -75,7 +76,7 @@ export default function registerFieldTypes(app) {
 
     app.component('array-fieldtype', ArrayFieldtype);
     app.component('assets-fieldtype', AssetsFieldtype);
-    // app.component('assets-fieldtype-index', AssetsIndexFieldtype);
+    app.component('assets-fieldtype-index', AssetsIndexFieldtype);
     // app.component('asset_folder-fieldtype', AssetFolderFieldtype);
     // app.component('bard-fieldtype', BardFieldtype);
     // app.component('bard-fieldtype-set', BardSet);
@@ -86,7 +87,7 @@ export default function registerFieldTypes(app) {
     app.component('collection_routes-fieldtype', Routes);
     app.component('collection_title_formats-fieldtype', TitleFormats);
     app.component('color-fieldtype', ColorFieldtype);
-    // app.component('date-fieldtype', DateFieldtype);
+    app.component('date-fieldtype', DateFieldtype);
     // app.component('field_display-fieldtype', FieldDisplayFieldtype);
     // app.component('fields-fieldtype', FieldsFieldtype);
     // app.component('files-fieldtype', FilesFieldtype);
@@ -95,7 +96,7 @@ export default function registerFieldTypes(app) {
     app.component('grid-fieldtype', Grid);
     // app.component('grid-fieldtype-index', GridIndex);
     app.component('group-fieldtype', GroupFieldtype);
-    // app.component('hidden-fieldtype', HiddenFieldtype);
+    app.component('hidden-fieldtype', HiddenFieldtype);
     app.component('html-fieldtype', HtmlFieldtype);
     app.component('icon-fieldtype', IconFieldtype);
     app.component('integer-fieldtype', IntegerFieldtype);

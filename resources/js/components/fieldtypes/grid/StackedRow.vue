@@ -24,7 +24,7 @@
                 :key="field.handle"
                 :field="field"
                 :meta="meta[field.handle]"
-                :value="values[field.handle]"
+                :model-value="values[field.handle]"
                 :parent-name="name"
                 :set-index="index"
                 :errors="errors(field.handle)"
