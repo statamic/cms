@@ -59,17 +59,28 @@ class Arr extends Fieldtype
         ];
     }
 
+    private function keys()
+    {
+        return collect($this->config('keys'))->map(fn ($value, $key) => [
+            'key' => is_array($value) ? $value['key'] : $key,
+            'value' => is_array($value) ? $value['value'] : $value,
+        ])->values();
+    }
+
     public function preProcess($data)
     {
         if ($this->isKeyed()) {
-            return collect($this->config('keys'))
-                ->mapWithKeys(function ($value, $index) use ($data) {
-                    $key = is_array($value) ? $value['key'] : $index;
-                    $value = collect($data)->where('key', $key)->pluck('value')->first();
+            $isMulti = is_array(SupportArr::first($data));
 
-                    return [$key => $value ?? null];
-                })
-                ->all();
+            return $this->keys()->mapWithKeys(function ($item) use ($isMulti, $data) {
+                $key = $item['key'];
+
+                $value = $isMulti
+                    ? collect($data)->where('key', $key)->pluck('value')->first()
+                    : $data[$key] ?? null;
+
+                return [$key => $value];
+            })->all();
         }
 
         // When using the legacy format, return the data as is.
@@ -91,13 +102,22 @@ class Arr extends Fieldtype
 
     public function process($data)
     {
-        return collect($data)
-            ->map(fn ($value, $key) => [
-                'key' => $key,
-                'value' => $value,
-            ])
-            ->values()
-            ->all();
+        $isMulti = false;
+        foreach (array_keys($data) as $key) {
+            if (is_numeric($key)) {
+                $isMulti = true;
+                break;
+            }
+        }
+
+        if ($isMulti) {
+            return collect($data)
+                ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
+                ->values()
+                ->all();
+        }
+
+        return $data;
     }
 
     protected function isKeyed()
