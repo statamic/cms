@@ -54,6 +54,7 @@ class CorePreferences
 
         return collect([
             'ar' => 'Arabic',
+            'az' => 'Azerbaijani',
             'cs' => 'Czech',
             'da' => 'Danish',
             'de' => 'German',
