@@ -59,7 +59,7 @@ export default {
     computed: {
 
         publishContainer() {
-            return `relate-fieldtype-inline-${this._uid}`;
+            return `relate-fieldtype-inline-${this.$.uid}`;
         }
 
     },

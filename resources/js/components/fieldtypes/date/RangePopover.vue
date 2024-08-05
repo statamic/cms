@@ -98,8 +98,8 @@ export default {
             endOpen: false,
             picker: null,
             portalTarget: null,
-            startPortalTarget: `date-picker-start-${this._uid}`,
-            endPortalTarget: `date-picker-end-${this._uid}`,
+            startPortalTarget: `date-picker-start-${this.$.uid}`,
+            endPortalTarget: `date-picker-end-${this.$.uid}`,
             startInputValue: null,
             endInputValue: null,
         }

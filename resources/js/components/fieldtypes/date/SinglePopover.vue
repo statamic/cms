@@ -57,7 +57,7 @@ export default {
         return {
             open: false,
             picker: null,
-            portalTarget: `date-picker-${this._uid}`,
+            portalTarget: `date-picker-${this.$.uid}`,
             inputValue: null
         }
     },
