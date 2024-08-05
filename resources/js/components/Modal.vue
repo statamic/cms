@@ -71,7 +71,7 @@ const modalId = computed(() => {
         v-model="model"
         v-bind="$attrs"
     >
-        <div :style="styling">
+        <div :style="styling" class="max-h-[90vh]">
             <slot />
         </div>
     </VueFinalModal>
