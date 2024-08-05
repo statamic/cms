@@ -49,13 +49,7 @@ class Arr extends Fieldtype
     public function preload(): array
     {
         return [
-            'keys' => collect($this->config('keys'))
-                ->mapWithKeys(function ($value, $index) {
-                    $key = is_array($value) ? $value['key'] : $index;
-                    $label = is_array($value) ? $value['value'] : $value;
-
-                    return [$key => $label];
-                }),
+            'keys' => $this->keys()->mapWithKeys(fn ($item) => [$item['key'] => $item['value']]),
         ];
     }
 
