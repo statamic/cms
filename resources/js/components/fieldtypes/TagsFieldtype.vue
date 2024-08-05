@@ -38,7 +38,7 @@
                     handle-class="sortable-item"
                     :distance="5"
                     :mirror="false"
-                    :model-value="value"
+                    :model-value="modelValue"
                     @update:model-value="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">

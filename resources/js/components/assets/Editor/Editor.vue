@@ -306,7 +306,7 @@ export default {
     },
 
     mounted() {
-        this.$modal.show('asset-editor');
+        this.$modal.open('asset-editor');
         this.load();
     },
 
@@ -400,7 +400,7 @@ export default {
         },
 
         close() {
-            this.$modal.hide('asset-editor');
+            this.$modal.close('asset-editor');
             this.$emit('closed');
         },
 

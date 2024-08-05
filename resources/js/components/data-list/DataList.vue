@@ -54,7 +54,6 @@ export default {
     },
 
     computed: {
-
         filteredRows() {
             let rows = this.rows;
             rows = this.filterBySearch(rows);
@@ -70,11 +69,9 @@ export default {
                 ? this.visibleColumns.map(column => column.field)
                 : Object.keys(rows[0]);
         },
-
     },
 
     watch: {
-
         filteredRows: {
             immediate: true,
             handler: function (rows) {
@@ -104,21 +101,19 @@ export default {
         visibleColumns(columns) {
             this.$emit('visible-columns-updated', columns);
         },
-
     },
 
-    created() {
+    mounted() {
         this.setInitialSortColumn();
 
         this.$events.$on('clear-selections', this.clearSelections);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('clear-selections', this.clearSelections);
     },
 
     methods: {
-
         setInitialSortColumn() {
             const columns = this.sharedState.columns;
 
@@ -160,7 +155,6 @@ export default {
         clearSelections() {
             this.sharedState.selections = [];
         },
-
     },
 
     render() {

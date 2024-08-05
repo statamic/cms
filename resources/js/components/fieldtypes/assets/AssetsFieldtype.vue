@@ -1,6 +1,5 @@
 <template>
     <div class="@container">
-
         <uploader
             ref="uploader"
             :container="container"
@@ -12,7 +11,6 @@
         >
             <template #default="{ dragging }">
                 <div class="assets-fieldtype-drag-container">
-
                     <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
                         <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 rtl:ml-2 ltr:mr-2 @md:mr-6" />
                         <span>{{ __('Drop to Upload') }}</span>
@@ -26,7 +24,6 @@
                             'bard-drag-handle': isInBardField
                         }"
                     >
-
                         <button
                             v-if="canBrowse"
                             :class="{'opacity-0': dragging }"
@@ -96,8 +93,7 @@
                                     :mirror="false"
                                 >
                                     <tbody ref="assets">
-                                        <tr
-                                            is="assetRow"
+                                        <AssetRow
                                             class="asset-row"
                                             v-for="asset in assets"
                                             :key="asset.id"
@@ -108,7 +104,7 @@
                                             @updated="assetUpdated"
                                             @removed="assetRemoved"
                                             @id-changed="idChanged(asset.id, $event)"
-                                        ></tr>
+                                        ></AssetRow>
                                     </tbody>
                                 </sortable-list>
                             </table>
@@ -134,9 +130,7 @@
     </div>
 </template>
 
-
 <style>
-
     .asset-listing-uploads {
         border: 1px dashed #ccc;
         border-top: 0;
@@ -157,7 +151,6 @@
     }
 
 </style>
-
 
 <script>
 import AssetRow from './AssetRow.vue';

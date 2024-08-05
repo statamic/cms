@@ -3,7 +3,7 @@ export default {
 
     props: {
         handle: { type: String, required: true },
-        modelValue: { required: true },
+        value: { required: true },
         values: { required: true },
     }
 

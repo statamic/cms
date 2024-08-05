@@ -70,7 +70,7 @@
             />
         </div>
 
-        <button v-if="value" class="btn-close rtl:mr-1 ltr:ml-1" :aria-label="__('Reset')" @click="resetColor">&times;</button>
+        <button v-if="modelValue" class="btn-close rtl:mr-1 ltr:ml-1" :aria-label="__('Reset')" @click="resetColor">&times;</button>
     </div>
 </template>
 
@@ -94,7 +94,7 @@ export default {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
             return this.modelValue
-                ? `<span class="little-dot" style="background-color:${this.value}"></span>`
+                ? `<span class="little-dot" style="background-color:${this.modelValue}"></span>`
                 : null;
         }
     },
