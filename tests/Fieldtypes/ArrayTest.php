@@ -2,63 +2,605 @@
 
 namespace Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
+use Statamic\Fieldtypes\Arr;
 use Tests\TestCase;
 
 class ArrayTest extends TestCase
 {
     #[Test]
-    public function it_preprocesses_with_legacy_format()
+    #[DataProvider('keyedPreloadProvider')]
+    public function it_preloads_keys($options, $expected)
     {
-        $field = new Field('test', ['type' => 'array']);
+        $field = new Field('test', ['type' => 'array', 'keys' => $options]);
 
-        $field->setValue([
-            'foo' => 'bar',
-            'baz' => 'qux',
-            'quux' => 'quuz',
-        ]);
+        $this->assertEquals($expected, $field->meta()['keys']->all());
+    }
 
-        $this->assertEquals([
-            'foo' => 'bar',
-            'baz' => 'qux',
-            'quux' => 'quuz',
-        ], $field->preProcess()->value());
+    public static function keyedPreloadProvider()
+    {
+        return [
+            'dynamic null' => [
+                null,
+                [],
+            ],
+            'dynamic empty array' => [
+                [],
+                [],
+            ],
+            'associative array options' => [
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+            ],
+            'multidimensional array options' => [
+                [
+                    ['key' => 'food', 'value' => 'Food'],
+                    ['key' => 'drink', 'value' => 'Drink'],
+                    ['key' => 'side', 'value' => 'Side'],
+                ],
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+            ],
+            'multidimensional array with numbers' => [
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    0 => 'Zero',
+                    1 => 'One',
+                    2 => 'Two',
+                ],
+            ],
+            'multidimensional array with non-sequential numbers' => [
+                [
+                    ['key' => 2, 'value' => 'Two'],
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                ],
+                [
+                    2 => 'Two',
+                    0 => 'Zero',
+                    1 => 'One',
+                ],
+            ],
+        ];
     }
 
     #[Test]
-    public function it_preprocesses()
+    #[DataProvider('dynamicPreprocessProvider')]
+    public function it_preprocesses_dynamic($value, $expected)
     {
         $field = new Field('test', ['type' => 'array']);
 
-        $field->setValue([
-            ['key' => 'foo', 'value' => 'bar'],
-            ['key' => 'baz', 'value' => 'qux'],
-            ['key' => 'quux', 'value' => 'quuz'],
-        ]);
+        $field->setValue($value);
 
-        $this->assertEquals([
-            'foo' => 'bar',
-            'baz' => 'qux',
-            'quux' => 'quuz',
-        ], $field->preProcess()->value());
+        $this->assertEquals($expected, $field->preProcess()->value());
+    }
+
+    public static function dynamicPreprocessProvider()
+    {
+        return [
+            'associative array value' => [
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array value' => [
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array with numbers' => [
+                [
+                    ['key' => 0, 'value' => 'none'],
+                    ['key' => 1, 'value' => 'some'],
+                    ['key' => 2, 'value' => 'more'],
+                ],
+                [
+                    0 => 'none',
+                    1 => 'some',
+                    2 => 'more',
+                ],
+            ],
+            'multidimensional array with non-sequential numbers' => [
+                [
+                    ['key' => 2, 'value' => 'some'],
+                    ['key' => 1, 'value' => 'one'],
+                    ['key' => 0, 'value' => 'none'],
+                ],
+                [
+                    2 => 'some',
+                    1 => 'one',
+                    0 => 'none',
+                ],
+            ],
+        ];
     }
 
     #[Test]
-    public function it_processes()
+    #[DataProvider('keyedPreprocessProvider')]
+    public function it_preprocesses_keyed($options, $value, $expected)
+    {
+        $field = new Field('test', ['type' => 'array', 'keys' => $options]);
+
+        $field->setValue($value);
+
+        $this->assertEquals($expected, $field->preProcess()->value());
+    }
+
+    public static function keyedPreprocessProvider()
+    {
+        return [
+            'associative array options, associative array value' => [
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array options, associative array value' => [
+                [
+                    ['key' => 'food', 'value' => 'Food'],
+                    ['key' => 'drink', 'value' => 'Drink'],
+                    ['key' => 'side', 'value' => 'Side'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'associative array options, multidimensional array value' => [
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array options, multidimensional array value' => [
+                [
+                    ['key' => 'food', 'value' => 'Food'],
+                    ['key' => 'drink', 'value' => 'Drink'],
+                    ['key' => 'side', 'value' => 'Side'],
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array with numbers' => [
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    ['key' => 0, 'value' => 'none'],
+                    ['key' => 1, 'value' => 'some'],
+                    ['key' => 2, 'value' => 'more'],
+                ],
+                [
+                    0 => 'none',
+                    1 => 'some',
+                    2 => 'more',
+                ],
+            ],
+            'multidimensional array with non-sequential numbers' => [
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    ['key' => 2, 'value' => 'some'],
+                    ['key' => 1, 'value' => 'one'],
+                    ['key' => 0, 'value' => 'none'],
+                ],
+                [
+                    2 => 'some',
+                    1 => 'one',
+                    0 => 'none',
+                ],
+            ],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('dynamicProcessProvider')]
+    public function it_processes_dynamic($value, $expected)
     {
         $field = new Field('test', ['type' => 'array']);
 
-        $field->setValue([
-            'foo' => 'bar',
-            'baz' => 'qux',
-            'quux' => 'quuz',
-        ]);
+        $field->setValue($value);
 
-        $this->assertEquals([
-            ['key' => 'foo', 'value' => 'bar'],
-            ['key' => 'baz', 'value' => 'qux'],
-            ['key' => 'quux', 'value' => 'quuz'],
-        ], $field->process()->value());
+        $this->assertEquals($expected, $field->process()->value());
+    }
+
+    public static function dynamicProcessProvider()
+    {
+        return [
+            'string keys' => [
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'numeric keys' => [
+                [
+                    0 => 'none',
+                    1 => 'some',
+                    2 => 'more',
+                ],
+                [
+                    ['key' => 0, 'value' => 'none'],
+                    ['key' => 1, 'value' => 'some'],
+                    ['key' => 2, 'value' => 'more'],
+                ],
+            ],
+            'non-sequential numeric keys' => [
+                [
+                    2 => 'some',
+                    1 => 'one',
+                    0 => 'none',
+                ],
+                [
+                    ['key' => 2, 'value' => 'some'],
+                    ['key' => 1, 'value' => 'one'],
+                    ['key' => 0, 'value' => 'none'],
+                ],
+            ],
+            'strings and numeric keys' => [
+                [
+                    'one' => 'One',
+                    2 => 'Two',
+                    'three' => 'Three',
+                ],
+                [
+                    ['key' => 'one', 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                    ['key' => 'three', 'value' => 'Three'],
+                ],
+            ],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('keyedProcessProvider')]
+    public function it_processes_keyed($options, $value, $expected)
+    {
+        $field = new Field('test', ['type' => 'array', 'keys' => $options]);
+
+        $field->setValue($value);
+
+        $this->assertEquals($expected, $field->process()->value());
+    }
+
+    public static function keyedProcessProvider()
+    {
+        return [
+            'associative array options, associative array value' => [
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array options, associative array value' => [
+                [
+                    ['key' => 'food', 'value' => 'Food'],
+                    ['key' => 'drink', 'value' => 'Drink'],
+                    ['key' => 'side', 'value' => 'Side'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array with numbers' => [
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    0 => 'none',
+                    1 => 'some',
+                    2 => 'more',
+                ],
+                [
+                    ['key' => 0, 'value' => 'none'],
+                    ['key' => 1, 'value' => 'some'],
+                    ['key' => 2, 'value' => 'more'],
+                ],
+            ],
+            'multidimensional array with non-sequential numbers' => [
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    2 => 'some',
+                    1 => 'one',
+                    0 => 'none',
+                ],
+                [
+                    ['key' => 2, 'value' => 'some'],
+                    ['key' => 1, 'value' => 'one'],
+                    ['key' => 0, 'value' => 'none'],
+                ],
+            ],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('dynamicAugmentProvider')]
+    public function it_augments_dynamic($value, $expected)
+    {
+        $fieldtype = (new Arr)->setField(new Field('test', ['type' => 'arr']));
+
+        $this->assertEquals($expected, $fieldtype->augment($value));
+    }
+
+    public static function dynamicAugmentProvider()
+    {
+        return [
+            'null' => [
+                null,
+                null,
+            ],
+            'associative array value' => [
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array value' => [
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array with numbers' => [
+                [
+                    ['key' => 0, 'value' => 'none'],
+                    ['key' => 1, 'value' => 'some'],
+                    ['key' => 2, 'value' => 'more'],
+                ],
+                [
+                    0 => 'none',
+                    1 => 'some',
+                    2 => 'more',
+                ],
+            ],
+            'multidimensional array with non-sequential numbers' => [
+                [
+                    ['key' => 2, 'value' => 'some'],
+                    ['key' => 1, 'value' => 'one'],
+                    ['key' => 0, 'value' => 'none'],
+                ],
+                [
+                    2 => 'some',
+                    1 => 'one',
+                    0 => 'none',
+                ],
+            ],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('keyedAugmentProvider')]
+    public function it_augments_keyed($options, $value, $expected)
+    {
+        $fieldtype = (new Arr)->setField(new Field('test', ['type' => 'arr', 'keys' => $options]));
+
+        $this->assertEquals($expected, $fieldtype->augment($value));
+    }
+
+    public static function keyedAugmentProvider()
+    {
+        return [
+            'null' => [
+                ['foo' => 'Foo'],
+                null,
+                null,
+            ],
+            'associative array options, associative array value' => [
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array options, associative array value' => [
+                [
+                    ['key' => 'food', 'value' => 'Food'],
+                    ['key' => 'drink', 'value' => 'Drink'],
+                    ['key' => 'side', 'value' => 'Side'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'associative array options, multidimensional array value' => [
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array options, multidimensional array value' => [
+                [
+                    ['key' => 'food', 'value' => 'Food'],
+                    ['key' => 'drink', 'value' => 'Drink'],
+                    ['key' => 'side', 'value' => 'Side'],
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+            ],
+            'multidimensional array with numbers' => [
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    ['key' => 0, 'value' => 'none'],
+                    ['key' => 1, 'value' => 'some'],
+                    ['key' => 2, 'value' => 'more'],
+                ],
+                [
+                    0 => 'none',
+                    1 => 'some',
+                    2 => 'more',
+                ],
+            ],
+            'multidimensional array with non-sequential numbers' => [
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    ['key' => 2, 'value' => 'some'],
+                    ['key' => 1, 'value' => 'one'],
+                    ['key' => 0, 'value' => 'none'],
+                ],
+                [
+                    2 => 'some',
+                    1 => 'one',
+                    0 => 'none',
+                ],
+            ],
+        ];
     }
 }
