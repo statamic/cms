@@ -1,6 +1,5 @@
 <template>
     <div class="datetime min-w-[145px]">
-
         <button
             type="button"
             class="btn flex mb-2 md:mb-0 items-center rtl:pr-3 ltr:pl-3"
@@ -19,7 +18,7 @@
             <component
                 :is="pickerComponent"
                 v-bind="pickerProps"
-                @input="setDate"
+                @update:model-value="setDate"
                 @focus="focusedField = $event"
                 @blur="focusedField = null"
             />
@@ -39,10 +38,11 @@
 			</div>
         </div>
     </div>
-
 </template>
 
 <script>
+import { useScreens } from 'vue-screen-utils';
+
 import SinglePopover from './date/SinglePopover.vue';
 import SingleInline from './date/SingleInline.vue';
 import RangePopover from './date/RangePopover.vue';
@@ -50,7 +50,6 @@ import RangeInline from './date/RangeInline.vue';
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
     components: {
         SinglePopover,
         SingleInline,
@@ -62,6 +61,19 @@ export default {
 
     inject: ['storeName'],
 
+    setup() {
+        const { mapCurrent } = useScreens({
+            xs: '0px',
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+        });
+        
+        return {
+            mapCurrent
+        }
+    },
+
     data() {
         return {
             containerWidth: null,
@@ -70,7 +82,6 @@ export default {
     },
 
     computed: {
-
         pickerComponent() {
             if (this.isRange) {
                 return this.usesPopover ? 'RangePopover' : 'RangeInline';
@@ -137,17 +148,26 @@ export default {
                         dates: new Date()
                     }
                 ],
-                columns: this.$screens({ default: 1, lg: this.config.columns }),
-                rows: this.$screens({ default: 1, lg: this.config.rows }),
-                isExpanded: this.name === 'date' || this.config.full_width,
+                columns: this.mapCurrent({ default: 1, lg: this.config.columns }).value,
+                rows: this.mapCurrent({ default: 1, lg: this.config.rows }).value,
+                expanded: this.name === 'date' || this.config.full_width,
                 isRequired: this.config.required,
                 locale: this.$config.get('locale').replace('_', '-'),
-                masks: { input: [this.displayFormat] },
+                masks: {
+                    input: [this.displayFormat],
+                    modelValue: this.format,
+                },
                 minDate: this.config.earliest_date.date,
                 maxDate: this.config.latest_date.date,
-                modelConfig: { type: 'string', mask: this.format },
                 updateOnInput: false,
-                value: this.datePickerValue,
+                modelValue: this.datePickerValue,
+                modelModifiers: {
+                    string: true,
+                    range: this.isRange,
+                },
+                popover: {
+                    visibility: 'click',
+                }
             };
         },
 

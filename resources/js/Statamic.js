@@ -12,6 +12,9 @@ import 'vue-final-modal/style.css';
 import 'vue-toastification/dist/index.css';
 import 'floating-vue/dist/style.css';
 
+import VCalendar from 'v-calendar';
+import 'v-calendar/style.css';
+
 // import isLatLong from "validator/es/lib/isLatLong.js";
 
 import { store } from './store.js';
@@ -161,10 +164,7 @@ export default {
         this.$app.use(createVfm());
         this.$app.component('modals-container', ModalsContainer);
 
-        // Vue.use(VModal, { componentName: 'v-modal' })
-        // Vue.use(Vuex);
-        // Vue.use(VCalendar);
-
+        this.$app.use(VCalendar);
 
         this.$app.config.globalProperties.$toast = useToast();
         this.$app.config.globalProperties.$moment = window.moment;
