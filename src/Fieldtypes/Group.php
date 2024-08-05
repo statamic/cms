@@ -38,7 +38,7 @@ class Group extends Fieldtype
                         'default' => true,
                     ],
                     'border' => [
-                        'display' => __('Display Border'),
+                        'display' => __('Border'),
                         'instructions' => __('statamic::fieldtypes.grid.config.border'),
                         'type' => 'toggle',
                         'default' => true,
