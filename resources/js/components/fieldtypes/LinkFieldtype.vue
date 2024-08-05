@@ -92,7 +92,7 @@ export default {
                 case 'url':
                     return this.urlValue;
                 case 'first-child':
-                    return 'First child';
+                    return __('First child');
                 case 'entry':
                     return data_get(this.meta, 'entry.meta.data.0.title', this.entryValue);
                 case 'asset':
