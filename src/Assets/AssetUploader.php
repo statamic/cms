@@ -104,4 +104,12 @@ class AssetUploader extends Uploader
 
         return (string) $str;
     }
+
+    public static function getSafeFoldername($string)
+    {
+        $str = Stringy::create(urldecode($string))->toAscii();
+        $folders = array_filter(preg_split('/[\/\\\\]+/', $str));
+        $safe_folders = array_map(fn ($folder) => self::getSafeFilename($folder), $folders);
+        return implode('/', $safe_folders);
+    }
 }
