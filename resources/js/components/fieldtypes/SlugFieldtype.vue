@@ -3,12 +3,12 @@
         ref="slugify"
         :enabled="generate"
         :from="source"
+        :to="slug"
         :separator="separator"
         :language="language"
         :async="config.async"
         @slugifying="syncing = true"
-        @slugified="syncing = false"
-        v-model="slug"
+        @slugified="syncing = false; slug = $event"
     >
         <div>
             <text-input
@@ -38,7 +38,6 @@
             </text-input>
         </div>
     </slugify>
-
 </template>
 
 <script>
@@ -107,7 +106,6 @@ export default {
     unmounted() {
         this.$events.$off('localization.created', this.handleLocalizationCreated);
     },
-
 
     methods: {
         handleLocalizationCreated({ store }) {
