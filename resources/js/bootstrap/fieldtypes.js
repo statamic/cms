@@ -51,6 +51,7 @@ import ReplicatorIndex from '../components/fieldtypes/replicator/ReplicatorIndex
 import SectionFieldtype from '../components/fieldtypes/SectionFieldtype.vue';
 import SelectFieldtype from '../components/fieldtypes/SelectFieldtype.vue';
 // import SetsFieldtype from '../components/fieldtypes/replicator/SetsFieldtype.vue';
+import SpacerFieldtype from '../components/fieldtypes/SpacerFieldtype.vue';
 import TableFieldtype from '../components/fieldtypes/TableFieldtype.vue';
 import TagsFieldtype from '../components/fieldtypes/TagsFieldtype.vue';
 // import TagsIndexFieldtype from '../components/fieldtypes/TagsIndexFieldtype.vue';
@@ -115,6 +116,7 @@ export default function registerFieldTypes(app) {
     app.component('section-fieldtype', SectionFieldtype);
     app.component('select-fieldtype', SelectFieldtype);
     // app.component('sets-fieldtype', SetsFieldtype);
+    app.component('spacer-fieldtype', SpacerFieldtype);
     app.component('table-fieldtype', TableFieldtype);
     app.component('tags-fieldtype', TagsFieldtype);
     // app.component('tags-fieldtype-index', TagsIndexFieldtype);
