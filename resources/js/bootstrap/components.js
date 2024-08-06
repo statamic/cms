@@ -21,7 +21,7 @@ export { default as LivePreview } from '../components/live-preview/LivePreview.v
 export { default as LivePreviewPopout } from '../components/live-preview/Popout.vue';
 
 export { default as EntryPublishForm } from '../components/entries/PublishForm.vue';
-// export { default as TermPublishForm } from '../components/terms/PublishForm.vue';
+export { default as TermPublishForm } from '../components/terms/PublishForm.vue';
 // export { default as UserPublishForm } from '../components/users/PublishForm.vue';
 
 // Data List
@@ -85,7 +85,7 @@ export { default as DarkModeToggle } from '../components/DarkModeToggle.vue';
 export { default as Login } from '../components/login/Login.vue';
 // export { default as LoginModal } from '../components/login/LoginModal.vue';
 // export { default as BaseEntryCreateForm } from '../components/entries/BaseCreateForm.vue';
-// export { default as BaseTermCreateForm } from '../components/terms/BaseCreateForm.vue';
+export { default as BaseTermCreateForm } from '../components/terms/BaseCreateForm.vue';
 // export { default as CreateTermButton } from '../components/terms/CreateTermButton.vue';
 // export { default as Importer } from '../components/importer/importer';
 // export { default as FieldsetListing } from '../components/fieldsets/Listing.vue';
