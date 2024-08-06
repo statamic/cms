@@ -38,7 +38,7 @@ import Elastic from './directives/elastic.js';
 import PortalVue from 'portal-vue';
 import useProgressBar from './composables/useProgressBar';
 import useDirtyState from './composables/useDirtyState';
-import useEventBus from './composables/useEventBus';
+import useGlobalEventBus from './composables/useGlobalEventBus';
 import registerFieldTypes from './bootstrap/fieldtypes.js';
 import filters from './bootstrap/filters.js';
 import registerVueSelect from './bootstrap/vue-select/vue-select.js';
@@ -169,7 +169,7 @@ export default {
         this.$app.config.globalProperties.$toast = useToast();
         this.$app.config.globalProperties.$moment = window.moment;
         this.$app.config.globalProperties.$axios = http;
-        this.$app.config.globalProperties.$events = useEventBus();
+        this.$app.config.globalProperties.$events = useGlobalEventBus();
         this.$app.config.globalProperties.$echo = this.$echo;
         this.$app.config.globalProperties.$bard = this.$bard;
         this.$app.config.globalProperties.$keys = this.$keys;

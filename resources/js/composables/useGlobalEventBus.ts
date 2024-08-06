@@ -2,7 +2,7 @@ import emitter from 'tiny-emitter/instance';
 
 const eventBus = emitter
 
-export default function useEventBus() {
+export default function useGlobalEventBus() {
     return {
         $on: (...args) => eventBus.on(...args),
         $once: (...args) => eventBus.once(...args),

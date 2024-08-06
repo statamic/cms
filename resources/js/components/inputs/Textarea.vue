@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue';
 import autosize from 'autosize';
 
 import useLengthLimiter from '../../composables/useLengthLimiter';
-import useEventBus from '../../composables/useEventBus';
+import useGlobalEventBus from '../../composables/useGlobalEventBus';
 
-const $events = useEventBus()
+const $events = useGlobalEventBus()
 
 const props = defineProps({
     disabled: { default: false },
@@ -39,6 +39,10 @@ onMounted(() => {
     }, 1);
 
     $events.$on('tab-switched', updateSize);
+})
+
+onUnmounted(() => {
+    $events.$off('tab-switched', updateSize);
 })
 
 onBeforeUnmount(() => {
