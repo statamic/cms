@@ -11,7 +11,8 @@
         <div
             class="help-block" :class="{ '-mt-2': showLabel }"
             v-if="instructions && field.instructions_position !== 'below'"
-            v-html="instructions" />
+            v-html="instructions"
+        />
 
         <component
             :is="fieldtypeComponent"
@@ -47,6 +48,13 @@
 
 <script>
 export default {
+    emits: [
+        'focus',
+        'blur',
+        'updated',
+        'meta-updated',
+        'replicator-preview-updated',
+    ],
 
     props: {
         field: {
@@ -87,13 +95,13 @@ export default {
         },
 
         display() {
-            return __(this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1))
+            return __(this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1));
         },
 
         instructions() {
             return this.field.instructions
                 ? this.$filters.markdown(__(this.field.instructions))
-                : null
+                : null;
         },
 
         storeState() {
@@ -140,11 +148,11 @@ export default {
         },
 
         fieldId() {
-            let prefix = this.fieldPath ? this.fieldPath+'.' : '';
-            return prefix+'field_'+this.field.handle;
+            let prefix = this.fieldPath ? this.fieldPath + '.' : '';
+            return prefix + 'field_' + this.field.handle;
         }
 
     }
 
-}
+};
 </script>

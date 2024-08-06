@@ -22,7 +22,8 @@
             @update:model-value="vueSelectUpdated"
             @focus="$emit('focus')"
             @search:focus="$emit('focus')"
-            @search:blur="$emit('blur')">
+            @search:blur="$emit('blur')"
+        >
                 <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
                 <template #search="{ events, attributes }" v-if="config.multiple">
                     <input
@@ -87,6 +88,7 @@ import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 import Fieldtype from './Fieldtype.vue';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
 

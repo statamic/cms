@@ -96,6 +96,7 @@ import SortableKeyValue from '../sortable/SortableKeyValue';
 import Fieldtype from './Fieldtype.vue';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [Fieldtype, SortableHelpers],
 
