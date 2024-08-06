@@ -111,7 +111,20 @@ export default {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
             return Object.values(this.modelValue).join(', ');
-        }
+        },
+    },
+    watch: {
+        focused(focused, oldFocused) {
+            if (focused === oldFocused) return;
+
+            if (focused) return this.$emit('focus');
+
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.$emit('blur');
+                }
+            }, 1);
+        },
     },
     methods: {
         blurred() {
@@ -137,18 +150,6 @@ export default {
                 toggleFullScreen: { get: () => this.toggleFullScreen },
             });
             return group;
-        },
-
-        focused(focused, oldFocused) {
-            if (focused === oldFocused) return;
-
-            if (focused) return this.$emit('focus');
-
-            setTimeout(() => {
-                if (!this.$el.contains(document.activeElement)) {
-                    this.$emit('blur');
-                }
-            }, 1);
         },
 
         updated(handle, value) {
