@@ -3,7 +3,6 @@
         <v-date-picker
             ref="picker"
             v-bind="pickerBindings"
-            v-show="open"
             @update:model-value="dateSelected"
             :is-dark="darkMode"
         >

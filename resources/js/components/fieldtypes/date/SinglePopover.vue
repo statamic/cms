@@ -3,7 +3,6 @@
         <v-date-picker
             ref="picker"
             v-bind="bindings"
-            v-show="open"
             :is-dark="darkMode"
             @update:model-value="dateSelected"
         >
@@ -51,7 +50,6 @@ export default {
 
     data() {
         return {
-            open: false,
             portalTarget: `date-picker-${this.$.uid}`,
         };
     },
