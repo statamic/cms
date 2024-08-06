@@ -731,7 +731,7 @@ class AssetFolderTest extends TestCase
 
         Event::fake();
 
-        $folder->move('destination/folder', 'new: move');
+        $folder->move('destination/folder', 'new move');
 
         $disk->assertMissing('move');
         $disk->assertMissing('move/sub');
