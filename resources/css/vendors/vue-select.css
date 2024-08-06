@@ -173,6 +173,12 @@
 
     &.sortable-item { @apply !cursor-grab; }
 
+    &.invalid {
+        @apply border-red-300 dark:border-dark-red bg-red-100 dark:bg-red-400 text-red-500 dark:text-red-950;
+        background-image: none;
+
+        .vs__deselect { @apply text-red-500 dark:text-red-950 }
+    }
 }
 
 .vs__deselect {

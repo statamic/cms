@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions\Action;
+use Statamic\Dictionaries\Dictionary;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
@@ -54,6 +55,11 @@ abstract class AddonServiceProvider extends ServiceProvider
      * @var list<class-string<Action>>
      */
     protected $actions = [];
+
+    /**
+     * @var list<class-string<Dictionary>>
+     */
+    protected $dictionaries = [];
 
     /**
      * @var list<class-string<Fieldtype>>
@@ -187,6 +193,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootTags()
                 ->bootScopes()
                 ->bootActions()
+                ->bootDictionaries()
                 ->bootFieldtypes()
                 ->bootModifiers()
                 ->bootWidgets()
@@ -252,6 +259,15 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootActions()
     {
         foreach ($this->actions as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootDictionaries()
+    {
+        foreach ($this->dictionaries as $class) {
             $class::register();
         }
 

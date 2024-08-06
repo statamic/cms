@@ -46,6 +46,12 @@ class CacheServiceProvider extends ServiceProvider
                 ), $this->app['config']['cache.stores.file']);
             });
 
+            // Don't extend the file store if it's already being extended.
+            $creators = (fn () => $this->customCreators)->call(Cache::getFacadeRoot());
+            if (isset($creators['file'])) {
+                return;
+            }
+
             Cache::extend('file', function ($app, $config) {
                 return Cache::repository(
                     (new FileStore($app['files'], $config['path'], $config['permission'] ?? null))
