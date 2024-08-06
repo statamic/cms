@@ -213,16 +213,13 @@ export default {
 
             form.append('file', file);
 
-            const data = { ...this.extraData };
-
             // Pass along the relative path of files uploaded as a directory
             if (file.fullPath) {
-                const fileFolder = file.fullPath.split('/').slice(0, -1).join('/');
-                data.folder = tidy_url(`${data.folder}/${fileFolder}`).replace(/^[/]+/, '');
+                form.append('subfolder', file.fullPath.split('/').slice(0, -1).join('/'));
             }
 
-            for (let key in data) {
-                form.append(key, data[key]);
+            for (let key in this.extraData) {
+                form.append(key, this.extraData[key]);
             }
 
             return form;
