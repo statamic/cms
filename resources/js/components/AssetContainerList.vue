@@ -1,8 +1,8 @@
 <template>
     <data-list :visible-columns="visibleColumns" :columns="columns" :rows="initialRows">
-        <template #default="{ filteredRows: rows }">
+        <template #default>
             <div class="card p-0">
-                <data-list-table :rows="rows">
+                <data-list-table>
                     <template #cell-title="{ row: container }">
                         <a :href="container.edit_url">{{ container.title }}</a>
                     </template>

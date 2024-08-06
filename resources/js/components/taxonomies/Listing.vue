@@ -2,7 +2,7 @@
     <data-list :columns="columns" :rows="rows">
         <template #default="{ filteredRows: rows }">
             <div class="card p-0">
-                <data-list-table :rows="rows">
+                <data-list-table>
                     <template #cell-title="{ row: taxonomy }">
                         <a :href="taxonomy.terms_url">{{ __(taxonomy.title) }}</a>
                     </template>
