@@ -45,8 +45,7 @@ export default {
     props: {
         context: {
             type: Object,
-            default: () => {
-            }
+            default: () => ({})
         },
         showAlways: {
             type: Boolean,

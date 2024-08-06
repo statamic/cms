@@ -256,17 +256,20 @@ export default {
             const i = this.sharedState.selections.indexOf(id);
 
             if (i > -1) {
-                this.sharedState.selections.splice(i, 1);
+                this.sharedState.selections = this.sharedState.selections.filter(selection => selection !== id)
 
                 return;
             }
 
             if (this.singleSelect) {
-                this.sharedState.selections.pop();
+                this.sharedState.selections = []
             }
 
             if (! this.reachedSelectionLimit) {
-                this.sharedState.selections.push(id);
+                this.sharedState.selections = [
+                    ...this.sharedState.selections,
+                    id,
+                ]
             }
         },
 
