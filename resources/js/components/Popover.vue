@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, provide } from 'vue';
+import { computed, ref, provide, onUnmounted } from 'vue';
 import { useFloating, flip, offset, shift, Placement, autoUpdate } from '@floating-ui/vue';
 
 const props = withDefaults(defineProps<{
@@ -37,8 +37,7 @@ function open() {
 
     isOpen.value = true;
 
-    // @todo(jelleroorda): Escape closes popover.
-    // escBinding.value = this.$keys.bindGlobal('esc', e => this.close());
+    escBinding.value = window.Statamic.$keys.bindGlobal('esc', close);
 
     popover.value.addEventListener('transitionend', () => {
         $emit('opened');
@@ -49,7 +48,9 @@ function close() {
     if (!isOpen.value) return;
 
     isOpen.value = false;
+
     $emit('closed');
+
     escBinding.value?.destroy();
 }
 
@@ -96,9 +97,14 @@ const provide = computed(() => ({
     }
 }))
 
+onUnmounted(() => {
+    escBinding.value?.destroy();
+})
+
 defineExpose({
     open,
     close,
+    toggle,
 })
 </script>
 
