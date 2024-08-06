@@ -139,7 +139,7 @@ export default {
                         this.addFilesFromDirectory(entry, entry.name);
                     }
                 } else if (item.getAsFile) {
-                    if (!item.kind || item.kind === "file") {
+                    if (item.kind === "file" || ! item.kind) {
                         this.addFile(item.getAsFile());
                     }
                 }
@@ -153,8 +153,10 @@ export default {
                 for (let entry of entries) {
                     if (entry.isFile) {
                         entry.file((file) => {
-                            file.fullPath = `${path}/${file.name}`;
-                            this.addFile(file);
+                            if (! file.name.startsWith('.')) {
+                                file.fullPath = `${path}/${file.name}`;
+                                this.addFile(file);
+                            }
                         });
                     } else if (entry.isDirectory) {
                         this.addFilesFromDirectory(entry, `${path}/${entry.name}`);
