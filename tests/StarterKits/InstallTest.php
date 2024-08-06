@@ -7,12 +7,16 @@ use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
+use Laravel\Prompts\Key;
+use Laravel\Prompts\Prompt as LaravelPrompt;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\YAML;
+use Statamic\StarterKits\Installer;
+use Statamic\StarterKits\LicenseManager;
 use Statamic\Support\Str;
 use Tests\Fakes\Composer\FakeComposer;
 use Tests\TestCase;
@@ -38,6 +42,8 @@ class InstallTest extends TestCase
 
     public function tearDown(): void
     {
+        Prompt::resetFallbacks();
+
         $this->restoreSite();
 
         parent::tearDown();
@@ -706,6 +712,194 @@ EOT;
         $this->assertFileExists(base_path('copied.md'));
     }
 
+    #[Test]
+    public function it_installs_no_modules_by_default_when_running_non_interactively()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'seo' => [
+                    'export_paths' => [
+                        'resources/css/seo.css',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+                'bobsled' => [
+                    'export_paths' => [
+                        'resources/css/bobsled.css',
+                    ],
+                    'dependencies' => [
+                        'bobsled/speed-calculator' => '^1.0.0',
+                    ],
+                ],
+                'jamaica' => [
+                    'export_as' => [
+                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+    }
+
+    #[Test]
+    public function it_installs_modules_with_prompt_false_config_by_default_when_running_non_interactively()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'seo' => [
+                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                    'export_paths' => [
+                        'resources/css/seo.css',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+                'bobsled' => [
+                    'export_paths' => [
+                        'resources/css/bobsled.css',
+                    ],
+                    'dependencies' => [
+                        'bobsled/speed-calculator' => '^1.0.0',
+                    ],
+                ],
+                'jamaica' => [
+                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                    'export_as' => [
+                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+    }
+
+    #[Test]
+    public function it_installs_a_module_when_user_confirms_interactively_via_prompt()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'seo' => [
+                    'export_paths' => [
+                        'resources/css/seo.css',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+                'bobsled' => [
+                    'export_paths' => [
+                        'resources/css/bobsled.css',
+                    ],
+                    'dependencies' => [
+                        'bobsled/speed-calculator' => '^1.0.0',
+                    ],
+                ],
+                'jamaica' => [
+                    'export_as' => [
+                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+
+        $this->installCoolRunningsWithModulePrompts([
+            'y', Key::ENTER, // install first seo module
+            Key::ENTER,      // skip second bobsled module
+            'y', Key::ENTER, // install third jamaica module
+        ]);
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+    }
+
+    #[Test]
+    public function it_installs_modules_without_dependencies()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'dependencies' => [
+                'bobsled/speed-calculator' => '^1.0.0',
+            ],
+            'modules' => [
+                'seo' => [
+                    'export_paths' => [
+                        'resources/css/seo.css',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+
+        $this->installCoolRunningsWithModulePrompts(['y', Key::ENTER], withoutDependencies: true);
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+    }
+
     private function kitRepoPath($path = null)
     {
         return collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/');
@@ -737,18 +931,40 @@ EOT;
         return $path;
     }
 
-    private function installCoolRunnings($options = [], $customFake = null)
+    private function installCoolRunnings($options = [], $customHttpFake = null)
+    {
+        $this->httpFake($customHttpFake);
+
+        $this->artisan('statamic:starter-kit:install', array_merge([
+            'package' => 'statamic/cool-runnings',
+            '--no-interaction' => true,
+        ], $options));
+    }
+
+    private function installCoolRunningsWithModulePrompts($modulePrompts = [], $withoutDependencies = false)
+    {
+        $this->httpFake();
+
+        Prompt::fake($modulePrompts);
+
+        $licenseManager = LicenseManager::validate($package = 'statamic/cool-runnings');
+
+        // New up `Installer` class directly, because `Prompt::fake()` isn't compatible with `$this->artisan()` test helper.
+        // See: https://github.com/laravel/prompts/issues/158
+        (new Installer($package, null, $licenseManager))
+            ->withoutDependencies($withoutDependencies)
+            ->isInteractive(true)
+            ->withUserPrompt(false)
+            ->install();
+    }
+
+    private function httpFake($customFake = null)
     {
         Http::fake($customFake ?? [
             'outpost.*' => Http::response(['data' => ['price' => null]], 200),
             'repo.packagist.org/*' => Http::response('', 200),
             '*' => Http::response('', 404),
         ]);
-
-        $this->artisan('statamic:starter-kit:install', array_merge([
-            'package' => 'statamic/cool-runnings',
-            '--no-interaction' => true,
-        ], $options));
     }
 
     private function assertFileHasContent($expected, $path)
@@ -797,5 +1013,18 @@ class StarterKitTestCommand extends \Illuminate\Console\Command
     public function handle()
     {
         Blink::put('starter-kit-command-run', true);
+    }
+}
+
+class Prompt extends LaravelPrompt
+{
+    public static function resetFallbacks()
+    {
+        static::$shouldFallback = false;
+    }
+
+    public function value(): mixed
+    {
+        //
     }
 }
