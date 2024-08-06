@@ -21,7 +21,9 @@
                 </div>
             </div>
 
-            <portal-target :name="actionsPortal" class="publish-tab publish-tab-actions-footer" />
+            <div class="publish-tab publish-tab-actions-footer">
+                <portal-target :name="actionsPortal"  />
+            </div>
         </div>
     </element-container>
 </template>
