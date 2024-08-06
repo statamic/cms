@@ -5,7 +5,6 @@ import HasPagination from './data-list/HasPagination';
 import HasPreferences from './data-list/HasPreferences';
 
 export default {
-
     mixins: [
         HasActions,
         HasFilters,
@@ -41,7 +40,6 @@ export default {
     },
 
     computed: {
-
         parameterMap()  {
             return {
                 sort: 'sortColumn',
@@ -114,7 +112,6 @@ export default {
 
             return false;
         },
-
     },
 
     created() {
@@ -130,14 +127,13 @@ export default {
         }
     },
 
-    beforeUnmount() {
+    unmounted() {
         if (this.pushQuery) {
             window.removeEventListener('popstate', this.popState);
         }
     },
 
     watch: {
-
         parameters: {
             deep: true,
             handler(after, before) {
@@ -165,11 +161,9 @@ export default {
             this.request();
             this.pushState();
         }
-
     },
 
     methods: {
-
         request() {
             if (! this.requestUrl) {
                 this.loading = false;
@@ -254,8 +248,6 @@ export default {
                 this.popping = false;
             });
         },
-
     }
-
 }
 </script>

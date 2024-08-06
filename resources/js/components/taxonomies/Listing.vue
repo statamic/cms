@@ -6,6 +6,7 @@
                     <template #cell-title="{ row: taxonomy }">
                         <a :href="taxonomy.terms_url">{{ __(taxonomy.title) }}</a>
                     </template>
+
                     <template #actions="{ row: taxonomy, index }">
                         <dropdown-list placement="left-start">
                             <dropdown-item :text="__('Edit')" :redirect="taxonomy.edit_url" />
@@ -34,7 +35,6 @@
 import Listing from '../Listing.vue'
 
 export default {
-
     mixins: [Listing],
 
     props: [
@@ -48,6 +48,5 @@ export default {
             columns: this.initialColumns
         }
     }
-
 }
 </script>

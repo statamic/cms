@@ -7,12 +7,12 @@
         :danger="true"
         @confirm="confirmed"
         @cancel="cancel"
-    >
-    </confirmation-modal>
+    ></confirmation-modal>
 </template>
 
 <script>
 export default {
+    expose: ['confirm'],
 
     props: {
         resource: {

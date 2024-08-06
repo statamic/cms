@@ -39,7 +39,7 @@ export { default as DataListFilterPresets } from '../components/data-list/Filter
 // Resource Type Lists
 export { default as EntryList } from '../components/entries/Listing.vue';
 export { default as CollectionList } from '../components/collections/Listing.vue';
-// export { default as TaxonomyList } from '../components/taxonomies/Listing.vue';
+export { default as TaxonomyList } from '../components/taxonomies/Listing.vue';
 // export { default as TermList } from '../components/terms/Listing.vue';
 // export { default as AssetContainerList } from '../components/AssetContainerList.vue';
 // export { default as AddonList } from '../components/AddonList.vue';
