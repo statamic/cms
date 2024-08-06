@@ -97,7 +97,7 @@ class DefaultInvalidatorTest extends TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://localhost/blog/one', 'http://localhost/blog/two']);
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -105,6 +105,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -161,7 +162,7 @@ class DefaultInvalidatorTest extends TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->never();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://localhost/blog/one', 'http://localhost/blog/two']);
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -169,6 +170,7 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
         });
 
         $invalidator = new Invalidator($cacher, [
