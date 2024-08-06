@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Path;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\AllowedFolder;
 
 class FoldersController extends CpController
 {
@@ -15,7 +16,7 @@ class FoldersController extends CpController
 
         $request->validate([
             'path' => 'required',
-            'directory' => 'required|alpha_dash',
+            'directory' => ['required', 'string', new AllowedFolder],
         ]);
 
         $path = ltrim(Path::assemble($request->path, $request->directory), '/');

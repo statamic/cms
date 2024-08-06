@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\AssetFolder;
+use Statamic\Rules\AllowedFolder;
 
 class RenameAssetFolder extends Action
 {
@@ -43,7 +44,7 @@ class RenameAssetFolder extends Action
         return [
             'name' => [
                 'type' => 'text',
-                'validate' => 'required|alpha_dash',
+                'validate' => ['required', 'string', new AllowedFolder],
                 'classes' => 'mousetrap',
                 'focus' => true,
                 'debounce' => false,
