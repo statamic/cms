@@ -2,9 +2,9 @@
 
     <publish-field
         :config="fieldConfig"
-        :value="value"
         :errors="fieldErrors"
-        @input="$emit('input', $event)"
+        :model-value="modelValue"
+        @update:model-value="$emit('update:model-value', $event)"
     />
 
 </template>
@@ -18,7 +18,7 @@ export default {
 
     props: {
 
-        value: {},
+        modelValue: {},
 
         fieldtype: {
             type: String,

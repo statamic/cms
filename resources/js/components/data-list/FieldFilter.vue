@@ -8,8 +8,8 @@
                     :placeholder="__('Field')"
                     :options="fieldOptions"
                     :reduce="option => option.value"
-                    :value="field"
-                    @input="createFilter"
+                    :model-value="field"
+                    @update:model-value="createFilter"
                 />
 
                 <publish-container
@@ -18,18 +18,18 @@
                     :meta="{}"
                     :values="containerValues"
                     :track-dirty-state="false"
-                    class="filter-fields mt-2"
                     @updated="updateValues"
                 >
-                    <!-- TODO: handle showing/hiding of labels more elegantly -->
-                    <publish-fields
-                        slot-scope="{ setFieldValue, setFieldMeta }"
-                        :fields="filter.fields"
-                        name-prefix="filter-field"
-                        class="w-full no-label"
-                        @updated="setFieldValue"
-                        @meta-updated="setFieldMeta"
-                    />
+                    <template #default="{ setFieldValue, setFieldMeta }">
+                        <!-- TODO: handle showing/hiding of labels more elegantly -->
+                        <publish-fields
+                            :fields="filter.fields"
+                            name-prefix="filter-field"
+                            class="filter-fields mt-2 w-full no-label"
+                            @updated="setFieldValue"
+                            @meta-updated="setFieldMeta"
+                        />
+                    </template>
                 </publish-container>
 
             </div>

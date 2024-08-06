@@ -44,9 +44,9 @@
                 :placeholder="__('Add Rule')"
                 :multiple="false"
                 :searchable="true"
-                :value="selectedLaravelRule"
+                :model-value="selectedLaravelRule"
                 class="w-full"
-                @input="add"
+                @update:model-value="add"
             >
                 <template #search="{ attributes, events }">
                     <input

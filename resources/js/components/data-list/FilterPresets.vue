@@ -30,7 +30,7 @@
         </div>
 
         <confirmation-modal
-            v-if="showCreateModal"
+            v-model="showCreateModal"
             :title="__('Create New View')"
             :buttonText="__('Create')"
             @cancel="showCreateModal = false"
@@ -44,7 +44,7 @@
         </confirmation-modal>
 
         <confirmation-modal
-            v-if="showRenameModal"
+            v-model="showRenameModal"
             :title="__('Rename View')"
             :buttonText="__('Rename')"
             @cancel="showRenameModal = false"
@@ -58,7 +58,7 @@
         </confirmation-modal>
 
         <confirmation-modal
-            v-if="showDeleteModal"
+            v-model="showDeleteModal"
             :title="__('Delete View')"
             :bodyText="__('Are you sure you want to delete this view?')"
             :buttonText="__('Delete')"

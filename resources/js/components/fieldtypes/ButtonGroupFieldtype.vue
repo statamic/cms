@@ -1,7 +1,8 @@
 <template>
     <div class="button-group-fieldtype-wrapper" :class="{'inline-mode': config.inline}">
         <div class="btn-group" ref="buttonGroup">
-            <button class="btn px-4"
+            <button
+                class="btn px-4"
                 v-for="(option, $index) in options"
                 :key="$index"
                 ref="button"
@@ -9,7 +10,7 @@
                 @click="update($event.target.value)"
                 :value="option.value"
                 :disabled="isReadOnly"
-                :class="{'active': value === option.value}"
+                :class="{'active': modelValue === option.value}"
                 v-text="option.label || option.value"
             />
         </div>
@@ -19,6 +20,7 @@
 <script>
 import HasInputOptions from './HasInputOptions.js'
 import ResizeObserver from 'resize-observer-polyfill';
+import Fieldtype from './Fieldtype.vue';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
@@ -33,7 +35,7 @@ export default {
         this.setupResizeObserver();
     },
 
-    beforeDestroy() {
+    unmounted() {
         this.resizeObserver.disconnect();
     },
 
@@ -45,8 +47,9 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            var option = _.findWhere(this.config.options, {value: this.value});
-            return (option) ? option.label : this.value;
+            var option = _.findWhere(this.config.options, { value: this.modelValue });
+
+            return (option) ? option.label : this.modelValue;
         },
     },
 

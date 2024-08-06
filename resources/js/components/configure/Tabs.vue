@@ -21,19 +21,22 @@
                 </div>
             </div>
 
-            <portal-target :name="actionsPortal" class="publish-tab publish-tab-actions-footer" />
+            <div class="publish-tab publish-tab-actions-footer">
+                <portal-target :name="actionsPortal"  />
+            </div>
         </div>
     </element-container>
 </template>
 
 <script>
 export default {
+    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
 
     inject: ['storeName'],
 
     props: {
         readOnly: Boolean,
-        syncable: Boolean
+        syncable: Boolean,
     },
 
     data() {
@@ -46,7 +49,6 @@ export default {
     },
 
     computed: {
-
         state() {
             return this.$store.state.publish[this.storeName];
         },
@@ -56,20 +58,22 @@ export default {
         },
 
         mainTabs() {
-            if (! this.shouldShowSidebar) return this.tabs;
+            // @todo(jasonvarga): is this correct? Seems to be from copy paste from publish/tabs.vue
+            // Since this.shouldShowSidebar doesn't exist this would always return all tabs.
+            return this.tabs
 
-            if (this.active === "sidebar") {
-                this.active = this.state.blueprint.tabs[0].handle
-            }
-
-            return _.filter(this.tabs, tab => tab.handle != 'sidebar');
+            // if (! this.shouldShowSidebar) return this.tabs;
+            //
+            // if (this.active === "sidebar") {
+            //     this.active = this.state.blueprint.tabs[0].handle
+            // }
+            //
+            // return _.filter(this.tabs, tab => tab.handle != 'sidebar');
         },
 
         actionsPortal() {
             return `publish-actions-${this.storeName}`;
         }
-
     }
-
 }
 </script>

@@ -1,3 +1,4 @@
+import { nextTick } from 'vue'; // Import nextTick from Vue 3
 import { closestVm } from '../bootstrap/globals';
 
 class Reveal {
@@ -16,7 +17,7 @@ class Reveal {
             }
             parent = parent.parentElement;
         }
-        Vue.nextTick(() => {
+        nextTick(() => { // Use the imported nextTick function
             el.scrollIntoView({
                 block: 'center',
             });
@@ -24,7 +25,7 @@ class Reveal {
     }
 
     invalid() {
-        Vue.nextTick(() => {
+        nextTick(() => { // Use the imported nextTick function
             const el = document.querySelector('.publish-field.has-error:not(:has(.publish-field.has-error))');
             if (!el) return;
             this.element(el);

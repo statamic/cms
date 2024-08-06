@@ -11,20 +11,22 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue }">
+        <template #default="{ setFieldValue }">
+            <div>
 
-            <div class="flex items-center mb-6">
-                <h1 class="flex-1">
-                    <small class="subhead block">
-                        <a :href="listingUrl" v-text="__('Assets')" />
-                    </small>
-                    {{ title }}
-                </h1>
-                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+                <div class="flex items-center mb-6">
+                    <h1 class="flex-1">
+                        <small class="subhead block">
+                            <a :href="listingUrl" v-text="__('Assets')" />
+                        </small>
+                        {{ title }}
+                    </h1>
+                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+                </div>
+
+                <configure-tabs @updated="setFieldValue" :enable-sidebar="false"/>
             </div>
-
-            <configure-tabs @updated="setFieldValue" :enable-sidebar="false"/>
-        </div>
+        </template>
     </publish-container>
 
 </template>

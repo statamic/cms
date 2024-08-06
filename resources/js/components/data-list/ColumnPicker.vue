@@ -8,7 +8,7 @@
             <svg-icon name="light/settings-horizontal" class="w-4 h-4" />
         </button>
 
-        <modal v-if="open" name="column-picker" @closed="open = false" draggable=".modal-drag-handle" click-to-close>
+        <modal v-model="open" name="column-picker" draggable=".modal-drag-handle" click-to-close>
             <div class="flex flex-col h-full -max-h-screen-px">
 
                 <header class="modal-drag-handle p-4 bg-gray-200 dark:bg-dark-650 border-b dark:border-dark-900 flex items-center justify-between cursor-grab active:cursor-grabbing">

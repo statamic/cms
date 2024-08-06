@@ -1,26 +1,27 @@
 <template>
 
     <div class="publish-fields @container">
-
-        <publish-field
+        <template
             v-for="field in fields"
-            v-show="showField(field)"
             :key="field.handle"
-            :config="field"
-            :value="values[field.handle]"
-            :meta="meta[field.handle]"
-            :errors="errors[field.handle]"
-            :read-only="readOnly"
-            :syncable="isSyncableField(field)"
-            :name-prefix="namePrefix"
-            @input="$emit('updated', field.handle, $event)"
-            @meta-updated="$emit('meta-updated', field.handle, $event)"
-            @synced="$emit('synced', field.handle)"
-            @desynced="$emit('desynced', field.handle)"
-            @focus="$emit('focus', field.handle)"
-            @blur="$emit('blur', field.handle)"
-        />
-
+        >
+            <publish-field
+                v-show="showField(field)"
+                :config="field"
+                :meta="meta[field.handle]"
+                :errors="errors[field.handle]"
+                :read-only="readOnly"
+                :syncable="isSyncableField(field)"
+                :name-prefix="namePrefix"
+                :model-value="values[field.handle]"
+                @update:model-value="$emit('updated', field.handle, $event)"
+                @meta-updated="$emit('meta-updated', field.handle, $event)"
+                @synced="$emit('synced', field.handle)"
+                @desynced="$emit('desynced', field.handle)"
+                @focus="$emit('focus', field.handle)"
+                @blur="$emit('blur', field.handle)"
+            />
+        </template>
     </div>
 
 </template>
@@ -30,6 +31,7 @@ import PublishField from './Field.vue';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
+    emits: ['focus', 'blur', 'synced', 'desynced', 'updated', 'meta-updated'],
 
     components: { PublishField },
 

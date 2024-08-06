@@ -1,118 +1,118 @@
 <template>
-
-    <element-container @resized="containerWasResized">
     <div>
+        <element-container @resized="containerWasResized">
+            <div>
+                <!-- Tabs -->
+                <div v-if="showTabs" class="tabs-container flex items-center">
+                    <div
+                        ref="tabsContainer"
+                        class="publish-tabs tabs"
+                        :class="{ 'tabs-scrolled': canScrollLeft }"
+                        role="tablist"
+                        :aria-label="__('Edit Content')"
+                        @keydown.prevent.arrow-left="activatePreviousTab"
+                        @keydown.prevent.arrow-right="activateNextTab"
+                        @keydown.prevent.arrow-up="activatePreviousTab"
+                        @keydown.prevent.arrow-down="activateNextTab"
+                        @keydown.prevent.home="activateFirstTab"
+                        @keydown.prevent.end="activateLastTab"
+                        @mousewheel.prevent="scrollTabs"
+                        @scroll="updateScrollHints"
+                    >
+                        <button
+                            v-for="tab in mainTabs"
+                            :key="tab.handle"
+                            ref="tabs"
+                            class="tab-button"
+                            :class="{
+                                'active': isActive(tab.handle),
+                                'has-error': tabHasError(tab.handle),
+                            }"
+                            role="tab"
+                            :id="tabId(tab.handle)"
+                            :aria-controls="tabPanelId(tab.handle)"
+                            :aria-selected="isActive(tab.handle)"
+                            :tabindex="isActive(tab.handle) ? 0 : -1"
+                            @click="setActive(tab.handle)"
+                            v-text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
+                        />
+                    </div>
+                    <div class="fade-left" v-if="canScrollLeft" />
+                    <div class="fade-right" :class="{ 'mr-8': showHiddenTabsDropdown }" v-if="canScrollRight" />
 
-        <!-- Tabs -->
-        <div v-if="showTabs" class="tabs-container flex items-center">
-            <div
-                class="publish-tabs tabs"
-                :class="{ 'tabs-scrolled': canScrollLeft }"
-                ref="tabs"
-                role="tablist"
-                :aria-label="__('Edit Content')"
-                @keydown.prevent.arrow-left="activatePreviousTab"
-                @keydown.prevent.arrow-right="activateNextTab"
-                @keydown.prevent.arrow-up="activatePreviousTab"
-                @keydown.prevent.arrow-down="activateNextTab"
-                @keydown.prevent.home="activateFirstTab"
-                @keydown.prevent.end="activateLastTab"
-                @mousewheel.prevent="scrollTabs"
-                @scroll="updateScrollHints"
-            >
-                <button v-for="tab in mainTabs"
-                    class="tab-button"
-                    :ref="tab.handle + '-tab'"
-                    :key="tab.handle"
-                    :class="{
-                        'active': isActive(tab.handle),
-                        'has-error': tabHasError(tab.handle),
-                    }"
-                    role="tab"
-                    :id="tabId(tab.handle)"
-                    :aria-controls="tabPanelId(tab.handle)"
-                    :aria-selected="isActive(tab.handle)"
-                    :tabindex="isActive(tab.handle) ? 0 : -1"
-                    @click="setActive(tab.handle)"
-                    v-text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
-                />
-            </div>
-            <div class="fade-left" v-if="canScrollLeft" />
-            <div class="fade-right" :class="{ 'mr-8': showHiddenTabsDropdown }" v-if="canScrollRight" />
-
-
-            <dropdown-list class="rtl:mr-2 ltr:ml-2" v-cloak v-if="showHiddenTabsDropdown">
-                <dropdown-item
-                    v-for="(tab, index) in mainTabs"
-                    v-show="shouldShowInDropdown(index)"
-                    :key="tab.handle"
-                    :text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
-                    @click.prevent="setActive(tab.handle)"
-                />
-            </dropdown-list>
-        </div>
-
-        <!-- Main and Sidebar -->
-        <div class="publish-tab-outer">
-
-            <!-- Main -->
-            <div ref="publishTabWrapper" class="publish-tab-wrapper w-full min-w-0">
-                <div
-                    class="publish-tab tab-panel w-full"
-                    :class="showTabs"
-                    :role="showTabs && 'tabpanel'"
-                    :id="showTabs && tabPanelId(tab.handle)"
-                    :aria-labelledby="showTabs && tabId(tab.handle)"
-                    :data-tab-handle="tab.handle"
-                    tabindex="0"
-                    :key="tab.handle"
-                    v-for="tab in mainTabs"
-                    v-show="isActive(tab.handle)"
-                >
-                    <publish-sections
-                        :sections="tab.sections"
-                        :read-only="readOnly"
-                        :syncable="syncable"
-                        @updated="(handle, value) => $emit('updated', handle, value)"
-                        @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
-                        @synced="$emit('synced', $event)"
-                        @desynced="$emit('desynced', $event)"
-                        @focus="$emit('focus', $event)"
-                        @blur="$emit('blur', $event)"
-                    />
+                    <dropdown-list class="rtl:mr-2 ltr:ml-2" v-cloak v-if="showHiddenTabsDropdown">
+                        <dropdown-item
+                            v-for="(tab, index) in mainTabs"
+                            v-show="shouldShowInDropdown(index)"
+                            :key="tab.handle"
+                            :text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
+                            @click.prevent="setActive(tab.handle)"
+                        />
+                    </dropdown-list>
                 </div>
-            </div>
 
-            <!-- Sidebar(ish) -->
-            <div :class="{ 'publish-sidebar': shouldShowSidebar }">
-                <div class="publish-tab">
-                    <div class="publish-tab-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
-                        <v-portal :to="actionsPortal" :disabled="shouldShowSidebar">
-                            <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
-                        </v-portal>
+                <!-- Main and Sidebar -->
+                <div class="publish-tab-outer">
+
+                    <!-- Main -->
+                    <div ref="publishTabWrapper" class="publish-tab-wrapper w-full min-w-0">
+                        <div
+                            class="publish-tab tab-panel w-full"
+                            :class="showTabs"
+                            :role="showTabs && 'tabpanel'"
+                            :id="showTabs && tabPanelId(tab.handle)"
+                            :aria-labelledby="showTabs && tabId(tab.handle)"
+                            :data-tab-handle="tab.handle"
+                            tabindex="0"
+                            :key="tab.handle"
+                            v-for="tab in mainTabs"
+                            v-show="isActive(tab.handle)"
+                        >
+                            <publish-sections
+                                :sections="tab.sections"
+                                :read-only="readOnly"
+                                :syncable="syncable"
+                                @updated="(handle, value) => $emit('updated', handle, value)"
+                                @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
+                                @synced="$emit('synced', $event)"
+                                @desynced="$emit('desynced', $event)"
+                                @focus="$emit('focus', $event)"
+                                @blur="$emit('blur', $event)"
+                            />
+                        </div>
                     </div>
 
-                    <publish-sections
-                        v-if="layoutReady && shouldShowSidebar && sidebarTab"
-                        :sections="sidebarTab.sections"
-                        :read-only="readOnly"
-                        :syncable="syncable"
-                        @updated="(handle, value) => $emit('updated', handle, value)"
-                        @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
-                        @synced="$emit('synced', $event)"
-                        @desynced="$emit('desynced', $event)"
-                        @focus="$emit('focus', $event)"
-                        @blur="$emit('blur', $event)"
-                    />
+                    <!-- Sidebar(ish) -->
+                    <div :class="{ 'publish-sidebar': shouldShowSidebar }">
+                        <div class="publish-tab">
+                            <div class="publish-tab-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
+                                 <v-portal :to="actionsPortal" :disabled="shouldShowSidebar">
+                                     <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
+                                 </v-portal>
+                            </div>
+
+                            <publish-sections
+                                v-if="layoutReady && shouldShowSidebar && sidebarTab"
+                                :sections="sidebarTab.sections"
+                                :read-only="readOnly"
+                                :syncable="syncable"
+                                @updated="(handle, value) => $emit('updated', handle, value)"
+                                @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
+                                @synced="$emit('synced', $event)"
+                                @desynced="$emit('desynced', $event)"
+                                @focus="$emit('focus', $event)"
+                                @blur="$emit('blur', $event)"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="publish-tab publish-tab-actions-footer">
+                    <portal-target :name="actionsPortal" />
                 </div>
             </div>
-        </div>
-
-        <portal-target :name="actionsPortal" class="publish-tab publish-tab-actions-footer" />
-
+        </element-container>
     </div>
-    </element-container>
-
 </template>
 
 <script>
@@ -120,6 +120,7 @@ import { uniq } from 'underscore';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
+    emits: ['synced', 'desynced', 'focus', 'blur', 'updated', 'meta-updated'],
 
     inject: ['storeName'],
 
@@ -131,7 +132,7 @@ export default {
         enableSidebar: {
             type: Boolean,
             default: true
-        }
+        },
     },
 
     data() {
@@ -145,7 +146,7 @@ export default {
             tabsAreScrolled: false,
             canScrollLeft: false,
             canScrollRight: false,
-        }
+        };
     },
 
     computed: {
@@ -163,7 +164,7 @@ export default {
         },
 
         mainTabs() {
-            if (this.layoutReady && ! this.shouldShowSidebar) return this.tabs;
+            if (this.layoutReady && !this.shouldShowSidebar) return this.tabs;
 
             return this.tabs.filter(tab => tab.handle !== 'sidebar');
         },
@@ -177,7 +178,7 @@ export default {
         },
 
         showTabs() {
-            return this.layoutReady && this.numberOfTabs > 1
+            return this.layoutReady && this.numberOfTabs > 1;
         },
 
         showHiddenTabsDropdown() {
@@ -190,6 +191,7 @@ export default {
 
         tabsWithErrors() {
             let fields = {};
+
             Object.values(this.tabs).forEach(tab => {
                 tab.sections.forEach(section => {
                     section.fields.forEach(field => {
@@ -254,6 +256,10 @@ export default {
 
             if (!this.inStack) {
                 window.location.hash = handle;
+            }
+
+            if (!this.showTabs) {
+                return;
             }
 
             const tab = this.getTabNode(handle);
@@ -336,13 +342,13 @@ export default {
         },
 
         getTabNode(handle) {
-            return this.$refs.tabs.childNodes[this.tabIndex(handle)];
+            return this.$refs.tabs[this.tabIndex(handle)]
         },
 
         scrollTabs(event) {
-            if (!this.$refs.tabs) return;
+            if (!this.$refs.tabsContainer) return;
 
-            this.$refs.tabs.scrollLeft += event.deltaY;
+            this.$refs.tabsContainer.scrollLeft += event.deltaY;
 
             this.updateHiddenTabs();
         },
@@ -351,8 +357,10 @@ export default {
             if (typeof tab === 'string') {
                 tab = this.getTabNode(tab);
             }
+
             if (!tab) {
                 console.error(`Tab '${tab}' not found`);
+
                 return;
             }
 
@@ -365,8 +373,7 @@ export default {
 
             if (side === 'left') {
                 this.$refs.tabs.scrollLeft = tab.offsetLeft - offset;
-            }
-            else {
+            } else {
                 this.$refs.tabs.scrollLeft = tab.offsetLeft + tab.offsetWidth - this.$refs.tabs.clientWidth + offset + 8;
             }
 
@@ -398,19 +405,19 @@ export default {
 
             const hidden = [];
 
-            this.$refs.tabs.childNodes.forEach((tab, index) => {
+            this.$refs.tabs.forEach((tab, index) => {
                 if (this.tabIsOutsideView(tab, 20)) {
                     hidden.push(index);
                 }
             });
 
             if (JSON.stringify(hidden) !== JSON.stringify(this.hiddenTabs)) {
-               this.hiddenTabs = hidden;
+                this.hiddenTabs = hidden;
             }
         },
 
         tabIsOutsideView(tab, tolerance = 0) {
-            const viewportRect = this.$refs.tabs.getBoundingClientRect();
+            const viewportRect = this.$refs.tabsContainer.getBoundingClientRect();
             const tabRect = tab.getBoundingClientRect();
 
             if ((viewportRect.left - tabRect.left) > tolerance) {
@@ -429,5 +436,5 @@ export default {
         }
     }
 
-}
+};
 </script>

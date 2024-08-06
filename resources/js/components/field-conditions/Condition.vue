@@ -4,7 +4,6 @@
 
         <v-select
             ref="fieldSelect"
-            :value="condition.field"
             class="w-full md:w-1/3 mb-2 md:mb-0"
             :options="fieldOptions"
             :placeholder="__('Field')"
@@ -12,11 +11,12 @@
             :push-tags="true"
             :reduce="field => field.value"
             :create-option="field => ({value: field, label: field })"
-            @input="fieldSelected"
+            :model-value="condition.field"
+            @update:model-value="fieldSelected"
             @search:blur="fieldSelectBlur"
         >
             <template #no-options><div class="hidden" /></template>
-            <template slot="option" slot-scope="option">
+            <template #option="option">
                 <div class="flex items-center">
                     <span v-text="option.label" />
                     <span v-text="option.value" class="font-mono text-2xs text-gray-500 dark:text-dark-150" :class="{ 'ml-2': option.label }" />
@@ -40,7 +40,6 @@
         <v-select
             v-else-if="showValueDropdown"
             ref="valueSelect"
-            :value="condition.value"
             class="rtl:mr-4 ltr:ml-4 w-full md:w-52 mb-2 md:mb-0"
             :options="valueOptions"
             :placeholder="__('Option')"
@@ -48,7 +47,8 @@
             :push-tags="true"
             :reduce="field => field.value"
             :create-option="field => ({value: field, label: field })"
-            @input="valueUpdated"
+            :model-value="condition.value"
+            @update:model-value="valueUpdated"
             @search:blur="valueSelectBlur"
         >
             <template #no-options><div class="hidden" /></template>

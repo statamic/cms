@@ -5,7 +5,7 @@
             :key="$index"
             class="option"
             :class="{
-                'selected': value === option.value,
+                'selected': modelValue === option.value,
                 'disabled': isReadOnly
             }"
         >
@@ -13,26 +13,27 @@
                 <svg-icon
                     name="regular/radio-deselected"
                     class="radio-icon"
-                    :aria-hidden="value === option.value"
+                    :aria-hidden="modelValue === option.value"
                     @click="update($event.target.value)"
-                    v-show="value !== option.value"
+                    v-show="modelValue !== option.value"
                     v-cloak
                 />
                 <svg-icon
                     name="regular/radio-selected"
                     class="radio-icon"
-                    :aria-hidden="value !== option.value"
+                    :aria-hidden="modelValue !== option.value"
                     @click="update($event.target.value)"
-                    v-show="value === option.value"
+                    v-show="modelValue === option.value"
                     v-cloak
                 />
-                <input type="radio"
+                <input
+                    type="radio"
                     ref="radio"
                     :name="name"
                     @input="update($event.target.value)"
                     :value="option.value"
                     :disabled="isReadOnly"
-                    :checked="value === option.value"
+                    :checked="modelValue === option.value"
                 />
                 {{ option.label || option.value }}
             </label>
@@ -42,6 +43,7 @@
 
 <script>
 import HasInputOptions from './HasInputOptions.js'
+import Fieldtype from './Fieldtype.vue';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
@@ -54,8 +56,9 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            var option = _.findWhere(this.config.options, {value: this.value});
-            return (option) ? option.label : this.value;
+            var option = _.findWhere(this.config.options, { value: this.modelValue });
+
+            return (option) ? option.label : this.modelValue;
         },
     },
 

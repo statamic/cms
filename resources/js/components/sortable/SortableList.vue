@@ -1,24 +1,26 @@
 <script>
-import { Sortable, Plugins } from '@shopify/draggable'
+import { Sortable, Plugins } from '@shopify/draggable';
+import { vue_element } from '../../node_helpers.js';
 
 function move(items, oldIndex, newIndex) {
     const itemRemovedArray = [
         ...items.slice(0, oldIndex),
         ...items.slice(oldIndex + 1, items.length)
-    ]
+    ];
 
     return [
         ...itemRemovedArray.slice(0, newIndex),
         items[oldIndex],
         ...itemRemovedArray.slice(newIndex, itemRemovedArray.length)
-    ]
+    ];
 }
 
 export default {
-
+    emits: ['dragstart', 'dragend', 'update:model-value'],
     props: {
-        value: {
+        modelValue: {
             required: true,
+            type: Array,
         },
         itemClass: {
             default: 'sortable-item',
@@ -34,7 +36,8 @@ export default {
             default: null,
         },
         options: {
-            default: () => {}
+            default: () => {
+            }
         },
         vertical: {
             type: Boolean
@@ -63,11 +66,10 @@ export default {
     data() {
         return {
             sortable: null,
-        }
+        };
     },
 
     computed: {
-
         computedOptions() {
             let plugins = [];
             if (this.animate) plugins.push(Plugins.SwapAnimation);
@@ -89,25 +91,24 @@ export default {
             }
 
             if (this.appendTo) {
-                options.mirror.appendTo = this.appendTo
+                options.mirror.appendTo = this.appendTo;
             }
 
             return options;
         }
+    },
 
+    watch: {
+        disabled(disabled) {
+            disabled ? this.destroySortableList() : this.setupSortableList();
+        }
     },
 
     provide() {
         return {
             itemClass: this.itemClass,
             handleClass: this.handleClass,
-        }
-    },
-
-    render() {
-        return this.$scopedSlots.default({
-            items: this.value,
-        })
+        };
     },
 
     mounted() {
@@ -118,20 +119,30 @@ export default {
         this.setupSortableList();
     },
 
+    unmounted() {
+        this.sortable?.destroy();
+    },
+
     methods: {
         setupSortableList() {
-            this.sortable = new Sortable(this.$el, this.computedOptions);
+            // Since Vue components can now contain multiple children,
+            // We'll get the first child of the vue component and make that the sortable container.
+            const firstChild = vue_element(this.$el);
+
+            if (!firstChild) {
+                console.warn('Could not find a sortable root container, does your SortableList have a child element?')
+
+                return;
+            }
+
+            this.sortable = new Sortable(firstChild, this.computedOptions);
 
             this.sortable.on('drag:start', () => this.$emit('dragstart'));
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-                this.$emit('input', move(this.value, oldIndex, newIndex))
-            })
-
-            this.$on('hook:destroyed', () => {
-                this.sortable.destroy()
-            })
+                this.$emit('update:model-value', move(this.modelValue, oldIndex, newIndex));
+            });
 
             if (this.mirror === false) {
                 this.sortable.on('mirror:create', (e) => e.cancel());
@@ -139,15 +150,12 @@ export default {
         },
 
         destroySortableList() {
-            this.sortable.destroy()
+            this.sortable.destroy();
         },
     },
-
-    watch: {
-        disabled(disabled) {
-            disabled ? this.destroySortableList() : this.setupSortableList();
-        },
-    },
-
-}
+};
 </script>
+
+<template>
+    <slot :items="modelValue" />
+</template>

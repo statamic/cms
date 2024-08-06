@@ -4,7 +4,7 @@
         <slot :action="action" :select="select" />
 
         <confirmation-modal
-            v-if="confirming"
+            v-model="confirming"
             :title="action.title"
             :danger="action.dangerous"
             :buttonText="runButtonText"
@@ -26,12 +26,13 @@
                 :errors="errors"
                 @updated="values = $event"
             >
-                <publish-fields
-                    slot-scope="{ setFieldValue, setFieldMeta }"
-                    :fields="action.fields"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                />
+                <template #default="{ setFieldValue, setFieldMeta }">
+                    <publish-fields
+                        :fields="action.fields"
+                        @updated="setFieldValue"
+                        @meta-updated="setFieldMeta"
+                    />
+                </template>
             </publish-container>
         </confirmation-modal>
     </span>

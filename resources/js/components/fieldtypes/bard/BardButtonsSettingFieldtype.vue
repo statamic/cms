@@ -1,7 +1,6 @@
 <template>
     <div class="relative">
         <div class="bard-fixed-toolbar dark bard-toolbar-setting" ref="buttons">
-
             <button
                 v-for="button in buttons"
                 :key="button.name"
@@ -12,22 +11,21 @@
                 <svg-icon :name="button.svg" v-if="button.svg"></svg-icon>
                 <div class="flex items-center" v-html="button.html" v-if="button.html"></div>
             </button>
-
         </div>
     </div>
 </template>
 
 <script>
-import {Sortable, Plugins} from '@shopify/draggable';
+import { Sortable, Plugins } from '@shopify/draggable';
 import { availableButtons, addButtonHtml } from './buttons';
+import Fieldtype from '../Fieldtype.vue';
 
 export default {
-
     mixins: [Fieldtype],
 
     data() {
         return {
-            data: this.value,
+            data: this.modelValue,
             buttons: [],
             autoBindChangeWatcher: false,
         };
@@ -39,7 +37,6 @@ export default {
     },
 
     watch: {
-
         buttons: {
             deep: true,
             handler(buttons) {
@@ -55,11 +52,9 @@ export default {
         data(data) {
             this.update(data);
         },
-
     },
 
     methods: {
-
         initButtons() {
             // Get all default buttons first
             let available = availableButtons();
@@ -103,6 +98,7 @@ export default {
             // and disabled buttons get stuck on the end. Otherwise, things will remain the same,
             // with inactive buttons dispersed throughout the toolbar, which looks cooler.
             let enabledButtonNames = buttons.filter(button => button.enabled).map(button => button.name);
+
             if (JSON.stringify(enabledButtonNames) !== JSON.stringify(this.data)) {
                 buttons = this.data.map(name => _.findWhere(buttons, { name }));
                 let unused = available.filter(button => !this.data.includes(button.name));

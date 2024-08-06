@@ -1,15 +1,13 @@
 <template>
-
     <div class="bard-link-toolbar">
         <div>
             <div class="px-4 py-4 border-b dark:border-dark-900">
-
                 <div class="flex">
-
                     <div class="h-8 mb-4 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 border dark:border-dark-200 rounded shadow-inner flex items-center rtl:ml-1 ltr:mr-1">
                         <select
                             class="input w-auto text-sm px-1"
-                            v-model="linkType">
+                            v-model="linkType"
+                        >
                             <option
                                 v-for="visibleLinkType in visibleLinkTypes"
                                 :value="visibleLinkType.type"
@@ -20,7 +18,6 @@
                     </div>
 
                     <div class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center">
-
                         <!-- URL input -->
                         <input
                             v-if="linkType === 'url'"
@@ -60,7 +57,6 @@
                             class="w-full flex items-center justify-between cursor-pointer"
                             @click="openSelector"
                         >
-
                             <loading-graphic v-if="isLoading" :inline="true" />
 
                             <div v-else class="flex-1 flex items-center rtl:ml-2 ltr:mr-2 truncate">
@@ -73,7 +69,7 @@
                             </div>
 
                             <button
-                            class="flex items-center"
+                                class="flex items-center"
                                 v-tooltip="`${__('Browse')}...`"
                                 :aria-label="`${__('Browse')}...`"
                                 @click="openSelector"
@@ -81,16 +77,13 @@
                                 <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
                                 <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
                             </button>
-
                         </div>
-
                     </div>
-
                 </div>
 
 
                 <!-- Title attribute -->
-                <div class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center" >
+                <div class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center">
                     <input
                         type="text"
                         ref="input"
@@ -101,7 +94,7 @@
                 </div>
 
                 <!-- Rel attribute -->
-                <div class="h-8 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center" >
+                <div class="h-8 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center">
                     <input
                         type="text"
                         ref="input"
@@ -111,16 +104,24 @@
                     />
                 </div>
 
-                <label for="target-blank" class="mt-4 flex items-center font-normal cursor-pointer text-gray-800 dark:text-dark-150 hover:text-black dark:hover:text-dark-100" v-if="canHaveTarget">
+                <label
+                    v-if="canHaveTarget"
+                    for="target-blank"
+                    class="mt-4 flex items-center font-normal cursor-pointer text-gray-800 dark:text-dark-150 hover:text-black dark:hover:text-dark-100"
+                >
                     <input class="checkbox rtl:ml-2 ltr:mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
             </div>
 
             <footer class="bg-gray-100 dark:bg-dark-575 rounded-b-md flex items-center justify-end space-x-3 rtl:space-x-reverse font-normal p-2">
-                <button @click="$emit('canceled')" class="text-xs text-gray-600 dark:text-dark-175 hover:text-gray-800 dark:hover-text-dark-100">
+                <button
+                    @click="$emit('canceled')"
+                    class="text-xs text-gray-600 dark:text-dark-175 hover:text-gray-800 dark:hover-text-dark-100"
+                >
                     {{ __('Cancel') }}
                 </button>
+
                 <button
                     :aria-label="__('Remove Link')"
                     @click="remove"
@@ -128,6 +129,7 @@
                 >
                     {{ __('Remove Link') }}
                 </button>
+
                 <button
                     :disabled="! canCommit"
                     v-tooltip="__('Apply Link')"
@@ -138,16 +140,14 @@
                     {{ __('Save') }}
                 </button>
             </footer>
-
         </div>
 
         <!-- Selectors -->
-
         <relationship-input
             class="hidden"
             ref="relationshipInput"
             name="link"
-            :value="[]"
+            :model-value="[]"
             :config="relationshipConfig"
             :item-data-url="itemDataUrl"
             :selections-url="selectionsUrl"
@@ -160,7 +160,7 @@
             @item-data-updated="entrySelected"
         />
 
-         <stack
+        <stack
             v-if="showAssetSelector"
             name="asset-selector"
             @closed="closeAssetSelector"
@@ -177,7 +177,6 @@
             />
         </stack>
     </div>
-
 </template>
 
 <script>
@@ -216,14 +215,14 @@ export default {
             targetBlank: null,
             showAssetSelector: false,
             isLoading: false,
-        }
+        };
     },
 
     computed: {
 
         visibleLinkTypes() {
             return this.linkTypes.filter((type) => {
-                if (type.type === 'asset' && ! this.config.container) {
+                if (type.type === 'asset' && !this.config.container) {
                     return false;
                 }
                 return true;
@@ -246,7 +245,7 @@ export default {
         },
 
         canCommit() {
-            return !! this.url[this.linkType];
+            return !!this.url[this.linkType];
         },
 
         href() {
@@ -325,8 +324,8 @@ export default {
     created() {
         this.applyAttrs(this.linkAttrs);
 
-        this.bard.$on('link-selected', this.applyAttrs);
-        this.bard.$on('link-deselected', () => this.$emit('deselected'));
+        this.bard.eventBus.on('link-selected', this.applyAttrs);
+        this.bard.eventBus.on('link-deselected', () => this.$emit('deselected'));
     },
 
     mounted() {
@@ -334,8 +333,8 @@ export default {
     },
 
     beforeDestroy() {
-        this.bard.$off('link-selected');
-        this.bard.$off('link-deselected');
+        this.bard.eventBus.off('link-selected');
+        this.bard.eventBus.off('link-deselected');
     },
 
     methods: {
@@ -370,14 +369,14 @@ export default {
             this.url = {
                 ...this.url,
                 [type]: url,
-            }
+            };
         },
 
         setItemData(type, itemData) {
             this.itemData = {
                 ...this.itemData,
                 [type]: itemData,
-            }
+            };
         },
 
         remove() {
@@ -402,7 +401,7 @@ export default {
 
             return str.match(/^\w[\w\-_\.]+\.(co|uk|com|org|net|gov|biz|info|us|eu|de|fr|it|es|pl|nz)/i)
                 ? `https://${str}`
-                : str
+                : str;
         },
 
         openSelector() {
@@ -435,7 +434,7 @@ export default {
             this.$axios.post(cp_url('assets-fieldtype'), {
                 assets: [url],
             }).then(response => {
-                this.selectItem('asset', response.data[0])
+                this.selectItem('asset', response.data[0]);
                 this.isLoading = false;
             });
         },
@@ -477,7 +476,7 @@ export default {
 
         getUrlDataForUrl(url) {
             const matches = url ? url.match(/^(mailto|tel):(.*)$/) : null;
-            if (! matches) {
+            if (!matches) {
                 return null;
             }
 
@@ -486,7 +485,7 @@ export default {
 
         getItemDataForUrl(url) {
             const { ref } = this.parseDataUrl(url);
-            if (! ref) {
+            if (!ref) {
                 return null;
             }
 
@@ -494,22 +493,22 @@ export default {
         },
 
         parseDataUrl(url) {
-            if (! url) {
-                return {}
+            if (!url) {
+                return {};
             }
 
             const regex = /^statamic:\/\/((.*?)::(.*))$/;
 
             const matches = url.match(regex);
-            if (! matches) {
+            if (!matches) {
                 return {};
             }
 
             const [_, ref, type, id] = matches;
 
-            return { ref, type, id};
+            return { ref, type, id };
         }
     }
 
-}
+};
 </script>

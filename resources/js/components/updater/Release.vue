@@ -19,7 +19,7 @@
         </div>
 
         <confirmation-modal
-             v-if="confirmationPrompt"
+             v-model="confirmationPrompt"
              :buttonText="__('OK')"
              :cancellable="false"
              @confirm="confirmationPrompt = null"

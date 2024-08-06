@@ -36,7 +36,7 @@ export default class Slug {
     async() {
         this.#async = true;
 
-        this.#debounced = _.debounce(function (resolve, reject) {
+        this.#debounced = _.debounce((resolve, reject) => {
             return this.#performRequest()
                 .then(slug => resolve(slug))
                 .catch(e => reject(e));
@@ -94,7 +94,7 @@ export default class Slug {
         return axios.post(cp_url('slug'), payload, { signal: this.#controller.signal })
             .then(response => response.data)
             .catch(e => {
-                if (axios.isCancel(e)) {
+                if (e.code === 'ERR_CANCELED') {
                     aborted = true;
                     return;
                 }

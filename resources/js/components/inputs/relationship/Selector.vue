@@ -18,7 +18,7 @@
             :max-selections="maxSelections"
             @selections-updated="selectionsUpdated"
         >
-            <div slot-scope="{}" class="flex flex-col h-full">
+            <div class="flex flex-col h-full">
                 <div class="bg-white dark:bg-dark-800 z-1">
                     <div class="py-2 px-4 flex items-center justify-between">
                         <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
@@ -55,16 +55,16 @@
                                 @sorted="sorted"
                                 class="cursor-pointer"
                             >
-                                <template slot="cell-title" slot-scope="{ row: entry }">
+                                <template #cell-title="{ row: entry }">
                                     <div class="flex items-center">
                                         <div class="little-dot rtl:ml-2 ltr:mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="entry.status && ! columnShowing('status')" />
                                         {{ entry.title }}
                                     </div>
                                 </template>
-                                <template slot="cell-status" slot-scope="{ row: entry }">
+                                <template #cell-status="{ row: entry }">
                                     <div class="status-index-field select-none" v-tooltip="getStatusTooltip(entry)" :class="`status-${entry.status}`" v-text="getStatusLabel(entry)" />
                                 </template>
-                                <template slot="cell-url" slot-scope="{ row: entry }">
+                                <template #cell-url="{ row: entry }">
                                     <span class="text-2xs">{{ entry.url }}</span>
                                 </template>
                             </data-list-table>
@@ -76,7 +76,8 @@
                             :resource-meta="meta"
                             :inline="true"
                             :scroll-to-top="false"
-                            @page-selected="setPage" />
+                            @page-selected="setPage"
+                        />
 
                         <div class="p-4 border-t dark:border-dark-200 flex items-center justify-between bg-gray-200 dark:bg-dark-500">
                             <div class="text-sm text-gray-700 dark:text-dark-150"
@@ -151,10 +152,12 @@
                                 </template>
 
                                 <template #branch-icon="{ branch }">
-                                    <svg-icon v-if="isRedirectBranch(branch)"
+                                    <svg-icon
+                                        v-if="isRedirectBranch(branch)"
                                         class="inline-block w-4 h-4 text-gray-500 dark:text-dark-175"
                                         name="light/external-link"
-                                        v-tooltip="__('Redirect')" />
+                                        v-tooltip="__('Redirect')"
+                                    />
                                 </template>
                             </page-tree>
                         </div>
@@ -324,9 +327,12 @@ export default {
             this.request();
         },
 
-        selections() {
-            if (this.maxSelections === 1 && this.selections.length === 1) {
-                this.select();
+        selections: {
+            deep: true,
+            handler() {
+                if (this.maxSelections === 1 && this.selections.length === 1) {
+                    this.select();
+                }
             }
         },
 
@@ -355,14 +361,14 @@ export default {
         request() {
             this.loading = true;
 
-            if (this.source) this.source.cancel();
-            this.source = this.$axios.CancelToken.source();
+            if (this.source) this.source.abort();
+            this.source = new AbortController();
 
             const params = {...this.parameters, ...{
                 search: this.searchQuery,
             }};
 
-            return this.$axios.get(this.selectionsUrl, { params, cancelToken: this.source.token }).then(response => {
+            return this.$axios.get(this.selectionsUrl, { params, signal: this.source.signal }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
@@ -370,7 +376,7 @@ export default {
                 this.loading = false;
                 this.initializing = false;
             }).catch(e => {
-                if (this.$axios.isCancel(e)) return;
+                if (e.code === 'ERR_CANCELED') return;
                 this.loading = false;
                 this.initializing = false;
                 this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
@@ -466,6 +472,8 @@ export default {
         },
 
         checkboxClicked(row, index, $event) {
+            console.log(row, index, $event, 'hoi');
+
             if ($event.shiftKey && this.lastItemClicked !== null) {
                 this.selectRange(
                     Math.min(this.lastItemClicked, index),

@@ -10,7 +10,7 @@ export default {
     data() {
         return {
             meta: this.initialMeta,
-            value: this.initialValue,
+            modelValue: this.initialValue,
             loading: false,
         }
     },
@@ -23,10 +23,10 @@ export default {
 
     },
 
-    render(h) {
-        return this.$scopedSlots.default({
+    render() {
+        return this.$slots.default({
             meta: this.meta,
-            value: this.value,
+            modelValue: this.modelValue,
             loading: this.loading,
         });
     },

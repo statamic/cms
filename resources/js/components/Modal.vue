@@ -1,81 +1,78 @@
-<template>
-
-    <portal name="modal">
-        <v-modal v-bind="modalProps" :delay="25" @opened="modalOpened" @closed="modalClosed">
-            <slot :close="close" />
-        </v-modal>
-    </portal>
-
-</template>
-
-<script>
+<script setup lang="ts">
+import { computed, watch } from 'vue';
+import { VueFinalModal } from 'vue-final-modal'
 import uniqid from 'uniqid';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
-export default {
+const props = withDefaults(defineProps<{
+    name?: string
+    adaptive?: boolean
+    draggable?: string | false
+    clickToClose?: boolean
+    focusTrap?: boolean
+    height?: number | 'auto'
+    width?: number | 'auto'
+    scrollable?: boolean
+}>(), {
+    adaptive: true,
+    draggable: false,
+    clickToClose: false,
+    focusTrap: true,
+    scrollable: false,
+})
 
-    props: {
-        adaptive: { type: Boolean, default: true },
-        draggable: { default: false },
-        clickToClose: { type: Boolean, default: false },
-        shiftY: { type: Number, default: 0.1 },
-        focusTrap: {type: Boolean, default: true},
-        height: { default: 'auto' },
-        width: {},
-        scrollable: { type: Boolean, default: false}
-    },
+const emit = defineEmits(['opened', 'closed'])
 
-    data() {
-        return {
-            modal: null,
-            name: uniqid(),
-        }
-    },
+const model = defineModel<boolean>()
 
-    computed: {
+watch(model, (newValue) => {
+    if (newValue) {
+        emit('opened')
+    } else {
+        emit('closed')
+    }
+})
 
-        modalProps() {
-            return {
-                name: this.name,
-                adaptive: this.adaptive,
-                clickToClose: this.clickToClose,
-                draggable: this.draggable,
-                height: this.height,
-                shiftY: this.shiftY,
-                focusTrap: this.focusTrap,
-                width: this.width,
-                scrollable: this.scrollable,
-            }
-        },
+const styling = computed(() => {
+    const width = props.width ?? 600;
+    const height = props.height ?? 'auto';
 
-    },
+    return ({
+        width: typeof(width) === 'number'
+            ? `${width}px`
+            : width,
+        height: typeof(height) === 'number'
+            ? `${height}px`
+            : height,
+    });
+})
 
-    mounted() {
-        this.$nextTick(() => this.$modal.show(this.name));
-        if (!this.scrollable) disableBodyScroll(this.$el);
-    },
+// @todo: make transition to be as clean as previously?
+// We can apply your own by writing the Vue classes for it and choosing it for content-transition below.
 
-    beforeDestroy() {
-        enableBodyScroll(this.$el);
-        this.close();
-    },
+// @todo support "shake" prop.
+// @todo support "adaptive" prop.
+// @todo support "draggable" prop.
 
-    methods: {
-
-        modalOpened(event) {
-            this.$emit('opened');
-        },
-
-        modalClosed(event) {
-            this.close();
-        },
-
-        close() {
-            this.$modal.hide(this.name);
-            this.$emit('closed');
-        }
-
+const modalId = computed(() => {
+    if (props.name) {
+        return props.name
     }
 
-}
+    return uniqid()
+})
 </script>
+
+<template>
+    <VueFinalModal
+        :modal-id="modalId"
+        class="flex items-start justify-center pt-[5%]"
+        overlay-transition="vfm-fade"
+        content-transition="vfm-fade"
+        v-model="model"
+        v-bind="$attrs"
+    >
+        <div :style="styling" class="max-h-[90vh]">
+            <slot />
+        </div>
+    </VueFinalModal>
+</template>

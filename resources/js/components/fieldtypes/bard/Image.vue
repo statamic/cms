@@ -73,7 +73,7 @@
 
 <script>
 import Asset from '../assets/Asset';
-import { NodeViewWrapper } from '@tiptap/vue-2';
+import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
 
 export default {

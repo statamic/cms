@@ -3,7 +3,9 @@
         <div class="flex items-center">
             <div class="input-group">
                 <div class="input-group-prepend">{{ __('URL') }}</div>
-                <input type="text"
+
+                <input
+                    type="text"
                     v-model="data"
                     class="input-text flex-1"
                     :class="{ 'bg-white dark:bg-dark-600': !isReadOnly }"
@@ -11,7 +13,8 @@
                     :readonly="isReadOnly"
                     :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
                     @focus="$emit('focus')"
-                    @blur="$emit('blur')" />
+                    @blur="$emit('blur')"
+                />
             </div>
         </div>
 
@@ -29,13 +32,14 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 
 export default {
     mixins: [Fieldtype],
 
     data() {
         return {
-            data: this.value || '',
+            data: this.modelValue || '',
             canShowIframe: false,
         }
     },
@@ -46,7 +50,7 @@ export default {
             this.update(value);
         }, 500),
 
-        value(value) {
+        modelValue(value) {
             this.data = value;
         }
 

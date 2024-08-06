@@ -17,22 +17,19 @@
 
 <script>
 import HasInputOptions from './HasInputOptions.js'
+import Fieldtype from './Fieldtype.vue';
 
 export default {
-
     mixins: [Fieldtype, HasInputOptions],
-
     data() {
         return {
-            values: this.value || []
+            values: this.modelValue || []
         }
     },
-
     computed: {
         options() {
             return this.normalizeInputOptions(this.config.options);
         },
-
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
@@ -42,9 +39,7 @@ export default {
             }).join(', ');
         },
     },
-
     watch: {
-
         values(values, oldValues) {
             values = this.sortValues(values);
 
@@ -53,18 +48,14 @@ export default {
             this.update(values);
         },
 
-        value(value) {
+        modelValue(value) {
             this.values = this.sortValues(value);
         }
-
     },
-
     methods: {
-
         focus() {
             this.$refs.checkbox[0].focus();
         },
-
         sortValues(values) {
             if (!values) return [];
 
@@ -72,7 +63,6 @@ export default {
                 .filter(opt => values.includes(opt.value))
                 .map(opt => opt.value);
         }
-
     }
 };
 </script>

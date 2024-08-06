@@ -1,5 +1,4 @@
 <template>
-
     <popover
         ref="popover"
         class="set-picker select-none"
@@ -7,12 +6,12 @@
         :disabled="!enabled || !hasMultipleSets"
         @opened="opened"
         @closed="closed"
-        @click="triggerWasClicked"
         @clicked-away="$emit('clicked-away', $event)"
     >
         <template #trigger>
             <slot name="trigger" />
         </template>
+
         <template #default>
             <div class="set-picker-header p-3 border-b dark:border-dark-900 text-xs flex items-center">
                 <input ref="search" type="text" class="input-text text-xs h-auto py-1 px-2 border rounded w-full dark:bg-dark-650 dark:border-gray-900" :placeholder="__('Search Sets')" v-show="showSearch" v-model="search" />
@@ -24,6 +23,7 @@
                     <span>{{ selectedGroupDisplayText }}</span>
                 </div>
             </div>
+
             <div class="p-1 max-h-[21rem] overflow-auto">
                 <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200 dark:bg-dark-600': selectionIndex === i }" @mouseover="selectionIndex = i">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
@@ -34,6 +34,7 @@
                         </div>
                         <svg-icon name="micro/chevron-right-thin" class="text-gray-600 group-hover:text-dark-800 dark:group-hover:text-dark-175" />
                     </div>
+
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
                         <svg-icon :name="setIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white dark:bg-dark-650 border border-gray-600 dark:border-dark-800 rtl:ml-2 ltr:mr-2 p-2 text-gray-800 dark:text-dark-175" />
                         <div class="flex-1">
@@ -42,6 +43,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div v-if="noSearchResults" class="text-center text-gray-600 text-xs p-3">
                     {{ __('No results') }}
                 </div>
@@ -53,7 +55,6 @@
 
 <script>
 export default {
-
     props: {
         sets: Array,
         enabled: { type: Boolean, default: true },
@@ -69,7 +70,6 @@ export default {
     },
 
     computed: {
-
         showSearch() {
             return !this.hasMultipleGroups || !this.selectedGroup;
         },
@@ -156,19 +156,15 @@ export default {
 
             return iconDirectory;
         },
-
     },
 
     watch: {
-
         search() {
             this.selectionIndex = 0;
         }
-
     },
 
     methods: {
-
         addSet(handle) {
             this.$emit('added', handle);
             this.unselectGroup();
@@ -233,12 +229,6 @@ export default {
             }
         },
 
-        triggerWasClicked() {
-            if (! this.hasMultipleSets) {
-                this.addSet(this.sets[0].sets[0].handle);
-            }
-        },
-
         groupIconName(name) {
             if (! name) return 'folder-generic';
 
@@ -254,8 +244,6 @@ export default {
                 ? this.iconSubFolder+'/'+name
                 : name;
         },
-
     }
-
 }
 </script>
