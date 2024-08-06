@@ -40,7 +40,7 @@ export { default as DataListFilterPresets } from '../components/data-list/Filter
 export { default as EntryList } from '../components/entries/Listing.vue';
 export { default as CollectionList } from '../components/collections/Listing.vue';
 export { default as TaxonomyList } from '../components/taxonomies/Listing.vue';
-// export { default as TermList } from '../components/terms/Listing.vue';
+export { default as TermList } from '../components/terms/Listing.vue';
 // export { default as AssetContainerList } from '../components/AssetContainerList.vue';
 // export { default as AddonList } from '../components/AddonList.vue';
 // export { default as AddonDetails } from '../components/AddonDetails.vue';
@@ -86,7 +86,7 @@ export { default as Login } from '../components/login/Login.vue';
 // export { default as LoginModal } from '../components/login/LoginModal.vue';
 // export { default as BaseEntryCreateForm } from '../components/entries/BaseCreateForm.vue';
 export { default as BaseTermCreateForm } from '../components/terms/BaseCreateForm.vue';
-// export { default as CreateTermButton } from '../components/terms/CreateTermButton.vue';
+export { default as CreateTermButton } from '../components/terms/CreateTermButton.vue';
 // export { default as Importer } from '../components/importer/importer';
 // export { default as FieldsetListing } from '../components/fieldsets/Listing.vue';
 // export { default as FieldsetCreateForm } from '../components/fieldsets/CreateForm.vue';
