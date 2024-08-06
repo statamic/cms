@@ -14,7 +14,7 @@ import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue';
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue';
 import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 // import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
-// import BardFieldtype from '../components/fieldtypes/bard/BardFieldtype.vue';
+import BardFieldtype from '../components/fieldtypes/bard/BardFieldtype.vue';
 // import BardSet from '../components/fieldtypes/bard/Set.vue';
 // import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
@@ -78,7 +78,7 @@ export default function registerFieldTypes(app) {
     app.component('assets-fieldtype', AssetsFieldtype);
     app.component('assets-fieldtype-index', AssetsIndexFieldtype);
     // app.component('asset_folder-fieldtype', AssetFolderFieldtype);
-    // app.component('bard-fieldtype', BardFieldtype);
+    app.component('bard-fieldtype', BardFieldtype);
     // app.component('bard-fieldtype-set', BardSet);
     // app.component('bard_buttons_setting-fieldtype', BardButtonsSettingFieldtype);
     app.component('button_group-fieldtype', ButtonGroupFieldtype);

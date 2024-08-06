@@ -1,9 +1,13 @@
 <template>
 
     <node-view-wrapper>
-        <div class="bard-set whitespace-normal my-6 rounded bg-white dark:bg-dark-500 border dark:border-dark-900 shadow-md"
+        <div
+            class="bard-set whitespace-normal my-6 rounded bg-white dark:bg-dark-500 border dark:border-dark-900 shadow-md"
             :class="{ 'border-blue-400 dark:border-dark-blue-100': selected || withinSelection, 'has-error': hasError }"
-            contenteditable="false" @copy.stop @paste.stop @cut.stop
+            contenteditable="false"
+            @copy.stop
+            @paste.stop
+            @cut.stop
         >
             <div ref="content" hidden />
             <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
@@ -39,24 +43,24 @@
                 </div>
             </div>
             <div class="replicator-set-body publish-fields @container" v-show="!collapsed" v-if="index !== undefined">
-                <set-field
-                    v-for="field in fields"
-                    v-show="showField(field, fieldPath(field))"
-                    :key="field.handle"
-                    :field="field"
-                    :value="values[field.handle]"
-                    :meta="meta[field.handle]"
-                    :parent-name="parentName"
-                    :set-index="index"
-                    :field-path="fieldPath(field)"
-                    :read-only="isReadOnly"
-                    :show-field-previews="showFieldPreviews"
-                    @updated="updated(field.handle, $event)"
-                    @meta-updated="metaUpdated(field.handle, $event)"
-                    @focus="focused"
-                    @blur="blurred"
-                    @replicator-preview-updated="previewUpdated(field.handle, $event)"
-                />
+                <template v-for="field in fields" :key="field.handle">
+                    <set-field
+                        v-show="showField(field, fieldPath(field))"
+                        :field="field"
+                        :meta="meta[field.handle]"
+                        :parent-name="parentName"
+                        :set-index="index"
+                        :field-path="fieldPath(field)"
+                        :read-only="isReadOnly"
+                        :show-field-previews="showFieldPreviews"
+                        :model-value="values[field.handle]"
+                        @updated="updated(field.handle, $event)"
+                        @meta-updated="metaUpdated(field.handle, $event)"
+                        @focus="focused"
+                        @blur="blurred"
+                        @replicator-preview-updated="previewUpdated(field.handle, $event)"
+                    />
+                </template>
             </div>
         </div>
     </node-view-wrapper>
@@ -70,7 +74,6 @@ import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
-
     props: [
         'editor', // the editor instance
         'node', // access the current node
@@ -89,7 +92,6 @@ export default {
     inject: ['bard', 'bardSets'],
 
     computed: {
-
         fields() {
             return this.config.fields;
         },

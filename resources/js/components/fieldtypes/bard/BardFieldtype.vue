@@ -1,110 +1,156 @@
 <template>
-
-<portal name="bard-fullscreen" :disabled="!fullScreenMode" :provide="provide">
-<!-- These wrappers allow any css that expected the field to
-     be within the context of a publish form to continue working
-     once it has been portaled out. -->
-<div :class="{ 'publish-fields': fullScreenMode }">
-<div :class="fullScreenMode && wrapperClasses">
-
-    <div
-        class="bard-fieldtype-wrapper"
-        :class="{'bard-fullscreen': fullScreenMode }"
-        ref="container"
-        @dragstart.stop="ignorePageHeader(true)"
-        @dragend="ignorePageHeader(false)"
+    <portal
+        name="bard-fullscreen"
+        :disabled="!fullScreenMode"
+        :provide="provide"
     >
+        <!-- These wrappers allow any css that expected the field to
+             be within the context of a publish form to continue working
+             once it has been portaled out. -->
+        <div :class="{ 'publish-fields': fullScreenMode }">
+            <div :class="fullScreenMode && wrapperClasses">
+                <div
+                    class="bard-fieldtype-wrapper"
+                    :class="{'bard-fullscreen': fullScreenMode }"
+                    ref="container"
+                    @dragstart.stop="ignorePageHeader(true)"
+                    @dragend="ignorePageHeader(false)"
+                >
+                    <div v-if="!readOnly && showFixedToolbar" class="bard-fixed-toolbar">
+                        <div
+                            v-if="toolbarIsFixed"
+                            class="flex flex-wrap flex-1 items-center no-select"
+                            :class="{'justify-center': fullScreenMode}"
+                        >
+                            <component
+                                v-for="button in visibleButtons(buttons)"
+                                :key="button.name"
+                                :is="button.component || 'BardToolbarButton'"
+                                :button="button"
+                                :active="buttonIsActive(button)"
+                                :config="config"
+                                :bard="this"
+                                :editor="editor"
+                            />
 
-        <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
-            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed" :class="{'justify-center': fullScreenMode}">
-                <component
-                    v-for="button in visibleButtons(buttons)"
-                    :key="button.name"
-                    :is="button.component || 'BardToolbarButton'"
-                    :button="button"
-                    :active="buttonIsActive(button)"
-                    :config="config"
-                    :bard="_self"
-                    :editor="editor" />
-                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                        <svg-icon name="show-source" class="w-4 h-4 "/>
-                    </button>
-                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && setConfigs.length > 0">
-                        <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
-                    </button>
-                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" :aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                        <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
-                        <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
-                    </button>
+                            <button
+                                v-if="allowSource"
+                                class="bard-toolbar-button"
+                                :aria-label="__('Show HTML Source')"
+                                v-tooltip="__('Show HTML Source')"
+                                @click="showSource = !showSource"
+                            >
+                                <svg-icon name="show-source" class="w-4 h-4 " />
+                            </button>
+
+                            <button
+                                v-if="config.collapse !== 'accordion' && setConfigs.length > 0"
+                                class="bard-toolbar-button"
+                                v-tooltip="__('Expand/Collapse Sets')"
+                                :aria-label="__('Expand/Collapse Sets')"
+                                @click="toggleCollapseSets"
+                            >
+                                <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
+                            </button>
+
+                            <button
+                                v-if="config.fullscreen"
+                                class="bard-toolbar-button"
+                                v-tooltip="__('Toggle Fullscreen Mode')"
+                                :aria-label="__('Toggle Fullscreen Mode')"
+                                @click="toggleFullscreen"
+                            >
+                                <svg-icon v-show="fullScreenMode" name="arrows-shrink" class="w-4 h-4" />
+                                <svg-icon v-show="!fullScreenMode" name="expand-bold" class="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bard-editor @container/bard"
+                        :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }"
+                        tabindex="0"
+                    >
+                        <bubble-menu
+                            v-if="editor && toolbarIsFloating && !readOnly"
+                            class="bard-floating-toolbar"
+                            :editor="editor"
+                            :tippy-options="{ maxWidth: 'none', zIndex: 1000 }"
+                        >
+                            <component
+                                v-for="button in visibleButtons(buttons)"
+                                :key="button.name"
+                                :is="button.component || 'BardToolbarButton'"
+                                :button="button"
+                                :active="buttonIsActive(button)"
+                                :bard="this"
+                                :config="config"
+                                :editor="editor"
+                            />
+                        </bubble-menu>
+
+                        <floating-menu
+                            v-if="editor"
+                            :editor="editor"
+                            :should-show="shouldShowSetButton"
+                            :is-showing="showAddSetButton"
+                            @shown="showAddSetButton = true"
+                            @hidden="showAddSetButton = false"
+                            v-slot="{ y }"
+                        >
+                            <set-picker
+                                v-if="showAddSetButton"
+                                :sets="groupConfigs"
+                                @added="addSet"
+                                @clicked-away="clickedAwayFromSetPicker"
+                                class="bard-set-selector"
+                            >
+                                <template #trigger>
+                                    <button
+                                        type="button"
+                                        class="btn-round group bard-add-set-button"
+                                        :style="{ transform: `translateY(${y}px)` }"
+                                        :aria-label="__('Add Set')"
+                                        v-tooltip="__('Add Set')"
+                                        @click="addSetButtonClicked"
+                                    >
+                                        <svg-icon
+                                            name="micro/plus"
+                                            class="w-3 h-3 text-gray-800 dark:text-dark-175 group-hover:text-black dark:group-hover:dark-text-100"
+                                        />
+                                    </button>
+                                </template>
+                            </set-picker>
+                        </floating-menu>
+
+                        <div v-if="initError" class="bard-error" v-html="initError"></div>
+                        <editor-content v-show="!showSource" :editor="editor" :id="fieldId" />
+                        <bard-source v-if="showSource" :html="htmlWithReplacedLinks" />
+                    </div>
+
+                    <div
+                        class="bard-footer-toolbar"
+                        v-if="editor && (config.reading_time || config.character_limit || config.word_count)"
+                    >
+                        <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
+                        <div v-else />
+                        <div v-if="config.character_limit || config.word_count" v-text="characterAndWordCountText" />
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="bard-editor @container/bard" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
-            <bubble-menu class="bard-floating-toolbar" :editor="editor" :tippy-options="{ maxWidth: 'none', zIndex: 1000 }" v-if="editor && toolbarIsFloating && !readOnly">
-                <component
-                    v-for="button in visibleButtons(buttons)"
-                    :key="button.name"
-                    :is="button.component || 'BardToolbarButton'"
-                    :button="button"
-                    :active="buttonIsActive(button)"
-                    :bard="_self"
-                    :config="config"
-                    :editor="editor" />
-            </bubble-menu>
-
-            <floating-menu
-                class="bard-set-selector"
-                :editor="editor"
-                :should-show="shouldShowSetButton"
-                :is-showing="showAddSetButton"
-                v-if="editor"
-                v-slot="{ y }"
-                @shown="showAddSetButton = true"
-                @hidden="showAddSetButton = false"
-            >
-                <set-picker
-                    v-if="showAddSetButton"
-                    :sets="groupConfigs"
-                    @added="addSet"
-                    @clicked-away="clickedAwayFromSetPicker"
-                >
-                    <template #trigger>
-                        <button
-                            type="button"
-                            class="btn-round group bard-add-set-button"
-                            :style="{ transform: `translateY(${y}px)` }"
-                            :aria-label="__('Add Set')"
-                            v-tooltip="__('Add Set')"
-                            @click="addSetButtonClicked"
-                        >
-                            <svg-icon name="micro/plus" class="w-3 h-3 text-gray-800 dark:text-dark-175 group-hover:text-black dark:group-hover:dark-text-100" />
-                        </button>
-                    </template>
-                </set-picker>
-            </floating-menu>
-
-            <div class="bard-error" v-if="initError" v-html="initError"></div>
-            <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
-            <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
-        </div>
-        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit || config.word_count)">
-            <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
-            <div v-else />
-            <div v-if="config.character_limit || config.word_count" v-text="characterAndWordCountText" />
-        </div>
-    </div>
-</div>
-</div>
-</portal>
+    </portal>
 
 </template>
 
 <script>
 import uniqid from 'uniqid';
 import reduce from 'underscore/modules/reduce';
+import readTimeEstimate from 'read-time-estimate';
+import Emitter from 'tiny-emitter';
+
 import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-3';
 import { Extension } from '@tiptap/core';
-import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
 import BulletList from '@tiptap/extension-bullet-list';
@@ -133,21 +179,30 @@ import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import Underline from '@tiptap/extension-underline';
+
+import { FloatingMenu } from './FloatingMenu';
 import BardSource from './Source.vue';
 import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
-import { Set } from './Set'
+import { Set } from './Set';
 import { Small } from './Small';
 import { Image } from './Image';
 import { Link } from './Link';
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
-import readTimeEstimate from 'read-time-estimate';
-// import { lowlight } from 'lowlight/lib/common.js';
+
+import {common, createLowlight} from 'lowlight'
+
+const lowlight = createLowlight(common)
+
 import 'highlight.js/styles/github.css';
 
+import Fieldtype from '../Fieldtype.vue';
+import BardToolbarButton from './ToolbarButton.vue'
+
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [Fieldtype, ManagesSetMeta],
 
@@ -169,6 +224,7 @@ export default {
 
     data() {
         return {
+            eventBus: new Emitter(),
             editor: null,
             html: null,
             json: [],
@@ -187,11 +243,10 @@ export default {
                 storeName: this.storeName,
                 bardSets: this.config.sets
             }
-        }
+        };
     },
 
     computed: {
-
         allowSource() {
             return this.config.allow_source === undefined ? true : this.config.allow_source;
         },
@@ -205,7 +260,7 @@ export default {
         },
 
         showFixedToolbar() {
-            return this.toolbarIsFixed && (this.visibleButtons.length > 0 || this.allowSource || this.hasExtraButtons)
+            return this.toolbarIsFixed && (this.visibleButtons.length > 0 || this.allowSource || this.hasExtraButtons);
         },
 
         hasExtraButtons() {
@@ -217,7 +272,7 @@ export default {
                 var stats = readTimeEstimate(this.html, 265, 12, 500, ['img', 'Image', 'bard-set']);
                 var duration = moment.duration(stats.duration, 'minutes');
 
-                return moment.utc(duration.asMilliseconds()).format("mm:ss");
+                return moment.utc(duration.asMilliseconds()).format('mm:ss');
             }
         },
 
@@ -248,7 +303,7 @@ export default {
         },
 
         setIndexes() {
-            let indexes = {}
+            let indexes = {};
 
             this.json.forEach((item, i) => {
                 if (item.type === 'set') {
@@ -260,7 +315,7 @@ export default {
         },
 
         storeState() {
-            if (! this.storeName) return undefined;
+            if (!this.storeName) return undefined;
 
             return this.$store.state.publish[this.storeName];
         },
@@ -272,7 +327,7 @@ export default {
         htmlWithReplacedLinks() {
             return this.html.replaceAll(/\"statamic:\/\/(.*?)\"/g, (match, ref) => {
                 const linkData = this.meta.linkData[ref];
-                if (! linkData) {
+                if (!linkData) {
                     this.$toast.error(`${__('No link data found for')} ${ref}`);
                     return '""';
                 }
@@ -282,18 +337,18 @@ export default {
         },
 
         setsWithErrors() {
-            if (! this.storeState) return [];
+            if (!this.storeState) return [];
 
             return Object.values(this.setIndexes).filter((setIndex) => {
                 const prefix = `${this.fieldPathPrefix || this.handle}.${setIndex}.`;
 
                 return Object.keys(this.storeState.errors).some(key => key.startsWith(prefix));
-            })
+            });
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
-            const stack = [...this.value];
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
+            const stack = [...this.modelValue];
             let text = '';
             while (stack.length) {
                 const node = stack.shift();
@@ -331,7 +386,6 @@ export default {
         groupConfigs() {
             return this.config.sets;
         },
-
     },
 
     mounted() {
@@ -341,7 +395,7 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.escBinding = this.$keys.bind('esc', this.closeFullscreen)
+        this.escBinding = this.$keys.bind('esc', this.closeFullscreen);
 
         this.$nextTick(() => {
             this.mounted = true;
@@ -360,13 +414,12 @@ export default {
         });
     },
 
-    beforeDestroy() {
+    unmounted() {
         this.editor.destroy();
         this.escBinding.destroy();
     },
 
     watch: {
-
         json(json, oldJson) {
             if (!this.mounted) return;
 
@@ -375,12 +428,12 @@ export default {
             this.updateDebounced(json);
         },
 
-        value(value, oldValue) {
+        modelValue(value, oldValue) {
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.commands.clearContent()
+                this.editor.commands.clearContent();
                 this.editor.commands.setContent(content, true);
             }
         },
@@ -399,7 +452,7 @@ export default {
             deep: true,
             handler(value) {
                 if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
-                    return
+                    return;
                 }
                 const meta = this.meta;
                 meta.previews = value;
@@ -410,7 +463,6 @@ export default {
         fullScreenMode() {
             this.initEditor();
         }
-
     },
 
     methods: {
@@ -469,7 +521,7 @@ export default {
 
         collapseSet(id) {
             if (!this.collapsed.includes(id)) {
-                this.collapsed.push(id)
+                this.collapsed.push(id);
             }
         },
 
@@ -510,8 +562,9 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock = $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
-            const isAroundInlineImage = state.selection.$to.nodeBefore?.type.name === 'image' || state.selection.$to.nodeAfter?.type.name === 'image'
+            const isAroundInlineImage = state.selection.$to.nodeBefore?.type.name === 'image' || state.selection.$to.nodeAfter?.type.name === 'image';
             const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
+
             return this.setConfigs.length && (this.config.always_show_set_button || isActive);
         },
 
@@ -573,18 +626,72 @@ export default {
                 return (button.condition) ? button.condition.call(null, this.config) : true;
             });
 
-            if (_.findWhere(buttons, {name: 'table'})) {
+            if (_.findWhere(buttons, { name: 'table' })) {
                 buttons.push(
-                    { name: 'deletetable', text: __('Delete Table'), command: (editor) => editor.commands.deleteTable(), svg: 'delete-table', visibleWhenActive: 'table' },
-                    { name: 'addcolumnbefore', text: __('Add Column Before'), command: (editor) => editor.commands.addColumnBefore(), svg: 'add-col-before', visibleWhenActive: 'table' },
-                    { name: 'addcolumnafter', text: __('Add Column After'), command: (editor) => editor.commands.addColumnAfter(), svg: 'add-col-after', visibleWhenActive: 'table' },
-                    { name: 'deletecolumn', text: __('Delete Column'), command: (editor) => editor.commands.deleteColumn(), svg: 'delete-col', visibleWhenActive: 'table' },
-                    { name: 'addrowbefore', text: __('Add Row Before'), command: (editor) => editor.commands.addRowBefore(), svg: 'add-row-before', visibleWhenActive: 'table' },
-                    { name: 'addrowafter', text: __('Add Row After'), command: (editor) => editor.commands.addRowAfter(), svg: 'add-row-after', visibleWhenActive: 'table' },
-                    { name: 'deleterow', text: __('Delete Row'), command: (editor) => editor.commands.deleteRow(), svg: 'delete-row', visibleWhenActive: 'table' },
-                    { name: 'toggleheadercell', text: __('Toggle Header Cell'), command: (editor) => editor.commands.toggleHeaderCell(), svg: 'flip-vertical', visibleWhenActive: 'table' },
-                    { name: 'togglecellmerge', text: __('Merge Cells'), command: (editor) => editor.commands.mergeCells(), svg: 'combine-cells', visibleWhenActive: 'table' },
-                )
+                    {
+                        name: 'deletetable',
+                        text: __('Delete Table'),
+                        command: (editor) => editor.commands.deleteTable(),
+                        svg: 'delete-table',
+                        visibleWhenActive: 'table'
+                    },
+                    {
+                        name: 'addcolumnbefore',
+                        text: __('Add Column Before'),
+                        command: (editor) => editor.commands.addColumnBefore(),
+                        svg: 'add-col-before',
+                        visibleWhenActive: 'table'
+                    },
+                    {
+                        name: 'addcolumnafter',
+                        text: __('Add Column After'),
+                        command: (editor) => editor.commands.addColumnAfter(),
+                        svg: 'add-col-after',
+                        visibleWhenActive: 'table'
+                    },
+                    {
+                        name: 'deletecolumn',
+                        text: __('Delete Column'),
+                        command: (editor) => editor.commands.deleteColumn(),
+                        svg: 'delete-col',
+                        visibleWhenActive: 'table'
+                    },
+                    {
+                        name: 'addrowbefore',
+                        text: __('Add Row Before'),
+                        command: (editor) => editor.commands.addRowBefore(),
+                        svg: 'add-row-before',
+                        visibleWhenActive: 'table'
+                    },
+                    {
+                        name: 'addrowafter',
+                        text: __('Add Row After'),
+                        command: (editor) => editor.commands.addRowAfter(),
+                        svg: 'add-row-after',
+                        visibleWhenActive: 'table'
+                    },
+                    {
+                        name: 'deleterow',
+                        text: __('Delete Row'),
+                        command: (editor) => editor.commands.deleteRow(),
+                        svg: 'delete-row',
+                        visibleWhenActive: 'table'
+                    },
+                    {
+                        name: 'toggleheadercell',
+                        text: __('Toggle Header Cell'),
+                        command: (editor) => editor.commands.toggleHeaderCell(),
+                        svg: 'flip-vertical',
+                        visibleWhenActive: 'table'
+                    },
+                    {
+                        name: 'togglecellmerge',
+                        text: __('Merge Cells'),
+                        command: (editor) => editor.commands.mergeCells(),
+                        svg: 'combine-cells',
+                        visibleWhenActive: 'table'
+                    },
+                );
             }
 
             this.buttons = buttons;
@@ -594,8 +701,10 @@ export default {
             if (button.hasOwnProperty('active')) {
                 return button.active(this.editor, button.args);
             }
+
             const nameProperty = button.hasOwnProperty('activeName') ? 'activeName' : 'name';
             const name = button[nameProperty];
+
             return this.editor.isActive(name, button.args);
         },
 
@@ -603,7 +712,11 @@ export default {
             if (button.hasOwnProperty('visible')) {
                 return button.visible(this.editor, button.args);
             }
-            if (! button.hasOwnProperty('visibleWhenActive')) return true;
+
+            if (!button.hasOwnProperty('visibleWhenActive')) {
+                return true;
+            }
+
             return this.editor.isActive(button.visibleWhenActive, button.args);
         },
 
@@ -612,9 +725,11 @@ export default {
         },
 
         initEditor() {
-            if (this.editor) this.editor.destroy();
+            if (this.editor) {
+                this.editor.destroy();
+            }
 
-            const content = this.valueToContent(clone(this.value));
+            const content = this.valueToContent(clone(this.modelValue));
 
             this.editor = new Editor({
                 extensions: this.getExtensions(),
@@ -622,7 +737,7 @@ export default {
                 editable: !this.readOnly,
                 enableInputRules: this.config.enable_input_rules,
                 enablePasteRules: this.config.enable_paste_rules,
-                editorProps: { attributes: { class: 'bard-content' }},
+                editorProps: { attributes: { class: 'bard-content' } },
                 onFocus: () => this.$emit('focus'),
                 onBlur: () => {
                     // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
@@ -693,7 +808,7 @@ export default {
                         return {
                             ...this.parent?.(),
                             'Enter': () => this.editor.commands.setHardBreak(),
-                        }
+                        };
                     },
                 }));
             }
@@ -708,7 +823,7 @@ export default {
                     return {
                         'Ctrl-Enter': () => true,
                         'Cmd-Enter': () => true,
-                    }
+                    };
                 },
             });
 
@@ -776,7 +891,7 @@ export default {
             }
 
             this.$bard.extensionCallbacks.forEach((callback) => {
-                let returned = callback({ bard: this});
+                let returned = callback({ bard: this });
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
@@ -824,5 +939,5 @@ export default {
         },
 
     }
-}
+};
 </script>
