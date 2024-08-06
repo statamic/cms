@@ -30,7 +30,7 @@ class DictionaryFieldsTest extends TestCase
                 'fields' => [
                     ['handle' => 'type', 'type' => 'select'],
                 ],
-                'meta' => collect(['type' => null]),
+                'meta' => ['type' => null],
             ],
         ], $preload);
 
@@ -39,10 +39,10 @@ class DictionaryFieldsTest extends TestCase
                 'fields' => [
                     ['handle' => 'category',  'type' => 'select'],
                 ],
-                'meta' => collect(['category' => null]),
-                'defaults' => collect(['category' => null]),
+                'meta' => ['category' => null],
+                'defaults' => ['category' => null],
             ],
-        ], $preload['dictionaries']->all());
+        ], $preload['dictionaries']);
     }
 
     #[Test]
