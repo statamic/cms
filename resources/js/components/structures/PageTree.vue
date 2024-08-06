@@ -35,6 +35,7 @@
                 @nodeOpenChanged="saveTreeState"
             >
                 <tree-branch
+                    :ref="`branch-${page.id}`"
                     slot-scope="{ data: page, store, vm }"
                     :page="page"
                     :depth="vm.level"

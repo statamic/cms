@@ -67,7 +67,7 @@ return [
     'lte.string' => 'Muss kleiner oder gleich :value Zeichen sein.',
     'mac_address' => 'Muss eine gültige MAC-Adresse sein.',
     'max.array' => 'Darf nicht mehr als :max Elemente haben.',
-    'max.file' => 'Darf nicht grösser als :max kilobytes sein.',
+    'max.file' => 'Darf nicht grösser als :max Kilobytes sein.',
     'max.numeric' => 'Darf nicht grösser als :max sein.',
     'max.string' => 'Darf nicht mehr als :max Zeichen haben.',
     'max_digits' => 'Darf nicht mehr als :max Ziffern enthalten.',
