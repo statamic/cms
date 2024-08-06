@@ -5,7 +5,7 @@ namespace Statamic\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class AllowedFolder implements ValidationRule
+class AlphaDashSpace implements ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

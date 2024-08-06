@@ -7,7 +7,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Assets\AssetUploader;
 use Statamic\Facades\Path;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Rules\AllowedFolder;
+use Statamic\Rules\AlphaDashSpace;
 
 class FoldersController extends CpController
 {
@@ -17,7 +17,7 @@ class FoldersController extends CpController
 
         $request->validate([
             'path' => 'required',
-            'directory' => ['required', 'string', new AllowedFolder],
+            'directory' => ['required', 'string', new AlphaDashSpace],
         ]);
 
         $name = AssetUploader::getSafeFilename($request->directory);
