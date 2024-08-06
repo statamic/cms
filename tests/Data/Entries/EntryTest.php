@@ -2586,12 +2586,22 @@ class EntryTest extends TestCase
         // asserts that they all have a valid title.
         $testInstance = $this;
         Artisan::command('testing:entry-stache-test-one {--expected=}', function ($expected) use ($testInstance) {
-            // Fetch entries and make sure that they all have titles.
-            $entriesBefore = Collection::find('test')->queryEntries()->get();
-            $testInstance->assertEquals($expected, $entriesBefore->count());
-            // NOTE: Must confirm that all entries have valid titles as empty entries
-            //       are one other symptom of out-of-sync stache.
-            $testInstance->assertEmpty($entriesBefore->pluck('title')->reject(fn ($title) => (bool) $title));
+            $originalArgv = $_SERVER['argv'] ?? [];
+            try {
+                // NOTE: Need to swap the `$_SERVER['argv']` to match the expected values as Laravel does
+                //       not correctly handle the `App::runningConsoleCommand(...)` check when a console
+                //       command is executed manually.
+                $_SERVER['argv'] = ['artisan', 'testing:entry-stache-test-one', "--expected={$expected}"];
+
+                // Fetch entries and make sure that they all have titles.
+                $entriesBefore = Collection::find('test')->queryEntries()->get();
+                $testInstance->assertEquals($expected, $entriesBefore->count());
+                // NOTE: Must confirm that all entries have valid titles as empty entries
+                //       are one other symptom of out-of-sync stache.
+                $testInstance->assertEmpty($entriesBefore->pluck('title')->reject(fn ($title) => (bool) $title));
+            } finally {
+                $_SERVER['argv'] = $originalArgv;
+            }
         });
 
         // Create a collection.
@@ -2633,9 +2643,6 @@ class EntryTest extends TestCase
         });
 
         // 5. Run the CLI command again and confirm that there are now less entries.
-        // NOTE: Uncomment the following line so that `Statamic::isWorker()` returns `true`
-        //       and this test will then pass.
-        // \Illuminate\Support\Facades\Request::swap(new \Tests\Fakes\FakeArtisanRequest('queue:work'));
         $this->artisan('testing:entry-stache-test-one --expected=3');
     }
 }
