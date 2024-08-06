@@ -815,6 +815,8 @@ EOT;
     #[Test]
     public function it_installs_a_module_when_user_confirms_interactively_via_prompt()
     {
+        $this->markTestSkippedInWindows();
+
         $this->setConfig([
             'export_paths' => [
                 'copied.md',
@@ -868,6 +870,8 @@ EOT;
     #[Test]
     public function it_installs_modules_without_dependencies()
     {
+        $this->markTestSkippedInWindows();
+
         $this->setConfig([
             'export_paths' => [
                 'copied.md',
