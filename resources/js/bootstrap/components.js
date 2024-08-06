@@ -118,7 +118,7 @@ export { default as NavigationView } from '../components/navigation/View.vue';
 export { default as NavigationEditForm } from '../components/navigation/EditForm.vue';
 // export { default as PreferencesEditForm } from '../components/preferences/EditForm.vue';
 export { default as TaxonomyCreateForm } from '../components/taxonomies/CreateForm.vue';
-// export { default as TaxonomyEditForm } from '../components/taxonomies/EditForm.vue';
+export { default as TaxonomyEditForm } from '../components/taxonomies/EditForm.vue';
 // export { default as TaxonomyBlueprintListing } from '../components/taxonomies/BlueprintListing.vue';
 // export { default as AssetContainerCreateForm } from '../components/asset-containers/CreateForm.vue';
 // export { default as AssetContainerEditForm } from '../components/asset-containers/EditForm.vue';
