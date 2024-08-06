@@ -5,9 +5,9 @@
                 <!-- Tabs -->
                 <div v-if="showTabs" class="tabs-container flex items-center">
                     <div
+                        ref="tabsContainer"
                         class="publish-tabs tabs"
                         :class="{ 'tabs-scrolled': canScrollLeft }"
-                        ref="tabs"
                         role="tablist"
                         :aria-label="__('Edit Content')"
                         @keydown.prevent.arrow-left="activatePreviousTab"
@@ -21,9 +21,9 @@
                     >
                         <button
                             v-for="tab in mainTabs"
-                            class="tab-button"
-                            :ref="tab.handle + '-tab'"
                             :key="tab.handle"
+                            ref="tabs"
+                            class="tab-button"
                             :class="{
                                 'active': isActive(tab.handle),
                                 'has-error': tabHasError(tab.handle),
@@ -118,7 +118,6 @@
 <script>
 import { uniq } from 'underscore';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
-import { is_ignorable } from '../../node_helpers.js';
 
 export default {
     emits: ['synced', 'desynced', 'focus', 'blur', 'updated', 'meta-updated'],
@@ -192,6 +191,7 @@ export default {
 
         tabsWithErrors() {
             let fields = {};
+
             Object.values(this.tabs).forEach(tab => {
                 tab.sections.forEach(section => {
                     section.fields.forEach(field => {
@@ -256,6 +256,10 @@ export default {
 
             if (!this.inStack) {
                 window.location.hash = handle;
+            }
+
+            if (!this.showTabs) {
+                return;
             }
 
             const tab = this.getTabNode(handle);
@@ -338,15 +342,13 @@ export default {
         },
 
         getTabNode(handle) {
-            const childNodes = [...this.$refs.tabs.childNodes].filter(node => !is_ignorable(node))
-
-            return childNodes[this.tabIndex(handle)];
+            return this.$refs.tabs[this.tabIndex(handle)]
         },
 
         scrollTabs(event) {
-            if (!this.$refs.tabs) return;
+            if (!this.$refs.tabsContainer) return;
 
-            this.$refs.tabs.scrollLeft += event.deltaY;
+            this.$refs.tabsContainer.scrollLeft += event.deltaY;
 
             this.updateHiddenTabs();
         },
@@ -355,8 +357,10 @@ export default {
             if (typeof tab === 'string') {
                 tab = this.getTabNode(tab);
             }
+
             if (!tab) {
                 console.error(`Tab '${tab}' not found`);
+
                 return;
             }
 
@@ -401,11 +405,7 @@ export default {
 
             const hidden = [];
 
-            this.$refs.tabs.childNodes.forEach((tab, index) => {
-                if (is_ignorable(tab)) {
-                    return;
-                }
-
+            this.$refs.tabs.forEach((tab, index) => {
                 if (this.tabIsOutsideView(tab, 20)) {
                     hidden.push(index);
                 }
@@ -417,7 +417,7 @@ export default {
         },
 
         tabIsOutsideView(tab, tolerance = 0) {
-            const viewportRect = this.$refs.tabs.getBoundingClientRect();
+            const viewportRect = this.$refs.tabsContainer.getBoundingClientRect();
             const tabRect = tab.getBoundingClientRect();
 
             if ((viewportRect.left - tabRect.left) > tolerance) {
