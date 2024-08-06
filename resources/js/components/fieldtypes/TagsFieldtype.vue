@@ -18,54 +18,67 @@
         @search:focus="$emit('focus')"
         @search:blur="$emit('blur')"
     >
-            <template #selected-option-container><i class="hidden"></i></template>
-            <template #search="{ events, attributes }">
-                <input
-                    :placeholder="config.placeholder"
-                    class="vs__search"
-                    type="search"
-                    v-on="events"
-                    v-bind="attributes"
-                    @paste="onPaste"
-                >
-            </template>
-             <template #no-options>
-                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
-            </template>
-            <template #footer="{ deselect }">
-                <sortable-list
-                    item-class="sortable-item"
-                    handle-class="sortable-item"
-                    :distance="5"
-                    :mirror="false"
-                    :model-value="modelValue"
-                    @update:model-value="update"
-                >
-                    <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="tag in modelValue" :key="tag" class="vs__selected mt-2 sortable-item">
-                            {{ tag }}
-                            <button @click="deselect(tag)" type="button" :aria-label="__('Remove tag')" class="vs__deselect">
-                                <span>×</span>
-                            </button>
-                        </span>
-                    </div>
-                </sortable-list>
-            </template>
+        <template #selected-option-container><i class="hidden"></i></template>
+
+        <template #search="{ events, attributes }">
+            <input
+                :placeholder="config.placeholder"
+                class="vs__search"
+                type="search"
+                v-on="events"
+                v-bind="attributes"
+                @paste="onPaste"
+            >
+        </template>
+
+        <template #no-options>
+            <div
+                class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4"
+                v-text="__('No options to choose from.')"
+            />
+        </template>
+
+        <template #footer="{ deselect }">
+            <sortable-list
+                item-class="sortable-item"
+                handle-class="sortable-item"
+                :distance="5"
+                :mirror="false"
+                :model-value="modelValue"
+                @update:model-value="update"
+            >
+                <div class="vs__selected-options-outside flex flex-wrap">
+                    <span v-for="tag in modelValue" :key="tag" class="vs__selected mt-2 sortable-item">
+                        {{ tag }}
+                        <button
+                            @click="deselect(tag)"
+                            type="button"
+                            :aria-label="__('Remove tag')"
+                            class="vs__deselect"
+                        >
+                            <span>×</span>
+                        </button>
+                    </span>
+                </div>
+            </sortable-list>
+        </template>
     </v-select>
 </template>
 
 <style scoped>
-    .draggable-source--is-dragging {
-        @apply opacity-75 bg-transparent border-dashed
-    }
+.draggable-source--is-dragging {
+    @apply opacity-75 bg-transparent border-dashed
+}
 </style>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import HasInputOptions from './HasInputOptions.js'
+import HasInputOptions from './HasInputOptions.js';
 import { SortableList, SortableItem } from '../sortable/Sortable';
 
 export default {
+    emits: ['focus', 'blur'],
+
     mixins: [Fieldtype, HasInputOptions],
 
     components: {
