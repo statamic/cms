@@ -26,16 +26,9 @@
                 </template>
 
                 <template v-else>
-                    <img :src="thumbnail" v-if="thumbnail" :title="label" />
-
-                    <template v-else>
-                        <img v-if="canShowSvg" :src="asset.url" class="p-4" />
-                        <file-icon
-                            v-else
-                            :extension="asset.extension"
-                            class="p-4 h-full w-full"
-                        />
-                    </template>
+                    <img v-if="canShowSvg" :src="asset.url" class="p-4" />
+                    <img v-else-if="thumbnail" :src="thumbnail" :title="label" />
+                    <file-icon v-else :extension="asset.extension" class="p-4 h-full w-full" />
                 </template>
 
                 <div class="asset-controls" v-if="!readOnly">
