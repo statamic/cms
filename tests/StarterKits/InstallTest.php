@@ -7,8 +7,6 @@ use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
-use Laravel\Prompts\Key;
-use Laravel\Prompts\Prompt as LaravelPrompt;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
@@ -16,7 +14,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Installer;
-use Statamic\StarterKits\LicenseManager;
 use Statamic\Support\Str;
 use Tests\Fakes\Composer\FakeComposer;
 use Tests\TestCase;
@@ -42,8 +39,6 @@ class InstallTest extends TestCase
 
     public function tearDown(): void
     {
-        Prompt::resetFallbacks();
-
         $this->restoreSite();
 
         parent::tearDown();
@@ -371,6 +366,21 @@ EOT;
         $this->files->put($this->preparePath(base_path('content/collections/blog/article.md')), 'Article');
 
         $this->installCoolRunnings(['--clear-site' => true]);
+
+        $this->assertFileExists(base_path('content/collections/pages/home.md'));
+        $this->assertFileDoesNotExist(base_path('content/collections/pages/contact.md'));
+        $this->assertFileDoesNotExist(base_path('content/collections/blog'));
+    }
+
+    #[Test]
+    public function it_clears_site_when_interactively_confirmed()
+    {
+        $this->files->put($this->preparePath(base_path('content/collections/pages/contact.md')), 'Contact');
+        $this->files->put($this->preparePath(base_path('content/collections/blog/article.md')), 'Article');
+
+        $this
+            ->installCoolRunningsInteractively(['--without-user' => true])
+            ->expectsConfirmation('Clear site first?', 'yes');
 
         $this->assertFileExists(base_path('content/collections/pages/home.md'));
         $this->assertFileDoesNotExist(base_path('content/collections/pages/contact.md'));
@@ -813,10 +823,8 @@ EOT;
     }
 
     #[Test]
-    public function it_installs_a_module_when_user_confirms_interactively_via_prompt()
+    public function it_installs_only_the_modules_confirmed_interactively_via_prompt()
     {
-        $this->markTestSkippedInWindows();
-
         $this->setConfig([
             'export_paths' => [
                 'copied.md',
@@ -843,6 +851,42 @@ EOT;
                         'resources/css/theme.css' => 'resources/css/jamaica.css',
                     ],
                 ],
+                'js' => [
+                    'options' => [
+                        'react' => [
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                            'dependencies' => [
+                                'bobsled/vue-components' => '^1.5',
+                            ],
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+                'oldschool_js' => [
+                    'options' => [
+                        'jquery' => [
+                            'export_paths' => [
+                                'resources/js/jquery.js',
+                            ],
+                        ],
+                        'mootools' => [
+                            'export_paths' => [
+                                'resources/js/jquery.js',
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ]);
 
@@ -850,28 +894,103 @@ EOT;
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertComposerJsonDoesntHave('bobsled/vue-components');
 
-        $this->installCoolRunningsWithModulePrompts([
-            'y', Key::ENTER, // install first seo module
-            Key::ENTER,      // skip second bobsled module
-            'y', Key::ENTER, // install third jamaica module
-        ]);
+        $this
+            ->installCoolRunningsModules()
+            ->expectsConfirmation('Would you like to install the [seo] module?', 'yes')
+            ->expectsConfirmation('Would you like to install the [bobsled] module?', 'no')
+            ->expectsConfirmation('Would you like to install the [jamaica] module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following [js] modules?', 'vue')
+            ->expectsQuestion('Would you like to install one of the following [oldschool_js] modules?', 'skip_module');
 
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
         $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertComposerJsonHasPackageVersion('require', 'bobsled/vue-components', '^1.5');
+    }
+
+    #[Test]
+    public function it_display_custom_module_prompts()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => [
+                    'prompt' => 'Want some extra SEO magic?',
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+                'js' => [
+                    'prompt' => 'Want one of these fancy JS options?',
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+
+        $this
+            ->installCoolRunningsModules()
+            ->expectsConfirmation('Want some extra SEO magic?', 'yes')
+            ->expectsQuestion('Want one of these fancy JS options?', 'svelte');
+
+        // TODO: Also assert custom option labels using `expectsChoice()`,
+        // but there is currently a bug with the third `$answers` param,
+        // so maybe we can revisit this after. For example...
+        //
+        //     ->expectsChoice('Want one of these fancy JS options?', 'svelte', [
+        //         'skip_module' => 'No',
+        //         'react' => 'React JS',
+        //         'vue' => 'Vue JS',
+        //         'svelte' => 'Svelte',
+        //     ]);
+
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileExists(base_path('resources/js/svelte.js'));
     }
 
     #[Test]
     public function it_installs_modules_without_dependencies()
     {
-        $this->markTestSkippedInWindows();
-
         $this->setConfig([
             'export_paths' => [
                 'copied.md',
@@ -896,7 +1015,9 @@ EOT;
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
 
-        $this->installCoolRunningsWithModulePrompts(['y', Key::ENTER], withoutDependencies: true);
+        $this
+            ->installCoolRunningsModules(['--without-dependencies' => true])
+            ->expectsConfirmation('Would you like to install the [seo] module?', 'yes');
 
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(base_path('resources/css/seo.css'));
@@ -939,27 +1060,27 @@ EOT;
     {
         $this->httpFake($customHttpFake);
 
-        $this->artisan('statamic:starter-kit:install', array_merge([
+        return $this->artisan('statamic:starter-kit:install', array_merge([
             'package' => 'statamic/cool-runnings',
             '--no-interaction' => true,
         ], $options));
     }
 
-    private function installCoolRunningsWithModulePrompts($modulePrompts = [], $withoutDependencies = false)
+    private function installCoolRunningsInteractively($options = [], $customHttpFake = null)
     {
-        $this->httpFake();
+        $this->httpFake($customHttpFake);
 
-        Prompt::fake($modulePrompts);
+        return $this->artisan('statamic:starter-kit:install', array_merge([
+            'package' => 'statamic/cool-runnings',
+        ], $options));
+    }
 
-        $licenseManager = LicenseManager::validate($package = 'statamic/cool-runnings');
-
-        // New up `Installer` class directly, because `Prompt::fake()` isn't compatible with `$this->artisan()` test helper.
-        // See: https://github.com/laravel/prompts/issues/158
-        (new Installer($package, null, $licenseManager))
-            ->withoutDependencies($withoutDependencies)
-            ->isInteractive(true)
-            ->withUserPrompt(false)
-            ->install();
+    private function installCoolRunningsModules($options = [], $customHttpFake = null)
+    {
+        return $this->installCoolRunningsInteractively(array_merge($options, [
+            '--clear-site' => true,   // skip clear site prompt
+            '--without-user' => true, // skip create user prompt
+        ]), $customHttpFake);
     }
 
     private function httpFake($customFake = null)
@@ -1017,18 +1138,5 @@ class StarterKitTestCommand extends \Illuminate\Console\Command
     public function handle()
     {
         Blink::put('starter-kit-command-run', true);
-    }
-}
-
-class Prompt extends LaravelPrompt
-{
-    public static function resetFallbacks()
-    {
-        static::$shouldFallback = false;
-    }
-
-    public function value(): mixed
-    {
-        //
     }
 }
