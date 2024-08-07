@@ -226,6 +226,7 @@ export default {
         },
 
         processUploadQueue() {
+            // Make sure we're not grabbing a running upload
             const upload = this.uploads.find(upload => upload.instance.state === 'new');
             if (!upload) return;
 
