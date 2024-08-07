@@ -12,6 +12,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
+use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\View\Antlers\AntlersString;
@@ -89,6 +90,8 @@ class PathDataManager
      */
     private $reduceFinal = true;
 
+    private $isReturningForConditions = false;
+
     /**
      * @var Parser|null
      */
@@ -163,6 +166,17 @@ class PathDataManager
         if ($this->nodeProcessor != null) {
             $this->nodeProcessor->restoreLockedData();
         }
+    }
+
+    /**
+     * Reset state for things that should not persist
+     * across repeated calls to getData and friends.
+     *
+     * @return void
+     */
+    private function resetInternalState()
+    {
+        $this->isReturningForConditions = false;
     }
 
     /**
@@ -296,6 +310,13 @@ class PathDataManager
     public function setReduceFinal($reduceFinal)
     {
         $this->reduceFinal = $reduceFinal;
+
+        return $this;
+    }
+
+    public function setIsReturningForConditions($isCondition)
+    {
+        $this->isReturningForConditions = $isCondition;
 
         return $this;
     }
@@ -476,6 +497,17 @@ class PathDataManager
         }
     }
 
+    private function isSafeToCollapseFinal()
+    {
+        if ($this->isReturningForConditions) {
+            if ($this->reducedVar instanceof LabeledValue) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function collapseValues(bool $isFinal)
     {
         if (! $isFinal && $this->reducedVar instanceof Values) {
@@ -509,6 +541,8 @@ class PathDataManager
         $this->encounteredBuilderOnFinalPart = false;
 
         if (! $this->guardRuntimeAccess($path->normalizedReference)) {
+            $this->resetInternalState();
+
             return null;
         }
 
@@ -523,6 +557,8 @@ class PathDataManager
             $path = $tempPathParser->parse($dynamicPath);
 
             if (! $this->guardRuntimeAccess($path->normalizedReference)) {
+                $this->resetInternalState();
+
                 return null;
             }
         }
@@ -555,6 +591,8 @@ class PathDataManager
                 }
 
                 if ($pathItem->name == 'void' && count($path->pathParts) == 1) {
+                    $this->resetInternalState();
+
                     return 'void::'.GlobalRuntimeState::$environmentId;
                 }
 
@@ -612,7 +650,9 @@ class PathDataManager
                             if (! $pathItem->isFinal) {
                                 $this->compact(false);
                             } else {
-                                $this->compact(true);
+                                if ($this->isSafeToCollapseFinal()) {
+                                    $this->compact(true);
+                                }
                             }
                         }
 
@@ -746,10 +786,13 @@ class PathDataManager
         }
 
         if ($this->isPair && ! $this->reduceFinal) {
-            $this->compact(true);
+            if ($this->isSafeToCollapseFinal()) {
+                $this->compact(true);
+            }
         }
 
         $this->namedSlotsInScope = false;
+        $this->resetInternalState();
 
         return $this->reducedVar;
     }

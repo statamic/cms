@@ -1255,6 +1255,8 @@ class Environment
         if ($name instanceof VariableReference) {
             if (! $this->isEvaluatingTruthValue) {
                 $this->dataRetriever->setReduceFinal(false);
+            } else {
+                $this->dataRetriever->setIsReturningForConditions(true);
             }
 
             if ($originalNode != null && $originalNode->hasModifiers()) {
