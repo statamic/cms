@@ -30,13 +30,13 @@ class Asset extends JsonResource
             'isMedia' => $this->isMedia(),
             'isPdf' => $this->isPdf(),
             'isPreviewable' => $this->isPreviewable(),
+            'thumbnail' => $this->thumbnailUrl('small'),
 
             $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
                 return [
                     'width' => $this->width(),
                     'height' => $this->height(),
                     'preview' => $this->previewUrl(),
-                    'thumbnail' => $this->thumbnailUrl('small'),
                 ];
             }),
 

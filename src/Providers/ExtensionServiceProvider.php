@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
+use Statamic\Assets\Thumbnails;
 use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Extend\Manifest;
@@ -246,12 +247,18 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\MigrateSitesConfigToYaml::class,
     ];
 
+    protected $thumbnailGenerators = [
+        Thumbnails\ImageThumbnailGenerator::class,
+        Thumbnails\SvgThumbnailGenerator::class,
+    ];
+
     public function register()
     {
         $this->registerExtensions();
         $this->registerAddonManifest();
         $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
+        $this->registerThumbnailGenerators();
         $this->app->instance('statamic.hooks', collect());
     }
 
@@ -376,6 +383,15 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->updateScripts as $class) {
             $class::register(Statamic::PACKAGE);
+        }
+    }
+
+    protected function registerThumbnailGenerators()
+    {
+        $this->app->instance('statamic.thumbnail-generators', collect());
+
+        foreach ($this->thumbnailGenerators as $class) {
+            $class::register();
         }
     }
 }

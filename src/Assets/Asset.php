@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Assets\AssetUploader as Uploader;
+use Statamic\Assets\Thumbnails\ThumbnailProvider;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -411,23 +412,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function thumbnailUrl($preset = null)
     {
-        if ($this->isSvg()) {
-            return $this->svgThumbnailUrl();
-        }
-
-        return cp_route('assets.thumbnails.show', [
-            'encoded_asset' => base64_encode($this->id()),
-            'size' => $preset,
-        ]);
-    }
-
-    protected function svgThumbnailUrl()
-    {
-        if ($url = $this->url()) {
-            return $url;
-        }
-
-        return cp_route('assets.svgs.show', ['encoded_asset' => base64_encode($this->id())]);
+        return ThumbnailProvider::provide($this, ['preset' => $preset]);
     }
 
     public function pdfUrl()
