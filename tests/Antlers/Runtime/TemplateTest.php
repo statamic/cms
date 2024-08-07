@@ -18,6 +18,7 @@ use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Tags\Tags;
@@ -462,6 +463,39 @@ EOT;
             $this->variables,
             true
         ));
+    }
+
+    #[Test]
+    public function ternary_condition_with_labeled_values_supplied_to_tags_resolve_correctly()
+    {
+        $this->withFakeViews();
+        $value = new LabeledValue(null, null);
+        $valueTwo = new LabeledValue('something', null);
+
+        $partial = <<<'EOT'
+{{ the_field ? 'true' : 'false' }}
+EOT;
+
+        $this->viewShouldReturnRaw('test', $partial);
+
+        $template = <<<'EOT'
+O: {{ the_field ? 'true' : 'false' }}
+P: {{ partial:test :the_field="the_field" }}
+EOT;
+
+        $expected = <<<'EXP'
+O: false
+P: false
+EXP;
+
+        $this->assertSame($expected, $this->renderString($template, ['the_field' => $value], true));
+
+        $expected = <<<'EXP'
+O: true
+P: true
+EXP;
+
+        $this->assertSame($expected, $this->renderString($template, ['the_field' => $valueTwo], true));
     }
 
     #[Test]

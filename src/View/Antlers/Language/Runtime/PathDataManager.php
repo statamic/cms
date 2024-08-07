@@ -14,6 +14,7 @@ use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Support\Boolable;
 use Statamic\View\Antlers\AntlersString;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
@@ -89,6 +90,8 @@ class PathDataManager
      */
     private $reduceFinal = true;
 
+    private $isReturningForConditions = false;
+
     /**
      * @var Parser|null
      */
@@ -163,6 +166,17 @@ class PathDataManager
         if ($this->nodeProcessor != null) {
             $this->nodeProcessor->restoreLockedData();
         }
+    }
+
+    /**
+     * Reset state for things that should not persist
+     * across repeated calls to getData and friends.
+     *
+     * @return void
+     */
+    private function resetInternalState()
+    {
+        $this->isReturningForConditions = false;
     }
 
     /**
@@ -296,6 +310,13 @@ class PathDataManager
     public function setReduceFinal($reduceFinal)
     {
         $this->reduceFinal = $reduceFinal;
+
+        return $this;
+    }
+
+    public function setIsReturningForConditions($isCondition)
+    {
+        $this->isReturningForConditions = $isCondition;
 
         return $this;
     }
@@ -523,6 +544,8 @@ class PathDataManager
             $path = $tempPathParser->parse($dynamicPath);
 
             if (! $this->guardRuntimeAccess($path->normalizedReference)) {
+                $this->resetInternalState();
+
                 return null;
             }
         }
@@ -555,6 +578,8 @@ class PathDataManager
                 }
 
                 if ($pathItem->name == 'void' && count($path->pathParts) == 1) {
+                    $this->resetInternalState();
+
                     return 'void::'.GlobalRuntimeState::$environmentId;
                 }
 
@@ -750,6 +775,7 @@ class PathDataManager
         }
 
         $this->namedSlotsInScope = false;
+        $this->resetInternalState();
 
         return $this->reducedVar;
     }
@@ -885,6 +911,12 @@ class PathDataManager
     {
         if ($this->isForArrayIndex && $isFinal && is_object($this->reducedVar) && method_exists($this->reducedVar, '__toString')) {
             $this->reducedVar = (string) $this->reducedVar;
+
+            return;
+        }
+
+        if ($this->isReturningForConditions && $isFinal && $this->reducedVar instanceof Boolable) {
+            $this->reducedVar = $this->reducedVar->toBool();
 
             return;
         }
