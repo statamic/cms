@@ -225,7 +225,7 @@ Statamic.app({
 
         wrapperClass() {
             return this.$config.get('wrapperClass', 'max-w-xl');
-        },
+        }
 
     },
 
@@ -293,7 +293,7 @@ Statamic.app({
 
         hideBanner() {
             this.showBanner = false;
-            localStorage.setItem(`statamic.snooze_license_banner`, new Date(Date.now() + 1 * 60 * 1000).valueOf());
+            localStorage.setItem(`statamic.snooze_license_banner`, new Date(Date.now() + 5 * 60 * 1000).valueOf());
         },
 
         fixAutofocus() {
