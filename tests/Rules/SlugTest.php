@@ -13,7 +13,7 @@ class SlugTest extends TestCase
     protected static $customRule = Slug::class;
 
     #[Test]
-    public function it_validates_handles()
+    public function it_validates_slugs()
     {
         $this->assertPasses('foo');
         $this->assertPasses('foo-bar');
