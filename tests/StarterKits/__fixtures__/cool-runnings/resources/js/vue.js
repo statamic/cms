@@ -1,1 +1,1 @@
-// vue stuff!
+// vue!
