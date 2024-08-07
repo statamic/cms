@@ -226,9 +226,9 @@ export default {
         },
 
         processUploadQueue() {
-            if (this.uploads.length === 0) return;
+            const upload = this.uploads.find(upload => upload.instance.state === 'new');
+            if (!upload) return;
 
-            const upload = this.uploads[0];
             const id = upload.id;
 
             upload.instance.upload().then(response => {
