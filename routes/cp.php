@@ -24,6 +24,7 @@ use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
+use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionTreeController;
@@ -147,6 +148,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'index'])->name('collections.tree.index');
     Route::patch('collections/{collection}/tree', [CollectionTreeController::class, 'update'])->name('collections.tree.update');
+    Route::post('collections/{collection}/actions', [CollectionActionController::class, 'run'])->name('collections.actions.run');
 
     Route::group(['prefix' => 'collections/{collection}/entries'], function () {
         Route::get('/', [EntriesController::class, 'index'])->name('collections.entries.index');

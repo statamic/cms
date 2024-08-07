@@ -7,6 +7,7 @@ use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\SiteNotFoundException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -44,6 +45,8 @@ class CollectionsController extends CpController
                 'editable' => User::current()->can('edit', $collection),
                 'blueprint_editable' => User::current()->can('configure fields'),
                 'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
+                'actions' => Action::for($collection),
+                'actions_url' => cp_route('collections.actions.run', ['collection' => $collection->handle()]),
             ];
         })->values();
 
@@ -103,6 +106,7 @@ class CollectionsController extends CpController
                 ->mapWithKeys(fn ($site) => [$site => cp_route('collections.entries.create', [$collection->handle(), $site])])
                 ->all(),
             'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
+            'actions' => Action::for($collection),
         ];
 
         if ($collection->queryEntries()->count() === 0) {
