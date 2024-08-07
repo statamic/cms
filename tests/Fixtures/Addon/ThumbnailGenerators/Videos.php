@@ -7,11 +7,13 @@ use Statamic\Contracts\Assets\Asset;
 
 class Videos extends ThumbnailGenerator
 {
-    public function accepts(Asset $asset): bool {
+    public function accepts(Asset $asset): bool
+    {
         return $asset->isVideo();
     }
 
-    public function generate(Asset $asset, mixed $params): ?string {
-        return '/custom/video/thumb/' . base64_encode($asset->id());
+    public function generate(Asset $asset, mixed $params): ?string
+    {
+        return '/custom/video/thumb/'.base64_encode($asset->id());
     }
 }

@@ -21,8 +21,8 @@ class ThumbnailService
     {
         return app('statamic.thumbnail-generators')
             ->reverse()
-            ->map(fn($class) => static::makeGenerator($class))
-            ->first(fn($generator) => $generator->accepts($asset));
+            ->map(fn ($class) => static::makeGenerator($class))
+            ->first(fn ($generator) => $generator->accepts($asset));
     }
 
     protected static function makeGenerator(string $class): ThumbnailGenerator

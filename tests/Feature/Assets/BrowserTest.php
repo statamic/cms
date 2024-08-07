@@ -169,8 +169,7 @@ class BrowserTest extends TestCase
             ->assertSuccessful()
             ->assertJsonFragment(['thumbnail' => $assetOne->thumbnailUrl('small')])
             ->assertJsonFragment(['thumbnail' => $assetTwo->thumbnailUrl('small')])
-            ->assertJsonFragment(['thumbnail' => $assetThree->thumbnailUrl('small')])
-            ;
+            ->assertJsonFragment(['thumbnail' => $assetThree->thumbnailUrl('small')]);
     }
 
     #[Test]

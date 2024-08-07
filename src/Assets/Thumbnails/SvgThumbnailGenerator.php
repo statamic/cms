@@ -6,11 +6,13 @@ use Statamic\Contracts\Assets\Asset;
 
 class SvgThumbnailGenerator extends ThumbnailGenerator
 {
-    public function accepts(Asset $asset): bool {
+    public function accepts(Asset $asset): bool
+    {
         return $asset->isSvg();
     }
 
-    public function generate(Asset $asset, mixed $params = null): ?string {
+    public function generate(Asset $asset, mixed $params = null): ?string
+    {
         if ($url = $asset->url()) {
             return $url;
         }
