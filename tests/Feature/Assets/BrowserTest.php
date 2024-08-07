@@ -149,6 +149,31 @@ class BrowserTest extends TestCase
     }
 
     #[Test]
+    public function it_includes_assets_thumbnail_urls()
+    {
+        $this->withoutExceptionHandling();
+        $container = AssetContainer::make('test')->disk('test')->save();
+        $assetOne = $container
+            ->makeAsset('one.txt')
+            ->upload(UploadedFile::fake()->create('one.txt'));
+        $assetTwo = $container
+            ->makeAsset('two.jpg')
+            ->upload(UploadedFile::fake()->image('two.jpg'));
+        $assetThree = $container
+            ->makeAsset('other.svg')
+            ->upload(UploadedFile::fake()->createWithContent('other.svg', '<svg width=100 height=100></svg>'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/folders/test/')
+            ->assertSuccessful()
+            ->assertJsonFragment(['thumbnail' => $assetOne->thumbnailUrl('small')])
+            ->assertJsonFragment(['thumbnail' => $assetTwo->thumbnailUrl('small')])
+            ->assertJsonFragment(['thumbnail' => $assetThree->thumbnailUrl('small')])
+            ;
+    }
+
+    #[Test]
     public function it_lists_assets_in_a_subfolder()
     {
         $container = AssetContainer::make('test')->disk('test')->save();
