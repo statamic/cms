@@ -227,7 +227,8 @@ Statamic.app({
         },
 
         isLicensingBannerHidden() {
-            return document.cookie.includes('statamic_licensing_banner_hidden');
+            return localStorage.getItem(`statamic.licensing_banner_hidden_until`) !== undefined
+                && localStorage.getItem(`statamic.licensing_banner_hidden_until`) > new Date().valueOf();
         }
 
     },
@@ -246,7 +247,7 @@ Statamic.app({
 
         this.fixAutofocus();
 
-        this.showBanner = ! this.isLicensingBannerHidden && Statamic.$config.get('hasLicenseBanner');
+        this.showBanner = !this.isLicensingBannerHidden && Statamic.$config.get('hasLicenseBanner');
 
         this.$toast.intercept();
     },
@@ -296,7 +297,7 @@ Statamic.app({
 
         hideBanner() {
             this.showBanner = false;
-            document.cookie = `statamic_licensing_banner_hidden=true; expires=${new Date(Date.now() + 5 * 60 * 1000).toUTCString()}; path=/`;
+            localStorage.setItem(`statamic.licensing_banner_hidden_until`, new Date(Date.now() + 5 * 60 * 1000).valueOf());
         },
 
         fixAutofocus() {
