@@ -16,6 +16,8 @@ export default {
             switch (this.extension.toLowerCase()) {
                 case 'folder':
                     return 'folder';
+                case 'parentfolder':
+                    return 'folder-home';
                 case '7z':
                 case 'pkg':
                 case 'rar':
