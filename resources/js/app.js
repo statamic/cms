@@ -210,6 +210,7 @@ Statamic.app({
         showBanner: true,
         portals: [],
         appendedComponents: [],
+        isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
     },
 
     computed: {
@@ -225,11 +226,6 @@ Statamic.app({
         wrapperClass() {
             return this.$config.get('wrapperClass', 'max-w-xl');
         },
-
-        isLicensingBannerHidden() {
-            return localStorage.getItem(`statamic.licensing_banner_hidden_until`) !== undefined
-                && localStorage.getItem(`statamic.licensing_banner_hidden_until`) > new Date().valueOf();
-        }
 
     },
 
@@ -247,7 +243,7 @@ Statamic.app({
 
         this.fixAutofocus();
 
-        this.showBanner = !this.isLicensingBannerHidden && Statamic.$config.get('hasLicenseBanner');
+        this.showBanner = !this.isLicensingBannerSnoozed && Statamic.$config.get('hasLicenseBanner');
 
         this.$toast.intercept();
     },
@@ -297,7 +293,7 @@ Statamic.app({
 
         hideBanner() {
             this.showBanner = false;
-            localStorage.setItem(`statamic.licensing_banner_hidden_until`, new Date(Date.now() + 5 * 60 * 1000).valueOf());
+            localStorage.setItem(`statamic.snooze_license_banner`, new Date(Date.now() + 1 * 60 * 1000).valueOf());
         },
 
         fixAutofocus() {
