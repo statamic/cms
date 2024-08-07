@@ -338,7 +338,7 @@ export default {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
             return replicatorPreviewHtml(_.map(this.assets, (asset) => {
-                return (asset.isImage || asset.isSvg) ?
+                return (asset.thumbnail) ?
                     `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', '));
