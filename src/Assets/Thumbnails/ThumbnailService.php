@@ -4,11 +4,11 @@ namespace Statamic\Assets\Thumbnails;
 
 use Statamic\Contracts\Assets\Asset;
 
-class ThumbnailProvider
+class ThumbnailService
 {
     protected static $generators = [];
 
-    public static function provide(Asset $asset, mixed $params): ?string
+    public static function generate(Asset $asset, mixed $params = null): ?string
     {
         if ($generator = static::findGenerator($asset)) {
             return $generator->generate($asset, $params);

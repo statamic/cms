@@ -10,7 +10,7 @@ class SvgThumbnailGenerator extends ThumbnailGenerator
         return $asset->isSvg();
     }
 
-    public function generate(Asset $asset, mixed $params): ?string {
+    public function generate(Asset $asset, mixed $params = null): ?string {
         if ($url = $asset->url()) {
             return $url;
         }
