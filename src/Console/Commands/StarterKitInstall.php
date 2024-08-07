@@ -29,6 +29,7 @@ class StarterKitInstall extends Command
         { --local : Install from local repo configured in composer config.json }
         { --with-config : Copy starter-kit.yaml config for local development }
         { --without-dependencies : Install without dependencies }
+        { --without-user : Install without creating user }
         { --force : Force install and allow dependency errors }
         { --cli-install : Installing from CLI Tool }
         { --clear-site : Clear site before installing }';
@@ -66,7 +67,7 @@ class StarterKitInstall extends Command
             ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
-            ->withUserPrompt($cleared && $this->input->isInteractive() && ! $this->option('cli-install'))
+            ->withUserPrompt($cleared && $this->input->isInteractive() && ! $this->option('without-user') && ! $this->option('cli-install'))
             ->isInteractive($this->input->isInteractive())
             ->usingSubProcess($this->option('cli-install'))
             ->force($this->option('force'));
