@@ -32,7 +32,7 @@ final class Module
     public function validate(): void
     {
         $this
-            ->ensureExportPathsExist()
+            ->ensureInstallableFilesExist()
             ->ensureCompatibleDependencies();
     }
 
@@ -191,11 +191,11 @@ final class Module
     }
 
     /**
-     * Ensure export paths exist.
+     * Ensure installable files exist.
      *
      * @throws StarterKitException
      */
-    protected function ensureExportPathsExist(): self
+    protected function ensureInstallableFilesExist(): self
     {
         $this
             ->exportPaths()

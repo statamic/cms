@@ -332,7 +332,7 @@ final class Installer
     }
 
     /**
-     * Instantiate individual module.
+     * Instantiate options module.
      */
     protected function instantiateOptionsModule(array $config, string $key): Module|bool
     {
