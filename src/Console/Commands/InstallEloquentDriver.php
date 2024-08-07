@@ -531,18 +531,13 @@ class InstallEloquentDriver extends Command
                 $this->runArtisanCommand('migrate');
 
                 $this->switchToEloquentDriver('sites');
+
+                $this->runArtisanCommand('statamic:eloquent:import-sites');
             },
             message: 'Migrating sites...'
         );
 
-        $this->components->info('Configured sites');
-
-        spin(
-            callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-sites'),
-            message: 'Importing existing sites...'
-        );
-
-        $this->components->info('Imported existing sites');
+        $this->components->info('Configured & imported sites');
     }
 
     protected function migrateTaxonomies(): void
