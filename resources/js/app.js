@@ -224,6 +224,10 @@ Statamic.app({
 
         wrapperClass() {
             return this.$config.get('wrapperClass', 'max-w-xl');
+        },
+
+        isLicensingBannerHidden() {
+            return document.cookie.includes('statamic_licensing_banner_hidden');
         }
 
     },
@@ -242,7 +246,7 @@ Statamic.app({
 
         this.fixAutofocus();
 
-        this.showBanner = Statamic.$config.get('hasLicenseBanner');
+        this.showBanner = ! this.isLicensingBannerHidden && Statamic.$config.get('hasLicenseBanner');
 
         this.$toast.intercept();
     },
@@ -292,6 +296,7 @@ Statamic.app({
 
         hideBanner() {
             this.showBanner = false;
+            document.cookie = `statamic_licensing_banner_hidden=true; expires=${new Date(Date.now() + 5 * 60 * 1000).toUTCString()}; path=/`;
         },
 
         fixAutofocus() {
