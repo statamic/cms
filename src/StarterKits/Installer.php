@@ -163,10 +163,10 @@ final class Installer
             ->ensureConfig()
             ->instantiateModules()
             ->installModules()
-            ->copyStarterKitConfig() // TODO handle modules
-            ->copyStarterKitHooks() // TODO handle modules
+            ->copyStarterKitConfig()
+            ->copyStarterKitHooks()
             ->makeSuperUser()
-            ->runPostInstallHooks() // TODO handle modules
+            ->runPostInstallHooks()
             ->reticulateSplines()
             ->removeStarterKit()
             ->removeRepository()
@@ -290,7 +290,7 @@ final class Installer
      */
     protected function instantiateModules(): self
     {
-        $topLevelConfig = $this->config()->except('modules')->all();
+        $topLevelConfig = $this->config()->all();
 
         $nestedConfigs = $this->config('modules');
 
@@ -306,7 +306,7 @@ final class Installer
     /**
      * Instantiate individual module.
      */
-    protected function instantiateModule(array $config, string $key): Module|bool
+    protected function instantiateModule(array $config, string $key): InstallableModule|bool
     {
         $shouldPrompt = true;
 
@@ -328,13 +328,13 @@ final class Installer
             return false;
         }
 
-        return new Module(collect($config), $this);
+        return (new InstallableModule($config, $key))->installer($this);
     }
 
     /**
      * Instantiate options module.
      */
-    protected function instantiateOptionsModule(array $config, string $key): Module|bool
+    protected function instantiateOptionsModule(array $config, string $key): InstallableModule|bool
     {
         $options = collect($config['options'])
             ->map(fn ($option, $key) => Arr::get($option, 'label', ucfirst($key)))
@@ -350,7 +350,7 @@ final class Installer
             return false;
         }
 
-        return new Module(collect($config['options'][$choice]), $this);
+        return (new InstallableModule($config['options'][$choice], $key))->installer($this);
     }
 
     /**
