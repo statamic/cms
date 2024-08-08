@@ -64,11 +64,8 @@ class DeleteMultisiteEntry extends Delete
         }
 
         return $this->items->every(function ($entry) {
-            if ($entry->descendants()->isEmpty()) {
-                return false;
-            }
-
-            return $entry->descendants()->every(fn ($descendant) => User::current()->can("access {$descendant->site()->handle()} site"));
+            return $entry->descendants()->isNotEmpty()
+                && $entry->descendants()->every(fn ($descendant) => User::current()->can("access {$descendant->site()->handle()} site"));
         });
     }
 }
