@@ -20,6 +20,7 @@
         reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
         initial-site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
+        :can-change-localization-delete-behavior="{{ Statamic\Support\Str::bool($canChangeLocalizationDeleteBehavior) }}"
 
         @if ($collection->hasStructure())
         :structured="{{ Statamic\Support\Str::bool($user->can('reorder', $collection)) }}"
