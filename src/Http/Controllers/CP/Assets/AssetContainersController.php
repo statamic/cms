@@ -285,7 +285,7 @@ class AssetContainersController extends CpController
                         'display' => __('Process Source Images'),
                         'instructions' => __('statamic::messages.asset_container_source_preset_instructions'),
                         'label_html' => true,
-                        'options' => $this->expandedGlidePresetOptions()->all(),
+                        'options' => $this->expandedGlidePresetOptions(),
                         'clearable' => true,
                     ],
                     'warm_intelligent' => [
@@ -300,7 +300,7 @@ class AssetContainersController extends CpController
                         'instructions' => __('statamic::messages.asset_container_warm_presets_instructions'),
                         'multiple' => true,
                         'label_html' => true,
-                        'options' => $this->expandedGlidePresetOptions()->all(),
+                        'options' => $this->expandedGlidePresetOptions(),
                         'if' => [
                             'warm_intelligent' => false,
                         ],
@@ -317,7 +317,7 @@ class AssetContainersController extends CpController
         return collect(config('statamic.assets.image_manipulation.presets'))
             ->mapWithKeys(function ($params, $handle) {
                 return [$handle => $this->expandedGlidePresetLabel($handle, $params)];
-            });
+            })->all();
     }
 
     private function expandedGlidePresetLabel($handle, $params)
