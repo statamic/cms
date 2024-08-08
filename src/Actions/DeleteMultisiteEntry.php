@@ -3,7 +3,6 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 
@@ -59,10 +58,6 @@ class DeleteMultisiteEntry extends Delete
 
     private function canChangeBehavior(): bool
     {
-        if (! Site::multiEnabled()) {
-            return true;
-        }
-
         return $this->items->every(function ($entry) {
             return $entry->descendants()->isNotEmpty()
                 && $entry->descendants()->every(fn ($descendant) => User::current()->can("access {$descendant->site()->handle()} site"));
