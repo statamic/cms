@@ -97,9 +97,7 @@ class InstallCollaboration extends Command
                 continue;
             }
 
-            $contents = File::get($file);
-
-            if (Str::contains($contents, 'BROADCAST_DRIVER')) {
+            if (Str::contains($contents = File::get($file), 'BROADCAST_DRIVER')) {
                 $contents = Str::of($contents)
                     ->replace('BROADCAST_DRIVER', 'BROADCAST_CONNECTION')
                     ->__toString();
