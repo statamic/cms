@@ -59,8 +59,10 @@ class DeleteMultisiteEntry extends Delete
     private function canChangeBehavior(): bool
     {
         return $this->items->every(function ($entry) {
-            return $entry->descendants()->isNotEmpty()
-                && $entry->descendants()->every(fn ($descendant) => User::current()->can("access {$descendant->site()->handle()} site"));
+            $descendants = $entry->descendants();
+
+            return $descendants->isNotEmpty()
+                && $descendants->every(fn ($descendant) => User::current()->can('view', $descendant->site()));
         });
     }
 }
