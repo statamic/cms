@@ -98,13 +98,12 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'sites' => $this->getAuthorizedSitesForCollection($collection),
+            'sites' => $authorizedSites = $this->getAuthorizedSitesForCollection($collection),
             'createUrls' => $collection->sites()
                 ->mapWithKeys(fn ($site) => [$site => cp_route('collections.entries.create', [$collection->handle(), $site])])
                 ->all(),
             'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
-            'canChangeLocalizationDeleteBehavior' => $collection->sites()->count() > 1
-                && $collection->sites()->every(fn ($site) => User::current()->can("access {$site} site")),
+            'canChangeLocalizationDeleteBehavior' => count($authorizedSites) == $collection->sites()->count(),
         ];
 
         if ($collection->queryEntries()->count() === 0) {
