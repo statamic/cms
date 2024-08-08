@@ -87,6 +87,10 @@ class InstallCollaboration extends Command
 
     protected function updateBroadcastingKeysInEnvironmentFiles(): void
     {
+        if (version_compare(app()->version(), '11', '<')) {
+            return;
+        }
+
         $environmentFiles = [
             app()->environmentFile(),
             app()->environmentFile('.env.example'),
