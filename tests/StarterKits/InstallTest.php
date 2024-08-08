@@ -8,12 +8,12 @@ use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\YAML;
-use Statamic\StarterKits\Installer;
 use Statamic\Support\Str;
 use Tests\Fakes\Composer\FakeComposer;
 use Tests\TestCase;
@@ -1023,6 +1023,92 @@ EOT;
         $this->assertFileExists(base_path('resources/css/seo.css'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+    }
+
+    #[Test]
+    public function it_requires_valid_module_config()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => [
+                    'prompt' => false,
+                    // no installable config!
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this
+            ->installCoolRunnings()
+            ->expectsOutput('Starter-kit module is missing `export_paths` or `dependencies`!')
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_doesnt_require_anything_installable_in_top_level_if_user_wants_to_organize_using_modules_only()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => [
+                    'prompt' => false,
+                    'export_paths' => [
+                        'copied.md',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this
+            ->installCoolRunnings()
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    #[DataProvider('validModuleConfigs')]
+    public function it_passes_validation_if_module_export_paths_or_dependencies_are_properly_configured($config)
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => array_merge(['prompt' => false], $config),
+            ],
+        ]);
+
+        $this
+            ->installCoolRunnings()
+            ->assertSuccessful();
+    }
+
+    public static function validModuleConfigs()
+    {
+        return [
+            'export paths' => [[
+                'export_paths' => [
+                    'copied.md',
+                ],
+            ]],
+            'export as paths' => [[
+                'export_as' => [
+                    'copied.md' => 'resources/js/vue.js',
+                ],
+            ]],
+            'dependencies' => [[
+                'dependencies' => [
+                    'statamic/seo-pro' => '^1.0',
+                ],
+            ]],
+            'dev dependencies' => [[
+                'dependencies_dev' => [
+                    'statamic/seo-pro' => '^1.0',
+                ],
+            ]],
+        ];
     }
 
     private function kitRepoPath($path = null)
