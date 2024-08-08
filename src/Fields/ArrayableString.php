@@ -27,7 +27,7 @@ class ArrayableString implements Arrayable, Boolable, JsonSerializable
         return (array) $this->extra;
     }
 
-    public function toBool()
+    public function toBool(): bool
     {
         return (bool) $this->value;
     }
