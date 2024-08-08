@@ -2,12 +2,12 @@
 
 namespace Statamic\Console\Commands;
 
-use Facades\Statamic\StarterKits\Exporter as StarterKitExporter;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\StarterKits\Exceptions\StarterKitException;
+use Statamic\StarterKits\Exporter as StarterKitExporter;
 
 use function Laravel\Prompts\confirm;
 
@@ -42,8 +42,10 @@ class StarterKitExport extends Command
             $this->askToCreateExportPath($path);
         }
 
+        $exporter = new StarterKitExporter($path);
+
         try {
-            StarterKitExporter::export($path);
+            $exporter->export();
         } catch (StarterKitException $exception) {
             $this->components->error($exception->getMessage());
 

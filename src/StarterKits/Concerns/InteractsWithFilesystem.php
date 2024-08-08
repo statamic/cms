@@ -24,6 +24,26 @@ trait InteractsWithFilesystem
     }
 
     /**
+     * Export starter kit path.
+     */
+    protected function exportPath(string $starterKitPath, string $from, ?string $to = null): void
+    {
+        $to = $to
+            ? "{$starterKitPath}/{$to}"
+            : "{$starterKitPath}/{$from}";
+
+        $from = base_path($from);
+
+        $this->preparePath($to);
+
+        $files = app(Filesystem::class);
+
+        $files->isDirectory($from)
+            ? $files->copyDirectory($from, $to)
+            : $files->copy($from, $to);
+    }
+
+    /**
      * Prepare path directory.
      */
     protected function preparePath(string $path): string

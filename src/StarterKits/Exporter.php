@@ -5,20 +5,27 @@ namespace Statamic\StarterKits;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Statamic\Facades\YAML;
+use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Exporter
 {
-    protected $files;
+    use InteractsWithFilesystem;
+
     protected $exportPath;
+    protected $files;
     protected $vendorName;
+    protected $modules;
 
     /**
      * Instantiate starter kit exporter.
      */
-    public function __construct()
+    public function __construct(string $exportPath)
     {
+        $this->exportPath = $exportPath;
+
         $this->files = app(Filesystem::class);
     }
 
@@ -27,135 +34,97 @@ class Exporter
      *
      * @throws StarterKitException
      */
-    public function export(string $absolutePath): void
+    public function export(): void
     {
-        $this->exportPath = $absolutePath;
-
-        if (! $this->files->exists($this->exportPath)) {
-            throw new StarterKitException("Path [$this->exportPath] does not exist.");
-        }
-
-        if (! $this->files->exists(base_path('starter-kit.yaml'))) {
-            throw new StarterKitException('Export config [starter-kit.yaml] does not exist.');
-        }
-
         $this
-            ->exportFiles()
+            ->validateExportPath()
+            ->validateConfig()
+            ->instantiateModules()
+            ->exportModules()
             ->exportConfig()
             ->exportHooks()
             ->exportComposerJson();
     }
 
     /**
-     * Export files and folders.
+     * Validate that export path exists.
      */
-    protected function exportFiles(): self
+    protected function validateExportPath(): self
     {
-        $this
-            ->exportPaths()
-            ->each(function ($path) {
-                $this->ensureExportPathExists($path);
-            })
-            ->each(function ($path) {
-                $this->copyPath($path);
-            });
-
-        $this
-            ->exportAsPaths()
-            ->each(function ($to, $from) {
-                $this->ensureExportPathExists($from);
-            })
-            ->each(function ($to, $from) {
-                $this->copyPath($from, $to);
-            });
+        if (! $this->files->exists($this->exportPath)) {
+            throw new StarterKitException("Path [$this->exportPath] does not exist.");
+        }
 
         return $this;
     }
 
     /**
-     * Ensure export path exists.
-     *
-     * @throws StarterKitException
+     * Validate starter kit config.
      */
-    protected function ensureExportPathExists(string $path)
+    protected function validateConfig(): self
     {
-        if (! $this->files->exists(base_path($path))) {
-            throw new StarterKitException("Export path [{$path}] does not exist.");
+        if (! $this->files->exists(base_path('starter-kit.yaml'))) {
+            throw new StarterKitException('Export config [starter-kit.yaml] does not exist.');
         }
+
+        return $this;
     }
 
     /**
-     * Copy path to new export path location.
+     * Instantiate and validate modules that are to be installed.
      */
-    protected function copyPath(string $fromPath, ?string $toPath = null): void
+    protected function instantiateModules(): self
     {
-        $toPath = $toPath
-            ? "{$this->exportPath}/{$toPath}"
-            : "{$this->exportPath}/{$fromPath}";
+        $topLevelConfig = $this->config()->all();
 
-        $fromPath = base_path($fromPath);
+        $nestedConfigs = $this->config('modules');
 
-        $this->preparePath($fromPath, $toPath);
+        $this->modules = collect(['top_level' => $topLevelConfig])
+            ->merge($nestedConfigs)
+            ->map(fn ($config, $key) => $this->instantiateModule($config, $key))
+            ->flatten()
+            ->filter()
+            ->each(fn ($module) => $module->validate());
 
-        $this->files->isDirectory($fromPath)
-            ? $this->files->copyDirectory($fromPath, $toPath)
-            : $this->files->copy($fromPath, $toPath);
+        return $this;
     }
 
     /**
-     * Prepare path directory.
+     * Instantiate individual module.
      */
-    protected function preparePath(string $fromPath, string $toPath): void
+    protected function instantiateModule(array $config, string $key): ExportableModule|array
     {
-        $directory = $this->files->isDirectory($fromPath)
-            ? $toPath
-            : preg_replace('/(.*)\/[^\/]*/', '$1', $toPath);
-
-        if (! $this->files->exists($directory)) {
-            $this->files->makeDirectory($directory, 0755, true);
+        if (Arr::has($config, 'options')) {
+            return collect($config['options'])
+                ->map(fn ($option) => $this->instantiateModule($option, $key))
+                ->all();
         }
+
+        return new ExportableModule($config, $key);
+    }
+
+    /**
+     * Export all the modules.
+     */
+    protected function exportModules(): self
+    {
+        $this->modules->each(fn ($module) => $module->export($this->exportPath));
+
+        return $this;
     }
 
     /**
      * Get starter kit config.
      */
-    protected function config(): Collection
+    protected function config(?string $key = null): mixed
     {
-        return collect(YAML::parse($this->files->get(base_path('starter-kit.yaml'))));
-    }
+        $config = collect(YAML::parse($this->files->get(base_path('starter-kit.yaml'))));
 
-    /**
-     * Get starter kit `export_paths` paths from config.
-     *
-     * @throws StarterKitException
-     */
-    protected function exportPaths(): Collection
-    {
-        $paths = collect($this->config()->get('export_paths'));
-
-        if ($paths->isEmpty()) {
-            throw new StarterKitException('Export config [starter-kit.yaml] does not contain any export paths.');
-        } elseif ($paths->contains('composer.json')) {
-            throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array!');
+        if ($key) {
+            return $config->get($key);
         }
 
-        return $paths;
-    }
-
-    /**
-     * Get starter kit 'export_as' paths (to be renamed on export) from config.
-     *
-     * @throws StarterKitException
-     */
-    protected function exportAsPaths(): Collection
-    {
-        $paths = collect($this->config()->get('export_as'));
-
-        if ($paths->keys()->contains('composer.json')) {
-            throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array!');
-        }
-
-        return $paths;
+        return $config;
     }
 
     /**
@@ -163,13 +132,59 @@ class Exporter
      */
     protected function exportConfig(): self
     {
-        $config = $this->config();
-
-        $config = $this->exportDependenciesFromComposerJson($config);
+        $config = $this
+            ->versionModuleDependencies()
+            ->syncWithModuleConfigs();
 
         $this->files->put("{$this->exportPath}/starter-kit.yaml", YAML::dump($config->all()));
 
         return $this;
+    }
+
+    /**
+     * Version module dependencies from composer.json.
+     */
+    protected function versionModuleDependencies(): self
+    {
+        $this->modules->map(fn ($module) => $module->versionDependencies());
+
+        return $this;
+    }
+
+    /**
+     * Get synced config from newly versioned module dependencies.
+     */
+    protected function syncWithModuleConfigs(): Collection
+    {
+        $config = $this->config()->all();
+
+        $this->modules->each(function ($module) use (&$config) {
+            if ($dependencies = $module->config('dependencies')) {
+                Arr::forget($config, $this->dottedModulePath($module, 'dependencies'));
+                Arr::set($config, $this->dottedModulePath($module, 'dependencies'), $dependencies);
+            }
+        });
+
+        $this->modules->each(function ($module) use (&$config) {
+            if ($dependenciesDev = $module->config('dependencies_dev')) {
+                Arr::forget($config, $this->dottedModulePath($module, 'dependencies_dev'));
+                Arr::set($config, $this->dottedModulePath($module, 'dependencies_dev'), $dependenciesDev);
+            }
+        });
+
+        return collect($config);
+    }
+
+    /**
+     * Get dotted module path.
+     */
+    protected function dottedModulePath(Module $module, string $key): string
+    {
+        if ($module->isTopLevelModule()) {
+            return $key;
+        }
+
+        return 'modules.'.$module->key().'.'.$key;
     }
 
     /**
@@ -181,75 +196,12 @@ class Exporter
 
         collect($hooks)
             ->filter(fn ($hook) => $this->files->exists(base_path($hook)))
-            ->each(fn ($hook) => $this->copyPath($hook));
+            ->each(fn ($hook) => $this->exportPath(
+                from: $hook,
+                starterKitPath: $this->exportPath,
+            ));
 
         return $this;
-    }
-
-    /**
-     * Export dependencies from composer.json.
-     */
-    protected function exportDependenciesFromComposerJson(Collection $config): Collection
-    {
-        $exportableDependencies = $this->getExportableDependenciesFromConfig($config);
-
-        $config
-            ->forget('dependencies')
-            ->forget('dependenices_dev');
-
-        if ($dependencies = $this->exportDependenciesFromComposerRequire('require', $exportableDependencies)) {
-            $config->put('dependencies', $dependencies->all());
-        }
-
-        if ($devDependencies = $this->exportDependenciesFromComposerRequire('require-dev', $exportableDependencies)) {
-            $config->put('dependencies_dev', $devDependencies->all());
-        }
-
-        return $config;
-    }
-
-    /**
-     * Get exportable dependencies without versions from config.
-     */
-    protected function getExportableDependenciesFromConfig(Collection $config): Collection
-    {
-        if ($this->hasDependenciesWithoutVersions($config)) {
-            return collect($config->get('dependencies') ?? []);
-        }
-
-        return collect()
-            ->merge($config->get('dependencies') ?? [])
-            ->merge($config->get('dependencies_dev') ?? [])
-            ->keys();
-    }
-
-    /**
-     * Check if config has dependencies without versions.
-     */
-    protected function hasDependenciesWithoutVersions(Collection $config): bool
-    {
-        if (! $config->has('dependencies')) {
-            return false;
-        }
-
-        return isset($config['dependencies'][0]);
-    }
-
-    /**
-     * Export dependencies from composer.json using specific require key.
-     */
-    protected function exportDependenciesFromComposerRequire(string $requireKey, Collection $exportableDependencies): mixed
-    {
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
-
-        $dependencies = collect($composerJson[$requireKey] ?? [])
-            ->filter(function ($version, $dependency) use ($exportableDependencies) {
-                return $exportableDependencies->contains($dependency);
-            });
-
-        return $dependencies->isNotEmpty()
-            ? $dependencies
-            : false;
     }
 
     /**
