@@ -20,7 +20,7 @@ class DeleteMultisiteEntry extends Delete
 
     public function fieldItems()
     {
-        if (! $this->canChangeBehaviour()) {
+        if (! $this->canChangeBehavior()) {
             return [];
         }
 
@@ -46,7 +46,7 @@ class DeleteMultisiteEntry extends Delete
 
     public function run($items, $values)
     {
-        $behavior = $this->canChangeBehaviour() ? $values['behavior'] : 'copy';
+        $behavior = $this->canChangeBehavior() ? $values['behavior'] : 'copy';
 
         if ($behavior === 'copy') {
             $items->each->detachLocalizations();
@@ -57,7 +57,7 @@ class DeleteMultisiteEntry extends Delete
         $items->each->delete();
     }
 
-    private function canChangeBehaviour(): bool
+    private function canChangeBehavior(): bool
     {
         if (! Site::multiEnabled()) {
             return true;
