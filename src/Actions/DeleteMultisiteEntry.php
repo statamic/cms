@@ -68,9 +68,7 @@ class DeleteMultisiteEntry extends Delete
                 return false;
             }
 
-            return $entry->isRoot()
-                ? $entry->descendants()->every(fn ($descendant) => User::current()->can("access {$descendant->site()->handle()} site"))
-                : $entry->ancestors()->every(fn ($ancestor) => User::current()->can("access {$ancestor->site()->handle()} site"));
+            return $entry->descendants()->every(fn ($descendant) => User::current()->can("access {$descendant->site()->handle()} site"));
         });
     }
 }
