@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Support;
+namespace Statamic\Contracts\Support;
 
 interface Boolable
 {

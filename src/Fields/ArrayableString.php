@@ -4,7 +4,7 @@ namespace Statamic\Fields;
 
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
-use Statamic\Support\Boolable;
+use Statamic\Contracts\Support\Boolable;
 
 class ArrayableString implements Arrayable, Boolable, JsonSerializable
 {
