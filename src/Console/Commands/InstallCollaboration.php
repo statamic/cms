@@ -49,7 +49,7 @@ class InstallCollaboration extends Command
 
             $this->components->info('Installed statamic/collaboration addon');
         }
-
+        
         $this->enableBroadcasting();
         $this->updateBroadcastingKeysInEnvironmentFiles();
         $this->installBroadcastingDriver();
