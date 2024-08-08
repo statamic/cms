@@ -966,21 +966,24 @@ EOT;
         $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
 
-        $this
+        $command = $this
             ->installCoolRunningsModules()
-            ->expectsConfirmation('Want some extra SEO magic?', 'yes')
-            ->expectsQuestion('Want one of these fancy JS options?', 'svelte');
+            ->expectsConfirmation('Want some extra SEO magic?', 'yes');
 
-        // TODO: Also assert custom option labels using `expectsChoice()`,
-        // but there is currently a bug with the third `$answers` param,
-        // so maybe we can revisit this after. For example...
-        //
-        //     ->expectsChoice('Want one of these fancy JS options?', 'svelte', [
-        //         'skip_module' => 'No',
-        //         'react' => 'React JS',
-        //         'vue' => 'Vue JS',
-        //         'svelte' => 'Svelte',
-        //     ]);
+        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
+        // See: https://github.com/laravel/framework/pull/52408
+        if (version_compare(app()->version(), '11.20.0', '>')) {
+            $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
+                'skip_module' => 'No',
+                'react' => 'React JS',
+                'vue' => 'Vue JS',
+                'svelte' => 'Svelte',
+            ]);
+        } else {
+            $command->expectsQuestion('Want one of these fancy JS options?', 'svelte');
+        }
+
+        $command->run();
 
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
