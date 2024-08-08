@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Contracts\Support\Boolable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Entry;
 use Statamic\Fields\ArrayableString;
@@ -466,36 +467,52 @@ EOT;
     }
 
     #[Test]
-    public function ternary_condition_with_labeled_values_supplied_to_tags_resolve_correctly()
+    #[DataProvider('boolablesInTernaryProvider')]
+    public function ternary_condition_with_boolables_supplied_to_tags_resolve_correctly($value, $expected)
     {
         $this->withFakeViews();
-        $value = new LabeledValue(null, null);
-        $valueTwo = new LabeledValue('something', null);
 
-        $partial = <<<'EOT'
-{{ the_field ? 'true' : 'false' }}
-EOT;
-
-        $this->viewShouldReturnRaw('test', $partial);
+        $this->viewShouldReturnRaw('test', "{{ the_field ? 'true' : 'false' }}");
 
         $template = <<<'EOT'
-O: {{ the_field ? 'true' : 'false' }}
-P: {{ partial:test :the_field="the_field" }}
+view: {{ the_field ? 'true' : 'false' }}, partial: {{ partial:test :the_field="the_field" }}
 EOT;
 
-        $expected = <<<'EXP'
-O: false
-P: false
-EXP;
-
         $this->assertSame($expected, $this->renderString($template, ['the_field' => $value], true));
+    }
 
-        $expected = <<<'EXP'
-O: true
-P: true
-EXP;
-
-        $this->assertSame($expected, $this->renderString($template, ['the_field' => $valueTwo], true));
+    public static function boolablesInTernaryProvider()
+    {
+        return [
+            'truthy generic boolable' => [
+                new class implements Boolable
+                {
+                    public function toBool(): bool
+                    {
+                        return true;
+                    }
+                },
+                'view: true, partial: true',
+            ],
+            'falsey generic boolable' => [
+                new class implements Boolable
+                {
+                    public function toBool(): bool
+                    {
+                        return false;
+                    }
+                },
+                'view: false, partial: false',
+            ],
+            'truthy LabeledValue' => [
+                new LabeledValue('foo', 'Foo'),
+                'view: true, partial: true',
+            ],
+            'falsey LabeledValue' => [
+                new LabeledValue(null, null),
+                'view: false, partial: false',
+            ],
+        ];
     }
 
     #[Test]
