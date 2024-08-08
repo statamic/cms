@@ -16,7 +16,7 @@
                     loading="lazy"
                     :src="thumbnail"
                     :alt="asset.basename"
-                    v-if="isImage"
+                    v-if="thumbnail"
                 />
                 <file-icon :extension="asset.extension" v-else class="w-7 h-7" />
             </button>

@@ -17,11 +17,11 @@ class FolderAsset extends JsonResource
             'url' => $this->absoluteUrl(),
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),
             'last_modified_relative' => $this->lastModified()->diffForHumans(),
+            'thumbnail' => $this->thumbnailUrl('small'),
 
             $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
                 return [
                     'is_image' => true,
-                    'thumbnail' => $this->thumbnailUrl('small'),
                     'can_be_transparent' => $this->isSvg() || $this->extension() === 'png',
                     'alt' => $this->alt,
                 ];
