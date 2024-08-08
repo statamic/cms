@@ -5,12 +5,12 @@
         <div class="flex items-center mb-6 -mt-2">
             <h1 class="flex-1">
                 <small class="block text-xs text-gray-700 dark:text-dark-175 font-medium leading-none mt-2 flex items-center">
-                    <svg-icon class="h-4 w-4 rtl:ml-2 ltr:mr-2 inline-block text-gray-700 dark:text-dark-175" name="paperclip"/>{{ __('Linked fieldset') }}
+                    <svg-icon class="h-4 w-4 me-2 inline-block text-gray-700 dark:text-dark-175" name="paperclip"/>{{ __('Linked fieldset') }}
                 </small>
                 {{ __('Fieldset') }}
             </h1>
             <button
-                class="text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:hover:text-dark-100 rtl:ml-6 ltr:mr-6 text-sm"
+                class="text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:hover:text-dark-100 me-6 text-sm"
                 @click.prevent="close"
                 v-text="__('Cancel')"
             ></button>

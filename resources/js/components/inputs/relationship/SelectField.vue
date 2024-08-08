@@ -25,7 +25,7 @@
             <template #option="{ title, hint, status }">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center">
-                        <div v-if="status" class="little-dot rtl:ml-2 ltr:mr-2 hidden@sm:block" :class="status" />
+                        <div v-if="status" class="little-dot me-2 hidden@sm:block" :class="status" />
                         <div v-text="title" />
                     </div>
                     <div v-if="hint" class="text-4xs text-gray-600 uppercase whitespace-nowrap" v-text="hint" />
@@ -42,7 +42,7 @@
                 >
             </template>
              <template #no-options>
-                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                <div class="text-sm text-gray-700 text-start py-2 px-4" v-text="__('No options to choose from.')" />
             </template>
         </v-select>
     </div>

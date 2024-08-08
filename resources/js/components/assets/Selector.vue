@@ -39,7 +39,7 @@
 
                     <button
                         type="button"
-                        class="btn-primary rtl:mr-2 ltr:ml-2"
+                        class="btn-primary ms-2"
                         @click="select">
                         {{ __('Select') }}
                     </button>

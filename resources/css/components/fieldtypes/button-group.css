@@ -9,16 +9,16 @@
     @apply flex-col items-stretch justify-start p-0 h-auto;
 
     button {
-        @apply border-b border-t-0 rounded-none border-l border-r ;
+        @apply border-b border-t-0 rounded-none border-x ;
         height: 2.375rem; /*  38px */
     }
 
     :is(.btn-group button:not(:last-child):not(.active)) {
-        @apply border-r border-l;
+        @apply border-x;
     }
 
     button.active+button {
-        @apply border-l border-r;
+        @apply border-x;
     }
 
     button:first-child {

@@ -346,7 +346,7 @@
   }
 
   .CodeMirror-rulers {
-      @apply absolute left-0 right-0 overflow-hidden;
+      @apply absolute start-0 end-0 overflow-hidden;
       top: -50px;
       bottom: -20px;
   }

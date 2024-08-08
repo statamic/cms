@@ -15,7 +15,7 @@
 }
 
 .blueprint-drag-handle {
-    @apply flex-none w-4 ltr:border-r rtl:border-l dark:border-dark-500 cursor-move;
+    @apply flex-none w-4 border-e dark:border-dark-500 cursor-move;
     background: rgba(0, 0, 0, 0.01) url('../../svg/icons/light/drag-dots.svg') 50% 50% no-repeat;
     background-size: 7px 17px;
 }
@@ -41,9 +41,9 @@
     &:before {
         content: '';
         @apply border rounded absolute bg-gray-200 shadow-sm;
-        top: -3px; left: 6px ; right: 0 ; bottom: 3px; z-index: 1;
-
-        [dir="rtl"] & { left: 0 ; right: 6px ; }
+        top: -3px; bottom: 3px; z-index: 1;
+        inset-inline-start: 6px;
+        inset-inline-end: 0;
 
         .dark & {
             @apply border-dark-300 bg-dark-550;

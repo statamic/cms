@@ -10,17 +10,17 @@
             <label v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
                     v-if="showLabelText"
-                    class="rtl:ml-1 ltr:mr-1"
+                    class="me-1"
                     :class="{ 'text-gray-600': syncable && isSynced }"
                     v-text="__(labelText)"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
-                <i class="required rtl:ml-1 ltr:mr-1" v-if="showLabelText && config.required">*</i>
-                <avatar v-if="isLocked" :user="lockingUser" class="w-6 h-6 rounded-full -mt-px rtl:mr-2 ltr:ml-2 rtl:ml-2 ltr:mr-2" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isTab && !isSection" class="text-gray-500 font-normal text-2xs rtl:ml-1 ltr:mr-1">
+                <i class="required me-1" v-if="showLabelText && config.required">*</i>
+                <avatar v-if="isLocked" :user="lockingUser" class="w-6 h-6 rounded-full -mt-px ms-2 me-2" v-tooltip="lockingUser.name" />
+                <span v-if="isReadOnly && !isTab && !isSection" class="text-gray-500 font-normal text-2xs me-1">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 rtl:ml-1 ltr:mr-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 me-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
 
                 <button
                     v-if="!isReadOnly && !isTab"

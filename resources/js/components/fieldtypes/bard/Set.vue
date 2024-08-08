@@ -9,7 +9,7 @@
             <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" data-drag-handle />
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label class="text-xs rtl:ml-2 ltr:mr-2">
+                    <label class="text-xs me-2">
                         <span v-if="isSetGroupVisible">
                             {{ setGroup.display }}
                             <svg-icon name="micro/chevron-right" class="w-4" />
@@ -19,7 +19,7 @@
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
                         <svg-icon name="micro/circle-help" class="text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:hover:text-dark-100 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
                     </div>
-                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
+                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 pe-8">
                         <div
                             v-html="previewText"
                             class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
@@ -28,7 +28,7 @@
                 <div class="replicator-set-controls">
                     <toggle-fieldtype
                         handle="set-enabled"
-                        class="toggle-sm rtl:ml-4 ltr:mr-4"
+                        class="toggle-sm me-4"
                         v-model="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list class="-mt-1">

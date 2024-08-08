@@ -7,7 +7,7 @@
 }
 
 .radio-fieldtype .radio-icon {
-    @apply cursor-pointer h-4 w-4 ltr:mr-2 rtl:ml-2 block;
+    @apply cursor-pointer h-4 w-4 me-2 block;
 }
 
 .radio-fieldtype .option.disabled {

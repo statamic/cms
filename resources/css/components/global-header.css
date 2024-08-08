@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white dark:bg-dark-600 shadow dark:shadow-dark rtl:pl-4 ltr:pr-4 h-13 items-center flex relative w-full;
+    @apply bg-white dark:bg-dark-600 shadow dark:shadow-dark pe-4 h-13 items-center flex relative w-full;
     z-index: 3; /* The search focus overlay sits underneath using z-index 2. */
 
     .dark & {
@@ -36,8 +36,8 @@
 
     .search-input {
         @apply text-sm w-full max-w-full dark:bg-dark-600 dark:text-dark-150;
-        padding-left: 5px ;
-        padding-right: 20px ; [dir="rtl"] & { padding-left: 20px ; padding-right: 5px ; }
+        padding-inline-start: 5px;
+        padding-inline-end: 20px;
         height: 32px;
 		&:focus {
 			outline: 0;
@@ -48,13 +48,13 @@
         @apply shadow-lg absolute p-0 w-full bg-white rounded border border-gray-500;
         @apply dark:bg-dark-650 dark:border-dark-900;
         top: 36px;
-        left: -1px ; [dir="rtl"] & { left: auto ; right: -1px ; } /*  border offset */
+        inset-inline-start: -1px; /*  border offset */
         z-index: 999;
     }
 
     .global-search-loading-indicator {
         position: absolute;
-        right: 8px ; [dir="rtl"] & { right: auto ; left: 8px ; }
+        inset-inline-end: 8px;
     }
 
     .global-search-result-item {
@@ -87,7 +87,7 @@
     }
 
     .status {
-        float: right ; [dir="rtl"] & { float: left ; }
+        float: inline-end;
         background: #ddd;
         border-radius: 2px;
         padding: 2px 4px;
@@ -104,7 +104,7 @@
 
     .reset {
         font-size: 21px;
-        left: -3px ; [dir="rtl"] & { left: auto ; right: -3px ; }
+        inset-inline-start: -3px;
         position: relative;
     }
 

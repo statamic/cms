@@ -16,7 +16,7 @@
     <div class="card p-0" dir="ltr">
         <table class="data-table ltr:text-left">
             <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('PHP Version') }}</th>
+                <th class="ps-4 py-2 w-1/4">{{ __('PHP Version') }}</th>
                 <td>{{ PHP_VERSION }}</td>
             </tr>
         </table>
@@ -28,7 +28,7 @@
             <table class="data-table ltr:text-left">
                 @foreach ($items as $name => $value)
                 <tr>
-                    <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ $name }}</th>
+                    <th class="ps-4 py-2 w-1/4">{{ $name }}</th>
                     <td class="break-all">{{ is_array($value) ? join(', ', $value) : $value }}</td>
                 </tr>
                 @endforeach

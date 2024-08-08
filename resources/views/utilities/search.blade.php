@@ -42,7 +42,7 @@
                 @foreach (\Statamic\Facades\Search::indexes() as $index)
                     <tr>
                         <td class="flex items-center">
-                            @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 rtl:ml-2 ltr:mr-2')
+                            @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 me-2')
                             <div class="text-gray-800 dark:text-dark-150 leading-none">{{ $index->title() }}</div>
                         </td>
                         <td>
@@ -54,7 +54,7 @@
                             @else
                                 <div class="text-sm text-gray flex flex-wrap">
                                     @foreach($index->config()['searchables'] as $searchable)
-                                        <div class="rtl:ml-2 ltr:mr-2 badge-pill-sm">
+                                        <div class="me-2 badge-pill-sm">
                                             {{ $searchable }}
                                         </div>
                                     @endforeach
@@ -64,13 +64,13 @@
                         <td>
                             <div class="text-sm text-gray flex flex-wrap">
                                 @foreach($index->config()['fields'] as $field)
-                                    <div class="rtl:ml-2 ltr:mr-2 badge-pill-sm">
+                                    <div class="me-2 badge-pill-sm">
                                         {{ $field }}
                                     </div>
                                 @endforeach
                             </div>
                         </td>
-                        <td class="rtl:text-left ltr:text-right">
+                        <td class="text-end">
                             <form method="POST" action="{{ cp_route('utilities.search') }}">
                                 @csrf
                                 <input type="hidden" name="indexes[]" value="{{ $index->name() }}::{{ $index->locale() }}">

@@ -3,7 +3,7 @@
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-gray-100 dark:bg-dark-700 h-full flex flex-col">
 
-            <header class="bg-white dark:bg-dark-550 rtl:pr-6 ltr:pl-6 rtl:pl-3 ltr:pr-3 py-2 mb-4 border-b dark:border-dark-950 shadow-md text-lg font-medium flex items-center justify-between">
+            <header class="bg-white dark:bg-dark-550 ps-6 pe-3 py-2 mb-4 border-b dark:border-dark-950 shadow-md text-lg font-medium flex items-center justify-between">
                 {{ headerText }}
                 <button
                     type="button"
@@ -56,12 +56,12 @@
 
             <div v-if="!loading && (!readOnly || type === 'entry')" class="bg-gray-200 dark:bg-dark-500 p-4 border-t dark:border-dark-900 flex items-center justify-between flex-row-reverse">
                 <div v-if="!readOnly">
-                    <button @click="confirmClose(close)" class="btn rtl:ml-2 ltr:mr-2">{{ __('Cancel') }}</button>
+                    <button @click="confirmClose(close)" class="btn me-2">{{ __('Cancel') }}</button>
                     <button @click="submit" class="btn-primary">{{ __('Submit') }}</button>
                 </div>
                 <div v-if="type === 'entry'">
-                    <a :href="editEntryUrl" target="_blank" class="text-xs flex items-center justify-center text-blue hover:text-blue underline rtl:ml-4 ltr:mr-4">
-                        <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2" />
+                    <a :href="editEntryUrl" target="_blank" class="text-xs flex items-center justify-center text-blue hover:text-blue underline me-4">
+                        <svg-icon name="light/external-link" class="w-4 h-4 me-2" />
                         {{ __('Edit Entry') }}
                     </a>
                 </div>

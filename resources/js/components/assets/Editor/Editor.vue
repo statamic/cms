@@ -17,7 +17,7 @@
             <div id="asset-editor-header" class="flex justify-between w-full px-2 relative">
                 <button class="flex items-center p-4 group" @click="open" v-tooltip.right="__('Open in a new window')" :aria-label="__('Open in a new window')">
                     <svg-icon name="folder-image" class="text-gray-700 dark:text-dark-175 h-5 w-5" />
-                    <span class="rtl:mr-2 ltr:ml-2 text-sm text-gray-800 dark:text-dark-150 group-hover:text-blue dark:group-hover:text-dark-100">{{ asset.path }}</span>
+                    <span class="ms-2 text-sm text-gray-800 dark:text-dark-150 group-hover:text-blue dark:group-hover:text-dark-100">{{ asset.path }}</span>
                     <svg-icon name="micro/chevron-right" class="text-gray-700 dark:text-dark-175 h-5 w-5 group-hover:text-blue dark:group-hover:text-dark-100 rtl:rotate-180" />
                 </button>
                 <button class="btn-close absolute top-2 rtl:left-2.5 ltr:right-2.5" @click="close" :aria-label="__('Close Editor')">&times;</button>
@@ -26,46 +26,46 @@
             <div class="flex flex-1 flex-col md:flex-row md:justify-between grow overflow-scroll">
 
                 <!-- Visual Area -->
-                <div class="editor-preview bg-gray-800 dark:bg-dark-950 rtl:md:rounded-tl-md ltr:md:rounded-tr-md flex flex-col justify-between flex-1 min-h-[45vh] md:min-h-auto md:flex-auto md:grow w-full md:w-1/2 lg:w-2/3 shadow-[inset_0px_4px_3px_0px_black]">
+                <div class="editor-preview bg-gray-800 dark:bg-dark-950 md:rounded-se-md flex flex-col justify-between flex-1 min-h-[45vh] md:min-h-auto md:flex-auto md:grow w-full md:w-1/2 lg:w-2/3 shadow-[inset_0px_4px_3px_0px_black]">
 
                     <!-- Toolbar -->
-                    <div id="asset-editor-toolbar" class="@container/toolbar flex items-center justify-center py-4 px-2 text-2xs text-white dark:text-dark-100 text-center space-x-1 sm:space-x-3 rtl:space-x-reverse " v-if="isToolbarVisible">
+                    <div id="asset-editor-toolbar" class="@container/toolbar flex items-center justify-center py-4 px-2 text-2xs text-white dark:text-dark-100 text-center space-x-1 sm:space-x-3 rtl:space-x-reverse" v-if="isToolbarVisible">
                         <button v-if="isImage && isFocalPointEditorEnabled" type="button" class="flex bg-gray-750 dark:bg-dark-400 hover:bg-gray-900 dark:hover:bg-dark-600 hover:text-yellow-light dark:hover:text-yellow-dark rounded items-center justify-center px-3 py-1.5" @click.prevent="openFocalPointEditor">
                             <svg-icon name="focal-point" class="h-4" />
-                            <span class="rtl:mr-2 ltr:ml-2 hidden @3xl/toolbar:inline-block">{{ __('Focal Point') }}</span>
+                            <span class="ms-2 hidden @3xl/toolbar:inline-block">{{ __('Focal Point') }}</span>
                         </button>
 
                         <button v-if="canRunAction('rename_asset')" type="button" class="flex bg-gray-750 dark:bg-dark-400 hover:bg-gray-900 dark:hover:bg-dark-600 hover:text-yellow-light dark:hover:text-yellow-dark rounded items-center px-3 py-1.5" @click.prevent="runAction('rename_asset')">
                             <svg-icon name="rename-file" class="h-4" />
-                            <span class="rtl:mr-2 ltr:ml-2 hidden @3xl/toolbar:inline-block">{{ __('Rename') }}</span>
+                            <span class="ms-2 hidden @3xl/toolbar:inline-block">{{ __('Rename') }}</span>
                         </button>
 
                         <button v-if="canRunAction('move_asset')" type="button" class="flex bg-gray-750 dark:bg-dark-400 hover:bg-gray-900 dark:hover:bg-dark-600 hover:text-yellow-light dark:hover:text-yellow-dark rounded items-center px-3 py-1.5" @click.prevent="runAction('move_asset')">
                             <svg-icon name="move-file" class="h-4" />
-                            <span class="rtl:mr-2 ltr:ml-2 hidden @3xl/toolbar:inline-block">{{ __('Move') }}</span>
+                            <span class="ms-2 hidden @3xl/toolbar:inline-block">{{ __('Move') }}</span>
                         </button>
 
                         <button v-if="canRunAction('replace_asset')" type="button" class="flex bg-gray-750 dark:bg-dark-400 hover:bg-gray-900 dark:hover:bg-dark-600 hover:text-yellow-light dark:hover:text-yellow-dark rounded items-center px-3 py-1.5" @click.prevent="runAction('replace_asset')">
                             <svg-icon name="swap" class="h-4" />
-                            <span class="rtl:mr-2 ltr:ml-2 hidden @3xl/toolbar:inline-block">{{ __('Replace') }}</span>
+                            <span class="ms-2 hidden @3xl/toolbar:inline-block">{{ __('Replace') }}</span>
                         </button>
 
                         <button v-if="canRunAction('reupload_asset')" type="button" class="flex bg-gray-750 dark:bg-dark-400 hover:bg-gray-900 dark:hover:bg-dark-600 hover:text-yellow-light dark:hover:text-yellow-dark rounded items-center px-3 py-1.5" @click.prevent="runAction('reupload_asset')">
                             <svg-icon name="upload-cloud" class="h-4" />
-                            <span class="rtl:mr-2 ltr:ml-2 hidden @3xl/toolbar:inline-block">{{ __('Reupload') }}</span>
+                            <span class="ms-2 hidden @3xl/toolbar:inline-block">{{ __('Reupload') }}</span>
                         </button>
 
                         <button v-if="asset.allowDownloading" class="flex bg-gray-750 dark:bg-dark-400 hover:bg-gray-900 dark:hover:bg-dark-600 hover:text-yellow-light dark:hover:text-yellow-dark rounded items-center px-3 py-1.5" @click="download" :aria-label="__('Download file')">
                             <svg-icon name="download-desktop" class="h-4"/>
-                            <span class="rtl:mr-2 ltr:ml-2 hidden @3xl/toolbar:inline-block">{{ __('Download') }}</span>
+                            <span class="ms-2 hidden @3xl/toolbar:inline-block">{{ __('Download') }}</span>
                         </button>
 
                         <button v-if="allowDeleting && canRunAction('delete')" @click="runAction('delete')" class="flex bg-gray-750 dark:bg-dark-400 hover:bg-gray-900 dark:hover:bg-dark-600 hover:text-red-400 dark:hover:text-dark-red rounded items-center text-center px-3 py-1.5">
                             <svg-icon name="trash" class="h-4" />
-                            <span class="rtl:mr-2 ltr:ml-2 hidden @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
+                            <span class="ms-2 hidden @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
                         </button>
 
-                        <dropdown-list class="mr-4" v-if="actionsMenu.length">
+                        <dropdown-list class="me-4" v-if="actionsMenu.length">
                             <data-list-inline-actions
                                 :item="id"
                                 :url="actionUrl"
@@ -91,10 +91,10 @@
                                     <div class="flex-1 order-r p-4 border-gray-900 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-4 h-4" />
                                     </div>
-                                    <div class="flex-1 rtl:border-r ltr:border-l rtl:border-l ltr:border-r p-4 border-gray-900 flex items-center justify-center">
+                                    <div class="flex-1 border-x p-4 border-gray-900 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-12 h-12" />
                                     </div>
-                                    <div class="flex-1 rtl:border-r ltr:border-l p-4 border-gray-900 flex items-center justify-center">
+                                    <div class="flex-1 border-s p-4 border-gray-900 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-24 h-24" />
                                     </div>
                                 </div>
@@ -151,16 +151,16 @@
 
             <div class="bg-gray-200 dark:bg-dark-550 w-full border-t dark:border-dark-200 flex items-center justify-end py-3 px-4 rounded-b">
                 <div id="asset-meta-data" class="flex-1 hidden sm:flex space-x-3 rtl:space-x-reverse py-1 h-full text-xs text-gray-800 dark:text-dark-150">
-                    <div class="flex items-center bg-gray-400 dark:bg-dark-600 rounded py-1 rtl:pr-2 ltr:pl-2 rtl:pl-3 ltr:pr-3" v-if="isImage">
-                        <svg-icon name="image-picture" class="h-3 rtl:ml-2 ltr:mr-2" />
+                    <div class="flex items-center bg-gray-400 dark:bg-dark-600 rounded py-1 ps-2 pe-3" v-if="isImage">
+                        <svg-icon name="image-picture" class="h-3 me-2" />
                         <div class="">{{ __('messages.width_x_height', { width: asset.width, height: asset.height }) }}</div>
                     </div>
-                    <div class="flex items-center bg-gray-400 dark:bg-dark-600 rounded py-1 rtl:pr-2 ltr:pl-2 rtl:pl-3 ltr:pr-3">
-                        <svg-icon name="sd-card" class="h-3 rtl:ml-2 ltr:mr-2" />
+                    <div class="flex items-center bg-gray-400 dark:bg-dark-600 rounded py-1 ps-2 pe-3">
+                        <svg-icon name="sd-card" class="h-3 me-2" />
                         <div class="">{{ asset.size }}</div>
                     </div>
-                    <div class="flex items-center bg-gray-400 dark:bg-dark-600 rounded py-1 rtl:pr-2 ltr:pl-2 rtl:pl-3 ltr:pr-3">
-                        <svg-icon name="thumbprint" class="h-3 rtl:ml-2 ltr:mr-2" />
+                    <div class="flex items-center bg-gray-400 dark:bg-dark-600 rounded py-1 ps-2 pe-3">
+                        <svg-icon name="thumbprint" class="h-3 me-2" />
                         <div class="" :title="asset.lastModified">{{ asset.lastModifiedRelative }}</div>
                     </div>
                 </div>
