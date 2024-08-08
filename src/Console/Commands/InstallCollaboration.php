@@ -50,8 +50,9 @@ class InstallCollaboration extends Command
             $this->components->info('Installed statamic/collaboration addon');
         }
 
-        $this->enableBroadcasting();
-        $this->installBroadcastingDriver();
+//        $this->enableBroadcasting();
+        $this->updateBroadcastingKeysInEnvironmentFiles();
+//        $this->installBroadcastingDriver();
     }
 
     protected function enableBroadcasting(): void
@@ -81,8 +82,33 @@ class InstallCollaboration extends Command
             },
             message: 'Enabling broadcasting...'
         );
-
         $this->components->info('Broadcasting enabled successfully.');
+    }
+
+    protected function updateBroadcastingKeysInEnvironmentFiles(): void
+    {
+        $environmentFiles = [
+            app()->environmentFile(),
+            app()->environmentFile('.env.example'),
+        ];
+
+        foreach ($environmentFiles as $file) {
+            if (File::missing($file)) {
+                continue;
+            }
+
+            $contents = File::get($file);
+
+            if (Str::contains($contents, 'BROADCAST_DRIVER')) {
+                $contents = Str::of($contents)
+                    ->replace('BROADCAST_DRIVER', 'BROADCAST_CONNECTION')
+                    ->__toString();
+
+                File::put($file, $contents);
+
+                $this->components->warn("Laravel expects the BROADCAST_CONNECTION key in your .env file. You were using the legacy BROADCAST_DRIVER key. We've updated it for you. Remember to update the .env file on any servers you might have.");
+            }
+        }
     }
 
     protected function installBroadcastingDriver(): void
