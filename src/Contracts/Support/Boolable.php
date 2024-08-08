@@ -4,5 +4,5 @@ namespace Statamic\Contracts\Support;
 
 interface Boolable
 {
-    public function toBool();
+    public function toBool(): bool;
 }
