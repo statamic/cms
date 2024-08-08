@@ -103,7 +103,7 @@ class CollectionsController extends CpController
                 ->mapWithKeys(fn ($site) => [$site => cp_route('collections.entries.create', [$collection->handle(), $site])])
                 ->all(),
             'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
-            'canChangeLocalizationDeleteBehavior' => count($authorizedSites) == $collection->sites()->count(),
+            'canChangeLocalizationDeleteBehavior' => count($authorizedSites) > 1 && (count($authorizedSites) == $collection->sites()->count()),
         ];
 
         if ($collection->queryEntries()->count() === 0) {
