@@ -205,6 +205,7 @@ class FeatureTest extends TestCase
     {
         $structure = Structure::find('footer');
 
+        NavRepository::shouldReceive('find')->with('footer');
         NavRepository::shouldReceive('save')->with($structure)->once();
 
         $structure->save();
