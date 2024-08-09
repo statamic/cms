@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
+use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
@@ -81,7 +82,11 @@ class AssetsController extends CpController
         ]);
 
         $file = $request->file('file');
-        $path = ltrim($request->folder.'/'.$file->getClientOriginalName(), '/');
+        $folder = $request->folder;
+        if ($container->createFolders() && ($subfolder = Uploader::getSafeFoldername($request->subfolder))) {
+            $folder = $request->folder.'/'.$subfolder;
+        }
+        $path = ltrim($folder.'/'.$file->getClientOriginalName(), '/');
 
         $asset = $container->makeAsset($path)->upload($file);
 
