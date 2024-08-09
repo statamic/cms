@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 abstract class AbstractCacher implements Cacher
@@ -140,7 +141,20 @@ abstract class AbstractCacher implements Cacher
         $url = $request->getUri();
 
         if ($this->config('ignore_query_strings')) {
-            $url = explode('?', $url)[0];
+            $originalUrl = $url;
+
+            $url = Arr::get(explode('?', $originalUrl), 0);
+            $queryParams = Arr::get(explode('?', $originalUrl), 1);
+
+            $allowedQueryParams = collect($this->config('allowed_query_parameters', []))
+                ->map(fn ($param) => Str::ensureRight($param, '='))
+                ->all();
+
+            if ($queryParams && $allowedQueryParams) {
+                $url .= '?'.collect(explode('&', $queryParams))->filter(function ($param) use ($allowedQueryParams) {
+                    return Str::startsWith($param, $allowedQueryParams);
+                })->implode('&');
+            }
         }
 
         return $url;

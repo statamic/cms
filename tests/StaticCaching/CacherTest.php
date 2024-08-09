@@ -58,6 +58,19 @@ class CacherTest extends TestCase
     }
 
     #[Test]
+    public function gets_a_url_with_query_strings_disabled_and_allowed_query_params()
+    {
+        $cacher = $this->cacher(['ignore_query_strings' => true, 'allowed_query_parameters' => ['page']]);
+
+        $request = Request::create('http://example.com/test', 'GET', [
+            'page' => 5,
+            'foo' => 'bar',
+        ]);
+
+        $this->assertEquals('http://example.com/test?page=5', $cacher->getUrl($request));
+    }
+
+    #[Test]
     public function gets_the_base_url_using_the_deprecated_config_value()
     {
         $cacher = $this->cacher(['base_url' => 'http://example.com']);
