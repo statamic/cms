@@ -6,7 +6,7 @@
             'is-svg': canShowSvg,
             'is-file': !isImage && !canShowSvg,
         }"
-        :title="asset.filename"
+        :title="label"
     >
         <asset-editor
             v-if="editing"
@@ -29,7 +29,7 @@
                     <img :src="thumbnail" v-if="isImage" :title="label" />
 
                     <template v-else>
-                        <img v-if="canShowSvg" :src="asset.url" class="p-4" />
+                        <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4" />
                         <file-icon
                             v-else
                             :extension="asset.extension"
@@ -40,11 +40,11 @@
 
                 <div class="asset-controls" v-if="!readOnly">
                     <div class="h-full w-full flex items-center justify-center space-x-1 rtl:space-x-reverse">
-                        <button @click="edit" class="btn btn-icon" :alt="__('Edit')">
+                        <button @click="edit" class="btn btn-icon" :title="__('Edit')">
                             <svg-icon name="micro/sharp-pencil" class="h-4 my-2" />
                         </button>
 
-                        <button @click="remove" class="btn btn-icon" :alt="__('Remove')">
+                        <button @click="remove" class="btn btn-icon" :title="__('Remove')">
                             <span class="text-lg antialiased w-4">×</span>
                         </button>
                     </div>
@@ -55,7 +55,7 @@
                         v-if="asset.url && asset.isMedia && this.canDownload"
                         @click="open"
                         class="btn btn-icon"
-                        :alt="__('Open in a new window')"
+                        :title="__('Open in a new window')"
                     >
                         <svg-icon name="light/external-link" class="h-4 my-2" />
                     </button>
@@ -64,7 +64,7 @@
                         v-if="asset.allowDownloading && this.canDownload"
                         @click="download"
                         class="btn btn-icon"
-                        :alt="__('Download file')"
+                        :title="__('Download file')"
                     >
                         <svg-icon name="download" class="h-4 my-2" />
                     </button>
