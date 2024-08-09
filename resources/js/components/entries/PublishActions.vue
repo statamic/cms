@@ -157,8 +157,7 @@ export default {
                 .then(response => {
                     this.saving = false;
                     if (! response.data.saved) {
-                        this.$emit('saved', { published: false, isWorkingCopy: false, response });
-
+                        this.$emit('failed');
                         return this.$toast.error(__(`Couldn't publish entry`));
                     }
                     this.$toast.success(__('Published'));
