@@ -19,7 +19,8 @@ class ExportableModule extends Module
         $this
             ->ensureModuleConfigNotEmpty()
             ->ensureNotExportingComposerJson()
-            ->ensureExportablePathsExist();
+            ->ensureExportablePathsExist()
+            ->ensureExportableDependenciesExist();
     }
 
     /**
@@ -47,7 +48,7 @@ class ExportableModule extends Module
 
     public function versionDependencies(): self
     {
-        $exportableDependencies = $this->getExportableDependencies();
+        $exportableDependencies = $this->exportableDependencies();
 
         $this->config->forget('dependencies');
         $this->config->forget('dependencies_dev');
@@ -66,7 +67,7 @@ class ExportableModule extends Module
     /**
      * Get exportable dependencies without versions from module config.
      */
-    protected function getExportableDependencies(): Collection
+    protected function exportableDependencies(): Collection
     {
         $config = $this->config();
 
@@ -131,6 +132,28 @@ class ExportableModule extends Module
             ->reject(fn ($path) => $this->files->exists(base_path($path)))
             ->each(function ($path) {
                 throw new StarterKitException("Cannot export [{$path}], because it does not exist in your app!");
+            });
+
+        return $this;
+    }
+
+    /**
+     * Ensure export dependencies exist in app's composer.json.
+     *
+     * @throws StarterKitException
+     */
+    protected function ensureExportableDependenciesExist(): self
+    {
+        $installedDependencies = collect(json_decode($this->files->get(base_path('composer.json')), true))
+            ->only(['require', 'require-dev'])
+            ->map(fn ($dependencies) => array_keys($dependencies))
+            ->flatten();
+
+        $this
+            ->exportableDependencies()
+            ->reject(fn ($dependency) => $installedDependencies->contains($dependency))
+            ->each(function ($dependency) {
+                throw new StarterKitException("Cannot export [{$dependency}], because it does not exist in your composer.json!");
             });
 
         return $this;

@@ -809,6 +809,24 @@ EOT
     #[DataProvider('validModuleConfigs')]
     public function it_passes_validation_if_module_export_paths_or_dependencies_are_properly_configured($config)
     {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
         $this->setConfig([
             'modules' => [
                 'seo' => array_merge(['prompt' => false], $config),
@@ -841,6 +859,150 @@ EOT
             'dev dependencies' => [[
                 'dependencies_dev' => [
                     'statamic/seo-pro' => '^1.0',
+                ],
+            ]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('nonExistentExportPaths')]
+    public function it_fails_validation_if_module_export_paths_do_not_exist($config)
+    {
+        $this->setConfig($config);
+
+        $this
+            ->exportCoolRunnings()
+            // ->expectsOutput('Cannot export [non-existent.txt], because it does not exist in your app!') // TODO: Why does this work in InstallTest?
+            ->assertFailed();
+    }
+
+    public static function nonExistentExportPaths()
+    {
+        return [
+            'top level export' => [[
+                'export_paths' => [
+                    'non-existent.txt',
+                ],
+            ]],
+            'top level export as from' => [[
+                'export_as' => [
+                    'non-existent.txt' => 'resources/views/welcome.blade.php',
+                ],
+            ]],
+            'module export' => [[
+                'modules' => [
+                    'seo' => [
+                        'export_paths' => [
+                            'non-existent.txt',
+                        ],
+                    ],
+                ],
+            ]],
+            'module export as from' => [[
+                'modules' => [
+                    'seo' => [
+                        'export_as' => [
+                            'non-existent.txt' => 'resources/views/welcome.blade.php',
+                        ],
+                    ],
+                ],
+            ]],
+            'options module export' => [[
+                'modules' => [
+                    'js' => [
+                        'options' => [
+                            'vue' => [
+                                'export_paths' => [
+                                    'non-existent.txt',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]],
+            'options module export as from' => [[
+                'modules' => [
+                    'js' => [
+                        'options' => [
+                            'vue' => [
+                                'export_as' => [
+                                    'non-existent.txt' => 'resources/views/welcome.blade.php',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('nonExistentDependencies')]
+    public function it_fails_validation_if_module_dependencies_are_not_installed_in_composer_json($config)
+    {
+        $this->setConfig($config);
+
+        $this
+            ->exportCoolRunnings()
+            // ->expectsOutput('Cannot export [non-existent.txt], because it does not exist in your app!') // TODO: Why does this work in InstallTest?
+            ->assertFailed();
+    }
+
+    public static function nonExistentDependencies()
+    {
+        return [
+            'top level dependencies' => [[
+                'dependencies' => [
+                    'non/existent',
+                ],
+            ]],
+            'top level dev dependencies' => [[
+                'dependencies_dev' => [
+                    'non/existent',
+                ],
+            ]],
+            'module dependencies' => [[
+                'modules' => [
+                    'seo' => [
+                        'dependencies' => [
+                            'non/existent',
+                        ],
+                    ],
+                ],
+            ]],
+            'module dev dependencies' => [[
+                'modules' => [
+                    'seo' => [
+                        'dependencies_dev' => [
+                            'non/existent',
+                        ],
+                    ],
+                ],
+            ]],
+            'options module dependencies' => [[
+                'modules' => [
+                    'js' => [
+                        'options' => [
+                            'vue' => [
+                                'dependencies' => [
+                                    'non/existent',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]],
+            'options module dev dependencies' => [[
+                'modules' => [
+                    'js' => [
+                        'options' => [
+                            'vue' => [
+                                'dependencies_dev' => [
+                                    'non/existent',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
             ]],
         ];
