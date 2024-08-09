@@ -49,6 +49,9 @@ class ExportableModule extends Module
     {
         $exportableDependencies = $this->getExportableDependencies();
 
+        $this->config->forget('dependencies');
+        $this->config->forget('dependencies_dev');
+
         if ($dependencies = $this->exportDependenciesFromComposerRequire('require', $exportableDependencies)) {
             $this->config->put('dependencies', $dependencies->all());
         }

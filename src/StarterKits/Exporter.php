@@ -134,7 +134,7 @@ class Exporter
     {
         $config = $this
             ->versionModuleDependencies()
-            ->syncWithModuleConfigs();
+            ->syncConfigWithModules();
 
         $this->files->put("{$this->exportPath}/starter-kit.yaml", YAML::dump($config->all()));
 
@@ -154,31 +154,34 @@ class Exporter
     /**
      * Get synced config from newly versioned module dependencies.
      */
-    protected function syncWithModuleConfigs(): Collection
+    protected function syncConfigWithModules(): Collection
     {
         $config = $this->config()->all();
 
         $this->modules->each(function ($module) use (&$config) {
-            if ($dependencies = $module->config('dependencies')) {
-                Arr::forget($config, $this->dottedModulePath($module, 'dependencies'));
-                Arr::set($config, $this->dottedModulePath($module, 'dependencies'), $dependencies);
-            }
-        });
-
-        $this->modules->each(function ($module) use (&$config) {
-            if ($dependenciesDev = $module->config('dependencies_dev')) {
-                Arr::forget($config, $this->dottedModulePath($module, 'dependencies_dev'));
-                Arr::set($config, $this->dottedModulePath($module, 'dependencies_dev'), $dependenciesDev);
-            }
+            $this->syncConfigWithIndividualModule($config, $module, 'dependencies');
+            $this->syncConfigWithIndividualModule($config, $module, 'dependencies_dev');
         });
 
         return collect($config);
     }
 
     /**
+     * Sync config with individual module
+     */
+    protected function syncConfigWithIndividualModule(array &$config, ExportableModule $module, string $key)
+    {
+        Arr::forget($config, $this->dottedModulePath($module, $key));
+
+        if ($dependenciesDev = $module->config($key)) {
+            Arr::set($config, $this->dottedModulePath($module, $key), $dependenciesDev);
+        }
+    }
+
+    /**
      * Get dotted module path.
      */
-    protected function dottedModulePath(Module $module, string $key): string
+    protected function dottedModulePath(ExportableModule $module, string $key): string
     {
         if ($module->isTopLevelModule()) {
             return $key;

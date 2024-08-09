@@ -427,6 +427,82 @@ EOT
     }
 
     #[Test]
+    public function it_correctly_categorizes_non_dev_dependencies_from_composer_json()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+
+EOT
+        );
+
+        // this is actually a dev dependency, so it should get converted to dev dependency
+        $this->setExportableDependencies([
+            'dependencies' => [
+                'statamic/ssg',
+            ],
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigDoesNotHave('dependencies');
+
+        $this->assertExportedConfigEquals('dependencies_dev', [
+            'statamic/ssg' => '^0.4.0',
+        ]);
+    }
+
+    #[Test]
+    public function it_correctly_categorizes_dev_dependencies_from_composer_json()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+
+EOT
+        );
+
+        // this is actually a non-dev dependency, so it should get converted to non-dev dependency
+        $this->setExportableDependencies([
+            'dependencies_dev' => [
+                'hansolo/falcon',
+            ],
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigEquals('dependencies', [
+            'hansolo/falcon' => '*',
+        ]);
+
+        $this->assertExportedConfigDoesNotHave('dependencies_dev');
+    }
+
+    #[Test]
     public function it_does_not_export_opinionated_app_composer_json()
     {
         $this->setExportPaths([
