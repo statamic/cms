@@ -78,10 +78,14 @@ trait Revisable
             $item->remove('parent');
         }
 
-        $item
+        $saved = $item
             ->published(true)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
+
+        if (! $saved) {
+            return false;
+        }
 
         if ($item instanceof Entry && $item->collection()->hasStructure() && $parent) {
             $tree = $item->collection()->structure()->in($item->locale());
@@ -111,10 +115,14 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
-        $item
+        $saved = $item
             ->published(false)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
+
+        if (! $saved) {
+            return false;
+        }
 
         $item
             ->makeRevision()
