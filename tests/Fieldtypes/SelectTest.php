@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class SelectTest extends TestCase
 {
-    use CastsBooleansTests, CastsMultipleBooleansTests, LabeledValueTests, MultipleLabeledValueTests;
+    use CastsBooleansTests, CastsMultipleBooleansTests, HasSelectOptionsTests, LabeledValueTests, MultipleLabeledValueTests;
 
     private function field($config)
     {
