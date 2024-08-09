@@ -2,6 +2,7 @@
 
 namespace Statamic\Actions;
 
+use Exception;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\User;
 
@@ -44,8 +45,13 @@ class Unpublish extends Action
 
     public function run($entries, $values)
     {
-        $entries->each(function ($entry) {
-            $entry->unpublish(['user' => User::current()]);
+        $failedActions = $entries->filter(function ($entry) {
+            return ! $entry->unpublish(['user' => User::current()]);
         });
+
+        if ($failedActions->isNotEmpty()) {
+            /** @translation */
+            throw new Exception(__("Couldn't unpublish entry"));
+        }
     }
 }
