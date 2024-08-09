@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class ButtonGroupTest extends TestCase
 {
-    use CastsBooleansTests, LabeledValueTests;
+    use CastsBooleansTests, HasSelectOptionsTests, LabeledValueTests;
 
     private function field($config)
     {

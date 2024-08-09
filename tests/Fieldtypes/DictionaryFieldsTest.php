@@ -33,11 +33,11 @@ class DictionaryFieldsTest extends TestCase
                 'meta' => [
                     'type' => [
                         'options' => [
-                            'countries' => 'Countries',
-                            'currencies' => 'Currencies',
-                            'file' => 'File',
-                            'timezones' => 'Timezones',
-                            'fake_dictionary' => 'Fake Dictionary',
+                            ['value' => 'countries', 'label' => 'Countries'],
+                            ['value' => 'currencies', 'label' => 'Currencies'],
+                            ['value' => 'file', 'label' => 'File'],
+                            ['value' => 'timezones', 'label' => 'Timezones'],
+                            ['value' => 'fake_dictionary', 'label' => 'Fake Dictionary'],
                         ],
                     ],
                 ],

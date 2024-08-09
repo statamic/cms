@@ -25,21 +25,22 @@ trait HasSelectOptions
     {
         $options = $this->config('options') ?? [];
 
-        // When it's just a simple list of values, we'll assume the keys should be the same as the values.
         if (array_is_list($options) && ! is_array(Arr::first($options))) {
-            return collect($options)->mapWithKeys(function ($value) {
-                return [$value => $value];
-            })->all();
+            $options = collect($options)
+                ->map(fn ($value) => ['key' => $value, 'value' => $value])
+                ->all();
         }
 
-        // When it's an associative array, just return it as is.
         if (Arr::isAssoc($options)) {
-            return $options;
+            $options = collect($options)
+                ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
+                ->all();
         }
 
-        return collect($options)->mapWithKeys(function ($value) {
-            return [$value['key'] => $value['value']];
-        })->all();
+        return collect($options)
+            ->map(fn ($item) => ['value' => $item['key'], 'label' => $item['value']])
+            ->values()
+            ->all();
     }
 
     public function preProcessIndex($value)
