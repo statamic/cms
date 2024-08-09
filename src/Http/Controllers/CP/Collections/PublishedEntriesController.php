@@ -32,6 +32,7 @@ class PublishedEntriesController extends CpController
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
             ]),
+            'saved' => true,
         ];
     }
 
@@ -56,6 +57,7 @@ class PublishedEntriesController extends CpController
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
             ]),
+            'saved' => true,
         ];
     }
 }
