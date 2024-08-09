@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Events\StaticCacheCleared;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
+use Statamic\StaticCaching\Cachers\DatabaseCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\Cachers\Writer;
@@ -37,6 +38,11 @@ class StaticCacheManager extends Manager
     public function createApplicationDriver(array $config)
     {
         return new ApplicationCacher($this->app[Repository::class], $config);
+    }
+
+    public function createDatabaseDriver(array $config)
+    {
+        return new DatabaseCacher($config);
     }
 
     public function cacheStore()
