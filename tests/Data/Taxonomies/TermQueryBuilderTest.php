@@ -3,6 +3,7 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
@@ -601,5 +602,165 @@ class TermQueryBuilderTest extends TestCase
 
         $terms = Term::query()->offset(1)->get();
         $this->assertEquals(['b', 'c'], $terms->map->slug()->all());
+    }
+
+    /** @test */
+    public function term_can_be_found_using_find_or_new()
+    {
+        Taxonomy::make('tags')->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'Alfa']))->save();
+
+        $findOrNew = Term::query()
+            ->where('taxonomy', 'tags')
+            ->findOrNew('tags::alfa');
+
+        $this->assertEquals($term->slug(), $findOrNew->slug());
+    }
+
+    /** @test */
+    public function term_can_be_created_using_find_or_new()
+    {
+        Taxonomy::make('tags')->save();
+
+        $findOrNew = Term::query()
+            ->where('taxonomy', 'tags')
+            ->findOrNew('tags::alfa');
+
+        $this->assertEmpty($findOrNew->slug());
+        $this->assertInstanceOf(TermContract::class, $findOrNew);
+    }
+
+    /** @test */
+    public function term_can_be_found_using_find_or()
+    {
+        Taxonomy::make('tags')->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'Alfa']))->save();
+
+        $findOrNew = Term::query()
+            ->where('taxonomy', 'tags')
+            ->findOr('tags::alfa', function () {
+                return 'This could be anything.';
+            });
+
+        $this->assertEquals($term->slug(), $findOrNew->slug());
+    }
+
+    /** @test */
+    public function callback_is_called_using_find_or()
+    {
+        Taxonomy::make('tags')->save();
+
+        $findOrNew = Term::query()
+            ->where('taxonomy', 'tags')
+            ->findOr('tags::alfa', function () {
+                return 'This could be anything.';
+            });
+
+        $this->assertSame('This could be anything.', $findOrNew);
+    }
+
+    /** @test */
+    public function term_can_be_found_using_first_or_new()
+    {
+        Taxonomy::make('tags')->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'Alfa']))->save();
+
+        $firstOrNew = Term::query()
+            ->where('taxonomy', 'tags')
+            ->firstOrNew(
+                ['slug' => 'alfa'],
+                ['title' => 'Alfa']
+            );
+
+        $this->assertEquals($term->slug(), $firstOrNew->slug());
+    }
+
+    /** @test */
+    public function term_can_be_created_using_first_or_new()
+    {
+        Taxonomy::make('tags')->save();
+
+        $firstOrNew = Term::query()
+            ->where('taxonomy', 'tags')
+            ->firstOrNew(
+                ['slug' => 'alfa'],
+                ['title' => 'Alfa']
+            );
+
+        $this->assertNull(Term::find('tags::alfa'));
+        $this->assertSame('Alfa', $firstOrNew->get('title'));
+        $this->assertSame('alfa', $firstOrNew->slug());
+        $this->assertSame('tags', $firstOrNew->taxonomy()->handle());
+    }
+
+    /** @test */
+    public function term_can_be_found_using_first_or_create()
+    {
+        Taxonomy::make('tags')->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'Alfa']))->save();
+
+        $firstOrCreate = Term::query()
+            ->where('taxonomy', 'tags')
+            ->firstOrCreate(
+                ['slug' => 'alfa'],
+                ['title' => 'Alfa']
+            );
+
+        $this->assertEquals($term->slug(), $firstOrCreate->slug());
+    }
+
+    /** @test */
+    public function term_can_be_created_using_first_or_create()
+    {
+        Taxonomy::make('tags')->save();
+
+        $firstOrCreate = Term::query()
+            ->where('taxonomy', 'tags')
+            ->firstOrCreate(
+                ['slug' => 'alfa'],
+                ['title' => 'Alfa']
+            );
+
+        $this->assertNotNull(Term::find('tags::alfa'));
+        $this->assertSame('Alfa', $firstOrCreate->get('title'));
+        $this->assertSame('alfa', $firstOrCreate->slug());
+        $this->assertSame('tags', $firstOrCreate->taxonomy()->handle());
+    }
+
+    /** @test */
+    public function term_can_be_found_and_updated_using_update_or_create()
+    {
+        Taxonomy::make('tags')->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'Alfa']))->save();
+
+        $updateOrCreate = Term::query()
+            ->where('taxonomy', 'tags')
+            ->updateOrCreate(
+                ['slug' => 'alfa'],
+                ['title' => 'Alfa - Updated']
+            );
+
+        $this->assertEquals($term->slug(), $updateOrCreate->slug());
+        $this->assertSame('Alfa - Updated', $updateOrCreate->title);
+        $this->assertSame('alfa', $updateOrCreate->slug());
+        $this->assertSame('tags', $updateOrCreate->taxonomy()->handle());
+    }
+
+    /** @test */
+    public function term_can_be_created_using_update_or_create()
+    {
+        Taxonomy::make('tags')->save();
+
+        $updateOrCreate = Term::query()
+            ->where('taxonomy', 'tags')
+            ->updateOrCreate(
+                ['slug' => 'alfa'],
+                ['title' => 'Alfa']
+            );
+
+        $this->assertNotNull(Term::find('tags::alfa'));
+        $this->assertSame('Alfa', $updateOrCreate->get('title'));
+        $this->assertSame('alfa', $updateOrCreate->slug());
+        $this->assertSame('tags', $updateOrCreate->taxonomy()->handle());
     }
 }
