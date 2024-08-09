@@ -34,7 +34,7 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
                     return "{$this->request->getUri()}?{$pageName}={$page}";
                 })
                 ->each(function (string $uri) {
-                    StaticWarmJob::dispatch(new Request('GET', $uri));
+                    StaticWarmJob::dispatch(new Request('GET', $uri), $this->clientConfig);
                 });
         }
     }
