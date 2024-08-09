@@ -156,6 +156,7 @@ export default {
             this.$axios.post(this.actions.publish, payload)
                 .then(response => {
                     this.saving = false;
+
                     if (! response.data.saved) {
                         this.$emit('failed');
                         return this.$toast.error(__(`Couldn't publish entry`));
@@ -191,6 +192,8 @@ export default {
             const payload = { message: this.revisionMessage };
 
             this.$axios.post(this.actions.unpublish, { data: payload }).then(response => {
+                this.saving = false;
+
                 if (! response.data.saved) {
                     this.$emit('failed');
                     return this.$toast.error(__(`Couldn't unpublish entry`));
