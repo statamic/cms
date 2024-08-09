@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Statamic\Events\UserPasswordChanged;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -30,6 +31,10 @@ class PasswordController extends CpController
         $user->password($request->password)->save();
 
         UserPasswordChanged::dispatch($user);
+
+        if ($currentPassword = $request->current_password) {
+            Auth::logoutOtherDevices($currentPassword);
+        }
 
         return response('', 204);
     }
