@@ -350,7 +350,7 @@ final class Installer
             return false;
         }
 
-        return (new InstallableModule($config['options'][$choice], $key))->installer($this);
+        return (new InstallableModule($config['options'][$choice], "{$key}_{$choice}"))->installer($this);
     }
 
     /**

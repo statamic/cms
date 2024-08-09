@@ -96,7 +96,7 @@ class Exporter
     {
         if (Arr::has($config, 'options')) {
             return collect($config['options'])
-                ->map(fn ($option) => $this->instantiateModule($option, $key))
+                ->map(fn ($option, $optionKey) => $this->instantiateModule($option, "{$key}.options.{$optionKey}"))
                 ->all();
         }
 
@@ -158,9 +158,18 @@ class Exporter
     {
         $config = $this->config()->all();
 
-        $this->modules->each(function ($module) use (&$config) {
-            $this->syncConfigWithIndividualModule($config, $module, 'dependencies');
-            $this->syncConfigWithIndividualModule($config, $module, 'dependencies_dev');
+        $normalizedModuleKeyOrder = [
+            'export_paths',
+            'export_as',
+            'dependencies',
+            'dependencies_dev',
+            'modules',
+        ];
+
+        $this->modules->each(function ($module) use ($normalizedModuleKeyOrder, &$config) {
+            foreach ($normalizedModuleKeyOrder as $key) {
+                $this->syncConfigWithIndividualModule($config, $module, $key);
+            }
         });
 
         return collect($config);
@@ -173,8 +182,8 @@ class Exporter
     {
         Arr::forget($config, $this->dottedModulePath($module, $key));
 
-        if ($dependenciesDev = $module->config($key)) {
-            Arr::set($config, $this->dottedModulePath($module, $key), $dependenciesDev);
+        if ($module->config()->has($key)) {
+            Arr::set($config, $this->dottedModulePath($module, $key), $module->config($key));
         }
     }
 

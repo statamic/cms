@@ -623,6 +623,40 @@ EOT
     }
 
     #[Test]
+    public function it_can_export_options_module_files()
+    {
+        $this->setConfig([
+            'modules' => [
+                'js' => [
+                    'options' => [
+                        'vue' => [
+                            'export_paths' => [
+                                'config/filesystems.php',
+                            ],
+                        ],
+                        'react' => [
+                            'export_as' => [
+                                'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+
+        $this->exportCoolRunnings();
+
+        $this->assertFileExists($filesystemsConfig);
+        $this->assertFileHasContent("'disks' => [", $filesystemsConfig);
+
+        $this->assertFileExists($welcomeView);
+        $this->assertFileHasContent('<body', $welcomeView);
+    }
+
+    #[Test]
     public function it_can_export_module_dependencies()
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
@@ -671,6 +705,61 @@ EOT
         ]);
 
         $this->assertExportedConfigDoesNotHave('modules.ssg.dependencies');
+    }
+
+    #[Test]
+    public function it_can_export_options_module_dependencies()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $this->setConfig([
+            'modules' => [
+                'first_party' => [
+                    'options' => [
+                        'seo' => [
+                            'dependencies' => [
+                                'statamic/seo-pro',
+                            ],
+                        ],
+                        'ssg' => [
+                            'dependencies_dev' => [
+                                'statamic/ssg',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigEquals('modules.first_party.options.seo.dependencies', [
+            'statamic/seo-pro' => '^2.2',
+        ]);
+
+        $this->assertExportedConfigDoesNotHave('modules.first_party.seo.dependencies_dev');
+
+        $this->assertExportedConfigEquals('modules.first_party.options.ssg.dependencies_dev', [
+            'statamic/ssg' => '^0.4.0',
+        ]);
+
+        $this->assertExportedConfigDoesNotHave('modules.first_party.ssg.dependencies');
     }
 
     #[Test]
@@ -787,7 +876,7 @@ EOT
                     'resources/views/welcome.blade.php' => 'composer.json',
                 ],
             ]],
-            'modules export' => [[
+            'module export' => [[
                 'modules' => [
                     'seo' => [
                         'export_paths' => [
@@ -796,7 +885,7 @@ EOT
                     ],
                 ],
             ]],
-            'modules export as from' => [[
+            'module export as from' => [[
                 'modules' => [
                     'seo' => [
                         'export_as' => [
@@ -805,7 +894,7 @@ EOT
                     ],
                 ],
             ]],
-            'modules export as to' => [[
+            'module export as to' => [[
                 'modules' => [
                     'seo' => [
                         'export_as' => [
@@ -814,7 +903,171 @@ EOT
                     ],
                 ],
             ]],
+            'options module export' => [[
+                'modules' => [
+                    'js' => [
+                        'options' => [
+                            'vue' => [
+                                'export_paths' => [
+                                    'composer.json',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]],
+            'options module export as from' => [[
+                'modules' => [
+                    'js' => [
+                        'options' => [
+                            'vue' => [
+                                'export_as' => [
+                                    'composer.json' => 'resources/views/welcome.blade.php',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]],
+            'options module export as to' => [[
+                'modules' => [
+                    'js' => [
+                        'options' => [
+                            'vue' => [
+                                'export_as' => [
+                                    'resources/views/welcome.blade.php' => 'composer.json',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]],
         ];
+    }
+
+    #[Test]
+    public function it_normalizes_module_key_order()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $paths = $this->cleanPaths([
+            base_path('README.md'),
+            base_path('test-folder'),
+            resource_path('vue.js'),
+        ]);
+
+        $this->files->put(base_path('README.md'), 'This is a readme!');
+        $this->files->makeDirectory(base_path('test-folder'));
+        $this->files->put(base_path('test-folder/one.txt'), 'One.');
+        $this->files->put(resource_path('vue.js'), 'Vue!');
+
+        $this->setConfig([
+            'modules' => [
+                'seo' => [
+                    'dependencies_dev' => [
+                        'statamic/ssg',
+                    ],
+                    'prompt' => false,
+                    'export_as' => [
+                        'README.md' => 'README-new-site.md',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro',
+                    ],
+                    'export_paths' => [
+                        'resources/views',
+                    ],
+                ],
+                'js' => [
+                    'prompt' => 'Pick the best JS framework!',
+                    'skip_option' => 'Nah',
+                    'options' => [
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'dependencies' => [
+                                'hansolo/falcon',
+                            ],
+                            'export_paths' => [
+                                'resources/vue.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'export_as' => [
+                'test-folder' => 'test-renamed-folder',
+            ],
+            'dependencies_dev' => [
+                'statamic/ssg',
+            ],
+            'export_paths' => [
+                'config/filesystems.php',
+            ],
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertConfigSameOrder([
+            'export_paths' => [
+                'config/filesystems.php',
+            ],
+            'export_as' => [
+                'test-folder' => 'test-renamed-folder',
+            ],
+            'dependencies_dev' => [
+                'statamic/ssg' => '^0.4.0',
+            ],
+            'modules' => [
+                'seo' => [
+                    'prompt' => false,
+                    'export_paths' => [
+                        'resources/views',
+                    ],
+                    'export_as' => [
+                        'README.md' => 'README-new-site.md',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^2.2',
+                    ],
+                    'dependencies_dev' => [
+                        'statamic/ssg' => '^0.4.0',
+                    ],
+                ],
+                'js' => [
+                    'prompt' => 'Pick the best JS framework!',
+                    'skip_option' => 'Nah',
+                    'options' => [
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/vue.js',
+                            ],
+                            'dependencies' => [
+                                'hansolo/falcon' => '*',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->cleanPaths($paths);
     }
 
     private function exportPath($path = null)
@@ -867,6 +1120,14 @@ EOT
     {
         return $this->assertFalse(
             Arr::has(YAML::parse($this->files->get($this->exportPath('starter-kit.yaml'))), $key)
+        );
+    }
+
+    private function assertConfigSameOrder($expectedConfig)
+    {
+        return $this->assertSame(
+            $expectedConfig,
+            YAML::parse($this->files->get($this->exportPath('starter-kit.yaml')))
         );
     }
 
