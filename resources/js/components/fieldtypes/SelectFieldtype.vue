@@ -106,7 +106,7 @@ export default {
         },
 
         options() {
-            return this.normalizeInputOptions(this.config.options);
+            return this.normalizeInputOptions(this.meta.options);
         },
 
         replicatorPreview() {

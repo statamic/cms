@@ -14,6 +14,34 @@ trait HasSelectOptions
         return $this->config('multiple');
     }
 
+    public function preload(): array
+    {
+        return [
+            'options' => $this->getOptions(),
+        ];
+    }
+
+    protected function getOptions(): array
+    {
+        $options = $this->config('options') ?? [];
+
+        // When it's just a simple list of values, we'll assume the keys should be the same as the values.
+        if (array_is_list($options) && ! is_array(Arr::first($options))) {
+            return collect($options)->mapWithKeys(function ($value) {
+                return [$value => $value];
+            })->all();
+        }
+
+        // When it's an associative array, just return it as is.
+        if (Arr::isAssoc($options)) {
+            return $options;
+        }
+
+        return collect($options)->mapWithKeys(function ($value) {
+            return [$value['key'] => $value['value']];
+        })->all();
+    }
+
     public function preProcessIndex($value)
     {
         $values = $this->preProcess($value);

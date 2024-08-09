@@ -6,6 +6,7 @@ use Closure;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\ArrayType;
+use Statamic\Support\Arr as SupportArr;
 
 class Arr extends Fieldtype
 {
@@ -45,9 +46,47 @@ class Arr extends Fieldtype
         ];
     }
 
+    public function preload(): array
+    {
+        return [
+            'keys' => $this->keys()->mapWithKeys(fn ($item) => [$item['key'] => $item['value']]),
+        ];
+    }
+
+    private function keys()
+    {
+        return collect($this->config('keys'))->map(fn ($value, $key) => [
+            'key' => is_array($value) ? $value['key'] : $key,
+            'value' => is_array($value) ? $value['value'] : $value,
+        ])->values();
+    }
+
     public function preProcess($data)
     {
-        return array_replace($this->blankKeyed(), $data ?? []);
+        if ($this->isKeyed()) {
+            $isMulti = is_array(SupportArr::first($data));
+
+            return $this->keys()->mapWithKeys(function ($item) use ($isMulti, $data) {
+                $key = $item['key'];
+
+                $value = $isMulti
+                    ? collect($data)->where('key', $key)->pluck('value')->first()
+                    : $data[$key] ?? null;
+
+                return [$key => $value];
+            })->all();
+        }
+
+        // When using the legacy format, return the data as is.
+        if (! is_array(SupportArr::first($data))) {
+            return $data ?? [];
+        }
+
+        return collect($data)
+            ->mapWithKeys(fn ($item) => [
+                (string) $item['key'] => $item['value'],
+            ])
+            ->all();
     }
 
     public function preProcessConfig($data)
@@ -57,25 +96,31 @@ class Arr extends Fieldtype
 
     public function process($data)
     {
-        return collect($data)
-            ->when($this->isKeyed(), function ($data) {
-                return $data->filter();
-            })
-            ->all();
+        if (empty($data)) {
+            return null;
+        }
+
+        $isMulti = false;
+        foreach (array_keys($data) as $key) {
+            if (is_numeric($key)) {
+                $isMulti = true;
+                break;
+            }
+        }
+
+        if ($isMulti) {
+            return collect($data)
+                ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
+                ->values()
+                ->all();
+        }
+
+        return $data;
     }
 
     protected function isKeyed()
     {
         return (bool) $this->config('keys');
-    }
-
-    protected function blankKeyed()
-    {
-        return collect($this->config('keys'))
-            ->map(function () {
-                return null;
-            })
-            ->all();
     }
 
     public function toGqlType()
@@ -100,5 +145,16 @@ class Arr extends Fieldtype
                 $fail('statamic::validation.arr_fieldtype')->translate();
             }
         }];
+    }
+
+    public function augment($value)
+    {
+        if (is_array(SupportArr::first($value))) {
+            return collect($value)
+                ->mapWithKeys(fn ($item) => [$item['key'] => $item['value']])
+                ->all();
+        }
+
+        return $value;
     }
 }

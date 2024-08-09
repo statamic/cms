@@ -30,7 +30,17 @@ class DictionaryFieldsTest extends TestCase
                 'fields' => [
                     ['handle' => 'type', 'type' => 'select'],
                 ],
-                'meta' => ['type' => null],
+                'meta' => [
+                    'type' => [
+                        'options' => [
+                            'countries' => 'Countries',
+                            'currencies' => 'Currencies',
+                            'file' => 'File',
+                            'timezones' => 'Timezones',
+                            'fake_dictionary' => 'Fake Dictionary',
+                        ],
+                    ],
+                ],
             ],
         ], $preload);
 
@@ -39,7 +49,11 @@ class DictionaryFieldsTest extends TestCase
                 'fields' => [
                     ['handle' => 'category',  'type' => 'select'],
                 ],
-                'meta' => ['category' => null],
+                'meta' => [
+                    'category' => [
+                        'options' => [],
+                    ],
+                ],
                 'defaults' => ['category' => null],
             ],
         ], $preload['dictionaries']);
