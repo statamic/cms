@@ -6,7 +6,11 @@
      once it has been portaled out. -->
 <div :class="{ 'publish-fields': fullScreenMode }">
 <div :class="{ wrapperClasses: fullScreenMode }">
-<div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-gray-200 dark:bg-dark-700': fullScreenMode }">
+<div class="replicator-fieldtype-container" :class="{
+    'replicator-fullscreen bg-gray-200 dark:bg-dark-700': fullScreenMode,
+    'replicator-droppable': canDropSet === true,
+    'replicator-not-droppable': canDropSet === false,
+}">
 
     <header class="bg-white dark:bg-dark-550 fixed top-0 inset-x-0 border-b dark:border-dark-900 p-3 rtl:pr-4 ltr:pl-4 flex items-center justify-between shadow z-max" v-if="fullScreenMode">
         <h2 v-text="__(config.display)" class="flex-1" />
@@ -43,11 +47,15 @@
         <sortable-list
             :value="value"
             :vertical="true"
-            :item-class="sortableItemClass"
-            :handle-class="sortableHandleClass"
+            group="replicator-fieldtype"
+            :group-validator="sortableGroupValidator"
+            item-class="replicator-sortable-item"
+            handle-class="replicator-sortable-handle"
             append-to="body"
             constrain-dimensions
             @input="sorted($event)"
+            @groupstart="sortableGroupStart"
+            @groupend="sortableGroupEnd"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >
@@ -59,9 +67,10 @@
                     :values="set"
                     :meta="meta.existing[set._id]"
                     :config="setConfig(set.type)"
+                    :config-hash="setConfigHash(set.type)"
                     :parent-name="name"
-                    :sortable-item-class="sortableItemClass"
-                    :sortable-handle-class="sortableHandleClass"
+                    sortable-item-class="replicator-sortable-item"
+                    sortable-handle-class="replicator-sortable-handle"
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
                     :field-path-prefix="fieldPathPrefix || handle"
@@ -117,6 +126,7 @@ import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 import reduce from 'underscore/modules/reduce';
+import { closestVm } from '../../../bootstrap/globals';
 
 export default {
 
@@ -136,6 +146,7 @@ export default {
             collapsed: clone(this.meta.collapsed),
             previews: this.meta.previews,
             fullScreenMode: false,
+            canDropSet: null,
             provide: {
                 storeName: this.storeName,
                 replicatorSets: this.config.sets
@@ -157,16 +168,12 @@ export default {
             }, []);
         },
 
+        setConfigHashes() {
+            return this.meta.setConfigHashes;
+        },
+
         groupConfigs() {
             return this.config.sets;
-        },
-
-        sortableItemClass() {
-            return `${this.name}-sortable-item`;
-        },
-
-        sortableHandleClass() {
-            return `${this.name}-sortable-handle`;
         },
 
         storeState() {
@@ -186,6 +193,10 @@ export default {
             return _.find(this.setConfigs, { handle }) || {};
         },
 
+        setConfigHash(handle) {
+            return this.setConfigHashes[handle];
+        },
+
         updated(index, set) {
             this.update([...this.value.slice(0, index), set, ...this.value.slice(index + 1)]);
         },
@@ -196,8 +207,32 @@ export default {
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },
 
-        sorted(value) {
-            this.update(value);
+        sorted({ operation, oldIndex, newIndex, oldList }) {
+            if (operation === 'move') {
+                // Move set within this replicator
+                this.update(arrayMove(this.value, oldIndex, newIndex));
+            } else if (operation === 'add') {
+                // Add set to this replicator
+                const oldReplicator = closestVm(oldList, 'replicator-fieldtype');
+                const set = oldReplicator.value[oldIndex];
+                const meta = oldReplicator.meta.existing[set._id];
+                const previews = oldReplicator.previews[set._id];
+                this.updateSetPreviews(set._id, previews);
+                this.updateSetMeta(set._id, meta);
+                this.update(arrayAdd(this.value, set, newIndex));
+                if (oldReplicator.collapsed.includes(set._id)) {
+                    this.collapseSet(set._id);
+                } else {
+                    this.expandSet(set._id);
+                }
+                // Remove set from old replicator
+                // Do this from the target replicator in order to avoid race conditions with nested
+                // replicators both trying to update their parent's value at the same time.
+                this.$nextTick(() => {
+                    oldReplicator.removeSetMeta(set._id);
+                    oldReplicator.update(arrayRemove(oldReplicator.value, oldIndex)); 
+                });
+            }
         },
 
         addSet(handle, index) {
@@ -285,6 +320,20 @@ export default {
 
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
+
+        sortableGroupValidator({ source }) {
+            this.canDropSet = this.canAddSet && Object.values(this.setConfigHashes).includes(source.dataset.configHash);
+            return this.canDropSet;
+        },
+
+        sortableGroupStart({ valid }) {
+            this.canDropSet = valid;
+        },
+
+        sortableGroupEnd() {
+            this.canDropSet = null;
+        },
+
     },
 
     mounted() {

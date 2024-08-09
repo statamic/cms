@@ -4,6 +4,7 @@
 
 .replicator-set-container {
     @apply outline-none;
+    min-height: 1rem;
 }
 
 .replicator-set {
@@ -79,4 +80,22 @@
 
 .replicator-fullscreen {
     @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
+}
+
+@scope (.replicator-droppable) to (.replicator-fieldtype) {
+    :scope {
+        cursor: auto;
+    }
+    * {
+        pointer-events: auto;
+    }
+}
+
+@scope (.replicator-not-droppable) to (.replicator-fieldtype) {
+    :scope {
+        cursor: not-allowed;
+    }
+    * {
+        pointer-events: none;
+    }
 }
