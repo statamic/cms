@@ -2,12 +2,13 @@
 
 namespace Tests\Data;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Data\DataCollection;
 use Tests\TestCase;
 
 class DataCollectionTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_sorts()
     {
         $collection = new DataCollection([
@@ -19,7 +20,7 @@ class DataCollectionTest extends TestCase
         $this->assertEquals(['alfa', 'bravo', 'charlie'], $collection->multisort('foo')->pluck('foo')->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_by_first_item_in_arrays()
     {
         $collection = new DataCollection([

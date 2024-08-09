@@ -2,6 +2,7 @@
 
 namespace Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -10,9 +11,7 @@ class ToQsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_converts_to_query_string(): void
     {
         $input = [

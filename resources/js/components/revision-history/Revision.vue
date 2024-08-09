@@ -33,6 +33,7 @@
                 >
                     <template slot="action-buttons-right">
                         <restore-revision
+                            v-if="canRestoreRevisions"
                             :revision="revision"
                             :url="restoreUrl"
                             :reference="reference"
@@ -60,6 +61,7 @@ export default {
         revision: Object,
         restoreUrl: String,
         reference: String,
+        canRestoreRevisions: Boolean,
     },
 
     data() {

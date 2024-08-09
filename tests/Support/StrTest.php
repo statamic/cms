@@ -2,6 +2,7 @@
 
 namespace Tests\Support;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Compare;
 use Statamic\Support\Str;
 use Tests\TestCase;
@@ -10,14 +11,14 @@ class StrTest extends TestCase
 {
     use Concerns\TestsIlluminateStr;
 
-    /** @test */
+    #[Test]
     public function undefined_methods_get_passed_to_stringy()
     {
         $this->assertFalse(method_exists(Str::class, 'last'));
         $this->assertEquals('bar', Str::last('foobar', 3));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_sentence_lists()
     {
         $this->assertEquals('this', Str::makeSentenceList(['this']));
@@ -33,7 +34,7 @@ class StrTest extends TestCase
         $this->assertEquals('this, that and the other', Str::makeSentenceList(['this', 'that', 'the other'], 'and', false));
     }
 
-    /** @test */
+    #[Test]
     public function it_strips_tags()
     {
         $html = '<h1>heading</h1> <b>bold</b>';
@@ -44,7 +45,7 @@ class StrTest extends TestCase
         $this->assertEquals('heading bold', Str::stripTags($html, ['h1', 'b']));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_slugs()
     {
         // Assertions copied over from laravel/framework...
@@ -71,7 +72,7 @@ class StrTest extends TestCase
         $this->assertEquals('foo_bar-baz', Str::slug('foo_bar % baz'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_slugs_and_replaces_extra_symbols()
     {
         config(['statamic.system.ascii_replace_extra_symbols' => true]);
@@ -82,25 +83,25 @@ class StrTest extends TestCase
         $this->assertEquals('foo_bar-percent-baz', Str::slug('foo_bar % baz'));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_studly_to_slug()
     {
         $this->assertEquals('foo-bar-baz', Str::studlyToSlug('FooBarBaz'));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_studly_to_title()
     {
         $this->assertEquals('Foo Bar Baz', Str::studlyToTitle('FooBarBaz'));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_slug_to_title()
     {
         $this->assertEquals('Foo Bar Baz', Str::studlyToTitle('foo-bar-baz'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_for_a_url()
     {
         $this->assertTrue(Str::isUrl('http://example.com'));
@@ -111,13 +112,13 @@ class StrTest extends TestCase
         $this->assertFalse(Str::isUrl('test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_deslugifies_a_slug()
     {
         $this->assertEquals('foo bar baz', Str::deslugify('foo-bar-baz'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_file_size_for_humans()
     {
         $this->assertEquals('0 B', Str::fileSizeForHumans(0));
@@ -137,7 +138,7 @@ class StrTest extends TestCase
         $this->assertEquals('2 GB', Str::fileSizeForHumans(1879048192, 0));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_time_for_humans()
     {
         $this->assertEquals('1ms', Str::timeForHumans(1));
@@ -146,21 +147,21 @@ class StrTest extends TestCase
         $this->assertEquals('1.57s', Str::timeForHumans(1570));
     }
 
-    /** @test */
+    #[Test]
     public function it_widonts()
     {
         $this->assertEquals('one two&nbsp;three', Str::widont('one two three'));
         $this->assertEquals('<p>one two&nbsp;three</p>', Str::widont('<p>one two three</p>'));
     }
 
-    /** @test */
+    #[Test]
     public function it_compares_two_strings()
     {
         Compare::shouldReceive('strings')->with('one', 'two')->once();
         Str::compare('one', 'two');
     }
 
-    /** @test */
+    #[Test]
     public function it_modifies_strings_with_multiple_methods_at_once()
     {
         $this->assertEquals(
@@ -169,7 +170,7 @@ class StrTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_tailwind_width_classes()
     {
         $this->assertEquals('w-full @lg:w-1/4', Str::tailwindWidthClass(25));
@@ -181,14 +182,14 @@ class StrTest extends TestCase
         $this->assertEquals('w-full', Str::tailwindWidthClass('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_boolean_strings()
     {
         $this->assertEquals('true', Str::bool(true));
         $this->assertEquals('false', Str::bool(false));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_booleans()
     {
         $this->assertTrue(Str::toBool('true'));

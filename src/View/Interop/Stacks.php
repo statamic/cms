@@ -66,14 +66,14 @@ PHP;
     public static function endBladePush($stack): void
     {
         if ($content = self::getBladeValue('pushes', $stack)) {
-            StackReplacementManager::pushStack($stack, $content, false);
+            StackReplacementManager::pushStack($stack, $content, false, true);
         }
     }
 
     public static function endBladePrepend($stack): void
     {
         if ($content = self::getBladeValue('prepends', $stack)) {
-            StackReplacementManager::prependStack($stack, $content, false);
+            StackReplacementManager::prependStack($stack, $content, false, true);
         }
     }
 

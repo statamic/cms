@@ -40,6 +40,8 @@ trait ListensForContentEvents
         \Statamic\Events\RevisionSaved::class,
         \Statamic\Events\RoleDeleted::class,
         \Statamic\Events\RoleSaved::class,
+        \Statamic\Events\SiteDeleted::class,
+        \Statamic\Events\SiteSaved::class,
         \Statamic\Events\SubmissionDeleted::class,
         \Statamic\Events\SubmissionSaved::class,
         \Statamic\Events\TaxonomyDeleted::class,

@@ -21,7 +21,7 @@
                     <p v-text="`${__('messages.addon_install_command')}:`" />
                     <code-block copyable :text="`composer require ${package}`" />
                 </template>
-                <p>{{ __('Learn more about') }} <a href="https://statamic.dev/addons">{{ __('Addons') }}</a>.</p>
+                <p v-html="link"></p>
             </div>
         </confirmation-modal>
         <div>
@@ -86,6 +86,10 @@ import AddonEditions from './addons/Editions.vue';
                 low = low ? `$${low}` : __('Free');
                 high = high ? `$${high}` : __('Free');
                 return (low == high) ? low : `${low} - ${high}`;
+            },
+
+            link() {
+                return __('Learn more about :link', { link: `<a href="https://statamic.dev/addons" target="_blank">${__('Addons')}</a>`}) + '.';
             },
         },
 

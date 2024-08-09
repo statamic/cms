@@ -22,7 +22,7 @@
                     v-if="hasChildren"
                     class="p-2 text-gray-600 dark:text-dark-175 hover:text-gray-700 dark:hover:text-dark-150 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
-                    @click="$emit('toggle-open')"
+                    @click.stop="$emit('toggle-open')"
                 >
                     <svg-icon name="micro/chevron-down-xs" class="h-1.5" />
                 </button>
@@ -120,7 +120,7 @@ export default {
                 case 'published':
                     return 'bg-green-600';
                 case 'draft':
-                    return 'bg-gray-400';
+                    return 'bg-gray-400 dark:bg-dark-200';
                 default:
                     return 'bg-transparent border border-gray-600';
             }

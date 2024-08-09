@@ -3,6 +3,7 @@
 namespace Tests\Modifiers;
 
 use Illuminate\Support\Arr;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Modifiers\Modify;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class BardItemsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_extracts_bard_items()
     {
         $data = [
@@ -62,7 +63,7 @@ class BardItemsTest extends TestCase
         $this->assertEquals($expected, $this->modify($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_bard_items_from_single_node()
     {
         $data = [
@@ -85,7 +86,7 @@ class BardItemsTest extends TestCase
         $this->assertEquals($expected, $this->modify($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_bard_items_from_value_object()
     {
         $data = new Value([
@@ -110,7 +111,7 @@ class BardItemsTest extends TestCase
         $this->assertEquals($expected, $this->modify($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_bard_items_with_nodes_appended_to_marks()
     {
         $data = [
