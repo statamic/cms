@@ -4,6 +4,7 @@ return [
     'any.config.antlers' => "Enable Antlers parsing in this field's content.",
     'any.config.cast_booleans' => 'Options with values of true and false will be saved as booleans.',
     'any.config.mode' => 'Choose your preferred UI style.',
+    'array.config.expand' => 'Whether to save the array in the expanded format. Use this if you intend to have numeric values.',
     'array.config.keys' => 'Set the array keys (variables) and optional labels.',
     'array.config.mode' => 'The **dynamic** mode gives the user free control of the data, while **keyed** and **single** modes enforce strict keys.',
     'array.title' => 'Array',

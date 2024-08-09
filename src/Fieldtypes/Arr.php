@@ -42,6 +42,11 @@ class Arr extends Fieldtype
                             'mode' => 'dynamic',
                         ],
                     ],
+                    'expand' => [
+                        'type' => 'toggle',
+                        'display' => __('Expand'),
+                        'instructions' => __('statamic::fieldtypes.array.config.expand'),
+                    ],
                 ],
             ],
         ];
