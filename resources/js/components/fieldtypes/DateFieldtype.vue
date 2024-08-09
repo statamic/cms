@@ -133,13 +133,16 @@ export default {
                 rows: this.$screens({ default: 1, lg: this.config.rows }),
                 isExpanded: this.name === 'date' || this.config.full_width,
                 isRequired: this.config.required,
-                locale: this.$config.get('locale').replace('_', '-'),
+                locale: this.config.calendar_locale?.replace('_', '-') ?? this.$config.get('calendarLocale')?.replace('_', '-') ?? this.$config.get('locale').replace('_', '-'),
                 masks: { input: [this.displayFormat] },
                 minDate: this.config.earliest_date.date,
                 maxDate: this.config.latest_date.date,
                 modelConfig: { type: 'string', mask: this.format },
                 updateOnInput: false,
                 value: this.datePickerValue,
+                calendar: this.config.calendar ?? this.$config.get('calendar') ?? undefined,
+                firstDayOfWeek: this.config.firstDayOfWeek ?? this.$config.get('firstDayOfWeek') ?? undefined,
+                timezone: this.config.timezone ?? this.$config.get('timezone') ?? undefined,
             };
         },
 
