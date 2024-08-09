@@ -267,9 +267,9 @@ class ArrayTest extends TestCase
 
     #[Test]
     #[DataProvider('dynamicProcessProvider')]
-    public function it_processes_dynamic($value, $expected)
+    public function it_processes_dynamic($expand, $value, $expected)
     {
-        $field = new Field('test', ['type' => 'array']);
+        $field = new Field('test', ['type' => 'array', 'expand' => $expand]);
 
         $field->setValue($value);
 
@@ -280,10 +280,12 @@ class ArrayTest extends TestCase
     {
         return [
             'null' => [
+                false,
                 null,
                 null,
             ],
             'string keys' => [
+                false,
                 [
                     'food' => 'burger',
                     'drink' => 'coke',
@@ -295,7 +297,34 @@ class ArrayTest extends TestCase
                     'side' => 'fries',
                 ],
             ],
+            'string keys with expanded setting' => [
+                true,
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+            ],
             'numeric keys' => [
+                false,
+                [
+                    0 => 'none',
+                    1 => 'some',
+                    2 => 'more',
+                ],
+                [
+                    0 => 'none',
+                    1 => 'some',
+                    2 => 'more',
+                ],
+            ],
+            'numeric keys with expanded setting' => [
+                true,
                 [
                     0 => 'none',
                     1 => 'some',
@@ -308,6 +337,20 @@ class ArrayTest extends TestCase
                 ],
             ],
             'non-sequential numeric keys' => [
+                false,
+                [
+                    2 => 'some',
+                    1 => 'one',
+                    0 => 'none',
+                ],
+                [
+                    2 => 'some',
+                    1 => 'one',
+                    0 => 'none',
+                ],
+            ],
+            'non-sequential numeric keys with expanded setting' => [
+                true,
                 [
                     2 => 'some',
                     1 => 'one',
@@ -320,6 +363,20 @@ class ArrayTest extends TestCase
                 ],
             ],
             'strings and numeric keys' => [
+                false,
+                [
+                    'one' => 'One',
+                    2 => 'Two',
+                    'three' => 'Three',
+                ],
+                [
+                    'one' => 'One',
+                    2 => 'Two',
+                    'three' => 'Three',
+                ],
+            ],
+            'strings and numeric keys with expanded setting' => [
+                true,
                 [
                     'one' => 'One',
                     2 => 'Two',
@@ -336,9 +393,9 @@ class ArrayTest extends TestCase
 
     #[Test]
     #[DataProvider('keyedProcessProvider')]
-    public function it_processes_keyed($options, $value, $expected)
+    public function it_processes_keyed($expand, $options, $value, $expected)
     {
-        $field = new Field('test', ['type' => 'array', 'keys' => $options]);
+        $field = new Field('test', ['type' => 'array', 'keys' => $options, 'expand' => $expand]);
 
         $field->setValue($value);
 
@@ -349,11 +406,13 @@ class ArrayTest extends TestCase
     {
         return [
             'null' => [
+                false,
                 ['foo' => 'Foo'],
                 null,
                 null,
             ],
             'associative array options, associative array value' => [
+                false,
                 [
                     'food' => 'Food',
                     'drink' => 'Drink',
@@ -370,7 +429,26 @@ class ArrayTest extends TestCase
                     'side' => 'fries',
                 ],
             ],
+            'associative array options, associative array value with expanded setting' => [
+                true,
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+            ],
             'multidimensional array options, associative array value' => [
+                false,
                 [
                     ['key' => 'food', 'value' => 'Food'],
                     ['key' => 'drink', 'value' => 'Drink'],
@@ -387,7 +465,44 @@ class ArrayTest extends TestCase
                     'side' => 'fries',
                 ],
             ],
+            'multidimensional array options, associative array value with expanded setting' => [
+                true,
+                [
+                    ['key' => 'food', 'value' => 'Food'],
+                    ['key' => 'drink', 'value' => 'Drink'],
+                    ['key' => 'side', 'value' => 'Side'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => 'fries',
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                    ['key' => 'side', 'value' => 'fries'],
+                ],
+            ],
             'multidimensional array with numbers' => [
+                false,
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    0 => 'none',
+                    1 => 'some',
+                    2 => 'more',
+                ],
+                [
+                    0 => 'none',
+                    1 => 'some',
+                    2 => 'more',
+                ],
+            ],
+            'multidimensional array with numbers with expanded setting' => [
+                true,
                 [
                     ['key' => 0, 'value' => 'Zero'],
                     ['key' => 1, 'value' => 'One'],
@@ -405,6 +520,25 @@ class ArrayTest extends TestCase
                 ],
             ],
             'multidimensional array with non-sequential numbers' => [
+                false,
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    2 => 'some',
+                    1 => 'one',
+                    0 => 'none',
+                ],
+                [
+                    2 => 'some',
+                    1 => 'one',
+                    0 => 'none',
+                ],
+            ],
+            'multidimensional array with non-sequential numbers with expanded setting' => [
+                true,
                 [
                     ['key' => 0, 'value' => 'Zero'],
                     ['key' => 1, 'value' => 'One'],

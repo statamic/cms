@@ -34,6 +34,7 @@ class Arr extends Fieldtype
                         'display' => __('Keys'),
                         'instructions' => __('statamic::fieldtypes.array.config.keys'),
                         'type' => 'array',
+                        'expand' => true,
                         'key_header' => __('Key'),
                         'value_header' => __('Label').' ('.__('Optional').')',
                         'add_button' => __('Add Key'),
@@ -100,15 +101,7 @@ class Arr extends Fieldtype
             return null;
         }
 
-        $isMulti = false;
-        foreach (array_keys($data) as $key) {
-            if (is_numeric($key)) {
-                $isMulti = true;
-                break;
-            }
-        }
-
-        if ($isMulti) {
+        if ($this->config('expand')) {
             return collect($data)
                 ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
                 ->values()
