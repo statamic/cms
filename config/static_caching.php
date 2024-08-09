@@ -133,6 +133,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Background Re-cache
+    |--------------------------------------------------------------------------
+    |
+    | When this enabled, Statamic will re-cache URLs in the background,
+    | overwriting the existing cache, without removing it first.
+    |
+    */
+
+    'background_recache' => env('STATAMIC_BACKGROUND_RECACHE', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Shared Error Pages
     |--------------------------------------------------------------------------
     |
