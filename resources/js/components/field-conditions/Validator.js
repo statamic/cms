@@ -20,8 +20,9 @@ const NUMBER_SPECIFIC_COMPARISONS = [
 ];
 
 export default class {
-    constructor(field, values, store, storeName) {
+    constructor(field, values, store, storeName, dottedFieldPath = '') {
         this.field = field;
+        this.dottedFieldPath = dottedFieldPath;
         this.values = values;
         this.rootValues = store ? store.state.publish[storeName].values : false;
         this.store = store;
@@ -204,9 +205,23 @@ export default class {
     }
 
     getFieldValue(field) {
-        return field.startsWith('root.')
-            ?  data_get(this.rootValues, field.replace(new RegExp('^root.'), ''))
-            :  data_get(this.values, field);
+        if (field.startsWith('root.')) {
+            return data_get(this.rootValues, field.replace(new RegExp('^root.'), ''));
+        }
+
+        if (field.startsWith('parent.')) {
+            const fieldHandle = field.replace(new RegExp('^parent.'), '');
+            // Regex for fields like replicators, where the path ends with `parent_field_handle.0.field_handle`.
+            let regex = new RegExp('.[^\.]+\.[0-9]+\.[^\.]*$');
+            if (this.dottedFieldPath.match(regex)) {
+                return data_get(this.rootValues, `${this.dottedFieldPath.replace(regex, '')}.${fieldHandle}`);
+            }
+
+            // We dont’t have a regex field or similar, so the end of the field path looks like `parent_field_handle.field_handle`.
+            return data_get(this.rootValues, `${this.dottedFieldPath.replace(new RegExp('.[^\.]+\.[^\.]*$'), '')}.${fieldHandle}`);
+        }
+
+        return data_get(this.values, field);
     }
 
     passesCondition(condition) {
