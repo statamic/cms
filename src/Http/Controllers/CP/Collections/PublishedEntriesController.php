@@ -15,13 +15,14 @@ class PublishedEntriesController extends CpController
     {
         $this->authorize('publish', $entry);
 
-        $publish = $entry->publish([
+        $entry = $entry->publish([
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
         ]);
 
-        $saved = is_object($publish);
-        $entry = $saved ? $publish : $entry;
+        if ($entry === false) {
+            return ['saved' => false];
+        }
 
         $blueprint = $entry->blueprint();
 
@@ -31,7 +32,6 @@ class PublishedEntriesController extends CpController
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
             ]),
-            'saved' => $saved,
         ];
     }
 
@@ -39,13 +39,14 @@ class PublishedEntriesController extends CpController
     {
         $this->authorize('publish', $entry);
 
-        $unpublish = $entry->unpublish([
+        $entry = $entry->unpublish([
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
         ]);
 
-        $saved = is_object($unpublish);
-        $entry = $saved ? $unpublish : $entry;
+        if ($entry === false) {
+            return ['saved' => false];
+        }
 
         $blueprint = $entry->blueprint();
 
@@ -55,7 +56,6 @@ class PublishedEntriesController extends CpController
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
             ]),
-            'saved' => $saved,
         ];
     }
 }
