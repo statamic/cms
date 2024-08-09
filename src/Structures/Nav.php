@@ -22,6 +22,7 @@ class Nav extends Structure implements Contract
     use ExistsAsFile;
 
     protected $collections;
+    protected $canSelectAcrossSites = false;
     private $blueprintCache;
 
     public function save()
@@ -59,6 +60,7 @@ class Nav extends Structure implements Contract
         return [
             'title' => $this->title,
             'collections' => $this->collections,
+            'select_across_sites' => $this->canSelectAcrossSites ? true : null,
             'max_depth' => $this->maxDepth,
             'root' => $this->expectsRoot ?: null,
         ];
@@ -138,5 +140,12 @@ class Nav extends Structure implements Contract
         NavBlueprintFound::dispatch($blueprint, $this);
 
         return $blueprint;
+    }
+
+    public function canSelectAcrossSites($canSelect = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('canSelectAcrossSites')
+            ->args(func_get_args());
     }
 }

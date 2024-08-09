@@ -8,6 +8,7 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Contracts\Forms\SubmissionQueryBuilder;
+use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormCreated;
@@ -29,7 +30,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Form implements Arrayable, Augmentable, FormContract
 {
-    use FluentlyGetsAndSets, HasAugmentedInstance;
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance;
 
     protected $handle;
     protected $title;
@@ -40,6 +41,11 @@ class Form implements Arrayable, Augmentable, FormContract
     protected $metrics;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+
+    public function __construct()
+    {
+        $this->data = collect();
+    }
 
     /**
      * Get or set the handle.
@@ -186,7 +192,7 @@ class Form implements Arrayable, Augmentable, FormContract
             }
         }
 
-        $data = collect([
+        $data = $this->data->merge(collect([
             'title' => $this->title,
             'honeypot' => $this->honeypot,
             'email' => collect(isset($this->email['to']) ? [$this->email] : $this->email)->map(function ($email) {
@@ -196,7 +202,7 @@ class Form implements Arrayable, Augmentable, FormContract
                 return Arr::removeNullValues($email);
             })->all(),
             'metrics' => $this->metrics,
-        ])->filter()->all();
+        ]))->filter()->all();
 
         if ($this->store === false) {
             $data['store'] = false;
@@ -254,14 +260,20 @@ class Form implements Arrayable, Augmentable, FormContract
      */
     public function hydrate()
     {
-        collect(YAML::parse(File::get($this->path())))
-            ->filter(function ($value, $property) {
-                return in_array($property, [
-                    'title',
-                    'honeypot',
-                    'store',
-                    'email',
-                ]);
+        $contents = YAML::parse(File::get($this->path()));
+
+        $methods = [
+            'title',
+            'honeypot',
+            'store',
+            'email',
+        ];
+
+        $this->merge(collect($contents)->except($methods));
+
+        collect($contents)
+            ->filter(function ($value, $property) use ($methods) {
+                return in_array($property, $methods);
             })
             ->each(function ($value, $property) {
                 $this->{$property}($value);
