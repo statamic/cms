@@ -22,6 +22,7 @@ class Select extends Fieldtype
                         'display' => __('Options'),
                         'instructions' => __('statamic::fieldtypes.select.config.options'),
                         'type' => 'array',
+                        'expand' => true,
                         'key_header' => __('Key'),
                         'value_header' => __('Label').' ('.__('Optional').')',
                         'add_button' => __('Add Option'),

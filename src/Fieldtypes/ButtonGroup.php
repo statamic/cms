@@ -21,6 +21,7 @@ class ButtonGroup extends Fieldtype
                         'display' => __('Options'),
                         'instructions' => __('statamic::fieldtypes.radio.config.options'),
                         'type' => 'array',
+                        'expand' => true,
                         'value_header' => __('Label').' ('.__('Optional').')',
                         'add_button' => __('Add Option'),
                         'validate' => [function ($attribute, $value, $fail) {
