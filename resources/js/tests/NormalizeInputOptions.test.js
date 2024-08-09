@@ -45,3 +45,13 @@ it('normalizes input options with object', () => {
         {value: 'two', label: 'Two'}
     ]);
 });
+
+it('normalizes input options with array of objects', () => {
+    expect(normalizeInputOptions([
+        {value: 'one', label: 'One'},
+        {value: 'two', label: 'Two'}
+    ])).toEqual([
+        {value: 'one', label: 'Uno'},
+        {value: 'two', label: 'Two'}
+    ]);
+});
