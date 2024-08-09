@@ -96,7 +96,7 @@ export default {
 
     computed: {
         selectedOptions() {
-            let selections = this.value || [];
+            let selections = this.value === null ? [] : this.value;
             if (typeof selections === 'string' || typeof selections === 'number') {
                 selections = [selections];
             }
