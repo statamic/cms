@@ -51,7 +51,7 @@ class InstallCollaboration extends Command
         }
 
         $this->enableBroadcasting();
-        $this->updateBroadcastingKeysInEnvironmentFiles();
+        $this->warnAboutLegacyBroadcastDriverKey();
         $this->installBroadcastingDriver();
     }
 
@@ -85,31 +85,14 @@ class InstallCollaboration extends Command
         $this->components->info('Broadcasting enabled successfully.');
     }
 
-    protected function updateBroadcastingKeysInEnvironmentFiles(): void
+    protected function warnAboutLegacyBroadcastDriverKey(): void
     {
         if (version_compare(app()->version(), '11', '<')) {
             return;
         }
 
-        $environmentFiles = [
-            app()->environmentFile(),
-            app()->environmentFile('.env.example'),
-        ];
-
-        foreach ($environmentFiles as $file) {
-            if (File::missing($file)) {
-                continue;
-            }
-
-            if (Str::contains($contents = File::get($file), 'BROADCAST_DRIVER')) {
-                $contents = Str::of($contents)
-                    ->replace('BROADCAST_DRIVER', 'BROADCAST_CONNECTION')
-                    ->__toString();
-
-                File::put($file, $contents);
-
-                $this->components->warn("Laravel expects the BROADCAST_CONNECTION key in your .env file. You were using the legacy BROADCAST_DRIVER key. We've updated it for you. Remember to update the .env file on any servers you might have.");
-            }
+        if (Str::contains(File::get(app()->environmentFile()), 'BROADCAST_DRIVER')) {
+            $this->components->warn('The BROADCAST_DRIVER environment variable has been renamed to BROADCAST_CONNECTION in Laravel 11. You should update your .env file.');
         }
     }
 
