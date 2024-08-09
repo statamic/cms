@@ -136,6 +136,9 @@ class TaxonomiesController extends CpController
             'collections' => $taxonomy->collections()->map->handle()->all(),
             'sites' => $taxonomy->sites()->all(),
             'preview_targets' => $taxonomy->basePreviewTargets(),
+            'routes' => $taxonomy->routes()->unique()->count() === 1
+                ? $taxonomy->routes()->first()
+                : $taxonomy->routes()->all(),
             'term_template' => $taxonomy->hasCustomTermTemplate() ? $taxonomy->termTemplate() : null,
             'template' => $taxonomy->hasCustomTemplate() ? $taxonomy->template() : null,
             'layout' => $taxonomy->layout(),
@@ -169,6 +172,7 @@ class TaxonomiesController extends CpController
         $taxonomy
             ->title($values['title'])
             ->previewTargets($values['preview_targets'])
+            ->routes($values['routes'])
             ->termTemplate($values['term_template'] ?? null)
             ->template($values['template'] ?? null)
             ->layout($values['layout'] ?? null);
@@ -285,6 +289,11 @@ class TaxonomiesController extends CpController
             'routing' => [
                 'display' => __('Routing & URLs'),
                 'fields' => [
+                    'routes' => [
+                        'display' => __('Route'),
+                        'instructions' => __('statamic::messages.taxonomies_route_instructions'),
+                        'type' => 'collection_routes',
+                    ],
                     'preview_targets' => [
                         'display' => __('Preview Targets'),
                         'instructions' => __('statamic::messages.taxonomies_preview_targets_instructions'),
