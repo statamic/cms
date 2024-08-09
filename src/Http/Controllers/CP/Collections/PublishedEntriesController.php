@@ -15,34 +15,13 @@ class PublishedEntriesController extends CpController
     {
         $this->authorize('publish', $entry);
 
-        return $this->performAction($entry, 'publish', [
+        $publish = $entry->publish([
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
         ]);
-    }
 
-    public function destroy(Request $request, $collection, $entry)
-    {
-        $this->authorize('publish', $entry);
-
-        return $this->performAction($entry, 'unpublish', [
-            'message' => $request->message,
-            'user' => User::fromUser($request->user()),
-        ]);
-    }
-
-    protected function performAction($entry, string $action, array $options)
-    {
-        if (! method_exists($entry, $action)) {
-            return;
-        }
-
-        $entrySaved = $entry->$action($options);
-
-        if ($entrySaved) {
-            $entry = $entrySaved;
-            $entrySaved = true;
-        }
+        $saved = is_object($publish);
+        $entry = $saved ? $publish : $entry;
 
         $blueprint = $entry->blueprint();
 
@@ -52,6 +31,31 @@ class PublishedEntriesController extends CpController
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
             ]),
+            'saved' => $saved,
+        ];
+    }
+
+    public function destroy(Request $request, $collection, $entry)
+    {
+        $this->authorize('publish', $entry);
+
+        $unpublish = $entry->unpublish([
+            'message' => $request->message,
+            'user' => User::fromUser($request->user()),
+        ]);
+
+        $saved = is_object($unpublish);
+        $entry = $saved ? $unpublish : $entry;
+
+        $blueprint = $entry->blueprint();
+
+        [$values] = $this->extractFromFields($entry, $blueprint);
+
+        return [
+            'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
+                'values' => $values,
+            ]),
+            'saved' => $saved,
         ];
     }
 }
