@@ -192,8 +192,7 @@ export default {
 
             this.$axios.post(this.actions.unpublish, { data: payload }).then(response => {
                 if (! response.data.saved) {
-                    this.$emit('saved', { published: true, isWorkingCopy: false, response });
-
+                    this.$emit('failed');
                     return this.$toast.error(__(`Couldn't unpublish entry`));
                 }
 
