@@ -195,6 +195,8 @@ export default {
         reorderUrl: { type: String, required: true },
         initialSite: { type: String, required: true },
         sites: { type: Array },
+        totalSitesCount: { type: Number },
+        canChangeLocalizationDeleteBehavior: { type: Boolean },
         structurePagesUrl: { type: String },
         structureSubmitUrl: { type: String },
         structureMaxDepth: { type: Number, default: Infinity },
@@ -276,9 +278,17 @@ export default {
         },
 
         saveTree() {
-            if (this.sites.length === 1 || this.deletedEntries.length === 0) {
+            if (this.deletedEntries.length === 0) {
                 this.performTreeSaving();
                 return;
+            }
+
+            // When the user doesn't have permission to access the sites the entry is localized in,
+            // we should use the "copy" behavior to detach the entry from the site.
+            if (! this.canChangeLocalizationDeleteBehavior) {
+                this.deleteLocalizationBehavior = 'copy';
+                this.$nextTick(() => this.performTreeSaving());
+                return
             }
 
             this.showLocalizationDeleteBehaviorConfirmation = true;

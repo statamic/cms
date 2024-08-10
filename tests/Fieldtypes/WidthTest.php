@@ -3,16 +3,16 @@
 namespace Tests\Fieldtypes;
 
 use Statamic\Fields\Field;
-use Statamic\Fieldtypes\Checkboxes;
+use Statamic\Fieldtypes\Width;
 use Tests\TestCase;
 
-class CheckboxesTest extends TestCase
+class WidthTest extends TestCase
 {
-    use CastsMultipleBooleansTests, HasSelectOptionsTests, MultipleLabeledValueTests;
+    use HasSelectOptionsTests;
 
     private function field($config)
     {
-        $ft = new Checkboxes;
+        $ft = new Width;
 
         return $ft->setField(new Field('test', array_merge($config, ['type' => $ft->handle()])));
     }

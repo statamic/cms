@@ -24,6 +24,7 @@
                 v-if="showFilename"
                 @click="editOrOpen"
                 class="flex items-center flex-1 ms-3 text-xs text-start truncate w-full"
+                :title="__('Edit')"
                 :aria-label="__('Edit Asset')"
             >
                 {{ asset.basename }}
@@ -43,6 +44,7 @@
             <button
                 class="flex items-center p-1 w-6 h-8 text-lg antialiased text-gray-600 dark:text-dark-150 hover:text-gray-900 dark:hover:text-dark-100"
                 @click="remove"
+                :title="__('Remove')"
                 :aria-label="__('Remove Asset')"
             >
                 ×
