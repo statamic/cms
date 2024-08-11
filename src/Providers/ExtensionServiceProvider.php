@@ -247,18 +247,12 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\MigrateSitesConfigToYaml::class,
     ];
 
-    protected $thumbnailGenerators = [
-        Thumbnails\ImageThumbnailGenerator::class,
-        Thumbnails\SvgThumbnailGenerator::class,
-    ];
-
     public function register()
     {
         $this->registerExtensions();
         $this->registerAddonManifest();
         $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
-        $this->registerThumbnailGenerators();
         $this->app->instance('statamic.hooks', collect());
     }
 
@@ -383,19 +377,6 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->updateScripts as $class) {
             $class::register(Statamic::PACKAGE);
-        }
-    }
-
-    protected function registerThumbnailGenerators()
-    {
-        $this->app->instance('statamic.thumbnail-generators', collect());
-
-        // User defined generators take precedence over core generators
-        $generators = collect(config('statamic.cp.thumbnail_generators', []))
-            ->merge($this->thumbnailGenerators);
-
-        foreach ($generators as $class) {
-            $class::register();
         }
     }
 }
