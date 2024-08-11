@@ -4,6 +4,7 @@ namespace Statamic\Assets\Thumbnails;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Assets\ThumbnailGenerator;
 
 class ThumbnailService
 {
@@ -40,7 +41,7 @@ class ThumbnailService
     {
         $instance = static::$generatorInstances[$class] ?? new $class();
         if (! $instance instanceof ThumbnailGenerator) {
-            throw new \Exception("Thumbnail generator must extend [Statamic\Assets\Thumbnails\ThumbnailGenerator]!");
+            throw new \Exception('Thumbnail generator must implement [Statamic\Contracts\Assets\ThumbnailGenerator]!');
         }
 
         return static::$generatorInstances[$class] = $instance;

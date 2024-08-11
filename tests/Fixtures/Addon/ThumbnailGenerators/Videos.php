@@ -2,10 +2,10 @@
 
 namespace Tests\Fixtures\Addon\ThumbnailGenerators;
 
-use Statamic\Assets\Thumbnails\ThumbnailGenerator;
 use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Assets\ThumbnailGenerator;
 
-class Videos extends ThumbnailGenerator
+class Videos implements ThumbnailGenerator
 {
     public function accepts(Asset $asset): bool
     {

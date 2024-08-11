@@ -3,8 +3,9 @@
 namespace Statamic\Assets\Thumbnails;
 
 use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Assets\ThumbnailGenerator;
 
-class ImageThumbnailGenerator extends ThumbnailGenerator
+class ImageThumbnailGenerator implements ThumbnailGenerator
 {
     public function accepts(Asset $asset): bool
     {
