@@ -2,10 +2,10 @@
 
 namespace Tests\Assets;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Assets\Thumbnails\ThumbnailService;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Fixtures\Addon\ThumbnailGenerators;
 use Tests\TestCase;
 
