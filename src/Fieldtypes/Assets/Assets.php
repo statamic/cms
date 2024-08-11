@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Support\Collection;
 use Statamic\Assets\OrderedQueryBuilder;
+use Statamic\Assets\Thumbnails\ThumbnailService;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -262,18 +263,12 @@ class Assets extends Fieldtype
         return $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
-                'is_image' => $isImage = $asset->isImage(),
+                'is_image' => $asset->isImage(),
                 'is_svg' => $asset->isSvg(),
                 'extension' => $asset->extension(),
                 'url' => $asset->url(),
+                'thumbnail' => ThumbnailService::generate($asset, ['preset' => 'small']),
             ];
-
-            if ($isImage) {
-                $arr['thumbnail'] = cp_route('assets.thumbnails.show', [
-                    'encoded_asset' => base64_encode($asset->id()),
-                    'size' => 'small',
-                ]);
-            }
 
             return $arr;
         });
