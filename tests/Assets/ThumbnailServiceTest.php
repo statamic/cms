@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Assets\Thumbnails\ThumbnailService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Fixtures\Addon\ThumbnailGenerators;
 use Tests\TestCase;
 
@@ -31,153 +32,51 @@ class ThumbnailServiceTest extends TestCase
             'url' => null,
         ]]);
 
-        $this->service = new ThumbnailService();
+        // Register custom thumbnail generators from data provider
+        $arguments = $this->providedData();
+        if (is_array($arguments[0] ?? null)) {
+            config(['statamic.cp.thumbnail_generators' => $arguments[0]]);
+        }
     }
 
-    public function testJpeg()
+    #[DataProvider('thumbnailAssetProvider')]
+    public function testThumbnailUrls($generators, $asset, $expected)
     {
-        $asset = $this->createAsset('foo.jpg');
-
-        $encoded = base64_encode($asset->id());
-
         $this->assertEquals(
+            $expected,
             ThumbnailService::generate($asset),
-            "http://localhost/cp/thumbnails/$encoded"
+            "Wrong thumbnail URL for asset {$asset->basename()}"
         );
     }
 
-    public function testPng()
+    public static function thumbnailAssetProvider()
     {
-        $asset = $this->createAsset('foo.png');
+        $txt = static::createAsset('foo.txt');
+        $jpg = static::createAsset('foo.jpg');
+        $png = static::createAsset('foo.png');
+        $svg = static::createAsset('foo.svg');
+        $privateSvg = static::createAsset('foo.svg', 'private');
+        $pdf = static::createAsset('foo.pdf');
+        $video = static::createAsset('foo.mp4');
 
-        $encoded = base64_encode($asset->id());
+        return [
+            [[], $txt, null],
+            [[], $jpg, 'http://localhost/cp/thumbnails/'.base64_encode($jpg->id())],
+            [[], $png, 'http://localhost/cp/thumbnails/'.base64_encode($png->id())],
+            [[], $svg, '/the-url/img/foo.svg'],
+            [[], $privateSvg, 'http://localhost/cp/svgs/'.base64_encode($privateSvg->id())],
+            [[], $pdf, null],
+            [[], $video, null],
 
-        $this->assertEquals(
-            ThumbnailService::generate($asset),
-            "http://localhost/cp/thumbnails/$encoded"
-        );
+            [[ThumbnailGenerators\Random::class], $video, 'https://picsum.photos/200/300'],
+            [[ThumbnailGenerators\Random::class], $jpg, 'https://picsum.photos/200/300'],
+
+            [[ThumbnailGenerators\Videos::class], $video, '/custom/video/thumb/'.base64_encode($video->id())],
+            [[ThumbnailGenerators\Videos::class], $jpg, 'http://localhost/cp/thumbnails/'.base64_encode($jpg->id())],
+        ];
     }
 
-    public function testPublicSvg()
-    {
-        $asset = $this->createAsset('foo.svg');
-
-        $this->assertEquals(
-            ThumbnailService::generate($asset),
-            '/the-url/img/foo.svg'
-        );
-    }
-
-    public function testPrivateSvg()
-    {
-        $asset = $this->createAsset('foo.svg', 'private');
-
-        $encoded = base64_encode($asset->id());
-
-        $this->assertEquals(
-            ThumbnailService::generate($asset),
-            "http://localhost/cp/svgs/$encoded"
-        );
-    }
-
-    public function testTxt()
-    {
-        $asset = $this->createAsset('foo.txt');
-
-        $this->assertEquals(
-            ThumbnailService::generate($asset),
-            null
-        );
-    }
-
-    public function testPdf()
-    {
-        $asset = $this->createAsset('foo.pdf');
-
-        $this->assertEquals(
-            ThumbnailService::generate($asset),
-            null
-        );
-    }
-
-    public function testWithoutCustomGenerator()
-    {
-        $text = $this->createAsset('foo.txt');
-        $video = $this->createAsset('foo.mp4');
-        $image = $this->createAsset('foo.jpg');
-
-        $this->assertEquals(
-            ThumbnailService::generate($text),
-            null
-        );
-
-        $this->assertEquals(
-            ThumbnailService::generate($video),
-            null
-        );
-
-        $encoded = base64_encode($image->id());
-
-        $this->assertEquals(
-            ThumbnailService::generate($image),
-            "http://localhost/cp/thumbnails/$encoded"
-        );
-    }
-
-    public function testCustomVideoGenerator()
-    {
-        ThumbnailGenerators\Videos::register();
-
-        $text = $this->createAsset('foo.txt');
-        $video = $this->createAsset('foo.mp4');
-        $image = $this->createAsset('foo.jpg');
-
-        $this->assertEquals(
-            ThumbnailService::generate($text),
-            null
-        );
-
-        $encoded = base64_encode($video->id());
-
-        $this->assertEquals(
-            ThumbnailService::generate($video),
-            "/custom/video/thumb/$encoded"
-        );
-
-        $encoded = base64_encode($image->id());
-
-        $this->assertEquals(
-            ThumbnailService::generate($image),
-            "http://localhost/cp/thumbnails/$encoded"
-        );
-    }
-
-    public function testCustomRandomGenerator()
-    {
-
-        ThumbnailGenerators\Random::register();
-
-        $text = $this->createAsset('foo.txt');
-        $video = $this->createAsset('foo.mp4');
-        $image = $this->createAsset('foo.jpg');
-
-        $this->assertEquals(
-            ThumbnailService::generate($text),
-            'https://picsum.photos/200/300'
-        );
-
-        $this->assertEquals(
-            ThumbnailService::generate($video),
-            'https://picsum.photos/200/300'
-        );
-
-        $this->assertEquals(
-            ThumbnailService::generate($image),
-            'https://picsum.photos/200/300'
-        );
-    }
-
-    protected function createAsset(string $filename, string $disk = 'public')
+    protected static function createAsset(string $filename, string $disk = 'public')
     {
         $container = (new AssetContainer)->handle('main')->disk($disk);
         $asset = new Asset;
