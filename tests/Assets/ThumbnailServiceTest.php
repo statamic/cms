@@ -49,6 +49,19 @@ class ThumbnailServiceTest extends TestCase
         );
     }
 
+    public function testInterface()
+    {
+        config(['statamic.cp.thumbnail_generators' => [
+            ThumbnailGenerators\MissingInterface::class
+        ]]);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Thumbnail generator must implement [Statamic\Contracts\Assets\ThumbnailGenerator]!');
+
+        $asset = static::createAsset('foo.txt');
+        ThumbnailService::generator($asset);
+    }
+
     public static function thumbnailAssetProvider()
     {
         $txt = static::createAsset('foo.txt');
