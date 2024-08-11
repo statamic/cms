@@ -6,7 +6,6 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
-use Statamic\Assets\Thumbnails;
 use Statamic\Dictionaries;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Extend\Manifest;

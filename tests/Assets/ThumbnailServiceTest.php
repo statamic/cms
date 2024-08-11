@@ -52,7 +52,7 @@ class ThumbnailServiceTest extends TestCase
     public function testInterface()
     {
         config(['statamic.cp.thumbnail_generators' => [
-            ThumbnailGenerators\MissingInterface::class
+            ThumbnailGenerators\MissingInterface::class,
         ]]);
 
         $this->expectException(\Exception::class);
