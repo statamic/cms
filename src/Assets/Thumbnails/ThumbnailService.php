@@ -20,7 +20,6 @@ class ThumbnailService
     protected static function findGenerator(Asset $asset): ?ThumbnailGenerator
     {
         return app('statamic.thumbnail-generators')
-            ->reverse()
             ->map(fn ($class) => static::makeGenerator($class))
             ->first(fn ($generator) => $generator->accepts($asset));
     }

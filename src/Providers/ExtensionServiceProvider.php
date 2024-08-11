@@ -390,8 +390,9 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->app->instance('statamic.thumbnail-generators', collect());
 
-        $generators = collect($this->thumbnailGenerators)
-            ->merge(config('statamic.cp.thumbnail_generators', []));
+        // User defined generators take precedence over core generators
+        $generators = collect(config('statamic.cp.thumbnail_generators', []))
+            ->merge($this->thumbnailGenerators);
 
         foreach ($generators as $class) {
             $class::register();
