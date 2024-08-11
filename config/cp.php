@@ -147,7 +147,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Thumbnails
+    | Thumbnail Presets
     |--------------------------------------------------------------------------
     |
     | Here you may define additional CP asset thumbnail presets.
@@ -156,5 +156,20 @@ return [
 
     'thumbnail_presets' => [
         // 'medium' => 800,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Thumbnail Generators
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will generate thumbnails for most image types. If you wish to
+    | generate thumbnails for other file types like videos or PDFs, you may
+    | register custom thumbnail generators here.
+    |
+    */
+
+    'thumbnail_generators' => [
+        // \App\Thumbnails\VideoThumbnailGenerator::class,
     ],
 ];
