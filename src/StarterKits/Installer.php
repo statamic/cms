@@ -297,8 +297,8 @@ final class Installer
         $this->modules = collect(['top_level' => $topLevelConfig])
             ->merge($nestedConfigs)
             ->map(fn ($config, $key) => $this->instantiateModule($config, $key))
-            ->filter()
             ->flatten()
+            ->filter()
             ->each(fn ($module) => $module->validate());
 
         return $this;
