@@ -322,7 +322,9 @@ final class Installer
             $shouldPrompt = false;
         }
 
-        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$key}] module?"), false)) {
+        $name = str_replace('_', ' ', $key);
+
+        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the {$name} module?"), false)) {
             return false;
         } elseif ($shouldPrompt && ! $this->isInteractive) {
             return false;
@@ -341,8 +343,10 @@ final class Installer
             ->prepend(Arr::get($config, 'skip_option', 'No'), $skipModule = 'skip_module')
             ->all();
 
+        $name = str_replace('_', ' ', $key);
+
         $choice = select(
-            label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$key}] modules?"),
+            label: Arr::get($config, 'prompt', "Would you like to install one of the following {$name} modules?"),
             options: $options,
         );
 
