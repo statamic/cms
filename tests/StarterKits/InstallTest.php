@@ -1029,6 +1029,23 @@ EOT;
     }
 
     #[Test]
+    public function it_requires_valid_config_at_top_level()
+    {
+        $this->setConfig([
+            // no installable config!
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this
+            ->installCoolRunnings()
+            ->expectsOutput('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`!')
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    #[Test]
     public function it_requires_valid_module_config()
     {
         $this->setConfig([
@@ -1044,21 +1061,26 @@ EOT;
 
         $this
             ->installCoolRunnings()
-            ->expectsOutput('Starter-kit module is missing `export_paths` or `dependencies`!')
+            ->expectsOutput('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`!')
             ->assertFailed();
 
         $this->assertFileDoesNotExist(base_path('copied.md'));
     }
 
     #[Test]
-    public function it_doesnt_require_anything_installable_in_top_level_if_user_wants_to_organize_using_modules_only()
+    public function it_doesnt_require_anything_installable_if_module_contains_nested_modules()
     {
         $this->setConfig([
             'modules' => [
                 'seo' => [
                     'prompt' => false,
-                    'export_paths' => [
-                        'copied.md',
+                    'modules' => [
+                        'js' => [
+                            'prompt' => false,
+                            'export_paths' => [
+                                'copied.md',
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -1075,7 +1097,7 @@ EOT;
 
     #[Test]
     #[DataProvider('validModuleConfigs')]
-    public function it_passes_validation_if_module_export_paths_or_dependencies_are_properly_configured($config)
+    public function it_passes_validation_if_module_export_paths_or_dependencies_or_nested_modules_are_properly_configured($config)
     {
         $this->setConfig([
             'modules' => [
@@ -1109,6 +1131,15 @@ EOT;
             'dev dependencies' => [[
                 'dependencies_dev' => [
                     'statamic/seo-pro' => '^1.0',
+                ],
+            ]],
+            'nested modules' => [[
+                'modules' => [
+                    'js' => [
+                        'export_paths' => [
+                            'resources/js/vue.js',
+                        ],
+                    ],
                 ],
             ]],
         ];
