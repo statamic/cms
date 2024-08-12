@@ -339,7 +339,7 @@ final class Installer
     protected function instantiateOptionsModule(array $config, string $key): InstallableModule|bool
     {
         $options = collect($config['options'])
-            ->map(fn ($option, $key) => Arr::get($option, 'label', ucfirst($key)))
+            ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
             ->prepend(Arr::get($config, 'skip_option', 'No'), $skipModule = 'skip_module')
             ->all();
 
