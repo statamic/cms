@@ -331,11 +331,7 @@ final class Installer
             return false;
         }
 
-        if ($key !== 'top_level' && Arr::has($config, 'modules')) {
-            return $this->instantiateNestedModules($config['modules'], $key);
-        }
-
-        return (new InstallableModule($config, $key))->installer($this);
+        return $this->instantiateRecursively($config, $key);
     }
 
     /**
@@ -362,26 +358,29 @@ final class Installer
         $selectedKey = "{$key}_{$choice}";
         $selectedModuleConfig = $config['options'][$choice];
 
-        if ($key !== 'top_level' && Arr::has($selectedModuleConfig, 'modules')) {
-            return $this->instantiateNestedModules($selectedModuleConfig['modules'], $selectedKey);
-        }
-
-        return (new InstallableModule($selectedModuleConfig, $selectedKey))->installer($this);
+        return $this->instantiateRecursively($selectedModuleConfig, $selectedKey);
     }
 
     /**
-     * Instantiate nested modules.
+     * Instantiate module and check if nested modules should be recursively instantiated.
      */
-    protected function instantiateNestedModules(array $modules, string $key): array|bool
+    protected function instantiateRecursively(array $config, string $key): InstallableModule|array
     {
-        if ($key === 'top_level') {
-            return false;
+        $instantiated = (new InstallableModule($config, $key))->installer($this);
+
+        if ($instantiated->isTopLevelModule()) {
+            return $instantiated;
         }
 
-        return collect($modules)
-            ->map(fn ($config, $childKey) => $this->instantiateModule($config, "{$key}_{$childKey}"))
-            ->filter()
-            ->all();
+        if ($modules = Arr::get($config, 'modules')) {
+            $instantiated = collect($modules)
+                ->map(fn ($config, $childKey) => $this->instantiateModule($config, "{$key}_{$childKey}"))
+                ->prepend($instantiated, $key)
+                ->filter()
+                ->all();
+        }
+
+        return $instantiated;
     }
 
     /**
