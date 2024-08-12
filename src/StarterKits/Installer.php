@@ -298,6 +298,7 @@ final class Installer
             ->merge($nestedConfigs)
             ->map(fn ($config, $key) => $this->instantiateModule($config, $key))
             ->filter()
+            ->flatten()
             ->each(fn ($module) => $module->validate());
 
         return $this;
@@ -306,7 +307,7 @@ final class Installer
     /**
      * Instantiate individual module.
      */
-    protected function instantiateModule(array $config, string $key): InstallableModule|bool
+    protected function instantiateModule(array $config, string $key): InstallableModule|array|bool
     {
         $shouldPrompt = true;
 
@@ -330,13 +331,17 @@ final class Installer
             return false;
         }
 
+        if ($key !== 'top_level' && Arr::has($config, 'modules')) {
+            return $this->instantiateNestedModules($config['modules'], $key);
+        }
+
         return (new InstallableModule($config, $key))->installer($this);
     }
 
     /**
      * Instantiate options module.
      */
-    protected function instantiateOptionsModule(array $config, string $key): InstallableModule|bool
+    protected function instantiateOptionsModule(array $config, string $key): InstallableModule|array|bool
     {
         $options = collect($config['options'])
             ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
@@ -354,7 +359,29 @@ final class Installer
             return false;
         }
 
-        return (new InstallableModule($config['options'][$choice], "{$key}_{$choice}"))->installer($this);
+        $selectedKey = "{$key}_{$choice}";
+        $selectedModuleConfig = $config['options'][$choice];
+
+        if ($key !== 'top_level' && Arr::has($selectedModuleConfig, 'modules')) {
+            return $this->instantiateNestedModules($selectedModuleConfig['modules'], $selectedKey);
+        }
+
+        return (new InstallableModule($selectedModuleConfig, $selectedKey))->installer($this);
+    }
+
+    /**
+     * Instantiate nested modules.
+     */
+    protected function instantiateNestedModules(array $modules, string $key): array|bool
+    {
+        if ($key === 'top_level') {
+            return false;
+        }
+
+        return collect($modules)
+            ->map(fn ($config, $childKey) => $this->instantiateModule($config, "{$key}_{$childKey}"))
+            ->filter()
+            ->all();
     }
 
     /**
