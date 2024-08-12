@@ -907,7 +907,7 @@ EOT
                     ],
                 ],
             ]],
-            'options module export' => [[
+            'select module export' => [[
                 'modules' => [
                     'js' => [
                         'options' => [
@@ -920,7 +920,7 @@ EOT
                     ],
                 ],
             ]],
-            'options module export as from' => [[
+            'select module export as from' => [[
                 'modules' => [
                     'js' => [
                         'options' => [
@@ -979,7 +979,7 @@ EOT
                     ],
                 ],
             ]],
-            'options module dependencies' => [[
+            'select module dependencies' => [[
                 'modules' => [
                     'js' => [
                         'options' => [
@@ -992,7 +992,7 @@ EOT
                     ],
                 ],
             ]],
-            'options module dev dependencies' => [[
+            'select module dev dependencies' => [[
                 'modules' => [
                     'js' => [
                         'options' => [
@@ -1065,7 +1065,7 @@ EOT
                     ],
                 ],
             ]],
-            'options module export' => [[
+            'select module export' => [[
                 'modules' => [
                     'js' => [
                         'options' => [
@@ -1078,7 +1078,7 @@ EOT
                     ],
                 ],
             ]],
-            'options module export as from' => [[
+            'select module export as from' => [[
                 'modules' => [
                     'js' => [
                         'options' => [
@@ -1091,7 +1091,7 @@ EOT
                     ],
                 ],
             ]],
-            'options module export as to' => [[
+            'select module export as to' => [[
                 'modules' => [
                     'js' => [
                         'options' => [

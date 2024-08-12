@@ -316,7 +316,7 @@ final class Installer
         }
 
         if (Arr::has($config, 'options')) {
-            return $this->instantiateOptionsModule($config, $key);
+            return $this->instantiateSelectModule($config, $key);
         }
 
         if (Arr::get($config, 'prompt') === false) {
@@ -335,9 +335,9 @@ final class Installer
     }
 
     /**
-     * Instantiate options module.
+     * Instantiate select module.
      */
-    protected function instantiateOptionsModule(array $config, string $key): InstallableModule|array|bool
+    protected function instantiateSelectModule(array $config, string $key): InstallableModule|array|bool
     {
         $options = collect($config['options'])
             ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
