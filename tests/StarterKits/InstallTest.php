@@ -1114,6 +1114,207 @@ EOT;
         ];
     }
 
+    #[Test]
+    public function it_installs_nested_modules_with_prompt_false_config_by_default_when_running_non_interactively()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'canada' => [
+                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                    'export_paths' => [
+                        'resources/css/hockey.css',
+                    ],
+                    'modules' => [
+                        'hockey_players' => [
+                            'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                            'export_paths' => [
+                                'resources/dictionaries/players.yaml',
+                            ],
+                            'dependencies' => [
+                                'nhl/hockey-league' => '*',
+                            ],
+                            'modules' => [
+                                'hockey_night_in_usa' => [
+                                    'export_paths' => [
+                                        'resources/dictionaries/american_players.yaml',
+                                    ],
+                                ],
+                                'hockey_night_in_canada' => [
+                                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                                    'export_paths' => [
+                                        'resources/dictionaries/canadian_players.yaml',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
+        $this->assertComposerJsonDoesntHave('nhl/hockey-league');
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/american_players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/canadian_players.yaml'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/hockey.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'nhl/hockey-league', '*');
+        $this->assertFileExists(base_path('resources/dictionaries/players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/american_players.yaml'));
+        $this->assertFileExists(base_path('resources/dictionaries/canadian_players.yaml'));
+    }
+
+    #[Test]
+    public function it_installs_nested_modules_confirmed_interactively_via_prompt()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'seo' => [
+                    'export_paths' => [
+                        'resources/css/seo.css',
+                    ],
+                    'dependencies' => [
+                        'statamic/seo-pro' => '^0.2.0',
+                    ],
+                    'modules' => [
+                        'js' => [
+                            'options' => [
+                                'react' => [
+                                    'export_paths' => [
+                                        'resources/js/react.js',
+                                    ],
+                                    'modules' => [
+                                        'testing_tools' => [
+                                            'export_paths' => [
+                                                'resources/js/react-testing-tools.js',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'vue' => [
+                                    'export_paths' => [
+                                        'resources/js/vue.js',
+                                    ],
+                                    'dependencies_dev' => [
+                                        'i-love-vue/test-helpers' => '^1.5',
+                                    ],
+                                    'modules' => [
+                                        'testing_tools' => [
+                                            'export_paths' => [
+                                                'resources/js/vue-testing-tools.js',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'svelte' => [
+                                    'export_paths' => [
+                                        'resources/js/svelte.js',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'oldschool_js' => [
+                            'options' => [
+                                'jquery' => [
+                                    'export_paths' => [
+                                        'resources/js/jquery.js',
+                                    ],
+                                ],
+                                'mootools' => [
+                                    'export_paths' => [
+                                        'resources/js/jquery.js',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'canada' => [
+                    'export_paths' => [
+                        'resources/css/hockey.css',
+                    ],
+                    'modules' => [
+                        'hockey_players' => [
+                            'export_paths' => [
+                                'resources/dictionaries/players.yaml',
+                            ],
+                        ],
+                    ],
+                ],
+                'jamaica' => [
+                    'export_as' => [
+                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    ],
+                    'modules' => [
+                        'bobsled' => [
+                            'export_paths' => [
+                                'resources/css/bobsled.css',
+                            ],
+                            'dependencies' => [
+                                'bobsled/speed-calculator' => '^1.0.0',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react-testing-tools.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue-testing-tools.js'));
+        $this->assertComposerJsonDoesntHave('i-love-vue/test-helpers');
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+
+        $this
+            ->installCoolRunningsModules()
+            ->expectsConfirmation('Would you like to install the seo module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following seo js modules?', 'vue')
+            ->expectsQuestion('Would you like to install the seo js vue testing tools module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following seo oldschool js modules?', 'skip_module')
+            ->expectsConfirmation('Would you like to install the canada module?', 'no')
+            ->expectsConfirmation('Would you like to install the jamaica module?', 'yes')
+            ->expectsConfirmation('Would you like to install the jamaica bobsled module?', 'yes');
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react-testing-tools.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
+        $this->assertFileExists(base_path('resources/js/vue-testing-tools.js'));
+        $this->assertComposerJsonHasPackageVersion('require-dev', 'i-love-vue/test-helpers', '^1.5');
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
+        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/bobsled.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
+    }
+
     private function kitRepoPath($path = null)
     {
         return collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/');
