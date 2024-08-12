@@ -277,6 +277,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     ->save();
             });
 
+        Blink::forget('entry-descendants-'.$this->id());
+
         return true;
     }
 
