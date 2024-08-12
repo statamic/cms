@@ -109,7 +109,7 @@
 
         <template v-if="!initializing && canUseTree && view === 'tree'">
             <div class="flex flex-col h-full">
-                <div class="bg-white bg-gray-200 dark:bg-dark-550 shadow px-4 py-2 z-1 h-13 flex items-center justify-end">
+                <div class="bg-white dark:bg-dark-550 shadow px-4 py-2 z-1 h-13 flex items-center justify-end">
                     <h1 class="flex-1 flex items-center text-xl">{{ tree.title }}</h1>
                     <div class="btn-group rtl:mr-4 ltr:ml-4">
                         <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">

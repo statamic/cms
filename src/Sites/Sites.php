@@ -129,10 +129,10 @@ class Sites
     {
         return File::exists($sitesPath = $this->path())
             ? YAML::file($sitesPath)->parse()
-            : $this->getDefaultSite();
+            : $this->getFallbackConfig();
     }
 
-    protected function getDefaultSite()
+    protected function getFallbackConfig()
     {
         return [
             'default' => [
@@ -149,6 +149,7 @@ class Sites
         $newSites = $this->getNewSites();
         $deletedSites = $this->getDeletedSites();
 
+        // Save sites to store
         $this->saveToStore();
 
         // Dispatch our tracked `SiteCreated` and `SiteDeleted` events
@@ -161,7 +162,6 @@ class Sites
 
     protected function saveToStore()
     {
-        // Save to file
         File::put($this->path(), YAML::dump($this->config()));
     }
 

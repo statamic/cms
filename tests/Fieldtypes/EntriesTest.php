@@ -360,6 +360,22 @@ class EntriesTest extends TestCase
         $this->assertNull($augmented); // 456 isnt localized
     }
 
+    #[Test]
+    public function it_doesnt_localize_when_select_across_sites_setting_is_enabled()
+    {
+        $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
+
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->date('2021-01-02')->create();
+        EntryFactory::id('789-fr')->origin('789')->locale('fr')->collection('blog')->slug('three-fr')->data(['title' => 'Le Three'])->date('2021-01-02')->published(false)->create();
+        EntryFactory::id('910-fr')->origin('910')->locale('fr')->collection('blog')->slug('four-fr')->data(['title' => 'Le Four'])->date('2021-01-02')->create();
+
+        $augmented = $this->fieldtype(['select_across_sites' => true], $parent)->augment(['123', 'invalid', 456, 789, 910, 'draft', 'scheduled', 'expired']);
+
+        $this->assertInstanceOf(Builder::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(Entry::class, $augmented->get());
+        $this->assertEquals(['one', 'two', 'three', 'four'], $augmented->get()->map->slug()->all());
+    }
+
     public function fieldtype($config = [], $parent = null)
     {
         $field = new Field('test', array_merge([

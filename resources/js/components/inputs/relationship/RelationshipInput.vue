@@ -19,7 +19,7 @@
 
         <loading-graphic v-if="initializing" :inline="true" />
 
-        <template v-if="!initializing">
+        <template v-if="shouldShowSelectedItems">
             <div ref="items" class="relationship-input-items space-y-1 outline-none" :class="{ 'mt-4': usesSelectField && items.length }">
                 <component
                     :is="itemComponent"
@@ -164,7 +164,9 @@ export default {
     computed: {
 
         items() {
-            return this.value.map(selection => {
+            if (this.value === null) return [];
+
+            return this.value?.map(selection => {
                 const data = _.find(this.data, (item) => item.id == selection);
 
                 if (! data) return { id: selection, title: selection };
@@ -174,7 +176,7 @@ export default {
         },
 
         maxItemsReached() {
-            return this.value.length >= this.maxItems;
+            return this.value?.length >= this.maxItems;
         },
 
         canSelectOrCreate() {
@@ -183,6 +185,14 @@ export default {
 
         usesSelectField() {
             return ['select', 'typeahead'].includes(this.mode);
+        },
+
+        shouldShowSelectedItems() {
+            if (this.initializing) return false;
+
+            if (this.usesSelectField && this.maxItems === 1) return false;
+
+            return true;
         }
 
     },
