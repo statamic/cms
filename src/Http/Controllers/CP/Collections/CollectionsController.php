@@ -22,11 +22,33 @@ use Statamic\Support\Str;
 
 class CollectionsController extends CpController
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
 
-        $collections = Collection::all()->filter(function ($collection) {
+        $columns = [
+            Column::make('title')->label(__('Title')),
+            Column::make('entries')->label(__('Entries'))->numeric(true),
+        ];
+
+        if ($request->wantsJson()) {
+            return [
+                'data' => $this->collections(),
+                'meta' => [
+                    'columns' => $columns,
+                ],
+            ];
+        }
+
+        return view('statamic::collections.index', [
+            'collections' => $this->collections(),
+            'columns' => $columns,
+        ]);
+    }
+
+    private function collections()
+    {
+        return Collection::all()->filter(function ($collection) {
             return User::current()->can('configure collections')
                 || User::current()->can('view', $collection)
                 && $collection->sites()->contains(Site::selected()->handle());
@@ -49,14 +71,6 @@ class CollectionsController extends CpController
                 'actions_url' => cp_route('collections.actions.run', ['collection' => $collection->handle()]),
             ];
         })->values();
-
-        return view('statamic::collections.index', [
-            'collections' => $collections,
-            'columns' => [
-                Column::make('title')->label(__('Title')),
-                Column::make('entries')->label(__('Entries'))->numeric(true),
-            ],
-        ]);
     }
 
     public function show(Request $request, $collection)
