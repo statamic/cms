@@ -905,11 +905,11 @@ EOT;
 
         $this
             ->installCoolRunningsModules()
-            ->expectsConfirmation('Would you like to install the seo module?', 'yes')
-            ->expectsConfirmation('Would you like to install the bobsled module?', 'no')
-            ->expectsConfirmation('Would you like to install the jamaica module?', 'yes')
-            ->expectsQuestion('Would you like to install one of the following js modules?', 'vue')
-            ->expectsQuestion('Would you like to install one of the following oldschool js modules?', 'skip_module');
+            ->expectsConfirmation('Would you like to install the [seo] module?', 'yes')
+            ->expectsConfirmation('Would you like to install the [bobsled] module?', 'no')
+            ->expectsConfirmation('Would you like to install the [jamaica] module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following [js] modules?', 'vue')
+            ->expectsQuestion('Would you like to install one of the following [oldschool js] modules?', 'skip_module');
 
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(base_path('resources/css/seo.css'));
@@ -1020,7 +1020,7 @@ EOT;
 
         $this
             ->installCoolRunningsModules(['--without-dependencies' => true])
-            ->expectsConfirmation('Would you like to install the seo module?', 'yes');
+            ->expectsConfirmation('Would you like to install the [seo] module?', 'yes');
 
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(base_path('resources/css/seo.css'));
@@ -1320,13 +1320,13 @@ EOT;
 
         $this
             ->installCoolRunningsModules()
-            ->expectsConfirmation('Would you like to install the seo module?', 'yes')
-            ->expectsQuestion('Would you like to install one of the following seo js modules?', 'vue')
-            ->expectsQuestion('Would you like to install the seo js vue testing tools module?', 'yes')
-            ->expectsQuestion('Would you like to install one of the following seo oldschool js modules?', 'skip_module')
-            ->expectsConfirmation('Would you like to install the canada module?', 'no')
-            ->expectsConfirmation('Would you like to install the jamaica module?', 'yes')
-            ->expectsConfirmation('Would you like to install the jamaica bobsled module?', 'yes');
+            ->expectsConfirmation('Would you like to install the [seo] module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following [seo js] modules?', 'vue')
+            ->expectsQuestion('Would you like to install the [seo js vue testing tools] module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following [seo oldschool js] modules?', 'skip_module')
+            ->expectsConfirmation('Would you like to install the [canada] module?', 'no')
+            ->expectsConfirmation('Would you like to install the [jamaica] module?', 'yes')
+            ->expectsConfirmation('Would you like to install the [jamaica bobsled] module?', 'yes');
 
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(base_path('resources/css/seo.css'));
