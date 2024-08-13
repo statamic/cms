@@ -290,13 +290,8 @@ final class Installer
      */
     protected function instantiateModules(): self
     {
-        $topLevelConfig = $this->config()->all();
-
-        $nestedConfigs = $this->config('modules');
-
-        $this->modules = collect(['top_level' => $topLevelConfig])
-            ->merge($nestedConfigs)
-            ->map(fn ($config, $key) => $this->instantiateModule($config, $key))
+        $this->modules = collect(['top_level' => $this->config()->all()])
+            ->map(fn ($config, $key) => $this->instantiateModuleRecursively($config, $key))
             ->flatten()
             ->filter()
             ->each(fn ($module) => $module->validate());
@@ -310,10 +305,6 @@ final class Installer
     protected function instantiateModule(array $config, string $key): InstallableModule|array|bool
     {
         $shouldPrompt = true;
-
-        if ($key === 'top_level') {
-            $shouldPrompt = false;
-        }
 
         if (Arr::has($config, 'options')) {
             return $this->instantiateSelectModule($config, $key);
@@ -331,7 +322,7 @@ final class Installer
             return false;
         }
 
-        return $this->instantiateRecursively($config, $key);
+        return $this->instantiateModuleRecursively($config, $key);
     }
 
     /**
@@ -358,29 +349,33 @@ final class Installer
         $selectedKey = "{$key}_{$choice}";
         $selectedModuleConfig = $config['options'][$choice];
 
-        return $this->instantiateRecursively($selectedModuleConfig, $selectedKey);
+        return $this->instantiateModuleRecursively($selectedModuleConfig, $selectedKey);
     }
 
     /**
      * Instantiate module and check if nested modules should be recursively instantiated.
      */
-    protected function instantiateRecursively(array $config, string $key): InstallableModule|array
+    protected function instantiateModuleRecursively(array $config, string $key): InstallableModule|array
     {
         $instantiated = (new InstallableModule($config, $key))->installer($this);
 
-        if ($instantiated->isTopLevelModule()) {
-            return $instantiated;
-        }
-
         if ($modules = Arr::get($config, 'modules')) {
             $instantiated = collect($modules)
-                ->map(fn ($config, $childKey) => $this->instantiateModule($config, "{$key}_{$childKey}"))
+                ->map(fn ($config, $childKey) => $this->instantiateModule($config, $this->normalizeModuleKey($key, $childKey)))
                 ->prepend($instantiated, $key)
                 ->filter()
                 ->all();
         }
 
         return $instantiated;
+    }
+
+    /**
+     * Normalize module key.
+     */
+    protected function normalizeModuleKey(string $key, string $childKey): string
+    {
+        return $key !== 'top_level' ? "{$key}_{$childKey}" : $childKey;
     }
 
     /**

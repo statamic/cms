@@ -75,13 +75,8 @@ class Exporter
      */
     protected function instantiateModules(): self
     {
-        $topLevelConfig = $this->config()->all();
-
-        $nestedConfigs = $this->config('modules');
-
-        $this->modules = collect(['top_level' => $topLevelConfig])
-            ->merge($nestedConfigs)
-            ->map(fn ($config, $key) => $this->instantiateModule($config, $key))
+        $this->modules = collect(['top_level' => $this->config()->all()])
+            ->map(fn ($config, $key) => $this->instantiateModuleRecursively($config, $key))
             ->flatten()
             ->filter()
             ->each(fn ($module) => $module->validate());
@@ -94,35 +89,47 @@ class Exporter
      */
     protected function instantiateModule(array $config, string $key): ExportableModule|array
     {
-        if (Arr::has($config, 'options')) {
-            return collect($config['options'])
-                ->map(fn ($option, $optionKey) => $this->instantiateRecursively($option, "{$key}.options.{$optionKey}"))
-                ->all();
+        if (Arr::has($config, 'options') && $key !== 'top_level') {
+            return $this->instantiateSelectModule($config, $key);
         }
 
-        return $this->instantiateRecursively($config, $key);
+        return $this->instantiateModuleRecursively($config, $key);
+    }
+
+    /**
+     * Instantiate select module.
+     */
+    protected function instantiateSelectModule(array $config, string $key): ExportableModule|array
+    {
+        return collect($config['options'])
+            ->map(fn ($option, $optionKey) => $this->instantiateModuleRecursively($option, "{$key}.options.{$optionKey}"))
+            ->all();
     }
 
     /**
      * Instantiate module and check if nested modules should be recursively instantiated.
      */
-    protected function instantiateRecursively(array $config, string $key): ExportableModule|array
+    protected function instantiateModuleRecursively(array $config, string $key): ExportableModule|array
     {
         $instantiated = new ExportableModule($config, $key);
 
-        if ($instantiated->isTopLevelModule()) {
-            return $instantiated;
-        }
-
         if ($modules = Arr::get($config, 'modules')) {
             $instantiated = collect($modules)
-                ->map(fn ($config, $childKey) => $this->instantiateModule($config, "{$key}.modules.{$childKey}"))
+                ->map(fn ($config, $childKey) => $this->instantiateModule($config, $this->normalizeModuleKey($key, $childKey)))
                 ->prepend($instantiated, $key)
                 ->filter()
                 ->all();
         }
 
         return $instantiated;
+    }
+
+    /**
+     * Normalize module key, as dotted array key for location in starter-kit.yaml.
+     */
+    protected function normalizeModuleKey(string $key, string $childKey): string
+    {
+        return $key !== 'top_level' ? "{$key}.modules.{$childKey}" : $childKey;
     }
 
     /**
