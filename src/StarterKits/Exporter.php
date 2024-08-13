@@ -96,11 +96,33 @@ class Exporter
     {
         if (Arr::has($config, 'options')) {
             return collect($config['options'])
-                ->map(fn ($option, $optionKey) => $this->instantiateModule($option, "{$key}.options.{$optionKey}"))
+                ->map(fn ($option, $optionKey) => $this->instantiateRecursively($option, "{$key}.options.{$optionKey}"))
                 ->all();
         }
 
-        return new ExportableModule($config, $key);
+        return $this->instantiateRecursively($config, $key);
+    }
+
+    /**
+     * Instantiate module and check if nested modules should be recursively instantiated.
+     */
+    protected function instantiateRecursively(array $config, string $key): ExportableModule|array
+    {
+        $instantiated = new ExportableModule($config, $key);
+
+        if ($instantiated->isTopLevelModule()) {
+            return $instantiated;
+        }
+
+        if ($modules = Arr::get($config, 'modules')) {
+            $instantiated = collect($modules)
+                ->map(fn ($config, $childKey) => $this->instantiateModule($config, "{$key}.modules.{$childKey}"))
+                ->prepend($instantiated, $key)
+                ->filter()
+                ->all();
+        }
+
+        return $instantiated;
     }
 
     /**
