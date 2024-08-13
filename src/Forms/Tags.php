@@ -64,12 +64,9 @@ class Tags extends BaseTags
 
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
 
-        $configFields = [];
-        foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
-            $configFields[$handle] = $config;
-        }
-
-        $data['form_config'] = $configFields ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->process()->values()->all() : [];
+        $data['form_config'] = ($configFields = Form::extraConfigFor($form->handle()))
+            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->process()->values()->all()
+            : [];
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
