@@ -66,8 +66,8 @@ export default {
         action: String,
         initialBlueprint: Object,
         showTitle: Boolean,
-        useTabs: {type: Boolean, default: true},
-        isFormBlueprint: {type: Boolean, default: false},
+        useTabs: { type: Boolean, default: true },
+        isFormBlueprint: { type: Boolean, default: false },
     },
 
     data() {
@@ -112,7 +112,7 @@ export default {
         initializeBlueprint() {
             let blueprint = clone(this.initialBlueprint);
 
-            if (!this.showTitle) delete blueprint.title;
+            if (! this.showTitle) delete blueprint.title;
 
             return blueprint;
         },
