@@ -16,13 +16,15 @@ class PasswordController extends CpController
     {
         throw_unless($user = User::find($user), new NotFoundHttpException);
 
+        $updatingOwnPassword = $user->id() == $request->user()->id();
+
         $this->authorize('editPassword', $user);
 
         $rules = [
             'password' => ['required', 'confirmed', Password::default()],
         ];
 
-        if ($request->user()->id === $user) {
+        if ($updatingOwnPassword) {
             $rules['current_password'] = ['required', 'current_password'];
         }
 
@@ -30,11 +32,11 @@ class PasswordController extends CpController
 
         $user->password($request->password)->save();
 
-        UserPasswordChanged::dispatch($user);
-
-        if ($currentPassword = $request->current_password) {
-            Auth::logoutOtherDevices($currentPassword);
+        if ($updatingOwnPassword) {
+            Auth::login($user);
         }
+
+        UserPasswordChanged::dispatch($user);
 
         return response('', 204);
     }
