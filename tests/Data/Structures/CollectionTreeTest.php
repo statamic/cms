@@ -2,7 +2,10 @@
 
 namespace Tests\Data\Structures;
 
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\CollectionTreeDeleting;
+use Statamic\Events\CollectionTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Structures\CollectionTree;
@@ -18,12 +21,14 @@ class CollectionTreeTest extends TestCase
 
     private $directory;
 
+    private $stache;
+
     public function setUp(): void
     {
         parent::setUp();
 
-        $stache = $this->app->make('stache');
-        $stache->store('collection-trees')->directory($this->directory = '/path/to/structures/collections');
+        $this->stache = $this->app->make('stache');
+        $this->directory = '/path/to/structures/collections';
     }
 
     #[Test]
@@ -58,6 +63,8 @@ class CollectionTreeTest extends TestCase
     #[Test]
     public function it_gets_the_path()
     {
+        $this->stache->store('collection-trees')->directory($this->directory);
+
         $collection = Collection::make('pages')->structureContents(['root' => true]);
         Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);
         $tree = $collection->structure()->makeTree('en');
@@ -67,6 +74,8 @@ class CollectionTreeTest extends TestCase
     #[Test]
     public function it_gets_the_path_when_using_multisite()
     {
+        $this->stache->store('collection-trees')->directory($this->directory);
+
         $this->setSites([
             'one' => ['locale' => 'en_US', 'url' => '/one'],
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
@@ -117,5 +126,73 @@ class CollectionTreeTest extends TestCase
         $this->assertEquals(['1.3'], $diff->removed());
         $this->assertEquals(['1.1', '2.2', '2.3'], $diff->moved());
         $this->assertEquals(['1.1'], $diff->ancestryChanged());
+    }
+
+    #[Test]
+    public function it_fires_a_saving_event()
+    {
+        Event::fake();
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en');
+        $tree->save();
+
+        Event::assertDispatched(CollectionTreeSaving::class);
+
+        $this->assertFileExists($tree->path());
+    }
+
+    #[Test]
+    public function returning_false_in_collection_tree_saving_stops_saving()
+    {
+        Event::listen(CollectionTreeSaving::class, function (CollectionTreeSaving $event) {
+            return false;
+        });
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en');
+        $tree->save();
+
+        $this->assertFileDoesNotExist($tree->path());
+    }
+
+    #[Test]
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en');
+        $tree->save();
+
+        $tree->delete();
+
+        Event::assertDispatched(CollectionTreeDeleting::class);
+
+        $this->assertFileDoesNotExist($tree->path());
+    }
+
+    #[Test]
+    public function returning_false_in_nav_tree_deleting_stops_deleting()
+    {
+        Event::listen(CollectionTreeDeleting::class, function (CollectionTreeDeleting $event) {
+            return false;
+        });
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en');
+        $tree->save();
+
+        $tree->delete();
+
+        $this->assertFileExists($tree->path());
     }
 }

@@ -6,7 +6,9 @@ use Facades\Statamic\Structures\CollectionTreeDiff;
 use Statamic\Contracts\Structures\CollectionTree as TreeContract;
 use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Events\CollectionTreeDeleted;
+use Statamic\Events\CollectionTreeDeleting;
 use Statamic\Events\CollectionTreeSaved;
+use Statamic\Events\CollectionTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
@@ -45,9 +47,19 @@ class CollectionTree extends Tree implements TreeContract
         CollectionTreeSaved::dispatch($this);
     }
 
+    protected function dispatchSavingEvent()
+    {
+        return CollectionTreeSaving::dispatch($this);
+    }
+
     protected function dispatchDeletedEvent()
     {
         CollectionTreeDeleted::dispatch($this);
+    }
+
+    protected function dispatchDeletingEvent()
+    {
+        return CollectionTreeDeleting::dispatch($this);
     }
 
     public function collection()
