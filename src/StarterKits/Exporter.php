@@ -85,6 +85,24 @@ class Exporter
     }
 
     /**
+     * Instantiate module and check if nested modules should be recursively instantiated.
+     */
+    protected function instantiateModuleRecursively(array $config, string $key): ExportableModule|array
+    {
+        $instantiated = new ExportableModule($config, $key);
+
+        if ($modules = Arr::get($config, 'modules')) {
+            $instantiated = collect($modules)
+                ->map(fn ($config, $childKey) => $this->instantiateModule($config, $this->normalizeModuleKey($key, $childKey)))
+                ->prepend($instantiated, $key)
+                ->filter()
+                ->all();
+        }
+
+        return $instantiated;
+    }
+
+    /**
      * Instantiate individual module.
      */
     protected function instantiateModule(array $config, string $key): ExportableModule|array
@@ -104,24 +122,6 @@ class Exporter
         return collect($config['options'])
             ->map(fn ($option, $optionKey) => $this->instantiateModuleRecursively($option, "{$key}.options.{$optionKey}"))
             ->all();
-    }
-
-    /**
-     * Instantiate module and check if nested modules should be recursively instantiated.
-     */
-    protected function instantiateModuleRecursively(array $config, string $key): ExportableModule|array
-    {
-        $instantiated = new ExportableModule($config, $key);
-
-        if ($modules = Arr::get($config, 'modules')) {
-            $instantiated = collect($modules)
-                ->map(fn ($config, $childKey) => $this->instantiateModule($config, $this->normalizeModuleKey($key, $childKey)))
-                ->prepend($instantiated, $key)
-                ->filter()
-                ->all();
-        }
-
-        return $instantiated;
     }
 
     /**

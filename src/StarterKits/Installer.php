@@ -300,6 +300,24 @@ final class Installer
     }
 
     /**
+     * Instantiate module and check if nested modules should be recursively instantiated.
+     */
+    protected function instantiateModuleRecursively(array $config, string $key): InstallableModule|array
+    {
+        $instantiated = (new InstallableModule($config, $key))->installer($this);
+
+        if ($modules = Arr::get($config, 'modules')) {
+            $instantiated = collect($modules)
+                ->map(fn ($config, $childKey) => $this->instantiateModule($config, $this->normalizeModuleKey($key, $childKey)))
+                ->prepend($instantiated, $key)
+                ->filter()
+                ->all();
+        }
+
+        return $instantiated;
+    }
+
+    /**
      * Instantiate individual module.
      */
     protected function instantiateModule(array $config, string $key): InstallableModule|array|bool
@@ -350,24 +368,6 @@ final class Installer
         $selectedModuleConfig = $config['options'][$choice];
 
         return $this->instantiateModuleRecursively($selectedModuleConfig, $selectedKey);
-    }
-
-    /**
-     * Instantiate module and check if nested modules should be recursively instantiated.
-     */
-    protected function instantiateModuleRecursively(array $config, string $key): InstallableModule|array
-    {
-        $instantiated = (new InstallableModule($config, $key))->installer($this);
-
-        if ($modules = Arr::get($config, 'modules')) {
-            $instantiated = collect($modules)
-                ->map(fn ($config, $childKey) => $this->instantiateModule($config, $this->normalizeModuleKey($key, $childKey)))
-                ->prepend($instantiated, $key)
-                ->filter()
-                ->all();
-        }
-
-        return $instantiated;
     }
 
     /**
