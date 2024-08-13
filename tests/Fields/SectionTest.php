@@ -155,7 +155,7 @@ class SectionTest extends TestCase
                     'type' => 'textarea',
                     'validate' => 'min:2',
                     'placeholder' => null,
-                    'character_limit' => null,
+                    'character_limit' => 0,
                     'default' => null,
                     'antlers' => false,
                     'component' => 'textarea',
