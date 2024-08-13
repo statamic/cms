@@ -979,13 +979,13 @@ EOT
     }
 
     #[Test]
-    public function it_adds_renders_appended_config_fields()
+    public function it_adds_appended_config_fields()
     {
         Form::appendConfigFields('*', 'Fields', [
             'test_config' => ['type' => 'text', 'display' => 'First injected into fields section'],
         ]);
 
-        $form = tap(Form::find('contact')->data(['test_config' => 'This is a test config value']))->save();
+        tap(Form::find('contact')->data(['test_config' => 'This is a test config value']))->save();
 
         $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ form_config:test_config }}{{ /form:contact }}');
 
