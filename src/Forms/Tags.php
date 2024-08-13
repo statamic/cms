@@ -6,6 +6,7 @@ use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\JsDrivers\JsDriver;
@@ -62,6 +63,13 @@ class Tags extends BaseTags
         $data = $this->getFormSession($this->sessionHandle());
 
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
+
+        $configFields = [];
+        foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
+            $configFields[$handle] = $config;
+        }
+
+        $data['form_config'] = $configFields ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->process()->values()->all() : [];
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
