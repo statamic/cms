@@ -465,7 +465,7 @@ class Comb
         $output = '';
 
         if (! is_array($item)) {
-            return preg_replace('#\s+#ism', ' ', $item);
+            return preg_replace('#\s+#ism', ' ', (string) $item);
         }
 
         foreach ($item as $part) {

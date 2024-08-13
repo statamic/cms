@@ -3196,7 +3196,8 @@ class CoreModifiers extends Modifier
     private function handleUnlistedVimeoUrls($url)
     {
         $hash = '';
-        if (Str::substrCount($url, '/') > 4) {
+
+        if (! Str::contains($url, 'progressive_redirect') && Str::substrCount($url, '/') > 4) {
             $hash = Str::afterLast($url, '/');
             $url = Str::beforeLast($url, '/');
 
