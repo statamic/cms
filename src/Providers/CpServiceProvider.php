@@ -3,7 +3,6 @@
 namespace Statamic\Providers;
 
 use Illuminate\Routing\Router;
-use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -45,14 +44,6 @@ class CpServiceProvider extends ServiceProvider
         Sets::setIconsDirectory();
 
         $this->registerMiddlewareGroups();
-
-        if (method_exists(AuthenticateSession::class, 'redirectUsing')) {
-            AuthenticateSession::redirectUsing(function () {
-                return config('statamic.cp.auth.enabled', true)
-                    ? cp_route('login')
-                    : config('statamic.cp.auth.redirect_to', '/');
-            });
-        }
     }
 
     public function register()
@@ -88,7 +79,6 @@ class CpServiceProvider extends ServiceProvider
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Statamic\Http\Middleware\CP\ContactOutpost::class,
             \Statamic\Http\Middleware\CP\AuthGuard::class,
             \Statamic\Http\Middleware\CP\AddToasts::class,
@@ -96,6 +86,7 @@ class CpServiceProvider extends ServiceProvider
         ]);
 
         $router->middlewareGroup('statamic.cp.authenticated', [
+            \Statamic\Http\Middleware\CP\AuthenticateSession::class,
             \Statamic\Http\Middleware\CP\Authorize::class,
             \Statamic\Http\Middleware\CP\Localize::class,
             \Statamic\Http\Middleware\CP\SelectedSite::class,
