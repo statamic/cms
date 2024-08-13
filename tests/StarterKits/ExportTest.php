@@ -623,7 +623,39 @@ EOT
     }
 
     #[Test]
-    public function it_can_export_options_module_files()
+    public function it_can_export_nested_module_files()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => [
+                    'export_paths' => [
+                        'config/filesystems.php',
+                    ],
+                    'modules' => [
+                        'ssg' => [
+                            'export_as' => [
+                                'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+
+        $this->exportCoolRunnings();
+
+        $this->assertFileExists($filesystemsConfig);
+        $this->assertFileHasContent("'disks' => [", $filesystemsConfig);
+
+        $this->assertFileExists($welcomeView);
+        $this->assertFileHasContent('<body', $welcomeView);
+    }
+
+    #[Test]
+    public function it_can_export_select_module_files()
     {
         $this->setConfig([
             'modules' => [
@@ -651,6 +683,51 @@ EOT
 
         $this->assertFileExists($filesystemsConfig);
         $this->assertFileHasContent("'disks' => [", $filesystemsConfig);
+
+        $this->assertFileExists($welcomeView);
+        $this->assertFileHasContent('<body', $welcomeView);
+    }
+
+    #[Test]
+    public function it_can_export_nested_select_module_files()
+    {
+        $this->setConfig([
+            'modules' => [
+                'js' => [
+                    'options' => [
+                        'vue' => [
+                            'export_paths' => [
+                                'config/filesystems.php',
+                            ],
+                            'modules' => [
+                                'testing_tools' => [
+                                    'export_paths' => [
+                                        'config/app.php',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'react' => [
+                            'export_as' => [
+                                'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
+        $this->assertFileDoesNotExist($appConfig = $this->exportPath('config/app.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+
+        $this->exportCoolRunnings();
+
+        $this->assertFileExists($filesystemsConfig);
+        $this->assertFileHasContent("'disks' => [", $filesystemsConfig);
+
+        $this->assertFileExists($appConfig);
+        $this->assertFileHasContent("'url' => env(", $appConfig);
 
         $this->assertFileExists($welcomeView);
         $this->assertFileHasContent('<body', $welcomeView);
@@ -708,7 +785,60 @@ EOT
     }
 
     #[Test]
-    public function it_can_export_options_module_dependencies()
+    public function it_can_export_nested_module_dependencies()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $this->setConfig([
+            'modules' => [
+                'seo' => [
+                    'dependencies' => [
+                        'statamic/seo-pro',
+                    ],
+                    'modules' => [
+                        'ssg' => [
+                            'dependencies_dev' => [
+                                'statamic/ssg',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigEquals('modules.seo.dependencies', [
+            'statamic/seo-pro' => '^2.2',
+        ]);
+
+        $this->assertExportedConfigDoesNotHave('modules.seo.dependencies_dev');
+
+        $this->assertExportedConfigEquals('modules.seo.modules.ssg.dependencies_dev', [
+            'statamic/ssg' => '^0.4.0',
+        ]);
+
+        $this->assertExportedConfigDoesNotHave('modules.ssg.dependencies');
+    }
+
+    #[Test]
+    public function it_can_export_select_module_dependencies()
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
 {
@@ -763,6 +893,80 @@ EOT
     }
 
     #[Test]
+    public function it_can_export_nested_select_module_dependencies()
+    {
+        $this->files->put(base_path('composer.json'), <<<'EOT'
+{
+    "type": "project",
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "laravel/framework": "^8.0",
+        "statamic/cms": "3.1.*",
+        "statamic/seo-pro": "^2.2",
+        "hansolo/falcon": "*"
+    },
+    "require-dev": {
+        "statamic/ssg": "^0.4.0"
+    },
+    "prefer-stable": true
+}
+EOT
+        );
+
+        $this->setConfig([
+            'modules' => [
+                'first_party' => [
+                    'options' => [
+                        'seo' => [
+                            'dependencies' => [
+                                'statamic/seo-pro',
+                            ],
+                            'modules' => [
+                                'ssg' => [
+                                    'dependencies_dev' => [
+                                        'statamic/ssg',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->exportCoolRunnings();
+
+        $this->assertExportedConfigEquals('modules.first_party.options.seo.dependencies', [
+            'statamic/seo-pro' => '^2.2',
+        ]);
+
+        $this->assertExportedConfigDoesNotHave('modules.first_party.seo.dependencies_dev');
+
+        $this->assertExportedConfigEquals('modules.first_party.options.seo.modules.ssg.dependencies_dev', [
+            'statamic/ssg' => '^0.4.0',
+        ]);
+
+        $this->assertExportedConfigDoesNotHave('modules.first_party.ssg.dependencies');
+    }
+
+    #[Test]
+    public function it_requires_valid_config_at_top_level()
+    {
+        $this->setConfig([
+            // no installable config!
+        ]);
+
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
+
+        $this
+            ->exportCoolRunnings()
+            // ->expectsOutput('Starter-kit module is missing `export_paths` or `dependencies`!') // TODO: Why does this work in InstallTest?
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist($welcomeView);
+    }
+
+    #[Test]
     public function it_requires_valid_module_config()
     {
         $this->setConfig([
@@ -784,13 +988,17 @@ EOT
     }
 
     #[Test]
-    public function it_doesnt_require_anything_exportable_in_top_level_if_user_wants_to_organize_using_modules_only()
+    public function it_doesnt_require_anything_installable_if_module_contains_nested_modules()
     {
         $this->setConfig([
             'modules' => [
                 'seo' => [
-                    'export_paths' => [
-                        'resources/views/welcome.blade.php',
+                    'modules' => [
+                        'js' => [
+                            'export_paths' => [
+                                'resources/views/welcome.blade.php',
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -807,7 +1015,7 @@ EOT
 
     #[Test]
     #[DataProvider('validModuleConfigs')]
-    public function it_passes_validation_if_module_export_paths_or_dependencies_are_properly_configured($config)
+    public function it_passes_validation_if_module_export_paths_or_dependencies_or_nested_modules_are_properly_configured($config)
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
 {
@@ -859,6 +1067,15 @@ EOT
             'dev dependencies' => [[
                 'dependencies_dev' => [
                     'statamic/seo-pro' => '^1.0',
+                ],
+            ]],
+            'nested modules' => [[
+                'modules' => [
+                    'filesystem' => [
+                        'export_paths' => [
+                            'config/filesystems.php',
+                        ],
+                    ],
                 ],
             ]],
         ];
@@ -1118,7 +1335,8 @@ EOT
         "laravel/framework": "^8.0",
         "statamic/cms": "3.1.*",
         "statamic/seo-pro": "^2.2",
-        "hansolo/falcon": "*"
+        "hansolo/falcon": "*",
+        "luke/x-wing": "*"
     },
     "require-dev": {
         "statamic/ssg": "^0.4.0"
@@ -1132,12 +1350,14 @@ EOT
             base_path('README.md'),
             base_path('test-folder'),
             resource_path('vue.js'),
+            resource_path('vue-testing-tools.js'),
         ]);
 
         $this->files->put(base_path('README.md'), 'This is a readme!');
         $this->files->makeDirectory(base_path('test-folder'));
         $this->files->put(base_path('test-folder/one.txt'), 'One.');
         $this->files->put(resource_path('vue.js'), 'Vue!');
+        $this->files->put(resource_path('vue-testing-tools.js'), 'Vue testing tools!');
 
         $this->setConfig([
             'modules' => [
@@ -1164,6 +1384,16 @@ EOT
                             'label' => 'Vue JS',
                             'dependencies' => [
                                 'hansolo/falcon',
+                            ],
+                            'modules' => [
+                                'testing_tools' => [
+                                    'dependencies' => [
+                                        'luke/x-wing' => '*',
+                                    ],
+                                    'export_paths' => [
+                                        'resources/vue-testing-tools.js',
+                                    ],
+                                ],
                             ],
                             'export_paths' => [
                                 'resources/vue.js',
@@ -1222,6 +1452,16 @@ EOT
                             ],
                             'dependencies' => [
                                 'hansolo/falcon' => '*',
+                            ],
+                            'modules' => [
+                                'testing_tools' => [
+                                    'export_paths' => [
+                                        'resources/vue-testing-tools.js',
+                                    ],
+                                    'dependencies' => [
+                                        'luke/x-wing' => '*',
+                                    ],
+                                ],
                             ],
                         ],
                     ],
