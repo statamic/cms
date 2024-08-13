@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Testing\Assert as IlluminateAssert;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
@@ -24,8 +23,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         parent::setUp();
 
         $this->withoutVite();
-
-        $this->withoutMiddleware(AuthenticateSession::class);
 
         $uses = array_flip(class_uses_recursive(static::class));
 
