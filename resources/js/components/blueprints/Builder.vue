@@ -24,7 +24,7 @@
                     </div>
                 </div>
 
-                <div class="form-group config-field" v-if="showHidden">
+                <div class="form-group config-field">
                     <div class="field-inner">
                         <label class="block">{{ __('Hidden') }}</label>
                         <p class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</p>
@@ -66,9 +66,8 @@ export default {
         action: String,
         initialBlueprint: Object,
         showTitle: Boolean,
-        useTabs: { type: Boolean, default: true },
-        isFormBlueprint: { type: Boolean, default: false },
-        showHidden: { type: Boolean, default: true },
+        useTabs: {type: Boolean, default: true},
+        isFormBlueprint: {type: Boolean, default: false},
     },
 
     data() {
@@ -113,7 +112,7 @@ export default {
         initializeBlueprint() {
             let blueprint = clone(this.initialBlueprint);
 
-            if (! this.showTitle) delete blueprint.title;
+            if (!this.showTitle) delete blueprint.title;
 
             return blueprint;
         },
