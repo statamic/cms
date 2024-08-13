@@ -6,7 +6,7 @@
 
         <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true">
             <div class="-max-h-screen-px">
-            <div class="flex items-center p-6 bg-gray-200 dark:bg-dark-700 border-b dark:border-dark-900 text-center">
+            <div class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
                 {{ __('Resume Your Session') }}
             </div>
 
@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div v-if="!isUsingOauth" class="publish-fields p-3">
+            <div v-if="!isUsingOauth" class="publish-fields p-2">
                 <div class="form-group w-full">
                     <label v-text="__('messages.session_expiry_enter_password')" />
                     <small
