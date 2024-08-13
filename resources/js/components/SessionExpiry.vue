@@ -10,7 +10,7 @@
                 {{ __('Resume Your Session') }}
             </div>
 
-            <div v-if="isUsingOauth" class="p-6">
+            <div v-if="isUsingOauth" class="p-5">
                 <a :href="oauthProvider.loginUrl" target="_blank" class="btn-primary">
                     {{ __('Log in with :provider', {provider: oauthProvider.label}) }}
                 </a>
