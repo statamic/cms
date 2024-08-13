@@ -364,7 +364,7 @@ export default {
         },
 
         afterActionSuccessfullyCompleted(response) {
-            // should reload in there but if we do, we lose the toast
+            if (!response.redirect) window.location.reload();
         }
 
     }
