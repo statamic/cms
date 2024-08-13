@@ -1,5 +1,31 @@
 # Release Notes
 
+## 5.21.0 (2024-08-13)
+
+### What's new
+- Starter kit modules and other misc improvements [#10559](https://github.com/statamic/cms/issues/10559) by @jesseleite
+- Pass any appended form config to antlers [#10616](https://github.com/statamic/cms/issues/10616) by @ryanmitchell
+- Collection Actions [#10471](https://github.com/statamic/cms/issues/10471) by @edalzell
+- Implement NavCreating / NavSaving / NavCreated events [#10604](https://github.com/statamic/cms/issues/10604) by @duncanmcclean
+
+### What's fixed
+- Fix rounded corners in asset fields [#10624](https://github.com/statamic/cms/issues/10624) by @daun
+- Fix asset tile buttons in read-only mode [#10622](https://github.com/statamic/cms/issues/10622) by @daun
+- Adjust dark mode readonly label [#10623](https://github.com/statamic/cms/issues/10623) by @daun
+- Add padding to session expiry modal [#10620](https://github.com/statamic/cms/issues/10620) by @jasonvarga
+- Prevent published toast when save failed [#10263](https://github.com/statamic/cms/issues/10263) by @simonerd
+- Change character_limit to integer on textarea [#10608](https://github.com/statamic/cms/issues/10608) by @jasonvarga
+- Adjust behavior of array fields [#10467](https://github.com/statamic/cms/issues/10467) by @duncanmcclean
+- Allow options without labels in the select etc fieldtypes [#10336](https://github.com/statamic/cms/issues/10336) by @duncanmcclean
+- Handle lock timeout in cache middleware [#10607](https://github.com/statamic/cms/issues/10607) by @jasonvarga
+- Render attributes inside single quotes when value contains double quotes [#10600](https://github.com/statamic/cms/issues/10600) by @ryanmitchell
+- Warn when using legacy broadcasting env variable when installing the Collaboration addon [#10597](https://github.com/statamic/cms/issues/10597) by @duncanmcclean
+- Optimize hover titles of asset edit buttons [#10603](https://github.com/statamic/cms/issues/10603) by @daun
+- Update tiptap-php [#10611](https://github.com/statamic/cms/issues/10611) by @arcs-
+- French translations [#10609](https://github.com/statamic/cms/issues/10609) by @ebeauchamps
+
+
+
 ## 5.20.0 (2024-08-08)
 
 ### What's new
