@@ -66,7 +66,7 @@
                                 class="btn btn-icon"
                                 :title="__('Download file')"
                             >
-                                <svg-icon name="download" class="h-4 my-2" />
+                                <svg-icon name="light/download" class="h-4 my-2" />
                             </button>
                         </template>
                     </div>
