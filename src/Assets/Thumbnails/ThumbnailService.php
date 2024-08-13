@@ -39,7 +39,7 @@ class ThumbnailService
 
     protected static function makeGenerator(string $class): ThumbnailGenerator
     {
-        $instance = static::$generatorInstances[$class] ?? new $class();
+        $instance = static::$generatorInstances[$class] ?? app($class);
         if (! $instance instanceof ThumbnailGenerator) {
             throw new \Exception('Thumbnail generator must implement [Statamic\Contracts\Assets\ThumbnailGenerator]!');
         }
