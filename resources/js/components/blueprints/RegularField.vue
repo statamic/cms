@@ -40,6 +40,7 @@
                             :config="fieldConfig"
                             :overrides="field.config_overrides || []"
                             :suggestable-condition-fields="suggestableConditionFields"
+                            :is-inside-set="isInsideSet"
                             @committed="settingsUpdated"
                             @closed="editorClosed"
                         />
@@ -69,6 +70,10 @@ export default {
     props: [
         'suggestableConditionFields'
     ],
+
+    inject: {
+        isInsideSet: { default: false },
+    },
 
      data() {
         return {

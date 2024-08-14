@@ -102,6 +102,21 @@ class RendersAttributesTest extends TestCase
 
         $this->assertEquals('class="m-0 mb-2" name="Han" src="avatar.jpg" focusable="false" disabled="true" autocomplete="true" aria-hidden="true"', $output);
     }
+
+    #[Test]
+    public function it_renders_params_with_double_quotes_inside_single_quotes()
+    {
+        $this->assertEquals('', $this->tag->renderAttributesFromParams());
+
+        $output = $this->tag
+            ->setContext(['first_name' => 'Han'])
+            ->setParameters([
+                'x-data' => '{"something":"here","something_else":"there"}',
+            ])
+            ->renderAttributesFromParams();
+
+        $this->assertEquals('x-data=\'{"something":"here","something_else":"there"}\'', $output);
+    }
 }
 
 class FakeTagWithRendersAttributes extends Tags

@@ -120,6 +120,7 @@ export default {
         root: Boolean,
         fields: Array,
         suggestableConditionFields: Array,
+        isInsideSet: Boolean,
     },
 
     provide: {
@@ -247,7 +248,8 @@ export default {
                 id: this.id,
                 type: this.type,
                 values: this.values,
-                fields: this.fields
+                fields: this.fields,
+                isInsideSet: this.isInsideSet,
             }).then(response => {
                 this.$emit('committed', response.data, this.editedFields);
                 this.close();

@@ -169,7 +169,9 @@ export default {
     computed: {
 
         items() {
-            return this.modelValue.map(selection => {
+            if (this.value === null) return [];
+
+            return this.modelValue?.map(selection => {
                 const data = _.find(this.data, (item) => item.id == selection);
 
                 if (! data) return { id: selection, title: selection };
@@ -179,7 +181,7 @@ export default {
         },
 
         maxItemsReached() {
-            return this.modelValue.length >= this.maxItems;
+            return this.modelValue?.length >= this.maxItems;
         },
 
         canSelectOrCreate() {

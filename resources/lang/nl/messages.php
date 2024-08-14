@@ -178,7 +178,7 @@ return [
     'password_protect_token_invalid' => 'Ongeldig of verlopen token.',
     'password_protect_token_missing' => 'Beveiligde token mist. Je moet op dit scherm komen via de originele, beveiligde URL.',
     'phpinfo_utility_description' => 'Controleer de PHP-configuratie-instellingen en geïnstalleerde modules.',
-    'preference_favorites_instructions' => 'Snelkoppelingen die getoont worden bij het openen van de algemen zoekbalk. Je kunt ook de pagina bezoeken en het speldpictogram bovenaan de pagina gebruiken om deze toe te voegen aan deze lijst.',
+    'preference_favorites_instructions' => 'Snelkoppelingen die getoont worden bij het openen van de algemene zoekbalk. Je kunt ook de pagina bezoeken en het speldpictogram bovenaan de pagina gebruiken om deze toe te voegen aan deze lijst.',
     'preference_locale_instructions' => 'De voorkeurstaal voor het Control Panel.',
     'preference_start_page_instructions' => 'De pagina die moet worden weergegeven na het inloggen op het Control Panel.',
     'publish_actions_create_revision' => 'Een revisie wordt gemaakt op basis van de werkkopie. De huidige revisie zal niet wijzigen.',

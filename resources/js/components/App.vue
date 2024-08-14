@@ -9,6 +9,7 @@ export default {
             mobileNavOpen: false,
             showBanner: true,
             appendedComponents: [],
+            isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
         };
     },
     computed: {
@@ -34,7 +35,7 @@ export default {
         this.fixAutofocus();
 
         // @todo(jelleroorda): put backs.
-        this.showBanner = false // Statamic.$config.get('hasLicenseBanner');
+        this.showBanner = false // !this.isLicensingBannerSnoozed && Statamic.$config.get('hasLicenseBanner');
     },
     created() {
         const state = localStorage.getItem('statamic.nav') || 'open';
@@ -81,6 +82,7 @@ export default {
 
         hideBanner() {
             this.showBanner = false;
+            localStorage.setItem(`statamic.snooze_license_banner`, new Date(Date.now() + 5 * 60 * 1000).valueOf());
         },
 
         fixAutofocus() {

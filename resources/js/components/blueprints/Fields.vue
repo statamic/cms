@@ -61,6 +61,7 @@
                     :fields="fields"
                     :config="pendingCreatedField.config"
                     :suggestable-condition-fields="suggestableConditionFields"
+                    :is-inside-set="isInsideSet"
                     @committed="fieldCreated"
                     @closed="close"
                 />
@@ -98,6 +99,10 @@ export default {
         editingField: {},
         suggestableConditionFields: Array,
         excludeFieldset: String,
+    },
+
+    inject: {
+        isInsideSet: { default: false },
     },
 
     data() {

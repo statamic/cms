@@ -26,7 +26,7 @@
                         />
                         <span
                             v-if="isReadOnly && !isTab && !isSection"
-                            class="text-gray-500 font-normal text-2xs rtl:ml-1 ltr:mr-1"
+                            class="text-gray-500 dark:text-dark-200 font-normal text-2xs rtl:ml-1 ltr:mr-1 mt-0.5"
                         >
                             {{ isLocked ? __('Locked') : __('Read Only') }}
                         </span>

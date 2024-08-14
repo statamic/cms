@@ -69,6 +69,7 @@ return [
     'collections_route_instructions' => 'با تنظیمات مسیر الگوی آدرس‌دهی مطالب کلکسیون‌ها را مشخص می‌کنید. برای اطلاعات بیشتر لطفا به [مستندات](https://statamic.dev/collections#routing) مراجعه کنید.',
     'collections_sort_direction_instructions' => 'تنظیم جهت پیشفرض برای مرتب‌سازی.',
     'collections_taxonomies_instructions' => 'مطالب این کلکسیون را به یک یا چندتا از تکسنومی‌ها متصل کنید. فیلدهای تکسنومی به طور خودکار به فرم انتشار مطلب اضافه می‌شوند.',
+    'dictionaries_countries_region_instructions' => 'فیلتر کردن اختیاری کشورها بر اساس منطقه.',
     'duplicate_action_localizations_confirmation' => 'با انجام این عمل ترجمه‌ی این مطلب نیز تکثیر می‌یابد. با توجه به این موضوع می‌خواهید این عمل انجام شود؟',
     'duplicate_action_warning_localization' => 'آیتمی که برای تکثیر برگزیده‌اید یک نسخه‌ی ترجمه شده می‌باشد. بجای آن مطلب اصلی تکثیر خواهد یافت.',
     'duplicate_action_warning_localizations' => 'در بین آیتم‌های انتخاب شده نسخه‌های ترجمه‌شده وجود دارند که بجای آنها مطلب اصلی و مرجع تکثیر خواهد یافت.',

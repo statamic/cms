@@ -28,7 +28,7 @@ export default {
     },
     computed: {
         options() {
-            return this.normalizeInputOptions(this.config.options);
+            return this.normalizeInputOptions(this.meta.options);
         },
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;

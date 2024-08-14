@@ -158,6 +158,11 @@ export default {
             this.$axios.post(this.actions.publish, payload)
                 .then(response => {
                     this.saving = false;
+
+                    if (! response.data.saved) {
+                        this.$emit('failed');
+                        return this.$toast.error(__(`Couldn't publish entry`));
+                    }
                     this.$toast.success(__('Published'));
                     this.runAfterPublishHook(response);
                 }).catch(error => this.handleAxiosError(error));
@@ -189,6 +194,13 @@ export default {
             const payload = { message: this.revisionMessage };
 
             this.$axios.post(this.actions.unpublish, { data: payload }).then(response => {
+                this.saving = false;
+
+                if (! response.data.saved) {
+                    this.$emit('failed');
+                    return this.$toast.error(__(`Couldn't unpublish entry`));
+                }
+
                 this.$toast.success(__('Unpublished'));
                 this.revisionMessage = null;
                 this.$emit('saved', { published: false, isWorkingCopy: false, response });

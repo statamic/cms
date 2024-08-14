@@ -41,13 +41,13 @@ export default {
 
     computed: {
         options() {
-            return this.normalizeInputOptions(this.config.options);
+            return this.normalizeInputOptions(this.meta.options);
         },
 
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            var option = _.findWhere(this.config.options, { value: this.modelValue });
+            var option = _.findWhere(this.options, { value: this.modelValue });
 
             return (option) ? option.label : this.modelValue;
         },

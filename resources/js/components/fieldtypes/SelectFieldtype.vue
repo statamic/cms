@@ -98,7 +98,7 @@ export default {
 
     computed: {
         selectedOptions() {
-            let selections = this.modelValue || [];
+            let selections = this.modelValue === null ? [] : this.modelValue;
             if (typeof selections === 'string' || typeof selections === 'number') {
                 selections = [selections];
             }
@@ -108,7 +108,7 @@ export default {
         },
 
         options() {
-            return this.normalizeInputOptions(this.config.options);
+            return this.normalizeInputOptions(this.meta.options);
         },
 
         replicatorPreview() {

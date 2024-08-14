@@ -293,6 +293,7 @@
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
+            @failed="publishActionFailed"
         />
 
         <confirmation-modal
@@ -820,6 +821,11 @@ export default {
                 this.permalink = response.data.data.permalink
                 this.$nextTick(() => this.$emit('saved', response));
             }
+        },
+
+        publishActionFailed() {
+            this.confirmPublish = false;
+            this.saving = false;
         },
 
         setFieldValue(handle, value) {

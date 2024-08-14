@@ -9,7 +9,7 @@
                      >
                         <option
                             v-for="(element, index) in keyedData"
-                            v-text="config.keys[element.key] || element.key"
+                            v-text="meta.keys[element.key] || element.key"
                             :key="element._id"
                             :value="element.key"
                             :selected="element.key === selectedKey"
@@ -34,7 +34,7 @@
             <table class="array-table">
                 <tbody>
                     <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
-                        <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] || element.key }}</label></th>
+                        <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ meta.keys[element.key] || element.key }}</label></th>
                         <td>
                             <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
                         </td>
@@ -136,7 +136,7 @@ export default {
 
     computed: {
         isKeyed() {
-            return Boolean(Object.keys(this.config.keys).length);
+            return Boolean(Object.keys(this.meta.keys).length);
         },
 
         isDynamic() {
@@ -148,7 +148,7 @@ export default {
         },
 
         keyedData() {
-            return this.data.filter(element => this.config.keys.hasOwnProperty(element.key));
+            return this.data.filter(element => this.meta.keys.hasOwnProperty(element.key));
         },
 
         maxItems() {

@@ -56,6 +56,7 @@ const components = new Components();
 export default {
     bootingCallbacks: [],
     bootedCallbacks: [],
+    darkMode: null,
 
     get $callbacks() {
         return callbacks;

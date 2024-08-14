@@ -9,6 +9,7 @@
         :min="config.min"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
+        :placeholder="__(config.placeholder)"
         :model-value="modelValue"
         @update:model-value="updateDebounced"
         @focus="$emit('focus')"
