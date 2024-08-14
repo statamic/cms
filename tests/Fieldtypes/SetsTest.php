@@ -370,13 +370,13 @@ class SetsTest extends TestCase
                 'display' => 'Alfa',
                 'instructions' => 'Alfa instructions',
                 'icon' => 'alfa-icon',
-                'hide' => false,
                 'sections' => [
                     [
                         'handle' => 'one',
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
+                        'hide' => false,
                         'fields' => [
                             [
                                 'handle' => 'field_one',
@@ -402,7 +402,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
-                        'hide' => null,
+                        'hide' => false,
                         'fields' => [
                             [
                                 'handle' => 'field_one',
