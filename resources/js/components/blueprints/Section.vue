@@ -51,7 +51,7 @@
                     </div>
                     <div class="form-group w-full" v-if="showHideField">
                         <label v-text="__('Hidden')" />
-                        <toggle-input :value="editingSection.hide === true" @input="editingSection.hide = $event ? true : null" />
+                        <toggle-input v-model="editingSection.hide" />
                     </div>
                 </div>
             </confirmation-modal>
