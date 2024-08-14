@@ -23,7 +23,7 @@ trait HasSelectOptions
 
     protected function getOptions(): array
     {
-        $options = $this->config('options') ?? [];
+        $options = (array) $this->config('options') ?? [];
 
         if (array_is_list($options) && ! is_array(Arr::first($options))) {
             $options = collect($options)
