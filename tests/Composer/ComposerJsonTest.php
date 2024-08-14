@@ -3,6 +3,7 @@
 namespace Tests\Composer;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Composer\Json;
 use Statamic\Console\Composer\Scripts;
 use Tests\TestCase;
@@ -36,7 +37,7 @@ class ComposerJsonTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_detect_if_statamic_pre_update_cmd_is_not_registered()
     {
         $this->assertTrue(Json::isMissingPreUpdateCmd());
@@ -53,7 +54,7 @@ class ComposerJsonTest extends TestCase
         $this->assertFalse(Json::isMissingPreUpdateCmd());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_pre_update_cmd_array_when_doesnt_exist()
     {
         $this->files->put($this->path, <<<'EOT'
@@ -93,7 +94,7 @@ EOT;
         $this->assertEquals($expected, $this->files->get($this->path));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_statamic_pre_update_cmd_to_existing_array()
     {
         $this->files->put($this->path, <<<'EOT'
@@ -137,7 +138,7 @@ EOT;
         $this->assertEquals($expected, $this->files->get($this->path));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_nothing_if_pre_update_cmd_already_exists()
     {
         $composerJson = <<<'EOT'
@@ -166,7 +167,7 @@ EOT;
         $this->assertEquals($composerJson, $this->files->get($this->path));
     }
 
-    /** @test */
+    #[Test]
     public function it_will_throw_error_when_it_unsuccessfully_adds_pre_update_cmd()
     {
         $invalidJson = <<<'EOT'

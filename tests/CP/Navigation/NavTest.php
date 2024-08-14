@@ -3,6 +3,7 @@
 namespace Tests\CP\Navigation;
 
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
 use Statamic\Facades\CP\Nav;
@@ -30,7 +31,7 @@ class NavTest extends TestCase
         Facades\Form::shouldReceive('all')->andReturn(collect());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_nav_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -51,7 +52,7 @@ class NavTest extends TestCase
         $this->assertFalse($item->isHidden());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_more_explicitly_create_a_nav_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -67,7 +68,7 @@ class NavTest extends TestCase
         $this->assertEquals('http://localhost/r2', $item->url());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_nav_item_with_a_more_custom_config()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -93,7 +94,7 @@ class NavTest extends TestCase
         $this->assertEquals(' target="_blank" class="red"', $item->attributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_nav_item_which_uses_default_entries_icon()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -106,7 +107,7 @@ class NavTest extends TestCase
         $this->assertEquals(\Statamic\Statamic::svg('icons/light/entries'), $item->svg());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_nav_item_with_references_to_a_bundled_light_svg_icon()
     {
         File::put($svg = statamic_path('resources/svg/icons/light/test.svg'), '<svg>the totally real svg</svg>');
@@ -123,7 +124,7 @@ class NavTest extends TestCase
         File::delete($svg);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_nav_item_with_a_custom_inline_svg_icon()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -139,7 +140,7 @@ class NavTest extends TestCase
         $this->assertEquals($expected, $item->svg());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_find_and_modify_an_existing_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -159,7 +160,7 @@ class NavTest extends TestCase
         $this->assertEquals('http://localhost/d-squad', $item->url());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_find_and_modify_an_existing_item_using_magic_constructor()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -180,7 +181,7 @@ class NavTest extends TestCase
         $this->assertEquals('http://localhost/d-squad', $item->url());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_build_items_that_the_user_is_not_authorized_to_see()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -196,7 +197,7 @@ class NavTest extends TestCase
         $this->assertNull($this->build()->get('The Empire'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_nav_item_with_children()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -226,7 +227,7 @@ class NavTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_parent_icon_on_children()
     {
         File::put($svg = statamic_path('resources/svg/icons/light/droid.svg'), '<svg>droid</svg>');
@@ -256,7 +257,7 @@ class NavTest extends TestCase
         File::delete($svg);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_build_children_that_the_user_is_not_authorized_to_see()
     {
         $this->setTestRoles(['sith' => ['view sith diaries']]);
@@ -286,7 +287,7 @@ class NavTest extends TestCase
         $this->assertNull($logs->children());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_nav_item_with_children_in_a_closure_to_defer_loading_until_they_are_needed()
     {
         $this->markTestSkipped('Getting a NotFoundHttpException, even though I\'m registering route?');
@@ -318,7 +319,7 @@ class NavTest extends TestCase
         $this->assertEquals('droids::security_droids::k_2so', $item->children()->get(1)->id());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_resolve_its_children_from_closure()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -344,7 +345,7 @@ class NavTest extends TestCase
         $this->assertEquals('droids::security_droids::k_2so', $item->children()->get(1)->id());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_a_nav_section()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -364,7 +365,7 @@ class NavTest extends TestCase
         $this->assertNull($this->build()->get('Ships'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_a_specific_nav_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -385,7 +386,7 @@ class NavTest extends TestCase
         $this->assertEquals('A-Wing', $ships->first()->display());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_a_specific_nav_child_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -420,7 +421,7 @@ class NavTest extends TestCase
         $this->assertEquals(['Foo', 'Bar'], $ships->last()->resolveChildren()->children()->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_extend_to_defer_until_after_statamic_core_nav_items_are_built()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -438,7 +439,7 @@ class NavTest extends TestCase
         $this->assertEquals('Jedi', $this->build()->keys()->last());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_extend_to_remove_a_default_statamic_nav_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -454,7 +455,7 @@ class NavTest extends TestCase
         $this->assertNotContains('Collections', $this->build()->get('Content')->map->display());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_extend_to_remove_a_default_statamic_child_nav_item()
     {
         Facades\Collection::make('articles')->save();
@@ -481,7 +482,7 @@ class NavTest extends TestCase
         $this->assertEquals(['Pages'], $collectionsChildren()->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_the_url()
     {
         tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
@@ -500,7 +501,7 @@ class NavTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_cleaner_editable_version_of_the_url()
     {
         tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
@@ -516,7 +517,7 @@ class NavTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_automatically_add_a_resolve_children_pattern_when_setting_url_if_one_is_already_defined()
     {
         $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
@@ -524,7 +525,7 @@ class NavTest extends TestCase
         $this->assertEquals('foo.*', $nav->active());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_build_with_hidden_items()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -536,7 +537,7 @@ class NavTest extends TestCase
         $this->assertEquals('Visible Item', $this->build()->get('Test Section')->first()->display());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_build_sections_containing_only_hidden_items()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -546,7 +547,7 @@ class NavTest extends TestCase
         $this->assertNull($this->build()->get('Test Section'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_build_with_hidden_items()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -560,7 +561,7 @@ class NavTest extends TestCase
         $this->assertTrue($items->first()->isHidden());
     }
 
-    /** @test */
+    #[Test]
     public function it_hides_items_after_calling_with_hidden()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -576,7 +577,7 @@ class NavTest extends TestCase
         $this->assertEquals('Visible Item', $this->build()->get('Test Section')->first()->display());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_preserve_current_id_to_prevent_dynamic_id_generation()
     {
         $item = Nav::droids('3PO');
@@ -595,7 +596,7 @@ class NavTest extends TestCase
         $this->assertEquals('droids_preserved::r2', $item->id());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_sync_original_state_to_original_property()
     {
         $item = Nav::droids('C-3PO')
@@ -630,7 +631,7 @@ class NavTest extends TestCase
         $this->assertEquals(['B1', 'B2'], $item->original()->children()->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_children_on_synced_original_nav_item()
     {
         $item = Nav::droids('C-3PO')->children(function () {
@@ -669,7 +670,7 @@ class NavTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_call_name_alias_for_backwards_compatibility()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -681,7 +682,7 @@ class NavTest extends TestCase
         $this->assertEquals('NOT 3PO', $item->name());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_rebuild_from_fresh_slate()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -699,7 +700,7 @@ class NavTest extends TestCase
         $this->assertCount(1, $this->build()->get('Jedi')->map->display());
     }
 
-    /** @test */
+    #[Test]
     public function it_ensures_top_level_section_is_always_built_when_building_with_hidden()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());

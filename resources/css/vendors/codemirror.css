@@ -363,10 +363,6 @@
     .CodeMirror {
         @apply border p-0
     }
-
-    CodeMirror-scroll {
-        min-height: 80px;
-    }
   }
 
 

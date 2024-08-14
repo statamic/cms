@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Fieldsets;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Tests\Fakes\FakeFieldsetRepository;
@@ -21,7 +22,7 @@ class StoreFieldsetTest extends TestCase
         FieldsetRepository::swap(new FakeFieldsetRepository);
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -41,7 +42,7 @@ class StoreFieldsetTest extends TestCase
         $this->assertNull(Facades\Fieldset::find('test'));
     }
 
-    /** @test */
+    #[Test]
     public function fieldset_gets_created()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
@@ -63,7 +64,7 @@ class StoreFieldsetTest extends TestCase
         $this->assertEquals('test', $fieldset->handle());
     }
 
-    /** @test */
+    #[Test]
     public function title_is_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
@@ -77,7 +78,7 @@ class StoreFieldsetTest extends TestCase
             ->assertSessionHasErrors('title');
     }
 
-    /** @test */
+    #[Test]
     public function handle_is_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
@@ -91,7 +92,7 @@ class StoreFieldsetTest extends TestCase
             ->assertSessionHasErrors('handle');
     }
 
-    /** @test */
+    #[Test]
     public function handle_must_be_alpha_dash()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();

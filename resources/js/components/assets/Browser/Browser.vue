@@ -21,17 +21,6 @@
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
-                <div class="publish-tabs tabs rounded-none rounded-t mb-3 shadow-none" v-if="showContainerTabs">
-                    <button class="tab-button" v-for="item in containers" :key="item.id"
-                        v-text="__(item.title)"
-                        :class="{
-                            active: item.id === container.id,
-                            'border-b border-gray-300': item.id !== container.id
-                        }"
-                        @click="selectContainer(item.id)"
-                    />
-                </div>
-
                 <data-list
                     v-if="!initializing"
                     :rows="assets"
@@ -109,7 +98,7 @@
                                         </td>
                                         <td :colspan="columns.length" />
                                     </tr>
-                                    <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation && page === 1">
+                                    <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer group">
@@ -321,7 +310,6 @@ export default {
         // Either the ID, or the whole container object.
         initialContainer: {},
         selectedPath: String,        // The path to display, determined by a parent component.
-        restrictContainerNavigation: Boolean,  // Whether to restrict to a single container and prevent navigation.
         restrictFolderNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         maxFiles: Number,
@@ -374,10 +362,6 @@ export default {
 
         actionContext() {
             return {container: this.selectedContainer};
-        },
-
-        showContainerTabs() {
-            return !this.restrictContainerNavigation && Object.keys(this.containers).length > 1
         },
 
         showAssetEditor() {
@@ -552,14 +536,6 @@ export default {
             this.$emit('navigated', this.container, this.path);
         },
 
-        selectContainer(id) {
-            this.container = this.containers[id];
-            this.path = '/';
-            this.page = 1;
-
-            this.$emit('navigated', this.container, this.path);
-        },
-
         setMode(mode) {
             this.mode = mode;
             this.setPreference('mode', mode == 'table' ? null : mode);
@@ -628,7 +604,9 @@ export default {
             const i = this.selectedAssets.indexOf(id);
             this.$refs.browser.focus()
 
-            if (i != -1) {
+            if (this.maxFiles === 1) {
+                this.selectedAssets = [id];
+            } else if (i != -1) {
                 this.selectedAssets.splice(i, 1);
             } else if (! this.reachedSelectionLimit) {
                 if ($event.shiftKey && this.lastItemClicked !== null) {

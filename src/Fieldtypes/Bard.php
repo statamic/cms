@@ -9,6 +9,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
+use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\GraphQL\Types\BardSetsType;
 use Statamic\GraphQL\Types\BardTextType;
@@ -37,7 +38,6 @@ class Bard extends Replicator
     ];
 
     protected $categories = ['text', 'structured'];
-    protected $defaultValue = [];
     protected $rules = [];
 
     protected function configFieldItems(): array
@@ -245,8 +245,13 @@ class Bard extends Replicator
 
     protected function performAugmentation($value, $shallow)
     {
-        if ($this->shouldSaveHtml() && is_string($value)) {
-            return is_null($value) ? $value : $this->resolveStatamicUrls($value);
+        if ($this->shouldSaveHtml()) {
+            if (
+                is_string($value)
+                || ($value instanceof Value && is_string($value->value())) // This part is not under test. See https://github.com/statamic/cms/pull/10104
+            ) {
+                return is_null($value) ? $value : $this->resolveStatamicUrls($value);
+            }
         }
 
         if ($this->isLegacyData($value)) {

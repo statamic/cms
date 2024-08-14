@@ -4,6 +4,7 @@ namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -13,7 +14,7 @@ class MountingTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function updating_a_mounted_page_will_update_the_uris_for_each_entry_in_that_collection()
     {
         config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
@@ -39,7 +40,7 @@ class MountingTest extends TestCase
         $this->assertEquals($two->id(), Entry::findByUri('/pages/diary/two')->id());
     }
 
-    /** @test */
+    #[Test]
     public function updating_a_mounted_page_will_not_update_the_uris_when_slug_is_clean()
     {
         config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.

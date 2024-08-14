@@ -2,15 +2,15 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class AliasTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_aliases_arrays()
     {
         $arr = ['one', 'two'];
@@ -18,7 +18,7 @@ class AliasTest extends TestCase
         $this->assertEquals(['as' => ['one', 'two']], $this->modify($arr, 'as'));
     }
 
-    /** @test */
+    #[Test]
     public function it_aliases_collections()
     {
         $collection = collect(['one', 'two']);
@@ -26,7 +26,7 @@ class AliasTest extends TestCase
         $this->assertEquals(['as' => $collection], $this->modify($collection, 'as'));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_nothing_when_no_array_or_collection_was_passed()
     {
         $noCollection = 'one';

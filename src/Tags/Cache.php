@@ -17,7 +17,7 @@ class Cache extends Tags implements CachesOutput
             return [];
         }
 
-        $store = LaraCache::store();
+        $store = LaraCache::store($this->params->get('store'));
 
         if (count($tags = $this->params->explode('tags', []))) {
             $store = $store->tags($tags);

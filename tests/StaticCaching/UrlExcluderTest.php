@@ -4,6 +4,7 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultUrlExcluder;
 use Statamic\StaticCaching\UrlExcluder;
@@ -20,7 +21,7 @@ class UrlExcluderTest extends TestCase
         app()->instance(Cacher::class, $mock);
     }
 
-    /** @test */
+    #[Test]
     public function it_defaults_to_the_default_excluder_when_only_urls_are_defined()
     {
         config(['statamic.static_caching.exclude' => [
@@ -35,7 +36,7 @@ class UrlExcluderTest extends TestCase
         $this->assertEquals('http://example.com', $excluder->getBaseUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_defaults_to_the_default_excluder_when_no_class_is_provided()
     {
         config(['statamic.static_caching.exclude' => [
@@ -52,7 +53,7 @@ class UrlExcluderTest extends TestCase
         $this->assertEquals(['/one', '/two'], $excluder->getExclusions());
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_error_when_referencing_class_that_doesnt_exist()
     {
         $this->expectException(BindingResolutionException::class);
@@ -65,7 +66,7 @@ class UrlExcluderTest extends TestCase
         app(UrlExcluder::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_custom_class()
     {
         config(['statamic.static_caching.exclude' => [

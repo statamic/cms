@@ -408,9 +408,14 @@ class Field implements Arrayable
 
         $fields = $fieldtype->configFields()->addValues($this->config);
 
-        return array_merge($this->config, $fields->preProcess()->values()->all(), [
-            'component' => $fieldtype->component(),
-        ]);
+        return array_merge(
+            self::commonFieldOptions()->all()->map->defaultValue()->all(),
+            $this->config,
+            $fields->preProcess()->values()->all(),
+            [
+                'component' => $fieldtype->component(),
+            ]
+        );
     }
 
     public function meta()
@@ -467,7 +472,6 @@ class Field implements Arrayable
             'resource',
             'status',
             'unless',
-            'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
             'views',
         ];
 
@@ -526,6 +530,15 @@ class Field implements Arrayable
                 'default' => 'hidden',
                 'unless' => [
                     'type' => 'section',
+                ],
+            ],
+            'sortable' => [
+                'display' => __('Sortable'),
+                'instructions' => __('statamic::messages.fields_sortable_instructions'),
+                'type' => 'toggle',
+                'default' => true,
+                'unless' => [
+                    'visibility' => 'equals computed',
                 ],
             ],
             'visibility' => [

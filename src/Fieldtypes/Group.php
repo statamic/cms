@@ -13,7 +13,6 @@ class Group extends Fieldtype
 {
     protected $categories = ['structured'];
     protected $defaultable = false;
-    protected $defaultValue = [];
 
     protected function configFieldItems(): array
     {
@@ -35,6 +34,12 @@ class Group extends Fieldtype
                     'fullscreen' => [
                         'display' => __('Allow Fullscreen Mode'),
                         'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'border' => [
+                        'display' => __('Border'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.border'),
                         'type' => 'toggle',
                         'default' => true,
                     ],

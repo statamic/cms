@@ -4,6 +4,7 @@ namespace Tests\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class MakeActionTest extends TestCase
@@ -28,7 +29,7 @@ class MakeActionTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_an_action()
     {
         $path = base_path('app/Actions/Delete.php');
@@ -41,7 +42,7 @@ class MakeActionTest extends TestCase
         $this->assertStringContainsString('namespace App\Actions;', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_will_not_overwrite_an_existing_action()
     {
         $path = base_path('app/Actions/Delete.php');
@@ -56,7 +57,7 @@ class MakeActionTest extends TestCase
         $this->assertStringContainsString('overwritten action', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function using_force_option_will_overwrite_original_action()
     {
         $path = base_path('app/Actions/Delete.php');
@@ -71,7 +72,7 @@ class MakeActionTest extends TestCase
         $this->assertStringNotContainsString('overwritten action', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_an_action_into_an_addon()
     {
         $path = base_path('addons/yoda/bag-odah');
