@@ -2,11 +2,12 @@
 
 namespace Tests\Auth\Protect;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class PasswordEntryTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_returns_back_with_error_if_theres_no_token()
     {
         $this
@@ -18,7 +19,7 @@ class PasswordEntryTest extends TestCase
             ->assertSessionHasErrors('token', null, 'passwordProtect');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_back_with_error_if_the_wrong_password_is_entered()
     {
         config(['statamic.protect.schemes.password-scheme' => [
@@ -42,7 +43,7 @@ class PasswordEntryTest extends TestCase
             ->assertSessionHasErrors('password', null, 'passwordProtect');
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_access_if_allowed_password_was_entered()
     {
         $this->withoutExceptionHandling();

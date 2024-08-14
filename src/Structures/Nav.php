@@ -7,9 +7,12 @@ use Statamic\Contracts\Structures\NavTree;
 use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\NavBlueprintFound;
+use Statamic\Events\NavCreated;
+use Statamic\Events\NavCreating;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavDeleting;
 use Statamic\Events\NavSaved;
+use Statamic\Events\NavSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
@@ -22,11 +25,26 @@ class Nav extends Structure implements Contract
     use ExistsAsFile;
 
     protected $collections;
+    protected $canSelectAcrossSites = false;
     private $blueprintCache;
 
     public function save()
     {
+        $isNew = ! Facades\Nav::find($this->handle());
+
+        if ($isNew && NavCreating::dispatch($this) === false) {
+            return false;
+        }
+
+        if (NavSaving::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\Nav::save($this);
+
+        if ($isNew) {
+            NavCreated::dispatch($this);
+        }
 
         NavSaved::dispatch($this);
 
@@ -59,6 +77,7 @@ class Nav extends Structure implements Contract
         return [
             'title' => $this->title,
             'collections' => $this->collections,
+            'select_across_sites' => $this->canSelectAcrossSites ? true : null,
             'max_depth' => $this->maxDepth,
             'root' => $this->expectsRoot ?: null,
         ];
@@ -138,5 +157,12 @@ class Nav extends Structure implements Contract
         NavBlueprintFound::dispatch($blueprint, $this);
 
         return $blueprint;
+    }
+
+    public function canSelectAcrossSites($canSelect = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('canSelectAcrossSites')
+            ->args(func_get_args());
     }
 }

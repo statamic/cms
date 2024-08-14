@@ -40,6 +40,10 @@ export default {
         }
     },
 
+    provide: {
+        isInsideSet: true,
+    },
+
     methods: {
 
         tabsUpdated(tabs) {

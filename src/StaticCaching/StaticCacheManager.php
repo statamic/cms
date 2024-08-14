@@ -4,6 +4,7 @@ namespace Statamic\StaticCaching;
 
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Events\StaticCacheCleared;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
@@ -68,6 +69,8 @@ class StaticCacheManager extends Manager
         if ($this->hasCustomStore()) {
             $this->cacheStore()->flush();
 
+            StaticCacheCleared::dispatch();
+
             return;
         }
 
@@ -78,6 +81,8 @@ class StaticCacheManager extends Manager
         });
 
         $this->cacheStore()->forget('nocache::urls');
+
+        StaticCacheCleared::dispatch();
     }
 
     public function nocacheJs(string $js)

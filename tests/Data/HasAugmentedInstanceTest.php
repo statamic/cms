@@ -3,6 +3,7 @@
 namespace Tests\Data;
 
 use ArrayAccess;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\HasAugmentedInstance;
@@ -11,7 +12,7 @@ use Tests\TestCase;
 
 class HasAugmentedInstanceTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_makes_an_augmented_instance()
     {
         $augmentedCollection = new AugmentedCollection(['foo', 'bar', 'baz']);
@@ -58,7 +59,7 @@ class HasAugmentedInstanceTest extends TestCase
         $this->assertTrue($collection->hasShallowNesting());
     }
 
-    /** @test */
+    #[Test]
     public function instance_runs_through_hook()
     {
         $mock = $this->mock(Augmented::class);
@@ -94,7 +95,7 @@ class HasAugmentedInstanceTest extends TestCase
         $this->assertSame($mock2, $thing->augmented());
     }
 
-    /** @test */
+    #[Test]
     public function augmented_thing_can_define_the_default_array_keys()
     {
         $mock = $this->mock(Augmented::class);
@@ -127,7 +128,7 @@ class HasAugmentedInstanceTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $thing->toAugmentedArray());
     }
 
-    /** @test */
+    #[Test]
     public function augmented_thing_can_define_the_default_relations()
     {
         $mock = $this->mock(Augmented::class);
@@ -160,7 +161,7 @@ class HasAugmentedInstanceTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $thing->toAugmentedArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_for_array_key_existence()
     {
         $mock = $this->mock(Augmented::class);

@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Tests\TestCase;
@@ -18,7 +19,7 @@ class GetSiteTagTest extends TestCase
         ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_site_by_handle()
     {
         $this->assertEquals(
@@ -32,7 +33,7 @@ class GetSiteTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_used_as_single_tag()
     {
         $this->assertEquals(
@@ -41,7 +42,7 @@ class GetSiteTagTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_if_handle_is_missing()
     {
         $this->expectExceptionMessage('A site handle is required.');
@@ -49,7 +50,7 @@ class GetSiteTagTest extends TestCase
         Antlers::parse('{{ get_site }}{{ name }}{{ /get_site }}');
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_if_site_doesnt_exist()
     {
         $this->expectExceptionMessage('Site [nonexistent] does not exist.');

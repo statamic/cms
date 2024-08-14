@@ -1,6 +1,6 @@
 <template>
     <modal name="confirmation-modal" @opened="$emit('opened')">
-        <div class="confirmation-modal flex flex-col h-full">
+        <form class="confirmation-modal flex flex-col h-full" @submit.prevent="submit">
             <header v-if="title" class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
                 {{ __(title) }}
             </header>
@@ -13,10 +13,10 @@
                 </slot>
             </div>
             <div class="px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-b-lg border-t dark:border-dark-900 flex items-center justify-end text-sm">
-                <button class="text-gray dark:text-dark-150 hover:text-gray-900 dark:hover:text-dark-100" @click="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" />
-                <button class="rtl:mr-4 ltr:ml-4" :class="buttonClass" :disabled="disabled" v-text="__(buttonText)" @click="$emit('confirm')" />
+                <button class="btn-flat" @click.prevent="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" />
+                <button class="rtl:mr-4 ltr:ml-4" :class="buttonClass" :disabled="disabled" v-text="__(buttonText)" />
             </div>
-        </div>
+        </form>
     </modal>
 </template>
 
@@ -75,12 +75,10 @@ export default {
 
     created() {
         this.escBinding = this.$keys.bind('esc', this.dismiss)
-        this.enterBinding = this.$keys.bind('enter', this.submit)
     },
 
      beforeDestroy() {
         this.escBinding.destroy()
-        this.enterBinding.destroy()
     },
 }
 </script>

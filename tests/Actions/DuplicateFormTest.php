@@ -2,6 +2,7 @@
 
 namespace Tests\Actions;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\DuplicateForm;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -26,7 +27,7 @@ class DuplicateFormTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_duplicates_a_form()
     {
         Form::make('a')->title('Original A')->honeypot('a')->save();
@@ -52,7 +53,7 @@ class DuplicateFormTest extends TestCase
         ], $this->formData());
     }
 
-    /** @test */
+    #[Test]
     public function user_with_create_permission_is_authorized()
     {
         $this->setTestRoles([

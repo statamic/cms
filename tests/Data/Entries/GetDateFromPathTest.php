@@ -2,16 +2,15 @@
 
 namespace Tests\Data\Entries;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\GetDateFromPath;
 use Tests\TestCase;
 
 class GetDateFromPathTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider pathsProvider
-     **/
+    #[Test]
+    #[DataProvider('pathsProvider')]
     public function it_gets_the_date_from_a_path($expected, $path)
     {
         $this->assertEquals($expected, (new GetDateFromPath)($path));

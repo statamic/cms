@@ -101,6 +101,7 @@ class InstallEloquentDriver extends Command
             'navs' => 'Navigations',
             'nav_trees' => 'Navigation Trees',
             'revisions' => 'Revisions',
+            'sites' => 'Sites',
             'taxonomies' => 'Taxonomies',
             'terms' => 'Terms',
             'tokens' => 'Tokens',
@@ -148,6 +149,9 @@ class InstallEloquentDriver extends Command
                 case 'revisions':
                     return ! config('statamic.revisions.enabled')
                         || config('statamic.eloquent-driver.revisions.driver') === 'eloquent';
+
+                case 'sites':
+                    return config('statamic.eloquent-driver.sites.driver') === 'eloquent';
 
                 case 'taxonomies':
                     return config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent';
@@ -517,6 +521,23 @@ class InstallEloquentDriver extends Command
 
             $this->components->info('Imported existing revisions');
         }
+    }
+
+    protected function migrateSites(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-site-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('sites');
+
+                $this->runArtisanCommand('statamic:eloquent:import-sites');
+            },
+            message: 'Migrating sites...'
+        );
+
+        $this->components->info('Configured & imported sites');
     }
 
     protected function migrateTaxonomies(): void

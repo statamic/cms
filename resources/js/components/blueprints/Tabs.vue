@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="!singleTab && tabs.length > 0" class="tabs-container relative">
-            <div ref="tabs" class="tabs flex-1 flex space-x-3 overflow-auto rtl:pl-6 ltr:pr-6" role="tablist">
+            <div ref="tabs" class="tabs flex-1 flex space-x-3 rtl:space-x-reverse overflow-auto rtl:pl-6 ltr:pr-6" role="tablist">
                 <tab
                     ref="tab"
                     v-for="tab in tabs"

@@ -2,6 +2,7 @@
 
 namespace Tests\Preferences;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
@@ -23,7 +24,7 @@ class PreferencesTest extends TestCase
         UserGroup::all()->each->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_registers_with_string_and_field_definition()
     {
         $preferences = new Preferences;
@@ -41,7 +42,7 @@ class PreferencesTest extends TestCase
         ], $preferences->tabs()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_registers_by_returning_array_from_extend_closure()
     {
         $preferences = new Preferences;
@@ -95,7 +96,7 @@ class PreferencesTest extends TestCase
         ], $preferences->tabs()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_defers_registration_until_boot_using_extend_method()
     {
         $preferences = new Preferences;
@@ -113,7 +114,7 @@ class PreferencesTest extends TestCase
         $this->assertTrue($callbackRan);
     }
 
-    /** @test */
+    #[Test]
     public function it_places_any_preferences_registered_early_without_extend_callback_at_the_end()
     {
         $preferences = new Preferences;
@@ -132,7 +133,7 @@ class PreferencesTest extends TestCase
         $this->assertEquals(['three', 'one', 'two'], $fields);
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_fresh_default_preferences()
     {
         $preferences = new Preferences;
@@ -151,7 +152,7 @@ class PreferencesTest extends TestCase
         ], $preferences->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_fresh_role_preferences()
     {
         $preferences = new Preferences;
@@ -170,7 +171,7 @@ class PreferencesTest extends TestCase
         ], $preferences->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_fresh_role_preferences_via_group()
     {
         $preferences = new Preferences;
@@ -183,7 +184,7 @@ class PreferencesTest extends TestCase
         $this->assertEquals(['alfa' => 'bravo'], $preferences->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_fresh_user_preferences()
     {
         $preferences = new Preferences;
@@ -202,7 +203,7 @@ class PreferencesTest extends TestCase
         ], $preferences->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_preferences_with_priority()
     {
         // This test will check a handful of preferences, adding them step by step. With each step up in priority, fewer

@@ -8,14 +8,18 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Contracts\Support\Boolable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Entry;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Tags\Tags;
@@ -63,7 +67,7 @@ class TemplateTest extends ParserTestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function string_variable()
     {
         $template = '{{ string }}';
@@ -71,7 +75,7 @@ class TemplateTest extends ParserTestCase
         $this->assertEquals('Hello wilderness', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function string_variables_with_tight_braces()
     {
         $template = '{{string}}';
@@ -79,7 +83,7 @@ class TemplateTest extends ParserTestCase
         $this->assertEquals('Hello wilderness', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function array_variables()
     {
         $template = <<<'EOT'
@@ -124,7 +128,7 @@ EOT;
         $this->assertEquals('Very deep', $this->renderString('{{ associative:three[second_key] }}', $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function complex_array_variable()
     {
         $template = <<<'EOT'
@@ -157,7 +161,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function associative_array_variable()
     {
         $template = <<<'EOT'
@@ -195,7 +199,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function scope_glue()
     {
         $template = '{{ associative:one }} {{ associative.two }}';
@@ -203,7 +207,7 @@ EOT;
         $this->assertEquals('hello wilderness', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function non_existent_variables_should_be_null()
     {
         $template = '{{ missing }}';
@@ -211,13 +215,13 @@ EOT;
         $this->assertEquals('', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function accessing_strings_as_arrays_returns_null()
     {
         $this->assertEquals('bar, ><', $this->renderString('{{ foo }}, >{{ foo:test }}<', ['foo' => 'bar']));
     }
 
-    /** @test */
+    #[Test]
     public function accessing_string_as_array_which_exists_as_callback_calls_the_callback()
     {
         (new class extends Tags
@@ -233,7 +237,7 @@ EOT;
         $this->assertEquals('bar, callback', $this->renderString('{{ foo }}, {{ foo:test }}', ['foo' => 'bar'], true));
     }
 
-    /** @test */
+    #[Test]
     public function non_arrays_cannot_be_looped()
     {
         Log::shouldReceive('debug')->once()
@@ -246,7 +250,7 @@ EOT;
         $this->assertEquals('', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function static_strings_with_double_quotes_should_be_left_alone()
     {
         $template = '{{ "Thundercats are Go!" }}';
@@ -254,7 +258,7 @@ EOT;
         $this->assertEquals('Thundercats are Go!', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function static_strings_with_single_quotes_should_be_left_alone()
     {
         $template = "{{ 'Thundercats are Go!' }}";
@@ -262,7 +266,7 @@ EOT;
         $this->assertEquals('Thundercats are Go!', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function static_strings_with_double_quotes_can_be_modified()
     {
         $template = '{{ "Thundercats are Go!" | upper }}';
@@ -270,7 +274,7 @@ EOT;
         $this->assertEquals('THUNDERCATS ARE GO!', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function static_strings_with_single_quotes_can_be_modified()
     {
         $template = "{{ 'Thundercats are Go!' | upper }}";
@@ -278,7 +282,7 @@ EOT;
         $this->assertEquals('THUNDERCATS ARE GO!', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function single_braces_should_not_be_parsed()
     {
         $template = '{string}';
@@ -286,7 +290,7 @@ EOT;
         $this->assertEquals('{string}', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function modified_non_existent_variables_should_be_null()
     {
         $template = '{{ missing|upper }}';
@@ -294,7 +298,7 @@ EOT;
         $this->assertEquals('', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function unclosed_array_variable_pairs_should_be_null()
     {
         Log::shouldReceive('debug')->once()
@@ -307,7 +311,7 @@ EOT;
         $this->assertEquals('', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function single_condition()
     {
         $template = '{{ if string == "Hello wilderness" }}yes{{ endif }}';
@@ -315,7 +319,7 @@ EOT;
         $this->assertEquals('yes', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function multiple_and_conditions()
     {
         $template = '{{ if string == "Hello wilderness" && content }}yes{{ endif }}';
@@ -323,7 +327,7 @@ EOT;
         $this->assertEquals('yes', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function multiple_or_conditions()
     {
         $should_pass = '{{ if string == "failure" || string == "Hello wilderness" }}yes{{ endif }}';
@@ -333,7 +337,7 @@ EOT;
         $this->assertEquals('', $this->renderString($should_fail, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function or_existence_conditions()
     {
         $should_pass = '{{ if string || strudel }}yes{{ endif }}';
@@ -347,7 +351,7 @@ EOT;
         $this->assertEquals('', $this->renderString($should_also_fail, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function conditions_on_overlapping_variable_names()
     {
         $template = '{{ if complex }}{{ complex limit="1" }}{{ string }}{{ /complex }}{{ /if }}';
@@ -355,7 +359,7 @@ EOT;
         $this->assertEquals('the first string', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function loop_with_param_inside_condition_matching_variable_name()
     {
         $template = '{{ if complex_string }}{{ complex_string }}{{ /if }}{{ complex }}{{ /complex }}';
@@ -363,7 +367,7 @@ EOT;
         $this->assertEquals('Hello wildernesses', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function ternary_condition()
     {
         $template = '{{ string ? "Pass" : "Fail" }}';
@@ -371,7 +375,7 @@ EOT;
         $this->assertEquals('Pass', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function ternary_condition_with_dynamic_array()
     {
         $template = '{{ associative[default_key] ? "Pass" : "Fail" }}';
@@ -379,7 +383,7 @@ EOT;
         $this->assertEquals('Pass', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function ternary_condition_isnt_too_greedy()
     {
         $template = '{{ content }} {{ string ? "Pass" : "Fail" }} {{ content }}';
@@ -387,7 +391,7 @@ EOT;
         $this->assertEquals('Paragraph Pass Paragraph', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function ternary_condition_with_a_variable()
     {
         $template = '{{ string ? string : "Fail" }}';
@@ -395,7 +399,7 @@ EOT;
         $this->assertEquals('Hello wilderness', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function ternary_condition_with_modifiers()
     {
         $template = '{{ string ? string | upper : "Fail" }}';
@@ -403,7 +407,7 @@ EOT;
         $this->assertEquals('HELLO WILDERNESS', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function ternary_condition_with_modifiers_and_dynamic_array()
     {
         $template = '{{ string ? associative[default_key] | upper : "Fail" }}';
@@ -411,7 +415,7 @@ EOT;
         $this->assertEquals('WILDERNESS', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function ternary_condition_with_multiple_lines()
     {
         $template = <<<'EOT'
@@ -423,7 +427,7 @@ EOT;
         $this->assertEquals('Pass', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function ternary_escapes_quotes_properly()
     {
         $data = ['condition' => true, 'var' => '"Wow" said the man'];
@@ -432,7 +436,7 @@ EOT;
         $this->assertEquals('"Wow" said the man', $this->renderString($template, $data));
     }
 
-    /** @test */
+    #[Test]
     public function ternary_condition_inside_parameter()
     {
         $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\TestTags::class;
@@ -462,7 +466,56 @@ EOT;
         ));
     }
 
-    /** @test */
+    #[Test]
+    #[DataProvider('boolablesInTernaryProvider')]
+    public function ternary_condition_with_boolables_supplied_to_tags_resolve_correctly($value, $expected)
+    {
+        $this->withFakeViews();
+
+        $this->viewShouldReturnRaw('test', "{{ the_field ? 'true' : 'false' }}");
+
+        $template = <<<'EOT'
+view: {{ the_field ? 'true' : 'false' }}, partial: {{ partial:test :the_field="the_field" }}
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, ['the_field' => $value], true));
+    }
+
+    public static function boolablesInTernaryProvider()
+    {
+        return [
+            'truthy generic boolable' => [
+                new class implements Boolable
+                {
+                    public function toBool(): bool
+                    {
+                        return true;
+                    }
+                },
+                'view: true, partial: true',
+            ],
+            'falsey generic boolable' => [
+                new class implements Boolable
+                {
+                    public function toBool(): bool
+                    {
+                        return false;
+                    }
+                },
+                'view: false, partial: false',
+            ],
+            'truthy LabeledValue' => [
+                new LabeledValue('foo', 'Foo'),
+                'view: true, partial: true',
+            ],
+            'falsey LabeledValue' => [
+                new LabeledValue(null, null),
+                'view: false, partial: false',
+            ],
+        ];
+    }
+
+    #[Test]
     public function null_coalescence()
     {
         // or, ?:, and ?? are all aliases.
@@ -483,7 +536,7 @@ EOT;
         $this->assertEquals('Pass', $this->renderString('{{ missing[thing] ?? "Pass" }}', $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function truth_coalescing()
     {
         $this->assertEquals('Pass', $this->renderString('{{ string ?= "Pass" }}', $this->variables));
@@ -510,7 +563,7 @@ EOT;
         $this->assertEquals('Pass', $this->renderString('{{ ! missing[thing] ?= "Pass" }}', $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function truth_coalescing_inside_loop()
     {
         $template = '{{ complex }}{{ first ?= "Pass" }}{{ /complex }}';
@@ -518,7 +571,7 @@ EOT;
         $this->assertEquals('Pass', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function single_standard_string_modifier_tight()
     {
         $template = '{{ string|upper }}';
@@ -526,7 +579,7 @@ EOT;
         $this->assertEquals('HELLO WILDERNESS', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function chained_standard_string_modifiers_tight()
     {
         $template = '{{ string|upper|lower }}';
@@ -534,7 +587,7 @@ EOT;
         $this->assertEquals('hello wilderness', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function single_standard_string_modifier_relaxed()
     {
         $template = '{{ string | upper }}';
@@ -542,7 +595,7 @@ EOT;
         $this->assertEquals('HELLO WILDERNESS', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function chained_standard_string_modifiers_relaxed()
     {
         $template = '{{ string | upper | lower }}';
@@ -550,7 +603,7 @@ EOT;
         $this->assertEquals('hello wilderness', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function chained_standard_string_modifiers_from_dynamic_array_relaxed()
     {
         $template = '{{ associative[default_key] | upper | lower }}';
@@ -558,7 +611,7 @@ EOT;
         $this->assertEquals('wilderness', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function single_parameter_string_modifier()
     {
         $template = "{{ string upper='true' }}";
@@ -566,7 +619,7 @@ EOT;
         $this->assertEquals('HELLO WILDERNESS', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function single_parameter_string_from_array_modifier()
     {
         $this->assertEquals(
@@ -585,7 +638,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function chained_parameter_string_modifiers()
     {
         $template = "{{ string upper='true' lower='true' }}";
@@ -593,7 +646,7 @@ EOT;
         $this->assertEquals('hello wilderness', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function single_standard_array_modifier_tight()
     {
         $template = '{{ simple|length }}';
@@ -601,7 +654,7 @@ EOT;
         $this->assertEquals('3', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function single_standard_array_modifier_relaxed()
     {
         $template = '{{ simple | length }}';
@@ -609,7 +662,7 @@ EOT;
         $this->assertEquals('3', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function chained_standard_array_modifiers_tight_on_content()
     {
         $template = '{{ content|markdown|lower }}';
@@ -617,7 +670,7 @@ EOT;
         $this->assertEquals("<p>paragraph</p>\n", $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function chained_standard_modifiers_relaxed_on_content()
     {
         $template = '{{ content | markdown | lower }}';
@@ -625,7 +678,7 @@ EOT;
         $this->assertEquals("<p>paragraph</p>\n", $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function chained_parameter_modifiers_on_content()
     {
         $template = "{{ content markdown='true' lower='true' }}";
@@ -633,7 +686,7 @@ EOT;
         $this->assertEquals("<p>paragraph</p>\n", $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function conditions_with_modifiers()
     {
         $template = "{{ if string|upper == 'HELLO WILDERNESS' }}yes{{ endif }}";
@@ -641,7 +694,7 @@ EOT;
         $this->assertEquals('yes', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function conditions_with_relaxed_modifiers()
     {
         $template = "{{ if string | upper == 'HELLO WILDERNESS' }}yes{{ endif }}";
@@ -649,7 +702,7 @@ EOT;
         $this->assertEquals('yes', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function tags_with_curlies_in_params_gets_parsed()
     {
         // the variables are inside Test@index
@@ -660,7 +713,7 @@ EOT;
         $this->assertEquals('Hello wilderness', $this->renderString($template, $this->variables, true));
     }
 
-    /** @test */
+    #[Test]
     public function date_condition_with_chained_relaxed_modifiers_with_spaces_in_arguments()
     {
         $template = '{{ if (date | modify_date:+3 years | format:Y) == "2015" }}yes{{ endif }}';
@@ -668,7 +721,7 @@ EOT;
         $this->assertEquals('yes', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function array_modifiers_get_parsed()
     {
         $template = '{{ simple limit="1" }}{{ value }}{{ /simple }}';
@@ -676,7 +729,7 @@ EOT;
         $this->assertEquals('one', $this->renderString($template, $this->variables));
     }
 
-    /** @test */
+    #[Test]
     public function array_modifiers_on_collections_get_parsed()
     {
         $template = '{{ simple limit="1" }}{{ value }}{{ /simple }}';
@@ -686,7 +739,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function recursive_children()
     {
         // the variables are inside RecursiveChildren@index
@@ -699,7 +752,7 @@ EOT;
         $this->assertEquals($expected, $this->renderString($template, ['foo' => 'Bar'], true));
     }
 
-    /** @test */
+    #[Test]
     public function recursive_children_with_scope()
     {
         // the variables are inside RecursiveChildren@index
@@ -712,7 +765,7 @@ EOT;
         $this->assertEquals($expected, $this->renderString($template, ['foo' => 'Bar'], true));
     }
 
-    /** @test */
+    #[Test]
     public function empty_values_are_not_overridden_by_previous_iteration()
     {
         $variables = [
@@ -733,7 +786,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function empty_values_are_not_overridden_by_previous_iteration_with_parsing()
     {
         $this->app['statamic.tags']['test'] = \Tests\Antlers\Fixtures\Addon\Tags\TestTags::class;
@@ -758,7 +811,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function nested_array_syntax()
     {
         $variables = [
@@ -782,7 +835,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_php_when_enabled()
     {
         $this->assertEquals(
@@ -796,7 +849,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_parse_noparse_tags()
     {
         $parsed = $this->renderString('{{ noparse }}{{ string }}{{ /noparse }} {{ string }}', $this->variables);
@@ -804,7 +857,7 @@ EOT;
         $this->assertEquals('{{ string }} Hello wilderness', $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_parse_data_in_noparse_modifiers()
     {
         $variables = [
@@ -817,7 +870,7 @@ EOT;
         $this->assertEquals('before {{ string }} after hello', $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_parse_data_in_noparse_modifiers_with_null_coalescence()
     {
         $variables = [
@@ -828,7 +881,7 @@ EOT;
         $this->assertEquals('before {{ string }} after hello', $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_parse_noparse_tags_inside_callbacks()
     {
         (new class extends Tags
@@ -868,7 +921,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, $this->variables, true));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_parse_data_in_noparse_modifiers_inside_callbacks()
     {
         (new class extends Tags
@@ -918,13 +971,13 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_parse_tags_prefixed_with_an_at_symbol()
     {
         $this->assertEquals('foo {{ bar }} baz', $this->renderString('foo @{{ bar }} baz'));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_parse_tags_prefixed_with_an_at_symbol_over_multiple_lines()
     {
         $template = <<<'EOT'
@@ -942,7 +995,7 @@ EOT;
         $this->assertEquals($expected, $this->renderString($template, ['baz' => 'BAZ']));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_parse_tags_prefixed_with_an_at_symbol_over_tags_in_multiple_lines()
     {
         $template = <<<'EOT'
@@ -960,7 +1013,7 @@ EOT;
         $this->assertEquals($expected, $this->renderString($template, ['baz' => 'BAZ', 'qux' => 'QUX']));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_parse_multiline_tags_prefixed_with_an_at_symbol_over_tags_in_multiple_lines()
     {
         $template = <<<'EOT'
@@ -982,13 +1035,13 @@ EOT;
         $this->assertEquals($expected, $this->renderString($template, ['baz' => 'BAZ', 'qux' => 'QUX']));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_parse_tags_prefixed_with_an_at_symbol_containing_nested_tags()
     {
         $this->assertEquals('{{ foo bar="{baz}" }}', $this->renderString('@{{ foo bar="{baz}" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_an_arrayable_object()
     {
         $this->assertEquals(
@@ -997,7 +1050,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_for_non_arrayable_data_object()
     {
         try {
@@ -1011,7 +1064,7 @@ EOT;
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_for_unsupported_data_value()
     {
         try {
@@ -1025,7 +1078,7 @@ EOT;
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_augmented_value()
     {
         $fieldtype = new class extends Fieldtype
@@ -1043,7 +1096,7 @@ EOT;
         $this->assertEquals('augmented expected', $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_expands_augmented_value_when_used_as_an_array()
     {
         $fieldtype = new class extends Fieldtype
@@ -1066,7 +1119,7 @@ EOT;
         $this->assertEquals('HELLO WORLD', $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_nested_values_from_augmentable_objects()
     {
         $value = new AugmentableObject(['foo' => 'bar']);
@@ -1076,7 +1129,7 @@ EOT;
         $this->assertEquals('bar', $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_loops_over_value_object()
     {
         $fieldtype = new class extends Fieldtype
@@ -1101,7 +1154,7 @@ EOT;
         $this->assertEquals('UNO DOS UNE DEUX ', $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_nested_values_from_value_objects()
     {
         $value = new Value(['foo' => 'bar'], 'test');
@@ -1111,7 +1164,7 @@ EOT;
         $this->assertEquals('bar', $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_nested_values_from_nested_value_objects()
     {
         $value = new Value(['foo' => 'bar'], 'test');
@@ -1125,7 +1178,7 @@ EOT;
         $this->assertEquals('bar', $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_nested_values_from_within_nested_value_objects()
     {
         $value = new Value([
@@ -1141,7 +1194,7 @@ EOT;
         $this->assertEquals('bar', $parsed);
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_value_objects_values_when_configured_to_do_so()
     {
         $fieldtypeOne = new class extends Fieldtype
@@ -1215,7 +1268,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_casts_objects_to_string_when_using_single_tags()
     {
         $object = new class
@@ -1232,7 +1285,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_output_anything_if_object_cannot_be_cast_to_a_string()
     {
         Log::shouldReceive('debug')->once()
@@ -1247,7 +1300,7 @@ EOT;
         $this->assertEquals('', $this->renderString('{{ object }}', compact('object')));
     }
 
-    /** @test */
+    #[Test]
     public function it_casts_arrayable_objects_to_arrays_when_using_tag_pairs()
     {
         $arrayableObject = new ArrayableObject([
@@ -1263,7 +1316,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_cast_non_arrayable_objects_to_arrays_when_using_tag_pairs()
     {
         Log::shouldReceive('debug')->once()
@@ -1284,7 +1337,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function callback_tags_that_return_unparsed_simple_arrays_get_parsed()
     {
         (new class extends Tags
@@ -1312,7 +1365,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, [], true));
     }
 
-    /** @test */
+    #[Test]
     public function callback_tags_that_return_unparsed_simple_arrays_get_parsed_with_scope()
     {
         (new class extends Tags
@@ -1340,7 +1393,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, [], true));
     }
 
-    /** @test */
+    #[Test]
     public function callback_tags_that_return_unparsed_multidimensional_arrays_get_parsed()
     {
         (new class extends Tags
@@ -1375,7 +1428,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, ['string' => 'Hello wilderness'], true));
     }
 
-    /** @test */
+    #[Test]
     public function callback_tags_that_return_empty_arrays_get_parsed_with_no_results()
     {
         (new class extends Tags
@@ -1403,7 +1456,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, $this->variables, true));
     }
 
-    /** @test */
+    #[Test]
     public function callback_tags_that_return_collections_get_parsed()
     {
         (new class extends Tags
@@ -1438,7 +1491,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, $this->variables, true));
     }
 
-    /** @test */
+    #[Test]
     public function callback_tags_that_return_query_builders_get_parsed()
     {
         (new class extends Tags
@@ -1476,7 +1529,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, $this->variables, true));
     }
 
-    /** @test */
+    #[Test]
     public function callback_tags_that_return_value_objects_gets_parsed()
     {
         (new class extends Tags
@@ -1500,7 +1553,7 @@ EOT;
         $this->assertEquals('augmented the value', $this->renderString('{{ tag }}', [], true));
     }
 
-    /** @test */
+    #[Test]
     public function callback_tags_that_return_value_objects_with_antlers_gets_parsed()
     {
         (new class extends Tags
@@ -1529,7 +1582,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function callback_tags_that_return_value_objects_with_antlers_disabled_does_not_get_parsed()
     {
         (new class extends Tags
@@ -1558,7 +1611,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function value_objects_with_antlers_gets_parsed()
     {
         $fieldtype = new class extends Fieldtype
@@ -1582,7 +1635,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function value_objects_with_antlers_disabled_do_not_get_parsed()
     {
         $fieldtype = new class extends Fieldtype
@@ -1606,7 +1659,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_automatically_augments_augmentable_objects_when_using_tag_pairs()
     {
         $augmentable = new AugmentableObject([
@@ -1622,7 +1675,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_automatically_augments_augmentable_objects_when_returned_from_a_callback_tag()
     {
         (new class extends Tags
@@ -1644,7 +1697,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_automatically_augments_collections_when_using_tag_pairs()
     {
         $augmentable = collect([
@@ -1660,7 +1713,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function callback_tag_pair_variables_get_context_merged_in_but_nulls_remain_null()
     {
         (new class extends Tags
@@ -1694,7 +1747,7 @@ EOT;
         $this->assertEquals($expected, $this->renderString($template, $context, true));
     }
 
-    /** @test */
+    #[Test]
     public function variable_tag_pair_get_context_merged_in_except_for_nulls()
     {
         $context = [
@@ -1719,7 +1772,7 @@ EOT;
         $this->assertEquals($expected, $this->renderString($template, $context));
     }
 
-    /** @test */
+    #[Test]
     public function scope_modifier_can_add_scopes()
     {
         $context = [
@@ -1749,7 +1802,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, $context, true));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reach_into_the_cascade()
     {
         $cascade = $this->mock(Cascade::class, function ($m) {
@@ -1798,7 +1851,7 @@ EOT;
         $this->assertEquals($expected, $results);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_scopes()
     {
         $context = [
@@ -1845,7 +1898,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, trim($this->renderString($template, $context, true)));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_accept_sequences()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -1853,7 +1906,7 @@ EOT;
         $this->renderString('', ['foo', 'bar']);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_accept_multidimensional_array()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -1864,7 +1917,7 @@ EOT;
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_aliases_array_tag_pairs_using_the_as_modifier()
     {
         $template = <<<'EOT'
@@ -1900,7 +1953,7 @@ EOT;
         ], true));
     }
 
-    /** @test */
+    #[Test]
     public function it_aliases_callback_tag_pair_loop_using_the_as_param()
     {
         (new class extends Tags
@@ -1944,7 +1997,7 @@ EOT;
         $this->assertEqualsWithCollapsedNewlines($expected, $this->renderString($template, [], true));
     }
 
-    /** @test */
+    #[Test]
     public function it_counts_query_builder_results_in_conditions()
     {
         (new EntryFactory())->collection('blog')->create();
@@ -1956,7 +2009,7 @@ EOT;
         $this->assertEquals('nope', $this->renderString($template, ['entries' => Entry::query()->where('collection', 'dunno')]));
     }
 
-    /** @test */
+    #[Test]
     public function it_applies_modifier_on_different_array_syntax()
     {
         $vars = [
@@ -1997,7 +2050,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function modifiers_on_tag_pairs_receive_the_augmented_value()
     {
         $fieldtype = new class extends Fieldtype
@@ -2024,7 +2077,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_the_value_when_a_ArrayableString_object_is_used_as_string()
     {
         $fieldtype = new class extends Fieldtype
@@ -2042,7 +2095,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_treat_a_ArrayableString_object_as_an_array()
     {
         $fieldtype = new class extends Fieldtype
@@ -2063,7 +2116,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_access_ArrayableString_properties_by_colon_notation()
     {
         $fieldtype = new class extends Fieldtype
@@ -2082,7 +2135,7 @@ EOT;
         $this->assertEquals('World', $this->renderString('{{ hello:label }}', $vars));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_ArrayableString_objects_in_conditions()
     {
         $fieldtype = new class extends Fieldtype
@@ -2130,7 +2183,7 @@ EOT;
         $this->assertEquals('', $this->renderString('{{ nully:label ?= "fallback" }}', $vars));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_escaping_characters_from_tenary_output()
     {
         $vars = [
@@ -2148,7 +2201,7 @@ EOT;
         $this->assertEquals('https://statamic.com', $this->renderString('{{ head_office_link ? head_office_link : local_office_link }}', $vars));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_escaping_characters_from_tenary_output_with_truth_coalescence()
     {
         $vars = [
@@ -2161,7 +2214,7 @@ EOT;
         $this->assertEquals('https://statamic.com', $this->renderString('{{ truthy ?= link }}', $vars));
     }
 
-    /** @test */
+    #[Test]
     public function empty_collections_are_considered_empty_in_conditions()
     {
         $template = '{{ if stuff }}yes{{ else }}no{{ /if }}';
@@ -2169,7 +2222,7 @@ EOT;
         $this->assertEquals('yes', $this->renderString($template, ['stuff' => collect(['one'])]));
     }
 
-    /** @test */
+    #[Test]
     public function empty_view_error_bags_are_considered_empty_in_conditions()
     {
         $template = '{{ if errors}}yes{{ else }}no{{ /if }}';
@@ -2180,7 +2233,7 @@ EOT;
         $this->assertEquals('yes', $this->renderString($template, ['errors' => $viewErrorBag->put('form.contact', new MessageBag)]));
     }
 
-    /** @test */
+    #[Test]
     public function objects_are_considered_truthy()
     {
         $this->assertEquals('yes', $this->renderString('{{ if object }}yes{{ else }}no{{ /if }}', [
@@ -2188,7 +2241,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function parameter_style_modifier_with_colon_prefix_will_get_the_values_from_context()
     {
         $this->assertEquals('Tes Te', $this->renderString('{{ word :backspace="one" }} {{ word :backspace="two" }}', [
@@ -2198,7 +2251,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function variables_starting_with_if_arent_treated_as_if_statements()
     {
         $this->assertEquals('test', $this->renderString('{{ iframe }}', ['iframe' => 'test']));
@@ -2207,7 +2260,7 @@ EOT;
         $this->assertEquals('test', $this->renderString('{{ elseunlessses }}', ['elseunlessses' => 'test']));
     }
 
-    /** @test */
+    #[Test]
     public function when_a_loop_is_a_value_object_with_an_empty_array_it_get_parsed_as_one()
     {
         $template = <<<'EOT'
@@ -2230,7 +2283,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_automatically_augments_augmentable_objects_when_looping_with_modifier()
     {
         $loop = [
@@ -2244,7 +2297,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_tags_with_single_part_in_conditions()
     {
         (new class extends Tags
@@ -2275,7 +2328,7 @@ EOT;
         $this->assertEquals('yes', $this->renderString('{{ if {falsey} == false }}yes{{ else }}no{{ /if }}', [], true));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_tags_with_multiple_parts_in_conditions()
     {
         (new class extends Tags
@@ -2306,7 +2359,7 @@ EOT;
         $this->assertEquals('yes', $this->renderString('{{ if {falsey:test} == false }}yes{{ else }}no{{ /if }}', [], true));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_stuff_in_issue_2537()
     {
         $template = '{{ if noindex || segment_1 == "mobile" || get:page > 0 }}yes{{ else }}no{{ /if }}';
@@ -2314,7 +2367,7 @@ EOT;
         $this->assertEquals('yes', $this->renderString($template, ['noindex' => true]));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_stuff_in_issue_2456()
     {
         $template = '{{ if publication_venue:publication_venue_types:slug !== "journal" and publication_venue:first_year }}yes{{ else }}no{{ /if }}';
@@ -2329,7 +2382,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_compares_to_a_string_that_looks_like_array_access()
     {
         $template = '{{ if test == "price:desc" }}yes{{ else }}no{{ /if }}';
@@ -2340,11 +2393,9 @@ EOT;
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/3374
      **/
-    /** @test */
+    #[Test]
     public function it_parses_single_and_tag_pairs_with_modifiers()
     {
         $data = ['items' => ['one', 'two', 'three']];
@@ -2353,7 +2404,7 @@ EOT;
         $this->assertEquals('3<one><two>', $this->renderString('{{ items | count }}{{ items limit="2" }}<{{ value }}>{{ /items }}', $data));
     }
 
-    /** @test */
+    #[Test]
     public function it_passes_along_query_builder_values_to_the_query_tag()
     {
         $builder = Mockery::mock(Builder::class);
@@ -2367,7 +2418,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_passes_along_query_builder_augmented_values_to_the_query_tag()
     {
         $builder = Mockery::mock(Builder::class);
@@ -2381,7 +2432,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reach_into_query_builders()
     {
         $builder = Mockery::mock(Builder::class);
@@ -2395,7 +2446,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reach_into_query_builders_through_values()
     {
         $builder = Mockery::mock(Builder::class);
@@ -2409,7 +2460,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_nested_query_builders()
     {
         $builder = Mockery::mock(Builder::class);
@@ -2425,7 +2476,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_loops_over_values_instances()
     {
         $this->assertEquals('<alfa><bravo><charlie><delta>', $this->renderString('{{ grid }}<{{ foo }}><{{ bar }}>{{ /grid }}', [
@@ -2436,11 +2487,8 @@ EOT;
         ]));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider objectInConditionProvider
-     */
+    #[Test]
+    #[DataProvider('objectInConditionProvider')]
     public function it_uses_entries_as_conditions($object)
     {
         $this->assertEquals('yes', $this->renderString('{{ if the_field }}yes{{ else }}no{{ /if }}', [
@@ -2484,6 +2532,7 @@ EOT;
         $this->assertEquals($expected, $actual);
     }
 
+    #[Test]
     public function test_rendering_a_non_array_variable_reports_current_file()
     {
         $this->markTestSkipped(); // todo
@@ -2513,11 +2562,13 @@ PARTIAL;
         $this->get('/home')->assertOk();
     }
 
+    #[Test]
     public function test_it_passes_data_to_php_when_enabled()
     {
         $this->assertEquals('hello', (string) $this->parser()->allowPhp(true)->parse('{{ associative }}<?php echo $one; ?>{{ /associative }}', $this->variables));
     }
 
+    #[Test]
     public function test_it_returns_escaped_content()
     {
         $input = 'Hey, look at that @{{ noun }}!';

@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class LcfirstTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_converts_first_char_of_string_to_lowercase_char(): void
     {
         $modified = $this->modify('WOW');

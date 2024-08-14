@@ -131,7 +131,7 @@ class FieldTransformer
 
     private static function referenceFieldToVue($field): array
     {
-        $fieldsetField = Arr::get(static::fieldsetFields(), $field['field'], []);
+        $fieldsetField = static::fieldsetFields()[$field['field']] ?? [];
 
         $mergedConfig = array_merge(
             $fieldsetFieldConfig = Arr::get($fieldsetField, 'config', []),

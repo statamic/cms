@@ -21,15 +21,9 @@ class ButtonGroup extends Fieldtype
                         'display' => __('Options'),
                         'instructions' => __('statamic::fieldtypes.radio.config.options'),
                         'type' => 'array',
+                        'expand' => true,
                         'value_header' => __('Label').' ('.__('Optional').')',
                         'add_button' => __('Add Option'),
-                        'validate' => [function ($attribute, $value, $fail) {
-                            $optionsWithoutKeys = collect($value)->keys()->filter(fn ($key) => empty($key) || $key === 'null');
-
-                            if ($optionsWithoutKeys->isNotEmpty()) {
-                                $fail(__('statamic::validation.options_require_keys'));
-                            }
-                        }],
                     ],
                     'default' => [
                         'display' => __('Default Value'),
