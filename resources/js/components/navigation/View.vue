@@ -421,6 +421,10 @@ export default {
         },
 
         treeSaved(response) {
+            if (! response.data.saved) {
+                return this.$toast.error(`Couldn't save tree`)
+            }
+
             this.replaceGeneratedIds(response.data.generatedIds);
 
             this.changed = false;
