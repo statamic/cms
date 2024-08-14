@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\LabeledValue;
 use Statamic\GraphQL\Types\LabeledValueType;
@@ -24,6 +25,10 @@ trait HasSelectOptions
     protected function getOptions(): array
     {
         $options = $this->config('options') ?? [];
+
+        if ($options instanceof Collection) {
+            $options = $options->all();
+        }
 
         if (array_is_list($options) && ! is_array(Arr::first($options))) {
             $options = collect($options)
