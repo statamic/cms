@@ -17,7 +17,7 @@
                 <div class="publish-field save-and-continue-options radio-fieldtype">
                     <radio-fieldtype
                         handle="save_and_continue_options"
-                        :meta="options"
+                        :config="options"
                         v-model="currentOption"
                     />
                 </div>
