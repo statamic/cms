@@ -1399,7 +1399,7 @@ class NodeProcessor
                                 if (! empty($recursiveParent->parameters)) {
                                     $lockData = $this->data;
                                     foreach ($recursiveParent->parameters as $param) {
-                                        if (ModifierManager::isModifier($param)) {
+                                        if ($param->name === 'scope') {
                                             $childDataToUse = $this->runModifier($param->name, $parentParameterValues, $childDataToUse, $rootData);
                                         }
                                     }

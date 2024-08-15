@@ -12,12 +12,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Contracts\Support\Boolable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Entry;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Tags\Tags;
@@ -462,6 +464,55 @@ EOT;
             $this->variables,
             true
         ));
+    }
+
+    #[Test]
+    #[DataProvider('boolablesInTernaryProvider')]
+    public function ternary_condition_with_boolables_supplied_to_tags_resolve_correctly($value, $expected)
+    {
+        $this->withFakeViews();
+
+        $this->viewShouldReturnRaw('test', "{{ the_field ? 'true' : 'false' }}");
+
+        $template = <<<'EOT'
+view: {{ the_field ? 'true' : 'false' }}, partial: {{ partial:test :the_field="the_field" }}
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, ['the_field' => $value], true));
+    }
+
+    public static function boolablesInTernaryProvider()
+    {
+        return [
+            'truthy generic boolable' => [
+                new class implements Boolable
+                {
+                    public function toBool(): bool
+                    {
+                        return true;
+                    }
+                },
+                'view: true, partial: true',
+            ],
+            'falsey generic boolable' => [
+                new class implements Boolable
+                {
+                    public function toBool(): bool
+                    {
+                        return false;
+                    }
+                },
+                'view: false, partial: false',
+            ],
+            'truthy LabeledValue' => [
+                new LabeledValue('foo', 'Foo'),
+                'view: true, partial: true',
+            ],
+            'falsey LabeledValue' => [
+                new LabeledValue(null, null),
+                'view: false, partial: false',
+            ],
+        ];
     }
 
     #[Test]
