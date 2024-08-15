@@ -4,6 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Facades;
 use Statamic\Facades\Path;
@@ -34,7 +35,7 @@ class NavigationStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_only_gets_top_level_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
@@ -59,7 +60,7 @@ class NavigationStoreTest extends TestCase
         $this->assertTrue(file_exists($dir.'/top-level-non-yaml-file.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_structure_instances_from_files()
     {
         $contents = <<<'EOT'
@@ -87,7 +88,7 @@ EOT;
         // TODO: Some more assertions
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_filename_as_the_item_key()
     {
         $this->assertEquals(
@@ -96,7 +97,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         $structure = Facades\Nav::make()->handle('pages');
@@ -106,7 +107,7 @@ EOT;
         $this->assertStringEqualsFile($this->tempDir.'/pages.yaml', $structure->fileContents());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk_with_multiple_sites()
     {
         $this->markTestIncomplete();

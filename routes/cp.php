@@ -24,6 +24,7 @@ use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
+use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionTreeController;
@@ -45,6 +46,7 @@ use Statamic\Http\Controllers\CP\Fields\FieldsController;
 use Statamic\Http\Controllers\CP\Fields\FieldsetController;
 use Statamic\Http\Controllers\CP\Fields\FieldtypesController;
 use Statamic\Http\Controllers\CP\Fields\MetaController;
+use Statamic\Http\Controllers\CP\Fieldtypes\DictionaryFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
@@ -101,14 +103,17 @@ use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
 
 Route::group(['prefix' => 'auth'], function () {
-    Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [LoginController::class, 'login']);
-    Route::get('logout', [LoginController::class, 'logout'])->name('logout');
+    if (config('statamic.cp.auth.enabled', true)) {
+        Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+        Route::post('login', [LoginController::class, 'login']);
 
-    Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-    Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+        Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+        Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+        Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+    }
+
+    Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('token', CsrfTokenController::class)->name('token');
     Route::get('extend', ExtendSessionController::class)->name('extend');
@@ -143,6 +148,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'index'])->name('collections.tree.index');
     Route::patch('collections/{collection}/tree', [CollectionTreeController::class, 'update'])->name('collections.tree.update');
+    Route::post('collections/{collection}/actions', [CollectionActionController::class, 'run'])->name('collections.actions.run');
 
     Route::group(['prefix' => 'collections/{collection}/entries'], function () {
         Route::get('/', [EntriesController::class, 'index'])->name('collections.entries.index');
@@ -306,6 +312,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('relationship/filters', [RelationshipFieldtypeController::class, 'filters'])->name('relationship.filters');
         Route::post('markdown', [MarkdownFieldtypeController::class, 'preview'])->name('markdown.preview');
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
+        Route::get('dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {

@@ -4,6 +4,7 @@ namespace Tests\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class MakeModifierTest extends TestCase
@@ -28,7 +29,7 @@ class MakeModifierTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_modifier()
     {
         $path = base_path('app/Modifiers/Giraffe.php');
@@ -41,7 +42,7 @@ class MakeModifierTest extends TestCase
         $this->assertStringContainsString('namespace App\Modifiers;', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_will_not_overwrite_an_existing_modifier()
     {
         $path = base_path('app/Modifiers/Giraffe.php');
@@ -58,7 +59,7 @@ class MakeModifierTest extends TestCase
         $this->assertStringContainsString('overwritten modifier', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function using_force_option_will_overwrite_original_modifier()
     {
         $path = base_path('app/Modifiers/Giraffe.php');
@@ -73,7 +74,7 @@ class MakeModifierTest extends TestCase
         $this->assertStringNotContainsString('overwritten modifier', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_modifier_into_an_addon()
     {
         $path = base_path('addons/yoda/bag-odah');

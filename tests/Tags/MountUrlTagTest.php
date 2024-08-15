@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
@@ -33,7 +34,7 @@ class MountUrlTagTest extends TestCase
         Collection::make('blog')->routes('{mount}/{slug}')->mount($mountEn->id())->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_collection_mount()
     {
         $this->assertParseEquals('/pages/blog', '{{ mount_url:blog }}');
@@ -44,7 +45,7 @@ class MountUrlTagTest extends TestCase
         $this->assertParseEquals('/fr/le-pages/le-blog', '{{ mount_url handle="blog" }}');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_link_to_selected_site()
     {
         $this->assertParseEquals('/pages/blog', '{{ mount_url:blog }}');

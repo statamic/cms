@@ -3,6 +3,7 @@
 namespace Tests\Data\Structures;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Blueprint;
 use Statamic\Structures\AugmentedPage;
@@ -11,7 +12,7 @@ use Tests\Data\AugmentedTestCase;
 
 class AugmentedPageTest extends AugmentedTestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_page_keys()
     {
         $page = Mockery::mock(Page::class);
@@ -41,7 +42,7 @@ class AugmentedPageTest extends AugmentedTestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entry_keys()
     {
         $entryBlueprint = Blueprint::makeFromFields([
@@ -111,7 +112,7 @@ class AugmentedPageTest extends AugmentedTestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_values_from_the_page()
     {
         $blueprint = Blueprint::makeFromFields([
@@ -155,7 +156,7 @@ class AugmentedPageTest extends AugmentedTestCase
         $this->assertAugmentedCorrectly($expectations, $augmented);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_values_from_the_entry()
     {
         $entryBlueprint = Blueprint::makeFromFields([

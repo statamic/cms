@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Fieldsets;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Fields\Fieldset;
 use Tests\FakesRoles;
@@ -13,7 +14,7 @@ class ViewFieldsetListingTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_a_list_of_fieldsets()
     {
         Facades\Fieldset::shouldReceive('all')->andReturn(collect([
@@ -93,7 +94,7 @@ class ViewFieldsetListingTest extends TestCase
             ->assertDontSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

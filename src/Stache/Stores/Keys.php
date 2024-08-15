@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
-use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Stache;
 use Statamic\Stache\Exceptions\DuplicateKeyException;
 
 class Keys
@@ -17,19 +17,19 @@ class Keys
 
     public function load()
     {
-        $this->keys = Cache::get($this->cacheKey(), []);
+        $this->keys = Stache::cacheStore()->get($this->cacheKey(), []);
 
         return $this;
     }
 
     public function cache()
     {
-        Cache::forever($this->cacheKey(), $this->keys);
+        Stache::cacheStore()->forever($this->cacheKey(), $this->keys);
     }
 
     public function clear()
     {
-        Cache::forget($this->cacheKey());
+        Stache::cacheStore()->forget($this->cacheKey());
     }
 
     private function cacheKey()

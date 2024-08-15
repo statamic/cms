@@ -33,12 +33,12 @@
                         >
                             <svg-icon
                                 name="expand-bold"
-                                class="h-3.5 px-0.5 text-gray-750 group-hover:text-black"
+                                class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175 group-hover:text-black dark:group-hover:text-dark-100"
                             />
                         </button>
                     </div>
-                    <div class="mb-4 border rounded shadow-sm replicator-set">
-                        <div class="replicator-set-body publish-fields @container">
+                    <div :class="{ 'border dark:border-dark-900 rounded shadow-sm replicator-set': config.border }">
+                        <div class="publish-fields @container" :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }">
                             <set-field
                                 v-for="field in fields"
                                 :key="field.handle"
@@ -55,7 +55,6 @@
                                 @meta-updated="updateMeta(field.handle, $event)"
                                 @focus="$emit('focus')"
                                 @blur="$emit('blur')"
-                                class="p-4"
                             />
                         </div>
                     </div>

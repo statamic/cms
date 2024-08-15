@@ -14,7 +14,7 @@ class Publish extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof Entry && ! $item->published();
+        return $this->context['view'] === 'list' && $item instanceof Entry && ! $item->published();
     }
 
     public function visibleToBulk($items)

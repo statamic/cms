@@ -7,17 +7,19 @@ use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Scope;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
-    protected $defaultValue = [];
     protected $selectableInForms = true;
 
     protected function configFieldItems(): array
@@ -56,6 +58,7 @@ class Assets extends Fieldtype
                         'mode' => 'select',
                         'required' => true,
                         'default' => AssetContainer::all()->count() == 1 ? AssetContainer::all()->first()->handle() : null,
+                        'force_in_config' => true,
                     ],
                     'folder' => [
                         'display' => __('Folder'),
@@ -96,6 +99,11 @@ class Assets extends Fieldtype
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.assets.config.query_scopes'),
                         'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
                 ],
             ],
@@ -159,6 +167,12 @@ class Assets extends Fieldtype
     {
         $values = Arr::wrap($values);
 
+        $single = $this->config('max_files') === 1;
+
+        if ($single && Blink::has($key = 'assets-augment-'.json_encode($values))) {
+            return Blink::get($key);
+        }
+
         $ids = collect($values)
             ->map(fn ($value) => $this->container()->handle().'::'.$value)
             ->all();
@@ -167,7 +181,7 @@ class Assets extends Fieldtype
 
         $query = new OrderedQueryBuilder($query, $ids);
 
-        return $this->config('max_files') === 1 ? $query->first() : $query;
+        return $single ? Blink::once($key, fn () => $query->first()) : $query;
     }
 
     public function shallowAugment($values)

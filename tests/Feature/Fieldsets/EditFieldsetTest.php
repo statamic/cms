@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Fieldsets;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Fieldset;
@@ -22,7 +23,7 @@ class EditFieldsetTest extends TestCase
         FieldsetRepository::swap(new FakeFieldsetRepository);
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -37,7 +38,7 @@ class EditFieldsetTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function it_provides_the_fieldset()
     {
         $this->withoutExceptionHandling();

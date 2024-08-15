@@ -100,6 +100,7 @@ import './components/Permission';
 
 import GlobalSearch from './components/GlobalSearch.vue';
 import GlobalSiteSelector from './components/GlobalSiteSelector.vue';
+import DarkModeToggle from './components/DarkModeToggle.vue';
 import Login from './components/login/login';
 import LoginModal from './components/login/LoginModal.vue';
 import BaseEntryCreateForm from './components/entries/BaseCreateForm.vue';
@@ -156,6 +157,7 @@ Statamic.app({
     components: {
         GlobalSearch,
         GlobalSiteSelector,
+        DarkModeToggle,
         Login,
         LoginModal,
         BaseEntryCreateForm,
@@ -208,6 +210,7 @@ Statamic.app({
         showBanner: true,
         portals: [],
         appendedComponents: [],
+        isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
     },
 
     computed: {
@@ -240,7 +243,7 @@ Statamic.app({
 
         this.fixAutofocus();
 
-        this.showBanner = Statamic.$config.get('hasLicenseBanner');
+        this.showBanner = !this.isLicensingBannerSnoozed && Statamic.$config.get('hasLicenseBanner');
 
         this.$toast.intercept();
     },
@@ -290,6 +293,7 @@ Statamic.app({
 
         hideBanner() {
             this.showBanner = false;
+            localStorage.setItem(`statamic.snooze_license_banner`, new Date(Date.now() + 5 * 60 * 1000).valueOf());
         },
 
         fixAutofocus() {

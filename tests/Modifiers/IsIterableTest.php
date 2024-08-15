@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\EntryCollection;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
@@ -18,11 +20,8 @@ class IsIterableTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider iterablesProvider
-     */
+    #[Test]
+    #[DataProvider('iterablesProvider')]
     public function it_returns_true_if_input_is_iterable($expected, $input): void
     {
         $modified = $this->modify($input);

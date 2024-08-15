@@ -53,6 +53,8 @@ class CorePreferences
         $current = Statamic::cpLocale();
 
         return collect([
+            'ar' => 'Arabic',
+            'az' => 'Azerbaijani',
             'cs' => 'Czech',
             'da' => 'Danish',
             'de' => 'German',

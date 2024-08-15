@@ -4,6 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Events\GlideCacheCleared;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Filesystem\Filesystem;
@@ -45,6 +46,8 @@ class GlideClear extends Command
         }
 
         $this->deleteEmptyDirectories($disk);
+
+        GlideCacheCleared::dispatch();
 
         $this->info('Your Glide image cache is now so very, very empty.');
     }
