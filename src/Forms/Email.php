@@ -141,6 +141,10 @@ class Email extends Mailable
             ? collect([$value])->filter()
             : $value;
 
+        if (! $value) {
+            return;
+        }
+
         foreach ($value as $file) {
             $this->attachFromStorageDisk('local', 'statamic/file-uploads/'.$file);
         }

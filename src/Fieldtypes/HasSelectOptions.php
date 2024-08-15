@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\LabeledValue;
 use Statamic\GraphQL\Types\LabeledValueType;
@@ -12,6 +13,39 @@ trait HasSelectOptions
     protected function multiple()
     {
         return $this->config('multiple');
+    }
+
+    public function preload(): array
+    {
+        return [
+            'options' => $this->getOptions(),
+        ];
+    }
+
+    protected function getOptions(): array
+    {
+        $options = $this->config('options') ?? [];
+
+        if ($options instanceof Collection) {
+            $options = $options->all();
+        }
+
+        if (array_is_list($options) && ! is_array(Arr::first($options))) {
+            $options = collect($options)
+                ->map(fn ($value) => ['key' => $value, 'value' => $value])
+                ->all();
+        }
+
+        if (Arr::isAssoc($options)) {
+            $options = collect($options)
+                ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
+                ->all();
+        }
+
+        return collect($options)
+            ->map(fn ($item) => ['value' => $item['key'], 'label' => $item['value']])
+            ->values()
+            ->all();
     }
 
     public function preProcessIndex($value)
