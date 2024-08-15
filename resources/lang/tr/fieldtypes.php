@@ -7,6 +7,7 @@ return [
     'array.config.expand' => 'Diziyi genişletilmiş formatta kaydetme seçeneği. Sayısal değerler kullanmayı planlıyorsanız bunu açın.',
     'array.config.keys' => 'Dizi anahtarlarını (değişkenler) ve isteğe bağlı etiketleri ayarlayın.',
     'array.config.mode' => 'Dinamik mod, kullanıcıya verilerin kontrolünü sağlarken, anahtarlı mod vermez.',
+    'array.config.mode' => '**Dinamik** mod kullanıcıya verilerin kontrolünü sağlarken, **anahtar** ve **tek** modlar katı anahtar kurallarını uygular.',
     'array.title' => 'Dizi',
     'assets.config.allow_uploads' => 'Yeni dosya yüklemelerine izin ver.',
     'assets.config.container' => 'Bu alan için hangi varlık kapsayıcısının kullanılacağını seçin.',
