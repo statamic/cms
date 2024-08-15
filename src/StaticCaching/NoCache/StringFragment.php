@@ -47,9 +47,7 @@ class StringFragment
             $this->extension,
         ]);
 
-        if (! File::exists($path)) {
-            File::put($path, $this->contents);
-        }
+        File::put($path, $this->contents);
 
         return $path;
     }
