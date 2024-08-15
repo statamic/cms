@@ -41,7 +41,7 @@ class BlueprintRepository
 
     public function directory()
     {
-        return $this->directories['default'];
+        return $this->directories['default'] ?? null;
     }
 
     public function namespaceDirectory($namespace)
