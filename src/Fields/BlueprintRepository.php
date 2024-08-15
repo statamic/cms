@@ -273,9 +273,7 @@ class BlueprintRepository
     {
         return Blink::store(self::BLINK_FROM_FILE)->once($path, function () use ($path, $namespace) {
             if (! $namespace || ! isset($this->additionalNamespaces[$namespace])) {
-                [$namespace, $handle] = $this->getNamespaceAndHandle(
-                    Str::after(Str::before($path, '.yaml'), $this->directory().'/')
-                );
+                [$namespace, $handle] = $this->getNamespaceAndHandleFromPath($path);
             } else {
                 $handle = Str::of($path)->afterLast('/')->before('.');
             }
@@ -298,6 +296,23 @@ class BlueprintRepository
         $handle = array_pop($parts);
         $namespace = implode('.', $parts);
         $namespace = empty($namespace) ? null : $namespace;
+
+        return [$namespace, $handle];
+    }
+
+    public function getNamespaceAndHandleFromPath($path)
+    {
+        $namespace = collect($this->directories)
+            ->search(function ($directory) use ($path) {
+                return Str::startsWith($path, $directory);
+            });
+
+        if ($namespace === 'default') {
+            return $this->getNamespaceAndHandle(Str::after(Str::before($path, '.yaml'), $this->directory().'/'));
+        }
+
+        $directory = $this->directories[$namespace];
+        $handle = Str::after(Str::before($path, '.yaml'), $directory.'/');
 
         return [$namespace, $handle];
     }
