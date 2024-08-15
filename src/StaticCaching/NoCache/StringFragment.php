@@ -4,6 +4,7 @@ namespace Statamic\StaticCaching\NoCache;
 
 use Statamic\Facades\File;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class StringFragment
 {
@@ -27,22 +28,22 @@ class StringFragment
         view()->addNamespace('nocache', $this->directory);
         File::makeDirectory($this->directory);
 
-        $path = $this->createTemporaryView();
+        $path = $this->createTemporaryView($view = $this->region.Str::random());
 
         $this->data['__frontmatter'] = Arr::pull($this->data, 'view', []);
 
-        $rendered = view('nocache::'.$this->region, $this->data)->render();
+        $rendered = view('nocache::'.$view, $this->data)->render();
 
         File::delete($path);
 
         return $rendered;
     }
 
-    private function createTemporaryView(): string
+    private function createTemporaryView($view): string
     {
         $path = vsprintf('%s/%s.%s', [
             $this->directory,
-            $this->region,
+            $view,
             $this->extension,
         ]);
 
