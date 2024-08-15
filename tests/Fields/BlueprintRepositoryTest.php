@@ -14,7 +14,6 @@ use Tests\TestCase;
 class BlueprintRepositoryTest extends TestCase
 {
     private $repo;
-    private $repoSplit;
 
     public function setUp(): void
     {
@@ -22,12 +21,6 @@ class BlueprintRepositoryTest extends TestCase
 
         $this->repo = app(BlueprintRepository::class)
             ->setDirectory('/path/to/resources/blueprints');
-
-        $this->repoSplit = app(BlueprintRepository::class)
-            ->setDirectory([
-                'default' => '/path/to/resources/blueprints',
-                'forms' => '/path/to/content/forms/blueprints',
-            ]);
 
         Facades\Blueprint::swap($this->repo);
     }
@@ -344,6 +337,12 @@ EOT;
     /** @test */
     public function it_gets_a_blueprint_from_split_repository()
     {
+        $repo = (new BlueprintRepository())
+            ->setDirectory([
+                'default' => '/path/to/resources/blueprints',
+                'forms' => '/path/to/content/forms/blueprints',
+            ]);
+
         $contents = <<<'EOT'
 title: Test
 tabs:
@@ -358,7 +357,7 @@ EOT;
         File::shouldReceive('exists')->with('/path/to/content/forms/blueprints/test.yaml')->once()->andReturnTrue();
         File::shouldReceive('get')->with('/path/to/content/forms/blueprints/test.yaml')->once()->andReturn($contents);
 
-        $this->repo->find('globals.test');
-        $this->repo->find('forms.test');
+        $repo->find('globals.test');
+        $repo->find('forms.test');
     }
 }
