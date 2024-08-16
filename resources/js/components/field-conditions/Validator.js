@@ -206,7 +206,7 @@ export default class {
 
     getFieldValue(field) {
         if (field.startsWith('$root.') || field.startsWith('root.')) {
-            return data_get(this.rootValues, field.replace(new RegExp('^\\$?root.'), ''));
+            return data_get(this.rootValues, field.replace(new RegExp('^\\$?root\\.'), ''));
         }
 
         if (field.startsWith('$parent.')) {
@@ -303,7 +303,7 @@ export default class {
 
     relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix) {
         if (lhs.startsWith('$root.') || lhs.startsWith('root.')) {
-            return lhs.replace(new RegExp('^\\$?root.'), '');
+            return lhs.replace(new RegExp('^\\$?root\\.'), '');
         }
 
         // TODO: Also handle `$parent` usage?
