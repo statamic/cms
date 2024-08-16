@@ -1,5 +1,4 @@
 <template>
-
     <publish-container
         v-if="blueprint"
         ref="container"
@@ -13,20 +12,19 @@
     >
         <template #default="{ setFieldValue }">
             <div>
-                <configure-tabs @updated="setFieldValue" :enable-sidebar="false"/>
+                <configure-tabs @updated="setFieldValue" />
+
                 <div class="py-4 border-t dark:border-dark-950 flex justify-between">
-                    <a :href="url" class="btn" v-text="__('Cancel') "/>
+                    <a :href="url" class="btn" v-text="__('Cancel') " />
                     <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
                 </div>
             </div>
         </template>
     </publish-container>
-
 </template>
 
 <script>
 export default {
-
     props: {
         blueprint: Object,
         initialValues: Object,
@@ -42,11 +40,10 @@ export default {
             values: this.initialValues,
             error: null,
             errors: {},
-        }
+        };
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -56,9 +53,13 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            this.$axios.patch(this.url, this.values).then(response => {
-                window.location = response.data.redirect;
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios.patch(this.url, this.values)
+                .then(response => {
+                    this.$refs.container.saved();
+
+                    this.$nextTick(() => window.location = response.data.redirect);
+                })
+                .catch(e => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -72,7 +73,6 @@ export default {
                 this.$toast.error(__('Unable to save changes'));
             }
         },
-
     },
 
     created() {
@@ -81,6 +81,5 @@ export default {
             this.submit();
         });
     },
-
-}
+};
 </script>

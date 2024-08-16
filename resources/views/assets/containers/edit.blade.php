@@ -20,7 +20,6 @@
         :meta="{{ json_encode($meta) }}"
         url="{{ cp_route('asset-containers.update', $container->handle()) }}"
         listing-url="{{ cp_route('assets.browse.show', $container->handle()) }}"
-        action="patch"
     ></asset-container-edit-form>
 
 @endsection
