@@ -200,7 +200,7 @@
                                 <blueprint-resetter
                                     ref="resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}"
                                     :resource='@json($blueprint)'
-                                    reload="true"
+                                    reload
                                 >
                                 </blueprint-resetter>
                             </dropdown-item>
