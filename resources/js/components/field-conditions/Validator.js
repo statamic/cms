@@ -20,13 +20,13 @@ const NUMBER_SPECIFIC_COMPARISONS = [
 ];
 
 export default class {
-    constructor(field, values, store, storeName, dottedFieldPath = '') {
+    constructor(field, values, dottedFieldPath, store, storeName) {
         this.field = field;
-        this.dottedFieldPath = dottedFieldPath;
         this.values = values;
-        this.rootValues = store ? store.state.publish[storeName].values : false;
+        this.dottedFieldPath = dottedFieldPath;
         this.store = store;
         this.storeName = storeName;
+        this.rootValues = store ? store.state.publish[storeName].values : false;
         this.passOnAny = false;
         this.showOnPass = true;
         this.converter = new Converter;
@@ -279,6 +279,7 @@ export default class {
             root: this.rootValues,
             store: this.store,
             storeName: this.storeName,
+            fieldPath: this.dottedFieldPath,
         });
 
         return this.showOnPass ? passes : ! passes;
