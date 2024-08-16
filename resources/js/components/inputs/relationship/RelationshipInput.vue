@@ -169,7 +169,7 @@ export default {
     computed: {
 
         items() {
-            if (this.value === null) return [];
+            if (this.modelValue === null) return [];
 
             return this.modelValue?.map(selection => {
                 const data = _.find(this.data, (item) => item.id == selection);
