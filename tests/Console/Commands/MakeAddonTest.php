@@ -2,13 +2,14 @@
 
 namespace Tests\Console\Commands;
 
-use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class MakeAddonTest extends TestCase
 {
-    use Concerns\CleansUpGeneratedPaths;
+    use Concerns\CleansUpGeneratedPaths,
+        Concerns\FakesComposerInstalls;
 
     private $files;
 
@@ -19,6 +20,7 @@ class MakeAddonTest extends TestCase
         $this->markTestSkippedInWindows();
 
         $this->files = app(Filesystem::class);
+        $this->fakeSuccessfulComposerRequire();
     }
 
     public function tearDown(): void
@@ -28,7 +30,7 @@ class MakeAddonTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_generate_an_addon()
     {
         $this->assertFileDoesNotExist(base_path('addons/hasselhoff/knight-rider'));
@@ -37,27 +39,34 @@ class MakeAddonTest extends TestCase
 
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/README.md'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/.gitignore'));
+        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/phpunit.xml'));
 
         $this->assertFileExists($composerJson = base_path('addons/hasselhoff/knight-rider/composer.json'));
         $this->assertStringContainsString('"Hasselhoff\\\KnightRider\\\": "src"', $this->files->get($composerJson));
 
         $this->assertFileExists($provider = base_path('addons/hasselhoff/knight-rider/src/ServiceProvider.php'));
         $this->assertStringContainsString('namespace Hasselhoff\KnightRider;', $this->files->get($provider));
+
+        $this->assertFileExists($testCase = base_path('addons/hasselhoff/knight-rider/tests/TestCase.php'));
+        $this->assertStringContainsString('namespace Hasselhoff\KnightRider\Tests;', $this->files->get($testCase));
+
+        $this->assertFileExists($exampleTest = base_path('addons/hasselhoff/knight-rider/tests/ExampleTest.php'));
+        $this->assertStringContainsString('namespace Hasselhoff\KnightRider\Tests;', $this->files->get($exampleTest));
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_make_addon_with_invalid_composer_package_name()
     {
         $this->artisan('statamic:make:addon', ['addon' => 'deaths-tar-vulnerability'])
-            ->expectsOutput('Please enter a valid composer package name (eg. hasselhoff/kung-fury).');
+            ->expectsOutputToContain(trans('statamic::validation.composer_package'));
 
         $this->artisan('statamic:make:addon', ['addon' => 'some/path/deaths-tar-vulnerability'])
-            ->expectsOutput('Please enter a valid composer package name (eg. hasselhoff/kung-fury).');
+            ->expectsOutputToContain(trans('statamic::validation.composer_package'));
 
         $this->assertFileDoesNotExist(base_path('addons/erso/deaths-tar-vulnerability'));
     }
 
-    /** @test */
+    #[Test]
     public function it_will_not_overwrite_an_existing_addon()
     {
         $path = base_path('addons/erso/deaths-tar-vulnerability');
@@ -68,12 +77,12 @@ class MakeAddonTest extends TestCase
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
 
         $this->artisan('statamic:make:addon', ['addon' => 'erso/deaths-tar-vulnerability'])
-            ->expectsOutput('Addon already exists!');
+            ->expectsOutputToContain('Addon already exists!');
 
         $this->assertStringContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
     }
 
-    /** @test */
+    #[Test]
     public function using_force_option_will_overwrite_original_addon()
     {
         $path = base_path('addons/erso/deaths-tar-vulnerability');
@@ -88,11 +97,9 @@ class MakeAddonTest extends TestCase
         $this->assertStringNotContainsString('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_generate_with_a_fieldtype()
     {
-        $this->fakeSuccessfulComposerInstall();
-
         $this->assertFileDoesNotExist(base_path('addons/hasselhoff/knight-rider'));
 
         $this->makeAddon('hasselhoff/knight-rider', ['--fieldtype' => true]);
@@ -112,11 +119,9 @@ class MakeAddonTest extends TestCase
         $this->assertDirectoryExists(base_path('addons/hasselhoff/knight-rider/resources/dist'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_an_addon_with_everything_including_the_kitchen_sink()
     {
-        $this->fakeSuccessfulComposerInstall();
-
         $path = base_path('addons/ford/san-holo');
 
         $this->assertFileDoesNotExist($path);
@@ -142,10 +147,5 @@ class MakeAddonTest extends TestCase
             'addon' => $addon,
             '--no-interaction' => true,
         ], $options));
-    }
-
-    private function fakeSuccessfulComposerInstall()
-    {
-        Composer::shouldReceive('withoutQueue', 'throwOnFailure', 'require')->andReturnSelf();
     }
 }

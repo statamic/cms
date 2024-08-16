@@ -3,6 +3,9 @@
 namespace Tests\Yaml;
 
 use Exception;
+use Illuminate\Support\Facades\Facade;
+use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\YAML;
 use Statamic\Yaml\ParseException;
 use Statamic\Yaml\Yaml as StatamicYaml;
@@ -11,7 +14,7 @@ use Tests\TestCase;
 
 class YamlTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_dumps_yaml()
     {
         $array = [
@@ -21,7 +24,7 @@ class YamlTest extends TestCase
             'array' => ['one', 'two'],
         ];
 
-        $symfonyYaml = $this->mock(SymfonyYaml::class)
+        $symfonyYaml = Mockery::mock(SymfonyYaml::class)
             ->shouldReceive('dump')
             ->with($array, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
             ->once()
@@ -29,11 +32,12 @@ class YamlTest extends TestCase
             ->getMock();
 
         $this->app->instance(StatamicYaml::class, new StatamicYaml($symfonyYaml));
+        Facade::clearResolvedInstance(StatamicYaml::class);
 
         $this->assertEquals('some properly dumped yaml from symfony', YAML::dump($array));
     }
 
-    /** @test */
+    #[Test]
     public function it_dumps_with_front_matter_when_content_is_passed()
     {
         $expected = <<<'EOT'
@@ -46,7 +50,7 @@ EOT;
         $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar'], 'some content'));
     }
 
-    /** @test */
+    #[Test]
     public function it_dumps_without_front_matter_when_content_is_an_array()
     {
         $expected = <<<'EOT'
@@ -59,7 +63,7 @@ EOT;
         $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
-    /** @test */
+    #[Test]
     public function it_dumps_without_front_matter_when_content_is_an_empty_array()
     {
         $expected = <<<'EOT'
@@ -71,7 +75,7 @@ EOT;
         $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], []));
     }
 
-    /** @test */
+    #[Test]
     public function it_dumps_without_front_matter_when_content_is_null()
     {
         $expected = <<<'EOT'
@@ -83,7 +87,7 @@ EOT;
         $this->assertEquals($expected, YAML::dump(['foo' => 'bar']));
     }
 
-    /** @test */
+    #[Test]
     public function it_explicitly_dumps_front_matter()
     {
         $expected = <<<'EOT'
@@ -96,7 +100,7 @@ EOT;
         $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
-    /** @test */
+    #[Test]
     public function it_explicitly_dumps_front_matter_with_content()
     {
         $expected = <<<'EOT'
@@ -109,7 +113,7 @@ EOT;
         $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], 'some content'));
     }
 
-    /** @test */
+    #[Test]
     public function it_explicitly_dumps_front_matter_including_content_when_its_an_array()
     {
         $expected = <<<'EOT'
@@ -124,7 +128,7 @@ EOT;
         $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
-    /** @test */
+    #[Test]
     public function it_explicitly_dumps_front_matter_including_content_when_its_an_empty_array()
     {
         $expected = <<<'EOT'
@@ -138,7 +142,7 @@ EOT;
         $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], []));
     }
 
-    /** @test */
+    #[Test]
     public function it_explicitly_dumps_front_matter_without_content_when_its_null()
     {
         $expected = <<<'EOT'
@@ -153,10 +157,9 @@ EOT;
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/3612
      **/
+    #[Test]
     public function it_dumps_front_matter_properly_when_symfony_yaml_dumper_doesnt_end_with_a_line_break()
     {
         $array = [
@@ -167,7 +170,7 @@ EOT;
         // We mock symfony because the multiline character is different depending on the version installed.
         // It will be | on early versions. It will be |- on later versions.
         // The |- character means trim trailing newlines, and is the default when dumping multiline strings.
-        $symfonyYaml = $this->mock(SymfonyYaml::class)
+        $symfonyYaml = Mockery::mock(SymfonyYaml::class)
             ->shouldReceive('dump')
             ->with($array, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
             ->once()
@@ -175,6 +178,7 @@ EOT;
             ->getMock();
 
         $this->app->instance(StatamicYaml::class, new StatamicYaml($symfonyYaml));
+        Facade::clearResolvedInstance(StatamicYaml::class);
 
         // Without the bug fix, the --- would come immediately after the "second line". Like this:
         // baz: |-
@@ -191,19 +195,19 @@ EOT;
         $this->assertStringEqualsStringIgnoringLineEndings($expected, YAML::dumpFrontMatter($array, 'content'));
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_a_string_of_yaml()
     {
         $this->assertEquals(['foo' => 'bar'], YAML::parse('foo: bar'));
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_an_empty_string_of_yaml()
     {
         $this->assertEquals([], YAML::parse(''));
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_with_content_and_front_matter()
     {
         $yaml = "---\nfoo: bar\n---\nsome content";
@@ -211,7 +215,7 @@ EOT;
         $this->assertEquals(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_with_content_and_front_matter_with_crlf()
     {
         $yaml = "---\r\nfoo: bar\r\n---\r\nsome content";
@@ -219,7 +223,7 @@ EOT;
         $this->assertEquals(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_with_content_when_its_in_the_front_matter()
     {
         $yaml = <<<'EOT'
@@ -232,7 +236,7 @@ EOT;
         $this->assertEquals(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_there_is_a_content_var_and_a_content_area()
     {
         $yaml = <<<'EOT'
@@ -247,7 +251,7 @@ EOT;
         YAML::parse($yaml);
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_a_file_when_no_argument_is_given()
     {
         $yaml = <<<'EOT'
@@ -267,7 +271,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function when_parsing_and_content_is_just_whitespace_it_treats_it_as_null()
     {
         $yaml = <<<'EOT'
@@ -281,7 +285,7 @@ EOT;
         $this->assertEquals(['foo' => 'bar'], YAML::parse($yaml));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_parsing_without_an_argument_or_file()
     {
         $this->expectException(Exception::class);
@@ -290,7 +294,7 @@ EOT;
         YAML::parse();
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_parse_exception_pointing_to_temporary_file_when_no_file_is_provided()
     {
         $yaml = <<<'EOT'
@@ -315,7 +319,7 @@ EOT;
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_parse_exception_pointing_to_actual_file_when_file_is_provided_and_it_exists()
     {
         $yaml = <<<'EOT'
@@ -342,7 +346,7 @@ EOT;
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_parse_exception_pointing_to_temporary_file_with_similar_path_when_file_is_provided_but_doesnt_exist()
     {
         $yaml = <<<'EOT'
@@ -366,7 +370,7 @@ EOT;
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_maintain_files_across_uses()
     {
         YAML::file('path/to/file/previously/used.yaml')->parse('foo: bar');
@@ -393,7 +397,7 @@ EOT;
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_maintain_files_across_uses_when_previous_call_had_no_yaml()
     {
         YAML::file('path/to/file/previously/used.yaml')->parse('');
@@ -420,7 +424,7 @@ EOT;
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_when_an_array_cannot_be_returned()
     {
         $string = <<<'EOT'

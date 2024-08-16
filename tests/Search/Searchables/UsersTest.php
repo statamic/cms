@@ -2,7 +2,8 @@
 
 namespace Tests\Search\Searchables;
 
-use Statamic\Facades\Site;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Statamic\Search\Searchables\Users;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -12,17 +13,14 @@ class UsersTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     *
-     * @dataProvider usersProvider
-     */
+    #[Test]
+    #[DataProvider('usersProvider')]
     public function it_gets_users($locale, $config, $expected)
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         User::make()->email('alfa@test.com')->save();
         User::make()->email('bravo@test.com')->save();
@@ -80,11 +78,8 @@ class UsersTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider indexFilterProvider
-     */
+    #[Test]
+    #[DataProvider('indexFilterProvider')]
     public function it_can_use_a_custom_filter($filter)
     {
         $a = tap(User::make()->email('a@test.com'))->save();

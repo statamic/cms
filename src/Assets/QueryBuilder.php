@@ -7,6 +7,7 @@ use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Assets\QueryBuilder as Contract;
 use Statamic\Facades;
 use Statamic\Stache\Query\Builder as BaseQueryBuilder;
+use Statamic\Support\Arr;
 
 class QueryBuilder extends BaseQueryBuilder implements Contract
 {
@@ -118,5 +119,25 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
         });
 
         return $items;
+    }
+
+    public function getTableNameForFakeQuery(): string
+    {
+        return 'assets';
+    }
+
+    public function prepareForFakeQuery(): array
+    {
+        $data = parent::prepareForFakeQuery();
+
+        $data['wheres'] = Arr::prepend($data['wheres'], [
+            'type' => 'Basic',
+            'column' => 'container',
+            'operator' => '=',
+            'value' => $this->getContainer()->handle(),
+            'boolean' => 'and',
+        ]);
+
+        return $data;
     }
 }

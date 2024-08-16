@@ -2,12 +2,14 @@
 
 namespace Statamic\Console\Commands;
 
-use Facades\Statamic\StarterKits\Exporter as StarterKitExporter;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\StarterKits\Exceptions\StarterKitException;
+use Statamic\StarterKits\Exporter as StarterKitExporter;
+
+use function Laravel\Prompts\confirm;
 
 class StarterKitExport extends Command
 {
@@ -40,27 +42,29 @@ class StarterKitExport extends Command
             $this->askToCreateExportPath($path);
         }
 
+        $exporter = new StarterKitExporter($path);
+
         try {
-            StarterKitExporter::export($path);
+            $exporter->export();
         } catch (StarterKitException $exception) {
-            $this->error($exception->getMessage());
+            $this->components->error($exception->getMessage());
 
             return 1;
         }
 
-        $this->info("Starter kit was successfully exported to [$path].");
+        $this->components->info("Starter kit was successfully exported to [$path].");
     }
 
     /**
      * Ask to stub out starter kit config.
      */
-    protected function askToStubStarterKitConfig()
+    protected function askToStubStarterKitConfig(): void
     {
         $stubPath = __DIR__.'/stubs/starter-kits/starter-kit.yaml.stub';
         $newPath = base_path($config = 'starter-kit.yaml');
 
         if ($this->input->isInteractive()) {
-            if (! $this->confirm("Config [{$config}] does not exist. Would you like to create it now?", true)) {
+            if (! confirm("Config [{$config}] does not exist. Would you like to create it now?", true)) {
                 return;
             }
         }
@@ -73,10 +77,8 @@ class StarterKitExport extends Command
 
     /**
      * Get absolute path.
-     *
-     * @return string
      */
-    protected function getAbsolutePath()
+    protected function getAbsolutePath(): string
     {
         $path = $this->argument('path');
 
@@ -87,19 +89,17 @@ class StarterKitExport extends Command
 
     /**
      * Ask to create export path.
-     *
-     * @param  string  $path
      */
-    protected function askToCreateExportPath($path)
+    protected function askToCreateExportPath(string $path): void
     {
         if ($this->input->isInteractive()) {
-            if (! $this->confirm("Path [{$path}] does not exist. Would you like to create it now?", true)) {
+            if (! confirm("Path [{$path}] does not exist. Would you like to create it now?", true)) {
                 return;
             }
         }
 
         File::makeDirectory($path, 0755, true);
 
-        $this->comment("A new directory has been created at [{$path}].");
+        $this->components->info("A new directory has been created at [{$path}].");
     }
 }

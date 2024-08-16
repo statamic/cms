@@ -26,29 +26,94 @@ class FieldTransformer
 
     private static function inlineTabField(array $submitted)
     {
-        $field = Arr::removeNullValues(array_except($submitted['config'], ['isNew', 'icon']));
+        $fieldtype = FieldtypeRepository::find($submitted['fieldtype'] ?? $submitted['config']['type']);
 
-        if (Arr::get($field, 'width') === 100) {
-            unset($field['width']);
-        }
+        $fields = Field::commonFieldOptions()->all()
+            ->merge($fieldtype->configFields()->all());
 
-        if (Arr::get($field, 'localizable', false) === false && ! Site::hasMultiple()) {
-            unset($field['localizable']);
-        }
+        $field = collect($submitted['config'])
+            ->reject(function ($value, $key) use ($fields) {
+                if (in_array($key, ['isNew', 'icon'])) {
+                    return true;
+                }
 
-        if (Arr::get($field, 'duplicate', true) === true) {
-            unset($field['duplicate']);
-        }
+                if ($key === 'width' && $value === 100) {
+                    return true;
+                }
+
+                if ($key === 'localizable' && $value === false && ! Site::multiEnabled()) {
+                    return true;
+                }
+
+                if (! $field = $fields->get($key)) {
+                    return false;
+                }
+
+                if ($field->mustRemainInConfig()) {
+                    return false;
+                }
+
+                return $field->defaultValue() === $value;
+            })
+            ->map(function ($value, $key) {
+                if ($key === 'sets') {
+                    return collect($value)
+                        ->map(function ($setGroup) {
+                            if (! Arr::get($setGroup, 'instructions')) {
+                                unset($setGroup['instructions']);
+                            }
+
+                            if (! Arr::get($setGroup, 'icon')) {
+                                unset($setGroup['icon']);
+                            }
+
+                            if (isset($setGroup['sets'])) {
+                                $setGroup['sets'] = collect($setGroup['sets'])
+                                    ->map(function ($set) {
+                                        if (! Arr::get($set, 'instructions')) {
+                                            unset($set['instructions']);
+                                        }
+
+                                        if (! Arr::get($set, 'icon')) {
+                                            unset($set['icon']);
+                                        }
+
+                                        if (! Arr::get($set, 'hide')) {
+                                            unset($set['hide']);
+                                        }
+
+                                        return $set;
+                                    })
+                                    ->filter()
+                                    ->all();
+                            }
+
+                            return $setGroup;
+                        })
+                        ->all();
+                }
+
+                return $value;
+            })
+            ->sortBy(function ($value, $key) {
+                // Push sets & fields to the end of the config.
+                if ($key === 'sets' || $key === 'fields') {
+                    return 2;
+                }
+
+                return 1;
+            })
+            ->all();
 
         return array_filter([
             'handle' => $submitted['handle'],
-            'field' => $field,
+            'field' => Arr::removeNullValues($field),
         ]);
     }
 
     private static function referenceTabField(array $submitted)
     {
-        $config = Arr::removeNullValues(array_only($submitted['config'], $submitted['config_overrides']));
+        $config = Arr::removeNullValues(Arr::only($submitted['config'], $submitted['config_overrides']));
 
         return array_filter([
             'handle' => $submitted['handle'],
@@ -70,11 +135,11 @@ class FieldTransformer
 
     private static function referenceFieldToVue($field): array
     {
-        $fieldsetField = array_get(static::fieldsetFields(), $field['field'], []);
+        $fieldsetField = static::fieldsetFields()[$field['field']] ?? [];
 
         $mergedConfig = array_merge(
-            $fieldsetFieldConfig = array_get($fieldsetField, 'config', []),
-            $config = array_get($field, 'config', [])
+            $fieldsetFieldConfig = Arr::get($fieldsetField, 'config', []),
+            $config = Arr::get($field, 'config', [])
         );
 
         $mergedConfig['width'] = $mergedConfig['width'] ?? 100;

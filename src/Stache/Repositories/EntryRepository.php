@@ -8,7 +8,9 @@ use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\EntryNotFoundException;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
+use Statamic\Rules\Slug;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
 use Statamic\Support\Arr;
@@ -128,7 +130,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => $collection->autoGeneratesTitles() ? '' : 'required',
-            'slug' => 'alpha_dash',
+            'slug' => [new Slug],
         ];
     }
 
@@ -136,7 +138,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => $collection->autoGeneratesTitles() ? '' : 'required',
-            'slug' => 'alpha_dash',
+            'slug' => [new Slug],
         ];
     }
 
@@ -150,6 +152,7 @@ class EntryRepository implements RepositoryContract
 
     public function substitute($item)
     {
+        Blink::store('entry-uris')->forget($item->id());
         $this->substitutionsById[$item->id()] = $item;
         $this->substitutionsByUri[$item->locale().'@'.$item->uri()] = $item;
     }
@@ -159,5 +162,20 @@ class EntryRepository implements RepositoryContract
         return $items->map(function ($item) {
             return $this->substitutionsById[$item->id()] ?? $item;
         });
+    }
+
+    public function updateUris($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateUris($ids);
+    }
+
+    public function updateOrders($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateOrders($ids);
+    }
+
+    public function updateParents($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateParents($ids);
     }
 }

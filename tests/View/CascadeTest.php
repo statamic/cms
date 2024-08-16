@@ -5,6 +5,7 @@ namespace Tests\View;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
@@ -35,16 +36,16 @@ class CascadeTest extends TestCase
             return $this->cascade;
         }
 
-        return $this->cascade = new Cascade(request(), new \Statamic\Sites\Site('en', $this->siteConfig['sites']['en']));
+        return $this->cascade = new Cascade(request(), new \Statamic\Sites\Site('en', $this->siteConfig['en']));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_instance()
     {
         $this->assertEquals($this->cascade(), $this->cascade()->instance());
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_and_gets_the_entire_cascade()
     {
         $this->assertEquals([], $this->cascade()->toArray());
@@ -54,7 +55,7 @@ class CascadeTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $this->cascade()->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_values()
     {
         $this->cascade()->data(['foo' => 'bar']);
@@ -62,7 +63,7 @@ class CascadeTest extends TestCase
         $this->assertEquals('bar', $this->cascade()->get('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_values()
     {
         $this->assertEquals([], $this->cascade()->toArray());
@@ -75,7 +76,7 @@ class CascadeTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_constants()
     {
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
@@ -90,7 +91,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_auth_when_logged_in()
     {
         $user = User::make();
@@ -104,7 +105,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_auth_when_logged_out()
     {
         $this->get('/');
@@ -116,7 +117,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_current_user()
     {
         $this->actingAs(User::make())->get('/');
@@ -126,7 +127,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_dates()
     {
         Carbon::setTestNow($now = Carbon::create(2018, 2, 3, 19));
@@ -138,7 +139,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_request_variables()
     {
         $this->get('/test?test=test');
@@ -151,7 +152,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_request_is_homepage_when_request_is_homepage()
     {
         $this->get('http://test.com/');
@@ -161,7 +162,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_request_is_homepage_when_request_is_homepage_with_relative_site_url()
     {
         Arr::set($this->siteConfig, 'sites.en.url', '/');
@@ -173,7 +174,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_current_site_variables()
     {
         $cascade = $this->cascade()->withSite(Site::get('en'));
@@ -192,7 +193,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_current_site_variables_for_subdomain()
     {
         $cascade = $this->cascade()->withSite(Site::get('fr'));
@@ -211,7 +212,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_current_site_variables_for_subdirectory()
     {
         $cascade = $this->cascade()->withSite(Site::get('de'));
@@ -230,7 +231,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_sanitized_post_values()
     {
         $this->post('/', [
@@ -247,7 +248,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_sanitized_get_values()
     {
         $this->get('/?foo=bar&script=<script>&tag={{ foo }}');
@@ -260,7 +261,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_sanitized_get_and_post_values()
     {
         $this->post('/?getfoo=bar&getscript=<script>&gettag={{ foo }}', [
@@ -278,7 +279,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_sanitized_old_values()
     {
         session()->put('_old_input', [
@@ -295,7 +296,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_segments()
     {
         $this->get('/one/two/three/four/five');
@@ -313,7 +314,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_segments_in_subdirectory_site()
     {
         $this->get('/de/one/two/three/four/five');
@@ -331,7 +332,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_segments_on_the_home_page()
     {
         $this->get('/');
@@ -344,7 +345,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_segments_on_the_home_page_in_subdirectory_site()
     {
         $this->get('de');
@@ -357,7 +358,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function last_segment_doesnt_contain_query_params()
     {
         $this->get('/foo?bar=baz');
@@ -370,7 +371,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function last_segment_doesnt_contain_query_params_in_subdirectory_site()
     {
         $this->get('/de/foo?bar=baz');
@@ -383,7 +384,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_page_data()
     {
         $vars = ['foo' => 'bar', 'baz' => 'qux'];
@@ -409,7 +410,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_hydrates_globals()
     {
         $globals = $this->createGlobal('global', ['foo' => 'bar', 'hello' => 'world']);
@@ -432,7 +433,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function the_cascade_can_be_manipulated_after_hydration()
     {
         $cascade = $this->cascade();
@@ -450,7 +451,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function page_data_overrides_globals()
     {
         Event::fake(); // prevents taxonomy term tracker from kicking in.
@@ -471,7 +472,7 @@ class CascadeTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_view_model_data()
     {
         $page = EntryFactory::id('test')
@@ -494,13 +495,10 @@ class CascadeTest extends TestCase
     {
         config(['app.url' => 'http://test.com']);
         url()->forceRootUrl(config('app.url'));
-        Site::setConfig($this->siteConfig = [
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites($this->siteConfig = [
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
     }
 

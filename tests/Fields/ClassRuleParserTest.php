@@ -2,16 +2,15 @@
 
 namespace Tests\Fields;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\ClassRuleParser;
 use Tests\TestCase;
 
 class ClassRuleParserTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider classRuleProvider
-     */
+    #[Test]
+    #[DataProvider('classRuleProvider')]
     public function it_parses_class_rules($input, $expected)
     {
         $output = (new ClassRuleParser)->parse($input);
@@ -65,6 +64,18 @@ class ClassRuleParserTest extends TestCase
             'named argument with colon' => [
                 'new App\MyRule(a: "foo:bar")',
                 ['App\MyRule', ['a' => 'foo:bar']],
+            ],
+            'null argument' => [
+                'new App\MyRule(null)',
+                ['App\MyRule', [null]],
+            ],
+            'true boolean argument' => [
+                'new App\MyRule(true)',
+                ['App\MyRule', [true]],
+            ],
+            'false boolean argument' => [
+                'new App\MyRule(false)',
+                ['App\MyRule', [false]],
             ],
         ];
     }

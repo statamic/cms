@@ -8,10 +8,13 @@
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block shrink-0">
                 @if ($customLogo)
-                    <img src="{{ $customLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="white-label-logo">
+                    <img src="{{ $customLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="white-label-logo dark:hidden">
+                    <img src="{{ $customDarkLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="white-label-logo hidden dark:block">
+                @elseif ($customLogoText)
+                    <span class="font-medium">{{ $customLogoText }}</span>
                 @else
-                    @cp_svg('statamic-wordmark', 'w-24')
-                    @if (Statamic::pro())<span class="font-bold text-4xs align-top">PRO</span>@endif
+                    @cp_svg('statamic-wordmark', 'w-24 logo')
+                    @if (Statamic::pro())<span class="font-bold text-4xs align-top uppercase">{{ __('Pro') }}</span>@endif
                 @endif
             </div>
         </a>
@@ -22,7 +25,7 @@
         </global-search>
     </div>
 
-    <div class="head-link h-full rtl:md:pl-6 ltr:md:pr-6 flex items-center justify-end">
+    <div class="head-link h-full px-6 space-x-3 rtl:space-x-reverse flex items-center justify-end">
 
         @if (Statamic\Facades\Site::authorized()->count() > 1)
             <global-site-selector>
@@ -30,45 +33,37 @@
             </global-site-selector>
         @endif
 
+        <dark-mode-toggle initial="{{ $user->preferredTheme() }}"></dark-mode-toggle>
+
         <favorite-creator class="hidden md:block"></favorite-creator>
 
         @if (Route::has('horizon.index') && \Laravel\Horizon\Horizon::check(request()))
-            <a class="hidden md:block h-6 w-6 p-1 text-gray rtl:mr-4 ltr:ml-4 hover:text-gray-800" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
+            <a class="global-header-icon-button hidden md:block" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
                 @cp_svg('icons/regular/horizon')
             </a>
         @endif
 
         @if (Route::has('pulse') && (app()->environment('local') || $user->can('viewPulse')))
-            <a class="hidden md:block h-6 w-6 p-1 text-gray rtl:mr-4 ltr:ml-4 hover:text-gray-800" href="{{ route('pulse') }}" target="_blank" v-tooltip="'Laravel Pulse'">
+            <a class="global-header-icon-button hidden md:block" href="{{ route('pulse') }}" target="_blank" v-tooltip="'Laravel Pulse'">
                 @cp_svg('icons/regular/pulse')
             </a>
         @endif
 
         @if (config('nova.path') && (app()->environment('local') || $user->can('viewNova')))
-            <a class="hidden md:block h-6 w-6 p-1 text-gray rtl:mr-4 ltr:ml-4 hover:text-gray-800" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
+            <a class="global-header-icon-button hidden md:block" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
                 @cp_svg('icons/regular/nova')
             </a>
         @endif
 
         @if (Route::has('telescope') && \Laravel\Telescope\Telescope::check(request()))
-            <a class="hidden md:block h-6 w-6 p-1 text-gray rtl:mr-4 ltr:ml-4 hover:text-gray-800" href="{{ route('telescope') }}" target="_blank" v-tooltip="'Laravel Telescope'">
+            <a class="global-header-icon-button hidden md:block" href="{{ route('telescope') }}" target="_blank" v-tooltip="'Laravel Telescope'">
                 @cp_svg('icons/regular/telescope')
             </a>
         @endif
 
         <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <button class="hidden md:block h-6 w-6 rtl:mr-4 ltr:ml-4 p-1 text-gray hover:text-gray-800" v-tooltip="__('Preferences')" aria-label="{{ __('Manage Preferences') }}">
-                    @cp_svg('icons/light/cog')
-                </button>
-            </template>
-            <dropdown-item :text="__('Preferences')" redirect="{{ route('statamic.cp.preferences.index') }}"></dropdown-item>
-            <dropdown-item :text="__('CP Nav')" redirect="{{ route('statamic.cp.preferences.nav.index') }}"></dropdown-item>
-        </dropdown-list>
-
-        <dropdown-list v-cloak>
-            <template v-slot:trigger>
-                <button class="hidden md:block h-6 w-6 rtl:mr-4 ltr:ml-4 p-1 text-gray hover:text-gray-800" v-tooltip="__('Useful Links')" aria-label="{{ __('View Useful Links') }}">
+                <button class="global-header-icon-button hidden md:block" v-tooltip="__('Useful Links')" aria-label="{{ __('View Useful Links') }}">
                     @cp_svg('icons/light/book-open')
                 </button>
             </template>
@@ -92,12 +87,12 @@
             </dropdown-item>
         </dropdown-list>
 
-        <a class="hidden md:block h-6 w-6 p-1 text-gray rtl:mr-4 ltr:ml-4 hover:text-gray-800" href="{{ Statamic\Facades\Site::selected()->url() }}" target="_blank" v-tooltip="'{{ __('View Site') }}'" aria-label="{{ __('View Site') }}">
+        <a class="global-header-icon-button hidden md:block" href="{{ Statamic\Facades\Site::selected()->url() }}" target="_blank" v-tooltip="'{{ __('View Site') }}'" aria-label="{{ __('View Site') }}">
             @cp_svg('icons/light/browser-com')
         </a>
         <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <a class="dropdown-toggle items-center rtl:mr-4 ltr:ml-4 h-full hide flex relative group">
+                <a class="dropdown-toggle items-center h-full hide flex relative group">
                     @if ($user->avatar())
                         <div class="icon-header-avatar {{ session()->get('statamic_impersonated_by') ? 'animate-radar' : '' }}"><img src="{{ $user->avatar() }}" /></div>
                     @else

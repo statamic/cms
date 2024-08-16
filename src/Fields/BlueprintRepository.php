@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Closure;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
@@ -49,6 +50,17 @@ class BlueprintRepository
                 ? $this->makeBlueprintFromFile($path, count($parts) > 1 ? $parts[0] : null)
                 : $this->findFallback($blueprint);
         });
+    }
+
+    public function findOrFail($id): Blueprint
+    {
+        $blueprint = $this->find($id);
+
+        if (! $blueprint) {
+            throw new BlueprintNotFoundException($id);
+        }
+
+        return $blueprint;
     }
 
     public function findStandardBlueprintPath($handle)

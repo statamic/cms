@@ -31,9 +31,9 @@ abstract class RoleRepository implements RepositoryContract
         return $this->roles = $this->raw()->map(function ($role, $handle) {
             return Facades\Role::make()
                 ->handle($handle)
-                ->title(array_get($role, 'title'))
-                ->addPermission(array_get($role, 'permissions', []))
-                ->preferences(array_get($role, 'preferences', []));
+                ->title(Arr::get($role, 'title'))
+                ->addPermission(Arr::get($role, 'permissions', []))
+                ->preferences(Arr::get($role, 'preferences', []));
         });
     }
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GlobalSearch;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Search;
@@ -17,7 +18,7 @@ class GlobalSearchTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_performs_a_global_search()
     {
         $entry1 = tap(

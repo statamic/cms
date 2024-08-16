@@ -31,7 +31,7 @@ class DimensionsRule implements Rule
                     return true;
                 }
 
-                $size = getimagesize($id);
+                $size = getimagesize($id->getPathname());
             } else {
                 if (! $asset = Asset::find($id)) {
                     return false;

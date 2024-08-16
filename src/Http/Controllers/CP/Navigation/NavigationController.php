@@ -9,6 +9,7 @@ use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 
 class NavigationController extends CpController
@@ -39,7 +40,7 @@ class NavigationController extends CpController
     {
         $nav = Nav::find($nav);
 
-        $this->authorize('edit', $nav, __('You are not authorized to configure navs.'));
+        $this->authorize('configure', $nav, __('You are not authorized to configure navs.'));
 
         $values = [
             'title' => $nav->title(),
@@ -48,6 +49,7 @@ class NavigationController extends CpController
             'root' => $nav->expectsRoot(),
             'sites' => $nav->trees()->keys()->all(),
             'max_depth' => $nav->maxDepth(),
+            'select_across_sites' => $nav->canSelectAcrossSites(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($nav))
@@ -131,6 +133,8 @@ class NavigationController extends CpController
             foreach (array_diff($existingSites, $sites) as $site) {
                 $nav->in($site)->delete();
             }
+
+            $nav->canSelectAcrossSites($values['select_across_sites']);
         }
 
         $nav->save();
@@ -153,7 +157,7 @@ class NavigationController extends CpController
 
         $values = $request->validate([
             'title' => 'required',
-            'handle' => 'required|alpha_dash',
+            'handle' => ['required', new Handle],
         ]);
 
         if (Nav::find($values['handle'])) {
@@ -223,12 +227,18 @@ class NavigationController extends CpController
             ],
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $contents['options']['fields']['sites'] = [
                 'display' => __('Sites'),
                 'type' => 'sites',
                 'mode' => 'select',
                 'required' => true,
+            ];
+
+            $contents['options']['fields']['select_across_sites'] = [
+                'display' => __('Select Across Sites'),
+                'instructions' => __('statamic::messages.navigation_configure_select_across_sites'),
+                'type' => 'toggle',
             ];
         }
 

@@ -4,8 +4,9 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\UrlInvalidated;
-use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 
 class FileCacherTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function gets_cache_paths_when_multiple_paths_are_provided()
     {
         $cacher = $this->fileCacher([
@@ -29,7 +30,7 @@ class FileCacherTest extends TestCase
         ], $cacher->getCachePaths());
     }
 
-    /** @test */
+    #[Test]
     public function gets_cache_paths_when_a_single_path_is_provided()
     {
         $cacher = $this->fileCacher([
@@ -42,7 +43,7 @@ class FileCacherTest extends TestCase
         ], $cacher->getCachePaths());
     }
 
-    /** @test */
+    #[Test]
     public function gets_cache_path_when_multiple_paths_are_provided()
     {
         $cacher = $this->fileCacher([
@@ -58,7 +59,7 @@ class FileCacherTest extends TestCase
         $this->assertEquals('test/path', $cacher->getCachePath());
     }
 
-    /** @test */
+    #[Test]
     public function gets_cache_path_when_a_single_path_is_provided()
     {
         $cacher = $this->fileCacher([
@@ -68,7 +69,7 @@ class FileCacherTest extends TestCase
         $this->assertEquals('test/path', $cacher->getCachePath());
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_path_from_url()
     {
         $cacher = $this->fileCacher([
@@ -87,7 +88,7 @@ class FileCacherTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_path_from_url_and_hashes_long_query_strings()
     {
         $cacher = $this->fileCacher([
@@ -103,7 +104,7 @@ class FileCacherTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_path_from_url_and_ignores_query_strings()
     {
         $cacher = $this->fileCacher([
@@ -122,7 +123,7 @@ class FileCacherTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_path_with_multiple_locations()
     {
         $cacher = $this->fileCacher([
@@ -144,7 +145,7 @@ class FileCacherTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function flushing_the_cache_deletes_from_all_cache_locations()
     {
         $writer = \Mockery::spy(Writer::class);
@@ -163,7 +164,7 @@ class FileCacherTest extends TestCase
         $writer->shouldHaveReceived('flush')->with('fr/test/path');
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_thats_not_cached_will_do_nothing()
     {
         $writer = \Mockery::spy(Writer::class);
@@ -174,7 +175,7 @@ class FileCacherTest extends TestCase
         $writer->shouldNotHaveReceived('delete');
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_deletes_the_file_and_removes_the_url()
     {
         $writer = \Mockery::spy(Writer::class);
@@ -200,7 +201,7 @@ class FileCacherTest extends TestCase
         // Config::set('app.url', 'http://example.com');
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_for_query_string_versions_too()
     {
         $writer = \Mockery::spy(Writer::class);
@@ -225,14 +226,14 @@ class FileCacherTest extends TestCase
         ], $cacher->getUrls('http://example.com')->all());
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
-        ]]);
+        ]);
 
         $writer = \Mockery::spy(Writer::class);
         $cache = app(Repository::class);
@@ -263,14 +264,14 @@ class FileCacherTest extends TestCase
         $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://domain.de')->all());
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite_and_a_single_string_value_for_the_path()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
-        ]]);
+        ]);
 
         $writer = \Mockery::spy(Writer::class);
         $cache = app(Repository::class);
@@ -295,11 +296,8 @@ class FileCacherTest extends TestCase
         $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://domain.de')->all());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider invalidateEventProvider
-     */
+    #[Test]
+    #[DataProvider('invalidateEventProvider')]
     public function invalidating_a_url_dispatches_event($domain, $expectedUrl)
     {
         Event::fake();

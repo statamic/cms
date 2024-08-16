@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\GraphQL;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -96,7 +97,7 @@ class Field implements Arrayable
 
     public function type()
     {
-        return array_get($this->config, 'type', 'text');
+        return Arr::get($this->config, 'type', 'text');
     }
 
     public function fieldtype()
@@ -106,12 +107,12 @@ class Field implements Arrayable
 
     public function display()
     {
-        return array_get($this->config, 'display', __(Str::slugToTitle($this->handle)));
+        return Arr::get($this->config, 'display', __(Str::slugToTitle($this->handle)));
     }
 
     public function instructions()
     {
-        return array_get($this->config, 'instructions');
+        return Arr::get($this->config, 'instructions');
     }
 
     public function visibility()
@@ -227,6 +228,10 @@ class Field implements Arrayable
 
     public function isSortable()
     {
+        if ($this->get('visibility') === 'computed') {
+            return false;
+        }
+
         if (is_null($this->get('sortable'))) {
             return true;
         }
@@ -394,7 +399,7 @@ class Field implements Arrayable
 
     public function get(string $key, $fallback = null)
     {
-        return array_get($this->config, $key, $fallback);
+        return Arr::get($this->config, $key, $fallback);
     }
 
     private function preProcessedConfig()
@@ -403,9 +408,14 @@ class Field implements Arrayable
 
         $fields = $fieldtype->configFields()->addValues($this->config);
 
-        return array_merge($this->config, $fields->preProcess()->values()->all(), [
-            'component' => $fieldtype->component(),
-        ]);
+        return array_merge(
+            self::commonFieldOptions()->all()->map->defaultValue()->all(),
+            $this->config,
+            $fields->preProcess()->values()->all(),
+            [
+                'component' => $fieldtype->component(),
+            ]
+        );
     }
 
     public function meta()
@@ -447,5 +457,118 @@ class Field implements Arrayable
     public function form(): ?Form
     {
         return $this->form;
+    }
+
+    public static function commonFieldOptions(): Fields
+    {
+        $reserved = [
+            'content_type',
+            'elseif',
+            'endif',
+            'endunless',
+            'if',
+            'length',
+            'reference',
+            'resource',
+            'status',
+            'unless',
+            'views',
+        ];
+
+        $fields = collect([
+            'display' => [
+                'display' => __('Display Label'),
+                'instructions' => __('statamic::messages.fields_display_instructions'),
+                'type' => 'field_display',
+            ],
+            'hide_display' => [
+                'type' => 'toggle',
+                'visibility' => 'hidden',
+            ],
+            'handle' => [
+                'display' => __('Handle'),
+                'instructions' => __('statamic::messages.fields_handle_instructions'),
+                'type' => 'slug',
+                'from' => 'display',
+                'async' => false,
+                'separator' => '_',
+                'validate' => [
+                    'required',
+                    new Handle,
+                    'not_in:'.implode(',', $reserved),
+                ],
+                'show_regenerate' => true,
+            ],
+            'instructions' => [
+                'display' => __('Instructions'),
+                'instructions' => __('statamic::messages.fields_instructions_instructions'),
+                'type' => 'textarea',
+            ],
+            'instructions_position' => [
+                'display' => __('Instructions Position'),
+                'instructions' => __('statamic::messages.fields_instructions_position_instructions'),
+                'type' => 'select',
+                'options' => [
+                    'above' => __('Above'),
+                    'below' => __('Below'),
+                ],
+                'default' => 'above',
+                'if' => [
+                    'instructions' => 'not null',
+                ],
+            ],
+            'listable' => [
+                'display' => __('Listable'),
+                'instructions' => __('statamic::messages.fields_listable_instructions'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'options' => [
+                    'hidden' => __('Hidden by default'),
+                    'true' => __('Shown by default'),
+                    'false' => __('Not listable'),
+                ],
+                'default' => 'hidden',
+                'unless' => [
+                    'type' => 'section',
+                ],
+            ],
+            'sortable' => [
+                'display' => __('Sortable'),
+                'instructions' => __('statamic::messages.fields_sortable_instructions'),
+                'type' => 'toggle',
+                'default' => true,
+                'unless' => [
+                    'visibility' => 'equals computed',
+                ],
+            ],
+            'visibility' => [
+                'display' => __('Visibility'),
+                'instructions' => __('statamic::messages.fields_visibility_instructions'),
+                'options' => [
+                    'visible' => __('Visible'),
+                    'read_only' => __('Read Only'),
+                    'computed' => __('Computed'),
+                    'hidden' => __('Hidden'),
+                ],
+                'default' => 'visible',
+                'type' => 'select',
+            ],
+            'replicator_preview' => [
+                'display' => __('Preview'),
+                'instructions' => __('statamic::messages.fields_replicator_preview_instructions'),
+                'type' => 'toggle',
+                'validate' => 'boolean',
+                'default' => true,
+            ],
+            'duplicate' => [
+                'display' => __('Duplicate'),
+                'instructions' => __('statamic::messages.fields_duplicate_instructions'),
+                'type' => 'toggle',
+                'validate' => 'boolean',
+                'default' => true,
+            ],
+        ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
+
+        return new ConfigFields($fields);
     }
 }

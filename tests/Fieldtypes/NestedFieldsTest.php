@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -12,9 +13,11 @@ use Tests\TestCase;
 
 class NestedFieldsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_preprocesses_each_value_when_used_for_config()
     {
+        FieldtypeRepository::partialMock();
+
         FieldtypeRepository::shouldReceive('find')
             ->with('assets')
             ->andReturn(new class extends Fieldtype
@@ -71,25 +74,31 @@ class NestedFieldsTest extends TestCase
 
         $this->assertSame([
             [
+                'display' => 'Test Image Field',
+                'hide_display' => false,
+                'handle' => 'image',
+                'instructions' => 'Some instructions',
+                'instructions_position' => 'above',
+                'listable' => 'hidden',
+                'sortable' => true,
+                'visibility' => 'visible',
+                'replicator_preview' => true,
+                'duplicate' => true,
                 'type' => 'assets',
                 'max_files' => 2,
                 'container' => 'main',
                 'foo' => 'bar',
-                'display' => 'Test Image Field',
-                'instructions' => 'Some instructions',
                 'validate' => 'required',
                 'component' => 'assets',
-                'handle' => 'image',
                 'prefix' => null,
                 'required' => true,
-                'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
             ],
         ], $actual);
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_from_blueprint_format_to_vue()
     {
         $testFieldset = Fieldset::make('test')->setContents(['fields' => [
@@ -166,7 +175,7 @@ class NestedFieldsTest extends TestCase
         ], $actual);
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_from_vue_to_blueprint_format()
     {
         $actual = (new NestedFields)->process([
@@ -174,9 +183,9 @@ class NestedFieldsTest extends TestCase
                 '_id' => 'id-1',
                 'handle' => 'one',
                 'type' => 'inline',
-                'fieldtype' => 'plain',
+                'fieldtype' => 'text',
                 'config' => [
-                    'type' => 'plain',
+                    'type' => 'text',
                     'instructions' => null,
                     'width' => 100,
                     'display' => 'First Field',
@@ -213,7 +222,7 @@ class NestedFieldsTest extends TestCase
             [
                 'handle' => 'one',
                 'field' => [
-                    'type' => 'plain',
+                    'type' => 'text',
                     'display' => 'First Field',
                 ],
             ],

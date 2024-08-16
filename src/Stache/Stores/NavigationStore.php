@@ -5,6 +5,7 @@ namespace Statamic\Stache\Stores;
 use Statamic\Facades;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class NavigationStore extends BasicStore
@@ -18,15 +19,15 @@ class NavigationStore extends BasicStore
     {
         // The structures themselves should only exist in the root
         // (ie. no slashes in the filename)
-        $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
+        $filename = Str::after(Path::tidy($file->getPathName()), $this->directory);
 
         return substr_count($filename, '/') === 0 && $file->getExtension() === 'yaml';
     }
 
     public function makeItemFromFile($path, $contents)
     {
-        $relative = str_after($path, $this->directory);
-        $handle = str_before($relative, '.yaml');
+        $relative = Str::after($path, $this->directory);
+        $handle = Str::before($relative, '.yaml');
 
         $data = YAML::file($path)->parse($contents);
 
@@ -36,6 +37,7 @@ class NavigationStore extends BasicStore
             ->maxDepth($data['max_depth'] ?? null)
             ->collections($data['collections'] ?? null)
             ->expectsRoot($data['root'] ?? false)
+            ->canSelectAcrossSites($data['select_across_sites'] ?? false)
             ->initialPath($path);
     }
 

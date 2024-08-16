@@ -3,9 +3,10 @@
 namespace Tests\Search\Searchables;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Search\Searchables\Entries;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -14,17 +15,14 @@ class EntriesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     *
-     * @dataProvider entriesProvider
-     */
+    #[Test]
+    #[DataProvider('entriesProvider')]
     public function it_gets_entries($locale, $config, $expected)
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Collection::make('blog')->sites(['en', 'fr'])->save();
         Collection::make('pages')->sites(['en'])->save();
@@ -123,11 +121,8 @@ class EntriesTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider indexFilterProvider
-     */
+    #[Test]
+    #[DataProvider('indexFilterProvider')]
     public function it_can_use_a_custom_filter($filter)
     {
         Collection::make('blog')->save();

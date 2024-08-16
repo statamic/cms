@@ -6,19 +6,24 @@ use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
 use Statamic\Entries\RemoveSuffixFromPath;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes;
+use Statamic\Stache\Indexes\Index;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionEntriesStore extends ChildStore
 {
     protected $collection;
+    private bool $shouldBlinkEntryUris = true;
 
     protected function collection()
     {
@@ -27,14 +32,14 @@ class CollectionEntriesStore extends ChildStore
 
     public function getItemFilter(SplFileInfo $file)
     {
-        $dir = str_finish($this->directory(), '/');
+        $dir = Str::finish($this->directory(), '/');
         $relative = Path::tidy($file->getPathname());
 
         if (substr($relative, 0, strlen($dir)) == $dir) {
             $relative = substr($relative, strlen($dir));
         }
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             [$site, $relative] = explode('/', $relative, 2);
             if (! $this->collection()->sites()->contains($site)) {
                 return false;
@@ -54,7 +59,7 @@ class CollectionEntriesStore extends ChildStore
 
         $data = YAML::file($path)->parse($contents);
 
-        if (! $id = array_pull($data, 'id')) {
+        if (! $id = Arr::pull($data, 'id')) {
             $idGenerated = true;
             $id = app('stache')->generateId();
         }
@@ -66,7 +71,7 @@ class CollectionEntriesStore extends ChildStore
             ->id($id)
             ->collection($collection);
 
-        if ($origin = array_pull($data, 'origin')) {
+        if ($origin = Arr::pull($data, 'origin')) {
             $entry->origin($origin);
         }
 
@@ -74,7 +79,7 @@ class CollectionEntriesStore extends ChildStore
             ->blueprint($data['blueprint'] ?? null)
             ->locale($site)
             ->initialPath($path)
-            ->published(array_pull($data, 'published', true))
+            ->published(Arr::pull($data, 'published', true))
             ->data($data);
 
         $slug = (new GetSlugFromPath)($path);
@@ -94,6 +99,10 @@ class CollectionEntriesStore extends ChildStore
             $entry->date((new GetDateFromPath)($path));
         }
 
+        // Blink the entry so that it can be used when building the URI. If it's not
+        // in there, it would try to retrieve the entry, which doesn't exist yet.
+        Blink::store('structure-entries')->put($id, $entry);
+
         if (isset($idGenerated) || isset($positionGenerated)) {
             $this->writeItemToDiskWithoutIncrementing($entry);
         }
@@ -105,15 +114,15 @@ class CollectionEntriesStore extends ChildStore
     {
         $site = Site::default()->handle();
         $collection = pathinfo($path, PATHINFO_DIRNAME);
-        $collection = str_after($collection, $this->parent->directory());
+        $collection = Str::after($collection, $this->parent->directory());
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             [$collection, $site] = explode('/', $collection);
         }
 
         // Support entries within subdirectories at any level.
         if (Str::contains($collection, '/')) {
-            $collection = str_before($collection, '/');
+            $collection = Str::before($collection, '/');
         }
 
         return [$collection, $site];
@@ -215,5 +224,70 @@ class CollectionEntriesStore extends ChildStore
         }
 
         $item->writeFile($path);
+    }
+
+    protected function getCachedItem($key)
+    {
+        $cacheKey = $this->getItemCacheKey($key);
+
+        if (! $entry = Stache::cacheStore()->get($cacheKey)) {
+            return null;
+        }
+
+        $isLoadingIds = Index::currentlyLoading() === $this->key().'/id';
+
+        if (! $isLoadingIds && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
+            Blink::store('entry-uris')->put($entry->id(), $uri);
+        }
+
+        return $entry;
+    }
+
+    public function withoutBlinkingEntryUris($callback)
+    {
+        $this->shouldBlinkEntryUris = false;
+        $return = $callback();
+        $this->shouldBlinkEntryUris = true;
+
+        return $return;
+    }
+
+    public function updateUris($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('uri'), $ids);
+        $this->updateEntriesWithinStore($ids);
+    }
+
+    public function updateOrders($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('order'), $ids);
+    }
+
+    public function updateParents($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('parent'), $ids);
+    }
+
+    private function updateEntriesWithinIndex($index, $ids)
+    {
+        if (empty($ids)) {
+            return $index->update();
+        }
+
+        collect($ids)
+            ->map(fn ($id) => Entry::find($id))
+            ->filter()
+            ->each(fn ($entry) => $index->updateItem($entry));
+    }
+
+    private function updateEntriesWithinStore($ids)
+    {
+        if (empty($ids)) {
+            $ids = $this->paths()->keys();
+        }
+
+        $entries = $this->withoutBlinkingEntryUris(fn () => collect($ids)->map(fn ($id) => Entry::find($id))->filter());
+
+        $entries->each(fn ($entry) => $this->cacheItem($entry));
     }
 }

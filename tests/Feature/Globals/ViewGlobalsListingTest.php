@@ -3,6 +3,7 @@
 namespace Tests\Feature\Globals;
 
 use Facades\Tests\Factories\GlobalFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
@@ -15,7 +16,7 @@ class ViewGlobalsListingTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_lists_globals()
     {
         $this->withoutExceptionHandling();
@@ -40,13 +41,13 @@ class ViewGlobalsListingTest extends TestCase
             });
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_configure_url_if_it_doesnt_exist_in_the_selected_site_but_you_have_permission()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr', 'name' => 'French'],
-        ]]);
+        ]);
 
         $this->setTestRoles(['test' => [
             'access cp',
@@ -72,13 +73,13 @@ class ViewGlobalsListingTest extends TestCase
             });
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_globals_if_it_doesnt_exist_in_the_selected_site_and_you_dont_have_permission_to_configure()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr', 'name' => 'French'],
-        ]]);
+        ]);
 
         $this->setTestRoles(['test' => [
             'access cp',
@@ -107,13 +108,13 @@ class ViewGlobalsListingTest extends TestCase
             });
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_globals_in_sites_you_dont_have_permission_to_access()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr', 'name' => 'French'],
-        ]]);
+        ]);
 
         $this->setTestRoles(['test' => [
             'access cp',

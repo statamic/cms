@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class FlipTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_flips_array_key_with_value(): void
     {
         $input = [

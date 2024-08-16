@@ -3,11 +3,12 @@
 namespace Tests\Policies;
 
 use Facades\Tests\Factories\GlobalFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Globals\Variables;
 
 class GlobalSetVariablesPolicyTest extends PolicyTestCase
 {
-    /** @test */
+    #[Test]
     public function variables_are_editable_with_edit_permissions()
     {
         $user = $this->userWithPermissions(['edit test globals']);
@@ -18,7 +19,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
         $this->assertTrue($user->can('view', $global->inDefaultSite()));
     }
 
-    /** @test */
+    #[Test]
     public function variables_are_editable_with_edit_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de']);
@@ -42,7 +43,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
         $this->assertTrue($user->can('view', $global->in('de')));
     }
 
-    /** @test */
+    #[Test]
     public function variables_can_be_created_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);
@@ -52,7 +53,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
         $this->assertFalse($forbiddenUser->can('create', Variables::class));
     }
 
-    /** @test */
+    #[Test]
     public function variables_can_be_deleted_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);

@@ -6,6 +6,8 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Facades\Tests\Factories\GlobalFactory;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -14,7 +16,7 @@ use Statamic\Fields\Fieldtype;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class ResolvesValuesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
@@ -39,7 +41,7 @@ class ResolvesValuesTest extends TestCase
         $this->blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'example']]);
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_values_in_entries()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
@@ -53,7 +55,7 @@ class ResolvesValuesTest extends TestCase
         $this->assertEquals('bar', $entry->resolveRawGqlValue('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_values_in_terms()
     {
         BlueprintRepository::shouldReceive('in')->with('taxonomies/test')->andReturn(collect([
@@ -70,7 +72,7 @@ class ResolvesValuesTest extends TestCase
         $this->assertEquals('bar', $term->resolveRawGqlValue('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_values_in_users()
     {
         BlueprintRepository::shouldReceive('find')->with('user')->andReturn($this->blueprint);
@@ -82,7 +84,7 @@ class ResolvesValuesTest extends TestCase
         $this->assertEquals('bar', $user->resolveRawGqlValue('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_values_in_globals()
     {
         BlueprintRepository::shouldReceive('find')->with('globals.test')->andReturn($this->blueprint);

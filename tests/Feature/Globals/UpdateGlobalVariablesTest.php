@@ -4,11 +4,11 @@ namespace Tests\Feature\Globals;
 
 use Facades\Tests\Factories\GlobalFactory;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -19,7 +19,7 @@ class UpdateGlobalVariablesTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_edit_permission()
     {
         $this->setTestRoles(['test' => ['access cp', 'access en site']]);
@@ -34,13 +34,13 @@ class UpdateGlobalVariablesTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_site_permission()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr/'],
-        ]]);
+        ]);
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->make();
@@ -54,7 +54,7 @@ class UpdateGlobalVariablesTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function global_variables_get_updated()
     {
         $blueprint = Blueprint::make()->setContents(['fields' => [

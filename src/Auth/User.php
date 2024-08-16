@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -104,16 +105,28 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function editUrl()
     {
-        return cp_route('users.edit', $this->id());
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return cp_route('users.edit', $id);
     }
 
     public function updateUrl()
     {
-        return cp_route('users.update', $this->id());
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return cp_route('users.update', $id);
     }
 
     public function apiUrl()
     {
+        if (! $id = $this->id()) {
+            return null;
+        }
+
         return Statamic::apiRoute('users.show', $this->id());
     }
 
@@ -140,6 +153,18 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     public function getAuthPassword()
     {
         return $this->password();
+    }
+
+    public function getAuthPasswordName()
+    {
+        return 'password';
+    }
+
+    public function hasRole($role)
+    {
+        $role = $role instanceof RoleContract ? $role->handle() : $role;
+
+        return $this->roles()->has($role);
     }
 
     /**
@@ -199,15 +224,27 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (UserDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && UserDeleting::dispatch($this) === false) {
             return false;
         }
 
         Facades\User::delete($this);
 
-        UserDeleted::dispatch($this);
+        if ($withEvents) {
+            UserDeleted::dispatch($this);
+        }
 
         return $this;
     }
@@ -309,6 +346,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     public function setPreferredLocale($locale)
     {
         return $this->setPreference('locale', $locale);
+    }
+
+    public function preferredTheme()
+    {
+        return $this->getPreference('theme') ?? 'auto';
     }
 
     public function getCpSearchResultBadge(): string

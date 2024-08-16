@@ -2,7 +2,7 @@
 
 namespace Statamic\Console\Composer;
 
-use Composer\Package\Version\VersionParser;
+use Composer\Semver\VersionParser;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Exceptions\ComposerLockPackageNotFoundException;

@@ -4,20 +4,29 @@ namespace Statamic\Support\Traits;
 
 use Closure;
 use Illuminate\Pipeline\Pipeline;
+use Statamic\Hooks\Payload;
 
 trait Hookable
 {
-    private static $hooks = [];
-
     public static function hook(string $name, Closure $hook)
     {
-        static::$hooks[static::class][$name][] = $hook;
+        $hooks = app('statamic.hooks');
+
+        if (! isset($hooks[static::class])) {
+            $hooks[static::class] = collect();
+        }
+
+        if (! isset($hooks[static::class][$name])) {
+            $hooks[static::class][$name] = collect();
+        }
+
+        $hooks[static::class][$name][] = $hook;
     }
 
     protected function runHooks(string $name, $payload = null)
     {
         $closures = collect(
-            static::$hooks[static::class][$name] ?? []
+            app('statamic.hooks')[static::class][$name] ?? []
         )->map->bindTo($this, $this);
 
         if (debugbar()->isEnabled()) {
@@ -37,5 +46,10 @@ trait Hookable
             ->send($payload)
             ->through($closures->all())
             ->thenReturn();
+    }
+
+    protected function runHooksWith(string $name, array $payload)
+    {
+        return $this->runHooks($name, new Payload($payload));
     }
 }

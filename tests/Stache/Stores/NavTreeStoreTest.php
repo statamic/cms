@@ -4,9 +4,9 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Path;
-use Statamic\Facades\Site;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\NavTreeStore;
 use Statamic\Structures\NavTree;
@@ -35,7 +35,7 @@ class NavTreeStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_only_gets_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
@@ -54,7 +54,7 @@ class NavTreeStoreTest extends TestCase
         $this->assertTrue(file_exists($dir.'/non-yaml-file.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_nav_tree_instances_from_files()
     {
         $contents = <<<'YAML'
@@ -76,13 +76,13 @@ YAML;
         ], $item);
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_nav_tree_instances_from_files_when_using_multisite()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
-        ]]);
+        ]);
 
         $contents = <<<'YAML'
 tree:
@@ -103,7 +103,7 @@ YAML;
         ], $item);
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_handle_and_locale_as_the_item_key_for_nav_trees()
     {
         $this->assertEquals(
@@ -112,7 +112,7 @@ YAML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         $tree = Facades\Nav::make('links')->makeTree('en', [

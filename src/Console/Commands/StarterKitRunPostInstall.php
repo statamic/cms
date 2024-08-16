@@ -37,21 +37,21 @@ class StarterKitRunPostInstall extends Command
         }
 
         if (! app('files')->exists(base_path("vendor/{$package}"))) {
-            $this->error("Cannot find starter kit [{$package}] in vendor.");
+            $this->components->error("Cannot find starter kit [{$package}] in vendor.");
 
             return 1;
         }
 
-        $installer = StarterKitInstaller::package($package, $this);
+        $installer = new StarterKitInstaller($package, $this);
 
         try {
-            $installer->runPostInstallHook(true)->removeStarterKit();
+            $installer->runPostInstallHooks(true)->removeStarterKit();
         } catch (StarterKitException $exception) {
-            $this->error($exception->getMessage());
+            $this->components->error($exception->getMessage());
 
             return 1;
         }
 
-        $this->info("Starter kit [$package] was successfully installed.");
+        $this->components->info("Starter kit [$package] was successfully installed.");
     }
 }

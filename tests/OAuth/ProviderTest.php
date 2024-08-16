@@ -2,6 +2,7 @@
 
 namespace Tests\OAuth;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User as UserFacade;
 use Statamic\OAuth\Provider;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -21,10 +22,6 @@ class ProviderTest extends TestCase
             'driver' => 'local',
             'root' => $this->tempDir = __DIR__.'/tmp',
         ]]);
-
-        config(['statamic.oauth.providers' => [
-            'test',
-        ]]);
     }
 
     public function tearDown(): void
@@ -35,7 +32,7 @@ class ProviderTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_config()
     {
         $this->assertEquals([], (new Provider('test'))->config());
@@ -43,7 +40,7 @@ class ProviderTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], (new Provider('test', ['foo' => 'bar']))->config());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_label_through_the_config()
     {
         $this->assertEquals('Test', (new Provider('test'))->label());
@@ -51,7 +48,7 @@ class ProviderTest extends TestCase
         $this->assertEquals('Foo Bar', (new Provider('test', ['label' => 'Foo Bar']))->label());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_user_data()
     {
         $data = $this->provider()->userData($this->socialite());
@@ -59,7 +56,7 @@ class ProviderTest extends TestCase
         $this->assertEquals(['name' => 'Foo Bar'], $data);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_user_data_using_a_callback()
     {
         $provider = $this->provider();
@@ -70,7 +67,7 @@ class ProviderTest extends TestCase
         $this->assertEquals(['custom' => 'data'], $data);
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_data()
     {
         $provider = $this->provider();
@@ -82,7 +79,7 @@ class ProviderTest extends TestCase
         $this->assertEquals(['name' => 'Foo Bar', 'extra' => 'bar'], $user->data()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_a_user()
     {
         $this->assertCount(0, UserFacade::all());
@@ -94,7 +91,7 @@ class ProviderTest extends TestCase
         $this->assertEquals('Foo Bar', $user->name());
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_a_user_using_a_callback()
     {
         $this->assertCount(0, UserFacade::all());
@@ -108,7 +105,7 @@ class ProviderTest extends TestCase
         $this->assertEquals(['very' => 'custom'], $user->data()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_a_user()
     {
         $this->assertCount(0, UserFacade::all());
@@ -124,7 +121,7 @@ class ProviderTest extends TestCase
         $this->assertEquals($user->id(), $provider->getUserId('foo-bar'));
     }
 
-    /** @test */
+    #[Test]
     public function it_finds_an_existing_user_by_email()
     {
         $provider = $this->provider();
@@ -141,7 +138,7 @@ class ProviderTest extends TestCase
         $this->assertEquals($savedUser, $foundUser);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_user_by_id_after_merging_data()
     {
         $provider = $this->provider();

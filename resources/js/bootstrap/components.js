@@ -43,7 +43,7 @@ import LoadingGraphic from '../components/LoadingGraphic.vue';
 import DropdownList from '../components/DropdownList.vue';
 import DropdownItem from '../components/DropdownItem.vue';
 import ValidationErrors from '../components/ValidationErrors.vue';
-import Slugify from '../components/Slugify.vue';
+import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import Avatar from '../components/Avatar.vue';
 import Breadcrumb from '../components/Breadcrumb.vue';

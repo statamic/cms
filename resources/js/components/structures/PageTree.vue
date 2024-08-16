@@ -35,6 +35,7 @@
                 @nodeOpenChanged="saveTreeState"
             >
                 <tree-branch
+                    :ref="`branch-${page.id}`"
                     slot-scope="{ data: page, store, vm }"
                     :page="page"
                     :depth="vm.level"
@@ -118,7 +119,7 @@ export default {
         },
 
         direction() {
-            return this.$config.get('direction', 'rtl');
+            return this.$config.get('direction', 'ltr');
         },
 
     },
