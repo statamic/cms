@@ -1,6 +1,6 @@
 
 // Core
-// export { default as AssetManager } from '../components/assets/AssetManager.vue';
+export { default as AssetManager } from '../components/assets/AssetManager.vue';
 export { default as AssetBrowser } from '../components/assets/Browser/Browser.vue';
 export { default as UpdatesBadge } from '../components/UpdatesBadge.vue';
 

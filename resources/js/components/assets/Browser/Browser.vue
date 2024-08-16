@@ -291,7 +291,6 @@ import Uploads from '../Uploads.vue';
 import HasActions from '../../data-list/HasActions';
 
 export default {
-
     mixins: [
         HasActions,
         HasPagination,
@@ -436,6 +435,9 @@ export default {
     },
 
     watch: {
+        selectedPath(path) {
+            this.path = path
+        },
 
         initialContainer() {
             this.container = this.initialContainer;
@@ -544,6 +546,7 @@ export default {
         },
 
         edit(id) {
+            console.log('hoi', id);
             this.editedAssetId = id;
         },
 

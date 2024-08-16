@@ -7,9 +7,11 @@
                 <dropdown-item v-if="container.can_edit" :redirect="container.edit_url">
                     {{ __('Edit Container') }}
                 </dropdown-item>
+
                 <dropdown-item :redirect="container.blueprint_url">
                     {{ __('Edit Blueprint') }}
                 </dropdown-item>
+
                 <dropdown-item
                     v-if="container.can_delete"
                     class="warning"
@@ -24,7 +26,9 @@
                 </dropdown-item>
             </dropdown-list>
 
-            <a :href="createContainerUrl" class="btn rtl:mr-4 ltr:ml-4" v-if="canCreateContainers">{{ __('Create Container') }}</a>
+            <a v-if="canCreateContainers" :href="createContainerUrl" class="btn rtl:mr-4 ltr:ml-4">
+                {{ __('Create Container') }}
+            </a>
         </div>
 
         <asset-browser
@@ -44,7 +48,6 @@
 
 <script>
 export default {
-
     props: {
         initialContainer: Object,
         initialPath: String,
@@ -59,7 +62,7 @@ export default {
             container: this.initialContainer,
             path: this.initialPath,
             selectedAssets: [],
-        }
+        };
     },
 
     mounted() {
@@ -67,7 +70,6 @@ export default {
     },
 
     methods: {
-
         /**
          * Bind browser navigation features
          *
@@ -75,7 +77,10 @@ export default {
          * navigation back and forth through folders using browser buttons.
          */
         bindBrowserNavigation() {
-            window.history.replaceState({ container: this.container, path: this.path }, '');
+            window.history.replaceState({
+                container: { ...this.container },
+                path: this.path
+            }, '');
 
             window.onpopstate = (e) => {
                 this.container = e.state.container;
@@ -94,7 +99,8 @@ export default {
             }
 
             window.history.pushState({
-                container: this.container, path: this.path
+                container: { ...this.container },
+                path: this.path,
             }, '', url);
         },
 
@@ -120,11 +126,10 @@ export default {
         },
 
         editAsset(asset) {
-            event.preventDefault()
+            event.preventDefault();
+
             this.$refs.browser.edit(asset.id);
         }
-
     }
-
-}
+};
 </script>
