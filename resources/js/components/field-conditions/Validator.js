@@ -205,12 +205,12 @@ export default class {
     }
 
     getFieldValue(field) {
-        if (field.startsWith('root.')) {
-            return data_get(this.rootValues, field.replace(new RegExp('^root.'), ''));
+        if (field.startsWith('$root.') || field.startsWith('root.')) {
+            return data_get(this.rootValues, field.replace(new RegExp('^\\$?root.'), ''));
         }
 
-        if (field.startsWith('parent.')) {
-            const fieldHandle = field.replace(new RegExp('^parent.'), '');
+        if (field.startsWith('$parent.')) {
+            const fieldHandle = field.replace(new RegExp('^\\$parent.'), '');
             // Regex for fields like replicators, where the path ends with `parent_field_handle.0.field_handle`.
             let regex = new RegExp('.[^\.]+\.[0-9]+\.[^\.]*$');
             if (this.dottedFieldPath.match(regex)) {
@@ -306,8 +306,13 @@ export default class {
             return lhs;
         }
 
-        return lhs.startsWith('root.')
-            ? lhs.replace(/^root\./, '')
-            : dottedPrefix + '.' + lhs;
+        // TODO: Add test coverage for this!
+        if (lhs.startsWith('$root.') || lhs.startsWith('root.')) {
+            return lhs.replace(new RegExp('^\\$?root.'), '');
+        }
+
+        // TODO: Also handle `$parent` usage?
+
+        return dottedPrefix + '.' + lhs;
     }
 }

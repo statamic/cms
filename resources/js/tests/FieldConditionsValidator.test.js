@@ -98,7 +98,7 @@ const Fields = new Vue({
 
 let showFieldIf = function (conditions=null, dottedFieldPath=null) {
     if (dottedFieldPath === null && conditions && Object.keys(conditions).length === 1) {
-        dottedFieldPath = Object.keys(conditions)[0].replace(new RegExp('^root.'), '');
+        dottedFieldPath = Object.keys(conditions)[0].replace(new RegExp('^\\$?root.'), '');
     }
 
     return Fields.showField(conditions ? {'if': conditions} : {}, dottedFieldPath);
@@ -325,10 +325,22 @@ test('it can run conditions on nested data', () => {
     expect(showFieldIf({'name': 'Chewy'})).toBe(false);
     expect(showFieldIf({'address.country': 'Canada'})).toBe(true);
     expect(showFieldIf({'address.country': 'Australia'})).toBe(false);
+    expect(showFieldIf({'$root.user.address.country': 'Canada'})).toBe(true);
+    expect(showFieldIf({'$root.user.address.country': 'Australia'})).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Han'}, 'user.address.country')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'user.address.country')).toBe(false);
+});
+
+test('it can run conditions on nested data using `root.` without `$` for backwards compatibility', () => {
+    Fields.setValues({
+        name: 'Han',
+        address: {
+            country: 'Canada'
+        }
+    }, 'user');
+
     expect(showFieldIf({'root.user.address.country': 'Canada'})).toBe(true);
     expect(showFieldIf({'root.user.address.country': 'Australia'})).toBe(false);
-    expect(showFieldIf({'parent.name': 'Han'}, 'user.address.country')).toBe(true);
-    expect(showFieldIf({'parent.name': 'Chewy'}, 'user.address.country')).toBe(false);
 });
 
 test('it can run conditions on root store values', () => {
@@ -337,6 +349,14 @@ test('it can run conditions on root store values', () => {
     });
 
     expect(showFieldIf({'favorite_foods': 'contains lasagna'})).toBe(false);
+    expect(showFieldIf({'$root.favorite_foods': 'contains lasagna'})).toBe(true);
+});
+
+test('it can run conditions on root store values using `root.` without `$` for backwards compatibility', () => {
+    Fields.setStoreValues({
+        favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
+    });
+
     expect(showFieldIf({'root.favorite_foods': 'contains lasagna'})).toBe(true);
 });
 
@@ -355,16 +375,16 @@ test('it can run conditions on nested prefixed fields', async () => {
         prefixed_first_name: 'Rincess',
         prefixed_last_name: 'Pleia',
         prefixed_address: {
-            home_planet: 'Alderaan'
+            home_planet: 'Elderaan'
         }
     }, 'nested');
 
     expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
     expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
-    expect(Fields.showField({if: {'root.nested.prefixed_last_name': 'is Pleia'}})).toBe(true);
-    expect(Fields.showField({if: {'root.nested.prefixed_last_name': 'is Holo'}})).toBe(false);
-    expect(Fields.showField({if: {'parent.prefixed_last_name': 'is Pleia'}}, 'nested.prefixed_address.home_planet')).toBe(true);
-    expect(Fields.showField({if: {'parent.prefixed_last_name': 'is Holo'}}, 'nested.prefixed_address.home_planet')).toBe(false);
+    expect(Fields.showField({if: {'$root.nested.prefixed_last_name': 'is Pleia'}})).toBe(true);
+    expect(Fields.showField({if: {'$root.nested.prefixed_last_name': 'is Holo'}})).toBe(false);
+    expect(Fields.showField({if: {'$parent.prefixed_last_name': 'is Pleia'}}, 'nested.prefixed_address.home_planet')).toBe(true);
+    expect(Fields.showField({if: {'$parent.prefixed_last_name': 'is Holo'}}, 'nested.prefixed_address.home_planet')).toBe(false);
 });
 
 test('it can call a custom function', () => {
@@ -386,7 +406,7 @@ test('it can call a custom function', () => {
     expect(Fields.showField({unless: 'custom reallyLovesAnimals'})).toBe(true);
 });
 
-test('it can call a custom function that uses fieldPath param to evaluate nested fields', () => {
+test('it can call a custom function that uses `fieldPath` param to evaluate nested fields', () => {
     Fields.setValues({ nested:
         [
             { favorite_animals: ['cats', 'dogs'] },
@@ -442,6 +462,25 @@ test('it can call a custom function on a specific field', () => {
 });
 
 test('it can call a custom function on a specific field using params against a root value', () => {
+    Fields.setStoreValues({
+        favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
+    });
+
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, root, fieldPath }) {
+        expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(root.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
+        expect(fieldPath).toBe('favorite_animals');
+        return target.length > (params[0] || 3);
+    });
+
+    expect(showFieldIf({'$root.favorite_animals': 'custom lovesAnimals'})).toBe(true);
+    expect(showFieldIf({'$root.favorite_animals': 'custom lovesAnimals:2'})).toBe(true);
+    expect(showFieldIf({'$root.favorite_animals': 'custom lovesAnimals:7'})).toBe(false);
+});
+
+test('it can call a custom function on a specific field using params against a root value using `root.` backwards compatibility', () => {
     Fields.setStoreValues({
         favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
     });
