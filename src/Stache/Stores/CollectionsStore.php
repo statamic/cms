@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -82,57 +81,9 @@ class CollectionsStore extends BasicStore
         return $value === 'published';
     }
 
-    public function updateEntryUris($collection, $ids = null)
-    {
-        $store = Stache::store('entries')->store($collection->handle());
-        $this->updateEntriesWithinIndex($store->index('uri'), $ids);
-        $this->updateEntriesWithinStore($store, $ids);
-    }
-
-    private function updateEntriesWithinStore($store, $ids)
-    {
-        if (empty($ids)) {
-            $ids = $store->paths()->keys();
-        }
-
-        $entries = $store->withoutBlinkingEntryUris(fn () => collect($ids)->map(fn ($id) => Entry::find($id))->filter());
-
-        $entries->each(fn ($entry) => $store->cacheItem($entry));
-    }
-
-    public function updateEntryOrder($collection, $ids = null)
-    {
-        $index = Stache::store('entries')
-            ->store($collection->handle())
-            ->index('order');
-
-        $this->updateEntriesWithinIndex($index, $ids);
-    }
-
-    public function updateEntryParent($collection, $ids = null)
-    {
-        $index = Stache::store('entries')
-            ->store($collection->handle())
-            ->index('parent');
-
-        $this->updateEntriesWithinIndex($index, $ids);
-    }
-
-    private function updateEntriesWithinIndex($index, $ids)
-    {
-        if (empty($ids)) {
-            return $index->update();
-        }
-
-        collect($ids)
-            ->map(fn ($id) => Entry::find($id))
-            ->filter()
-            ->each(fn ($entry) => $index->updateItem($entry));
-    }
-
     public function handleFileChanges()
     {
-        if ($this->fileChangesHandled || ! config('statamic.stache.watcher')) {
+        if ($this->fileChangesHandled || ! Stache::isWatcherEnabled()) {
             return;
         }
 

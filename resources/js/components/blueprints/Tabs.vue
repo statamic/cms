@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="!singleTab && tabs.length > 0" class="tabs-container relative">
-            <div ref="tabs" class="tabs flex-1 flex space-x-3 overflow-auto rtl:pl-6 ltr:pr-6" role="tablist">
+            <div ref="tabs" class="tabs flex-1 flex space-x-3 rtl:space-x-reverse overflow-auto rtl:pl-6 ltr:pr-6" role="tablist">
                 <tab
                     ref="tab"
                     v-for="tab in tabs"
@@ -33,6 +33,7 @@
             :tab="tab"
             v-show="currentTab === tab._id"
             :show-section-handle-field="showSectionHandleField"
+            :show-section-hide-field="showSectionHideField"
             :new-section-text="newSectionText"
             :edit-section-text="editSectionText"
             :add-section-text="addSectionText"
@@ -93,6 +94,10 @@ export default {
             default: false
         },
         showSectionHandleField: {
+            type: Boolean,
+            default: false
+        },
+        showSectionHideField: {
             type: Boolean,
             default: false
         },

@@ -1,9 +1,9 @@
 <template>
 
     <stack narrow name="publish-options" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
+        <div slot-scope="{ close }" class="bg-white dark:bg-dark-800 h-full flex flex-col">
 
-            <div class="bg-gray-200 px-6 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
+            <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
                 {{ __('Publish') }}
                 <button
                     type="button"
@@ -156,6 +156,11 @@ export default {
             this.$axios.post(this.actions.publish, payload)
                 .then(response => {
                     this.saving = false;
+
+                    if (! response.data.saved) {
+                        this.$emit('failed');
+                        return this.$toast.error(__(`Couldn't publish entry`));
+                    }
                     this.$toast.success(__('Published'));
                     this.runAfterPublishHook(response);
                 }).catch(error => this.handleAxiosError(error));
@@ -187,6 +192,13 @@ export default {
             const payload = { message: this.revisionMessage };
 
             this.$axios.post(this.actions.unpublish, { data: payload }).then(response => {
+                this.saving = false;
+
+                if (! response.data.saved) {
+                    this.$emit('failed');
+                    return this.$toast.error(__(`Couldn't unpublish entry`));
+                }
+
                 this.$toast.success(__('Unpublished'));
                 this.revisionMessage = null;
                 this.$emit('saved', { published: false, isWorkingCopy: false, response });

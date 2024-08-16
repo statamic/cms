@@ -6,7 +6,7 @@
                 <input type="text"
                     v-model="data"
                     class="input-text flex-1"
-                    :class="{ 'bg-white': !isReadOnly }"
+                    :class="{ 'bg-white dark:bg-dark-600': !isReadOnly }"
                     :id="fieldId"
                     :readonly="isReadOnly"
                     :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
@@ -73,7 +73,8 @@ export default {
 
             if (embed_url.includes('vimeo')) {
                 embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
-                if (embed_url.split('/').length > 5) {
+
+                if (! this.data.includes('progressive_redirect') && embed_url.split('/').length > 5) {
                     let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
                     embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
                 }

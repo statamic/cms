@@ -4,6 +4,7 @@ namespace Tests\Data\Globals;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetCreating;
 use Statamic\Events\GlobalSetDeleted;
@@ -25,7 +26,7 @@ class GlobalSetTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_file_contents_for_saving_with_a_single_site()
     {
         $this->setSites([
@@ -53,7 +54,7 @@ EOT;
         $this->assertEquals($expected, $set->fileContents());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_file_contents_for_saving_with_multiple_sites()
     {
         $this->setSites([
@@ -85,7 +86,7 @@ EOT;
         $this->assertEquals($expected, $set->fileContents());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_through_the_api()
     {
         Event::fake();
@@ -124,7 +125,7 @@ EOT;
         });
     }
 
-    /** @test */
+    #[Test]
     public function saving_a_new_global_set_will_create_its_localizations()
     {
         $this->setSites([
@@ -152,7 +153,7 @@ EOT;
         $set->save();
     }
 
-    /** @test */
+    #[Test]
     public function saving_an_existing_global_set_will_save_or_delete_its_localizations()
     {
         $this->setSites([
@@ -192,7 +193,7 @@ EOT;
         $set->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_global_set_created_only_once()
     {
         Event::fake();
@@ -223,7 +224,7 @@ EOT;
         Event::assertDispatched(GlobalSetCreated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_quietly()
     {
         Event::fake();
@@ -251,7 +252,7 @@ EOT;
         Event::assertNotDispatched(GlobalSetCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_creating_event_returns_false_the_global_set_doesnt_save()
     {
         Event::fake([GlobalSetCreated::class]);
@@ -281,7 +282,7 @@ EOT;
         Event::assertNotDispatched(GlobalSetCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_saving_event_returns_false_the_global_set_doesnt_save()
     {
         Event::fake([GlobalSetSaved::class]);
@@ -310,7 +311,7 @@ EOT;
         Event::assertNotDispatched(GlobalSetSaved::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_the_origin_of_descendants_when_saving_an_entry_with_localizations()
     {
         // The issue this test is covering doesn't happen when using the
@@ -349,7 +350,7 @@ EOT;
         $this->assertEquals('fr updated', $global->in('de')->foo);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_available_sites_from_localizations()
     {
         $this->setSites([
@@ -367,7 +368,7 @@ EOT;
         $this->assertEquals(['en', 'fr'], $set->sites()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_view_global_sets_from_sites_that_the_user_is_not_authorized_to_see()
     {
         $this->setSites([
@@ -408,7 +409,7 @@ EOT;
         $this->assertFalse($user->can('view', $set3));
     }
 
-    /** @test */
+    #[Test]
     public function it_fires_a_deleting_event()
     {
         Event::fake();
@@ -422,7 +423,7 @@ EOT;
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         GlobalSet::spy();
@@ -441,7 +442,7 @@ EOT;
         Event::assertNotDispatched(GlobalSetDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_quietly()
     {
         Event::fake();

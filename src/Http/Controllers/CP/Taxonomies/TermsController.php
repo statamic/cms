@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
@@ -19,7 +20,8 @@ use Statamic\Rules\UniqueTermValue;
 
 class TermsController extends CpController
 {
-    use QueriesFilters;
+    use ExtractsFromTermFields,
+        QueriesFilters;
 
     public function index(FilteredRequest $request, $taxonomy)
     {
@@ -141,6 +143,7 @@ class TermsController extends CpController
             'revisionsEnabled' => $term->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
+            'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
         ];
 
         if ($request->wantsJson()) {
@@ -204,8 +207,15 @@ class TermsController extends CpController
             $saved = $term->updateLastModified(User::current())->save();
         }
 
+        [$values] = $this->extractFromFields($term, $term->blueprint());
+
         return (new TermResource($term))
-            ->additional(['saved' => $saved]);
+            ->additional([
+                'saved' => $saved,
+                'data' => [
+                    'values' => $values,
+                ],
+            ]);
     }
 
     public function create(Request $request, $taxonomy, $site)
@@ -311,27 +321,6 @@ class TermsController extends CpController
 
         return (new TermResource($term))
             ->additional(['saved' => $saved]);
-    }
-
-    protected function extractFromFields($term, $blueprint)
-    {
-        // The values should only be data merged with the origin data.
-        // We don't want injected taxonomy values, which $term->values() would have given us.
-        $values = $term->inDefaultLocale()->data()->merge(
-            $term->data()
-        );
-
-        $fields = $blueprint
-            ->fields()
-            ->addValues($values->all())
-            ->preProcess();
-
-        $values = $fields->values()->merge([
-            'title' => $term->value('title'),
-            'slug' => $term->slug(),
-        ]);
-
-        return [$values->all(), $fields->meta()];
     }
 
     protected function extractAssetsFromValues($values)

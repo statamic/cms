@@ -1,6 +1,6 @@
 <template>
 
-    <div class="px-4 py-2 flex flex-wrap text-sm bg-gray-200 border-t border-b shadow-inner">
+    <div class="px-4 py-2 flex flex-wrap text-sm bg-gray-200 dark:bg-dark-700 border-t border-b dark:border-dark-900 shadow-inner">
         <a
             v-for="(part, index) in pathParts"
             :key="index"

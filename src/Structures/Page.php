@@ -66,7 +66,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
             return $this->augmentationReferenceKey = 'Page::'.$entry->getBulkAugmentationReferenceKey();
         }
 
-        return $this->augmentationReferenceKey = 'Page::';
+        return $this->augmentationReferenceKey = 'Page::'.$this->id();
     }
 
     public function setUrl($url)

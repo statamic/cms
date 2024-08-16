@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
@@ -61,6 +62,8 @@ class ServiceProvider extends LaravelServiceProvider
                 $urls
             );
         });
+
+        $this->app->singleton(ResponseStatusTracker::class, fn () => new ResponseStatusTracker);
     }
 
     public function boot()
@@ -78,5 +81,16 @@ class ServiceProvider extends LaravelServiceProvider
         Blade::directive('nocache', function ($exp) {
             return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>';
         });
+
+        Request::macro('fakeStaticCacheStatus', function (int $status) {
+            $url = '/__shared-errors/'.$status;
+            $this->pathInfo = $url;
+            $this->requestUri = $url;
+            app(Session::class)->setUrl($url);
+
+            return $this;
+        });
+
+        $this->app[ResponseStatusTracker::class]->registerMacros();
     }
 }

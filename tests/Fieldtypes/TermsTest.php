@@ -4,6 +4,8 @@ namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Data\AugmentedCollection;
@@ -54,7 +56,7 @@ class TermsTest extends TestCase
             ->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_slugs_to_a_query_builder_when_using_a_single_taxonomy()
     {
         $augmented = $this->fieldtype(['taxonomies' => 'tags'])->augment(['one', 'two']);
@@ -64,7 +66,7 @@ class TermsTest extends TestCase
         $this->assertEquals(['tags::one', 'tags::two'], $augmented->get()->map->id()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_ids_to_a_query_builder_when_using_multiple_taxonomies()
     {
         $augmented = $this->fieldtype(['taxonomies' => ['tags', 'categories']])->augment(['tags::one', 'categories::red']);
@@ -74,7 +76,7 @@ class TermsTest extends TestCase
         $this->assertEquals(['tags::one', 'categories::red'], $augmented->get()->map->id()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_when_augmenting_a_slug_when_using_multiple_taxonomies()
     {
         $this->expectExceptionMessage('Ambigious taxonomy term value [one]. Field [test] is configured with multiple taxonomies.');
@@ -82,7 +84,7 @@ class TermsTest extends TestCase
         $this->fieldtype(['taxonomies' => ['tags', 'categories']])->augment(['one', 'two']);
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_single_term_when_max_items_is_one()
     {
         $augmented = $this->fieldtype(['taxonomies' => 'tags', 'max_items' => 1])->augment(['one']);
@@ -91,7 +93,7 @@ class TermsTest extends TestCase
         $this->assertEquals('tags::one', $augmented->id());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_augmented_items_to_the_parent_entrys_locale()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
@@ -104,7 +106,7 @@ class TermsTest extends TestCase
         $this->assertEquals(['Un', 'Deux', 'Three'], $augmented->get()->map->title->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_augmented_item_to_the_parent_entrys_locale_when_max_items_is_one()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
@@ -122,7 +124,7 @@ class TermsTest extends TestCase
         $this->assertEquals('Three', $augmented->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_augmented_items_to_the_current_sites_locale_when_parent_is_not_localizable()
     {
         Site::setCurrent('fr');
@@ -140,7 +142,7 @@ class TermsTest extends TestCase
         $this->assertEquals(['Un', 'Deux', 'Three'], $augmented->get()->map->title->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_augmented_item_to_the_current_sites_locale_when_parent_is_not_localizable_when_max_items_is_one()
     {
         Site::setCurrent('fr');
@@ -163,7 +165,7 @@ class TermsTest extends TestCase
         $this->assertEquals('Three', $augmented->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_shallow_augments_slugs_to_a_collection_of_terms_when_using_a_single_taxonomy()
     {
         $augmented = $this->fieldtype(['taxonomies' => 'tags'])->shallowAugment(['one', 'two']);
@@ -192,7 +194,7 @@ class TermsTest extends TestCase
         ], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_shallow_augments_to_a_single_term_when_max_items_is_one()
     {
         $augmented = $this->fieldtype(['taxonomies' => 'tags', 'max_items' => 1])->shallowAugment(['one']);
@@ -208,7 +210,7 @@ class TermsTest extends TestCase
         ], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_shallow_augmented_items_to_the_parent_entrys_locale()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
@@ -237,7 +239,7 @@ class TermsTest extends TestCase
         ], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_shallow_augmented_item_to_the_parent_entrys_locale_when_max_items_is_one()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
@@ -267,7 +269,7 @@ class TermsTest extends TestCase
         ], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_shallow_augmented_items_to_the_current_sites_locale_when_parent_is_not_localizable()
     {
         Site::setCurrent('fr');
@@ -301,7 +303,7 @@ class TermsTest extends TestCase
         ], $augmented->toArray()); // only 123 and 789 have localized versions
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_the_shallow_augmented_item_to_the_current_sites_locale_when_parent_is_not_localizable_when_max_items_is_one()
     {
         Site::setCurrent('fr');
@@ -336,11 +338,8 @@ class TermsTest extends TestCase
         ], $augmented->toArray());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider collectionAttachmentProvider
-     **/
+    #[Test]
+    #[DataProvider('collectionAttachmentProvider')]
     public function it_attaches_collection_during_augmentation($expectCollection, $parentIsEntry, $handle, $isRootLevel, $collectionUsesTaxonomy)
     {
         if ($collectionUsesTaxonomy) {
@@ -437,7 +436,7 @@ class TermsTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function using_both_taxonomy_and_taxonomies_throws_an_exception()
     {
         $this->expectExceptionMessage('A terms fieldtype cannot define both `taxonomy` and `taxonomies`. Use `taxonomies`.');
@@ -445,7 +444,7 @@ class TermsTest extends TestCase
         $this->fieldtype(['taxonomy' => 'categories', 'taxonomies' => 'tags'])->taxonomies();
     }
 
-    /** @test */
+    #[Test]
     public function having_taxonomy_defined_but_not_taxonomies_throws_an_exception()
     {
         $this->expectExceptionMessage('A terms fieldtype configures its available taxonomies using the `taxonomies` option, but only found `taxonomy`.');

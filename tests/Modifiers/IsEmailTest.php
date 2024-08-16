@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -15,11 +17,8 @@ class IsEmailTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider emailsProvider
-     */
+    #[Test]
+    #[DataProvider('emailsProvider')]
     public function it_returns_true_if_the_string_is_a_valid_email_address($expected, $input): void
     {
         $modified = $this->modify($input);

@@ -3,6 +3,7 @@
 namespace Tests\Data\Assets;
 
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
@@ -30,7 +31,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->container = tap(AssetContainer::make('test')->disk('test'))->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_assets()
     {
         $assets = $this->container->queryAssets()->get();
@@ -39,7 +40,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_or_where()
     {
         $assets = $this->container->queryAssets()->where('filename', 'a')->orWhere('filename', 'c')->get();
@@ -48,7 +49,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_or_where_in()
     {
         $assets = $this->container->queryAssets()
@@ -61,7 +62,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'd', 'e', 'f'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_or_where_not_in()
     {
         $assets = $this->container->queryAssets()
@@ -86,7 +87,7 @@ class AssetQueryBuilderTest extends TestCase
         Asset::find('test::e.jpg')->data(['test_date' => null])->save();
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_date()
     {
         $this->createWhereDateTestAssets();
@@ -107,7 +108,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_month()
     {
         $this->createWhereDateTestAssets();
@@ -123,7 +124,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['d'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_day()
     {
         $this->createWhereDateTestAssets();
@@ -139,7 +140,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'd'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_year()
     {
         $this->createWhereDateTestAssets();
@@ -155,7 +156,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['d'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_time()
     {
         $this->createWhereDateTestAssets();
@@ -186,7 +187,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['c', 'e', 'f'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_not_null()
     {
         Asset::find('test::a.jpg')->data(['text' => 'Text 1'])->save();
@@ -202,7 +203,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'd'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_or_where_null()
     {
         Asset::find('test::a.jpg')->data(['text' => 'Text 1', 'content' => 'Content 1'])->save();
@@ -218,7 +219,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['c', 'e', 'f', 'b', 'd'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_or_where_not_null()
     {
         Asset::find('test::a.jpg')->data(['text' => 'Text 1', 'content' => 'Content 1'])->save();
@@ -234,7 +235,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c', 'b', 'd'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_nested_where()
     {
         $assets = $this->container->queryAssets()
@@ -251,7 +252,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c', 'd', 'f'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_nested_where_in()
     {
         $assets = $this->container->queryAssets()
@@ -269,7 +270,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'd', 'c', 'f'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_between()
     {
         Asset::find('test::a.jpg')->data(['number_field' => 8])->save();
@@ -285,7 +286,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'c', 'd'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_not_between()
     {
         Asset::find('test::a.jpg')->data(['number_field' => 8])->save();
@@ -301,7 +302,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'e', 'f'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_or_where_between()
     {
         Asset::find('test::a.jpg')->data(['number_field' => 8])->save();
@@ -317,7 +318,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'c', 'd', 'e'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_or_where_not_between()
     {
         Asset::find('test::a.jpg')->data(['text' => 'a', 'number_field' => 8])->save();
@@ -333,7 +334,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['e', 'a', 'b', 'f'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_json_contains()
     {
         Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
@@ -353,7 +354,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_json_doesnt_contain()
     {
         Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
@@ -374,7 +375,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'd', 'e'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_or_where_json_contains()
     {
         Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
@@ -389,7 +390,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c', 'e'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_or_where_json_doesnt_contain()
     {
         Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
@@ -405,7 +406,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'c', 'b', 'd'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_json_length()
     {
         Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
@@ -420,7 +421,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'e', 'd'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_array_of_wheres()
     {
         $assets = $this->container->queryAssets()
@@ -434,7 +435,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function results_are_found_using_where_with_json_value()
     {
         Asset::find('test::a.jpg')->data(['text' => 'Text 1', 'content' => ['value' => 1]])->save();
@@ -456,7 +457,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'd', 'e', 'f'], $assets->map->filename()->all());
     }
 
-    /** @test **/
+    #[Test]
     public function assets_are_found_using_where_column()
     {
         Asset::find('test::a.jpg')->data(['foo' => 'Post 1', 'other_foo' => 'Not Post 1'])->save();
@@ -477,7 +478,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 1', 'Post 2', 'Post 5', 'Post 6'], $entries->map->foo->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_assets_using_when()
     {
         $assets = $this->container->queryAssets()->when(true, function ($query) {
@@ -495,7 +496,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $assets->map->filename()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_assets_using_unless()
     {
         $assets = $this->container->queryAssets()->unless(true, function ($query) {
@@ -513,7 +514,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a'], $assets->map->filename()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_assets_using_tap()
     {
         $assets = $this->container->queryAssets()->tap(function ($query) {
@@ -524,7 +525,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a'], $assets->map->filename()->all());
     }
 
-    /** @test */
+    #[Test]
     public function assets_are_found_using_offset()
     {
         $query = $this->container->queryAssets()->limit(3);
@@ -534,7 +535,7 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['b.txt', 'c.txt', 'd.jpg'], $query->offset(1)->get()->map->path()->all());
     }
 
-    /** @test */
+    #[Test]
     public function querying_doesnt_generate_meta_files_unnecessarily()
     {
         $this->assertEquals([
@@ -561,7 +562,7 @@ class AssetQueryBuilderTest extends TestCase
         ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function querying_a_data_field_will_generate_meta_files()
     {
         Storage::disk('test')->put('.meta/b.txt.yaml', "data:\n  foo: bar");
@@ -601,7 +602,7 @@ class AssetQueryBuilderTest extends TestCase
         ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function values_can_be_plucked()
     {
         $this->assertEquals([

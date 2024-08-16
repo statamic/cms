@@ -2,6 +2,7 @@
 
 namespace Tests\Markdown;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Markdown;
 use Tests\TestCase;
 
@@ -12,19 +13,19 @@ class MarkdownTest extends TestCase
         $this->assertEquals($expectedHtml, rtrim(Markdown::parse($markdown)));
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_markdown()
     {
         $this->assertParses('<h1>Heading One</h1>', '# Heading One');
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_strikethrough()
     {
         $this->assertParses('<h1>Heading <del>One</del></h1>', '# Heading ~~One~~');
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_markdown_inside_markup()
     {
         $markdown = <<<'EOT'
@@ -47,7 +48,7 @@ EOT;
         $this->assertParses($html, $markdown);
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_attributes()
     {
         $this->assertParses(
@@ -56,7 +57,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_code_blocks()
     {
         $markdown = <<<'EOT'
@@ -78,7 +79,7 @@ EOT;
         $this->assertParses($html, $markdown);
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_tables()
     {
         $markdown = <<<'EOT'
@@ -118,7 +119,7 @@ EOT;
         $this->assertParses($html, $markdown);
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_description_lists()
     {
         $markdown = <<<'EOT'
@@ -150,7 +151,7 @@ EOT;
         $this->assertParses($html, $markdown);
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_footnotes()
     {
         $markdown = <<<'EOT'
@@ -166,7 +167,7 @@ EOT;
         $this->assertParses($html, $markdown);
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_tasklists()
     {
         $markdown = <<<'EOT'
@@ -191,7 +192,7 @@ EOT;
         $this->assertParses($html, $markdown);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_automatically_convert_urls_to_links()
     {
         $this->assertParses('<p>https://example.com</p>', 'https://example.com');
@@ -202,7 +203,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_line_breaks_on_demand()
     {
         $this->assertParses("<p>foo\nbar</p>", "foo\nbar");
@@ -213,7 +214,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_escapes_markup_on_demand()
     {
         $this->assertParses('<div></div>', '<div></div>');
@@ -224,7 +225,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_smart_punctuation_on_demand()
     {
         $this->assertParses('<p>&quot;Foo&quot; -- Bar...</p>', '"Foo" -- Bar...');
@@ -235,7 +236,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_heading_permalinks_on_demand()
     {
         $markdown = <<<'EOT'
@@ -256,7 +257,7 @@ EOT,
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_table_of_contents_on_demand()
     {
         $markdown = <<<'EOT'

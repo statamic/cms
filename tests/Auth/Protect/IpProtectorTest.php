@@ -2,9 +2,11 @@
 
 namespace Tests\Auth\Protect;
 
+use PHPUnit\Framework\Attributes\Test;
+
 class IpProtectorTest extends PageProtectionTestCase
 {
-    /** @test */
+    #[Test]
     public function allows_matching_ip()
     {
         config(['statamic.protect.schemes.ip_address' => [
@@ -17,7 +19,7 @@ class IpProtectorTest extends PageProtectionTestCase
             ->assertOk();
     }
 
-    /** @test */
+    #[Test]
     public function denies_for_incorrect_ip()
     {
         config(['statamic.protect.schemes.ip_address' => [
@@ -30,7 +32,7 @@ class IpProtectorTest extends PageProtectionTestCase
             ->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function denies_when_no_ip_addresses_are_configured()
     {
         config(['statamic.protect.schemes.ip_address' => [
