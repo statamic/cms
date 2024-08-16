@@ -302,17 +302,14 @@ export default class {
     }
 
     relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix) {
-        if (! dottedPrefix) {
-            return lhs;
-        }
-
-        // TODO: Add test coverage for this!
         if (lhs.startsWith('$root.') || lhs.startsWith('root.')) {
             return lhs.replace(new RegExp('^\\$?root.'), '');
         }
 
         // TODO: Also handle `$parent` usage?
 
-        return dottedPrefix + '.' + lhs;
+        return dottedPrefix
+            ? dottedPrefix + '.' + lhs
+            : lhs;
     }
 }

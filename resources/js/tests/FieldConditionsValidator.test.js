@@ -683,6 +683,42 @@ test('it tells omitter not omit revealer-hidden fields', async () => {
     expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
 });
 
+test('it tells omitter not omit revealer-hidden fields using `$root.` in condition', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        event_venue: false,
+    });
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'venue', if: {'$root.show_more_info': true}},
+    ]);
+
+    console.log(Store.state.publish.base.hiddenFields);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
+});
+
+test('it tells omitter not omit revealer-hidden fields using `root.` without `$` for backwards compatibility', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        event_venue: false,
+    });
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'venue', if: {'root.show_more_info': true}},
+    ]);
+
+    console.log(Store.state.publish.base.hiddenFields);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
+});
+
 test('it tells omitter not omit nested revealer-hidden fields', async () => {
     Fields.setValues({
         show_more_info: false,
@@ -692,6 +728,40 @@ test('it tells omitter not omit nested revealer-hidden fields', async () => {
     await Fields.setHiddenFieldsState([
         {handle: 'show_more_info', type: 'revealer'},
         {handle: 'venue', if: {show_more_info: true}},
+    ], 'nested');
+
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+});
+
+test('it tells omitter not omit nested revealer-hidden fields using `$root.` in condition', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        event_venue: false,
+    }, 'nested');
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'venue', if: {'$root.nested.show_more_info': true}},
+    ], 'nested');
+
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+});
+
+test('it tells omitter not omit nested revealer-hidden fields using `root.` in condition without `$` for backwards compatibility', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        event_venue: false,
+    }, 'nested');
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'venue', if: {'root.nested.show_more_info': true}},
     ], 'nested');
 
     expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
