@@ -618,7 +618,7 @@ test('it tells omitter to omit hidden fields by default', async () => {
 test('it tells omitter to omit nested hidden fields by default', async () => {
     Fields.setValues({
         is_online_event: false,
-        event_venue: false,
+        venue: false,
     }, 'nested');
 
     await Fields.setHiddenFieldsState([
@@ -669,7 +669,7 @@ test('it tells omitter to omit nested revealer fields', async () => {
 test('it tells omitter not omit revealer-hidden fields', async () => {
     Fields.setValues({
         show_more_info: false,
-        event_venue: false,
+        venue: false,
     });
 
     await Fields.setHiddenFieldsState([
@@ -686,7 +686,7 @@ test('it tells omitter not omit revealer-hidden fields', async () => {
 test('it tells omitter not omit revealer-hidden fields using `$root.` in condition', async () => {
     Fields.setValues({
         show_more_info: false,
-        event_venue: false,
+        venue: false,
     });
 
     await Fields.setHiddenFieldsState([
@@ -704,7 +704,7 @@ test('it tells omitter not omit revealer-hidden fields using `$root.` in conditi
 test('it tells omitter not omit revealer-hidden fields using `root.` without `$` for backwards compatibility', async () => {
     Fields.setValues({
         show_more_info: false,
-        event_venue: false,
+        venue: false,
     });
 
     await Fields.setHiddenFieldsState([
@@ -722,7 +722,7 @@ test('it tells omitter not omit revealer-hidden fields using `root.` without `$`
 test('it tells omitter not omit nested revealer-hidden fields', async () => {
     Fields.setValues({
         show_more_info: false,
-        event_venue: false,
+        venue: false,
     }, 'nested');
 
     await Fields.setHiddenFieldsState([
@@ -739,7 +739,7 @@ test('it tells omitter not omit nested revealer-hidden fields', async () => {
 test('it tells omitter not omit nested revealer-hidden fields using `$root.` in condition', async () => {
     Fields.setValues({
         show_more_info: false,
-        event_venue: false,
+        venue: false,
     }, 'nested');
 
     await Fields.setHiddenFieldsState([
@@ -756,7 +756,7 @@ test('it tells omitter not omit nested revealer-hidden fields using `$root.` in 
 test('it tells omitter not omit nested revealer-hidden fields using `root.` in condition without `$` for backwards compatibility', async () => {
     Fields.setValues({
         show_more_info: false,
-        event_venue: false,
+        venue: false,
     }, 'nested');
 
     await Fields.setHiddenFieldsState([
