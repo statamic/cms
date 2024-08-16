@@ -2,6 +2,7 @@
 
 namespace Statamic\StarterKits;
 
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
 
@@ -17,11 +18,8 @@ final class LicenseManager
 
     /**
      * Instantiate starter kit license manager.
-     *
-     * @param  string|null  $licenseKey
-     * @param  mixed  $console
      */
-    public function __construct(string $package, $licenseKey = null, $console = null)
+    public function __construct(string $package, ?string $licenseKey = null, ?Command $console = null)
     {
         $this->package = $package;
         $this->licenseKey = $licenseKey ?? config('statamic.system.license_key');
@@ -30,22 +28,16 @@ final class LicenseManager
 
     /**
      * Instantiate starter kit license manager.
-     *
-     * @param  string|null  $licenceKey
-     * @param  mixed  $console
-     * @return static
      */
-    public static function validate(string $package, $licenceKey = null, $console = null)
+    public static function validate(string $package, ?string $licenceKey = null, ?Command $console = null): self
     {
         return (new self($package, $licenceKey, $console))->performValidation();
     }
 
     /**
      * Check if user is able to install starter kit, whether free or paid.
-     *
-     * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return $this->valid;
     }
@@ -53,7 +45,7 @@ final class LicenseManager
     /**
      * Expire license key and increment install count.
      */
-    public function completeInstall()
+    public function completeInstall(): void
     {
         Http::post(self::OUTPOST_ENDPOINT.'installed', [
             'license' => $this->licenseKey,
@@ -64,10 +56,8 @@ final class LicenseManager
 
     /**
      * Perform validation.
-     *
-     * @return $this
      */
-    private function performValidation()
+    private function performValidation(): self
     {
         if (! $this->outpostGetStarterKitDetails()) {
             return $this->error('Cannot connect to [statamic.com] to validate license!');
@@ -102,10 +92,8 @@ final class LicenseManager
 
     /**
      * Get starter kit details from outpost.
-     *
-     * @return $this
      */
-    private function outpostGetStarterKitDetails()
+    private function outpostGetStarterKitDetails(): self
     {
         $response = Http::get(self::OUTPOST_ENDPOINT.$this->package);
 
@@ -120,10 +108,8 @@ final class LicenseManager
 
     /**
      * Check if starter kit is a free starter kit.
-     *
-     * @return bool
      */
-    private function isFreeStarterKit()
+    private function isFreeStarterKit(): bool
     {
         if ($this->details === false) {
             return true;
@@ -134,10 +120,8 @@ final class LicenseManager
 
     /**
      * Check if outpost validates kit license.
-     *
-     * @return bool
      */
-    private function outpostValidatesLicense()
+    private function outpostValidatesLicense(): bool
     {
         if (! $this->licenseKey) {
             return false;
@@ -158,10 +142,8 @@ final class LicenseManager
 
     /**
      * Clear license key.
-     *
-     * @return $this
      */
-    private function clearLicenseKey()
+    private function clearLicenseKey(): self
     {
         $this->licenseKey = null;
 
@@ -170,10 +152,8 @@ final class LicenseManager
 
     /**
      * Set validated status to true.
-     *
-     * @return $this
      */
-    private function setValid()
+    private function setValid(): self
     {
         $this->valid = true;
 
@@ -182,10 +162,8 @@ final class LicenseManager
 
     /**
      * Output info message.
-     *
-     * @return $this
      */
-    private function info(string $message)
+    private function info(string $message): self
     {
         $this->console->info($message);
 
@@ -194,10 +172,8 @@ final class LicenseManager
 
     /**
      * Output error message.
-     *
-     * @return $this
      */
-    private function error(string $message)
+    private function error(string $message): self
     {
         $this->console->error($message);
 
@@ -206,10 +182,8 @@ final class LicenseManager
 
     /**
      * Output comment line.
-     *
-     * @return $this
      */
-    private function comment(string $message)
+    private function comment(string $message): self
     {
         $this->console->comment($message);
 

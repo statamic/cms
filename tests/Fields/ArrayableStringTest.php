@@ -46,4 +46,13 @@ class ArrayableStringTest extends TestCase
 
         $this->assertSame(json_encode($val->toArray()), json_encode($val));
     }
+
+    #[Test]
+    public function it_converts_to_bool()
+    {
+        $this->assertTrue((new ArrayableString('world'))->toBool());
+        $this->assertFalse((new ArrayableString(null))->toBool());
+        $this->assertTrue((new ArrayableString(4))->toBool());
+        $this->assertFalse((new ArrayableString(''))->toBool());
+    }
 }

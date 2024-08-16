@@ -71,10 +71,10 @@ export default {
     },
 
     watch: {
-        dictionary() {
+        dictionary(dictionary) {
             this.update({
                 type: dictionary,
-                ...this.meta.dictionaries[this.dictionary]?.defaults
+                ...this.meta.dictionaries[dictionary]?.defaults
             })
         },
     },

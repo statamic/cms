@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Contracts\Support\Boolable;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
@@ -353,8 +354,8 @@ class Environment
         $this->isEvaluatingTruthValue = false;
 
         if (is_object($result)) {
-            if ($result instanceof ArrayableString) {
-                $value = $this->getTruthValue($result->value());
+            if ($result instanceof Boolable) {
+                $value = $this->getTruthValue($result->toBool());
                 $this->unlock();
 
                 return $value;
@@ -1255,6 +1256,8 @@ class Environment
         if ($name instanceof VariableReference) {
             if (! $this->isEvaluatingTruthValue) {
                 $this->dataRetriever->setReduceFinal(false);
+            } else {
+                $this->dataRetriever->setIsReturningForConditions(true);
             }
 
             if ($originalNode != null && $originalNode->hasModifiers()) {
