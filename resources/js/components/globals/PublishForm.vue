@@ -1,5 +1,4 @@
 <template>
-
     <div>
         <header class="mb-6">
             <breadcrumb :url="globalsUrl" :title="__('Globals')" />
@@ -81,7 +80,6 @@
             </template>
         </publish-container>
     </div>
-
 </template>
 
 <script>
