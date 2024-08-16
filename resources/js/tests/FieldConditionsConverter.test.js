@@ -35,7 +35,21 @@ test('it converts from blueprint format and applies prefixes', () => {
     expect(converted).toEqual(expected);
 });
 
-test('it converts from blueprint format and does not apply prefix to root field conditions', () => {
+test('it converts from blueprint format and does not apply prefix to `$root.` field conditions', () => {
+    let converted = FieldConditionsConverter.fromBlueprint({
+        'name': 'isnt joe',
+        '$root.title': 'not empty',
+    }, 'nested_');
+
+    let expected = [
+        {field: 'nested_name', operator: 'not', value: 'joe'},
+        {field: '$root.title', operator: 'not', value: 'empty'}
+    ];
+
+    expect(converted).toEqual(expected);
+});
+
+test('it converts from blueprint format and does not apply prefix to `root.` field conditions without `$` for backwards compatibility', () => {
     let converted = FieldConditionsConverter.fromBlueprint({
         'name': 'isnt joe',
         'root.title': 'not empty',
@@ -49,15 +63,15 @@ test('it converts from blueprint format and does not apply prefix to root field 
     expect(converted).toEqual(expected);
 });
 
-test('it converts from blueprint format and does not apply prefix to parent field conditions', () => {
+test('it converts from blueprint format and does not apply prefix to `$parent.` field conditions', () => {
     let converted = FieldConditionsConverter.fromBlueprint({
         'name': 'isnt joe',
-        'parent.title': 'not empty',
+        '$parent.title': 'not empty',
     }, 'nested_');
 
     let expected = [
         {field: 'nested_name', operator: 'not', value: 'joe'},
-        {field: 'parent.title', operator: 'not', value: 'empty'}
+        {field: '$parent.title', operator: 'not', value: 'empty'}
     ];
 
     expect(converted).toEqual(expected);
