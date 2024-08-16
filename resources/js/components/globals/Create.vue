@@ -1,11 +1,11 @@
 <template>
-    <div class="max-w-lg mt-4 mx-auto">
-
+    <form class="max-w-lg mt-4 mx-auto" @submit.prevent="submit">
         <div class="rounded p-6 lg:px-20 lg:py-10 shadow bg-white dark:bg-dark-600 dark:shadow-dark">
             <header class="text-center mb-16">
                 <h1 class="mb-6">{{ __('Create Global Set') }}</h1>
                 <p class="text-gray" v-text="__('messages.globals_configure_intro')" />
             </header>
+
             <div class="mb-10">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Title') }}</label>
                 <input type="text" v-model="title" class="input-text" autofocus tabindex="1">
@@ -13,6 +13,7 @@
                     {{ __('messages.globals_configure_title_instructions') }}
                 </div>
             </div>
+
             <div class="mb-4">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Handle') }}</label>
                 <div class="relative">
@@ -26,16 +27,15 @@
         </div>
 
         <div class="flex justify-center mt-8">
-            <button tabindex="4" class="btn-primary mx-auto btn-lg" :disabled="! canSubmit" @click="submit">
+            <button tabindex="4" class="btn-primary mx-auto btn-lg" :disabled="! canSubmit">
                 {{ __('Create Global Set')}}
             </button>
         </div>
-    </div>
+    </form>
 </template>
 
 <script>
 export default {
-
     props: {
         route: {
             type: String
@@ -67,6 +67,8 @@ export default {
             this.$axios.post(this.route, {title: this.title, handle: this.handle}).then(response => {
                 window.location = response.data.redirect;
             }).catch(error => {
+                console.error(error)
+
                 this.$toast.error(error.response.data.message);
             });
         }
@@ -79,6 +81,5 @@ export default {
             }
         });
     }
-
 }
 </script>
