@@ -36,7 +36,7 @@ class FieldsetController extends CpController
                             return [$this->group($item) => ['handle' => $item->handle(), 'title' => $item->title()]];
                         }),
                         'is_deletable' => $fieldset->isDeletable(),
-                        'is_resetable' => $fieldset->isResetable(),
+                        'is_resettable' => $fieldset->isResettable(),
                         'title' => $fieldset->title(),
                     ],
                 ];

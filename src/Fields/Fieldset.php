@@ -200,7 +200,7 @@ class Fieldset
         return ! $this->isNamespaced();
     }
 
-    public function isResetable()
+    public function isResettable()
     {
         return $this->isNamespaced()
             && File::exists(FieldsetRepository::overriddenNamespacedFieldsetPath($this->handle));

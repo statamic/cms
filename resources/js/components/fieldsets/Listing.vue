@@ -13,7 +13,7 @@
                         <dropdown-list>
                             <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
                             <dropdown-item
-                                v-if="fieldset.is_resetable"
+                                v-if="fieldset.is_resettable"
                                 :text="__('Reset')"
                                 class="warning"
                                 @click="$refs[`resetter_${fieldset.id}`].confirm()"
