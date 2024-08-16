@@ -212,4 +212,13 @@ trait HasSelectOptions
             },
         ];
     }
+
+    public function extraRenderableFieldData(): array
+    {
+        return [
+            'options' => collect($this->getOptions())
+                ->mapWithKeys(fn ($option) => [$option['value'] => $option['label']])
+                ->all(),
+        ];
+    }
 }
