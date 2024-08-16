@@ -13,7 +13,7 @@ export default {
             return _.map(options, (option) => {
                 if (typeof option === 'object') {
                     return {
-                        'value': option.value,
+                        'value': option.key || option.value,
                         'label': __(option.label) || option.value
                     };
                 }
