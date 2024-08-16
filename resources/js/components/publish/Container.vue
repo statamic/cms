@@ -26,15 +26,15 @@ export default {
         },
         blueprint: {
             type: Object,
-            default: () => {}
+            default: () => ({})
         },
         values: {
             type: Object,
-            default: () => {}
+            default: () => ({})
         },
         meta: {
             type: Object,
-            default: () => {}
+            default: () => ({})
         },
         errors: {
             type: Object
