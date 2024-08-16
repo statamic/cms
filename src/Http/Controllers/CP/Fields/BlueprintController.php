@@ -30,7 +30,7 @@ class BlueprintController extends CpController
                                 'namespace' => $blueprint->namespace(),
                                 'title' => $blueprint->title(),
                                 'reset_url' => $blueprint->resetUrl(),
-                                'is_resetable' => $blueprint->isResetable(),
+                                'is_resettable' => $blueprint->isResettable(),
                             ];
                         })
                         ->sortBy('title')

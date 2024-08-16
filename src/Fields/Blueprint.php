@@ -415,7 +415,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return ! $this->isNamespaced();
     }
 
-    public function isResetable()
+    public function isResettable()
     {
         return $this->isNamespaced()
             && File::exists($this->path());

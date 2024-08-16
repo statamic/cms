@@ -194,7 +194,7 @@
                     </div>
                 </td>
                 <th class="actions-column">
-                    @if ($blueprint['is_resetable'])
+                    @if ($blueprint['is_resettable'])
                         <dropdown-list class="dropdown-list">
                             <dropdown-item :text="__('Reset')" class="warning" @click="$refs[`resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}`].confirm()">
                                 <blueprint-resetter
