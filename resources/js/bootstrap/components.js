@@ -97,7 +97,7 @@ export { default as CreateTermButton } from '../components/terms/CreateTermButto
 // export { default as FormListing } from '../components/forms/Listing.vue';
 // export { default as FormSubmissionListing } from '../components/forms/SubmissionListing.vue';
 // export { default as GlobalListing } from '../components/globals/Listing.vue';
-// export { default as GlobalEditForm } from '../components/globals/EditForm.vue';
+export { default as GlobalEditForm } from '../components/globals/EditForm.vue';
 // export { default as GlobalPublishForm } from '../components/globals/PublishForm.vue';
 export { default as GlobalCreateForm } from '../components/globals/Create.vue';
 // export { default as UserListing } from '../components/users/Listing.vue';
