@@ -1,12 +1,13 @@
 <template>
     <element-container @resized="containerWidth = $event.width">
         <div>
-            <div v-for="tab in mainTabs" :key="tab.handle">
+            <div v-for="tab in tabs" :key="tab.handle">
                 <div class="mb-2 content">
                     <h2 v-text="tab.display" class="text-base" />
                     <p v-html="tab.instructions" />
                 </div>
-                <div class="">
+
+                <div>
                     <publish-sections
                         :sections="tab.sections"
                         :read-only="readOnly"
@@ -55,20 +56,6 @@ export default {
 
         tabs() {
             return this.state.blueprint.tabs;
-        },
-
-        mainTabs() {
-            // @todo(jasonvarga): is this correct? Seems to be from copy paste from publish/tabs.vue
-            // Since this.shouldShowSidebar doesn't exist this would always return all tabs.
-            return this.tabs
-
-            // if (! this.shouldShowSidebar) return this.tabs;
-            //
-            // if (this.active === "sidebar") {
-            //     this.active = this.state.blueprint.tabs[0].handle
-            // }
-            //
-            // return _.filter(this.tabs, tab => tab.handle != 'sidebar');
         },
 
         actionsPortal() {
