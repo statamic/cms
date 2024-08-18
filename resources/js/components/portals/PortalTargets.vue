@@ -1,12 +1,16 @@
 <template>
     <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks }">
-        <component
-            :is="portal.isStack() ? 'portal-target' : 'div'"
+        <template
             v-for="(portal, i) in portals"
             :key="portal.id"
-            :name="portal.id"
-            :id="portal.id"
-        />
+        >
+            <portal-target
+                v-if="portal.isStack()"
+                :name="portal.id"
+            />
+
+            <div v-else :id="portal.id"></div>
+        </template>
     </div>
 </template>
 
