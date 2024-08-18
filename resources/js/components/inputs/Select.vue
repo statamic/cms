@@ -60,7 +60,7 @@ export default {
 
     methods: {
         isOptionSelected(option) {
-            return this.placeholder === false && this.value === undefined
+            return this.placeholder === false && this.modelValue === undefined
                 ? option.value == this.options[0].value
                 : option.value == this.modelValue;
         },

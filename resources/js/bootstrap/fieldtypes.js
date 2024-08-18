@@ -26,7 +26,7 @@ import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
 import DateFieldtype from '../components/fieldtypes/DateFieldtype.vue';
 // import DictionaryFieldtype from '../components/fieldtypes/DictionaryFieldtype.vue';
 // import DictionaryFields from '../components/fieldtypes/DictionaryFields.vue';
-// import FieldDisplayFieldtype from '../components/fieldtypes/FieldDisplayFieldtype.vue';
+import FieldDisplayFieldtype from '../components/fieldtypes/FieldDisplayFieldtype.vue';
 // import FieldsFieldtype from '../components/fieldtypes/grid/FieldsFieldtype.vue';
 // import FilesFieldtype from '../components/fieldtypes/FilesFieldtype.vue';
 import FloatFieldtype from '../components/fieldtypes/FloatFieldtype.vue';
@@ -93,7 +93,7 @@ export default function registerFieldTypes(app) {
     app.component('date-fieldtype', DateFieldtype);
     // Vue.component('dictionary-fieldtype', DictionaryFieldtype);
     // Vue.component('dictionary_fields-fieldtype', DictionaryFields);
-    // app.component('field_display-fieldtype', FieldDisplayFieldtype);
+    app.component('field_display-fieldtype', FieldDisplayFieldtype);
     // app.component('fields-fieldtype', FieldsFieldtype);
     // app.component('files-fieldtype', FilesFieldtype);
     app.component('float-fieldtype', FloatFieldtype);

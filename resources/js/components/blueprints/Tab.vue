@@ -60,9 +60,15 @@
                     <publish-field-meta
                         :config="{ handle: 'icon', type: 'icon', directory: this.iconBaseDirectory, folder: this.iconSubFolder }"
                         :initial-value="icon"
-                        v-slot="{ meta, value, loading }"
+                        v-slot="{ meta, modelValue, loading }"
                     >
-                        <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="fieldUpdated('icon', $event)" />
+                        <icon-fieldtype
+                            v-if="!loading"
+                            handle="icon"
+                            :meta="meta"
+                            :model-value="modelValue"
+                            @update:model-value="fieldUpdated('icon', $event)"
+                        />
                     </publish-field-meta>
                 </div>
             </div>

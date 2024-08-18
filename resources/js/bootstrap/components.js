@@ -92,13 +92,13 @@ export { default as CreateTermButton } from '../components/terms/CreateTermButto
 // export { default as FieldsetCreateForm } from '../components/fieldsets/CreateForm.vue';
 // export { default as FieldsetEditForm } from '../components/fieldsets/EditForm.vue';
 // export { default as BlueprintListing } from '../components/blueprints/Listing.vue';
-// export { default as BlueprintBuilder } from '../components/blueprints/Builder.vue';
+export { default as BlueprintBuilder } from '../components/blueprints/Builder.vue';
 // export { default as FormCreateForm } from '../components/forms/CreateForm.vue';
 // export { default as FormListing } from '../components/forms/Listing.vue';
 // export { default as FormSubmissionListing } from '../components/forms/SubmissionListing.vue';
 export { default as GlobalListing } from '../components/globals/Listing.vue';
 export { default as GlobalEditForm } from '../components/globals/EditForm.vue';
-// export { default as GlobalPublishForm } from '../components/globals/PublishForm.vue';
+export { default as GlobalPublishForm } from '../components/globals/PublishForm.vue';
 export { default as GlobalCreateForm } from '../components/globals/Create.vue';
 // export { default as UserListing } from '../components/users/Listing.vue';
 // export { default as UserWizard } from '../components/users/Wizard.vue';

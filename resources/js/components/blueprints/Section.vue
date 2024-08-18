@@ -20,7 +20,7 @@
             </div>
 
             <confirmation-modal
-                v-model="editingSection"
+                v-model="showModal"
                 :title="editText"
                 @opened="$refs.displayInput.select()"
                 @confirm="editConfirmed"
@@ -44,9 +44,15 @@
                         <publish-field-meta
                             :config="{ handle: 'icon', type: 'icon', directory: this.iconBaseDirectory, folder: this.iconSubFolder }"
                             :initial-value="editingSection.icon"
-                            v-slot="{ meta, value, loading }"
+                            v-slot="{ meta, modelValue, loading }"
                         >
-                            <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="editingSection.icon = $event" />
+                            <icon-fieldtype
+                                v-if="!loading"
+                                handle="icon"
+                                :meta="meta"
+                                :model-value="modelValue"
+                                @update:model-value="editingSection.icon = $event"
+                            />
                         </publish-field-meta>
                     </div>
                 </div>
@@ -122,6 +128,9 @@ export default {
     },
 
     computed: {
+        showModal() {
+            return this.editingSection !== false;
+        },
 
         suggestableConditionFields() {
             return this.suggestableConditionFieldsProvider?.suggestableFields(this) || [];
