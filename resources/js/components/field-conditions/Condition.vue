@@ -25,17 +25,19 @@
         </v-select>
 
         <select-input
-            :value="condition.operator"
             :options="operatorOptions"
             :placeholder="false"
             class="rtl:md:mr-4 ltr:md:ml-4"
-            @input="operatorSelected" />
+            :model-value="condition.operator"
+            @update:model-value="operatorSelected"
+        />
 
         <toggle-input
             v-if="showValueToggle"
             class="rtl:mr-4 ltr:ml-4"
-            :value="condition.value === 'true'"
-            @input="valueUpdated" />
+            :model-value="condition.value === 'true'"
+            @update:model-value="valueUpdated"
+        />
 
         <v-select
             v-else-if="showValueDropdown"
@@ -56,9 +58,10 @@
 
         <text-input
             v-else
-            :value="condition.value"
             class="rtl:mr-4 ltr:ml-4"
-            @input="valueUpdated" />
+            :model-value="condition.value"
+            @update:model-value="valueUpdated"
+        />
 
         <button @click="remove" class="btn-close rtl:mr-2 ltr:ml-2 group">
             <svg-icon name="micro/trash" class="w-4 h-4 group-hover:text-red-500" />
