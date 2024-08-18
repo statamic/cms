@@ -1,6 +1,5 @@
 <script>
 export default {
-
     props: {
         config: Object,
         initialValue: {},
@@ -16,11 +15,9 @@ export default {
     },
 
     computed: {
-
         isPreloadable() {
             return this.$config.get('preloadableFieldtypes').includes(this.config.type);
         }
-
     },
 
     render() {
@@ -41,35 +38,30 @@ export default {
     },
 
     watch: {
-
         initialValue(value) {
-            this.value = value;
+            this.modelValue = value;
         },
 
         initialMeta(meta) {
             this.meta = meta;
         }
-
     },
 
     methods: {
-
         load() {
             this.loading = true;
 
             const params = {
                 config: utf8btoa(JSON.stringify(this.config)),
-                value: this.value,
+                value: this.modelValue,
             };
 
             this.$axios.get(cp_url('fields/field-meta'), { params }).then(response => {
                 this.meta = response.data.meta;
-                this.value = response.data.value;
+                this.modelValue = response.data.value;
                 this.loading = false;
             });
         }
-
     }
-
 }
 </script>
