@@ -60,7 +60,6 @@
                     :blueprint="blueprint"
                     :values="values"
                     :meta="meta"
-                    :is-config="true"
                     :errors="errors"
                     :is-root="true"
                     @updated="values = $event"
