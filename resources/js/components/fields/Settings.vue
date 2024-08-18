@@ -1,16 +1,20 @@
 <template>
-
-    <div class="h-full bg-gray-300 h-full dark:bg-dark-800 overflow-scroll">
-
+    <div class="h-full bg-gray-300 dark:bg-dark-800 overflow-scroll">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center ">
             <loading-graphic />
         </div>
 
-        <header v-if="!loading" class="flex items-center sticky top-0 inset-x-0 bg-white dark:bg-dark-550 shadow dark:shadow-dark px-8 py-2 z-1 h-13">
+        <header
+            v-if="!loading"
+            class="flex items-center sticky top-0 inset-x-0 bg-white dark:bg-dark-550 shadow dark:shadow-dark px-8 py-2 z-1 h-13"
+        >
             <h1 class="flex-1 flex items-center text-xl">
                 {{ __(values.display) || __(config.display) || config.handle }}
                 <small class="badge-pill bg-gray-100 dark:bg-dark-400 rtl:mr-4 ltr:ml-4 border dark:border-dark-200 text-xs text-gray-700 dark:text-dark-150 font-medium leading-none flex items-center">
-                    <svg-icon class="h-4 w-4 rtl:ml-2 ltr:mr-2 inline-block text-gray-700 dark:text-dark-150" :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`"></svg-icon>
+                    <svg-icon
+                        class="h-4 w-4 rtl:ml-2 ltr:mr-2 inline-block text-gray-700 dark:text-dark-150"
+                        :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`"
+                    ></svg-icon>
                     {{ fieldtype.title }}
                 </small>
             </h1>
@@ -25,21 +29,25 @@
                 v-text="__('Apply')"
             ></button>
         </header>
+
         <section class="py-4 px-3 md:px-8">
             <div class="tabs-container">
                 <div class="publish-tabs tabs">
-                    <button class="tab-button"
-                    :class="{ 'active': activeTab === 'settings' }"
+                    <button
+                        class="tab-button"
+                        :class="{ 'active': activeTab === 'settings' }"
                         @click="activeTab = 'settings'"
                         v-text="__('Settings')"
                     />
-                    <button class="tab-button"
-                    :class="{ 'active': activeTab === 'conditions' }"
+                    <button
+                        class="tab-button"
+                        :class="{ 'active': activeTab === 'conditions' }"
                         @click="activeTab = 'conditions'"
                         v-text="__('Conditions')"
                     />
-                    <button class="tab-button"
-                    :class="{ 'active': activeTab === 'validation' }"
+                    <button
+                        class="tab-button"
+                        :class="{ 'active': activeTab === 'validation' }"
                         @click="activeTab = 'validation'"
                         v-text="__('Validation')"
                     />
@@ -47,7 +55,6 @@
             </div>
 
             <div v-if="!loading" class="field-settings">
-
                 <publish-container
                     :name="publishContainer"
                     :blueprint="blueprint"
@@ -77,7 +84,8 @@
                             :config="config"
                             :suggestable-fields="suggestableConditionFields"
                             @updated="updateFieldConditions"
-                            @updated-always-save="updateAlwaysSave" />
+                            @updated-always-save="updateAlwaysSave"
+                        />
                     </div>
                 </div>
 
@@ -85,23 +93,25 @@
                     <div class="publish-fields @container">
                         <field-validation-builder
                             :config="config"
-                            @updated="updateField('validate', $event)" />
+                            @updated="updateField('validate', $event)"
+                        />
                     </div>
                 </div>
-
             </div>
         </section>
     </div>
-
 </template>
 
 <script>
 import PublishField from '../publish/Field.vue';
-import { ValidatesFieldConditions, FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
+import {
+    ValidatesFieldConditions,
+    FieldConditionsBuilder,
+    FIELD_CONDITIONS_KEYS
+} from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 
 export default {
-
     components: {
         PublishField,
         FieldConditionsBuilder,
@@ -132,7 +142,7 @@ export default {
         event: 'input'
     },
 
-    data: function() {
+    data() {
         return {
             values: null,
             meta: null,
@@ -152,9 +162,9 @@ export default {
             return `field-settings-${this.$.uid}`;
         },
 
-        selectedWidth: function() {
+        selectedWidth() {
             var width = this.config.width || 100;
-            var found = _.findWhere(this.widths, {value: width});
+            var found = _.findWhere(this.widths, { value: width });
             return found.text;
         },
 
@@ -162,15 +172,17 @@ export default {
             return this.fieldtype.config;
         },
 
-        canBeLocalized: function() {
-            return this.root && Object.keys(Statamic.$config.get('locales')).length > 1 && this.fieldtype.canBeLocalized;
+        canBeLocalized() {
+            return this.root
+                && Object.keys(Statamic.$config.get('locales')).length > 1
+                && this.fieldtype.canBeLocalized;
         },
 
-        canBeValidated: function() {
+        canBeValidated() {
             return this.fieldtype.canBeValidated;
         },
 
-        canHaveDefault: function() {
+        canHaveDefault() {
             return this.fieldtype.canHaveDefault;
         },
 
@@ -196,7 +208,6 @@ export default {
     },
 
     methods: {
-
         configFieldClasses(field) {
             return [
                 `form-group p-4 m-0 ${field.type}-fieldtype`,
@@ -204,7 +215,7 @@ export default {
             ];
         },
 
-        updateField(handle, value, setStoreValue=null) {
+        updateField(handle, value, setStoreValue = null) {
             this.values[handle] = value;
             this.markFieldEdited(handle);
 
@@ -217,12 +228,12 @@ export default {
             let values = {};
 
             _.each(this.values, (value, key) => {
-                if (! FIELD_CONDITIONS_KEYS.includes(key)) {
+                if (!FIELD_CONDITIONS_KEYS.includes(key)) {
                     values[key] = value;
                 }
             });
 
-            this.values = {...values, ...conditions};
+            this.values = { ...values, ...conditions };
 
             if (Object.keys(conditions).length > 0) {
                 this.markFieldEdited(Object.keys(conditions)[0]);
@@ -285,11 +296,9 @@ export default {
                 this.fieldtype = response.data.fieldtype;
                 this.blueprint = response.data.blueprint;
                 this.values = response.data.values;
-                this.meta = {...response.data.meta};
-            })
+                this.meta = { ...response.data.meta };
+            });
         }
-
     }
-
 };
 </script>

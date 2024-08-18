@@ -1,5 +1,4 @@
 <template>
-
     <div class="h-full bg-gray-100 dark:bg-dark-600 overflow-auto">
         <div class="bg-gray-300 dark:bg-dark-600 px-6 py-2 border-b dark:border-dark-900 text-lg font-medium flex items-center justify-between">
             {{ __('Fieldtypes') }}
@@ -21,10 +20,12 @@
                 <div class="fieldtype-selector">
                     <div class="fieldtype-list">
                         <div class="p-2" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
-                            <button class="bg-white dark:bg-dark-700 border border-gray-500 dark:shadow-dark-sm dark:border-dark-900 flex items-center group w-full rounded hover:border-gray-600 dark:hover:border-dark-950 shadow-sm hover:shadow-md rtl:pl-3 ltr:pr-3"
-                                @click="select(fieldtype)">
+                            <button
+                                class="bg-white dark:bg-dark-700 border border-gray-500 dark:shadow-dark-sm dark:border-dark-900 flex items-center group w-full rounded hover:border-gray-600 dark:hover:border-dark-950 shadow-sm hover:shadow-md rtl:pl-3 ltr:pr-3"
+                                @click="select(fieldtype)"
+                            >
                                 <div class="p-2 flex items-center rtl:border-l ltr:border-r border-gray-500 dark:border-dark-900 group-hover:border-gray-600 dark:group-hover:border-dark-950 bg-gray-200 dark:bg-dark-600 rtl:rounded-r ltr:rounded-l">
-                                    <svg-icon class="h-5 w-5 text-gray-800 dark:text-dark-150" :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`" default="light/generic-field"></svg-icon>
+                                    <svg-icon class="h-5 w-5 text-gray-800 dark:text-dark-150" :name="fieldtype.icon?.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`" default="light/generic-field"></svg-icon>
                                 </div>
                                 <span class="rtl:pr-3 ltr:pl-3 text-gray-800 dark:text-dark-150 text-md group-hover:text-gray-900 dark:group-hover:text-dark-100">{{ fieldtype.text }}</span>
                             </button>
@@ -33,7 +34,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -42,7 +42,6 @@ import Fuse from 'fuse.js';
 import ProvidesFieldtypes from '../fields/ProvidesFieldtypes';
 
 export default {
-
     mixins: [ProvidesFieldtypes],
 
     props: {
@@ -57,7 +56,7 @@ export default {
         },
     },
 
-    data: function() {
+    data() {
         return {
             categories: {
                 text: {
@@ -94,7 +93,6 @@ export default {
     },
 
     computed: {
-
         allFieldtypes() {
             if (!this.fieldtypesLoaded) return [];
 
@@ -157,7 +155,6 @@ export default {
     },
 
     watch: {
-
         fieldtypesLoaded: {
             immediate: true,
             handler() {
@@ -166,11 +163,9 @@ export default {
                 });
             }
         }
-
     },
 
     methods: {
-
         select(selection) {
             if (selection.isMeta) {
                 return this.selectMeta(selection);
@@ -244,8 +239,6 @@ export default {
             event.stopPropagation();
             this.search = '';
         }
-
     }
-
 }
 </script>

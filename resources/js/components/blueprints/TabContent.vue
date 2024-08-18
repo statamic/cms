@@ -20,7 +20,6 @@
 import Sections from './Sections.vue';
 
 export default {
-
     components: {
         Sections,
     },
@@ -45,7 +44,6 @@ export default {
     },
 
     methods: {
-
         addSection() {
             return this.$refs.sections.addSection();
         },
@@ -54,8 +52,6 @@ export default {
             let tab = {...this.tab, ...{ sections }};
             this.$emit('updated', tab);
         },
-
     }
-
 }
 </script>

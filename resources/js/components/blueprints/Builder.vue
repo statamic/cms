@@ -1,7 +1,5 @@
 <template>
-
     <div class="blueprint-builder">
-
         <header class="mb-6">
             <div class="flex items-center justify-between">
                 <h1 v-text="__('Edit Blueprint')" />
@@ -45,9 +43,7 @@
             :errors="errors.tabs"
             @updated="tabsUpdated"
         />
-
     </div>
-
 </template>
 
 <script>

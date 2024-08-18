@@ -1,9 +1,6 @@
 <template>
-
     <div class="w-full">
-
         <div class="flex">
-
             <div class="form-group publish-field select-fieldtype field-w-full">
                 <label class="publish-field-label">{{ __('Required') }}</label>
                 <div class="help-block -mt-2">
@@ -19,7 +16,6 @@
                 </div>
                 <toggle-input v-model="sometimesValidate" />
             </div>
-
         </div>
 
         <div class="form-group publish-field select-fieldtype field-w-full">
@@ -92,10 +88,8 @@
                     </div>
                 </sortable-list>
             </div>
-
         </div>
     </div>
-
 </template>
 
 <style scoped>
@@ -110,7 +104,6 @@ import SemVer from 'semver'
 import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
 
 export default {
-
     components: {
         SortableList,
         SortableItem,
@@ -133,7 +126,6 @@ export default {
     },
 
     computed: {
-
         laravelVersion() {
             return this.$store.state.statamic.config.laravelVersion;
         },
@@ -183,11 +175,9 @@ export default {
 
             return rule.example || false;
         },
-
     },
 
     watch: {
-
         isRequired(value) {
             if (value === true) {
                 this.ensureToggleableRule('required');
@@ -209,7 +199,6 @@ export default {
 
             this.$emit('updated', value);
         },
-
     },
 
     created() {
@@ -217,7 +206,6 @@ export default {
     },
 
     methods: {
-
         getInitial() {
             this.rules = this.config.validate
                 ? this.explodeRules(this.config.validate)
@@ -302,7 +290,6 @@ export default {
         valueWithoutTrailingColon(value) {
             return this.hasUnfinishedParameters(value) ? value.replace(':', '') : value;
         }
-
     }
 }
 </script>

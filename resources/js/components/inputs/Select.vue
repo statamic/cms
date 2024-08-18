@@ -4,9 +4,9 @@
             v-if="display"
             class="select-input"
             :name="name"
-            @change="change"
             :value="modelValue"
             :disabled="isReadOnly"
+            @change="change"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         >

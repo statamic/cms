@@ -1,5 +1,4 @@
 <template>
-
     <button
         class="blueprint-tab tab-button"
         role="tab"
@@ -11,13 +10,21 @@
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
     >
-        <svg-icon v-if="tab.icon" :name="iconName(tab.icon)" :directory="iconBaseDirectory" class="w-4 h-4 rtl:ml-1 ltr:mr-1" />
+        <svg-icon
+            v-if="tab.icon"
+            :name="iconName(tab.icon)"
+            :directory="iconBaseDirectory"
+            class="w-4 h-4 rtl:ml-1 ltr:mr-1"
+        />
 
         {{ __(tab.display) }}
 
         <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="rtl:text-right ltr:text-left">
             <template #trigger>
-                <button class="rtl:mr-2 ltr:ml-2 hover:text-gray-900 dark:hover:text-gray-400 active:text-gray-900" :aria-label="__('Open Dropdown')">
+                <button
+                    class="rtl:mr-2 ltr:ml-2 hover:text-gray-900 dark:hover:text-gray-400 active:text-gray-900"
+                    :aria-label="__('Open Dropdown')"
+                >
                     <svg-icon name="micro/chevron-down-xs" class="w-2" />
                 </button>
             </template>
@@ -35,28 +42,38 @@
             <div class="publish-fields @container">
                 <div class="form-group w-full">
                     <label v-text="__('Title')" />
-                    <input ref="title" type="text"
+                    <input
+                        ref="title"
+                        type="text"
                         :value="display"
                         @input="fieldUpdated('display', $event.target.value)"
-                        class="input-text" />
+                        class="input-text"
+                    />
                 </div>
+
                 <div class="form-group w-full">
                     <label v-text="__('Handle')" />
-                    <input type="text"
+                    <input
+                        type="text"
                         :value="handle"
                         @input="fieldUpdated('handle', $event.target.value)"
-                        class="input-text font-mono text-sm" />
+                        class="input-text font-mono text-sm"
+                    />
                 </div>
+
                 <div class="form-group w-full" v-if="showInstructions">
                     <label v-text="__('Instructions')" />
-                    <input type="text"
+                    <input
+                        type="text"
                         :value="instructions"
                         @input="fieldUpdated('instructions', $event.target.value)"
-                        class="input-text text-sm" />
+                        class="input-text text-sm"
+                    />
                 </div>
 
                 <div class="form-group w-full" v-if="showInstructions">
                     <label v-text="__('Icon')" />
+
                     <publish-field-meta
                         :config="{ handle: 'icon', type: 'icon', directory: this.iconBaseDirectory, folder: this.iconSubFolder }"
                         :initial-value="icon"
@@ -79,7 +96,6 @@
 
 <script>
 export default {
-
     props: {
         tab: {
             type: Object,
@@ -106,7 +122,7 @@ export default {
             icon: this.tab.icon,
             editing: false,
             handleSyncedWithDisplay: false,
-        }
+        };
     },
 
     created() {
@@ -118,7 +134,6 @@ export default {
     },
 
     computed: {
-
         isActive() {
             return this.currentTab === this.tab._id;
         },
@@ -130,18 +145,16 @@ export default {
         iconSubFolder() {
             return this.$config.get('setIconsFolder');
         },
-
     },
 
     methods: {
-
         edit() {
             this.editing = true;
         },
 
         editConfirmed() {
-            if (! this.handle) {
-                this.handle = snake_case(this.display)
+            if (!this.handle) {
+                this.handle = snake_case(this.display);
             }
 
             this.$emit('updated', {
@@ -178,14 +191,12 @@ export default {
         },
 
         iconName(name) {
-            if (! name) return null;
+            if (!name) return null;
 
             return this.iconSubFolder
-                ? this.iconSubFolder+'/'+name
+                ? this.iconSubFolder + '/' + name
                 : name;
         },
-
     }
-
-}
+};
 </script>

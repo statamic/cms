@@ -1,13 +1,10 @@
 <template>
-
     <div>
-
         <div
             ref="sections"
             class="blueprint-sections flex flex-wrap -mx-2 outline-none"
             :data-tab="tabId"
         >
-
             <blueprint-section
                 ref="section"
                 v-for="(section, i) in sections"
@@ -34,11 +31,8 @@
                     />
                 </button>
             </div>
-
         </div>
-
     </div>
-
 </template>
 
 <script>

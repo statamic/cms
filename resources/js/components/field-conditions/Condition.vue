@@ -15,11 +15,18 @@
             @update:model-value="fieldSelected"
             @search:blur="fieldSelectBlur"
         >
-            <template #no-options><div class="hidden" /></template>
+            <template #no-options>
+                <div class="hidden" />
+            </template>
+
             <template #option="option">
                 <div class="flex items-center">
                     <span v-text="option.label" />
-                    <span v-text="option.value" class="font-mono text-2xs text-gray-500 dark:text-dark-150" :class="{ 'ml-2': option.label }" />
+                    <span
+                        v-text="option.value"
+                        class="font-mono text-2xs text-gray-500 dark:text-dark-150"
+                        :class="{ 'ml-2': option.label }"
+                    />
                 </div>
             </template>
         </v-select>
@@ -53,7 +60,9 @@
             @update:model-value="valueUpdated"
             @search:blur="valueSelectBlur"
         >
-            <template #no-options><div class="hidden" /></template>
+            <template #no-options>
+                <div class="hidden" />
+            </template>
         </v-select>
 
         <text-input
@@ -117,7 +126,7 @@ export default {
         },
 
         valueOptions() {
-            if (! this.showValueDropdown) return;
+            if (!this.showValueDropdown) return;
 
             return this.normalizeInputOptions(this.field.config.options);
         },
@@ -134,11 +143,15 @@ export default {
                 .map(field => {
                     let display = field.config.display;
 
-                    if (! display) {
-                        display = field.handle.replace(/_/g, ' ').replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+                    if (!display) {
+                        display = field.handle
+                            .replace(/_/g, ' ')
+                            .replace(/(?:^|\s)\S/g, function (a) {
+                                return a.toUpperCase();
+                            });
                     }
 
-                    return {value: field.handle, label: display}
+                    return { value: field.handle, label: display };
                 });
         },
 
@@ -195,5 +208,5 @@ export default {
             this.$emit('removed');
         }
     }
-}
+};
 </script>
