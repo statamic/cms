@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 import { VueFinalModal } from 'vue-final-modal'
 import uniqid from 'uniqid';
 
@@ -23,14 +23,6 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits(['opened', 'closed'])
 
 const model = defineModel<boolean>()
-
-watch(model, (newValue) => {
-    if (newValue) {
-        emit('opened')
-    } else {
-        emit('closed')
-    }
-})
 
 const styling = computed(() => {
     const width = props.width ?? 600;
