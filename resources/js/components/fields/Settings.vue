@@ -137,11 +137,6 @@ export default {
         isInsideConfigFields: true,
     },
 
-    model: {
-        prop: 'config',
-        event: 'input'
-    },
-
     data() {
         return {
             values: null,
