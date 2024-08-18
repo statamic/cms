@@ -135,7 +135,7 @@ export default {
                     keys: ['text'],
                 });
 
-                options = fuse.search(this.search);
+                options = fuse.search(this.search).map(result => result.item);
             }
 
             return options;

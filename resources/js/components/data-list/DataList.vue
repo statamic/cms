@@ -134,7 +134,7 @@ export default {
                 keys: this.searchableColumns,
             });
 
-            return fuse.search(this.searchQuery);
+            return fuse.search(this.searchQuery).map(result => result.item);
         },
 
         sortRows(rows) {
