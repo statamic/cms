@@ -266,8 +266,9 @@ EOT;
     public function it_gets_blueprints_in_a_namespace()
     {
         $dir = '/path/to/resources/blueprints/collections/blog';
+        $overrideDir = '/path/to/resources/blueprints/vendor/collections/blog';
         File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
-        File::shouldReceive('exists')->with($dir)->once()->andReturnTrue();
+        File::shouldReceive('exists')->with($overrideDir)->once()->andReturnFalse();
         File::shouldReceive('getFilesByType')->with($dir, 'yaml')->once()->andReturn(
             new FileCollection([$dir.'/first.yaml', $dir.'/second.yaml'])
         );
@@ -288,12 +289,71 @@ EOT;
     #[Test]
     public function it_returns_empty_collection_if_directory_doesnt_exist()
     {
-        File::shouldReceive('exists')->with('/path/to/resources/blueprints/test')->once()->andReturnFalse();
+        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
+        File::shouldReceive('getFilesByType')->with('/path/to/resources/blueprints/test', 'yaml')->once()->andReturn(new FileCollection);
 
         $all = $this->repo->in('test');
 
         $this->assertInstanceOf(Collection::class, $all);
         $this->assertCount(0, $all);
+    }
+
+    #[Test]
+    public function it_gets_blueprints_in_a_custom_namespace()
+    {
+        $dir = '/path/to/custom';
+        $overrideDir = '/path/to/resources/blueprints/vendor/custom';
+        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
+        File::shouldReceive('exists')->with($overrideDir)->once()->andReturnFalse();
+        File::shouldReceive('getFilesByType')->with($dir, 'yaml')->once()->andReturn(
+            new FileCollection([$dir.'/first.yaml', $dir.'/second.yaml'])
+        );
+        File::shouldReceive('get')->with($dir.'/first.yaml')->once()->andReturn('title: First Blueprint');
+        File::shouldReceive('get')->with($dir.'/second.yaml')->once()->andReturn('title: Second Blueprint');
+
+        $this->repo->addNamespace('custom', $dir);
+
+        $blueprints = $this->repo->in('custom');
+
+        $this->assertInstanceOf(Collection::class, $blueprints);
+        $this->assertCount(2, $blueprints);
+        $this->assertEveryItemIsInstanceOf(Blueprint::class, $blueprints);
+        $this->assertEquals(['first', 'second'], $blueprints->keys()->all());
+        $this->assertEquals(['first', 'second'], $blueprints->map->handle()->values()->all());
+        $this->assertEquals(['custom', 'custom'], $blueprints->map->namespace()->values()->all());
+        $this->assertEquals(['First Blueprint', 'Second Blueprint'], $blueprints->map->title()->values()->all());
+    }
+
+    #[Test]
+    public function it_gets_blueprints_in_a_custom_namespace_with_overrides()
+    {
+        File::shouldReceive('withAbsolutePaths')->twice()->andReturnSelf();
+        $dir = '/path/to/custom';
+        $overrideDir = '/path/to/resources/blueprints/vendor/custom';
+        File::shouldReceive('exists')->with($overrideDir)->andReturnTrue();
+        File::shouldReceive('getFilesByType')->with($dir, 'yaml')->once()->andReturn(
+            new FileCollection([$dir.'/first.yaml', $dir.'/second.yaml'])
+        );
+        File::shouldReceive('getFilesByType')->with($overrideDir, 'yaml')->once()->andReturn(
+            new FileCollection([
+                $overrideDir.'/second.yaml',
+                $overrideDir.'/third.yaml', // This one exists as an override but since there's no original it will be ignored. This behavior is up for debate.
+            ])
+        );
+        File::shouldReceive('get')->with($dir.'/first.yaml')->once()->andReturn('title: First Blueprint');
+        File::shouldReceive('get')->with($overrideDir.'/second.yaml')->once()->andReturn('title: Overridden Second Blueprint');
+
+        $this->repo->addNamespace('custom', $dir);
+
+        $blueprints = $this->repo->in('custom');
+
+        $this->assertInstanceOf(Collection::class, $blueprints);
+        $this->assertCount(2, $blueprints);
+        $this->assertEveryItemIsInstanceOf(Blueprint::class, $blueprints);
+        $this->assertEquals(['first', 'second'], $blueprints->keys()->all());
+        $this->assertEquals(['first', 'second'], $blueprints->map->handle()->values()->all());
+        $this->assertEquals(['custom', 'custom'], $blueprints->map->namespace()->values()->all());
+        $this->assertEquals(['First Blueprint', 'Overridden Second Blueprint'], $blueprints->map->title()->values()->all());
     }
 
     #[Test]
