@@ -236,20 +236,26 @@ class BlueprintRepository
             $directory = $this->directory.'/'.$namespaceDir;
 
             if (isset($this->additionalNamespaces[$namespace])) {
-                $directory = $this->additionalNamespaces[$namespace];
-
-                $overridePath = "{$this->directory}/vendor/{$namespaceDir}";
-
-                if (File::exists($overridePath)) {
-                    $directory = $overridePath;
-                }
+                $directory = "{$this->additionalNamespaces[$namespace]}";
             }
 
-            if (! File::exists(Str::removeRight($directory, '/'))) {
-                return collect();
+            $files = File::withAbsolutePaths()->getFilesByType($directory, 'yaml');
+
+            if ($files->isNotEmpty() && File::exists($overrideDir = $this->directory.'/vendor/'.$namespaceDir)) {
+                $overrides = File::withAbsolutePaths()->getFilesByType($overrideDir, 'yaml');
+
+                $files = $files->map(function ($path) use ($overrides, $overrideDir, $directory) {
+                    $filename = str($path)->after($directory.'/');
+
+                    if ($overrides->contains($overridePath = $overrideDir.'/'.$filename)) {
+                        return $overridePath;
+                    }
+
+                    return $path;
+                });
             }
 
-            return File::withAbsolutePaths()->getFilesByType($directory, 'yaml');
+            return $files;
         });
     }
 
