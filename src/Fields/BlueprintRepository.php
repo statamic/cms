@@ -18,7 +18,7 @@ class BlueprintRepository
     protected const BLINK_FROM_FILE = 'blueprints.from-file';
     protected const BLINK_NAMESPACE_PATHS = 'blueprints.paths-in-namespace';
 
-    protected $directories;
+    protected $directories = ['default' => null];
     protected $fallbacks = [];
     protected $additionalNamespaces = [];
 
@@ -41,7 +41,7 @@ class BlueprintRepository
 
     public function directory()
     {
-        return $this->directories['default'] ?? null;
+        return $this->directories['default'];
     }
 
     public function namespaceDirectory($namespace)
