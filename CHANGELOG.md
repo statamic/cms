@@ -1,6 +1,6 @@
 # Release Notes
 
-# 5.22.1 (2024-08-19)
+## 5.22.1 (2024-08-19)
 
 ### What's fixed
 - Add more sanitization to control panel [#10656](https://github.com/statamic/cms/issues/10656) by @duncanmcclean
