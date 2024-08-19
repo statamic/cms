@@ -46,7 +46,7 @@
             @confirm="copyToClipboardModalUrl = null"
         >
             <div class="prose">
-                <code-block copyable :text="copyToClipboardModalUrl" />
+                <code-block :text="copyToClipboardModalUrl" />
             </div>
         </confirmation-modal>
 
