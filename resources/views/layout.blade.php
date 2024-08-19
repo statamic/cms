@@ -42,7 +42,7 @@
             v-if="copyToClipboardModalUrl"
             :cancellable="false"
             :button-text="__('OK')"
-            title="Copy to clipboard"
+            :title="__('Copy to clipboard')"
             @confirm="copyToClipboardModalUrl = null"
         >
             <div class="prose">
