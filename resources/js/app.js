@@ -211,6 +211,8 @@ Statamic.app({
         portals: [],
         appendedComponents: [],
         isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
+        copyToClipboardModalOpen: false,
+        copyToClipboardUrl: null,
     },
 
     computed: {
@@ -257,7 +259,8 @@ Statamic.app({
                 await navigator.clipboard.writeText(url);
                 Statamic.$toast.success(__('Copied to clipboard'));
             } catch (err) {
-                await alert(url);
+                Statamic.$app.copyToClipboardModalOpen = true;
+                Statamic.$app.copyToClipboardUrl = url;
             }
         });
 

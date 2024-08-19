@@ -38,6 +38,18 @@
             v-on="component.events"
         ></component>
 
+        <confirmation-modal
+            v-if="copyToClipboardModalOpen"
+            :cancellable="false"
+            :button-text="__('OK')"
+            title="Copy to clipboard"
+            @confirm="copyToClipboardModalOpen = false; copyToClipboardUrl = null"
+        >
+            <div class="prose">
+                <code-block copyable :text="copyToClipboardUrl" />
+            </div>
+        </confirmation-modal>
+
         <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
 
         <portal-targets></portal-targets>
