@@ -251,6 +251,7 @@ Statamic.app({
     },
 
     created() {
+        const app = this;
         const state = localStorage.getItem('statamic.nav') || 'open';
         this.navOpen = state === 'open';
 
@@ -259,8 +260,8 @@ Statamic.app({
                 await navigator.clipboard.writeText(url);
                 Statamic.$toast.success(__('Copied to clipboard'));
             } catch (err) {
-                Statamic.$app.copyToClipboardModalOpen = true;
-                Statamic.$app.copyToClipboardUrl = url;
+                app.copyToClipboardModalOpen = true;
+                app.copyToClipboardUrl = url;
             }
         });
 
