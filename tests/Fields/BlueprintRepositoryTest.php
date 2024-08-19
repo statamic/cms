@@ -337,23 +337,24 @@ EOT;
         File::shouldReceive('getFilesByType')->with($overrideDir, 'yaml')->once()->andReturn(
             new FileCollection([
                 $overrideDir.'/second.yaml',
-                $overrideDir.'/third.yaml', // This one exists as an override but since there's no original it will be ignored. This behavior is up for debate.
+                $overrideDir.'/third.yaml',
             ])
         );
         File::shouldReceive('get')->with($dir.'/first.yaml')->once()->andReturn('title: First Blueprint');
         File::shouldReceive('get')->with($overrideDir.'/second.yaml')->once()->andReturn('title: Overridden Second Blueprint');
+        File::shouldReceive('get')->with($overrideDir.'/third.yaml')->once()->andReturn('title: Third Blueprint only in overrides');
 
         $this->repo->addNamespace('custom', $dir);
 
         $blueprints = $this->repo->in('custom');
 
         $this->assertInstanceOf(Collection::class, $blueprints);
-        $this->assertCount(2, $blueprints);
+        $this->assertCount(3, $blueprints);
         $this->assertEveryItemIsInstanceOf(Blueprint::class, $blueprints);
-        $this->assertEquals(['first', 'second'], $blueprints->keys()->all());
-        $this->assertEquals(['first', 'second'], $blueprints->map->handle()->values()->all());
-        $this->assertEquals(['custom', 'custom'], $blueprints->map->namespace()->values()->all());
-        $this->assertEquals(['First Blueprint', 'Overridden Second Blueprint'], $blueprints->map->title()->values()->all());
+        $this->assertEquals(['first', 'second', 'third'], $blueprints->keys()->all());
+        $this->assertEquals(['first', 'second', 'third'], $blueprints->map->handle()->values()->all());
+        $this->assertEquals(['custom', 'custom', 'custom'], $blueprints->map->namespace()->values()->all());
+        $this->assertEquals(['First Blueprint', 'Overridden Second Blueprint', 'Third Blueprint only in overrides'], $blueprints->map->title()->values()->all());
     }
 
     #[Test]
