@@ -3,8 +3,8 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
-use Statamic\Contracts\Taxonomies\Term as TermContract;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
