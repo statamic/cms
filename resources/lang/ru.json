@@ -546,7 +546,7 @@
     "Latest Date": "Последняя дата",
     "Layout": "Макет",
     "Learn more": "Дополнительная информация",
-    "Learn more about": "Справка - ",
+    "Learn more about :link": "Справка - :link",
     "Less than": "Меньше чем",
     "Less than or equals": "Меньше или равно",
     "Licensing": "Лицензирование",

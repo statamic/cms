@@ -4,6 +4,7 @@ namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Cache\Lock;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
@@ -57,7 +58,11 @@ class Cache
 
         $lock = $this->createLock($request);
 
-        return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
+        try {
+            return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
+        } catch (LockTimeoutException $e) {
+            return $this->outputRefreshResponse($request);
+        }
     }
 
     private function handleRequest($request, Closure $next)
@@ -185,5 +190,19 @@ class Cache
         }
 
         return $store->lock($key, $this->lockFor);
+    }
+
+    public static function isBeingUsedOnCurrentRoute()
+    {
+        return in_array(static::class, app('router')->gatherRouteMiddleware(request()->route()));
+    }
+
+    private function outputRefreshResponse($request)
+    {
+        $html = $request->ajax() || $request->wantsJson()
+            ? __('Service Unavailable')
+            : sprintf('<meta http-equiv="refresh" content="1; URL=\'%s\'" />', $request->getUri());
+
+        return response($html, 503, ['Retry-After' => 1]);
     }
 }
