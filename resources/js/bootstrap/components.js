@@ -60,6 +60,7 @@ import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
+import SortableList from '../components/sortable/SortableList.vue';
 
 // Third Party
 Vue.component('v-select', vSelect)
@@ -129,6 +130,7 @@ Vue.component('create-entry-button', CreateEntryButton);
 Vue.component('popover', Popover);
 Vue.component('portal', Portal);
 Vue.component('code-block', CodeBlock);
+Vue.component('sortable-list', SortableList);
 
 // Recursive
 Vue.component('role-permission-tree', PermissionTree);
