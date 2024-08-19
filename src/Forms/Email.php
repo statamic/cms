@@ -234,7 +234,11 @@ class Email extends Mailable
         return collect($config)->map(function ($value) {
             $value = Parse::env($value); // deprecated
 
-            return (string) Antlers::parse($value, array_merge($this->getGlobalsData(), $this->submissionData));
+            return (string) Antlers::parse($value, array_merge(
+                ['config' => config()->all()],
+                $this->getGlobalsData(),
+                $this->submissionData,
+            ));
         });
     }
 }
