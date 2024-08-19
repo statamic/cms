@@ -10,7 +10,7 @@
         'url' => cp_route('taxonomies.index'),
         'title' => __('Taxonomies')
     ])
-    <h1>{{ __($taxonomy->title()) }}</h1>
+    <h1 v-pre>{{ __($taxonomy->title()) }}</h1>
 </header>
 
 <div class="card p-4 content">
