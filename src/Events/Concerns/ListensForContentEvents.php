@@ -19,6 +19,7 @@ trait ListensForContentEvents
         \Statamic\Events\AssetReuploaded::class,
         \Statamic\Events\AssetReferencesUpdated::class,
         \Statamic\Events\BlueprintDeleted::class,
+        \Statamic\Events\BlueprintReset::class,
         \Statamic\Events\BlueprintSaved::class,
         \Statamic\Events\CollectionDeleted::class,
         \Statamic\Events\CollectionSaved::class,

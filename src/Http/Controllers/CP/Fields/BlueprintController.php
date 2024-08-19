@@ -29,6 +29,8 @@ class BlueprintController extends CpController
                                 'handle' => $blueprint->handle(),
                                 'namespace' => $blueprint->namespace(),
                                 'title' => $blueprint->title(),
+                                'reset_url' => $blueprint->resetUrl(),
+                                'is_resettable' => $blueprint->isResettable(),
                             ];
                         })
                         ->sortBy('title')
@@ -72,5 +74,18 @@ class BlueprintController extends CpController
         ]);
 
         $this->updateBlueprint($request, $blueprint);
+    }
+
+    public function reset($namespace, $handle)
+    {
+        $blueprint = Blueprint::find($namespace.'::'.$handle);
+
+        if (! $blueprint) {
+            throw new NotFoundHttpException;
+        }
+
+        $blueprint->reset();
+
+        return response('');
     }
 }

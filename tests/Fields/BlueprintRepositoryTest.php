@@ -357,6 +357,19 @@ EOT;
     }
 
     #[Test]
+    public function it_resets_a_namespaced_blueprint()
+    {
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/vendor/foo/test.yaml')->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/blueprints/vendor/foo/test.yaml')->once()->andReturn('title: Overwritten Test Blueprint');
+        File::shouldReceive('delete')->once();
+
+        $this->repo->addNamespace('foo', 'foo');
+        $blueprint = $this->repo->find('foo::test');
+
+        $this->repo->reset($blueprint);
+    }
+
+    #[Test]
     public function it_sets_the_namespace_when_passed_when_making()
     {
         $blueprint = $this->repo->make('test::handle');

@@ -256,6 +256,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('blueprints', [BlueprintController::class, 'index'])->name('blueprints.index');
         Route::get('blueprints/{namespace}/{handle}', [BlueprintController::class, 'edit'])->name('blueprints.edit');
         Route::patch('blueprints/{namespace}/{handle}', [BlueprintController::class, 'update'])->name('blueprints.update');
+        Route::delete('blueprints/{namespace}/{handle}/reset', [BlueprintController::class, 'reset'])->name('blueprints.reset');
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
     });
 
