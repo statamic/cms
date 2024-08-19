@@ -39,14 +39,14 @@
         ></component>
 
         <confirmation-modal
-            v-if="copyToClipboardModalOpen"
+            v-if="copyToClipboardModalUrl"
             :cancellable="false"
             :button-text="__('OK')"
             title="Copy to clipboard"
-            @confirm="copyToClipboardModalOpen = false; copyToClipboardUrl = null"
+            @confirm="copyToClipboardModalUrl = null"
         >
             <div class="prose">
-                <code-block copyable :text="copyToClipboardUrl" />
+                <code-block copyable :text="copyToClipboardModalUrl" />
             </div>
         </confirmation-modal>
 
