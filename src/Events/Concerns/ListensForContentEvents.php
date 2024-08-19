@@ -27,6 +27,7 @@ trait ListensForContentEvents
         \Statamic\Events\EntryDeleted::class,
         \Statamic\Events\EntrySaved::class,
         \Statamic\Events\FieldsetDeleted::class,
+        \Statamic\Events\FieldsetReset::class,
         \Statamic\Events\FieldsetSaved::class,
         \Statamic\Events\FormDeleted::class,
         \Statamic\Events\FormSaved::class,
