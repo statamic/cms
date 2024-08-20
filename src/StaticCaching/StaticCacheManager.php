@@ -10,6 +10,7 @@ use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\Cachers\Writer;
+use Statamic\StaticCaching\NoCache\DatabaseRegion;
 use Statamic\Support\Manager;
 
 class StaticCacheManager extends Manager
@@ -65,6 +66,8 @@ class StaticCacheManager extends Manager
     public function flush()
     {
         $this->driver()->flush();
+
+        DatabaseRegion::truncate();
 
         if ($this->hasCustomStore()) {
             $this->cacheStore()->flush();

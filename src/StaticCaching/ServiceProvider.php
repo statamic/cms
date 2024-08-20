@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Facades\Cascade;
+use Statamic\StaticCaching\NoCache\DatabaseSession;
 use Statamic\StaticCaching\NoCache\Session;
 
 class ServiceProvider extends LaravelServiceProvider
@@ -40,6 +41,8 @@ class ServiceProvider extends LaravelServiceProvider
             if (config('statamic.static_caching.ignore_query_strings', false)) {
                 $uri = explode('?', $uri)[0];
             }
+
+            return new DatabaseSession($uri);
 
             return new Session($uri);
         });
