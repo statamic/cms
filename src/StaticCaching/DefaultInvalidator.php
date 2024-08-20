@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
+use Illuminate\Support\Str;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -68,7 +69,11 @@ class DefaultInvalidator implements Invalidator
         });
 
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls")
+            collect(Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"))->map(function (string $rule) use ($entry) {
+                return ! isset(parse_url($rule)['scheme'])
+                    ? Str::removeRight($entry->site()->url(), '/').Str::ensureLeft($rule, '/')
+                    : $rule;
+            })->values()->all()
         );
     }
 

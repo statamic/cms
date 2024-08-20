@@ -13,10 +13,12 @@ use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
+use Tests\TestCase;
 
-class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
+class DefaultInvalidatorTest extends TestCase
 {
     public function tearDown(): void
     {
@@ -95,7 +97,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://localhost/blog/one', 'http://localhost/blog/two']);
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -103,6 +105,42 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
+    public function collection_urls_can_be_invalidated_by_an_entry_in_a_multisite()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://test.com', 'locale' => 'en_US'],
+            'fr' => ['url' => 'http://test.fr', 'locale' => 'fr_FR'],
+        ]);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.fr')->once();
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://test.fr/blog/one', 'http://test.fr/blog/two']);
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.fr/my/test/entry');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::get('fr'));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -124,7 +162,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->never();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://localhost/blog/one', 'http://localhost/blog/two']);
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -132,6 +170,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::default());
         });
 
         $invalidator = new Invalidator($cacher, [
