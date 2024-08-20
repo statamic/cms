@@ -67,13 +67,26 @@ class StaticCacheManager extends Manager
     {
         $this->driver()->flush();
 
-        DatabaseRegion::truncate();
+        $this->flushNocache();
 
         if ($this->hasCustomStore()) {
             $this->cacheStore()->flush();
+        }
 
-            StaticCacheCleared::dispatch();
+        StaticCacheCleared::dispatch();
+    }
 
+    private function flushNocache()
+    {
+        if (config('statamic.static_caching.nocache', 'cache') === 'database') {
+            DatabaseRegion::truncate();
+
+            return;
+        }
+
+        // No need to do any looping if there's a custom
+        // store because the entire store will be flushed.
+        if ($this->hasCustomStore()) {
             return;
         }
 
@@ -84,8 +97,6 @@ class StaticCacheManager extends Manager
         });
 
         $this->cacheStore()->forget('nocache::urls');
-
-        StaticCacheCleared::dispatch();
     }
 
     public function nocacheJs(string $js)

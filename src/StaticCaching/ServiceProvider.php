@@ -42,9 +42,11 @@ class ServiceProvider extends LaravelServiceProvider
                 $uri = explode('?', $uri)[0];
             }
 
-            return new DatabaseSession($uri);
-
-            return new Session($uri);
+            return match ($driver = config('statamic.static_caching.nocache', 'cache')) {
+                'cache' => new Session($uri),
+                'database' => new DatabaseSession($uri),
+                default => throw new \Exception('Nocache driver ['.$driver.'] is not supported.'),
+            };
         });
 
         $this->app->bind(UrlExcluder::class, function ($app) {
