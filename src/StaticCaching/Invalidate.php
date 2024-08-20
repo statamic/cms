@@ -15,6 +15,9 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
 use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetSaved;
+use Statamic\Events\GlobalVariablesDeleted;
+use Statamic\Events\GlobalVariablesSaved;
+use Statamic\Events\GlobalVariablesSaving;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Events\NavTreeDeleted;
@@ -34,8 +37,8 @@ class Invalidate implements ShouldQueue
         EntryDeleting::class => 'invalidateEntry',
         TermSaved::class => 'invalidateTerm',
         TermDeleted::class => 'invalidateTerm',
-        GlobalSetSaved::class => 'invalidateGlobalSet',
-        GlobalSetDeleted::class => 'invalidateGlobalSet',
+        GlobalVariablesSaved::class => 'invalidateGlobalSet',
+        GlobalVariablesDeleted::class => 'invalidateGlobalSet',
         NavSaved::class => 'invalidateNav',
         NavDeleted::class => 'invalidateNav',
         FormSaved::class => 'invalidateForm',
@@ -77,7 +80,7 @@ class Invalidate implements ShouldQueue
 
     public function invalidateGlobalSet($event)
     {
-        $this->invalidator->invalidate($event->globals);
+        $this->invalidator->invalidate($event->variables);
     }
 
     public function invalidateNav($event)

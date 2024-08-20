@@ -14,17 +14,13 @@ use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
+use Statamic\Globals\Variables;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 use Tests\TestCase;
 
 class DefaultInvalidatorTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        Mockery::close();
-    }
-
     #[Test]
     public function specifying_all_as_invalidation_rule_will_just_flush_the_cache()
     {
@@ -259,6 +255,10 @@ class DefaultInvalidatorTest extends TestCase
             $m->shouldReceive('handle')->andReturn('social');
         });
 
+        $variables = tap(Mockery::mock(Variables::class), function ($m) use ($set) {
+            $m->shouldReceive('globalSet')->andReturn($set);
+        });
+
         $invalidator = new Invalidator($cacher, [
             'globals' => [
                 'social' => [
@@ -270,7 +270,7 @@ class DefaultInvalidatorTest extends TestCase
             ],
         ]);
 
-        $this->assertNull($invalidator->invalidate($set));
+        $this->assertNull($invalidator->invalidate($variables));
     }
 
     #[Test]
