@@ -158,6 +158,41 @@ class DefaultInvalidatorTest extends TestCase
     }
 
     #[Test]
+    public function collection_urls_can_be_invalidated_by_an_entry_in_a_multisite()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://test.com', 'locale' => 'en_US'],
+            'fr' => ['url' => 'http://test.fr', 'locale' => 'fr_FR'],
+        ]);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.fr')->once();
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://test.fr/blog/one', 'http://test.fr/blog/two']);
+        });
+
+        $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.fr/my/test/entry');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('site')->andReturn(Site::get('fr'));
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($entry));
+    }
+
+    #[Test]
     public function entry_urls_are_not_invalidated_by_an_entry_with_a_redirect()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
