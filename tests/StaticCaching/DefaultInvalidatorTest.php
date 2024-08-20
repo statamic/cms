@@ -248,7 +248,7 @@ class DefaultInvalidatorTest extends TestCase
     public function globals_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://localhost/one', 'http://localhost/two']);
         });
 
         $set = tap(Mockery::mock(GlobalSet::class), function ($m) {
@@ -257,6 +257,43 @@ class DefaultInvalidatorTest extends TestCase
 
         $variables = tap(Mockery::mock(Variables::class), function ($m) use ($set) {
             $m->shouldReceive('globalSet')->andReturn($set);
+            $m->shouldReceive('site')->andReturn(Site::default());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'globals' => [
+                'social' => [
+                    'urls' => [
+                        '/one',
+                        '/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($variables));
+    }
+
+    #[Test]
+    public function globals_urls_can_be_invalidated_in_a_multisite()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://test.com', 'locale' => 'en_US'],
+            'fr' => ['url' => 'http://test.fr', 'locale' => 'fr_FR'],
+        ]);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->never()->with(['http://test.com/one', 'http://test.com/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://test.fr/one', 'http://test.fr/two']);
+        });
+
+        $set = tap(Mockery::mock(GlobalSet::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('social');
+        });
+
+        $variables = tap(Mockery::mock(Variables::class), function ($m) use ($set) {
+            $m->shouldReceive('globalSet')->andReturn($set);
+            $m->shouldReceive('site')->andReturn(Site::get('fr'));
         });
 
         $invalidator = new Invalidator($cacher, [

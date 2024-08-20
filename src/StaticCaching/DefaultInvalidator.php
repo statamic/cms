@@ -104,7 +104,11 @@ class DefaultInvalidator implements Invalidator
     protected function invalidateGlobalUrls($variables)
     {
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "globals.{$variables->globalSet()->handle()}.urls")
+            collect(Arr::get($this->rules, "globals.{$variables->globalSet()->handle()}.urls"))->map(function (string $rule) use ($variables) {
+                return ! isset(parse_url($rule)['scheme'])
+                    ? Str::removeRight($variables->site()->url(), '/').Str::ensureLeft($rule, '/')
+                    : $rule;
+            })->values()->all()
         );
     }
 
