@@ -127,6 +127,9 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.fr')->never();
+            $cacher->shouldReceive('invalidateUrls')->never()->with(['http://test.fr/blog/one', 'http://test.fr/blog/two']);
+
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.fr')->once();
             $cacher->shouldReceive('invalidateUrls')->once()->with(['http://test.fr/blog/one', 'http://test.fr/blog/two']);
         });
