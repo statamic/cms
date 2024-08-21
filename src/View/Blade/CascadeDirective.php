@@ -9,9 +9,7 @@ class CascadeDirective
 {
     public static function handle($keys): array
     {
-        $data = Cascade::toArray();
-        if (! $data) {
-            dump('hydrating!');
+        if (! $data = Cascade::toArray()) {
             $data = Cascade::hydrate()->toArray();
         }
 
