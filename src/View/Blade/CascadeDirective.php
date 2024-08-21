@@ -14,7 +14,7 @@ class CascadeDirective
             $data = Cascade::hydrate()->toArray();
         }
 
-        if (! $keys) {
+        if (! isset($keys)) {
             return $data;
         }
 

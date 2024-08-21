@@ -4,6 +4,7 @@ namespace Tests\View\Blade;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\CascadeDataNotFoundException;
+use Statamic\Facades\Cascade;
 use Statamic\View\Blade\CascadeDirective;
 use Tests\TestCase;
 
@@ -19,9 +20,17 @@ class CascadeDirectiveTest extends TestCase
     {
         $data = CascadeDirective::handle();
 
-        $this->assertArrayHasKey('environment', $data);
-        $this->assertArrayHasKey('config', $data);
-        $this->assertArrayHasKey('site', $data);
+        $expected = Cascade::toArray();
+
+        $this->assertEquals($expected, $data);
+    }
+
+    #[Test]
+    public function it_gets_no_data()
+    {
+        $data = CascadeDirective::handle([]);
+
+        $this->assertEmpty($data);
     }
 
     #[Test]
@@ -32,11 +41,13 @@ class CascadeDirectiveTest extends TestCase
             'is_homepage',
         ]);
 
+        $expected = Cascade::toArray();
+
         $this->assertCount(2, $data);
         $this->assertArrayHasKey('homepage', $data);
         $this->assertArrayHasKey('is_homepage', $data);
-        $this->assertEquals($data['homepage'], 'http://localhost');
-        $this->assertEquals($data['is_homepage'], true);
+        $this->assertEquals($data['homepage'], $expected['homepage']);
+        $this->assertEquals($data['is_homepage'], $expected['is_homepage']);
     }
 
     #[Test]
@@ -58,10 +69,12 @@ class CascadeDirectiveTest extends TestCase
             'live_preview' => false,
         ]);
 
+        $expected = Cascade::toArray();
+
         $this->assertCount(2, $data);
         $this->assertArrayHasKey('homepage', $data);
         $this->assertArrayHasKey('live_preview', $data);
-        $this->assertEquals($data['homepage'], 'http://localhost');
+        $this->assertEquals($data['homepage'], $expected['homepage']);
         $this->assertEquals($data['live_preview'], false);
     }
 }
