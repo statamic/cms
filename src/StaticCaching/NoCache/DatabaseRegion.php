@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class DatabaseRegion extends Model
 {
-    protected $table = 'static_cache_regions';
+    protected $table = 'nocache_regions';
 
     protected $guarded = [];
+
+    protected $primaryKey = 'key';
+
+    public $timestamps = false;
 }
