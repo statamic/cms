@@ -14,6 +14,11 @@ use Statamic\Support\Manager;
 
 class StaticCacheManager extends Manager
 {
+    public function enabled()
+    {
+        return $this->getDefaultDriver() !== 'null';
+    }
+
     protected function invalidImplementationMessage($name)
     {
         return "Static cache strategy [{$name}] is not defined.";

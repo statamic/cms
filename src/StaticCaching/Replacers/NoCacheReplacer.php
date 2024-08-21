@@ -22,6 +22,10 @@ class NoCacheReplacer implements Replacer
 
     public function prepareResponseToCache(Response $responseToBeCached, Response $initialResponse)
     {
+        if (! StaticCache::enabled()) {
+            return;
+        }
+
         $this->replaceInResponse($initialResponse);
 
         $this->modifyFullMeasureResponse($responseToBeCached);

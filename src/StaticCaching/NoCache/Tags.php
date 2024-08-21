@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\NoCache;
 
 use Statamic\Facades\Antlers;
+use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Middleware\Cache;
 
 class Tags extends \Statamic\Tags\Tags
@@ -22,7 +23,7 @@ class Tags extends \Statamic\Tags\Tags
 
     public function index()
     {
-        if (! Cache::isBeingUsedOnCurrentRoute()) {
+        if (! StaticCache::enabled() || ! Cache::isBeingUsedOnCurrentRoute()) {
             return $this->parse();
         }
 
