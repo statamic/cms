@@ -80,18 +80,22 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateTermUrls($term)
     {
-        if ($url = $term->absoluteUrl()) {
+        if ($url = $term->term()->absoluteUrl()) {
             $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
 
             $term->taxonomy()->collections()->each(function ($collection) use ($term) {
-                if ($url = $term->collection($collection)->absoluteUrl()) {
+                if ($url = $term->collection($collection)->term()->absoluteUrl()) {
                     $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
                 }
             });
         }
 
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls")
+            collect(Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"))->map(function (string $rule) use ($term) {
+                return ! isset(parse_url($rule)['scheme'])
+                    ? Str::removeRight($term->site()->url(), '/').Str::ensureLeft($rule, '/')
+                    : $rule;
+            })->values()->all()
         );
     }
 

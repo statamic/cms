@@ -15,6 +15,8 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
 use Statamic\Events\GlobalVariablesDeleted;
 use Statamic\Events\GlobalVariablesSaved;
+use Statamic\Events\LocalizedTermDeleted;
+use Statamic\Events\LocalizedTermSaved;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Events\NavTreeDeleted;
@@ -32,8 +34,8 @@ class Invalidate implements ShouldQueue
         AssetDeleted::class => 'invalidateAsset',
         EntrySaved::class => 'invalidateEntry',
         EntryDeleting::class => 'invalidateEntry',
-        TermSaved::class => 'invalidateTerm',
-        TermDeleted::class => 'invalidateTerm',
+        LocalizedTermSaved::class => 'invalidateTerm',
+        LocalizedTermDeleted::class => 'invalidateTerm',
         GlobalVariablesSaved::class => 'invalidateGlobalSet',
         GlobalVariablesDeleted::class => 'invalidateGlobalSet',
         NavSaved::class => 'invalidateNav',

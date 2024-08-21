@@ -17,6 +17,7 @@ use Statamic\Facades\Site;
 use Statamic\Globals\Variables;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
+use Statamic\Taxonomies\LocalizedTerm;
 use Tests\TestCase;
 
 class DefaultInvalidatorTest extends TestCase
@@ -208,7 +209,7 @@ class DefaultInvalidatorTest extends TestCase
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://test.com')->once();
             $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/tags/one', '/tags/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://localhost/tags/one', 'http://localhost/tags/two']);
         });
 
         $collection = Mockery::mock(Collection::class);
@@ -219,9 +220,14 @@ class DefaultInvalidatorTest extends TestCase
 
         $term = tap(Mockery::mock(Term::class), function ($m) use ($taxonomy) {
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/term', 'http://test.com/my/collection/tags/term');
+        });
+
+        $localized = tap(Mockery::mock(LocalizedTerm::class), function ($m) use ($term, $taxonomy) {
+            $m->shouldReceive('term')->andReturn($term);
             $m->shouldReceive('taxonomyHandle')->andReturn('tags');
             $m->shouldReceive('taxonomy')->andReturn($taxonomy);
             $m->shouldReceive('collection')->andReturn($m);
+            $m->shouldReceive('site')->andReturn(Site::get('en'));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -235,7 +241,7 @@ class DefaultInvalidatorTest extends TestCase
             ],
         ]);
 
-        $this->assertNull($invalidator->invalidate($term));
+        $this->assertNull($invalidator->invalidate($localized));
     }
 
     #[Test]
