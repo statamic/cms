@@ -35,14 +35,11 @@ class DatabaseSession extends Session
 
     protected function cacheRegion(Region $region)
     {
-        DatabaseRegion::updateOrCreate(
-            [
-                'key' => $region->key(),
-            ],
-            [
-                'url' => $this->url,
-                'region' => serialize($region),
-            ],
-        );
+        DatabaseRegion::updateOrCreate([
+            'key' => $region->key(),
+        ], [
+            'url' => $this->url,
+            'region' => serialize($region),
+        ]);
     }
 }
