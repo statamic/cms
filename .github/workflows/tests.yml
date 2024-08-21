@@ -112,12 +112,18 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v44
         with:
           files: |
             **.{js,vue,ts}
             package.json
             .github/workflows/tests.yml
+
+      - name: List changed files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          echo "List all the files that have changed: $ALL_CHANGED_FILES"
 
       - name: Determine whether tests should run
         id: should-run-tests
