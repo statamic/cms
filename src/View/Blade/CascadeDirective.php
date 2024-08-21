@@ -3,14 +3,19 @@
 namespace Statamic\View\Blade;
 
 use Illuminate\Support\Arr;
+use Statamic\Exceptions\CascadeDataNotFoundException;
 use Statamic\Facades\Cascade;
 
 class CascadeDirective
 {
-    public static function handle($keys): array
+    public static function handle($keys = null): array
     {
         if (! $data = Cascade::toArray()) {
             $data = Cascade::hydrate()->toArray();
+        }
+
+        if (! $keys) {
+            return $data;
         }
 
         return collect($keys)
@@ -19,7 +24,7 @@ class CascadeDirective
                     $key = $default;
                     $default = null;
                     if (! array_key_exists($key, $data)) {
-                        throw new \Exception("Key [{$key}] not found in cascade data.");
+                        throw new CascadeDataNotFoundException($key);
                     }
                 }
 
