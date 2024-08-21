@@ -1,3 +1,5 @@
+// test change
+
 import Vue from 'vue';
 import Vuex from 'vuex';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
