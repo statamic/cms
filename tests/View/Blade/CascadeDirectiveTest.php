@@ -50,7 +50,7 @@ class CascadeDirectiveTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_default_for_missing_data()
+    public function it_uses_fallback_for_missing_data()
     {
         $data = CascadeDirective::handle([
             'live_preview' => false,
