@@ -109,6 +109,8 @@ return [
     |
     | Here you may define where the nocache data is stored.
     |
+    | https://statamic.dev/tags/nocache#database
+    |
     | Supported drivers: "cache", "database"
     |
     */
