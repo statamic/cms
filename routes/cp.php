@@ -252,10 +252,12 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('edit', [FieldsController::class, 'edit'])->name('fields.edit');
         Route::post('update', [FieldsController::class, 'update'])->name('fields.update');
         Route::get('field-meta', [MetaController::class, 'show']);
+        Route::delete('fieldsets/{fieldset}/reset', [FieldsetController::class, 'reset'])->name('fieldsets.reset');
         Route::resource('fieldsets', FieldsetController::class)->except(['show']);
         Route::get('blueprints', [BlueprintController::class, 'index'])->name('blueprints.index');
         Route::get('blueprints/{namespace}/{handle}', [BlueprintController::class, 'edit'])->name('blueprints.edit');
         Route::patch('blueprints/{namespace}/{handle}', [BlueprintController::class, 'update'])->name('blueprints.update');
+        Route::delete('blueprints/{namespace}/{handle}/reset', [BlueprintController::class, 'reset'])->name('blueprints.reset');
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
     });
 
