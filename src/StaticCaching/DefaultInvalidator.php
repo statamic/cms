@@ -80,11 +80,11 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateTermUrls($term)
     {
-        if ($url = $term->term()->absoluteUrl()) {
+        if ($url = $term->absoluteUrl()) {
             $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
 
             $term->taxonomy()->collections()->each(function ($collection) use ($term) {
-                if ($url = $term->collection($collection)->term()->absoluteUrl()) {
+                if ($url = $term->collection($collection)->absoluteUrl()) {
                     $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
                 }
             });
