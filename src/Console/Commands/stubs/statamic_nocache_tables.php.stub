@@ -12,6 +12,7 @@ class StatamicNocacheTables extends Migration
             $table->string('key')->index()->primary();
             $table->string('url')->index();
             $table->longText('region');
+            $table->timestamps();
         });
     }
 
