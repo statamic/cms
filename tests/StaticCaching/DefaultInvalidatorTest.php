@@ -64,14 +64,30 @@ class DefaultInvalidatorTest extends TestCase
     #[Test]
     public function collection_urls_can_be_invalidated()
     {
+        $this->setSites([
+            'en' => ['url' => 'http://test.com', 'locale' => 'en_US'],
+            'fr' => ['url' => 'http://test.fr', 'locale' => 'fr_FR'],
+            'de' => ['url' => 'http://test.de', 'locale' => 'de_DE'],
+        ]);
+
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://test.com/blog/one', 'http://test.com/blog/two']);
+
+            $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://test.fr')->once();
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://test.fr/blog/one', 'http://test.fr/blog/two']);
+
+            $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://test.de')->never();
+            $cacher->shouldReceive('invalidateUrls')->never()->with(['http://test.de/blog/one', 'http://test.de/blog/two']);
         });
 
         $collection = tap(Mockery::mock(Collection::class), function ($m) {
-            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/collection');
             $m->shouldReceive('handle')->andReturn('blog');
+            $m->shouldReceive('sites')->andReturn(collect(['en', 'fr']));
+
+            $m->shouldReceive('absoluteUrl')->with('en')->andReturn('http://test.com/my/test/collection');
+            $m->shouldReceive('absoluteUrl')->with('fr')->andReturn('http://test.fr/my/test/collection');
+            $m->shouldReceive('absoluteUrl')->with('de')->never();
         });
 
         $invalidator = new Invalidator($cacher, [

@@ -9,6 +9,7 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -114,13 +115,19 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateCollectionUrls($collection)
     {
-        if ($url = $collection->absoluteUrl()) {
-            $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
-        }
+        $collection->sites()->each(function (string $site) use (&$collection) {
+            if ($url = $collection->absoluteUrl($site)) {
+                $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+            }
 
-        $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "collections.{$collection->handle()}.urls")
-        );
+            $this->cacher->invalidateUrls(
+                collect(Arr::get($this->rules, "collections.{$collection->handle()}.urls"))->map(function (string $rule) use ($site) {
+                    return ! isset(parse_url($rule)['scheme'])
+                        ? Str::removeRight(Site::get($site)->url(), '/').Str::ensureLeft($rule, '/')
+                        : $rule;
+                })->values()->all()
+            );
+        });
     }
 
     private function splitUrlAndDomain(string $url)
