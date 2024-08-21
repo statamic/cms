@@ -1,5 +1,29 @@
 # Release Notes
 
+## 5.23.0 (2024-08-21)
+
+### What's new
+- Add blade `@cascade` directive [#10674](https://github.com/statamic/cms/issues/10674) by @jacksleight
+- Nocache database driver [#10671](https://github.com/statamic/cms/issues/10671) by @jasonvarga
+- Add ability to reset namespaced fieldsets [#9166](https://github.com/statamic/cms/issues/9166) by @aerni
+- Add ability to reset namespaced blueprints [#9327](https://github.com/statamic/cms/issues/9327) by @ryanmitchell
+- Bard: When email address is selected, assume link is a mailto [#10660](https://github.com/statamic/cms/issues/10660) by @duncanmcclean
+
+### What's fixed
+- Stop hiding `hidden` field in namespaced blueprints [#10617](https://github.com/statamic/cms/issues/10617) by @ryanmitchell
+- Fix fatal windows cache key error [#10667](https://github.com/statamic/cms/issues/10667) by @godismyjudge95
+- Fix blueprint override logic [#10661](https://github.com/statamic/cms/issues/10661) by @jasonvarga
+- Fix blueprint override logic, pt 2 [#10668](https://github.com/statamic/cms/issues/10668) by @jasonvarga
+- Translate confirm modal title [#10659](https://github.com/statamic/cms/issues/10659) by @peimn
+- Translate set groups in set previews [#10658](https://github.com/statamic/cms/issues/10658) by @duncanmcclean
+- Turkish translation [#10664](https://github.com/statamic/cms/issues/10664) by @peimn
+- Azerbaijani translation [#10665](https://github.com/statamic/cms/issues/10665) by @peimn
+- Persian translation [#10663](https://github.com/statamic/cms/issues/10663) by @peimn
+- Require spatie/laravel-ray in dev [#10662](https://github.com/statamic/cms/issues/10662) by @jasonvarga
+- Fix github workflow for changes in JS tests [#10677](https://github.com/statamic/cms/issues/10677) by @jesseleite
+
+
+
 ## 5.22.1 (2024-08-19)
 
 ### What's fixed
