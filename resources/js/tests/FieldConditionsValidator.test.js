@@ -1,5 +1,6 @@
 // test change
 // test change
+// test change
 
 import Vue from 'vue';
 import Vuex from 'vuex';
