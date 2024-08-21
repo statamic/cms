@@ -38,9 +38,11 @@ class DatabaseSession extends Session
         DatabaseRegion::updateOrCreate(
             [
                 'key' => $region->key(),
-                'url' => $this->url,
             ],
-            ['region' => serialize($region)],
+            [
+                'url' => $this->url,
+                'region' => serialize($region),
+            ],
         );
     }
 }
