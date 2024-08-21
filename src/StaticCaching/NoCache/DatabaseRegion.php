@@ -13,4 +13,8 @@ class DatabaseRegion extends Model
     protected $primaryKey = 'key';
 
     public $timestamps = false;
+
+    protected $casts = [
+        'key' => 'string',
+    ];
 }
