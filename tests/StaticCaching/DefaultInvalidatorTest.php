@@ -245,6 +245,54 @@ class DefaultInvalidatorTest extends TestCase
     }
 
     #[Test]
+    public function taxonomy_urls_can_be_invalidated_in_a_multisite()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://test.com', 'locale' => 'en_US'],
+            'fr' => ['url' => 'http://test.fr', 'locale' => 'fr_FR'],
+        ]);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://test.com')->once();
+            $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://test.com')->once();
+
+            $cacher->shouldReceive('invalidateUrls')->never()->with(['http://test.com/tags/one', 'http://test.com/tags/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://test.fr/tags/one', 'http://test.fr/tags/two']);
+        });
+
+        $collection = Mockery::mock(Collection::class);
+
+        $taxonomy = tap(Mockery::mock(Taxonomy::class), function ($m) use ($collection) {
+            $m->shouldReceive('collections')->andReturn(collect([$collection]));
+        });
+
+        $term = tap(Mockery::mock(Term::class), function ($m) use ($taxonomy) {
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/term', 'http://test.com/my/collection/tags/term');
+        });
+
+        $localized = tap(Mockery::mock(LocalizedTerm::class), function ($m) use ($term, $taxonomy) {
+            $m->shouldReceive('term')->andReturn($term);
+            $m->shouldReceive('taxonomyHandle')->andReturn('tags');
+            $m->shouldReceive('taxonomy')->andReturn($taxonomy);
+            $m->shouldReceive('collection')->andReturn($m);
+            $m->shouldReceive('site')->andReturn(Site::get('fr'));
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'taxonomies' => [
+                'tags' => [
+                    'urls' => [
+                        '/tags/one',
+                        '/tags/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($localized));
+    }
+
+    #[Test]
     public function navigation_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
