@@ -66,8 +66,6 @@ class BlueprintController extends CpController
             throw new NotFoundHttpException;
         }
 
-        $request->merge(['hidden' => false]); // we dont support hidden here
-
         $request->validate([
             'title' => 'required',
             'tabs' => 'array',
