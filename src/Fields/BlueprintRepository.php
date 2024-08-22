@@ -239,20 +239,16 @@ class BlueprintRepository
                 $directory = "{$this->additionalNamespaces[$namespace]}";
             }
 
-            $files = File::withAbsolutePaths()->getFilesByType($directory, 'yaml');
+            $files = File::withAbsolutePaths()
+                ->getFilesByType($directory, 'yaml')
+                ->mapWithKeys(fn ($path) => [Str::after($path, $directory.'/') => $path]);
 
-            if ($files->isNotEmpty() && File::exists($overrideDir = $this->directory.'/vendor/'.$namespaceDir)) {
-                $overrides = File::withAbsolutePaths()->getFilesByType($overrideDir, 'yaml');
+            if (File::exists($directory = $this->directory.'/vendor/'.$namespaceDir)) {
+                $overrides = File::withAbsolutePaths()
+                    ->getFilesByType($directory, 'yaml')
+                    ->mapWithKeys(fn ($path) => [Str::after($path, $directory.'/') => $path]);
 
-                $files = $files->map(function ($path) use ($overrides, $overrideDir, $directory) {
-                    $filename = str($path)->after($directory.'/');
-
-                    if ($overrides->contains($overridePath = $overrideDir.'/'.$filename)) {
-                        return $overridePath;
-                    }
-
-                    return $path;
-                });
+                $files = $files->merge($overrides)->values();
             }
 
             return $files;
