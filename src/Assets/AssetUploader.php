@@ -92,13 +92,7 @@ class AssetUploader extends Uploader
         ];
 
         return (string) Str::of(urldecode($string))
-            ->when(true, function ($stringable) use ($replacements) {
-                foreach ($replacements as $from => $to) {
-                    $stringable = $stringable->replace($from, $to);
-                }
-
-                return $stringable;
-            })
+            ->replace(array_keys($replacements), array_values($replacements))
             ->when(config('statamic.assets.lowercase'), fn ($stringable) => $stringable->lower())
             ->ascii();
     }
