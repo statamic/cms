@@ -18,6 +18,7 @@ use Statamic\Rules\Handle;
 use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
 
 class TaxonomiesController extends CpController
 {
@@ -80,6 +81,7 @@ class TaxonomiesController extends CpController
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
+            'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
         ];
 
         if ($taxonomy->queryTerms()->count() === 0) {
