@@ -22,6 +22,7 @@ $manualFiles = [
     'permissions',
     'markdown',
     'validation',
+    'moment',
 ];
 
 // Don't translate the following files.
