@@ -99,7 +99,7 @@ class AssetUploader extends Uploader
 
                 return $stringable;
             })
-            ->when(config('statamic.assets.case_sensitive'), function ($stringable) {
+            ->when(config('statamic.assets.lowercase'), function ($stringable) {
                 return $stringable->lower();
             })
             ->ascii();
