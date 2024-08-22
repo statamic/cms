@@ -92,16 +92,17 @@ class AssetUploader extends Uploader
             '%' => '-',
         ];
 
-        $str = Stringy::create(urldecode($string))->toAscii();
+        return (string) Str::of(urldecode($string))
+            ->when(true, function ($stringable) use ($replacements) {
+                foreach ($replacements as $from => $to) {
+                    $stringable = $stringable->replace($from, $to);
+                }
 
-        foreach ($replacements as $from => $to) {
-            $str = $str->replace($from, $to);
-        }
-
-        if (config('statamic.assets.lowercase')) {
-            $str = strtolower($str);
-        }
-
-        return (string) $str;
+                return $stringable;
+            })
+            ->when(config('statamic.assets.case_sensitive'), function ($stringable) {
+                return $stringable->lower();
+            })
+            ->ascii();
     }
 }
