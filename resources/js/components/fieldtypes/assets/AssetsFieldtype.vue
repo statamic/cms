@@ -67,7 +67,7 @@
                         :animate="false"
                         append-to="body"
                     >
-                        <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden rounded-t-none" ref="assets">
+                        <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden" :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }" ref="assets">
                             <asset-tile
                                 v-for="asset in assets"
                                 :key="asset.id"

@@ -12,9 +12,18 @@ export default {
 
             return _.map(options, (option) => {
                 if (typeof option === 'object') {
+                    let valueKey = 'value';
+                    let labelKey = 'label';
+
+                    // Support both {key: '', value: ''} and {value: '', label: ''} formats.
+                    if (option.hasOwnProperty('key')) {
+                        valueKey = 'key';
+                        labelKey = 'value';
+                    }
+
                     return {
-                        'value': option.value,
-                        'label': __(option.label) || option.value
+                        'value': option[valueKey],
+                        'label': __(option[labelKey]) || option[valueKey]
                     };
                 }
 

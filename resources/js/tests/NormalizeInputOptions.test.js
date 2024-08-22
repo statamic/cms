@@ -46,10 +46,20 @@ it('normalizes input options with object', () => {
     ]);
 });
 
-it('normalizes input options with array of objects', () => {
+it('normalizes input options with array of objects with value label keys', () => {
     expect(normalizeInputOptions([
         {value: 'one', label: 'One'},
         {value: 'two', label: 'Two'}
+    ])).toEqual([
+        {value: 'one', label: 'Uno'},
+        {value: 'two', label: 'Two'}
+    ]);
+});
+
+it('normalizes input options with array of objects with key value keys', () => {
+    expect(normalizeInputOptions([
+        {key: 'one', value: 'One'},
+        {key: 'two', value: 'Two'}
     ])).toEqual([
         {value: 'one', label: 'Uno'},
         {value: 'two', label: 'Two'}
