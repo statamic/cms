@@ -7,7 +7,6 @@ use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AssetUploader extends Uploader
