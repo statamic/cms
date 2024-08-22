@@ -88,6 +88,12 @@ class WhereTest extends TestCase
         $modified = $this->modify($data, ['whimsy_level', '!=', 0]);
         $this->assertEquals($expected, Arr::pluck($modified, 'name'));
 
+        $modified = $this->modify($data, ['whimsy_level', '!=', '0']);
+        $this->assertEquals($expected, Arr::pluck($modified, 'name'));
+
+        $modified = $this->modify($data, ['whimsy_level', '!==', '0']);
+        $this->assertEquals($data, $modified);
+
         $expected = [
             'Sir Bubblesworth',
             'Professor Whiskerbottom',

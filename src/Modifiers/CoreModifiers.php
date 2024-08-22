@@ -2921,7 +2921,7 @@ class CoreModifiers extends Modifier
         if (! $opr && Str::contains($key, ':')) {
             [$key, $opr] = explode(':', $key);
         }
-        if (! $val && $val !== 0) {
+        if (count($params) < 3) {
             $val = $opr;
             $opr = '==';
         }
