@@ -21,8 +21,6 @@ use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
-use Statamic\Events\TermDeleted;
-use Statamic\Events\TermSaved;
 use Statamic\Facades\Form;
 
 class Invalidate implements ShouldQueue
