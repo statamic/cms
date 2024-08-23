@@ -44,7 +44,7 @@ class Index extends BaseIndex
 
     protected function data()
     {
-        return collect(json_decode($this->raw(), true));
+        return collect(json_decode($this->raw(), true, flags: JSON_THROW_ON_ERROR));
     }
 
     protected function settings()
