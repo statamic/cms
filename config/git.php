@@ -152,6 +152,8 @@ return [
 
     'push' => env('STATAMIC_GIT_PUSH', false),
 
+    'push_options' => [],
+
     /*
     |--------------------------------------------------------------------------
     | Ignored Events

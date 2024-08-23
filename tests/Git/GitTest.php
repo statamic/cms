@@ -374,6 +374,24 @@ EOT;
         Git::commit();
     }
 
+    /** @test */
+    public function it_can_push_with_push_options()
+    {
+        Git::shouldReceive('push')->once();
+        Git::makePartial();
+
+        Config::set('statamic.git.push', true);
+
+        Config::set('statamic.git.push_options', [
+            'merge_request.create',
+            'merge_request.target' => 'develop',
+        ]);
+
+        $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
+
+        Git::commit();
+    }
+
     private function showLastCommit($path)
     {
         return Process::create($path)->run('git show');
