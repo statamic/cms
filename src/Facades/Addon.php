@@ -4,11 +4,12 @@ namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use Statamic\Extend\AddonRepository;
+use Illuminate\Support\Collection;
 
 /**
- * @method static \Statamic\Extend\Addon make($addon)
- * @method static \Illuminate\Support\Collection all()
- * @method static \Statamic\Extend\Addon get($id)
+ * @method static \Statamic\Extend\Addon make(string $addon)
+ * @method static Collection all()
+ * @method static \Statamic\Extend\Addon get(string $id)
  *
  * @see \Statamic\Extend\AddonRepository
  */
