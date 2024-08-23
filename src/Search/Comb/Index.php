@@ -73,7 +73,7 @@ class Index extends BaseIndex
             throw new IndexNotFoundException;
         }
 
-        return File::get($this->path());
+        return app('files')->get($this->path(), lock: true);
     }
 
     public function exists()
@@ -117,7 +117,7 @@ class Index extends BaseIndex
 
     protected function save($documents)
     {
-        File::put($this->path(), $documents->toJson());
+        app('files')->put($this->path(), $documents->toJson(), lock: true);
     }
 
     public function extraAugmentedResultData(Result $result)
