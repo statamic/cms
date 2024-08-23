@@ -48,7 +48,7 @@ class Update extends Command
         }
 
         $selection = select(
-            label: 'Select an index to update',
+            label: 'Which search index would you like to update?',
             options: collect(['All'])->merge($this->indexes()->keys())->all(),
             default: 0
         );
