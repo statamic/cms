@@ -7,6 +7,7 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Events\SearchIndexUpdated;
 use Statamic\Facades\Search;
 use Statamic\Support\Str;
+
 use function Laravel\Prompts\select;
 
 class Update extends Command
