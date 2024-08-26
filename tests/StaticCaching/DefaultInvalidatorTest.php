@@ -127,7 +127,8 @@ class DefaultInvalidatorTest extends TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://localhost/blog/one', 'http://localhost/blog/two']);
+            $cacher->shouldReceive('invalidateUrls')->with(['http://localhost/blog/one', 'http://localhost/blog/two'])->once();
+            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/blog/three')->once();
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -144,6 +145,7 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '/blog/one',
                         '/blog/two',
+                        'http://localhost/blog/three',
                     ],
                 ],
             ],
@@ -162,10 +164,12 @@ class DefaultInvalidatorTest extends TestCase
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.fr')->never();
-            $cacher->shouldReceive('invalidateUrls')->never()->with(['http://test.fr/blog/one', 'http://test.fr/blog/two']);
+            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/blog/one', 'http://test.fr/blog/two'])->never();
 
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.fr')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://test.fr/blog/one', 'http://test.fr/blog/two']);
+            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/blog/one', 'http://test.fr/blog/two'])->once();
+
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/blog/three')->once();
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -182,6 +186,7 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '/blog/one',
                         '/blog/two',
+                        'http://test.com/blog/three',
                     ],
                 ],
             ],
@@ -223,46 +228,6 @@ class DefaultInvalidatorTest extends TestCase
     #[Test]
     public function taxonomy_urls_can_be_invalidated()
     {
-        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://localhost/tags/one', 'http://localhost/tags/two']);
-        });
-
-        $collection = Mockery::mock(Collection::class);
-
-        $taxonomy = tap(Mockery::mock(Taxonomy::class), function ($m) use ($collection) {
-            $m->shouldReceive('collections')->andReturn(collect([$collection]));
-        });
-
-        $term = Mockery::mock(Term::class);
-
-        $localized = tap(Mockery::mock(LocalizedTerm::class), function ($m) use ($term, $taxonomy) {
-            $m->shouldReceive('term')->andReturn($term);
-            $m->shouldReceive('taxonomyHandle')->andReturn('tags');
-            $m->shouldReceive('taxonomy')->andReturn($taxonomy);
-            $m->shouldReceive('collection')->andReturn($m);
-            $m->shouldReceive('site')->andReturn(Site::get('en'));
-            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/term', 'http://test.com/my/collection/tags/term');
-        });
-
-        $invalidator = new Invalidator($cacher, [
-            'taxonomies' => [
-                'tags' => [
-                    'urls' => [
-                        '/tags/one',
-                        '/tags/two',
-                    ],
-                ],
-            ],
-        ]);
-
-        $this->assertNull($invalidator->invalidate($localized));
-    }
-
-    #[Test]
-    public function taxonomy_urls_can_be_invalidated_in_a_multisite()
-    {
         $this->setSites([
             'en' => ['url' => 'http://test.com', 'locale' => 'en_US'],
             'fr' => ['url' => 'http://test.fr', 'locale' => 'fr_FR'],
@@ -276,6 +241,8 @@ class DefaultInvalidatorTest extends TestCase
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://test.fr')->once();
             $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://test.fr')->once();
             $cacher->shouldReceive('invalidateUrls')->once()->with(['http://test.fr/tags/one', 'http://test.fr/tags/two']);
+
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/tags/three')->once();
         });
 
         $collection = Mockery::mock(Collection::class);
@@ -301,6 +268,7 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '/tags/one',
                         '/tags/two',
+                        'http://test.com/tags/three',
                     ],
                 ],
             ],
@@ -387,36 +355,6 @@ class DefaultInvalidatorTest extends TestCase
     #[Test]
     public function globals_urls_can_be_invalidated()
     {
-        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['http://localhost/one', 'http://localhost/two']);
-        });
-
-        $set = tap(Mockery::mock(GlobalSet::class), function ($m) {
-            $m->shouldReceive('handle')->andReturn('social');
-        });
-
-        $variables = tap(Mockery::mock(Variables::class), function ($m) use ($set) {
-            $m->shouldReceive('globalSet')->andReturn($set);
-            $m->shouldReceive('site')->andReturn(Site::default());
-        });
-
-        $invalidator = new Invalidator($cacher, [
-            'globals' => [
-                'social' => [
-                    'urls' => [
-                        '/one',
-                        '/two',
-                    ],
-                ],
-            ],
-        ]);
-
-        $this->assertNull($invalidator->invalidate($variables));
-    }
-
-    #[Test]
-    public function globals_urls_can_be_invalidated_in_a_multisite()
-    {
         $this->setSites([
             'en' => ['url' => 'http://test.com', 'locale' => 'en_US'],
             'fr' => ['url' => 'http://test.fr', 'locale' => 'fr_FR'],
@@ -425,6 +363,8 @@ class DefaultInvalidatorTest extends TestCase
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrls')->never()->with(['http://test.com/one', 'http://test.com/two']);
             $cacher->shouldReceive('invalidateUrls')->once()->with(['http://test.fr/one', 'http://test.fr/two']);
+
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/three')->once();
         });
 
         $set = tap(Mockery::mock(GlobalSet::class), function ($m) {
@@ -442,6 +382,7 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '/one',
                         '/two',
+                        'http://test.com/three',
                     ],
                 ],
             ],

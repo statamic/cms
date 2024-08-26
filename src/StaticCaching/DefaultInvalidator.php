@@ -13,6 +13,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class DefaultInvalidator implements Invalidator
 {
@@ -33,7 +34,7 @@ class DefaultInvalidator implements Invalidator
 
         if ($item instanceof Entry) {
             $this->invalidateEntryUrls($item);
-        } elseif ($item instanceof Term) {
+        } elseif ($item instanceof LocalizedTerm) {
             $this->invalidateTermUrls($item);
         } elseif ($item instanceof Nav) {
             $this->invalidateNavUrls($item);
@@ -82,23 +83,29 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateEntryUrls($entry)
     {
+        $rules = collect(Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"));
+
         $entry->descendants()->merge([$entry])->each(function ($entry) {
             if (! $entry->isRedirect() && $url = $entry->absoluteUrl()) {
                 $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
             }
         });
 
+        $rules
+            ->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))
+            ->each(fn (string $rule) => $this->cacher->invalidateUrl($rule));
+
         $this->cacher->invalidateUrls(
-            collect(Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"))->map(function (string $rule) use ($entry) {
-                return ! isset(parse_url($rule)['scheme'])
-                    ? Str::removeRight($entry->site()->url(), '/').Str::ensureLeft($rule, '/')
-                    : $rule;
-            })->values()->all()
+            $rules
+                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
+                ->map(fn (string $rule) => Str::removeRight($entry->site()->url(), '/').Str::ensureLeft($rule, '/'))->values()->all()
         );
     }
 
     protected function invalidateTermUrls($term)
     {
+        $rules = collect(Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"));
+
         if ($url = $term->absoluteUrl()) {
             $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
 
@@ -109,12 +116,14 @@ class DefaultInvalidator implements Invalidator
             });
         }
 
+        $rules
+            ->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))
+            ->each(fn (string $rule) => $this->cacher->invalidateUrl($rule));
+
         $this->cacher->invalidateUrls(
-            collect(Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"))->map(function (string $rule) use ($term) {
-                return ! isset(parse_url($rule)['scheme'])
-                    ? Str::removeRight($term->site()->url(), '/').Str::ensureLeft($rule, '/')
-                    : $rule;
-            })->values()->all()
+            $rules
+                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
+                ->map(fn (string $rule) => Str::removeRight($term->site()->url(), '/').Str::ensureLeft($rule, '/'))->values()->all()
         );
     }
 
@@ -152,12 +161,16 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateGlobalUrls($variables)
     {
+        $rules = collect(Arr::get($this->rules, "globals.{$variables->globalSet()->handle()}.urls"));
+
+        $rules
+            ->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))
+            ->each(fn (string $rule) => $this->cacher->invalidateUrl($rule));
+
         $this->cacher->invalidateUrls(
-            collect(Arr::get($this->rules, "globals.{$variables->globalSet()->handle()}.urls"))->map(function (string $rule) use ($variables) {
-                return ! isset(parse_url($rule)['scheme'])
-                    ? Str::removeRight($variables->site()->url(), '/').Str::ensureLeft($rule, '/')
-                    : $rule;
-            })->values()->all()
+            $rules
+                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
+                ->map(fn (string $rule) => Str::removeRight($variables->site()->url(), '/').Str::ensureLeft($rule, '/'))->values()->all()
         );
     }
 
