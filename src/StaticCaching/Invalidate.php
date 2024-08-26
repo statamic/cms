@@ -97,7 +97,7 @@ class Invalidate implements ShouldQueue
 
     public function invalidateNavByTree($event)
     {
-        $this->invalidator->invalidate($event->tree->structure());
+        $this->invalidator->invalidate($event->tree);
     }
 
     public function invalidateByBlueprint($event)

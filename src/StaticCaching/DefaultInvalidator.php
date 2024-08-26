@@ -8,6 +8,7 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Contracts\Structures\Nav;
+use Statamic\Contracts\Structures\NavTree;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
@@ -36,6 +37,8 @@ class DefaultInvalidator implements Invalidator
             $this->invalidateTermUrls($item);
         } elseif ($item instanceof Nav) {
             $this->invalidateNavUrls($item);
+        } elseif ($item instanceof NavTree) {
+            $this->invalidateNavTreeUrls($item);
         } elseif ($item instanceof Variables) {
             $this->invalidateGlobalUrls($item);
         } elseif ($item instanceof Collection) {
@@ -117,8 +120,33 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateNavUrls($nav)
     {
+        $rules = collect(Arr::get($this->rules, "navigation.{$nav->handle()}.urls"));
+
+        $rules
+            ->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))
+            ->each(fn (string $rule) => $this->cacher->invalidateUrl($rule));
+
+        $nav->sites()->each(function (string $site) use ($rules) {
+            $this->cacher->invalidateUrls(
+                $rules
+                    ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
+                    ->map(fn (string $rule) => Str::removeRight(Site::get($site)->url(), '/').Str::ensureLeft($rule, '/'))->values()->all()
+            );
+        });
+    }
+
+    protected function invalidateNavTreeUrls($tree)
+    {
+        $rules = collect(Arr::get($this->rules, "navigation.{$tree->structure()->handle()}.urls"));
+
+        $rules
+            ->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))
+            ->each(fn (string $rule) => $this->cacher->invalidateUrl($rule));
+
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "navigation.{$nav->handle()}.urls")
+            $rules
+                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
+                ->map(fn (string $rule) => Str::removeRight($tree->site()->url(), '/').Str::ensureLeft($rule, '/'))->values()->all()
         );
     }
 
