@@ -80,6 +80,10 @@ export default {
             this.$emit('cancel')
         },
         submit() {
+            if (this.submitting) {
+                return;
+            }
+
             this.$emit('confirm');
         }
     },
