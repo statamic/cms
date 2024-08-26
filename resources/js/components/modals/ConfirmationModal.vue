@@ -6,7 +6,7 @@
             </header>
 
             <div class="relative">
-                <div class="flex-1 px-5 py-6 text-gray dark:text-dark-150" :class="submitting ? ['opacity-50', 'select-none', 'pointer-events-none'] : []">
+                <div class="flex-1 px-5 py-6 text-gray dark:text-dark-150" :class="submitting ? ['blur-[2px]', 'opacity-75', 'select-none', 'pointer-events-none'] : []">
                     <slot name="body">
                         <p v-if="bodyText" v-text="bodyText"/>
                         <slot v-else>
