@@ -135,17 +135,21 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateCollectionUrls($collection)
     {
-        $collection->sites()->each(function (string $site) use (&$collection) {
+        $rules = collect(Arr::get($this->rules, "collections.{$collection->handle()}.urls"));
+
+        $rules
+            ->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))
+            ->each(fn (string $rule) => $this->cacher->invalidateUrl($rule));
+
+        $collection->sites()->each(function (string $site) use (&$collection, $rules) {
             if ($url = $collection->absoluteUrl($site)) {
                 $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
             }
 
             $this->cacher->invalidateUrls(
-                collect(Arr::get($this->rules, "collections.{$collection->handle()}.urls"))->map(function (string $rule) use ($site) {
-                    return ! isset(parse_url($rule)['scheme'])
-                        ? Str::removeRight(Site::get($site)->url(), '/').Str::ensureLeft($rule, '/')
-                        : $rule;
-                })->values()->all()
+                $rules
+                    ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
+                    ->map(fn (string $rule) => Str::removeRight(Site::get($site)->url(), '/').Str::ensureLeft($rule, '/'))->values()->all()
             );
         });
     }

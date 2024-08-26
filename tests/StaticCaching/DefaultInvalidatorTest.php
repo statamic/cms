@@ -92,6 +92,8 @@ class DefaultInvalidatorTest extends TestCase
 
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://test.de')->never();
             $cacher->shouldReceive('invalidateUrls')->never()->with(['http://test.de/blog/one', 'http://test.de/blog/two']);
+
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/blog/three')->once();
         });
 
         $collection = tap(Mockery::mock(Collection::class), function ($m) {
@@ -109,6 +111,7 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '/blog/one',
                         '/blog/two',
+                        'http://test.com/blog/three',
                     ],
                 ],
             ],
