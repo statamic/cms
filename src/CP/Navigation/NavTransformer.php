@@ -126,14 +126,15 @@ class NavTransformer
      *
      * @param  array  $items
      * @param  string  $parentId
+     * @param  bool  $transformingChildItems
      * @return array
      */
-    protected function transformItems($items, $parentId)
+    protected function transformItems($items, $parentId, $transformingChildItems = false)
     {
         return collect($items)
             ->map(fn ($item) => array_merge($item, ['id' => $this->transformItemId($item, $item['id'], $parentId, $items)]))
             ->keyBy('id')
-            ->map(fn ($item, $itemId) => $this->transformItem($item, $itemId, $parentId))
+            ->map(fn ($item, $itemId) => $this->transformItem($item, $itemId, $parentId, $transformingChildItems))
             ->all();
     }
 
@@ -174,11 +175,16 @@ class NavTransformer
      * @param  array  $item
      * @param  string  $itemId
      * @param  string  $parentId
+     * @param  bool  $isChild
      * @return array
      */
-    protected function transformItem($item, $itemId, $parentId)
+    protected function transformItem($item, $itemId, $parentId, $isChild = false)
     {
         $transformed = Arr::get($item, 'manipulations', []);
+
+        if ($isChild) {
+            Arr::forget($transformed, 'icon');
+        }
 
         if (! isset($transformed['action'])) {
             $transformed['action'] = '@inherit';
@@ -188,7 +194,7 @@ class NavTransformer
             $transformed['url'] = $this->transformItemUrl($transformed['url']);
         }
 
-        $children = $this->transformItems(Arr::get($item, 'children', []), $itemId);
+        $children = $this->transformItems(Arr::get($item, 'children', []), $itemId, true);
 
         $childrenHaveModifications = collect($children)
             ->reject(fn ($item) => $item['action'] === '@inherit')
@@ -403,6 +409,7 @@ class NavTransformer
         }
 
         if ($isChild) {
+            Arr::forget($item, 'icon');
             Arr::forget($item, 'children');
         }
 
