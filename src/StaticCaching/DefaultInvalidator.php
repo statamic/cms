@@ -49,9 +49,17 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateFormUrls($form)
     {
-        $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "forms.{$form->handle()}.urls")
-        );
+        $rules = collect(Arr::get($this->rules, "forms.{$form->handle()}.urls"));
+
+        $rules
+            ->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))
+            ->each(fn (string $rule) => $this->cacher->invalidateUrl($rule));
+
+        Site::all()->each(function ($site) use ($rules) {
+            $rules
+                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
+                ->each(fn (string $rule) => $this->cacher->invalidateUrl(Str::removeRight($site->url(), '/').Str::ensureLeft($rule, '/')));
+        });
     }
 
     protected function invalidateAssetUrls($asset)

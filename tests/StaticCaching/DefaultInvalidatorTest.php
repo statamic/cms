@@ -398,8 +398,19 @@ class DefaultInvalidatorTest extends TestCase
     #[Test]
     public function form_urls_can_be_invalidated()
     {
+        $this->setSites([
+            'en' => ['url' => 'http://test.com', 'locale' => 'en_US'],
+            'fr' => ['url' => 'http://test.fr', 'locale' => 'fr_FR'],
+        ]);
+
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two']);
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/one')->once();
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/two')->once();
+
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.fr/one')->once();
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.fr/two')->once();
+
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/three')->once();
         });
 
         $form = tap(Mockery::mock(Form::class), function ($m) {
@@ -412,6 +423,7 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '/one',
                         '/two',
+                        'http://test.com/three',
                     ],
                 ],
             ],
