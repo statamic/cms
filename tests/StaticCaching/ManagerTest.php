@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
@@ -56,5 +57,75 @@ class ManagerTest extends TestCase
         Cache::shouldReceive('forget')->with('nocache::urls')->once();
 
         StaticCache::flush();
+    }
+
+    #[Test]
+    public function it_gets_the_current_url()
+    {
+        $request = Request::create('http://example.com/test', 'GET', [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertEquals('http://example.com/test?foo=bar', StaticCache::currentUrl($request));
+    }
+
+    #[Test]
+    public function it_gets_the_current_url_with_query_strings_disabled()
+    {
+        config()->set('statamic.static_caching.ignore_query_strings', true);
+
+        $request = Request::create('http://example.com/test', 'GET', [
+            'foo' => 'bar',
+        ]);
+
+        $this->assertEquals('http://example.com/test', StaticCache::currentUrl($request));
+    }
+
+    #[Test]
+    public function it_gets_the_current_url_with_query_string_sorting()
+    {
+        $this->markTestIncomplete("We might not actually need this config option. It looks like Symfony's Request::normalizeQueryString() method already sorts query strings using ksort().");
+
+        config()->set('statamic.static_caching.sort_query_strings', true);
+
+        $request = Request::create('http://example.com/test', 'GET', [
+            'foo' => 'bar',
+            'baz' => 'qux',
+            'quux' => 'corge',
+        ]);
+
+        $this->assertEquals('http://example.com/test?baz=qux&foo=bar&quux=corge', StaticCache::currentUrl($request));
+    }
+
+    #[Test]
+    public function it_gets_the_current_url_with_allowed_query_parameters()
+    {
+        config()->set('statamic.static_caching.allowed_query_strings', [
+            'foo', 'quux',
+        ]);
+
+        $request = Request::create('http://example.com/test', 'GET', [
+            'foo' => 'bar',
+            'baz' => 'qux',
+            'quux' => 'corge',
+        ]);
+
+        $this->assertEquals('http://example.com/test?foo=bar&quux=corge', StaticCache::currentUrl($request));
+    }
+
+    #[Test]
+    public function it_gets_the_current_url_with_disallowed_query_parameters()
+    {
+        config()->set('statamic.static_caching.disallowed_query_strings', [
+            'quux',
+        ]);
+
+        $request = Request::create('http://example.com/test', 'GET', [
+            'foo' => 'bar',
+            'baz' => 'qux',
+            'quux' => 'corge',
+        ]);
+
+        $this->assertEquals('http://example.com/test?baz=qux&foo=bar', StaticCache::currentUrl($request));
     }
 }

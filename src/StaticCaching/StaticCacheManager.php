@@ -46,7 +46,7 @@ class StaticCacheManager extends Manager
     {
         $url = $request->getUri();
 
-        if (config('statamic.static_caching.ignore_query_strings')) {
+        if (config('statamic.static_caching.ignore_query_strings', false)) {
             $url = explode('?', $url)[0];
         }
 

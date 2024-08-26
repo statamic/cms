@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Tests\TestCase;
 
@@ -38,21 +39,12 @@ class CacherTest extends TestCase
     {
         $cacher = $this->cacher();
 
-        $request = Request::create('http://example.com/test', 'GET', [
-            'foo' => 'bar',
-        ]);
+        $request = Request::create('http://example.com/test', 'GET');
 
-        $this->assertEquals('http://example.com/test?foo=bar', $cacher->getUrl($request));
-    }
-
-    #[Test]
-    public function gets_a_url_with_query_strings_disabled()
-    {
-        $cacher = $this->cacher(['ignore_query_strings' => true]);
-
-        $request = Request::create('http://example.com/test', 'GET', [
-            'foo' => 'bar',
-        ]);
+        StaticCache::shouldReceive('currentUrl')
+            ->with($request)
+            ->andReturn('http://example.com/test')
+            ->once();
 
         $this->assertEquals('http://example.com/test', $cacher->getUrl($request));
     }
