@@ -87,7 +87,6 @@ export default {
     },
 
     created() {
-        this.$keys.bindGlobal('enter', this.submit)
         this.$keys.bindGlobal('esc', this.cancel)
     },
 
