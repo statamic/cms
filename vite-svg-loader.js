@@ -51,9 +51,7 @@ module.exports = function svgLoader (options = {}) {
         transformAssetUrls: false
       })
 
-      const template = code instanceof Promise ? await code : code;
-
-      return `${template}\nexport default { render: render }`
+      return `${code}\nexport default { render: render }`
     }
   }
 }
