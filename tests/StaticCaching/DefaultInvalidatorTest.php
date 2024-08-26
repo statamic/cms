@@ -18,7 +18,6 @@ use Statamic\Globals\Variables;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 use Statamic\Structures\NavTree;
-use Statamic\Structures\Tree;
 use Statamic\Taxonomies\LocalizedTerm;
 use Tests\TestCase;
 

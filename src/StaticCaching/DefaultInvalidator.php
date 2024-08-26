@@ -9,7 +9,6 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\NavTree;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
