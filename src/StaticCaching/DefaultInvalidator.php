@@ -26,10 +26,11 @@ class DefaultInvalidator implements Invalidator
         $this->rules = $rules;
     }
 
-    public function invalidate($item)
+    public function invalidate($item): void
     {
         if ($this->rules === 'all') {
-            return $this->cacher->flush();
+            $this->cacher->flush();
+            return;
         }
 
         if ($item instanceof Entry) {
@@ -53,7 +54,7 @@ class DefaultInvalidator implements Invalidator
         }
     }
 
-    protected function invalidateFormUrls($form)
+    protected function invalidateFormUrls($form): void
     {
         $rules = collect(Arr::get($this->rules, "forms.{$form->handle()}.urls"));
 
@@ -68,7 +69,7 @@ class DefaultInvalidator implements Invalidator
         });
     }
 
-    protected function invalidateAssetUrls($asset)
+    protected function invalidateAssetUrls($asset): void
     {
         $rules = collect(Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls"));
 
@@ -83,7 +84,7 @@ class DefaultInvalidator implements Invalidator
         });
     }
 
-    protected function invalidateEntryUrls($entry)
+    protected function invalidateEntryUrls($entry): void
     {
         $rules = collect(Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"));
 
@@ -104,7 +105,7 @@ class DefaultInvalidator implements Invalidator
         );
     }
 
-    protected function invalidateTermUrls($term)
+    protected function invalidateTermUrls($term): void
     {
         $rules = collect(Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"));
 
@@ -129,7 +130,7 @@ class DefaultInvalidator implements Invalidator
         );
     }
 
-    protected function invalidateNavUrls($nav)
+    protected function invalidateNavUrls($nav): void
     {
         $rules = collect(Arr::get($this->rules, "navigation.{$nav->handle()}.urls"));
 
@@ -146,7 +147,7 @@ class DefaultInvalidator implements Invalidator
         });
     }
 
-    protected function invalidateNavTreeUrls($tree)
+    protected function invalidateNavTreeUrls($tree): void
     {
         $rules = collect(Arr::get($this->rules, "navigation.{$tree->structure()->handle()}.urls"));
 
@@ -161,7 +162,7 @@ class DefaultInvalidator implements Invalidator
         );
     }
 
-    protected function invalidateGlobalUrls($variables)
+    protected function invalidateGlobalUrls($variables): void
     {
         $rules = collect(Arr::get($this->rules, "globals.{$variables->globalSet()->handle()}.urls"));
 
@@ -176,7 +177,7 @@ class DefaultInvalidator implements Invalidator
         );
     }
 
-    protected function invalidateCollectionUrls($collection)
+    protected function invalidateCollectionUrls($collection): void
     {
         $rules = collect(Arr::get($this->rules, "collections.{$collection->handle()}.urls"));
 
@@ -197,7 +198,7 @@ class DefaultInvalidator implements Invalidator
         });
     }
 
-    protected function invalidateCollectionTreeUrls($tree)
+    protected function invalidateCollectionTreeUrls($tree): void
     {
         $rules = collect(Arr::get($this->rules, "collections.{$tree->collection()->handle()}.urls"));
 
