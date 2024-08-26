@@ -56,9 +56,17 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateAssetUrls($asset)
     {
-        $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls")
-        );
+        $rules = collect(Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls"));
+
+        $rules
+            ->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))
+            ->each(fn (string $rule) => $this->cacher->invalidateUrl($rule));
+
+        Site::all()->each(function ($site) use ($rules) {
+            $rules
+                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
+                ->each(fn (string $rule) => $this->cacher->invalidateUrl(Str::removeRight($site->url(), '/').Str::ensureLeft($rule, '/')));
+        });
     }
 
     protected function invalidateEntryUrls($entry)
@@ -134,7 +142,12 @@ class DefaultInvalidator implements Invalidator
         });
     }
 
-    private function splitUrlAndDomain(string $url)
+    private function isAbsoluteUrl(string $url): bool
+    {
+        return isset(parse_url($url)['scheme']);
+    }
+
+    private function splitUrlAndDomain(string $url): array
     {
         $parsed = parse_url($url);
 

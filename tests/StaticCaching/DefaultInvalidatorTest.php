@@ -36,8 +36,19 @@ class DefaultInvalidatorTest extends TestCase
     #[Test]
     public function assets_can_trigger_url_invalidation()
     {
+        $this->setSites([
+            'en' => ['url' => 'http://test.com', 'locale' => 'en_US'],
+            'fr' => ['url' => 'http://test.fr', 'locale' => 'fr_FR'],
+        ]);
+
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/page/one', '/page/two']);
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/page/one')->once();
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/page/two')->once();
+
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.fr/page/one')->once();
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.fr/page/two')->once();
+
+            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/page/three')->once();
         });
 
         $container = tap(Mockery::mock(AssetContainer::class), function ($m) {
@@ -54,6 +65,7 @@ class DefaultInvalidatorTest extends TestCase
                     'urls' => [
                         '/page/one',
                         '/page/two',
+                        'http://test.com/page/three',
                     ],
                 ],
             ],
