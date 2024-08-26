@@ -92,7 +92,7 @@ class Invalidate implements ShouldQueue
 
     public function invalidateCollectionByTree($event)
     {
-        $this->invalidator->invalidate($event->tree->collection());
+        $this->invalidator->invalidate($event->tree);
     }
 
     public function invalidateNavByTree($event)

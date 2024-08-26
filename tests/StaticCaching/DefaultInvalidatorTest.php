@@ -17,7 +17,9 @@ use Statamic\Facades\Site;
 use Statamic\Globals\Variables;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
+use Statamic\Structures\CollectionTree;
 use Statamic\Structures\NavTree;
+use Statamic\Structures\Structure;
 use Statamic\Taxonomies\LocalizedTerm;
 use Tests\TestCase;
 
@@ -181,6 +183,88 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $this->assertNull($invalidator->invalidate($collection));
+    }
+
+    #[Test]
+    public function collection_urls_can_be_invalidated_by_a_tree()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with(['http://localhost/blog/one', 'http://localhost/blog/two'])->once();
+            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/blog/three')->once();
+        });
+
+        $collection = tap(Mockery::mock(Collection::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('blog');
+            $m->shouldReceive('sites')->andReturn(collect(['en']));
+        });
+
+        $structure = tap(Mockery::mock(Structure::class), function ($m) use ($collection) {
+            $m->shouldReceive('collection')->andReturn($collection);
+        });
+
+        $tree = tap(Mockery::mock(CollectionTree::class), function ($m) use ($collection, $structure) {
+            $m->shouldReceive('structure')->andReturn($structure);
+            $m->shouldReceive('collection')->andReturn($collection);
+            $m->shouldReceive('site')->andReturn(Site::default());
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                        'http://localhost/blog/three',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($tree));
+    }
+
+    #[Test]
+    public function collection_urls_can_be_invalidated_by_a_tree_in_a_multisite()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://test.com', 'locale' => 'en_US'],
+            'fr' => ['url' => 'http://test.fr', 'locale' => 'fr_FR'],
+        ]);
+
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/blog/one', 'http://test.fr/blog/two'])->once();
+            $cacher->shouldReceive('invalidateUrls')->with(['http://test.com/blog/one', 'http://test.com/blog/two'])->never();
+            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/blog/three')->once();
+        });
+
+        $collection = tap(Mockery::mock(Collection::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('blog');
+            $m->shouldReceive('sites')->andReturn(collect(['en']));
+        });
+
+        $structure = tap(Mockery::mock(Structure::class), function ($m) use ($collection) {
+            $m->shouldReceive('collection')->andReturn($collection);
+        });
+
+        $tree = tap(Mockery::mock(CollectionTree::class), function ($m) use ($collection, $structure) {
+            $m->shouldReceive('structure')->andReturn($structure);
+            $m->shouldReceive('collection')->andReturn($collection);
+            $m->shouldReceive('site')->andReturn(Site::get('fr'));
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                        'http://localhost/blog/three',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($tree));
     }
 
     #[Test]

@@ -10,6 +10,7 @@ use Statamic\Contracts\Globals\Variables;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\NavTree;
 use Statamic\Facades\Site;
+use Statamic\Structures\CollectionTree;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Taxonomies\LocalizedTerm;
@@ -43,6 +44,8 @@ class DefaultInvalidator implements Invalidator
             $this->invalidateGlobalUrls($item);
         } elseif ($item instanceof Collection) {
             $this->invalidateCollectionUrls($item);
+        } elseif ($item instanceof CollectionTree) {
+            $this->invalidateCollectionTreeUrls($item);
         } elseif ($item instanceof Asset) {
             $this->invalidateAssetUrls($item);
         } elseif ($item instanceof Form) {
@@ -192,6 +195,21 @@ class DefaultInvalidator implements Invalidator
                     ->map(fn (string $rule) => Str::removeRight(Site::get($site)->url(), '/').Str::ensureLeft($rule, '/'))->values()->all()
             );
         });
+    }
+
+    protected function invalidateCollectionTreeUrls($tree)
+    {
+        $rules = collect(Arr::get($this->rules, "collections.{$tree->collection()->handle()}.urls"));
+
+        $rules
+            ->filter(fn (string $rule) => $this->isAbsoluteUrl($rule))
+            ->each(fn (string $rule) => $this->cacher->invalidateUrl($rule));
+
+        $this->cacher->invalidateUrls(
+            $rules
+                ->reject(fn (string $rule) => $this->isAbsoluteUrl($rule))
+                ->map(fn (string $rule) => Str::removeRight($tree->site()->url(), '/').Str::ensureLeft($rule, '/'))->values()->all()
+        );
     }
 
     private function isAbsoluteUrl(string $url): bool
