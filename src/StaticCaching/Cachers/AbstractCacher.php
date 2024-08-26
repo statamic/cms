@@ -10,7 +10,6 @@ use Statamic\Facades\Site;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 abstract class AbstractCacher implements Cacher
