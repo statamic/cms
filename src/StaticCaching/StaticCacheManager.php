@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Cache\Repository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Events\StaticCacheCleared;
 use Statamic\Facades\Site;
@@ -11,6 +12,7 @@ use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\Cachers\Writer;
 use Statamic\StaticCaching\NoCache\DatabaseRegion;
+use Statamic\Support\Arr;
 use Statamic\Support\Manager;
 
 class StaticCacheManager extends Manager
@@ -38,6 +40,38 @@ class StaticCacheManager extends Manager
     public function createApplicationDriver(array $config)
     {
         return new ApplicationCacher($this->app[Repository::class], $config);
+    }
+
+    public function currentUrl(Request $request): string
+    {
+        $url = $request->getUri();
+
+        if (config('statamic.static_caching.ignore_query_strings')) {
+            $url = explode('?', $url)[0];
+        }
+
+        $parts = parse_url($url);
+
+        if (isset($parts['query'])) {
+            parse_str($parts['query'], $query);
+
+            if (config('statamic.static_caching.sort_query_strings', false)) {
+                $query = Arr::sort($query);
+            }
+
+            if ($allowedQueryStrings = config('statamic.static_caching.allowed_query_strings')) {
+                $query = array_intersect_key($query, array_flip($allowedQueryStrings));
+            }
+
+            if ($disallowedQueryStrings = config('statamic.static_caching.disallowed_query_strings')) {
+                $disallowedQueryStrings = array_flip($disallowedQueryStrings);
+                $query = array_diff_key($query, $disallowedQueryStrings);
+            }
+
+            $url = $parts['scheme'].'://'.$parts['host'].$parts['path'].'?'.http_build_query($query);
+        }
+
+        return $url;
     }
 
     public function cacheStore()

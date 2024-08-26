@@ -7,8 +7,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Site;
+use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 abstract class AbstractCacher implements Cacher
@@ -137,13 +139,7 @@ abstract class AbstractCacher implements Cacher
      */
     public function getUrl(Request $request)
     {
-        $url = $request->getUri();
-
-        if ($this->config('ignore_query_strings')) {
-            $url = explode('?', $url)[0];
-        }
-
-        return $url;
+        return StaticCache::currentUrl($request);
     }
 
     /**
