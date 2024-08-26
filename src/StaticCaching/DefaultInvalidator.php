@@ -30,6 +30,7 @@ class DefaultInvalidator implements Invalidator
     {
         if ($this->rules === 'all') {
             $this->cacher->flush();
+
             return;
         }
 
