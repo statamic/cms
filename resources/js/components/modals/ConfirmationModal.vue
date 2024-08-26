@@ -15,7 +15,7 @@
                     </slot>
                 </div>
                 <div v-if="submitting" class="absolute inset-0 flex items-center justify-center">
-                    <loading-graphic text="" :size="42"  />
+                    <loading-graphic text="" />
                 </div>
             </div>
 
@@ -66,7 +66,6 @@ export default {
     data() {
         return {
             escBinding: null,
-            enterBinding: null,
         }
     },
 
