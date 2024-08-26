@@ -84,8 +84,6 @@ class ManagerTest extends TestCase
     #[Test]
     public function it_gets_the_current_url_with_query_string_sorting()
     {
-        $this->markTestIncomplete("We might not actually need this config option. It looks like Symfony's Request::normalizeQueryString() method already sorts query strings using ksort().");
-
         config()->set('statamic.static_caching.sort_query_strings', true);
 
         $request = Request::create('http://example.com/test', 'GET', [
