@@ -55,10 +55,6 @@ class StaticCacheManager extends Manager
         if (isset($parts['query'])) {
             parse_str($parts['query'], $query);
 
-            if (config('statamic.static_caching.sort_query_strings', false)) {
-                $query = Arr::sort($query, fn ($value, $key) => $key);
-            }
-
             if ($allowedQueryStrings = config('statamic.static_caching.allowed_query_strings')) {
                 $query = array_intersect_key($query, array_flip($allowedQueryStrings));
             }
