@@ -126,6 +126,7 @@ export default {
             editingSection: false,
             editingField: null,
             handleSyncedWithDisplay: false,
+            enterBinding: null,
         }
     },
 
@@ -158,6 +159,15 @@ export default {
             if (this.editingSection && this.handleSyncedWithDisplay) {
                 this.editingSection.handle = snake_case(display);
             }
+        },
+
+        editingSection(editingSection) {
+            if (! editingSection) {
+                this.enterBinding = null;
+                return;
+            }
+
+            this.enterBinding = this.$keys.bind('enter', this.editConfirmed);
         }
 
     },
