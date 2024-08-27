@@ -17,7 +17,7 @@ class Controller extends BaseController
         $this->tokenData = session('statamic:protect:password.tokens.'.request('token'));
 
         $site = Site::findByUrl($this->getUrl());
-        
+
         app()->setLocale($site->shortLocale());
 
         return View::make('statamic::auth.protect.password');
