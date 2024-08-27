@@ -5,6 +5,7 @@ namespace Tests\StaticCaching;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
@@ -98,18 +99,22 @@ class ManagerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_current_url_with_disallowed_query_parameters()
+    #[DataProvider('disallowedQueryParametersProvider')]
+    public function it_gets_the_current_url_with_disallowed_query_parameters(array $disallowed, string $url, array $query, string $expected)
     {
-        config()->set('statamic.static_caching.disallowed_query_strings', [
-            'quux',
-        ]);
+        config()->set('statamic.static_caching.disallowed_query_strings', $disallowed);
 
-        $request = Request::create('http://example.com/test', 'GET', [
-            'foo' => 'bar',
-            'baz' => 'qux',
-            'quux' => 'corge',
-        ]);
+        $request = Request::create($url, 'GET', $query);
 
-        $this->assertEquals('http://example.com/test?baz=qux&foo=bar', StaticCache::currentUrl($request));
+        $this->assertEquals($expected, StaticCache::currentUrl($request));
+    }
+
+    public static function disallowedQueryParametersProvider()
+    {
+        return [
+            [[], 'http://example.com/test', ['foo' => 'bar'], 'http://example.com/test?foo=bar'],
+            [['quux'], 'http://example.com/test', ['quux' => 'corge'], 'http://example.com/test'],
+            [['quux'], 'http://example.com/test', ['foo' => 'bar', 'baz' => 'qux', 'quux' => 'corge'], 'http://example.com/test?baz=qux&foo=bar'],
+        ];
     }
 }
