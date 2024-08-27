@@ -63,6 +63,14 @@ class ManagerTest extends TestCase
     #[Test]
     public function it_gets_the_current_url()
     {
+        $request = Request::create('http://example.com/test', 'GET');
+
+        $this->assertEquals('http://example.com/test', StaticCache::currentUrl($request));
+    }
+
+    #[Test]
+    public function it_gets_the_current_url_with_query_parameters()
+    {
         $request = Request::create('http://example.com/test', 'GET', [
             'foo' => 'bar',
         ]);
