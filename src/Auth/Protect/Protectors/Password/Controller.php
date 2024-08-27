@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth\Protect\Protectors\Password;
 
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller as BaseController;
 use Statamic\View\View;
 
@@ -12,6 +13,10 @@ class Controller extends BaseController
 
     public function show()
     {
+        $site = Site::findByUrl(request('url'));
+
+        app()->setLocale($site->shortLocale());
+
         return View::make('statamic::auth.protect.password');
     }
 
