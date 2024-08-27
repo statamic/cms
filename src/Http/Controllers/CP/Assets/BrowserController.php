@@ -145,8 +145,6 @@ class BrowserController extends CpController
 
         if ($request->sort) {
             $query->orderBy($request->sort, $request->order ?? 'asc');
-        } else {
-            $query->orderBy($container->sortField(), $container->sortDirection());
         }
 
         $this->applyQueryScopes($query, $request->all());
