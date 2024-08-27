@@ -47,7 +47,7 @@ class PasswordProtector extends Protector
 
     protected function redirectToPasswordForm()
     {
-        $url = $this->getPasswordFormUrl().'?token='.$this->generateToken().'&url='.urlencode($this->url);
+        $url = $this->getPasswordFormUrl().'?token='.$this->generateToken();
 
         abort(redirect($url));
     }
