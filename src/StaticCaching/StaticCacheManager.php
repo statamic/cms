@@ -64,7 +64,11 @@ class StaticCacheManager extends Manager
                 $query = array_diff_key($query, $disallowedQueryStrings);
             }
 
-            $url = $parts['scheme'].'://'.$parts['host'].$parts['path'].'?'.http_build_query($query);
+            $url = $parts['scheme'].'://'.$parts['host'].$parts['path'];
+
+            if ($query) {
+                $url .= '?'.http_build_query($query);
+            }
         }
 
         return $url;
