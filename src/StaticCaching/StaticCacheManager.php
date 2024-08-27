@@ -12,7 +12,6 @@ use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\Cachers\Writer;
 use Statamic\StaticCaching\NoCache\DatabaseRegion;
-use Statamic\Support\Arr;
 use Statamic\Support\Manager;
 
 class StaticCacheManager extends Manager
