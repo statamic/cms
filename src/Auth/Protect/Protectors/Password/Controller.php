@@ -14,11 +14,12 @@ class Controller extends BaseController
     public function show()
     {
         $this->password = request('password');
-        $this->tokenData = session('statamic:protect:password.tokens.'.request('token'));
 
-        $site = Site::findByUrl($this->getUrl());
+        if ($this->tokenData = session('statamic:protect:password.tokens.'.request('token'))) {
+            $site = Site::findByUrl($this->getUrl());
 
-        app()->setLocale($site->shortLocale());
+            app()->setLocale($site->shortLocale());
+        }
 
         return View::make('statamic::auth.protect.password');
     }
