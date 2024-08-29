@@ -248,7 +248,7 @@ class EntriesController extends CpController
                         ->save();
                 });
 
-                $values->forget('parent');
+                $entry->remove('parent');
             }
         }
 
