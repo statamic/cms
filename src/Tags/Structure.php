@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use Statamic\Contracts\Structures\Structure as StructureContract;
+use Statamic\Data\BulkAugmentor;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\NavigationNotFoundException;
 use Statamic\Facades\Collection;
@@ -120,11 +121,9 @@ class Structure extends Tags
 
     public function toArray($tree, $parent = null, $depth = 1)
     {
-        $pages = collect($tree)->map(function ($item, $index) use ($parent, $depth, $tree) {
+        $pages = BulkAugmentor::tree($tree, $this->params->explode('select'))->map(function ($item, $data, $index) use ($depth, $tree, $parent) {
             $page = $item['page'];
-            $keys = $this->getQuerySelectKeys($page);
-            $data = $page->toAugmentedArray($keys);
-            $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
+            $children = empty($item['children']) ? [] : $this->toArray($item['children'], $page, $depth + 1);
 
             $url = $page->urlWithoutRedirect();
             $absoluteUrl = $page->absoluteUrl();

@@ -8,15 +8,17 @@
 
 @include('statamic::partials.outside-logo')
 
-<div class="card auth-card mx-auto">
-    <login
-        inline-template
-        :show-email-login="!{{ $str::bool($oauth) }}"
-        :has-error="{{ $str::bool(count($errors) > 0) }}"
-        :web-authn-routes=@json($webauthnRoutes)
-    >
+<div class="max-w-xs rounded shadow-lg flex items-center justify-center relative mx-auto">
+    <div class="outside-shadow absolute inset-0"></div>
+    <div class="card auth-card">
+        <login
+            inline-template
+            :show-email-login="!{{ $str::bool($oauth) }}"
+            :has-error="{{ $str::bool(count($errors) > 0) }}"
+            :web-authn-routes=@json($webauthnRoutes)
+        >
         <div>
-            <form method="POST" class="email-login select-none" @if ($oauth) v-cloak @endif>
+            <form method="POST" v-show="showEmailLogin" class="email-login select-none" @if ($oauth) v-cloak @endif @submit="busy = true">
                 {!! csrf_field() !!}
 
                 <input type="hidden" name="referer" value="{{ $referer }}" />
@@ -33,17 +35,16 @@
                         <input type="password" class="input-text input-text" name="password" id="input-password">
                         @if ($hasError('password'))<div class="text-red-500 text-xs mt-2">{{ $errors->first('password') }}</div>@endif
                     </div>
-
                     <div class="flex justify-between items-center">
                         <label for="remember-me" class="flex items-center cursor-pointer">
                             <input type="checkbox" name="remember" id="remember-me">
                             <span class="rtl:mr-2 ltr:ml-2">{{ __('Remember me') }}</span>
                         </label>
-                        <button type="submit" class="btn-primary">{{ __('Log in') }}</button>
+                        <button type="submit" class="btn-primary" :disabled="busy">{{ __('Log in') }}</button>
                     </div>
                 @endif
 
-                @if ($webAuthnEnabled || $oauth)
+                 @if ($webAuthnEnabled || $oauth)
                     @if ($emailLoginEnabled)
                         <div class="text-center text-sm text-gray-700 py-6" v-show="showWebAuthn || {{ $oauth ? 'true' : 'false' }}">&mdash; {{ __('or') }} &mdash;</div>
                     @endif
@@ -68,14 +69,14 @@
                         @endif
                     </div>
                 @endif
+
             </form>
         </div>
-
-    </login>
+        </login>
+    </div>
 </div>
-
 @if ($emailLoginEnabled)
-    <div class="w-full text-center mt-4">
+    <div class="w-full text-center mt-4 dark:mt-6">
         <a href="{{ cp_route('password.request') }}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
             {{ __('Forgot password?') }}
         </a>

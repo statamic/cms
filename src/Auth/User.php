@@ -105,16 +105,28 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function editUrl()
     {
-        return cp_route('users.edit', $this->id());
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return cp_route('users.edit', $id);
     }
 
     public function updateUrl()
     {
-        return cp_route('users.update', $this->id());
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return cp_route('users.update', $id);
     }
 
     public function apiUrl()
     {
+        if (! $id = $this->id()) {
+            return null;
+        }
+
         return Statamic::apiRoute('users.show', $this->id());
     }
 
@@ -334,6 +346,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     public function setPreferredLocale($locale)
     {
         return $this->setPreference('locale', $locale);
+    }
+
+    public function preferredTheme()
+    {
+        return $this->getPreference('theme') ?? 'auto';
     }
 
     public function getCpSearchResultBadge(): string

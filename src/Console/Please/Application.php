@@ -3,8 +3,8 @@
 namespace Statamic\Console\Please;
 
 use Illuminate\Console\Application as ConsoleApplication;
-use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 class Application extends ConsoleApplication

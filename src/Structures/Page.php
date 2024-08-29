@@ -10,6 +10,7 @@ use JsonSerializable;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Data\BulkAugmentable;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Routing\UrlBuilder;
@@ -24,7 +25,7 @@ use Statamic\Facades\URL;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Str;
 
-class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializable, Protectable, ResolvesValuesContract, Responsable
+class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entry, JsonSerializable, Protectable, ResolvesValuesContract, Responsable
 {
     use ContainsSupplementalData, ForwardsCalls, HasAugmentedInstance, ResolvesValues, TracksQueriedColumns;
 
@@ -39,6 +40,8 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
     protected $title;
     protected $depth;
     protected $data = [];
+    protected $augmentationReferenceKey;
+    protected $setAugmentationReferenceKey = false;
     private $absoluteUrl;
     private $absoluteUrlWithoutRedirect;
     private $blueprint;
@@ -49,6 +52,21 @@ class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializab
     public function __construct()
     {
         $this->supplements = collect();
+    }
+
+    public function getBulkAugmentationReferenceKey(): ?string
+    {
+        if ($this->setAugmentationReferenceKey) {
+            return $this->augmentationReferenceKey;
+        }
+
+        $this->setAugmentationReferenceKey = true;
+
+        if ($entry = $this->entry()) {
+            return $this->augmentationReferenceKey = 'Page::'.$entry->getBulkAugmentationReferenceKey();
+        }
+
+        return $this->augmentationReferenceKey = 'Page::'.$this->id();
     }
 
     public function setUrl($url)

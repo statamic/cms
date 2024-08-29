@@ -4,6 +4,7 @@ namespace Statamic\Tags\Concerns;
 
 use Closure;
 use Illuminate\Support\MessageBag;
+use Statamic\Fields\Field;
 use Statamic\Support\Str;
 
 trait RendersForms
@@ -135,7 +136,12 @@ trait RendersForms
         $default = $field->value() ?? $field->defaultValue();
         $value = $old === $missing ? $default : $old;
 
-        $data = array_merge($field->toArray(), [
+        $configDefaults = Field::commonFieldOptions()->all()
+            ->merge($field->fieldtype()->configFields()->all())
+            ->map->get('default')
+            ->filter()->all();
+
+        $data = array_merge($configDefaults, $field->toArray(), [
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),

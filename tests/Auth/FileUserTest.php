@@ -3,6 +3,8 @@
 namespace Tests\Auth;
 
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Passkey;
 use Statamic\Auth\File\User;
 use Statamic\Contracts\Auth\Role as RoleContract;
@@ -13,7 +15,7 @@ use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group user */
+#[Group('user')]
 class FileUserTest extends TestCase
 {
     use PermissibleContractTests, PreventSavingStacheItemsToDisk, UserContractTests;
@@ -28,13 +30,13 @@ class FileUserTest extends TestCase
         return $this->makeUser();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_path()
     {
         $this->assertEquals($this->fakeStacheDirectory.'/users/john@example.com.yaml', $this->user()->path());
     }
 
-    /** @test */
+    #[Test]
     public function hashed_password_gets_added_as_the_password()
     {
         $user = $this->user();
@@ -48,7 +50,7 @@ class FileUserTest extends TestCase
         $this->assertFalse($user->has('password_hash'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_file_contents_for_saving()
     {
         Hash::shouldReceive('make')->with('secret')->andReturn('hashed-secret');
@@ -75,7 +77,7 @@ class FileUserTest extends TestCase
         ], Arr::removeNullValues($user->fileData()));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_permissions_from_a_cache()
     {
         $directRole = $this->mock(RoleContract::class);
@@ -123,7 +125,7 @@ class FileUserTest extends TestCase
         $this->assertEquals($expectedPermissions, $user->permissions()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_passkey()
     {
         $user = $this->createPermissible();
@@ -144,7 +146,7 @@ class FileUserTest extends TestCase
         $this->assertSame($user->passkeys()->first(), $passkey);
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_a_passkey()
     {
         $user = $this->createPermissible();

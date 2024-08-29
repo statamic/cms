@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -15,11 +17,8 @@ class DeslugifyTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider slackingSlugsProvider
-     */
+    #[Test]
+    #[DataProvider('slackingSlugsProvider')]
     public function it_replaces_all_hyphens_and_underscores_with_spaces($expected, $input): void
     {
         $modified = $this->modify($input);

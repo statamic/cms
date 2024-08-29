@@ -5,6 +5,7 @@ namespace Tests\Tags;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 
@@ -36,14 +37,14 @@ class RedirectTest extends TestCase
         return (string) Parse::template($tag, $data);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_http_response_exception()
     {
         $this->expectException(HttpResponseException::class);
         $this->tag('{{ redirect to="/foo" }}');
     }
 
-    /** @test */
+    #[Test]
     public function it_redirects_to()
     {
         try {
@@ -55,7 +56,7 @@ class RedirectTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_redirects_to_route()
     {
         try {
@@ -66,7 +67,7 @@ class RedirectTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_redirects_to_route_with_query_params()
     {
         try {

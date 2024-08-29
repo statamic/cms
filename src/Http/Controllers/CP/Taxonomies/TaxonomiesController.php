@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
@@ -59,7 +60,7 @@ class TaxonomiesController extends CpController
             ->map(function ($blueprint) {
                 return [
                     'handle' => $blueprint->handle(),
-                    'title' => $blueprint->title(),
+                    'title' => __($blueprint->title()),
                 ];
             })->values();
 
@@ -80,6 +81,7 @@ class TaxonomiesController extends CpController
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
+            'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
         ];
 
         if ($taxonomy->queryTerms()->count() === 0) {
@@ -254,7 +256,7 @@ class TaxonomiesController extends CpController
                         'type' => 'html',
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <span class="rtl:ml-4 ltr:mr-4">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <span class="rtl:ml-4 ltr:mr-4">'.$taxonomy->termBlueprints()->map(fn ($bp) => __($bp->title()))->join(', ').'</span>'.
                             '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],

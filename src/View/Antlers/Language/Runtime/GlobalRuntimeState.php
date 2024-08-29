@@ -192,6 +192,7 @@ class GlobalRuntimeState
     public static $prefixState = [];
 
     public static $containsLayout = false;
+    public static $renderingLayout = false;
     public static $shareVariablesTemplateTrigger = '';
     public static $layoutVariables = [];
 

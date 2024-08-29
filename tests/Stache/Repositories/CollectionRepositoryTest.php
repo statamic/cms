@@ -3,6 +3,7 @@
 namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Collection;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection as CollectionAPI;
@@ -34,7 +35,7 @@ class CollectionRepositoryTest extends TestCase
         $this->repo = new CollectionRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_collections()
     {
         $collections = $this->repo->all();
@@ -48,7 +49,7 @@ class CollectionRepositoryTest extends TestCase
         $this->assertEquals(['Alphabetical', 'Blog', 'Numeric', 'Pages'], $ordered->map->title()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_collection_by_handle()
     {
         tap($this->repo->findByHandle('alphabetical'), function ($collection) {
@@ -78,7 +79,7 @@ class CollectionRepositoryTest extends TestCase
         $this->assertNull($this->repo->findByHandle('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_collection_to_the_stache_and_to_a_file()
     {
         $collection = CollectionAPI::make('new');
@@ -93,7 +94,7 @@ class CollectionRepositoryTest extends TestCase
         @unlink($this->directory.'/new.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_additional_preview_targets()
     {
         $collection1 = (new Collection)->handle('test');
@@ -118,7 +119,7 @@ class CollectionRepositoryTest extends TestCase
         $this->assertNotEquals($previewTargetsTest->all(), $previewTargetsTest2->all());
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_gets_collection()
     {
         $collection = $this->repo->findOrFail('blog');
@@ -127,7 +128,7 @@ class CollectionRepositoryTest extends TestCase
         $this->assertEquals('Blog', $collection->title());
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_throws_exception_when_collection_does_not_exist()
     {
         $this->expectException(CollectionNotFoundException::class);

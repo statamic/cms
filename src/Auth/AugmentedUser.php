@@ -113,4 +113,9 @@ class AugmentedUser extends AbstractAugmented
     {
         return $this->data->preferredLocale();
     }
+
+    public function notifications()
+    {
+        return $this->data->get('notifications');
+    }
 }

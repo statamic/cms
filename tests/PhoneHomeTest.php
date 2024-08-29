@@ -2,15 +2,15 @@
 
 namespace Tests;
 
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Licensing\Outpost;
 
 class PhoneHomeTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider algorithmProvider
-     */
+    #[Test]
+    #[DataProvider('algorithmProvider')]
     public function it_contacts_the_outpost($algo)
     {
         $this->assertTrue(app('router')->getRoutes()->hasNamedRoute('statamic.phone-home'));
@@ -39,11 +39,8 @@ class PhoneHomeTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @define-env disablePhoneHome
-     */
+    #[Test]
+    #[DefineEnvironment('disablePhoneHome')]
     public function it_does_not_contact_the_outpost_if_disabled()
     {
         config(['statamic.system.license_key' => 'test-key']);
@@ -60,7 +57,7 @@ class PhoneHomeTest extends TestCase
         $app['config']->set('statamic.system.phone_home_route_enabled', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_contact_the_outpost_when_an_incorrect_key_is_provided()
     {
         config(['statamic.system.license_key' => 'test-key']);
@@ -70,7 +67,7 @@ class PhoneHomeTest extends TestCase
         $this->get('/et/phone/home/invalid')->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_contact_the_outpost_when_key_is_missing()
     {
         config(['statamic.system.license_key' => 'test-key']);

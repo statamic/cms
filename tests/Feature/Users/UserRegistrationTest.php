@@ -3,6 +3,7 @@
 namespace Tests\Feature\Users;
 
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
 use Statamic\Facades\User;
@@ -13,7 +14,7 @@ class UserRegistrationTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function events_dispatched_when_user_registered()
     {
         Event::fake();
@@ -26,7 +27,7 @@ class UserRegistrationTest extends TestCase
         Event::assertDispatched(UserRegistered::class);
     }
 
-    /** @test */
+    #[Test]
     public function user_not_saved_when_user_registration_returns_false()
     {
         Event::fake([UserRegistered::class]);

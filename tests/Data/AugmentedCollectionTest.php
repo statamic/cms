@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Query\Builder as LaravelQueryBuilder;
 use JsonSerializable;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
 use Statamic\Data\AugmentedCollection;
@@ -16,7 +17,7 @@ use Tests\TestCase;
 
 class AugmentedCollectionTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_calls_toArray_on_each_item()
     {
         $item1 = m::mock(Arrayable::class);
@@ -29,24 +30,26 @@ class AugmentedCollectionTest extends TestCase
         $this->assertEquals(['foo.array', 'bar.array'], $results);
     }
 
-    /** @test */
+    #[Test]
     public function values_get_flagged_shallow_when_calling_toArray_with_flag()
     {
         $value = m::mock(Value::class);
         // $value->shouldNotReceive('toArray');
         $value->shouldReceive('isRelationship')->andReturnFalse();
-        $value->shouldReceive('shallow')->once()->andReturnSelf();
+        $value->shouldReceive('shallow')->once()->andReturn($value);
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $c = new AugmentedCollection([$value]);
         $results = $c->withShallowNesting()->toArray();
 
         $this->assertEquals([$value], $results);
     }
 
-    /** @test */
+    #[Test]
     public function values_do_not_get_flagged_shallow_when_calling_toArray_without_flag()
     {
         $value = m::mock(Value::class);
         $value->shouldReceive('isRelationship')->andReturnFalse();
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $value->shouldNotReceive('toArray');
         $value->shouldNotReceive('shallow');
         $c = new AugmentedCollection([$value]);
@@ -55,7 +58,7 @@ class AugmentedCollectionTest extends TestCase
         $this->assertEquals([$value], $results);
     }
 
-    /** @test */
+    #[Test]
     public function augmentables_get_converted_to_shallow_array_with_flag()
     {
         $augmentable = m::mock(Augmentable::class);
@@ -67,7 +70,7 @@ class AugmentedCollectionTest extends TestCase
         $this->assertEquals([['augmented array']], $results);
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_value_objects_to_their_augmented_values_with_flag()
     {
         $statamicQuery = m::mock(StatamicQueryBuilder::class);
@@ -113,15 +116,17 @@ class AugmentedCollectionTest extends TestCase
         ], $results);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_convert_value_objects_to_their_augmented_values_with_explicit_flag_or_without_any_flag()
     {
         $item1 = m::mock(Value::class);
         $item1->shouldReceive('value')->never();
         $item1->shouldReceive('isRelationship')->andReturnFalse();
+        $item1->shouldReceive('resolve')->andReturnSelf();
         $item2 = m::mock(Value::class);
         $item2->shouldReceive('value')->never();
         $item2->shouldReceive('isRelationship')->andReturnFalse();
+        $item2->shouldReceive('resolve')->andReturnSelf();
 
         $c = new AugmentedCollection([$item1, $item2, 'baz']);
 
@@ -132,10 +137,11 @@ class AugmentedCollectionTest extends TestCase
         $this->assertEquals([$item1, $item2, 'baz'], $results);
     }
 
-    /** @test */
+    #[Test]
     public function it_json_serializes()
     {
         $value = m::mock(Value::class);
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $value->shouldReceive('jsonSerialize')->once()->andReturn('value json serialized');
 
         $c = new AugmentedCollection([
@@ -157,10 +163,11 @@ class AugmentedCollectionTest extends TestCase
         ], $c->jsonSerialize());
     }
 
-    /** @test */
+    #[Test]
     public function augmentables_get_shallow_augmented_when_json_serializing_with_flag()
     {
         $value = m::mock(Value::class);
+        $value->shouldReceive('resolve')->once()->andReturnSelf();
         $value->shouldReceive('jsonSerialize')->once()->andReturn('value json serialized');
 
         $c = new AugmentedCollection([

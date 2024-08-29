@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Stores;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
@@ -13,8 +12,10 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes;
+use Statamic\Stache\Indexes\Index;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
@@ -225,28 +226,21 @@ class CollectionEntriesStore extends ChildStore
         $item->writeFile($path);
     }
 
-    protected function cacheItem($item)
-    {
-        $key = $this->getItemKey($item);
-
-        $cacheKey = $this->getItemCacheKey($key);
-
-        Cache::forever($cacheKey, ['entry' => $item, 'uri' => $item->uri()]);
-    }
-
     protected function getCachedItem($key)
     {
         $cacheKey = $this->getItemCacheKey($key);
 
-        if (! $cache = Cache::get($cacheKey)) {
+        if (! $entry = Stache::cacheStore()->get($cacheKey)) {
             return null;
         }
 
-        if ($this->shouldBlinkEntryUris && $cache['uri']) {
-            Blink::store('entry-uris')->put($cache['entry']->id(), $cache['uri']);
+        $isLoadingIds = Index::currentlyLoading() === $this->key().'/id';
+
+        if (! $isLoadingIds && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
+            Blink::store('entry-uris')->put($entry->id(), $uri);
         }
 
-        return $cache['entry'];
+        return $entry;
     }
 
     public function withoutBlinkingEntryUris($callback)
@@ -256,5 +250,44 @@ class CollectionEntriesStore extends ChildStore
         $this->shouldBlinkEntryUris = true;
 
         return $return;
+    }
+
+    public function updateUris($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('uri'), $ids);
+        $this->updateEntriesWithinStore($ids);
+    }
+
+    public function updateOrders($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('order'), $ids);
+    }
+
+    public function updateParents($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('parent'), $ids);
+    }
+
+    private function updateEntriesWithinIndex($index, $ids)
+    {
+        if (empty($ids)) {
+            return $index->update();
+        }
+
+        collect($ids)
+            ->map(fn ($id) => Entry::find($id))
+            ->filter()
+            ->each(fn ($entry) => $index->updateItem($entry));
+    }
+
+    private function updateEntriesWithinStore($ids)
+    {
+        if (empty($ids)) {
+            $ids = $this->paths()->keys();
+        }
+
+        $entries = $this->withoutBlinkingEntryUris(fn () => collect($ids)->map(fn ($id) => Entry::find($id))->filter());
+
+        $entries->each(fn ($entry) => $this->cacheItem($entry));
     }
 }

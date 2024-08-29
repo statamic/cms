@@ -6,7 +6,7 @@
     >
         <div class="item-move" v-if="sortable">&nbsp;</div>
         <div class="item-inner">
-            <div v-if="statusIcon" class="little-dot rtl:ml-2 ltr:mr-2 hidden@sm:block" :class="item.status" />
+            <div v-if="statusIcon" class="little-dot rtl:ml-2 ltr:mr-2 hidden @sm:block" :class="item.status" />
 
             <div
                 v-if="item.invalid"
@@ -27,7 +27,7 @@
             />
 
             <div class="flex items-center flex-1 justify-end">
-                <div v-if="item.collection" v-text="__(item.collection.title)" class="text-4xs text-gray-600 uppercase whitespace-nowrap rtl:ml-2 ltr:mr-2 hidden @sm:block" />
+                <div v-if="item.hint" v-text="item.hint" class="text-4xs text-gray-600 uppercase whitespace-nowrap rtl:ml-2 ltr:mr-2 hidden @sm:block" />
 
                 <div class="flex items-center" v-if="!readOnly">
                     <dropdown-list>
@@ -77,9 +77,8 @@ export default {
             if (! this.editable) return;
             if (this.item.invalid) return;
 
-            if (Object.entries(this.$store.state.publish).find(([key, value]) => value.values.id === this.item.id)) {
+            if (this.item.reference && Object.entries(this.$store.state.publish).find(([key, value]) => value.reference === this.item.reference)) {
                 this.$toast.error(__("You're already editing this item."));
-
                 return;
             }
 
