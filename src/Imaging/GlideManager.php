@@ -60,6 +60,7 @@ class GlideManager
             'driver' => 'local',
             'root' => $root,
             'visibility' => 'public',
+            'permissions' => config('statamic.assets.image_manipulation.cache_permissions'),
         ]);
     }
 
