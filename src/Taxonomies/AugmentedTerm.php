@@ -4,9 +4,9 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Data\AbstractAugmented;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Term;
 use Statamic\Query\StatusQueryBuilder;
 use Statamic\Statamic;
-use Statamic\Facades\Term;
 
 class AugmentedTerm extends AbstractAugmented
 {
