@@ -3,8 +3,10 @@
 namespace Statamic\Taxonomies;
 
 use Statamic\Data\AbstractAugmented;
+use Statamic\Facades\Blink;
 use Statamic\Query\StatusQueryBuilder;
 use Statamic\Statamic;
+use Statamic\Facades\Term;
 
 class AugmentedTerm extends AbstractAugmented
 {
@@ -79,5 +81,17 @@ class AugmentedTerm extends AbstractAugmented
         $title = $this->data->getSupplement('title') ?? $this->data->title();
 
         return $this->wrapValue($title, 'title');
+    }
+
+    public function entriesCount()
+    {
+        $key = vsprintf('term-published-entries-count-%s-%s', [
+            $this->data->id(),
+            optional($this->data->collection())->handle(),
+        ]);
+
+        return Blink::once($key, function () {
+            return Term::entriesCount($this->data, 'published');
+        });
     }
 }
