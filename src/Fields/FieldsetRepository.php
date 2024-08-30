@@ -157,7 +157,7 @@ class FieldsetRepository
             });
     }
 
-    public function save(Fieldset $fieldset): void
+    public function save(Fieldset $fieldset)
     {
         $directory = $this->directory;
 
@@ -174,7 +174,7 @@ class FieldsetRepository
         );
     }
 
-    public function delete(Fieldset $fieldset): void
+    public function delete(Fieldset $fieldset)
     {
         if ($fieldset->isNamespaced()) {
             throw new \Exception('Namespaced fieldsets cannot be deleted');
@@ -183,7 +183,7 @@ class FieldsetRepository
         File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
     }
 
-    public function reset(Fieldset $fieldset): void
+    public function reset(Fieldset $fieldset)
     {
         if (! $fieldset->isNamespaced()) {
             throw new \Exception('Non-namespaced fieldsets cannot be reset');
