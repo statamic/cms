@@ -17,7 +17,6 @@ use Statamic\Preferences\Preferences;
  * @method static \Illuminate\Support\Collection tabs()
  * @method static void tab()
  *
- *
  * @see \Statamic\Preferences\Preferences
  */
 class Preference extends Facade

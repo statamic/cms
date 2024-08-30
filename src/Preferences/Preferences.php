@@ -28,8 +28,6 @@ class Preferences
 
     /**
      * Prevent merging child data within a specific dotted preferences key.
-     *
-     * @param  string  $dottedKey
      */
     public function preventMergingChildren(string $dottedKey)
     {

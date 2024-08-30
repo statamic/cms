@@ -2,9 +2,9 @@
 
 namespace Statamic\Facades;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Extend\AddonRepository;
-use Illuminate\Support\Collection;
 
 /**
  * @method static \Statamic\Extend\Addon make(string $addon)

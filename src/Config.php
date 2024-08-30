@@ -44,8 +44,6 @@ class Config
 
     /**
      * Get the app key.
-     *
-     * @return string
      */
     public function getAppKey(): string
     {
@@ -54,8 +52,6 @@ class Config
 
     /**
      * Get the license key.
-     *
-     * @return string|null
      */
     public function getLicenseKey(): ?string
     {
@@ -77,7 +73,6 @@ class Config
      * Get the current locale's full code for date string translations.
      *
      * @param  string|null  $locale
-     * @return string
      */
     public function getFullLocale($locale = null): string
     {

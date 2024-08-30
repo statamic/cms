@@ -2,7 +2,6 @@
 
 namespace Statamic\Facades;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Contracts\Entries\EntryRepository;
 

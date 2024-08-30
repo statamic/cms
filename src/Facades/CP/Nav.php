@@ -3,10 +3,10 @@
 namespace Statamic\Facades\CP;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\CP\Navigation\Nav as Navigation;
 use Statamic\CP\Navigation\NavItem;
-use Illuminate\Support\Collection;
 
 /**
  * @method static void extend(Closure $callback)

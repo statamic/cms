@@ -3,9 +3,9 @@
 namespace Statamic\Facades;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Sites\Site;
-use Illuminate\Support\Collection;
 
 /**
  * @method static self instance()

@@ -4,7 +4,6 @@ namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use Statamic\Fields\BlueprintRepository;
-use Illuminate\Support\Collection;
 
 /**
  * @method static self setDirectory(string $directory)

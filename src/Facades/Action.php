@@ -2,9 +2,9 @@
 
 namespace Statamic\Facades;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Actions\ActionRepository;
-use Illuminate\Support\Collection;
 
 /**
  * @method static \Statamic\Actions\Action get($action)
