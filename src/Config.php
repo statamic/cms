@@ -16,7 +16,7 @@ class Config
      * @param  mixed|bool  $default  The fallback value
      * @return mixed
      */
-    public function get(string $key, $default = false)
+    public function get($key, $default = false)
     {
         return config($key, $default);
     }
@@ -27,7 +27,7 @@ class Config
      * @param  string  $key  The name of the key
      * @param  mixed  $value  The value to set
      */
-    public function set(string $key, mixed $value)
+    public function set($key, $value)
     {
         config([$key => $value]);
     }
@@ -44,16 +44,20 @@ class Config
 
     /**
      * Get the app key.
+     *
+     * @return string
      */
-    public function getAppKey(): string
+    public function getAppKey()
     {
         return $this->get('app.key');
     }
 
     /**
      * Get the license key.
+     *
+     * @return string|null
      */
-    public function getLicenseKey(): ?string
+    public function getLicenseKey()
     {
         $key = $this->get('statamic.system.license_key');
 
@@ -64,7 +68,7 @@ class Config
         return $key;
     }
 
-    public function getSite($locale = null): \Statamic\Sites\Site
+    public function getSite($locale = null)
     {
         return Site::get($locale ?? Site::current()->handle());
     }
@@ -73,8 +77,9 @@ class Config
      * Get the current locale's full code for date string translations.
      *
      * @param  string|null  $locale
+     * @return string
      */
-    public function getFullLocale($locale = null): string
+    public function getFullLocale($locale = null)
     {
         return $this->getSite($locale)->locale();
     }
@@ -116,7 +121,7 @@ class Config
      *
      * @return mixed
      */
-    public function getDefaultLocale(): string
+    public function getDefaultLocale()
     {
         return Site::default()->handle();
     }
@@ -142,7 +147,7 @@ class Config
      * @param  string|null  $locale  Optionally get the site url for a locale
      * @return mixed
      */
-    public function getSiteUrl($locale = null): string
+    public function getSiteUrl($locale = null)
     {
         return $this->getSite($locale)->url();
     }

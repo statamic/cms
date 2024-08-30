@@ -25,7 +25,7 @@ class Permissions
         $this->permissions = array_merge($this->permissions, $early);
     }
 
-    public function extend(\Closure $callback)
+    public function extend($callback)
     {
         $this->extensions[] = $callback;
     }
@@ -41,7 +41,7 @@ class Permissions
         return $permission;
     }
 
-    public function register(string $permission, ?\Closure $callback = null)
+    public function register($permission, $callback = null)
     {
         if (! $permission instanceof Permission) {
             $permission = self::make($permission);
@@ -76,7 +76,7 @@ class Permissions
         return $permissions;
     }
 
-    public function get(string $key)
+    public function get($key)
     {
         return $this->all()->get($key);
     }
@@ -107,7 +107,7 @@ class Permissions
         return $tree->values();
     }
 
-    public function group(string $name, string $label, $permissions = null)
+    public function group($name, $label, $permissions = null)
     {
         throw_if($this->pendingGroup, new \Exception('Cannot double nest permission groups'));
 

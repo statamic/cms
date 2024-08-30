@@ -28,8 +28,10 @@ class Preferences
 
     /**
      * Prevent merging child data within a specific dotted preferences key.
+     *
+     * @param  string  $dottedKey
      */
-    public function preventMergingChildren(string $dottedKey)
+    public function preventMergingChildren($dottedKey)
     {
         $this->preventMergingChildren[] = $dottedKey;
     }
@@ -60,7 +62,7 @@ class Preferences
      * @param  mixed  $fallback
      * @return mixed
      */
-    public function get(string $key, $fallback = null)
+    public function get($key, $fallback = null)
     {
         return Arr::get($this->all(), $key, $fallback);
     }
@@ -186,7 +188,7 @@ class Preferences
         $this->fields = array_merge($this->fields, $early);
     }
 
-    public function register($handle, array $field = [])
+    public function register($handle, $field = [])
     {
         $preference = self::make($handle, $field);
 

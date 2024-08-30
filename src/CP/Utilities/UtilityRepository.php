@@ -28,12 +28,12 @@ class UtilityRepository
         return $this;
     }
 
-    public function extend(Closure $callback)
+    public function extend($callback)
     {
         $this->extensions[] = $callback;
     }
 
-    public function make(string $handle)
+    public function make($handle)
     {
         return (new Utility)->handle($handle);
     }
@@ -61,12 +61,12 @@ class UtilityRepository
         });
     }
 
-    public function find(string $handle)
+    public function find($handle)
     {
         return $this->all()->get($handle);
     }
 
-    public function findBySlug(string $slug)
+    public function findBySlug($slug)
     {
         return $this->all()->first(fn ($utility) => $utility->slug() === $slug);
     }
