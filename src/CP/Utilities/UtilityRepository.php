@@ -2,7 +2,6 @@
 
 namespace Statamic\CP\Utilities;
 
-use Closure;
 use Facades\Statamic\CP\Utilities\CoreUtilities;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
