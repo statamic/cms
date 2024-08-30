@@ -28,6 +28,7 @@ export default {
             meta: this.meta,
             value: this.value,
             loading: this.loading,
+            updateMeta: this.updateMeta,
         });
     },
 
@@ -67,6 +68,10 @@ export default {
                 this.value = response.data.value;
                 this.loading = false;
             });
+        },
+
+        updateMeta(value) {
+            this.meta = value;
         }
 
     }
