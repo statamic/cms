@@ -2,6 +2,7 @@
 
 namespace Statamic\Facades;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Contracts\Entries\EntryRepository;
 
@@ -16,9 +17,14 @@ use Statamic\Contracts\Entries\EntryRepository;
  * @method static \Statamic\Contracts\Entries\QueryBuilder query()
  * @method static void save($entry)
  * @method static void delete($entry)
+ * @method static void taxonomize($entry)
  * @method static array createRules($collection, $site)
  * @method static array updateRules($collection, $entry)
  * @method static void substitute($entry)
+ * @method static \Illuminate\Support\Collection applySubstitutions()
+ * @method static void updateUris(\Statamic\Entries\Collection $collection, $ids = null)
+ * @method static void updateOrders(\Statamic\Entries\Collection $collection, $ids = null)
+ * @method static void updateParents(\Statamic\Entries\Collection $collection, $ids = null)
  *
  * @see \Statamic\Stache\Repositories\EntryRepository
  * @see \Statamic\Stache\Query\EntryQueryBuilder

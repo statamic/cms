@@ -15,7 +15,7 @@ class ScopeRepository
             ->values();
     }
 
-    public function find($key, $context = [])
+    public function find(string $key, array $context = [])
     {
         if (in_array($key, $this->removed)) {
             return;

@@ -2,6 +2,7 @@
 
 namespace Statamic\CP\Utilities;
 
+use Closure;
 use Facades\Statamic\CP\Utilities\CoreUtilities;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
@@ -27,12 +28,12 @@ class UtilityRepository
         return $this;
     }
 
-    public function extend($callback)
+    public function extend(Closure $callback)
     {
         $this->extensions[] = $callback;
     }
 
-    public function make($handle)
+    public function make(string $handle)
     {
         return (new Utility)->handle($handle);
     }
@@ -60,12 +61,12 @@ class UtilityRepository
         });
     }
 
-    public function find($handle)
+    public function find(string $handle)
     {
         return $this->all()->get($handle);
     }
 
-    public function findBySlug($slug)
+    public function findBySlug(string $slug)
     {
         return $this->all()->first(fn ($utility) => $utility->slug() === $slug);
     }

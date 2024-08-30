@@ -15,14 +15,14 @@ use Illuminate\Support\Collection;
  * @method static string findNamespacedBlueprintPath(string $handle)
  * @method static self setFallback(string $handle, Closure $blueprint)
  * @method static \Statamic\Fields\Blueprint findFallback(string $handle)
- * @method static void save(Blueprint $blueprint)
- * @method static void delete(Blueprint $blueprint)
- * @method static void reset(Blueprint $blueprint)
+ * @method static void save(\Statamic\Fields\Blueprint $blueprint)
+ * @method static void delete(\Statamic\Fields\Blueprint $blueprint)
+ * @method static void reset(\Statamic\Fields\Blueprint $blueprint)
  * @method static \Statamic\Fields\Blueprint make($handle = null)
  * @method static \Statamic\Fields\Blueprint makeFromFields($fields)
  * @method static \Statamic\Fields\Blueprint makeFromTabs($tabs)
  * @method static \Illuminate\Support\Collection in(string $namespace)
- * @method static self addNamespace(string $namespace, string $directory)
+ * @method static void addNamespace(string $namespace, string $directory)
  * @method static \Illuminate\Support\Collection getAdditionalNamespaces()
  *
  * @see \Statamic\Fields\BlueprintRepository

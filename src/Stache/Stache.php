@@ -51,7 +51,7 @@ class Stache
         return $this;
     }
 
-    public function registerStores($stores)
+    public function registerStores(array $stores)
     {
         foreach ($stores as $store) {
             $this->registerStore($store);

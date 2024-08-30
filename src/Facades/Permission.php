@@ -9,7 +9,7 @@ use Statamic\Auth\Permissions;
  * @method static void boot()
  * @method static void extend(\Closure $callback)
  * @method static \Statamic\Auth\Permission make(string $value)
- * @method static \Statamic\Auth\Permission register(string $permission, $callback = null)
+ * @method static \Statamic\Auth\Permission register(string $permission, \Closure $callback = null)
  * @method static \Illuminate\Support\Collection all()
  * @method static \Statamic\Auth\Permission get(string $key)
  * @method static \Illuminate\Support\Collection tree()

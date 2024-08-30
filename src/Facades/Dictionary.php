@@ -9,7 +9,7 @@ use Statamic\Dictionaries\DictionaryRepository;
  * @method static \Illuminate\Support\Collection all()
  * @method static \Statamic\Dictionaries\Dictionary find(string $handle, array $context = [])
  *
- * @see \Statamic\Actions\DictionaryRepository
+ * @see DictionaryRepository
  */
 class Dictionary extends Facade
 {

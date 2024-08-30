@@ -16,7 +16,7 @@ class Config
      * @param  mixed|bool  $default  The fallback value
      * @return mixed
      */
-    public function get($key, $default = false)
+    public function get(string $key, $default = false)
     {
         return config($key, $default);
     }
@@ -27,7 +27,7 @@ class Config
      * @param  string  $key  The name of the key
      * @param  mixed  $value  The value to set
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value)
     {
         config([$key => $value]);
     }
@@ -47,7 +47,7 @@ class Config
      *
      * @return string
      */
-    public function getAppKey()
+    public function getAppKey(): string
     {
         return $this->get('app.key');
     }
@@ -57,7 +57,7 @@ class Config
      *
      * @return string|null
      */
-    public function getLicenseKey()
+    public function getLicenseKey(): ?string
     {
         $key = $this->get('statamic.system.license_key');
 
@@ -68,7 +68,7 @@ class Config
         return $key;
     }
 
-    public function getSite($locale = null)
+    public function getSite($locale = null): \Statamic\Sites\Site
     {
         return Site::get($locale ?? Site::current()->handle());
     }
@@ -79,7 +79,7 @@ class Config
      * @param  string|null  $locale
      * @return string
      */
-    public function getFullLocale($locale = null)
+    public function getFullLocale($locale = null): string
     {
         return $this->getSite($locale)->locale();
     }
@@ -121,7 +121,7 @@ class Config
      *
      * @return mixed
      */
-    public function getDefaultLocale()
+    public function getDefaultLocale(): string
     {
         return Site::default()->handle();
     }
@@ -147,7 +147,7 @@ class Config
      * @param  string|null  $locale  Optionally get the site url for a locale
      * @return mixed
      */
-    public function getSiteUrl($locale = null)
+    public function getSiteUrl($locale = null): string
     {
         return $this->getSite($locale)->url();
     }

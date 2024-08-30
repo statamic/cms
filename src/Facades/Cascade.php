@@ -19,7 +19,7 @@ use Illuminate\Support\Collection;
  * @method static void data(array $data)
  * @method static self hydrated(Closure $callback)
  * @method static self hydrate()
- * @method static array getViewData(array $data)
+ * @method static array getViewData(string $view)
  * @method static Collection sections()
  * @method static self clearSections()
  *
