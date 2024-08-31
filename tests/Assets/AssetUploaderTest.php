@@ -31,6 +31,7 @@ class AssetUploaderTest extends TestCase
             'question marks' => ['one?two.jpg', 'one-two.jpg'],
             'asterisks' => ['one*two.jpg', 'one-two.jpg'],
             'percentage' => ['one%two.jpg', 'one-two.jpg'],
+            'ascii' => ['fòô-bàř', 'foo-bar'],
         ];
     }
 }

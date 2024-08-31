@@ -90,7 +90,7 @@ return [
     'fields_display_instructions' => 'The field\'s label shown in the Control Panel.',
     'fields_duplicate_instructions' => 'Whether this field should be included when duplicating the item.',
     'fields_fieldsets_description' => 'Fieldsets are simple, flexible, and completely optional groupings of fields that help to organize reusable, pre-configured fields.',
-    'fields_handle_instructions' => 'The field\'s template variable.',
+    'fields_handle_instructions' => 'The field\'s template variable. Avoid using [reserved words](https://statamic.dev/tips/reserved-words#as-field-names) as handles.',
     'fields_instructions_instructions' => 'Provide additional field instructions like this very text. Markdown formatting is supported.',
     'fields_instructions_position_instructions' => 'Show instructions above or below the field.',
     'fields_listable_instructions' => 'Control the listing column visibility.',
