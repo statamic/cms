@@ -1826,6 +1826,20 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Add a variable onto the end of an array
+     *
+     * @return array
+     */
+    public function push($value, $params, $context)
+    {
+        $push = Arr::get($context, $params[0], $params[0]);
+
+        array_push($value, $push);
+
+        return $value;
+    }
+
+    /**
      * Selects certain values from each item in a collection.
      *
      * @param  array|Collection  $value
@@ -2921,7 +2935,7 @@ class CoreModifiers extends Modifier
         if (! $opr && Str::contains($key, ':')) {
             [$key, $opr] = explode(':', $key);
         }
-        if (! $val) {
+        if (count($params) < 3) {
             $val = $opr;
             $opr = '==';
         }
