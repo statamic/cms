@@ -1826,20 +1826,6 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Add a variable onto the end of an array
-     *
-     * @return array
-     */
-    public function push($value, $params, $context)
-    {
-        $push = Arr::get($context, $params[0], $params[0]);
-
-        array_push($value, $push);
-
-        return $value;
-    }
-
-    /**
      * Selects certain values from each item in a collection.
      *
      * @param  array|Collection  $value
