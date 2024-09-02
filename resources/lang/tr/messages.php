@@ -90,7 +90,7 @@ return [
     'fields_display_instructions' => 'Kontrol Panelinde gösterilen alanın etiketi.',
     'fields_duplicate_instructions' => 'Bu öğe kopyalanırken bu alanın dahil edilip edilmeyeceği.',
     'fields_fieldsets_description' => 'Alan kümeleri, yeniden kullanılabilir, önceden yapılandırılmış alanları düzenlemeye yardımcı olan basit, esnek ve tamamen isteğe bağlı alan gruplarıdır.',
-    'fields_handle_instructions' => 'Alanın şablon değişkeni.',
+    'fields_handle_instructions' => 'Alanın şablon değişkeni. [Rezerve edilmiş kelimeleri](https://statamic.dev/tips/reserved-words#as-field-names) tutacağı olarak kullanmaktan kaçının.',
     'fields_instructions_instructions' => 'Bu metin gibi, alanın ekran etiketinin altında gösterilir. İşaretleme desteklenir.',
     'fields_instructions_position_instructions' => 'Alanın üstünde veya altında talimatları gösterin.',
     'fields_listable_instructions' => 'Liste sütununun görünürlüğünü kontrol edin.',
