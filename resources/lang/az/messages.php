@@ -90,7 +90,7 @@ return [
     'fields_display_instructions' => 'Sahənin İdarə Panelində göstərilən etiketi.',
     'fields_duplicate_instructions' => 'Bu sahənin əşyayı çoxaldarkən daxil ediləcəyi.',
     'fields_fieldsets_description' => 'Sahə dəstləri sadə, çevik və tamamilə seçimlik qruplamalardır, təkrar istifadə oluna bilən, əvvəlcədən konfiqurasiya edilmiş sahələri təşkil etməyə kömək edir.',
-    'fields_handle_instructions' => 'Sahənin şablon dəyişəni.',
+    'field_template_variable_instructions' => 'Sahənin şablon dəyişəni. [Ehtiyatda saxlanılmış sözlərdən](https://statamic.dev/tips/reserved-words#as-field-names) tutacaq kimi istifadə etməkdən çəkinin.',
     'fields_instructions_instructions' => 'Bu cür əlavə sahə təlimatları təqdim edin. Markdown formatı dəstəklənir.',
     'fields_instructions_position_instructions' => 'Təlimatları sahənin üstündə və ya altında göstərin.',
     'fields_listable_instructions' => 'Siyahı sütunlarının görünürlüyünü nəzarət edin.',
