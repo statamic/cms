@@ -13,8 +13,6 @@ class Controller extends BaseController
 
     public function show()
     {
-        $this->password = request('password');
-
         if ($this->tokenData = session('statamic:protect:password.tokens.'.request('token'))) {
             $site = Site::findByUrl($this->getUrl());
 
