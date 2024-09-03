@@ -183,7 +183,9 @@ class ApplicationCacherTest extends TestCase
     {
         $request = Request::create('http://example.com/test', 'GET');
 
-        $this->assertEquals('http://example.com/test', (new ApplicationCacher(app(Repository::class), []))->getUrl($request));
+        $cacher = new ApplicationCacher(app(Repository::class), []);
+
+        $this->assertEquals('http://example.com/test', $cacher->getUrl($request));
     }
 
     #[Test]
@@ -193,46 +195,52 @@ class ApplicationCacherTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $this->assertEquals('http://example.com/test?foo=bar', (new ApplicationCacher(app(Repository::class), []))->getUrl($request));
+        $cacher = new ApplicationCacher(app(Repository::class), []);
+
+        $this->assertEquals('http://example.com/test?foo=bar', $cacher->getUrl($request));
     }
 
     #[Test]
     public function it_gets_the_current_url_with_query_strings_disabled()
     {
-        config()->set('statamic.static_caching.ignore_query_strings', true);
-
         $request = Request::create('http://example.com/test', 'GET', [
             'foo' => 'bar',
         ]);
 
-        $this->assertEquals('http://example.com/test', (new ApplicationCacher(app(Repository::class), []))->getUrl($request));
+        $cacher = new ApplicationCacher(app(Repository::class), [
+            'ignore_query_strings' => true,
+        ]);
+
+        $this->assertEquals('http://example.com/test', $cacher->getUrl($request));
     }
 
     #[Test]
     public function it_gets_the_current_url_with_allowed_query_parameters()
     {
-        config()->set('statamic.static_caching.allowed_query_strings', [
-            'foo', 'quux',
-        ]);
-
         $request = Request::create('http://example.com/test', 'GET', [
             'foo' => 'bar',
             'baz' => 'qux',
             'quux' => 'corge',
         ]);
 
-        $this->assertEquals('http://example.com/test?foo=bar&quux=corge', (new ApplicationCacher(app(Repository::class), []))->getUrl($request));
+        $cacher = new ApplicationCacher(app(Repository::class), [
+            'allowed_query_strings' => ['foo', 'quux'],
+        ]);
+
+        $this->assertEquals('http://example.com/test?foo=bar&quux=corge', $cacher->getUrl($request));
     }
 
     #[Test]
     #[DataProvider('disallowedQueryParametersProvider')]
     public function it_gets_the_current_url_with_disallowed_query_parameters(array $disallowed, string $url, array $query, string $expected)
     {
-        config()->set('statamic.static_caching.disallowed_query_strings', $disallowed);
-
         $request = Request::create($url, 'GET', $query);
 
-        $this->assertEquals($expected, (new ApplicationCacher(app(Repository::class), []))->getUrl($request));
+        $cacher = new ApplicationCacher(app(Repository::class), [
+            'disallowed_query_strings' => $disallowed,
+        ]);
+
+        $this->assertEquals($expected, $cacher->getUrl($request));
     }
 
     public static function disallowedQueryParametersProvider()
