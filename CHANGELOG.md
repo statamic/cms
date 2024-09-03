@@ -1,5 +1,42 @@
 # Release Notes
 
+## 5.24.0 (2024-09-03)
+
+### What's new
+- Support querying by any status [#10752](https://github.com/statamic/cms/issues/10752) by @jasonvarga
+- Show field handle on hover for fields in Bard & Replicator sets [#10718](https://github.com/statamic/cms/issues/10718) by @duncanmcclean
+- Improve the output of the `search:update` command [#10693](https://github.com/statamic/cms/issues/10693) by @duncanmcclean
+- Add `LocalizedTermSaved` & `LocalizedTermDeleted` events [#10670](https://github.com/statamic/cms/issues/10670) by @duncanmcclean
+
+### What's fixed
+- When a user changes their password, delete any password reset tokens [#10694](https://github.com/statamic/cms/issues/10694) by @duncanmcclean
+- Filter out Spacer fields from form emails [#10710](https://github.com/statamic/cms/issues/10710) by @duncanmcclean
+- Fix search index race condition [#10695](https://github.com/statamic/cms/issues/10695) by @jasonvarga
+- Prevent error when writing to Comb index file [#10712](https://github.com/statamic/cms/issues/10712) by @duncanmcclean
+- Prevent button group fieldtype from submitting actions [#10755](https://github.com/statamic/cms/issues/10755) by @duncanmcclean
+- Fix augmentation of select options [#10720](https://github.com/statamic/cms/issues/10720) by @duncanmcclean
+- Fix translations on password protected pages [#10711](https://github.com/statamic/cms/issues/10711) by @duncanmcclean
+- Fix CP Asset Sort After Search issue [#10709](https://github.com/statamic/cms/issues/10709) by @danielml01
+- Allow using `entry` as a field handle in navigation blueprints [#10732](https://github.com/statamic/cms/issues/10732) by @duncanmcclean
+- Fix relationship fieldtypes showing ID instead of item title [#10737](https://github.com/statamic/cms/issues/10737) by @duncanmcclean
+- Twirldown should be shown even if the user doesn't have edit collection permissions [#10750](https://github.com/statamic/cms/issues/10750) by @duncanmcclean
+- Update docblock in action class stub [#10751](https://github.com/statamic/cms/issues/10751) by @duncanmcclean
+- Update facade docblocks [#10739](https://github.com/statamic/cms/issues/10739) by @duncanmcclean
+- Link to "Reserved Words" docs page from field settings. [#10728](https://github.com/statamic/cms/issues/10728) by @duncanmcclean
+- Dictionary Fixes [#10719](https://github.com/statamic/cms/issues/10719) by @duncanmcclean
+- Fix twirldown on navigation show page [#10731](https://github.com/statamic/cms/issues/10731) by @duncanmcclean
+- Fix `preg_replace` error when uploading assets [#10687](https://github.com/statamic/cms/issues/10687) by @duncanmcclean
+- Hide "Create Term" button when all taxonomy blueprints are hidden [#10682](https://github.com/statamic/cms/issues/10682) by @duncanmcclean
+- Improves "where" modifier value check [#10681](https://github.com/statamic/cms/issues/10681) by @JohnathonKoster
+- Antlers: Improves logging behavior when using the `ray` modifier [#10680](https://github.com/statamic/cms/issues/10680) by @JohnathonKoster
+- Update the PR template for v5 [#10733](https://github.com/statamic/cms/issues/10733) by @duncanmcclean
+- French translations [#10690](https://github.com/statamic/cms/issues/10690) by @ebeauchamps
+- Turkish translations [#10742](https://github.com/statamic/cms/issues/10742) [#10685](https://github.com/statamic/cms/issues/10685) by @peimn
+- Azerbaijani translations [#10741](https://github.com/statamic/cms/issues/10741) [#10684](https://github.com/statamic/cms/issues/10684) by @peimn
+- Persian translations [#10743](https://github.com/statamic/cms/issues/10743) [#10683](https://github.com/statamic/cms/issues/10683) by @peimn
+
+
+
 ## 5.23.0 (2024-08-21)
 
 ### What's new
