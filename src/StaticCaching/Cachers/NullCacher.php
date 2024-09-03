@@ -7,6 +7,8 @@ use Statamic\StaticCaching\Cacher;
 
 class NullCacher implements Cacher
 {
+    use GetsRequestUrl;
+
     public function cachePage(Request $request, $content)
     {
         //

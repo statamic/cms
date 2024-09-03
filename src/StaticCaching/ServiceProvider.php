@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Facades\Cascade;
-use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\NoCache\DatabaseSession;
 use Statamic\StaticCaching\NoCache\Session;
 
@@ -37,7 +36,7 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         $this->app->singleton(Session::class, function ($app) {
-            $uri = StaticCache::currentUrl(request());
+            $uri = $app[Cacher::class]->getUrl($app['request']);
 
             if (config('statamic.static_caching.ignore_query_strings', false)) {
                 $uri = explode('?', $uri)[0];

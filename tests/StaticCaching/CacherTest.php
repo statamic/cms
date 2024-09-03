@@ -3,11 +3,9 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Cache\Repository;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Tests\TestCase;
 
@@ -32,21 +30,6 @@ class CacherTest extends TestCase
         ]);
 
         $this->assertEquals(10, $cacher->getDefaultExpiration());
-    }
-
-    #[Test]
-    public function gets_a_url()
-    {
-        $cacher = $this->cacher();
-
-        $request = Request::create('http://example.com/test', 'GET');
-
-        StaticCache::shouldReceive('currentUrl')
-            ->with($request)
-            ->andReturn('http://example.com/test')
-            ->once();
-
-        $this->assertEquals('http://example.com/test', $cacher->getUrl($request));
     }
 
     #[Test]

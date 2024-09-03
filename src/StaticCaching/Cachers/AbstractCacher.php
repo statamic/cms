@@ -7,13 +7,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Site;
-use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
 
 abstract class AbstractCacher implements Cacher
 {
+    use GetsRequestUrl;
+
     /**
      * @var Repository
      */
@@ -129,16 +130,6 @@ abstract class AbstractCacher implements Cacher
         }
 
         $this->cache->forever($this->normalizeKey('domains'), $domains->all());
-    }
-
-    /**
-     * Get the URL from a request.
-     *
-     * @return string
-     */
-    public function getUrl(Request $request)
-    {
-        return StaticCache::currentUrl($request);
     }
 
     /**
