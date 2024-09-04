@@ -7,6 +7,10 @@ use Statamic\StaticCaching\Cacher;
 
 class NullCacher implements Cacher
 {
+    public function config($key, $default = null)
+    {
+        return $default;
+    }
 
     public function cachePage(Request $request, $content)
     {
