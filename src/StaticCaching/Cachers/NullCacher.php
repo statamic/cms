@@ -7,7 +7,6 @@ use Statamic\StaticCaching\Cacher;
 
 class NullCacher implements Cacher
 {
-    use GetsRequestUrl;
 
     public function cachePage(Request $request, $content)
     {
@@ -47,5 +46,10 @@ class NullCacher implements Cacher
     public function getBaseUrl()
     {
         //
+    }
+
+    public function getUrl(Request $request)
+    {
+        return $request->getUri();
     }
 }
