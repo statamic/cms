@@ -179,76 +179,55 @@ class ApplicationCacherTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_current_url()
-    {
-        $request = Request::create('http://example.com/test', 'GET');
+    #[DataProvider('currentUrlProvider')]
+    public function it_gets_the_current_url(
+        array $query,
+        array $config,
+        string $expectedUrl
+    ) {
+        $request = Request::create('http://example.com/test', 'GET', $query);
 
-        $cacher = new ApplicationCacher(app(Repository::class), []);
+        $cacher = new ApplicationCacher(app(Repository::class), $config);
 
-        $this->assertEquals('http://example.com/test', $cacher->getUrl($request));
+        $this->assertEquals($expectedUrl, $cacher->getUrl($request));
     }
 
-    #[Test]
-    public function it_gets_the_current_url_with_query_parameters()
-    {
-        $request = Request::create('http://example.com/test', 'GET', [
-            'foo' => 'bar',
-        ]);
-
-        $cacher = new ApplicationCacher(app(Repository::class), []);
-
-        $this->assertEquals('http://example.com/test?foo=bar', $cacher->getUrl($request));
-    }
-
-    #[Test]
-    public function it_gets_the_current_url_with_query_strings_disabled()
-    {
-        $request = Request::create('http://example.com/test', 'GET', [
-            'foo' => 'bar',
-        ]);
-
-        $cacher = new ApplicationCacher(app(Repository::class), [
-            'ignore_query_strings' => true,
-        ]);
-
-        $this->assertEquals('http://example.com/test', $cacher->getUrl($request));
-    }
-
-    #[Test]
-    public function it_gets_the_current_url_with_allowed_query_parameters()
-    {
-        $request = Request::create('http://example.com/test', 'GET', [
-            'foo' => 'bar',
-            'baz' => 'qux',
-            'quux' => 'corge',
-        ]);
-
-        $cacher = new ApplicationCacher(app(Repository::class), [
-            'allowed_query_strings' => ['foo', 'quux'],
-        ]);
-
-        $this->assertEquals('http://example.com/test?foo=bar&quux=corge', $cacher->getUrl($request));
-    }
-
-    #[Test]
-    #[DataProvider('disallowedQueryParametersProvider')]
-    public function it_gets_the_current_url_with_disallowed_query_parameters(array $disallowed, string $url, array $query, string $expected)
-    {
-        $request = Request::create($url, 'GET', $query);
-
-        $cacher = new ApplicationCacher(app(Repository::class), [
-            'disallowed_query_strings' => $disallowed,
-        ]);
-
-        $this->assertEquals($expected, $cacher->getUrl($request));
-    }
-
-    public static function disallowedQueryParametersProvider()
+    public static function currentUrlProvider()
     {
         return [
-            [[], 'http://example.com/test', ['foo' => 'bar'], 'http://example.com/test?foo=bar'],
-            [['quux'], 'http://example.com/test', ['quux' => 'corge'], 'http://example.com/test'],
-            [['quux'], 'http://example.com/test', ['foo' => 'bar', 'baz' => 'qux', 'quux' => 'corge'], 'http://example.com/test?baz=qux&foo=bar'],
+            'no query' => [
+                [],
+                [],
+                'http://example.com/test',
+            ],
+            'with query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [],
+                'http://example.com/test?alfa=a&bravo=b&charlie=c',
+            ],
+            'with query, ignoring query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['ignore_query_strings' => true],
+                'http://example.com/test',
+            ],
+            'with query, allowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['allowed_query_strings' => ['alfa', 'bravo']],
+                'http://example.com/test?alfa=a&bravo=b',
+            ],
+            'with query, disallowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['disallowed_query_strings' => ['charlie']],
+                'http://example.com/test?alfa=a&bravo=b',
+            ],
+            'with query, allowed and disallowed' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [
+                    'allowed_query_strings' => ['alfa', 'bravo'],
+                    'disallowed_query_strings' => ['bravo'],
+                ],
+                'http://example.com/test?alfa=a',
+            ],
         ];
     }
 }
