@@ -186,6 +186,17 @@ export default {
             return this.decorationSpecs.withinSelection;
         },
 
+        actionPayload() { 
+            return {
+                field: this.extension.options.bard,
+                values: this.values,
+                config: this.config,
+                meta: this.meta,
+                update: (handle, value) => this.updated(handle, value),
+                updateMeta: (handle, value) => this.metaUpdated(handle, value),
+            };
+        },
+
     },
 
     methods: {

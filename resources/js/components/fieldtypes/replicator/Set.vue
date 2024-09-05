@@ -187,6 +187,25 @@ export default {
             return Object.keys(this.config).length === 0;
         },
 
+        field() {
+            let vm = this;
+            while (vm !== vm.$root) {
+                if (vm.$options.name === 'replicator-fieldtype') return vm;
+                vm = vm.$parent;
+            }
+        },
+
+        actionPayload() { 
+            return {
+                field: this.field,
+                values: this.values,
+                config: this.config,
+                meta: this.meta,
+                update: (handle, value) => this.updated(handle, value),
+                updateMeta: (handle, value) => this.metaUpdated(handle, value),
+            };
+        },
+
     },
 
     methods: {
