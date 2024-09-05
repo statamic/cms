@@ -75,6 +75,12 @@ class ImportUsers extends Command
 
         $users = User::all();
 
+        if ($users->isEmpty()) {
+            error('No users to import!');
+
+            return 1;
+        }
+
         app()->bind(UserContract::class, EloquentUser::class);
 
         $eloquentRepository = app(UserRepositoryManager::class)->createEloquentDriver([]);
