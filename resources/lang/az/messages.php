@@ -209,7 +209,7 @@ return [
     'site_configure_lang_instructions' => '[Dillər](https://statamic.dev/multi-site#language) haqqında məlumat əldə edin.',
     'site_configure_locale_instructions' => '[Dil mühitləri](https://statamic.dev/multi-site#locale) haqqında öyrənin.',
     'site_configure_name_instructions' => 'İdarə panelində göstərilən istifadəçi qarşılıqlı ad.',
-    'site_configure_url_instructions' => '[Sayt URL-ləri](https://statamic.dev/multi-site#urlhttps://statamic.dev/multi-site#url) haqqında öyrənin.',
+    'site_configure_url_instructions' => '[Sayt URL-ləri](https://statamic.dev/multi-site#url) haqqında öyrənin.',
     'status_expired_with_date' => ':date tarixində müddəti bitmişdir',
     'status_published_with_date' => ':date tarixində dərc edilmişdir',
     'status_scheduled_with_date' => ':date tarixində dərc olunması planlaşdırılıb',
