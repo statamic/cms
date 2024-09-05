@@ -8,7 +8,14 @@ class Actions {
             this.actions[name] = [];
         }
 
-        this.actions[name].push(action);
+        this.actions[name].push({
+            display: null,
+            icon:  null,
+            quick: false,
+            run: () => {},
+            visible: () => true,
+            ...action,
+        });
     }
 
     get(name) {

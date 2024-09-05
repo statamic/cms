@@ -87,7 +87,11 @@ export default {
 
     components: { NodeViewWrapper, SetField },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText],
+    mixins: [
+        ValidatesFieldConditions,
+        ManagesPreviewText, 
+        HasActions,
+    ],
 
     inject: ['bard', 'bardSets'],
 
