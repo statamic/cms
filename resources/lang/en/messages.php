@@ -209,7 +209,7 @@ return [
     'site_configure_lang_instructions' => 'Learn about [Languages](https://statamic.dev/multi-site#language).',
     'site_configure_locale_instructions' => 'Learn about [Locales](https://statamic.dev/multi-site#locale).',
     'site_configure_name_instructions' => 'User-facing name shown throughout the control panel.',
-    'site_configure_url_instructions' => 'Learn about [Site URLs](https://statamic.dev/multi-site#urlhttps://statamic.dev/multi-site#url).',
+    'site_configure_url_instructions' => 'Learn about [Site URLs](https://statamic.dev/multi-site#url).',
     'status_expired_with_date' => 'Expired on :date',
     'status_published_with_date' => 'Published on :date',
     'status_scheduled_with_date' => 'Scheduled to be published on :date',
