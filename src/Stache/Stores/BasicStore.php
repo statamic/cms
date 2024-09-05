@@ -2,8 +2,8 @@
 
 namespace Statamic\Stache\Stores;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
+use Statamic\Facades\Stache;
 use Symfony\Component\Finder\SplFileInfo;
 
 abstract class BasicStore extends Store
@@ -77,7 +77,7 @@ abstract class BasicStore extends Store
     {
         $cacheKey = $this->getItemCacheKey($key);
 
-        return Cache::get($cacheKey);
+        return Stache::cacheStore()->get($cacheKey);
     }
 
     protected function cacheItem($item)
@@ -86,12 +86,12 @@ abstract class BasicStore extends Store
 
         $cacheKey = $this->getItemCacheKey($key);
 
-        Cache::forever($cacheKey, $item);
+        Stache::cacheStore()->forever($cacheKey, $item);
     }
 
     public function forgetItem($key)
     {
-        Cache::forget($this->getItemCacheKey($key));
+        Stache::cacheStore()->forget($this->getItemCacheKey($key));
     }
 
     protected function getItemCacheKey($key)

@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
-/** @group graphql */
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
+
+#[Group('graphql')]
 class CheckboxesFieldtypeTest extends FieldtypeTestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_values_and_labels()
     {
         $field = [

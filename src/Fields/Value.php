@@ -168,6 +168,8 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function augmentable()
     {
+        $this->resolve();
+
         return $this->augmentable;
     }
 

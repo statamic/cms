@@ -13,6 +13,19 @@
                         <dropdown-list>
                             <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
                             <dropdown-item
+                                v-if="fieldset.is_resettable"
+                                :text="__('Reset')"
+                                class="warning"
+                                @click="$refs[`resetter_${fieldset.id}`].confirm()"
+                            >
+                                <fieldset-resetter
+                                    :ref="`resetter_${fieldset.id}`"
+                                    :resource="fieldset"
+                                    :reload="true"
+                                >
+                                </fieldset-resetter>
+                            </dropdown-item>
+                            <dropdown-item
                                 v-if="fieldset.is_deletable"
                                 :text="__('Delete')"
                                 class="warning"
@@ -35,12 +48,16 @@
 <script>
 import Listing from '../Listing.vue';
 import FieldsetDeleter from './FieldsetDeleter.vue';
+import FieldsetResetter from './FieldsetResetter.vue';
 
 export default {
 
     mixins: [Listing],
 
-    components: {FieldsetDeleter},
+    components: {
+        FieldsetDeleter,
+        FieldsetResetter
+    },
 
     props: ['initialRows'],
 

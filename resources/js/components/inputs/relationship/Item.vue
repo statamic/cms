@@ -6,7 +6,7 @@
     >
         <div class="item-move" v-if="sortable">&nbsp;</div>
         <div class="item-inner">
-            <div v-if="statusIcon" class="little-dot rtl:ml-2 ltr:mr-2 hidden@sm:block" :class="item.status" />
+            <div v-if="statusIcon" class="little-dot rtl:ml-2 ltr:mr-2 hidden @sm:block" :class="item.status" />
 
             <div
                 v-if="item.invalid"
@@ -27,7 +27,7 @@
             />
 
             <div class="flex items-center flex-1 justify-end">
-                <div v-if="item.collection" v-text="__(item.collection.title)" class="text-4xs text-gray-600 uppercase whitespace-nowrap rtl:ml-2 ltr:mr-2 hidden @sm:block" />
+                <div v-if="item.hint" v-text="item.hint" class="text-4xs text-gray-600 uppercase whitespace-nowrap rtl:ml-2 ltr:mr-2 hidden @sm:block" />
 
                 <div class="flex items-center" v-if="!readOnly">
                     <dropdown-list>
@@ -52,7 +52,11 @@ export default {
         InlineEditForm
     },
 
-    inject: ['storeName'],
+    inject: {
+        storeName: {
+            default: null
+        }
+    },
 
     props: {
         item: Object,

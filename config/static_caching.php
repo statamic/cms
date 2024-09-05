@@ -104,6 +104,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Nocache
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define where the nocache data is stored.
+    |
+    | https://statamic.dev/tags/nocache#database
+    |
+    | Supported drivers: "cache", "database"
+    |
+    */
+
+    'nocache' => 'cache',
+
+    /*
+    |--------------------------------------------------------------------------
     | Replacers
     |--------------------------------------------------------------------------
     |
@@ -122,12 +137,14 @@ return [
     | Warm Queue
     |--------------------------------------------------------------------------
     |
-    | Here you may define the name of the queue that requests will be pushed
-    | onto when warming the static cache using the static:warm command.
+    | Here you may define the queue name and connection
+    | that will be used when warming the static cache.
     |
     */
 
-    'warm_queue' => null,
+    'warm_queue' => env('STATAMIC_STATIC_WARM_QUEUE'),
+
+    'warm_queue_connection' => env('STATAMIC_STATIC_WARM_QUEUE_CONNECTION'),
 
     /*
     |--------------------------------------------------------------------------

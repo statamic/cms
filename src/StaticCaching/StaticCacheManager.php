@@ -4,11 +4,13 @@ namespace Statamic\StaticCaching;
 
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Events\StaticCacheCleared;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\Cachers\Writer;
+use Statamic\StaticCaching\NoCache\DatabaseRegion;
 use Statamic\Support\Manager;
 
 class StaticCacheManager extends Manager
@@ -65,9 +67,26 @@ class StaticCacheManager extends Manager
     {
         $this->driver()->flush();
 
+        $this->flushNocache();
+
         if ($this->hasCustomStore()) {
             $this->cacheStore()->flush();
+        }
 
+        StaticCacheCleared::dispatch();
+    }
+
+    private function flushNocache()
+    {
+        if (config('statamic.static_caching.nocache', 'cache') === 'database') {
+            DatabaseRegion::truncate();
+
+            return;
+        }
+
+        // No need to do any looping if there's a custom
+        // store because the entire store will be flushed.
+        if ($this->hasCustomStore()) {
             return;
         }
 

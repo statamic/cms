@@ -17,7 +17,7 @@
                 />
                 <i class="required rtl:ml-1 ltr:mr-1" v-if="showLabelText && config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-6 h-6 rounded-full -mt-px rtl:mr-2 ltr:ml-2 rtl:ml-2 ltr:mr-2" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isTab && !isSection" class="text-gray-500 font-normal text-2xs rtl:ml-1 ltr:mr-1">
+                <span v-if="isReadOnly && !isTab && !isSection" class="text-gray-500 dark:text-dark-200 font-normal text-2xs rtl:ml-1 ltr:mr-1 mt-0.5">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
                 <svg-icon name="translate" class="h-4 rtl:ml-1 ltr:mr-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />

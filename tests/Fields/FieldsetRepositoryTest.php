@@ -3,6 +3,8 @@
 namespace Tests\Fields;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\FieldsetNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\File;
@@ -23,7 +25,7 @@ class FieldsetRepositoryTest extends TestCase
             ->setDirectory('/path/to/resources/fieldsets');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_fieldset()
     {
         $contents = <<<'EOT'
@@ -53,7 +55,7 @@ EOT;
         $this->assertEquals(['First Field', 'Second Field'], $fieldset->fields()->all()->map->display()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_fieldset_in_a_subdirectory()
     {
         $contents = <<<'EOT'
@@ -73,7 +75,7 @@ EOT;
         $this->assertEquals($fieldset, $this->repo->find('sub/test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_if_fieldset_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
@@ -81,7 +83,7 @@ EOT;
         $this->assertNull($this->repo->find('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_a_fieldset_exists()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
@@ -99,7 +101,7 @@ EOT;
         $this->assertFalse($this->repo->exists('unknownnamespace::unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_fieldsets()
     {
         $firstContents = <<<'EOT'
@@ -175,7 +177,7 @@ EOT;
         $this->assertEquals(['First Fieldset', 'Second Fieldset', 'Third Fieldset', 'First Namespaced Fieldset (vendor override)', 'Second Namespaced Fieldset'], $all->map->title()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_empty_collection_if_fieldset_directory_doesnt_exist()
     {
         $all = $this->repo->all();
@@ -184,11 +186,8 @@ EOT;
         $this->assertCount(0, $all);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider saveProvider
-     */
+    #[Test]
+    #[DataProvider('saveProvider')]
     public function it_saves_to_disk($handle, $expectedPath)
     {
         Facades\Fieldset::addNamespace('foo', '/path/to/foo');
@@ -231,7 +230,7 @@ EOT;
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_a_fieldset()
     {
         File::shouldReceive('delete')->with('/path/to/resources/fieldsets/test.yaml')->once();
@@ -241,7 +240,7 @@ EOT;
         $this->repo->delete($fieldset);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_delete_namespaced_fieldsets()
     {
         $this->expectExceptionMessage('Namespaced fieldsets cannot be deleted');
@@ -253,7 +252,17 @@ EOT;
         $this->repo->delete($fieldset);
     }
 
-    /** @test  */
+    #[Test]
+    public function it_resets_a_namespaced_fieldset()
+    {
+        File::shouldReceive('delete')->once();
+
+        $fieldset = (new Fieldset)->setHandle('foo::test');
+
+        $this->repo->reset($fieldset);
+    }
+
+    #[Test]
     public function it_gets_a_namespaced_fieldset()
     {
         $contents = <<<'EOT'
@@ -273,7 +282,7 @@ EOT;
         $this->assertEquals('foo::bar.baz.test', $fieldset->handle());
     }
 
-    /** @test  */
+    #[Test]
     public function it_gets_an_overridden_namespaced_fieldset()
     {
         $contents = <<<'EOT'
@@ -295,7 +304,7 @@ EOT;
         $this->assertFalse($this->repo->exists('vendor.foo.bar.baz.test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_blueprint_using_find_or_fail()
     {
         $contents = <<<'EOT'
@@ -321,7 +330,7 @@ EOT;
         $this->assertEquals('test', $fieldset->handle());
     }
 
-    /** @test */
+    #[Test]
     public function find_or_fail_throws_exception_when_blueprint_does_not_exist()
     {
         $this->expectException(FieldsetNotFoundException::class);

@@ -15,11 +15,6 @@
     @apply bg-gray-300 dark:bg-dark-700 px-1 py-px rounded;
 }
 
-.badge-updates {
-    @apply text-3xs not-italic bg-red-500 text-white rounded-full leading-normal;
-    padding: 2px 6px 1px;
-}
-
 .badge-sm {
     @apply bg-gray-300 dark:bg-dark-700 uppercase text-4xs text-white dark:text-dark-100 rounded-sm leading-normal;
     height: 16px;

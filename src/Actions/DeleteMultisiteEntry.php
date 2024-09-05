@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades\User;
 use Statamic\Statamic;
 
 class DeleteMultisiteEntry extends Delete
@@ -18,6 +19,10 @@ class DeleteMultisiteEntry extends Delete
 
     public function fieldItems()
     {
+        if (! $this->canChangeBehavior()) {
+            return [];
+        }
+
         return [
             'behavior' => [
                 'display' => __('Localizations'),
@@ -40,7 +45,7 @@ class DeleteMultisiteEntry extends Delete
 
     public function run($items, $values)
     {
-        $behavior = $values['behavior'];
+        $behavior = $this->canChangeBehavior() ? $values['behavior'] : 'copy';
 
         if ($behavior === 'copy') {
             $items->each->detachLocalizations();
@@ -49,5 +54,15 @@ class DeleteMultisiteEntry extends Delete
         }
 
         $items->each->delete();
+    }
+
+    private function canChangeBehavior(): bool
+    {
+        return $this->items->every(function ($entry) {
+            $descendants = $entry->descendants();
+
+            return $descendants->isNotEmpty()
+                && $descendants->every(fn ($descendant) => User::current()->can('view', $descendant->site()));
+        });
     }
 }

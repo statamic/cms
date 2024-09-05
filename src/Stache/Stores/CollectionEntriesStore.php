@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Stores;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
@@ -13,6 +12,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
@@ -230,7 +230,7 @@ class CollectionEntriesStore extends ChildStore
     {
         $cacheKey = $this->getItemCacheKey($key);
 
-        if (! $entry = Cache::get($cacheKey)) {
+        if (! $entry = Stache::cacheStore()->get($cacheKey)) {
             return null;
         }
 
@@ -250,5 +250,44 @@ class CollectionEntriesStore extends ChildStore
         $this->shouldBlinkEntryUris = true;
 
         return $return;
+    }
+
+    public function updateUris($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('uri'), $ids);
+        $this->updateEntriesWithinStore($ids);
+    }
+
+    public function updateOrders($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('order'), $ids);
+    }
+
+    public function updateParents($ids = null)
+    {
+        $this->updateEntriesWithinIndex($this->index('parent'), $ids);
+    }
+
+    private function updateEntriesWithinIndex($index, $ids)
+    {
+        if (empty($ids)) {
+            return $index->update();
+        }
+
+        collect($ids)
+            ->map(fn ($id) => Entry::find($id))
+            ->filter()
+            ->each(fn ($entry) => $index->updateItem($entry));
+    }
+
+    private function updateEntriesWithinStore($ids)
+    {
+        if (empty($ids)) {
+            $ids = $this->paths()->keys();
+        }
+
+        $entries = $this->withoutBlinkingEntryUris(fn () => collect($ids)->map(fn ($id) => Entry::find($id))->filter());
+
+        $entries->each(fn ($entry) => $this->cacheItem($entry));
     }
 }

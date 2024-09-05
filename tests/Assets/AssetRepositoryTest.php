@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetRepository;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Exceptions\AssetNotFoundException;
@@ -17,7 +18,7 @@ class AssetRepositoryTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_saves_the_meta_file_to_disk()
     {
         $disk = Storage::fake('test');
@@ -47,7 +48,7 @@ EOT;
         $this->assertEquals($contents, $disk->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_the_correct_disk_from_similar_names()
     {
         Storage::fake('disk_long', ['url' => 'test_long_url_same_beginning']);
@@ -82,7 +83,7 @@ EOT;
         $this->assertEquals('test_long_url_same_beginning/foo/image_in_long.jpg', $foundAssetLongUrl->url());
     }
 
-    /** @test */
+    #[Test]
     public function it_finds_assets_using_find_or_fail()
     {
         Storage::fake('disk_short', ['url' => 'test']);
@@ -105,7 +106,7 @@ EOT;
         $this->assertEquals($assetShortUrl->id(), $asset->id());
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_throws_exception_when_asset_does_not_exist()
     {
         $assetRepository = new AssetRepository;

@@ -231,6 +231,11 @@ abstract class Relationship extends Fieldtype
         })->values();
     }
 
+    public function getItemHint($item): ?string
+    {
+        return null;
+    }
+
     abstract protected function toItemArray($id);
 
     protected function invalidItemArray($id)

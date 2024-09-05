@@ -67,7 +67,7 @@
                         :animate="false"
                         append-to="body"
                     >
-                        <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden rounded-t-none" ref="assets">
+                        <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden" :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }" ref="assets">
                             <asset-tile
                                 v-for="asset in assets"
                                 :key="asset.id"
@@ -118,7 +118,6 @@
             <selector
                 :container="container"
                 :folder="folder"
-                :restrict-container-navigation="true"
                 :restrict-folder-navigation="restrictNavigation"
                 :selected="selectedAssets"
                 :view-mode="selectorViewMode"
@@ -340,7 +339,7 @@ export default {
 
             return replicatorPreviewHtml(_.map(this.assets, (asset) => {
                 return (asset.isImage || asset.isSvg) ?
-                    `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
+                    `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', '));
         },
