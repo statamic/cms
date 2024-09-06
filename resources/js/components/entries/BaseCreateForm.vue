@@ -29,7 +29,6 @@
 
 <script>
 export default {
-
     props: [
         'actions',
         'collectionHandle',
@@ -49,12 +48,9 @@ export default {
     ],
 
     methods: {
-
         saved(response) {
             window.location = response.data.data.edit_url + '?created=true';
         }
-
     }
-
 }
 </script>

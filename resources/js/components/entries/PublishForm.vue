@@ -145,7 +145,11 @@
                                                 :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
                                             >
                                                 <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                                <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
+                                                <toggle-input
+                                                    :read-only="!canManagePublishState"
+                                                    :model-value="published"
+                                                    @update:model-value="setFieldValue('published', $event)"
+                                                />
                                             </div>
 
                                             <div
