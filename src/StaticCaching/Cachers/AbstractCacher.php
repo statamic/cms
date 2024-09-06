@@ -284,6 +284,10 @@ abstract class AbstractCacher implements Cacher
     {
         $url = $request->getUri();
 
+        if ($this->isExcluded($url)) {
+            return $url;
+        }
+
         if ($this->config('ignore_query_strings', false)) {
             $url = explode('?', $url)[0];
         }

@@ -271,6 +271,10 @@ EOT;
     {
         $url = $request->getUri();
 
+        if ($this->isExcluded($url)) {
+            return $url;
+        }
+
         $url = explode('?', $url)[0];
 
         if ($this->config('ignore_query_strings', false)) {
