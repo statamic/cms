@@ -163,6 +163,5 @@ export default {
             hasSelections: this.sharedState.selections.length > 0,
         });
     }
-
 }
 </script>

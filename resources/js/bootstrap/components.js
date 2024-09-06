@@ -91,7 +91,7 @@ export { default as CreateTermButton } from '../components/terms/CreateTermButto
 // export { default as FieldsetListing } from '../components/fieldsets/Listing.vue';
 // export { default as FieldsetCreateForm } from '../components/fieldsets/CreateForm.vue';
 // export { default as FieldsetEditForm } from '../components/fieldsets/EditForm.vue';
-// export { default as BlueprintListing } from '../components/blueprints/Listing.vue';
+export { default as BlueprintListing } from '../components/blueprints/Listing.vue';
 export { default as BlueprintBuilder } from '../components/blueprints/Builder.vue';
 // export { default as FormCreateForm } from '../components/forms/CreateForm.vue';
 // export { default as FormListing } from '../components/forms/Listing.vue';
@@ -119,7 +119,7 @@ export { default as NavigationEditForm } from '../components/navigation/EditForm
 // export { default as PreferencesEditForm } from '../components/preferences/EditForm.vue';
 export { default as TaxonomyCreateForm } from '../components/taxonomies/CreateForm.vue';
 export { default as TaxonomyEditForm } from '../components/taxonomies/EditForm.vue';
-// export { default as TaxonomyBlueprintListing } from '../components/taxonomies/BlueprintListing.vue';
+export { default as TaxonomyBlueprintListing } from '../components/taxonomies/BlueprintListing.vue';
 export { default as AssetContainerCreateForm } from '../components/asset-containers/CreateForm.vue';
 export { default as AssetContainerEditForm } from '../components/asset-containers/EditForm.vue';
 // export { default as NavBuilder } from '../components/nav/Builder.vue';

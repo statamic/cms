@@ -1,5 +1,5 @@
 <template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="rows" :sort="false">
+    <data-list :columns="columns" :rows="rows" :sort="false">
         <template #default="{ filteredRows: rows }">
             <div class="card p-0">
                 <data-list-table
@@ -41,6 +41,7 @@
 import Listing from '../Listing.vue';
 
 export default {
+    emits: ['reordered'],
 
     mixins: [Listing],
 
@@ -58,12 +59,9 @@ export default {
     },
 
     watch: {
-
         initialRows(rows) {
             this.rows = rows;
         }
-
     }
-
 }
 </script>
