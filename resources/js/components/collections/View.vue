@@ -62,16 +62,21 @@
                     <button class="btn rtl:ml-4 ltr:mr-4"
                         v-if="!reordering"
                         @click="reordering = true"
-                        v-text="__('Reorder')" />
+                        v-text="__('Reorder')"
+                    />
 
                     <template v-if="reordering">
-                        <button class="btn rtl:mr-2 ltr:ml-2"
+                        <button
+                            class="btn rtl:mr-2 ltr:ml-2"
                             @click="reordering = false"
-                            v-text="__('Cancel')" />
+                            v-text="__('Cancel')"
+                        />
 
-                        <button class="btn-primary rtl:mr-2 ltr:ml-2"
+                        <button
+                            class="btn-primary rtl:mr-2 ltr:ml-2"
                             @click="$refs.list.saveOrder"
-                            v-text="__('Save Order')" />
+                            v-text="__('Save Order')"
+                        />
                     </template>
                 </template>
 

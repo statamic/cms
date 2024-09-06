@@ -1,5 +1,5 @@
 <template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="rows">
+    <data-list :columns="columns" :rows="rows">
         <template #default="{ filteredRows: rows }">
             <div class="card overflow-hidden p-0 relative">
                 <div class="overflow-x-auto overflow-y-hidden">
@@ -39,7 +39,6 @@ import Listing from '../Listing.vue';
 import FieldsetDeleter from './FieldsetDeleter.vue';
 
 export default {
-
     mixins: [Listing],
 
     components: {FieldsetDeleter},

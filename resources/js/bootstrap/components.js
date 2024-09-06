@@ -88,9 +88,9 @@ export { default as BaseEntryCreateForm } from '../components/entries/BaseCreate
 export { default as BaseTermCreateForm } from '../components/terms/BaseCreateForm.vue';
 export { default as CreateTermButton } from '../components/terms/CreateTermButton.vue';
 // export { default as Importer } from '../components/importer/importer';
-// export { default as FieldsetListing } from '../components/fieldsets/Listing.vue';
-// export { default as FieldsetCreateForm } from '../components/fieldsets/CreateForm.vue';
-// export { default as FieldsetEditForm } from '../components/fieldsets/EditForm.vue';
+export { default as FieldsetListing } from '../components/fieldsets/Listing.vue';
+export { default as FieldsetCreateForm } from '../components/fieldsets/CreateForm.vue';
+export { default as FieldsetEditForm } from '../components/fieldsets/EditForm.vue';
 export { default as BlueprintListing } from '../components/blueprints/Listing.vue';
 export { default as BlueprintBuilder } from '../components/blueprints/Builder.vue';
 // export { default as FormCreateForm } from '../components/forms/CreateForm.vue';
