@@ -13,13 +13,15 @@
             :options="normalizeInputOptions(options)"
             :placeholder="__(config.placeholder)"
             :multiple="multiple"
-            :value="selectedOptions"
-            @input="vueSelectUpdated"
+            :model-value="selectedOptions"
+            @update:model-value="vueSelectUpdated"
             @focus="$emit('focus')"
             @search="search"
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')">
-            <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
+            <template #selected-option-container v-if="multiple">
+                <i class="hidden"></i>
+            </template>
             <template #search="{ events, attributes }" v-if="multiple">
                 <input
                     :placeholder="__(config.placeholder)"
@@ -42,10 +44,10 @@
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
-                    :value="value"
                     :distance="5"
                     :mirror="false"
-                    @input="update"
+                    :model-value="modelValue ?? []"
+                    @update:model-value="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item" :class="{'invalid': option.invalid}">
@@ -77,9 +79,9 @@
 import HasInputOptions from './HasInputOptions.js'
 import { SortableList } from '../sortable/Sortable';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import Fieldtype from './Fieldtype.vue';
 
 export default {
-
     mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
 
     components: {
@@ -99,7 +101,7 @@ export default {
         },
 
         selectedOptions() {
-            let selections = this.value || [];
+            let selections = this.modelValue || [];
 
             if (typeof selections === 'string' || typeof selections === 'number') {
                 selections = [selections];
@@ -133,8 +135,8 @@ export default {
         },
 
         currentLength() {
-            if (this.value) {
-                return (typeof this.value == 'string') ? 1 : this.value.length;
+            if (this.modelValue) {
+                return (typeof this.modelValue == 'string') ? 1 : this.modelValue.length;
             }
 
             return 0;

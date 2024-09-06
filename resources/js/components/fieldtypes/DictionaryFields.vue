@@ -2,7 +2,7 @@
     <publish-container
         name="dictionary-fields"
         :blueprint="blueprint"
-        :values="value"
+        :values="modelValue"
         :meta="publishMeta"
         :errors="errors"
         @updated="update"
@@ -27,7 +27,7 @@ export default {
 
     computed: {
         dictionary() {
-            return this.value?.type;
+            return this.modelValue?.type;
         },
 
         fields() {
