@@ -1,11 +1,12 @@
 <template>
     <div>
         <popover v-if="isNotYetFavorited" ref="popper" placement="bottom-end" :offset="[10, 28]">
-            <template slot="trigger">
-                <button @click="shown" slot="reference" class="global-header-icon-button" v-tooltip="__('Pin to Favorites')" :aria-label="__('Pin to Favorites')">
+            <template #trigger>
+                <button @click="shown" class="global-header-icon-button" v-tooltip="__('Pin to Favorites')" :aria-label="__('Pin to Favorites')">
                     <svg-icon name="light/pin"></svg-icon>
                 </button>
             </template>
+
             <div class="p-4 pb-2">
                 <h6 class="mb-2">{{ __('Pin to Favorites') }}</h6>
                 <div class="flex items-center">
@@ -15,6 +16,7 @@
                 <button @click="makeStartPage" class="mt-2 text-xs text-blue outline-none hover:text-blue-800">{{ __('Set as start page') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></button>
             </div>
         </popover>
+
         <div v-else>
             <button @click="remove" class="global-header-icon-button" v-tooltip="__('Unpin from Favorites')" :aria-label="__('Unpin from Favorites')">
                 <svg-icon name="light/pin" class="text-green-600"></svg-icon>
@@ -24,9 +26,7 @@
 </template>
 
 <script>
-
 export default {
-
     data() {
         return {
             name: document.title.replace(` ${this.$config.get('direction', 'ltr') === 'ltr' ? '‹' : '›'} ${__('Statamic')}`, ''),

@@ -31,13 +31,14 @@
                     :component-props="componentProps"
                     @closed="showDetails = false"
                 >
-                    <template slot="action-buttons-right">
+                    <template #action-buttons-right>
                         <restore-revision
                             v-if="canRestoreRevisions"
                             :revision="revision"
                             :url="restoreUrl"
                             :reference="reference"
-                            class="rtl:mr-4 ltr:ml-4" />
+                            class="rtl:mr-4 ltr:ml-4"
+                        />
                     </template>
                 </revision-preview>
             </div>

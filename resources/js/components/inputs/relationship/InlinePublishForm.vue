@@ -23,7 +23,7 @@
                     :publish-container="publishContainer"
                     @saved="saved"
                 >
-                    <template slot="action-buttons-right">
+                    <template #action-buttons-right>
                         <slot name="action-buttons-right" />
                         <button
                             type="button"

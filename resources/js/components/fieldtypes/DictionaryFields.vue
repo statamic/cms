@@ -7,12 +7,13 @@
         :errors="errors"
         @updated="update"
     >
-        <publish-fields
-            slot-scope="{ setFieldValue, setFieldMeta }"
-            :fields="fields"
-            @updated="setFieldValue"
-            @meta-updated="setFieldMeta"
-        />
+        <template #default="{ setFieldValue, setFieldMeta }">
+            <publish-fields
+                :fields="fields"
+                @updated="setFieldValue"
+                @meta-updated="setFieldMeta"
+            />
+        </template>
     </publish-container>
 </template>
 
