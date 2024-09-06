@@ -110,7 +110,7 @@ export { default as GlobalCreateForm } from '../components/globals/Create.vue';
 export { default as CollectionScaffolder } from '../components/collections/Scaffolder.vue';
 export { default as CollectionEditForm } from '../components/collections/EditForm.vue';
 export { default as CollectionView } from '../components/collections/View.vue';
-// export { default as CollectionBlueprintListing } from '../components/collections/BlueprintListing.vue';
+export { default as CollectionBlueprintListing } from '../components/collections/BlueprintListing.vue';
 export { default as SessionExpiry } from '../components/SessionExpiry.vue';
 export { default as NavigationListing } from '../components/navigation/Listing.vue';
 export { default as NavigationView } from '../components/navigation/View.vue';

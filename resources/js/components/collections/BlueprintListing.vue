@@ -1,8 +1,15 @@
+<template>
+    <blueprint-listing
+        :initial-rows="rows"
+        :reorderable="initialRows.length > 1"
+        @reordered="reordered"
+    ></blueprint-listing>
+</template>
+
 <script>
 import BlueprintListing from '../blueprints/Listing.vue';
 
 export default {
-
     components: {
         BlueprintListing
     },
@@ -34,6 +41,5 @@ export default {
                 .catch(error => this.$toast.error(__('Something went wrong')))
         }
     }
-
 }
 </script>
