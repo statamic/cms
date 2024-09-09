@@ -127,6 +127,6 @@ class GlobalVariablesController extends CpController
             ->globalSet()
             ->localizations()
             ->sort()
-            ->filter(fn($set) => User::current()->can('edit', $set));
+            ->filter(fn ($set) => User::current()->can('edit', $set));
     }
 }
