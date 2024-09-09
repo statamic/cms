@@ -49,7 +49,7 @@ class NullCacher implements Cacher
 
     public function getBaseUrl()
     {
-        //
+        return '/';
     }
 
     public function getUrl(Request $request)
