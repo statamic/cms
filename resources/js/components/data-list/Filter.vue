@@ -2,7 +2,6 @@
 
     <div class="w-full no-label">
         <publish-container
-            class="p-3"
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
             :meta="meta"
@@ -10,13 +9,15 @@
             :track-dirty-state="false"
             @updated="updateValues"
         >
-            <publish-fields
-                slot-scope="{ setFieldValue }"
-                :fields="filter.fields"
-                :name-prefix="`filter-${filter.handle}`"
-                @updated="setFieldValue"
-                @meta-updated="updateMeta"
-            />
+            <template #default="{ setFieldValue }">
+                <publish-fields
+                    class="p-3"
+                    :fields="filter.fields"
+                    :name-prefix="`filter-${filter.handle}`"
+                    @updated="setFieldValue"
+                    @meta-updated="updateMeta"
+                />
+            </template>
         </publish-container>
 
         <div class="flex border-t dark:border-dark-900">
@@ -52,7 +53,7 @@ export default {
     data() {
         return {
             meta: {},
-        };
+        }
     },
 
     computed: {

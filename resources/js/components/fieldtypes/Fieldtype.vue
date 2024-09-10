@@ -1,8 +1,9 @@
 <script>
 export default {
+    emits: ['update:model-value', 'meta-updated', 'replicator-preview-updated'],
 
     props: {
-        value: {
+        modelValue: {
             required: true
         },
         config: {
@@ -31,7 +32,7 @@ export default {
 
     methods: {
         update(value) {
-            this.$emit('input', value);
+            this.$emit('update:model-value', value);
         },
 
         updateDebounced: _.debounce(function (value) {
@@ -62,7 +63,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return this.value;
+            return this.modelValue;
         },
 
         fieldPathKeys() {

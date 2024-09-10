@@ -1,7 +1,9 @@
 <script>
 import ResizeObserver from 'resize-observer-polyfill';
+import { vue_element } from '../node_helpers.js';
 
 export default {
+    emits: ['resized'],
 
     data() {
         return {
@@ -10,7 +12,7 @@ export default {
     },
 
     render() {
-        return this.$scopedSlots.default({});
+        return this.$slots.default({});
     },
 
     mounted() {
@@ -18,16 +20,13 @@ export default {
             this.width = entries[0].contentRect.width;
         }, 200));
 
-        observer.observe(this.$el);
+        observer.observe(vue_element(this.$el));
     },
 
     watch: {
-
         width(width) {
             this.$emit('resized', { width });
         }
-
     }
-
 }
 </script>

@@ -1,5 +1,4 @@
 <template>
-
     <div class="text-2xs flex">
         <a
             v-for="asset in value"
@@ -10,14 +9,16 @@
             <asset-thumbnail :asset="asset" class="h-8 max-w-3xs -my-1" />
         </a>
     </div>
-
 </template>
 
 <script>
 import AssetThumbnail from '../../assets/Browser/Thumbnail.vue';
+import IndexFieldtype from '../IndexFieldtype.vue';
 
 export default {
     mixins: [IndexFieldtype],
-    components: {AssetThumbnail}
-}
+    components: {
+        AssetThumbnail
+    }
+};
 </script>

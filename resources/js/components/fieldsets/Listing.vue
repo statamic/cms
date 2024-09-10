@@ -1,47 +1,49 @@
 <template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="rows">
-        <div class="card overflow-hidden p-0 relative" slot-scope="{ filteredRows: rows }">
-            <div class="overflow-x-auto overflow-y-hidden">
-                <data-list-table>
-                    <template slot="cell-title" slot-scope="{ row: fieldset }">
-                        <a :href="fieldset.edit_url">{{ __(fieldset.title) }}</a>
-                    </template>
-                    <template slot="cell-handle" slot-scope="{ value }">
-                        <span class="font-mono text-xs">{{ value }}</span>
-                    </template>
-                    <template slot="actions" slot-scope="{ row: fieldset, index }">
-                        <dropdown-list>
-                            <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
-                            <dropdown-item
-                                v-if="fieldset.is_resettable"
-                                :text="__('Reset')"
-                                class="warning"
-                                @click="$refs[`resetter_${fieldset.id}`].confirm()"
-                            >
-                                <fieldset-resetter
-                                    :ref="`resetter_${fieldset.id}`"
-                                    :resource="fieldset"
-                                    :reload="true"
+    <data-list :columns="columns" :rows="rows">
+        <template #default="{ filteredRows: rows }">
+            <div class="card overflow-hidden p-0 relative">
+                <div class="overflow-x-auto overflow-y-hidden">
+                    <data-list-table>
+                        <template #cell-title="{ row: fieldset }">
+                            <a :href="fieldset.edit_url">{{ __(fieldset.title) }}</a>
+                        </template>
+                        <template #cell-handle="{ value }">
+                            <span class="font-mono text-xs">{{ value }}</span>
+                        </template>
+                        <template #actions="{ row: fieldset, index }">
+                            <dropdown-list>
+                                <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
+                                <dropdown-item
+                                    v-if="fieldset.is_resettable"
+                                    :text="__('Reset')"
+                                    class="warning"
+                                    @click="$refs[`resetter_${fieldset.id}`].confirm()"
                                 >
-                                </fieldset-resetter>
-                            </dropdown-item>
-                            <dropdown-item
-                                v-if="fieldset.is_deletable"
-                                :text="__('Delete')"
-                                class="warning"
-                                @click="$refs[`deleter_${fieldset.id}`].confirm()"
-                            >
-                                <fieldset-deleter
-                                    :ref="`deleter_${fieldset.id}`"
-                                    :resource="fieldset"
-                                    @deleted="removeRow(fieldset)">
-                                </fieldset-deleter>
-                            </dropdown-item>
-                        </dropdown-list>
-                    </template>
-                </data-list-table>
+                                    <fieldset-resetter
+                                        :ref="`resetter_${fieldset.id}`"
+                                        :resource="fieldset"
+                                        :reload="true"
+                                    >
+                                    </fieldset-resetter>
+                                </dropdown-item>
+                                <dropdown-item
+                                    v-if="fieldset.is_deletable"
+                                    :text="__('Delete')"
+                                    class="warning"
+                                    @click="$refs[`deleter_${fieldset.id}`].confirm()"
+                                >
+                                    <fieldset-deleter
+                                        :ref="`deleter_${fieldset.id}`"
+                                        :resource="fieldset"
+                                        @deleted="removeRow(fieldset)">
+                                    </fieldset-deleter>
+                                </dropdown-item>
+                            </dropdown-list>
+                        </template>
+                    </data-list-table>
+                </div>
             </div>
-        </div>
+        </template>
     </data-list>
 </template>
 
@@ -51,7 +53,6 @@ import FieldsetDeleter from './FieldsetDeleter.vue';
 import FieldsetResetter from './FieldsetResetter.vue';
 
 export default {
-
     mixins: [Listing],
 
     components: {

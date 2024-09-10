@@ -70,9 +70,9 @@ export default {
 
         filterChanged({ handle, values }, unselectAll = true) {
             if (values && this.hasFields(values)) {
-                Vue.set(this.activeFilters, handle, values);
+                this.activeFilters[handle] = values;
             } else {
-                Vue.delete(this.activeFilters, handle);
+                delete this.activeFilters[handle];
             }
             if (unselectAll) this.unselectAllItems();
         },

@@ -1,6 +1,9 @@
+import { defineComponent } from 'vue';
 import { FloatingMenuPlugin } from './FloatingMenuPlugin'
 
-export const FloatingMenu = {
+export const FloatingMenu = defineComponent({
+    emits: ['shown', 'hidden'],
+
     name: 'FloatingMenu',
 
     props: {
@@ -59,7 +62,7 @@ export const FloatingMenu = {
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             x: this.x,
             y: this.y,
         });
@@ -68,4 +71,4 @@ export const FloatingMenu = {
     beforeDestroy() {
         this.editor.unregisterPlugin('floatingMenu')
     },
-}
+})

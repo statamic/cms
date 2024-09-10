@@ -5,7 +5,6 @@ import HasPagination from './data-list/HasPagination';
 import HasPreferences from './data-list/HasPreferences';
 
 export default {
-
     mixins: [
         HasActions,
         HasFilters,
@@ -41,7 +40,6 @@ export default {
     },
 
     computed: {
-
         parameterMap()  {
             return {
                 sort: 'sortColumn',
@@ -114,7 +112,6 @@ export default {
 
             return false;
         },
-
     },
 
     created() {
@@ -130,14 +127,13 @@ export default {
         }
     },
 
-    beforeDestroy() {
+    unmounted() {
         if (this.pushQuery) {
             window.removeEventListener('popstate', this.popState);
         }
     },
 
     watch: {
-
         parameters: {
             deep: true,
             handler(after, before) {
@@ -165,11 +161,9 @@ export default {
             this.request();
             this.pushState();
         }
-
     },
 
     methods: {
-
         request() {
             if (! this.requestUrl) {
                 this.loading = false;
@@ -178,12 +172,12 @@ export default {
 
             this.loading = true;
 
-            if (this.source) this.source.cancel();
-            this.source = this.$axios.CancelToken.source();
+            if (this.source) this.source.abort();
+            this.source = new AbortController()
 
             this.$axios.get(this.requestUrl, {
                 params: this.parameters,
-                cancelToken: this.source.token
+                signal: this.source.signal,
             }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
@@ -194,11 +188,11 @@ export default {
                 this.initializing = false;
                 this.afterRequestCompleted(response);
             }).catch(e => {
-                if (this.$axios.isCancel(e)) return;
+                if (e.code === 'ERR_CANCELED') return;
                 this.loading = false;
                 this.initializing = false;
                 if (e.request && ! e.response) return;
-                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
+                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { timeout: false });
             })
         },
 
@@ -254,8 +248,6 @@ export default {
                 this.popping = false;
             });
         },
-
     }
-
 }
 </script>

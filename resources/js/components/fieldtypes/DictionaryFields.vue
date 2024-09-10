@@ -2,18 +2,18 @@
     <publish-container
         name="dictionary-fields"
         :blueprint="blueprint"
-        :values="value"
+        :values="modelValue"
         :meta="publishMeta"
-        :is-config="true"
         :errors="errors"
         @updated="update"
     >
-        <publish-fields
-            slot-scope="{ setFieldValue, setFieldMeta }"
-            :fields="fields"
-            @updated="setFieldValue"
-            @meta-updated="setFieldMeta"
-        />
+        <template #default="{ setFieldValue, setFieldMeta }">
+            <publish-fields
+                :fields="fields"
+                @updated="setFieldValue"
+                @meta-updated="setFieldMeta"
+            />
+        </template>
     </publish-container>
 </template>
 
@@ -27,7 +27,7 @@ export default {
 
     computed: {
         dictionary() {
-            return this.value?.type;
+            return this.modelValue?.type;
         },
 
         fields() {

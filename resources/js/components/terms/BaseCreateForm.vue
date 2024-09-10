@@ -1,5 +1,4 @@
 <template>
-
     <term-publish-form
         :is-creating="true"
         publish-container="base"
@@ -22,12 +21,10 @@
         :preview-targets="previewTargets"
         @saved="saved"
     ></term-publish-form>
-
 </template>
 
 <script>
 export default {
-
     props: [
         'actions',
         'taxonomyHandle',
@@ -44,12 +41,9 @@ export default {
     ],
 
     methods: {
-
         saved(response) {
             window.location = response.data.data.edit_url + '?created=true';
         }
-
     }
-
 }
 </script>

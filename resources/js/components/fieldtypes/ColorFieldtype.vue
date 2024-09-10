@@ -11,8 +11,8 @@
                             <div class="inline-block cursor-pointer rounded m-0 p-[2px]">
                                 <div
                                     class="rounded-sm w-8 h-8"
-                                    :class="{ 'border dark:border-dark-900': !value, 'cursor-not-allowed': isReadOnly }"
-                                    :style="{ 'background-color': value }"
+                                    :class="{ 'border dark:border-dark-900': !modelValue, 'cursor-not-allowed': isReadOnly }"
+                                    :style="{ 'background-color': modelValue }"
                                 />
                             </div>
                         </div>
@@ -28,7 +28,7 @@
                                 @click="() => { update(swatch); closePopover(); }"
                             >
                                 <div
-                                    v-if="swatch === value"
+                                    v-if="swatch === modelValue"
                                     class="flex items-center justify-center h-full w-full"
                                 >
                                     <div class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center">
@@ -71,60 +71,48 @@
             />
         </div>
 
-        <button v-if="value" class="btn-close rtl:mr-1 ltr:ml-1" :aria-label="__('Reset')" @click="resetColor">&times;</button>
+        <button v-if="modelValue" class="btn-close rtl:mr-1 ltr:ml-1" :aria-label="__('Reset')" @click="resetColor">&times;</button>
     </div>
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
+
 export default {
-
     mixins: [Fieldtype],
-
     data () {
         return {
-            customColor: this.value
+            customColor: this.modelValue
         }
     },
-
     watch: {
-
-        value(value) {
+        modelValue(value) {
             this.customColor = value;
         },
-
     },
-
     computed: {
-
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return this.value
-                ? `<span class="little-dot" style="background-color:${this.value}"></span>`
+            return this.modelValue
+                ? `<span class="little-dot" style="background-color:${this.modelValue}"></span>`
                 : null;
         }
-
     },
-
     methods: {
-
         customColorSelected(event) {
             this.customColor = event.target.value;
         },
-
         sanitizeCustomColor() {
             this.customColor = this.sanitizeColor(this.customColor);
             this.update(this.customColor);
         },
-
         commitCustomColor() {
             this.update(this.customColor);
         },
-
         resetColor() {
             this.update(null);
         },
-
         sanitizeColor(color) {
             if (color && /^#?([a-fA-F0-9]{3,6})$/.test(color.trim())) {
                 color = color.replace(/[^a-fA-F0-9]/g, '');
@@ -135,6 +123,5 @@ export default {
             }
         }
     }
-
 };
 </script>

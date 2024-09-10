@@ -18,8 +18,7 @@
         <taxonomy-list
             :initial-rows="{{ json_encode($taxonomies) }}"
             :initial-columns="{{ json_encode($columns) }}"
-            :endpoints="{}">
-        </taxonomy-list>
+        ></taxonomy-list>
 
     @else
 

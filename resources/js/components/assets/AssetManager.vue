@@ -1,35 +1,34 @@
 <template>
-
     <div class="asset-manager">
-
         <div class="flex items-center mb-6">
             <h1 class="flex-1">{{ __(container.title) }}</h1>
 
             <dropdown-list v-if="container.can_edit || container.can_delete" class="rtl:mr-4 ltr:ml-4">
-                <dropdown-item
-                    v-if="container.can_edit"
-                    v-text="__('Edit Container')"
-                    :redirect="container.edit_url">
+                <dropdown-item v-if="container.can_edit" :redirect="container.edit_url">
+                    {{ __('Edit Container') }}
                 </dropdown-item>
-                <dropdown-item
-                    v-text="__('Edit Blueprint')"
-                    :redirect="container.blueprint_url">
+
+                <dropdown-item :redirect="container.blueprint_url">
+                    {{ __('Edit Blueprint') }}
                 </dropdown-item>
+
                 <dropdown-item
                     v-if="container.can_delete"
-                    v-text="__('Delete Container')"
                     class="warning"
                     @click="$refs.deleter.confirm()"
                 >
+                    {{ __('Delete Container') }}
                     <resource-deleter
                         ref="deleter"
                         :resource-title="__(container.title)"
-                        :route="container.delete_url">
-                    </resource-deleter>
+                        :route="container.delete_url"
+                    />
                 </dropdown-item>
             </dropdown-list>
 
-            <a :href="createContainerUrl" class="btn rtl:mr-4 ltr:ml-4" v-if="canCreateContainers">{{ __('Create Container') }}</a>
+            <a v-if="canCreateContainers" :href="createContainerUrl" class="btn rtl:mr-4 ltr:ml-4">
+                {{ __('Create Container') }}
+            </a>
         </div>
 
         <asset-browser
@@ -42,15 +41,13 @@
             @navigated="navigate"
             @selections-updated="updateSelections"
             @asset-doubleclicked="editAsset"
-            @edit-asset="editAsset" />
-
+            @edit-asset="editAsset"
+        />
     </div>
-
 </template>
 
 <script>
 export default {
-
     props: {
         initialContainer: Object,
         initialPath: String,
@@ -65,7 +62,7 @@ export default {
             container: this.initialContainer,
             path: this.initialPath,
             selectedAssets: [],
-        }
+        };
     },
 
     mounted() {
@@ -73,7 +70,6 @@ export default {
     },
 
     methods: {
-
         /**
          * Bind browser navigation features
          *
@@ -81,7 +77,10 @@ export default {
          * navigation back and forth through folders using browser buttons.
          */
         bindBrowserNavigation() {
-            window.history.replaceState({ container: this.container, path: this.path }, '');
+            window.history.replaceState({
+                container: { ...this.container },
+                path: this.path
+            }, '');
 
             window.onpopstate = (e) => {
                 this.container = e.state.container;
@@ -100,7 +99,8 @@ export default {
             }
 
             window.history.pushState({
-                container: this.container, path: this.path
+                container: { ...this.container },
+                path: this.path,
             }, '', url);
         },
 
@@ -126,11 +126,10 @@ export default {
         },
 
         editAsset(asset) {
-            event.preventDefault()
+            event.preventDefault();
+
             this.$refs.browser.edit(asset.id);
         }
-
     }
-
-}
+};
 </script>

@@ -1,6 +1,5 @@
 <template>
     <div>
-
         <div class="mb-2 flex justify-end">
             <a
                 class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
@@ -23,64 +22,74 @@
         </div>
 
         <div v-if="!loading" class="page-tree w-full">
-            <draggable-tree
-                :draggable="editable"
+            <Draggable
                 ref="tree"
-                :data="treeData"
+                v-model="treeData"
+                :disable-drag="!editable"
                 :space="1"
                 :indent="24"
                 :dir="direction"
-                @change="treeChanged"
-                @drag="treeDragstart"
-                @nodeOpenChanged="saveTreeState"
+                :node-key="(stat) => stat.data.id"
+                :each-droppable="eachDroppable"
+                :root-droppable="rootDroppable"
+                :max-level="maxDepth"
+                @after-drop="treeUpdated"
+                @open:node="saveTreeState"
+                @close:node="saveTreeState"
             >
-                <tree-branch
-                    :ref="`branch-${page.id}`"
-                    slot-scope="{ data: page, store, vm }"
-                    :page="page"
-                    :depth="vm.level"
-                    :vm="vm"
-                    :first-page-is-root="expectsRoot"
-                    :is-open="page.open"
-                    :has-children="page.children.length > 0"
-                    :show-slugs="showSlugs"
-                    :show-blueprint="blueprints?.length > 1"
-                    :editable="editable"
-                    @edit="$emit('edit-page', page, vm, store, $event)"
-                    @toggle-open="store.toggleOpen(page)"
-                    @removed="pageRemoved"
-                    @children-orphaned="childrenOrphaned"
-                    @branch-clicked="$emit('branch-clicked', page)"
-                >
-                    <template #branch-action="props">
-                        <slot name="branch-action" v-bind="{ ...props, vm }" />
-                    </template>
+                <template #placeholder>
+                    <div class="w-full bg-blue-500/10 rounded p-2 border-2 border-blue-400 border-dotted">
+                        &nbsp;
+                    </div>
+                </template>
 
-                    <template #branch-icon="props">
-                        <slot name="branch-icon" v-bind="{ ...props, vm }" />
-                    </template>
+                <template #default="{ node, stat }">
+                    <tree-branch
+                        :ref="`branch-${node.id}`"
+                        :page="node"
+                        :stat="stat"
+                        :depth="stat.level"
+                        :first-page-is-root="expectsRoot"
+                        :is-open="stat.open"
+                        :has-children="stat.children.length > 0"
+                        :show-slugs="showSlugs"
+                        :show-blueprint="blueprints?.length > 1"
+                        :editable="editable"
+                        :root="isRoot(stat)"
+                        @edit="$emit('edit-page', node, store, $event)"
+                        @toggle-open="stat.open = !stat.open"
+                        @removed="pageRemoved"
+                        @children-orphaned="childrenOrphaned"
+                        @branch-clicked="$emit('branch-clicked', node)"
+                        class="mb-px"
+                    >
+                        <template #branch-action="props">
+                            <slot name="branch-action" v-bind="{ ...props }" />
+                        </template>
 
-                    <template #branch-options="props">
-                        <slot name="branch-options" v-bind="{ ...props, vm }" />
-                    </template>
-                </tree-branch>
-            </draggable-tree>
+                        <template #branch-icon="props">
+                            <slot name="branch-icon" v-bind="{ ...props }" />
+                        </template>
 
+                        <template #branch-options="props">
+                            <slot name="branch-options" v-bind="{ ...props }" />
+                        </template>
+                    </tree-branch>
+                </template>
+            </Draggable>
         </div>
-
     </div>
 </template>
 
 
 <script>
-import * as th from 'tree-helper';
-import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
+import { dragContext, Draggable } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
 
 export default {
 
     components: {
-        DraggableTree,
+        Draggable,
         TreeBranch,
     },
 
@@ -109,7 +118,6 @@ export default {
     },
 
     computed: {
-
         activeLocalization() {
             return _.findWhere(this.localizations, { active: true });
         },
@@ -125,7 +133,6 @@ export default {
     },
 
     watch: {
-
         site(site) {
             this.getPages();
         }
@@ -143,6 +150,13 @@ export default {
     },
 
     methods: {
+        isRoot(stat) {
+            if (!this.expectsRoot) {
+                return false
+            }
+
+            return stat.level === 1 && stat.data.id === this.treeData[0]?.id
+        },
 
         getPages() {
             this.loading = true;
@@ -156,33 +170,9 @@ export default {
             });
         },
 
-        treeChanged(node, tree) {
-            if (!this.validate()) {
-                this.updateTreeData();
-                return;
-            }
-
-            this.treeUpdated(tree);
-        },
-
-        treeUpdated(tree) {
-            tree = tree || this.$refs.tree;
-
-            this.pages = tree.getPureData();
+        treeUpdated() {
+            this.pages = this.$refs.tree.getData();
             this.$emit('changed');
-        },
-
-        validate() {
-            let isValid = true;
-
-            this.traverseTree(this.treeData, (node, { isRoot }) => {
-                if (isRoot && node.children.length) {
-                    isValid = false;
-                    return false;
-                }
-            });
-
-            return isValid;
         },
 
         cleanPagesForSubmission(pages) {
@@ -252,13 +242,13 @@ export default {
             this.treeData = clone(this.pages);
         },
 
-        pageRemoved(tree) {
-            this.pages = tree.getPureData();
+        pageRemoved() {
+            this.pages = this.$refs.tree.getData();
             this.$emit('changed');
         },
 
-        childrenOrphaned(tree) {
-            this.pages = tree.getPureData();
+        childrenOrphaned() {
+            this.pages = this.$refs.tree.getData();
             this.$emit('changed');
         },
 
@@ -288,37 +278,33 @@ export default {
             this.$emit('canceled');
         },
 
-        treeDragstart(node) {
-            let nodeDepth = 1;
-            this.traverseTree(node, (_, { depth }) => {
-                nodeDepth = Math.max(nodeDepth, depth);
-            });
-            const maxDepth = this.maxDepth - nodeDepth;
+        rootDroppable() {
+            if (!this.expectsRoot) {
+                return true
+            }
 
-            this.traverseTree(this.treeData, (childNode, { depth, isRoot }) => {
-                if (childNode !== node) {
-                    this.$set(childNode, 'droppable', !isRoot && depth <= maxDepth);
-                }
-            });
+            return dragContext.dragNode.children.length === 0
         },
 
-        pageUpdated(tree) {
-            this.pages = tree.getPureData();
+        eachDroppable(targetStat) {
+            if (!this.expectsRoot) {
+                return true
+            }
+
+            return !this.isRoot(targetStat)
+        },
+
+        pageUpdated() {
+            this.pages = this.$refs.tree.getData();
             this.$emit('changed');
         },
 
         expandAll() {
-            this.traverseTree(this.treeData, node => {
-                node.open = true
-            })
-            this.saveTreeState();
+            this.$refs.tree.openAll()
         },
 
         collapseAll() {
-            this.traverseTree(this.treeData, node => {
-                node.open = false
-            })
-            this.saveTreeState();
+            this.$refs.tree.closeAll()
         },
 
         loadTreeState(treeData) {
@@ -371,7 +357,7 @@ export default {
                     return false;
                 }
 
-                if (node.children.length) {
+                if (node.children?.length) {
                     this.traverseTree(node.children, callback, nodePath);
                 }
 

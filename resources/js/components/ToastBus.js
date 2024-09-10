@@ -21,7 +21,7 @@ class ToastBus {
         this.instance.$axios.interceptors.response.use(response => {
             const toasts = response?.data?._toasts ?? []
 
-            toasts.forEach(toast => this.instance.$toast[toast.type](toast.message, {duration: toast.duration}))
+            toasts.forEach(toast => this.instance.$toast[toast.type](toast.message, { timeout: toast.duration }))
 
             return response;
         });

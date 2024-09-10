@@ -3,7 +3,7 @@
         <v-select
             ref="input"
             :name="name"
-            @input="update"
+            @update:model-value="update"
             :clearable="config.clearable"
             :disabled="config.disabled"
             :options="options"
@@ -11,7 +11,7 @@
             :searchable="true"
             :push-tags="false"
             :multiple="false"
-            :value="value" />
+            :model-value="value" />
     </div>
 </template>
 

@@ -1,67 +1,64 @@
 <template>
-
     <div>
         <template v-if="isToggleMode">
             <div class="toggle-fieldtype-wrapper">
-                <toggle-input :value="isRevealed" @input="update" :read-only="isReadOnly" />
-                <label v-if="config.input_label" class="rtl:mr-2 ltr:ml-2 font-normal">{{ __(config.input_label) }}</label>
+                <toggle-input
+                    :model-value="isRevealed"
+                    @update:model-value="update"
+                    :read-only="isReadOnly"
+                />
+                <label v-if="config.input_label" class="rtl:mr-2 ltr:ml-2 font-normal">
+                    {{ __(config.input_label) }}
+                </label>
             </div>
         </template>
 
         <template v-else>
             <button
+                type="button"
                 @click="buttonReveal"
                 class="btn"
                 :disabled="isReadOnly"
                 :v-tooltip="__(config.instructions)"
-                v-text="config.input_label || __('Show Fields')" />
+                v-text="config.input_label || __('Show Fields')"
+            />
         </template>
     </div>
-
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
+
 export default {
-
     mixins: [Fieldtype],
-
+    inject: ['storeName'],
     computed: {
-
         isRevealed() {
-            return this.value;
+            return this.modelValue;
         },
-
         isToggleMode() {
             return data_get(this.config, 'mode') === 'toggle';
         },
-
         fieldPath() {
             return this.fieldPathPrefix || this.handle;
         },
-
     },
-
-    inject: ['storeName'],
-
     mounted() {
         this.$store.commit(`publish/${this.storeName}/setRevealerField`, this.fieldPath);
     },
-
-    beforeDestroy() {
+    beforeUnmount() {
         this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, this.fieldPath);
     },
-
     watch: {
         fieldPath(fieldPath, oldFieldPath) {
             this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, oldFieldPath);
+
             this.$nextTick(() => {
                 this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
             });
         }
     },
-
     methods: {
-
         buttonReveal() {
             if (this.isReadOnly) {
                 return;
@@ -73,10 +70,8 @@ export default {
                 omitValue: true,
             });
 
-            this.update(true)
+            this.update(true);
         }
-
     }
-
-}
+};
 </script>
