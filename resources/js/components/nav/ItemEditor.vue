@@ -36,6 +36,19 @@
                                 </div>
                             </div>
 
+                            <div class="form-group publish-field w-full" v-if="! isChild">
+                                <div class="field-inner">
+                                    <label class="text-sm font-medium mb-2">{{ __('Icon') }}</label>
+                                    <publish-field-meta
+                                        :config="{ handle: 'icon', type: 'icon', folder: 'light' }"
+                                        :initial-value="config.icon"
+                                        v-slot="{ meta, value, loading }"
+                                    >
+                                        <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="config.icon = $event" />
+                                    </publish-field-meta>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -63,11 +76,12 @@ export default {
     props: {
         creating: false,
         item: {},
+        isChild: false,
     },
 
     data() {
         return {
-            config: data_get(this.item, 'config', this.createNewItem()),
+            config: clone(data_get(this.item, 'config', this.createNewItem())),
             saveKeyBinding: null,
             validateDisplay: false,
             validateUrl: false,
@@ -91,6 +105,7 @@ export default {
             return {
                 display: '',
                 url: '',
+                icon: null,
             };
         },
 
@@ -108,6 +123,14 @@ export default {
 
             if (this.validateDisplay || this.validateUrl) {
                 return;
+            }
+
+            let config = clone(this.config);
+
+            if (this.isChild) {
+                config.icon = null;
+            } else if (! config.icon) {
+                config.icon = data_get(this.item, 'original.icon');
             }
 
             this.$emit('updated', this.config, this.item);

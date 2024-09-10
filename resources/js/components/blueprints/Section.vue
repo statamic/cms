@@ -80,6 +80,10 @@
                             />
                         </publish-field-meta>
                     </div>
+                    <div class="form-group w-full" v-if="showHideField">
+                        <label v-text="__('Hidden')" />
+                        <toggle-input v-model="editingSection.hide" />
+                    </div>
                 </div>
             </confirmation-modal>
 
@@ -133,6 +137,10 @@ export default {
             required: true
         },
         showHandleField: {
+            type: Boolean,
+            default: false
+        },
+        showHideField: {
             type: Boolean,
             default: false
         },
@@ -218,6 +226,7 @@ export default {
                 handle: this.section.handle,
                 instructions: this.section.instructions,
                 icon: this.section.icon,
+                hide: this.section.hide,
             };
         },
 

@@ -50,7 +50,7 @@ export default {
 
     computed: {
         options() {
-            return this.normalizeInputOptions(this.meta.options);
+            return this.normalizeInputOptions(this.meta.options || this.config.options);
         },
 
         replicatorPreview() {

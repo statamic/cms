@@ -22,7 +22,7 @@
                     </div>
                 </div>
 
-                <div class="form-group config-field" v-if="showHidden">
+                <div class="form-group config-field">
                     <div class="field-inner">
                         <label class="block">{{ __('Hidden') }}</label>
                         <p class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</p>
@@ -64,7 +64,6 @@ export default {
         showTitle: Boolean,
         useTabs: { type: Boolean, default: true },
         isFormBlueprint: { type: Boolean, default: false },
-        showHidden: { type: Boolean, default: true },
     },
 
     data() {

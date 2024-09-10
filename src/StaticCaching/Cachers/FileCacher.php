@@ -12,6 +12,7 @@ use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 
 class FileCacher extends AbstractCacher
 {
@@ -61,7 +62,7 @@ class FileCacher extends AbstractCacher
 
         $content = $this->normalizeContent($content);
 
-        $path = $this->getFilePath($request->getUri());
+        $path = $this->getFilePath($url);
 
         if (! $this->writer->write($path, $content, $this->config('lock_hold_length'))) {
             return;
@@ -264,5 +265,32 @@ EOT;
     public function getNocachePlaceholder()
     {
         return $this->nocachePlaceholder ?? '';
+    }
+
+    public function getUrl(Request $request)
+    {
+        $url = $request->getUri();
+
+        if ($this->isExcluded($url)) {
+            return $url;
+        }
+
+        $url = explode('?', $url)[0];
+
+        if ($this->config('ignore_query_strings', false)) {
+            return $url;
+        }
+
+        // Symfony will normalize the query string which includes alphabetizing it. However, we
+        // want to maintain the real order so that when nginx looks for the file, it can find
+        // it. The following is the same normalizing code from Symfony without the ordering.
+
+        if (! $qs = $request->server->get('QUERY_STRING')) {
+            return $url;
+        }
+
+        $qs = HeaderUtils::parseQuery($qs);
+
+        return $url.'?'.http_build_query($qs, '', '&', \PHP_QUERY_RFC3986);
     }
 }

@@ -35,6 +35,7 @@
             auth()->user()->can('edit', $collection)
             || auth()->user()->can('delete', $collection)
             || auth()->user()->can('configure fields')
+            || $actions->isNotEmpty()
         )
         <template #twirldown="{ actionCompleted }">
             @can('edit', $collection)

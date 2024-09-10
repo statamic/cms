@@ -73,6 +73,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             \Rebing\GraphQL\GraphQLServiceProvider::class,
             \Wilderborn\Partyline\ServiceProvider::class,
             \Archetype\ServiceProvider::class,
+            \Spatie\LaravelRay\RayServiceProvider::class,
         ];
     }
 

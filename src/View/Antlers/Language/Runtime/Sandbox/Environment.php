@@ -1249,6 +1249,8 @@ class Environment
      */
     private function scopeValue($name, $originalNode = null)
     {
+        ModifierManager::clearModifierState();
+
         if (! empty(GlobalRuntimeState::$prefixState)) {
             $this->dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
         }

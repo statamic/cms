@@ -67,7 +67,7 @@
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
                     :initial-value="user.roles"
                 >
-                    <template #default="{ meta, value, loading }">
+                    <template #default="{ meta, value, loading, updateMeta }">
                         <div>
                             <relationship-fieldtype
                                 v-if="!loading"
@@ -76,6 +76,7 @@
                                 :meta="meta"
                                 :model-value="modelValue"
                                 @update:model-value="user.roles = $event"
+                                @meta-updated="updateMeta"
                             />
                         </div>
                     </template>
@@ -89,7 +90,7 @@
                     :config="{ handle: 'user.groups', type: 'user_groups' }"
                     :initial-value="user.groups"
                 >
-                    <template #default="{ meta, value, loading }">
+                    <template #default="{ meta, value, loading, updateMeta }">
                         <div>
                             <relationship-fieldtype
                                 v-if="!loading"
@@ -98,6 +99,7 @@
                                 :meta="meta"
                                 :model-value="modelValue"
                                 @update:model-value="user.groups = $event"
+                                @meta-updated="updateMeta"
                             />
                         </div>
                     </template>

@@ -25,6 +25,7 @@ export default {
             meta: this.meta,
             modelValue: this.modelValue,
             loading: this.loading,
+            updateMeta: this.updateMeta,
         });
     },
 
@@ -61,6 +62,10 @@ export default {
                 this.modelValue = response.data.value;
                 this.loading = false;
             });
+        },
+
+        updateMeta(value) {
+            this.meta = value;
         }
     }
 }

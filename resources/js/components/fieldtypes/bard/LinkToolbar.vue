@@ -299,6 +299,14 @@ export default {
             return ['url', 'entry', 'asset'].includes(this.linkType);
         },
 
+        selectedTextIsEmail() {
+            const { view, state } = this.bard.editor
+            const { from, to } = view.state.selection
+            const text = state.doc.textBetween(from, to, '')
+
+            return text.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        },
+
     },
 
     watch: {
@@ -326,6 +334,11 @@ export default {
 
         this.bard.eventBus.on('link-selected', this.applyAttrs);
         this.bard.eventBus.on('link-deselected', () => this.$emit('deselected'));
+
+        if (_.isEmpty(this.linkAttrs) && this.selectedTextIsEmail) {
+            this.linkType = 'mailto'
+            this.urlData = { mailto: this.selectedTextIsEmail }
+        }
     },
 
     mounted() {

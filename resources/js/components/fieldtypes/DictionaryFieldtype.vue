@@ -11,6 +11,7 @@
             :name="name"
             :disabled="config.disabled || isReadOnly || (multiple && limitReached)"
             :options="normalizeInputOptions(options)"
+            :get-option-key="(option) => option.value"
             :placeholder="__(config.placeholder)"
             :multiple="multiple"
             :model-value="selectedOptions"

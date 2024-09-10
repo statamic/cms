@@ -3,7 +3,7 @@
     <div class="p-4 m-0 @container" :class="classes">
 
         <label class="block" :for="fieldId" v-if="showLabel">
-            <span v-if="showLabelText">{{ display }}</span>
+            <span v-if="showLabelText" v-tooltip="{content: field.handle, delay: 500, autoHide: false}">{{ display }}</span>
             <i class="required" v-if="field.required">*</i>
             <span v-if="isReadOnly" class="text-gray-500 font-normal text-2xs mx-1" v-text="__('Read Only')" />
         </label>

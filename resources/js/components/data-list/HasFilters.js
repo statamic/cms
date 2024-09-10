@@ -55,13 +55,6 @@ export default {
 
     },
 
-    created() {
-        this.$keys.bind('f', e => {
-            e.preventDefault();
-            this.handleShowFilters();
-        });
-    },
-
     methods: {
 
         searchChanged(query) {

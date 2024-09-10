@@ -204,7 +204,7 @@ return [
     'site_configure_lang_instructions' => 'Leer meer over [Languages](https://statamic.dev/multi-site#language).',
     'site_configure_locale_instructions' => 'Leer meer over [Locales](https://statamic.dev/multi-site#locale).',
     'site_configure_name_instructions' => 'De naam van deze site die je gebruikers te zien krijgen in het control panel.',
-    'site_configure_url_instructions' => 'Leer meer over [Site-URLs](https://statamic.dev/multi-site#urlhttps://statamic.dev/multi-site#url).',
+    'site_configure_url_instructions' => 'Leer meer over [Site-URLs](https://statamic.dev/multi-site#url).',
     'status_expired_with_date' => 'Verlopen op :date',
     'status_published_with_date' => 'Gepubliceerd op :date',
     'status_scheduled_with_date' => 'Ingepland om gepubliceerd te worden op :date',

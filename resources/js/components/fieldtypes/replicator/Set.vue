@@ -2,7 +2,7 @@
     <div :class="sortableItemClass">
         <slot name="picker" />
 
-        <div class="replicator-set" :class="{ 'has-error': this.hasError }">
+        <div class="replicator-set" :class="{ 'has-error': this.hasError }" :data-type="config.handle">
             <div
                 class="replicator-set-header"
                 :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }"
@@ -16,7 +16,7 @@
                 >
                     <label class="text-xs rtl:ml-2 ltr:mr-2 cursor-pointer">
                         <span v-if="isSetGroupVisible">
-                            {{ setGroup.display }}
+                            {{ __(setGroup.display) }}
                             <svg-icon name="micro/chevron-right" class="w-4" />
                         </span>
 

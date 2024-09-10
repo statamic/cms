@@ -96,6 +96,7 @@
                         :depth="vm.level"
                         :vm="vm"
                         :is-open="item.open"
+                        :is-child="isChildItemNode(item)"
                         :has-children="item.children.length > 0"
                         :disable-sections="true"
                         :top-level="true"
@@ -106,7 +107,7 @@
                             <dropdown-item
                                 v-if="vm.level < 2"
                                 :text="__('Add Item')"
-                                @click="addItem(item.children)"
+                                @click="addItem(item.children, item)"
                             />
                             <dropdown-item
                                 :text="__('Edit')"
@@ -153,6 +154,7 @@
                         :depth="vm.level"
                         :vm="vm"
                         :is-open="item.open"
+                        :is-child="isChildItemNode(item)"
                         :has-children="item.children.length > 0"
                         @edit="editItem(item)"
                         @toggle-open="store.toggleOpen(item)"
@@ -161,7 +163,7 @@
                             <dropdown-item
                                 v-if="vm.level < 3"
                                 :text="__('Add Item')"
-                                @click="addItem(item.children)"
+                                @click="addItem(item.children, item)"
                             />
                             <dropdown-item
                                 :text="__('Edit')"
@@ -198,6 +200,7 @@
         <item-editor
             v-if="creatingItem"
             :creating="true"
+            :is-child="creatingItemIsChild"
             @closed="resetItemEditor"
             @updated="itemAdded"
         />
@@ -205,6 +208,7 @@
         <item-editor
             v-if="editingItem"
             :item="editingItem"
+            :is-child="isChildItemNode(editingItem)"
             @closed="resetItemEditor"
             @updated="itemUpdated"
         />
@@ -299,6 +303,7 @@ export default {
             changed: false,
             targetDataArray: null,
             creatingItem: false,
+            creatingItemIsChild: false,
             editingItem: false,
             creatingSection: false,
             editingSection: false,
@@ -457,6 +462,18 @@ export default {
             return data_get(node, 'isSection', false);
         },
 
+        isParentItemNode(node) {
+            return ! this.isSectionNode(node) && ! this.isChildItemNode(node);
+        },
+
+        isChildItemNode(node) {
+            if (data_get(node, 'parent.isRoot')) {
+                return false;
+            }
+
+            return ! this.isSectionNode(node.parent);
+        },
+
         isCustomSectionNode(node) {
             return this.isSectionNode(node) && data_get(node, 'manipulations.action') === '@create';
         },
@@ -467,14 +484,6 @@ export default {
             }
 
             return node;
-        },
-
-        isChildItemNode(node) {
-            if (data_get(node, 'parent.isRoot')) {
-                return false;
-            }
-
-            return !this.isSectionNode(node.parent);
         },
 
         traverseTree(nodes, callback, parentPath = []) {
@@ -497,9 +506,10 @@ export default {
             });
         },
 
-        addItem(targetDataArray) {
+        addItem(targetDataArray, parentItem) {
             this.targetDataArray = targetDataArray;
             this.creatingItem = true;
+            this.creatingItemIsChild = parentItem && this.isParentItemNode(parentItem);
         },
 
         addSection() {
@@ -513,6 +523,7 @@ export default {
                 action: '@create',
                 display: createdConfig.display,
                 url: createdConfig.url,
+                icon: createdConfig.icon,
             };
 
             this.targetDataArray.push(item);
@@ -542,9 +553,11 @@ export default {
 
         itemUpdated(updatedConfig, item) {
             item.text = updatedConfig.display;
+            item.config.icon = updatedConfig.icon;
 
             this.updateItemManipulation(item, 'display', updatedConfig.display);
             this.updateItemManipulation(item, 'url', updatedConfig.url);
+            this.updateItemManipulation(item, 'icon', updatedConfig.icon);
             this.updateItemAction(item);
 
             this.resetItemEditor();
@@ -698,6 +711,7 @@ export default {
         resetItemEditor() {
             this.editingItem = false;
             this.creatingItem = false;
+            this.creatingItemIsChild = false;
             this.targetDataArray = false;
         },
 
