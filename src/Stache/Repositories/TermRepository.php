@@ -155,7 +155,11 @@ class TermRepository implements RepositoryContract
         }
 
         if ($status) {
-            $items = $items->filter(fn ($item) => Entry::find($item['entry'])->status() === $status);
+            return Entry::query()
+                ->whereIn('id', $items->pluck('entry')->all())
+                ->when($collection, fn ($query) => $query->where('collection', $collection->handle()))
+                ->whereStatus($status)
+                ->count();
         }
 
         return $items->count();
