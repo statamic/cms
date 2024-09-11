@@ -3,7 +3,7 @@
     <confirmation-modal
         name="folder-editor"
         :title="modalTitle"
-        :submitting="submitting"
+        :busy="submitting"
         @cancel="cancel"
         @confirm="submit"
     >

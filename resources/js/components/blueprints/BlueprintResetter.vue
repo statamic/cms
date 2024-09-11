@@ -5,7 +5,7 @@
         :bodyText="modalBody"
         :buttonText="__('Reset')"
         :danger="true"
-        :submitting="submitting"
+        :busy="submitting"
         @confirm="confirmed"
         @cancel="cancel"
     >

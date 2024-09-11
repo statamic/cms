@@ -11,13 +11,13 @@
                         <p>{{ __('Are you sure?') }}</p>
                     </slot>
                 </slot>
-                <div v-if="submitting" class="bg-white dark:bg-dark-700 bg-opacity-75 select-none pointer-events-none absolute inset-0 flex items-center justify-center">
+                <div v-if="busy" class="bg-white dark:bg-dark-700 bg-opacity-75 select-none pointer-events-none absolute inset-0 flex items-center justify-center">
                     <loading-graphic text="" />
                 </div>
             </div>
             <div class="px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-b-lg border-t dark:border-dark-900 flex items-center justify-end text-sm">
-                <button type="button" class="btn-flat" @click.prevent="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" :disabled="submitting" />
-                <button class="rtl:mr-4 ltr:ml-4" :class="buttonClass" :disabled="disabled || submitting" v-text="__(buttonText)" />
+                <button type="button" class="btn-flat" @click.prevent="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" :disabled="busy" />
+                <button class="rtl:mr-4 ltr:ml-4" :class="buttonClass" :disabled="disabled || busy" v-text="__(buttonText)" />
             </div>
         </form>
     </modal>
@@ -52,7 +52,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        submitting: {
+        busy: {
             type: Boolean,
             default: false,
         }
@@ -75,7 +75,7 @@ export default {
             this.$emit('cancel')
         },
         submit() {
-            if (this.submitting) {
+            if (this.busy) {
                 return;
             }
 

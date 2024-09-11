@@ -8,7 +8,7 @@
             :title="action.title"
             :danger="action.dangerous"
             :buttonText="runButtonText"
-            :submitting="running"
+            :busy="running"
             @confirm="confirm"
             @cancel="reset"
         >
