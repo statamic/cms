@@ -112,7 +112,7 @@ class ThumbnailController extends Controller
                 $this->asset,
                 $preset ? ['p' => $preset] : []
             );
-        } catch(FileNotFoundException $e) {
+        } catch (FileNotFoundException $e) {
             throw new NotFoundHttpException;
         } finally {
             Cache::forget($this->mutex());
