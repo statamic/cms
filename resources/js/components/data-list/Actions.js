@@ -50,7 +50,9 @@ export default {
                         : this.handleActionSuccess(response); // Otherwise handle as normal, converting from JSON
                 })
                 .catch((error) => this.handleActionError(error.response))
-                .finally(() => done());
+                .finally(() => {
+                    if (done) done()
+                });
         },
 
         handleActionSuccess(response) {
