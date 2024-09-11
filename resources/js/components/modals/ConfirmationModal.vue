@@ -72,12 +72,12 @@ export default {
 
     methods: {
         dismiss() {
+            if (this.busy) return;
+
             this.$emit('cancel')
         },
         submit() {
-            if (this.busy) {
-                return;
-            }
+            if (this.busy) return;
 
             this.$emit('confirm');
         }
