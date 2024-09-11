@@ -81,6 +81,11 @@ class Dictionary extends Fieldtype
         })->values()->all();
     }
 
+    public function preProcessIndex($data)
+    {
+        return collect($this->getItemData($data))->pluck('label')->all();
+    }
+
     public function augment($value)
     {
         if ($this->multiple() && is_null($value)) {

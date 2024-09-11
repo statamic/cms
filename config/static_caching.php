@@ -102,6 +102,14 @@ return [
 
     'ignore_query_strings' => false,
 
+    'allowed_query_strings' => [
+        //
+    ],
+
+    'disallowed_query_strings' => [
+        //
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Nocache

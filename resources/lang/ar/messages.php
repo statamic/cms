@@ -209,7 +209,7 @@ return [
     'site_configure_lang_instructions' => 'معرفة المزيد عن [اللغات](https://statamic.dev/multi-site#language).',
     'site_configure_locale_instructions' => 'معرفة المزيد عن [المواقع](https://statamic.dev/multi-site#locale).',
     'site_configure_name_instructions' => 'اسم ظاهر للمستخدم يُعرض في جميع أنحاء لوحة التحكم.',
-    'site_configure_url_instructions' => 'معرفة المزيد عن [عناوين مواقع الويب](https://statamic.dev/multi-site#urlhttps://statamic.dev/multi-site#url).',
+    'site_configure_url_instructions' => 'معرفة المزيد عن [عناوين مواقع الويب](https://statamic.dev/multi-site#url).',
     'status_expired_with_date' => 'منتهي في :date',
     'status_published_with_date' => 'تم نشره في :date',
     'status_scheduled_with_date' => 'مقرر نشره في :date',

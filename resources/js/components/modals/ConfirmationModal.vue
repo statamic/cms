@@ -4,11 +4,10 @@
             <header v-if="title" class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
                 {{ __(title) }}
             </header>
-
             <div class="relative">
                 <div class="flex-1 px-5 py-6 text-gray dark:text-dark-150" :class="submitting ? ['blur-[2px]', 'opacity-75', 'select-none', 'pointer-events-none'] : []">
                     <slot name="body">
-                        <p v-if="bodyText" v-text="bodyText"/>
+                        <p v-if="bodyText" v-text="bodyText" />
                         <slot v-else>
                             <p>{{ __('Are you sure?') }}</p>
                         </slot>
@@ -18,11 +17,9 @@
                     <loading-graphic text="" />
                 </div>
             </div>
-
-            <div
-                class="px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-b-lg border-t dark:border-dark-900 flex items-center justify-end text-sm">
-                <button class="btn-flat" @click.prevent="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" :disabled="submitting"/>
-                <button class="rtl:mr-4 ltr:ml-4" :class="buttonClass" :disabled="disabled || submitting" v-text="__(buttonText)"/>
+            <div class="px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-b-lg border-t dark:border-dark-900 flex items-center justify-end text-sm">
+                <button type="button" class="btn-flat" @click.prevent="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" />
+                <button class="rtl:mr-4 ltr:ml-4" :class="buttonClass" :disabled="disabled || submitting" v-text="__(buttonText)" />
             </div>
         </form>
     </modal>
