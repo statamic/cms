@@ -355,7 +355,7 @@ abstract class AbstractCacher implements Cacher
     public function getUrl(Request $request)
     {
         $url = $request->getUri();
-      
+
         if ($recache = $request->input('__recache')) {
             $url = str_replace('__recache='.$recache, '', $url);
             if (substr($url, -1, 1) == '?') {
