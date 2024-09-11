@@ -6,6 +6,7 @@ use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\UnableToReadFile;
+use League\Glide\Filesystem\FileNotFoundException as GlideFileNotFoundException;
 use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset;
@@ -253,7 +254,11 @@ class ImageGenerator
             $this->validateImage();
         }
 
-        $path = $this->server->makeImage($image, $this->params);
+        try {
+            $path = $this->server->makeImage($image, $this->params);
+        } catch (GlideFileNotFoundException $e) {
+            throw UnableToReadFile::fromLocation($image);
+        }
 
         GlideImageGenerated::dispatch($path, $this->params);
 
