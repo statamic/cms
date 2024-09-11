@@ -4,16 +4,14 @@
             <header v-if="title" class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
                 {{ __(title) }}
             </header>
-            <div class="relative">
-                <div class="flex-1 px-5 py-6 text-gray dark:text-dark-150" :class="{ 'blur-[2px] opacity-75 select-none pointer-events-none': submitting }">
-                    <slot name="body">
-                        <p v-if="bodyText" v-text="bodyText" />
-                        <slot v-else>
-                            <p>{{ __('Are you sure?') }}</p>
-                        </slot>
+            <div class="relative flex-1 px-5 py-6 text-gray dark:text-dark-150">
+                <slot name="body">
+                    <p v-if="bodyText" v-text="bodyText" />
+                    <slot v-else>
+                        <p>{{ __('Are you sure?') }}</p>
                     </slot>
-                </div>
-                <div v-if="submitting" class="absolute inset-0 flex items-center justify-center">
+                </slot>
+                <div v-if="submitting" class="bg-white dark:bg-dark-700 bg-opacity-75 select-none pointer-events-none absolute inset-0 flex items-center justify-center">
                     <loading-graphic text="" />
                 </div>
             </div>
