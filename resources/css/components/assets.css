@@ -59,6 +59,10 @@
 
 }
 
+.assets-fieldtype-picker + .asset-table-listing {
+    @apply rounded-t-none;
+}
+
 .asset-listing .actions {
     margin-bottom: 15px;
     display: flex;

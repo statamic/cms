@@ -143,6 +143,10 @@ class BrowserController extends CpController
             $query->where('folder', $path);
         }
 
+        if ($request->sort) {
+            $query->orderBy($request->sort, $request->order ?? 'asc');
+        }
+
         $this->applyQueryScopes($query, $request->all());
 
         $assets = $query->paginate(request('perPage'));

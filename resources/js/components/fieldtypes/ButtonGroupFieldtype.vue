@@ -5,6 +5,7 @@
                 v-for="(option, $index) in options"
                 :key="$index"
                 ref="button"
+                type="button"
                 :name="name"
                 @click="update($event.target.value)"
                 :value="option.value"
@@ -39,13 +40,13 @@ export default {
 
     computed: {
         options() {
-            return this.normalizeInputOptions(this.config.options);
+            return this.normalizeInputOptions(this.meta.options || this.config.options);
         },
 
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            var option = _.findWhere(this.config.options, {value: this.value});
+            var option = _.findWhere(this.options, {value: this.value});
             return (option) ? option.label : this.value;
         },
     },

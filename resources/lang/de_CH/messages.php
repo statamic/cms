@@ -208,7 +208,7 @@ return [
     'site_configure_lang_instructions' => 'Mehr über [Sprachen](https://statamic.dev/multi-site#language) erfahren.',
     'site_configure_locale_instructions' => 'Mehr über [Regionen](https://statamic.dev/multi-site#locale) erfahren.',
     'site_configure_name_instructions' => 'Dieser Name wird den Benutzer:innen im gesamten Control Panel angezeigt.',
-    'site_configure_url_instructions' => 'Mehr über [Website URLs](https://statamic.dev/multi-site#urlhttps://statamic.dev/multi-site#url) erfahren.',
+    'site_configure_url_instructions' => 'Mehr über [Website URLs](https://statamic.dev/multi-site#url) erfahren.',
     'status_expired_with_date' => 'Abgelaufen am :date',
     'status_published_with_date' => 'Veröffentlicht am :date',
     'status_scheduled_with_date' => 'Geplante Veröffentlichung am :date',
