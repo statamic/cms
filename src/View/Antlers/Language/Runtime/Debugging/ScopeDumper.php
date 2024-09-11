@@ -132,7 +132,7 @@ class ScopeDumper
         $vars = [];
 
         foreach ($data as $k => $v) {
-            $variable = new DumpVariable();
+            $variable = new DumpVariable;
             $variable->name = strval($k);
 
             if (is_string($v)) {

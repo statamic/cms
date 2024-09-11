@@ -52,9 +52,7 @@ class FieldTest extends TestCase
     /** @test */
     public function it_gets_the_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype
-        {
-        };
+        $fieldtype = new class extends Fieldtype {};
 
         FieldtypeRepository::shouldReceive('find')
             ->with('the_fieldtype')

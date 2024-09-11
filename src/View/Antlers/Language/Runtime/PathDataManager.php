@@ -519,7 +519,7 @@ class PathDataManager
             $pathCopy->isVariableVariable = false;
             $dynamicPath = (string) $this->getData($pathCopy, $data);
 
-            $tempPathParser = new PathParser();
+            $tempPathParser = new PathParser;
             $path = $tempPathParser->parse($dynamicPath);
 
             if (! $this->guardRuntimeAccess($path->normalizedReference)) {
@@ -721,7 +721,7 @@ class PathDataManager
                         $referencePath = $processor->cloneProcessor()->setData($data)
                             ->setIsInterpolationProcessor(true)->reduce($this->interpolations[$pathItem->originalContent]);
                     } else {
-                        $retriever = new PathDataManager();
+                        $retriever = new PathDataManager;
                         $retriever->setInterpolations($this->interpolations);
                         $retriever->setEnvironment($this->environment);
                         $retriever->setIsPaired(false);

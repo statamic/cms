@@ -62,9 +62,7 @@ class TimingsTracer implements RuntimeTracerContract
         }
     }
 
-    public function onRenderComplete()
-    {
-    }
+    public function onRenderComplete() {}
 
     public function getTimings()
     {

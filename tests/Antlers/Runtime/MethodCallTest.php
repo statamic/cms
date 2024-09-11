@@ -12,7 +12,7 @@ class MethodCallTest extends ParserTestCase
 {
     public function test_methods_can_be_called()
     {
-        $object = new ClassOne();
+        $object = new ClassOne;
 
         $this->assertSame('Value: hello', $this->renderString('{{ object:method("hello"):methodTwo() }}', [
             'object' => $object,
@@ -24,7 +24,7 @@ class MethodCallTest extends ParserTestCase
 
     public function test_chained_methods_colon_syntax()
     {
-        $object = new ClassOne();
+        $object = new ClassOne;
 
         $this->assertSame('Value: hello', $this->renderString('{{ object:method("hello"):methodTwo() }}', [
             'object' => $object,
@@ -33,7 +33,7 @@ class MethodCallTest extends ParserTestCase
 
     public function test_chained_methods_dot_syntax()
     {
-        $object = new ClassOne();
+        $object = new ClassOne;
 
         $this->assertSame('Value: hello', $this->renderString('{{ object.method("hello").methodTwo() }}', [
             'object' => $object,
@@ -42,7 +42,7 @@ class MethodCallTest extends ParserTestCase
 
     public function test_chained_methods_mixed_syntax()
     {
-        $object = new ClassOne();
+        $object = new ClassOne;
 
         $this->assertSame('Value: hello', $this->renderString('{{ object:method("hello").methodTwo() }}', [
             'object' => $object,
@@ -222,7 +222,7 @@ EOT;
 
     public function test_method_calls_not_get_called_more_than_declared()
     {
-        $counter = new CallCounter();
+        $counter = new CallCounter;
 
         $template = <<<'EOT'
 {{ counter:increment():increment():increment() }}

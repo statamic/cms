@@ -36,7 +36,7 @@ class AssetTemplateTest extends ParserTestCase
 
     public function test_asset_returns_implicit_string_value()
     {
-        $asset = new Asset();
+        $asset = new Asset;
         $asset->container($this->container);
         $asset->path('path/to/asset.jpg');
 
@@ -59,7 +59,7 @@ class AssetTemplateTest extends ParserTestCase
     {
         VarTest::register();
 
-        $asset = new Asset();
+        $asset = new Asset;
         $asset->container($this->container);
         $asset->path('path/to/asset.jpg');
 
@@ -76,7 +76,7 @@ class AssetTemplateTest extends ParserTestCase
 
     public function test_asset_assignment()
     {
-        $asset = new Asset();
+        $asset = new Asset;
         $asset->container($this->container);
         $asset->path('path/to/asset.jpg');
 
@@ -92,7 +92,7 @@ class AssetTemplateTest extends ParserTestCase
 
     public function test_parameter_values_are_not_lost_when_passed_into_tags()
     {
-        $asset = new Asset();
+        $asset = new Asset;
         $asset->container($this->container);
         $asset->path('path/to/asset.jpg');
 

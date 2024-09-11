@@ -77,7 +77,7 @@ class MarkTest extends TestCase
                     ['type' => 'text', 'text' => 'amet', 'marks' => [['type' => 'bold']]],
                 ],
             ],
-        ], 'content', new Bard());
+        ], 'content', new Bard);
         $words = 'elüt amet';
 
         $expected = '<p>Lorem, ipsum <mark>el&uuml;t</mark> sit <strong><mark>amet</mark></strong></p>';
@@ -88,7 +88,7 @@ class MarkTest extends TestCase
     /** @test */
     public function it_marks_markdown_value()
     {
-        $data = new Value('Lorem, ipsum elüt sit **amet**', 'content', new Markdown());
+        $data = new Value('Lorem, ipsum elüt sit **amet**', 'content', new Markdown);
         $words = 'elüt amet';
 
         $expected = '<p>Lorem, ipsum <mark>el&uuml;t</mark> sit <strong><mark>amet</mark></strong></p>

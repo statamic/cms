@@ -19,7 +19,7 @@ EOT;
 
         $content = StringUtilities::normalizeLineEndings($content);
 
-        $markdownFieldType = new Markdown();
+        $markdownFieldType = new Markdown;
         $markdownField = new Value($content, 'markdown', $markdownFieldType);
 
         $this->assertSame($content, trim($this->renderString('{{ markdown }}', ['markdown' => $markdownField])));
@@ -54,7 +54,7 @@ EOT;
         $content = StringUtilities::normalizeLineEndings($content);
         $result = StringUtilities::normalizeLineEndings($result);
 
-        $markdownFieldType = new Markdown();
+        $markdownFieldType = new Markdown;
         $markdownField = new Value($content, 'markdown', $markdownFieldType);
         $this->assertSame($result, trim($this->renderString('{{ markdown }}', ['markdown' => $markdownField])));
     }

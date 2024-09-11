@@ -38,8 +38,8 @@ class AntlersNodeParser
 
     public function __construct()
     {
-        $this->pathParser = new PathParser();
-        $this->lexer = new AntlersLexer();
+        $this->pathParser = new PathParser;
+        $this->lexer = new AntlersLexer;
     }
 
     /**
@@ -96,10 +96,10 @@ class AntlersNodeParser
             $nodeContent = rtrim($nodeContent, '*');
             $nodeContent = trim(StringUtilities::substr($nodeContent, 13));
 
-            $recursiveNode = new RecursiveNode();
+            $recursiveNode = new RecursiveNode;
             $node->copyBasicDetailsTo($recursiveNode);
             $recursiveNode->originalNode = $node;
-            $recursiveNode->name = new TagIdentifier();
+            $recursiveNode->name = new TagIdentifier;
             $recursiveNode->name->name = $nodeContent;
             $recursiveNode->isNestedRecursive = true;
 
@@ -124,10 +124,10 @@ class AntlersNodeParser
             $nodeContent = rtrim($nodeContent, '*');
             $nodeContent = trim(StringUtilities::substr($nodeContent, 10));
 
-            $recursiveNode = new RecursiveNode();
+            $recursiveNode = new RecursiveNode;
             $node->copyBasicDetailsTo($recursiveNode);
             $recursiveNode->originalNode = $node;
-            $recursiveNode->name = new TagIdentifier();
+            $recursiveNode->name = new TagIdentifier;
             $recursiveNode->name->name = $nodeContent;
 
             try {
@@ -272,7 +272,7 @@ class AntlersNodeParser
             $parser = $node->getParser();
             $replacedNode->withParser($parser);
 
-            $replacedNode->name = new TagIdentifier();
+            $replacedNode->name = new TagIdentifier;
             $replacedNode->name->name = 'if';
             $replacedNode->name->compound = 'if';
 
@@ -289,7 +289,7 @@ class AntlersNodeParser
             $parser = $node->getParser();
             $replacedNode->withParser($parser);
 
-            $replacedNode->name = new TagIdentifier();
+            $replacedNode->name = new TagIdentifier;
             $replacedNode->name->name = 'if';
             $replacedNode->name->compound = 'if';
 
@@ -313,7 +313,7 @@ class AntlersNodeParser
             $parser = $node->getParser();
             $replacedNode->withParser($parser);
 
-            $replacedNode->name = new TagIdentifier();
+            $replacedNode->name = new TagIdentifier;
             $replacedNode->name->name = 'elseif';
             $replacedNode->name->compound = 'elseif';
 
@@ -506,7 +506,7 @@ class AntlersNodeParser
                     $endAt += 1;
                 }
 
-                $parameterNode = new ParameterNode();
+                $parameterNode = new ParameterNode;
                 $parameterNode->isVariableReference = true;
 
                 $name = implode('', array_slice($currentChars, 2));
@@ -658,7 +658,7 @@ class AntlersNodeParser
                 $terminator = null;
                 $currentChars = [];
 
-                $parameterNode = new ParameterNode();
+                $parameterNode = new ParameterNode;
 
                 if (Str::startsWith($name, DocumentParser::Punctuation_Colon)) {
                     $parameterNode->isVariableReference = true;

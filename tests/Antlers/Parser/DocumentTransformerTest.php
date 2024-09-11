@@ -811,7 +811,7 @@ Taxonomy: {{ taxonomy }}
         {{ /collection:articles }}
 EOT;
 
-        $result = (new DocumentTransformer())->load($template)->getTemplate();
+        $result = (new DocumentTransformer)->load($template)->getTemplate();
 
         $this->assertSame($template, $result);
     }
@@ -822,7 +822,7 @@ EOT;
 <p>{{ if 1 &gt; 3 }}Yes.{{ else }}No.{{ /if }}<br>{{ if 1 &lt; 3 &amp;&amp; true == true }}Yes.{{ else }}No.{{ /if }}<br>{{ if 3 &gt; 1 }}3 is bigger{{ /if }}<br>{{ now format=&quot;Y&quot; }}<br>Just some content</p>
 EOT;
 
-        $transformer = new DocumentTransformer();
+        $transformer = new DocumentTransformer;
         $reversed = $transformer->correct($template);
 
         $this->assertSame('<p>{{ if 1 > 3 }}Yes.{{ else }}No.{{ /if }}<br>{{ if 1 < 3 && true == true }}Yes.{{ else }}No.{{ /if }}<br>{{ if 3 > 1 }}3 is bigger{{ /if }}<br>{{ now format="Y" }}<br>Just some content</p>', $reversed);

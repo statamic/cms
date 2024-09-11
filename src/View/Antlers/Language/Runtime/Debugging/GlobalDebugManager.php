@@ -39,7 +39,7 @@ class GlobalDebugManager
     public static function getTimingsTracer()
     {
         if (self::$timingsTracer == null) {
-            self::$timingsTracer = new TimingsTracer();
+            self::$timingsTracer = new TimingsTracer;
         }
 
         return self::$timingsTracer;
@@ -133,7 +133,7 @@ class GlobalDebugManager
                 }
             }
 
-            $stackFrame = new StackFrame();
+            $stackFrame = new StackFrame;
             $stackFrame->line = $stackLine;
             $stackFrame->column = $stackColumn;
             $stackFrame->pathSource = $stackSource;
@@ -158,7 +158,7 @@ class GlobalDebugManager
 
         $activeData = $processor->getActiveData();
         $dump = [
-            'data' => (new ScopeDumper())->dump($activeData),
+            'data' => (new ScopeDumper)->dump($activeData),
             'frames' => self::getStackFrames(),
         ];
 
@@ -286,7 +286,7 @@ class GlobalDebugManager
             foreach ($existingBreakpoints as $bpPath) {
                 $contents = \json_decode(file_get_contents($bpPath), true);
 
-                $runtimeBreakpoint = new Breakpoint();
+                $runtimeBreakpoint = new Breakpoint;
                 $runtimeBreakpoint->path = $contents['path'];
                 $runtimeBreakpoint->line = $contents['line'];
                 $runtimeBreakpoint->debugId = $contents['encode'];

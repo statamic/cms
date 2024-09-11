@@ -253,7 +253,7 @@ class CoreModifiers extends Modifier
 
         $items = array_values(Arr::where($value, fn ($item) => $item['type'] !== 'set'));
 
-        return (new Augmentor(new Bard()))->augment($items);
+        return (new Augmentor(new Bard))->augment($items);
     }
 
     public function boolString($value)

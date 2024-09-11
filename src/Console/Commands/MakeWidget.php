@@ -84,7 +84,7 @@ class MakeWidget extends GeneratorCommand
      */
     protected function updateServiceProvider()
     {
-        $factory = new BuilderFactory();
+        $factory = new BuilderFactory;
 
         $widgetClassValue = $factory->classConstFetch('Widgets\\'.$this->getNameInput(), 'class');
 

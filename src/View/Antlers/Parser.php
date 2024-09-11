@@ -1304,7 +1304,7 @@ class Parser implements ParserContract
             if (! (is_string($value) || is_numeric($value))) {
                 // If the variable does not exist in the context or the value is not a valid key
                 // the replacement should not return a value to prevent unexpected behaviour.
-                throw new ArrayKeyNotFoundException();
+                throw new ArrayKeyNotFoundException;
             }
 
             return '.'.$value;

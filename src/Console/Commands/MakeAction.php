@@ -59,7 +59,7 @@ class MakeAction extends GeneratorCommand
      */
     protected function updateServiceProvider()
     {
-        $factory = new BuilderFactory();
+        $factory = new BuilderFactory;
 
         $actionClassValue = $factory->classConstFetch('Actions\\'.$this->getNameInput(), 'class');
 

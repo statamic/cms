@@ -20,7 +20,7 @@ class AddTest extends TestCase
     public function it_adds_a_variable(): void
     {
         $context = [
-            'magazines' => new Value(10, 'magazines', new Integer()),
+            'magazines' => new Value(10, 'magazines', new Integer),
         ];
         $modified = $this->modify(5, ['magazines'], $context);
         $this->assertEquals(15, $modified);

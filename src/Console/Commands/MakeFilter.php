@@ -59,7 +59,7 @@ class MakeFilter extends GeneratorCommand
      */
     protected function updateServiceProvider()
     {
-        $factory = new BuilderFactory();
+        $factory = new BuilderFactory;
 
         $filterClassValue = $factory->classConstFetch('Filters\\'.$this->getNameInput(), 'class');
 

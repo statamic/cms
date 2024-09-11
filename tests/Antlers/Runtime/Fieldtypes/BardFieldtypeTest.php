@@ -22,7 +22,7 @@ class BardFieldtypeTest extends ParserTestCase
 
     public function test_antlers_true_bard_fields_correct_for_html_encoded_values()
     {
-        $bard = new Bard();
+        $bard = new Bard;
         $field = new Field('test', [
             'type' => 'bard',
             'antlers' => true,

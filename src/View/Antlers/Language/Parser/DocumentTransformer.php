@@ -13,7 +13,7 @@ class DocumentTransformer
 
     public function __construct()
     {
-        $this->parser = new DocumentParser();
+        $this->parser = new DocumentParser;
     }
 
     public function load($text)

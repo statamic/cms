@@ -100,7 +100,7 @@ class LanguageParser
 
     public function __construct()
     {
-        $this->pathParser = new PathParser();
+        $this->pathParser = new PathParser;
     }
 
     public function parse($tokens)
@@ -159,19 +159,19 @@ class LanguageParser
 
             if ($thisNode instanceof ImplicitArrayBegin) {
                 // Emit the "arr" language operator followed by a LogicGroupBegin.
-                $arrConstruct = new LanguageOperatorConstruct();
+                $arrConstruct = new LanguageOperatorConstruct;
                 $arrConstruct->startPosition = $thisNode->startPosition;
                 $arrConstruct->endPosition = $thisNode->endPosition;
                 $arrConstruct->originalAbstractNode = $thisNode;
                 $arrConstruct->content = LanguageOperatorRegistry::ARR_MAKE;
 
-                $logicGroupBegin = new LogicGroupBegin();
+                $logicGroupBegin = new LogicGroupBegin;
                 $newNodes[] = $arrConstruct;
                 $newNodes[] = $logicGroupBegin;
 
                 continue;
             } elseif ($thisNode instanceof ImplicitArrayEnd) {
-                $logicGroupEnd = new LogicGroupEnd();
+                $logicGroupEnd = new LogicGroupEnd;
                 $newNodes[] = $logicGroupEnd;
 
                 continue;
@@ -196,7 +196,7 @@ class LanguageParser
                 /** @var AbstractNode $lastNode */
                 $lastNode = array_pop($newNodes);
 
-                $wrapperGroup = new LogicGroup();
+                $wrapperGroup = new LogicGroup;
                 $wrapperGroup->startPosition = $lastNode->startPosition;
                 $wrapperGroup->nodes[] = $lastNode;
                 $wrapperGroup->nodes[] = $thisNode;
@@ -271,7 +271,7 @@ class LanguageParser
 
     private function convertVariableToNumericNode(VariableNode $node)
     {
-        $numericNode = new NumberNode();
+        $numericNode = new NumberNode;
         $numericNode->startPosition = $node->startPosition;
         $numericNode->endPosition = $node->endPosition;
         $numericNode->content = $node->name;
@@ -321,7 +321,7 @@ class LanguageParser
                     }
                 }
 
-                $methodInvocation = new MethodInvocationNode();
+                $methodInvocation = new MethodInvocationNode;
                 $methodInvocation->startPosition = $thisNode->startPosition;
 
                 if ($prevNode instanceof InlineBranchSeparator) {
@@ -356,11 +356,11 @@ class LanguageParser
 
                 $reductionResult = $this->reduceVariableReferenceForObjectAccessor($prevNode);
                 // Construct a dynamic MethodInvocationNode.
-                $methodInvocation = new MethodInvocationNode();
+                $methodInvocation = new MethodInvocationNode;
                 $methodInvocation->startPosition = $thisNode->startPosition;
                 $methodInvocation->endPosition = $thisNode->endPosition;
 
-                $wrappedMethod = new VariableNode();
+                $wrappedMethod = new VariableNode;
                 $wrappedMethod->name = $reductionResult[0];
 
                 $methodInvocation->startPosition->offset -= $reductionResult[1];
@@ -410,7 +410,7 @@ class LanguageParser
                     }
                 }
 
-                $methodInvocation = new MethodInvocationNode();
+                $methodInvocation = new MethodInvocationNode;
                 $methodInvocation->startPosition = $thisNode->startPosition;
                 $methodInvocation->endPosition = $argGroup->endPosition;
                 $methodInvocation->args = $this->makeArgGroup($argNodes);
@@ -462,7 +462,7 @@ class LanguageParser
                     }
                 }
 
-                $methodInvocation = new MethodInvocationNode();
+                $methodInvocation = new MethodInvocationNode;
                 $methodInvocation->startPosition = $thisNode->startPosition;
                 $methodInvocation->endPosition = $argGroup->endPosition;
                 $methodInvocation->args = $this->makeArgGroup($argNodes);
@@ -584,7 +584,7 @@ class LanguageParser
 
     private function convertVarNodeToOperator(VariableNode $variable)
     {
-        $operator = new LanguageOperatorConstruct();
+        $operator = new LanguageOperatorConstruct;
         $operator->content = $variable->name;
         $operator->startPosition = $variable->startPosition;
         $operator->endPosition = $variable->endPosition;
@@ -595,7 +595,7 @@ class LanguageParser
 
     private function convertOperatorToVarNode(LanguageOperatorConstruct $operator)
     {
-        $varNodeWrap = new VariableNode();
+        $varNodeWrap = new VariableNode;
         $varNodeWrap->startPosition = $operator->startPosition;
         $varNodeWrap->endPosition = $operator->endPosition;
         $varNodeWrap->content = $operator->content;
@@ -688,7 +688,7 @@ class LanguageParser
                 }
 
                 // We will simply convert the tuple list syntax into an array node under the hood.
-                $arrayNode = new ArrayNode();
+                $arrayNode = new ArrayNode;
                 $arrayNode->startPosition = $thisToken->startPosition;
                 $arrayNode->endPosition = $thisToken->startPosition;
 
@@ -709,7 +709,7 @@ class LanguageParser
                         );
                     }
 
-                    $nestedArrayNode = new ArrayNode();
+                    $nestedArrayNode = new ArrayNode;
                     $nestedArrayNode->startPosition = $valueNodeCandidate->startPosition;
 
                     $valueCandidates = [];
@@ -733,7 +733,7 @@ class LanguageParser
                     for ($j = 0; $j < $listValueLength; $j++) {
                         $valueToken = $valueCandidates[$j];
 
-                        $namedValueNode = new NameValueNode();
+                        $namedValueNode = new NameValueNode;
                         $namedValueNode->startPosition = $valueToken->startPosition;
                         $namedValueNode->endPosition = $valueToken->endPosition;
                         $namedValueNode->name = $listNames[$j];
@@ -761,7 +761,7 @@ class LanguageParser
 
     private function convertVariableToStringNode(VariableNode $node)
     {
-        $wrappedNode = new StringValueNode();
+        $wrappedNode = new StringValueNode;
         $wrappedNode->content = $node->name;
         $wrappedNode->value = $node->name;
         $wrappedNode->originalAbstractNode = $node;
@@ -877,7 +877,7 @@ class LanguageParser
                         );
                     }
 
-                    $orderGroup = new DirectionGroup();
+                    $orderGroup = new DirectionGroup;
                     $orderGroup->orderClauses = $orderClauses;
                     $orderGroup->startPosition = $orderClauses[0]->directionNode->startPosition;
                     $orderGroup->endPosition = $orderClauses[count($orderClauses) - 1]->directionNode->endPosition;
@@ -1039,17 +1039,17 @@ class LanguageParser
 
                     $subTokens = $expressionNode->nodes;
 
-                    $switchGroup = new SwitchGroup();
+                    $switchGroup = new SwitchGroup;
 
-                    $wrapperGroup = new LogicGroup();
+                    $wrapperGroup = new LogicGroup;
                     $wrapperGroup->nodes = $firstCondition;
                     $wrapperGroup->startPosition = $wrapperGroup->nodes[0]->startPosition;
                     $wrapperGroup->endPosition = $wrapperGroup->nodes[count($wrapperGroup->nodes) - 1]->endPosition;
 
-                    $firstCase = new SwitchCase();
+                    $firstCase = new SwitchCase;
                     $firstCase->condition = $wrapperGroup;
 
-                    $expWrapper = new LogicGroup();
+                    $expWrapper = new LogicGroup;
                     $expWrapper->nodes = [array_shift($subTokens)];
                     $expWrapper->startPosition = $expWrapper->nodes[0]->startPosition;
                     $expWrapper->endPosition = $expWrapper->nodes[count($expWrapper->nodes) - 1]->endPosition;
@@ -1086,10 +1086,10 @@ class LanguageParser
                             }
 
                             if ($next instanceof ScopeAssignmentOperator) {
-                                $newCase = new SwitchCase();
+                                $newCase = new SwitchCase;
                                 $newCase->condition = $thisToken;
 
-                                $expWrapper = new LogicGroup();
+                                $expWrapper = new LogicGroup;
                                 $expWrapper->nodes = [$subTokens[$c + 2]];
                                 $expWrapper->startPosition = $expWrapper->nodes[0]->startPosition;
                                 $expWrapper->endPosition = $expWrapper->nodes[count($expWrapper->nodes) - 1]->endPosition;
@@ -1118,7 +1118,7 @@ class LanguageParser
                         }
                     }
 
-                    $newTokens[] = new NullConstant();
+                    $newTokens[] = new NullConstant;
                     $newTokens[] = $token;
                     $newTokens[] = $switchGroup;
 
@@ -1151,13 +1151,13 @@ class LanguageParser
                     }
 
                     if ($nextToken instanceof ScopedLogicGroup) {
-                        array_unshift($subNodes, new ScopeAssignmentOperator());
+                        array_unshift($subNodes, new ScopeAssignmentOperator);
                         array_unshift($subNodes, $nextToken->scope);
                     }
 
                     /** @var ListValueNode $values */
                     $values = $this->getArrayValues($subNodes);
-                    $arrayNode = new ArrayNode();
+                    $arrayNode = new ArrayNode;
                     $arrayNode->startPosition = $token->startPosition;
 
                     $valueNodeCount = count($values->values);
@@ -1186,7 +1186,7 @@ class LanguageParser
 
     private function getArrayValues($nodes)
     {
-        $valueNode = new ListValueNode();
+        $valueNode = new ListValueNode;
 
         $nodeCount = count($nodes);
         $values = [];
@@ -1239,7 +1239,7 @@ class LanguageParser
                 /** @var AbstractNode $keyValue */
                 $keyValue = $nodes[$i + 2];
 
-                $namedValueNode = new NameValueNode();
+                $namedValueNode = new NameValueNode;
 
                 if (! $this->isValidArrayKeyNode($thisNode)) {
                     throw ErrorFactory::makeSyntaxError(
@@ -1262,7 +1262,7 @@ class LanguageParser
             }
 
             if ($next == null || $next instanceof ArgSeparator) {
-                $namedValueNode = new NameValueNode();
+                $namedValueNode = new NameValueNode;
                 $namedValueNode->value = $thisNode;
                 $namedValueNode->startPosition = $thisNode->startPosition;
                 $namedValueNode->endPosition = $thisNode->endPosition;
@@ -1297,7 +1297,7 @@ class LanguageParser
 
     private function getValues($nodes)
     {
-        $valueNode = new ListValueNode();
+        $valueNode = new ListValueNode;
 
         $nodeCount = count($nodes);
         $values = [];
@@ -1330,10 +1330,10 @@ class LanguageParser
         $fields = [];
 
         if ($nodeCount == 1 && $nodes[0] instanceof VariableNode) {
-            $fieldNode = new GroupByField();
+            $fieldNode = new GroupByField;
             $fieldNode->field = $nodes[0];
 
-            $stringAlias = new StringValueNode();
+            $stringAlias = new StringValueNode;
             $stringAlias->value = $fieldNode->field->name;
             $stringAlias->startPosition = $fieldNode->field->startPosition;
             $stringAlias->endPosition = $fieldNode->field->endPosition;
@@ -1351,7 +1351,7 @@ class LanguageParser
                 }
 
                 if ($next == null || $next instanceof ArgSeparator) {
-                    $fieldNode = new GroupByField();
+                    $fieldNode = new GroupByField;
                     if ($i > 0) {
                         $fieldNode->field = $nodes[$i - 1];
                         $fieldNode->alias = $thisNode;
@@ -1363,7 +1363,7 @@ class LanguageParser
                         $fieldNode->field = $fieldNode->alias;
 
                         if ($fieldNode->field instanceof VariableNode) {
-                            $stringAlias = new StringValueNode();
+                            $stringAlias = new StringValueNode;
                             $stringAlias->value = $fieldNode->field->name;
                             $stringAlias->startPosition = $fieldNode->field->startPosition;
                             $stringAlias->endPosition = $fieldNode->field->endPosition;
@@ -1373,7 +1373,7 @@ class LanguageParser
 
                     if ($fieldNode->alias instanceof StringValueNode == false) {
                         if ($fieldNode->alias == null && $fieldNode->field instanceof VariableNode) {
-                            $stringAlias = new StringValueNode();
+                            $stringAlias = new StringValueNode;
                             $stringAlias->value = $fieldNode->field->name;
                             $stringAlias->startPosition = $fieldNode->field->startPosition;
                             $stringAlias->endPosition = $fieldNode->field->endPosition;
@@ -1396,7 +1396,7 @@ class LanguageParser
             }
         }
 
-        $fieldStructure = new FieldsNode();
+        $fieldStructure = new FieldsNode;
         $fieldStructure->fields = $fields;
 
         return $fieldStructure;
@@ -1426,7 +1426,7 @@ class LanguageParser
             if ($i > 0) {
                 if ($next == null || $next instanceof ArgSeparator) {
                     $orderCount += 1;
-                    $orderNode = new ValueDirectionNode();
+                    $orderNode = new ValueDirectionNode;
                     $orderNode->order = $orderCount;
                     $orderNode->name = $nodes[$i - 1];
                     $orderNode->directionNode = $thisNode;
@@ -1469,7 +1469,7 @@ class LanguageParser
      */
     private function makeArgGroup($nodes)
     {
-        $argGroup = new ArgumentGroup();
+        $argGroup = new ArgumentGroup;
 
         $nodeCount = count($nodes);
         for ($i = 0; $i < $nodeCount; $i++) {
@@ -1504,7 +1504,7 @@ class LanguageParser
                 }
                 $valueNode = $nodes[$i + 2];
 
-                $namedArgument = new NamedArgumentNode();
+                $namedArgument = new NamedArgumentNode;
                 $namedArgument->startPosition = $thisNode->startPosition;
                 $namedArgument->endPosition = $valueNode->endPosition;
                 $namedArgument->content = $thisNode->content.$valueNode->content;
@@ -1641,7 +1641,7 @@ class LanguageParser
 
                 $right = $nodes[$i + 1];
 
-                $logicGroup = new LogicGroup();
+                $logicGroup = new LogicGroup;
                 $logicGroup->nodes = array_merge($left, []);
                 $logicGroup->nodes[] = $node;
                 $logicGroup->nodes[] = $right;
@@ -1756,7 +1756,7 @@ class LanguageParser
         }
 
         if ($negationCount % 2 != 0) {
-            $logicGroup = new LogicGroup();
+            $logicGroup = new LogicGroup;
             $logicGroup->nodes = [$lastNegation, $value];
 
             return [$logicGroup, $negationCount];
@@ -1771,14 +1771,14 @@ class LanguageParser
 
         foreach ($nodes as $node) {
             if ($node instanceof ModifierValueSeparator) {
-                $branchSeparator = new InlineBranchSeparator();
+                $branchSeparator = new InlineBranchSeparator;
                 $branchSeparator->startPosition = $node->startPosition;
                 $branchSeparator->endPosition = $node->endPosition;
                 $newNodes[] = $branchSeparator;
 
                 continue;
             } elseif ($node instanceof ModifierValueNode) {
-                $varNode = new VariableNode();
+                $varNode = new VariableNode;
                 $varNode->name = $node->value;
                 $varNode->startPosition = $node->startPosition;
                 $varNode->endPosition = $node->endPosition;
@@ -2066,12 +2066,12 @@ class LanguageParser
                     $i = $skipTo;
                 }
 
-                $wrapper = new LogicGroup();
+                $wrapper = new LogicGroup;
                 $wrapper->startPosition = $targetNodes[0]->startPosition;
                 $wrapper->endPosition = $targetNodes[count($targetNodes) - 1]->endPosition;
                 $wrapper->nodes = $targetNodes;
 
-                $semanticWrapper = new SemanticGroup();
+                $semanticWrapper = new SemanticGroup;
                 $semanticWrapper->nodes[] = $wrapper;
 
                 $newNodes[] = $semanticWrapper;
@@ -2109,7 +2109,7 @@ class LanguageParser
                 $applyModifiersToNode = $newNodes[$newNodeCount - 1];
 
                 if ($applyModifiersToNode->modifierChain == null) {
-                    $applyModifiersToNode->modifierChain = new ModifierChainNode();
+                    $applyModifiersToNode->modifierChain = new ModifierChainNode;
                 }
 
                 if ($i + 1 >= $tokenCount) {
@@ -2250,7 +2250,7 @@ class LanguageParser
 
     private function wrapNumberInVariable(NumberNode $node)
     {
-        $variableNode = new VariableNode();
+        $variableNode = new VariableNode;
         $variableNode->startPosition = $node->startPosition;
         $variableNode->endPosition = $node->endPosition;
         $variableNode->name = strval($node->value);
@@ -2265,7 +2265,7 @@ class LanguageParser
 
     private function wrapConstantInVariable(AbstractNode $node)
     {
-        $variableNode = new VariableNode();
+        $variableNode = new VariableNode;
         $variableNode->startPosition = $node->startPosition;
         $variableNode->endPosition = $node->endPosition;
         $variableNode->name = strval($node->content);
@@ -2287,7 +2287,7 @@ class LanguageParser
      */
     private function wrapArithmeticModifier(AbstractNode $operator, $modifierName)
     {
-        $node = new ModifierNameNode();
+        $node = new ModifierNameNode;
         $node->startPosition = $operator->startPosition;
         $node->endPosition = $operator->endPosition;
         $node->originalAbstractNode = $operator;
@@ -2314,7 +2314,7 @@ class LanguageParser
 
             $unwrapped = $this->unpack($tokens[0]->nodes);
             $tArgGroup = $this->makeArgGroup($unwrapped);
-            $modifierNode = new ModifierNode();
+            $modifierNode = new ModifierNode;
 
             $modifierNode->nameNode = $modifierName;
             $modifierNode->methodStyleArguments = $tArgGroup;
@@ -2342,7 +2342,7 @@ class LanguageParser
                             // Unwind the combined variable and covert them to modifier parameters.
                             foreach ($next->variableReference->pathParts as $combinedPart) {
                                 if ($combinedPart instanceof PathNode) {
-                                    $modifierValue = new ModifierValueNode();
+                                    $modifierValue = new ModifierValueNode;
                                     $modifierValue->startPosition = $combinedPart->startPosition;
                                     $modifierValue->endPosition = $combinedPart->endPosition;
                                     $modifierValue->value = $combinedPart->name;
@@ -2352,7 +2352,7 @@ class LanguageParser
                                 }
                             }
                         } else {
-                            $modifierValue = new ModifierValueNode();
+                            $modifierValue = new ModifierValueNode;
                             $modifierValue->startPosition = $next->startPosition;
                             $modifierValue->endPosition = $next->endPosition;
                             $modifierValue->value = $next->name;
@@ -2377,7 +2377,7 @@ class LanguageParser
             }
         }
 
-        $modifierNode = new ModifierNode();
+        $modifierNode = new ModifierNode;
         $modifierNode->nameNode = $modifierName;
         $modifierNode->valueNodes = $values;
 
@@ -2465,7 +2465,7 @@ class LanguageParser
                     if ($peek instanceof StatementSeparatorNode == false) {
                         $adjustedTokens[] = $thisToken;
                         $adjustedTokens[] = $tokens[$i + 1];
-                        $adjustedTokens[] = new StatementSeparatorNode();
+                        $adjustedTokens[] = new StatementSeparatorNode;
                         $i += 1;
 
                         continue;
@@ -2480,7 +2480,7 @@ class LanguageParser
                 } else {
                     $adjustedTokens[] = $thisToken;
                     $adjustedTokens[] = $tokens[$i + 1];
-                    $adjustedTokens[] = new StatementSeparatorNode();
+                    $adjustedTokens[] = new StatementSeparatorNode;
                     break;
                 }
             } else {
@@ -2500,7 +2500,7 @@ class LanguageParser
 
         for ($i = 0; $i < $tokenCount; $i++) {
             if ($tokens[$i] instanceof StatementSeparatorNode) {
-                $semanticGroup = new SemanticGroup();
+                $semanticGroup = new SemanticGroup;
                 $semanticGroup->nodes = $groupNodes;
                 $groups[] = $semanticGroup;
                 $groupNodes = [];
@@ -2510,7 +2510,7 @@ class LanguageParser
                 $groupNodes[] = $tokens[$i];
 
                 if ($i + 1 >= $tokenCount) {
-                    $semanticGroup = new SemanticGroup();
+                    $semanticGroup = new SemanticGroup;
                     $semanticGroup->nodes = $groupNodes;
                     $groups[] = $semanticGroup;
                     break;
@@ -2542,7 +2542,7 @@ class LanguageParser
 
                 $right = $tokens[$i + 1];
 
-                $nullCoalescenceGroup = new NullCoalescenceGroup();
+                $nullCoalescenceGroup = new NullCoalescenceGroup;
                 $nullCoalescenceGroup->left = $left;
                 $nullCoalescenceGroup->right = $right;
                 $newTokens[] = $nullCoalescenceGroup;
@@ -2574,7 +2574,7 @@ class LanguageParser
         $collectedTokens = array_reverse($collectedTokens);
 
         if (count($collectedTokens) >= 3) {
-            $parser = new LanguageParser();
+            $parser = new LanguageParser;
             $parser->setIsRoot(false);
 
             return $this->unpack($parser->parse($collectedTokens));
@@ -2655,7 +2655,7 @@ class LanguageParser
 
                 $falseBranch = $tokens[$falseBranchStart];
 
-                $ternaryStructure = new TernaryCondition();
+                $ternaryStructure = new TernaryCondition;
                 $ternaryStructure->head = $condition;
                 $ternaryStructure->truthBranch = $truthBranch;
                 $ternaryStructure->falseBranch = $falseBranch;
@@ -2727,7 +2727,7 @@ class LanguageParser
                             }
                         }
 
-                        $factorialOperator = new FactorialOperator();
+                        $factorialOperator = new FactorialOperator;
                         $factorialOperator->startPosition = $token->startPosition;
                         $factorialOperator->endPosition = $token->endPosition;
                         $factorialOperator->content = str_repeat('!', $negationCount);
@@ -2775,7 +2775,7 @@ class LanguageParser
                     /** @var LogicGroup $subGroup */
                     $subGroup = $groupResults[0];
                     // Let's now wrap this in it's own group to negate the entire thing.
-                    $wrapperGroup = new LogicGroup();
+                    $wrapperGroup = new LogicGroup;
                     $wrapperGroup->start = $token;
                     $wrapperGroup->end = $subGroup;
                     $wrapperGroup->nodes = [$token, $subGroup];
@@ -2838,7 +2838,7 @@ class LanguageParser
 
                     /** @var AbstractNode $prev */
                     $prev = array_pop($groupedTokens);
-                    $wrapperGroup = new LogicGroup();
+                    $wrapperGroup = new LogicGroup;
                     $wrapperGroup->startPosition = $prev->startPosition;
                     $wrapperGroup->endPosition = $token->endPosition;
                     $wrapperGroup->originalAbstractNode = $token;
@@ -2903,13 +2903,13 @@ class LanguageParser
             );
         }
 
-        $parser = new LanguageParser();
+        $parser = new LanguageParser;
         $parser->setIsRoot(false);
 
-        $logicalGroup = new LogicGroup();
+        $logicalGroup = new LogicGroup;
 
         if (count($subNodes) >= 2 && $subNodes[1] instanceof ScopeAssignmentOperator) {
-            $logicalGroup = new ScopedLogicGroup();
+            $logicalGroup = new ScopedLogicGroup;
 
             if ($i + 2 < $nodeCount && $nodes[$i + 1] instanceof VariableNode && $nodes[$i + 2] instanceof StringValueNode) {
                 /** @var VariableNode $candidateVarNode */
@@ -2919,7 +2919,7 @@ class LanguageParser
                     /** @var StringValueNode $aliasNode */
                     $aliasNode = $nodes[$i + 2];
 
-                    $logicalGroup = new AliasedScopeLogicGroup();
+                    $logicalGroup = new AliasedScopeLogicGroup;
                     $logicalGroup->alias = $aliasNode;
                     $skipCount += 2;
                 }

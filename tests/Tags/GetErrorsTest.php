@@ -21,7 +21,7 @@ class GetErrorsTest extends TestCase
      */
     public function it_gets_errors_organized_into_fields($params, $bag, $errors, $expected)
     {
-        view()->share('errors', (new ViewErrorBag())->put($bag, new MessageBag($errors)));
+        view()->share('errors', (new ViewErrorBag)->put($bag, new MessageBag($errors)));
 
         $template = <<<EOT
 {{ get_errors $params }}
@@ -95,7 +95,7 @@ EOT;
      */
     public function it_gets_errors_for_all_fields_together($params, $bag, $errors, $expected)
     {
-        view()->share('errors', (new ViewErrorBag())->put($bag, new MessageBag($errors)));
+        view()->share('errors', (new ViewErrorBag)->put($bag, new MessageBag($errors)));
 
         $template = <<<EOT
 {{ get_errors:all $params }}
@@ -160,7 +160,7 @@ EOT;
      */
     public function it_gets_errors_for_a_single_field($params, $bag, $errors, $expected)
     {
-        view()->share('errors', (new ViewErrorBag())->put($bag, new MessageBag($errors)));
+        view()->share('errors', (new ViewErrorBag)->put($bag, new MessageBag($errors)));
 
         $template = <<<EOT
 {{ get_errors:name $params }}

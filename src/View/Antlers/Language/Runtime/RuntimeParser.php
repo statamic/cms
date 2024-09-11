@@ -794,9 +794,9 @@ INFO;
      */
     private function wrapText($text)
     {
-        $node = new AntlersNode();
+        $node = new AntlersNode;
 
-        $mockPosition = new Position();
+        $mockPosition = new Position;
         $mockPosition->offset = 0;
         $mockPosition->line = 0;
         $mockPosition->char = 0;
@@ -872,11 +872,11 @@ INFO;
             return $processor->evaluateDeferredVariable($variableNode);
         }
 
-        $pathParser = new PathParser();
+        $pathParser = new PathParser;
 
         $path = $pathParser->parse($key);
 
-        $pathDataManager = new PathDataManager();
+        $pathDataManager = new PathDataManager;
         $pathDataManager->setIsPaired(false);
         $pathDataManager->cascade($this->cascade);
 

@@ -80,7 +80,7 @@ class Structure extends Tags
 
     protected function query($handle)
     {
-        $query = new ItemQueryBuilder();
+        $query = new ItemQueryBuilder;
 
         return Str::startsWith($handle, 'collection::')
             ? $this->queryForCollection($query)

@@ -59,7 +59,7 @@ class MakeScope extends GeneratorCommand
      */
     protected function updateServiceProvider()
     {
-        $factory = new BuilderFactory();
+        $factory = new BuilderFactory;
 
         $scopeClassValue = $factory->classConstFetch('Scopes\\'.$this->getNameInput(), 'class');
 

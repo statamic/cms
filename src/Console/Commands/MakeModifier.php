@@ -59,7 +59,7 @@ class MakeModifier extends GeneratorCommand
      */
     protected function updateServiceProvider()
     {
-        $factory = new BuilderFactory();
+        $factory = new BuilderFactory;
 
         $modifierClassValue = $factory->classConstFetch('Modifiers\\'.$this->getNameInput(), 'class');
 

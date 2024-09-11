@@ -59,7 +59,7 @@ class MakeTag extends GeneratorCommand
      */
     protected function updateServiceProvider()
     {
-        $factory = new BuilderFactory();
+        $factory = new BuilderFactory;
 
         $tagsClassValue = $factory->classConstFetch('Tags\\'.$this->getNameInput(), 'class');
 

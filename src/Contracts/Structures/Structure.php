@@ -2,6 +2,4 @@
 
 namespace Statamic\Contracts\Structures;
 
-interface Structure
-{
-}
+interface Structure {}

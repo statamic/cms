@@ -16,7 +16,7 @@ class PasswordProtector extends Protector
     public function protect()
     {
         if (empty(array_get($this->config, 'allowed', []))) {
-            throw new ForbiddenHttpException();
+            throw new ForbiddenHttpException;
         }
 
         if (request()->isLivePreview()) {

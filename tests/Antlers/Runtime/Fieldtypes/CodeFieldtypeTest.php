@@ -16,7 +16,7 @@ class CodeFieldtypeTest extends ParserTestCase
 
     public function test_code_fieldtype_with_antlers_true()
     {
-        $code = new Code();
+        $code = new Code;
         $field = new Field('code_field', [
             'type' => 'code',
             'antlers' => true,

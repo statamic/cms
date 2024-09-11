@@ -18,7 +18,7 @@ class TagCheckScopeTest extends TestCase
 
     private function createData()
     {
-        $blueprint = new Blueprint();
+        $blueprint = new Blueprint;
         $blueprint->setContents([
             'fields' => [
                 [

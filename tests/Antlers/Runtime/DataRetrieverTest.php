@@ -9,7 +9,7 @@ class DataRetrieverTest extends ParserTestCase
 {
     private function getPathValue($path, $data)
     {
-        $dataRetriever = new PathDataManager();
+        $dataRetriever = new PathDataManager;
 
         return $dataRetriever->getData($this->parsePath($path), $data);
     }

@@ -8,6 +8,6 @@ class Fallback extends Protector
 {
     public function protect()
     {
-        throw new ForbiddenHttpException();
+        throw new ForbiddenHttpException;
     }
 }

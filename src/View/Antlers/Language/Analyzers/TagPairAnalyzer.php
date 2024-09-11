@@ -383,12 +383,12 @@ class TagPairAnalyzer
                         $node->endPosition->index + 1,
                         $node->isClosedBy->startPosition->index);
 
-                    $noParseNode = new EscapedContentNode();
+                    $noParseNode = new EscapedContentNode;
                     $parser = $node->getParser();
                     $noParseNode->withParser($parser);
 
                     $node->copyBasicDetailsTo($noParseNode);
-                    $noParseNode->name = new TagIdentifier();
+                    $noParseNode->name = new TagIdentifier;
                     $noParseNode->name->name = 'noparse';
                     $noParseNode->name->compound = 'noparse';
 
@@ -467,7 +467,7 @@ class TagPairAnalyzer
             if ($node instanceof AntlersNode && $node->isComment == false &&
                 $node->name->compound == 'if' && $node->isClosingTag == false &&
                 $node->isClosedBy != null) {
-                $conditionNode = new ConditionNode();
+                $conditionNode = new ConditionNode;
                 $conditionNode->index = $node->index;
                 $conditionNode->chain[] = $node->index;
 
@@ -483,7 +483,7 @@ class TagPairAnalyzer
                     /** @var AntlersNode $tail */
                     $tail = $result[0];
 
-                    $executionBranch = new ExecutionBranch();
+                    $executionBranch = new ExecutionBranch;
                     $executionBranch->head = $node;
                     $executionBranch->tail = $tail;
                     $executionBranch->nodes = $node->children;

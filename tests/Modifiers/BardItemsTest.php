@@ -95,7 +95,7 @@ class BardItemsTest extends TestCase
                     ['type' => 'text', 'text' => 'This is a paragraph.'],
                 ],
             ],
-        ], 'content', new Bard());
+        ], 'content', new Bard);
 
         $expected = [
             [

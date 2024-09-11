@@ -213,7 +213,7 @@ class PathParser
 
             if ($this->isParsingString == false && $this->cur == self::LeftBracket) {
                 if (! empty($currentChars)) {
-                    $pathNode = new PathNode();
+                    $pathNode = new PathNode;
                     $pathNode->name = implode($currentChars);
                     $pathNode->delimiter = $activeDelimiter;
                     $parts[] = $pathNode;
@@ -230,7 +230,7 @@ class PathParser
 
                 $results = $this->locateEndOfAccessor();
                 $this->currentIndex = $results[0];
-                $parser = new PathParser();
+                $parser = new PathParser;
 
                 $parts[] = $parser->parse($results[1]);
 
@@ -246,7 +246,7 @@ class PathParser
                     $addCur = true;
                 }
 
-                $accessorNode = new AccessorNode();
+                $accessorNode = new AccessorNode;
                 $accessorNode->name = implode($currentChars);
 
                 $parts[] = $accessorNode;
@@ -304,7 +304,7 @@ class PathParser
                     }
                 }
 
-                $pathNode = new PathNode();
+                $pathNode = new PathNode;
                 $pathNode->delimiter = $activeDelimiter;
                 $pathNode->name = implode($currentChars);
 
@@ -332,7 +332,7 @@ class PathParser
             $parts[$partLen - 1]->isFinal = true;
         }
 
-        $variableReference = new VariableReference();
+        $variableReference = new VariableReference;
         $variableReference->isStrictTagReference = $isStrictTagReference;
         $variableReference->isStrictVariableReference = $isStrictVariableReference;
         $variableReference->isExplicitVariableReference = $isExplicitVariableReference;
