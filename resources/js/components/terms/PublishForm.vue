@@ -299,7 +299,7 @@ export default {
         createAnotherUrl: String,
         listingUrl: String,
         previewTargets: Array,
-        hasGlobalTemplate: Boolean,
+        hasTemplate: Boolean,
     },
 
     data() {
@@ -366,7 +366,7 @@ export default {
         },
 
         showVisitUrlButton() {
-            return !!this.permalink && this.hasGlobalTemplate;
+            return !!this.permalink && this.hasTemplate;
         },
 
         isBase() {
