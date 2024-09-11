@@ -1,5 +1,12 @@
 # Release Notes
 
+## 4.58.3 (2024-09-11)
+
+### What's fixed
+- Add sanitization [#10787](https://github.com/statamic/cms/issues/10787) by @jasonvarga
+
+
+
 ## 4.58.2 (2024-05-09)
 
 ### What's fixed
