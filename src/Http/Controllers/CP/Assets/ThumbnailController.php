@@ -3,7 +3,9 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Support\Facades\Cache;
+use League\Glide\Filesystem\FileNotFoundException;
 use League\Glide\Server;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
@@ -110,6 +112,8 @@ class ThumbnailController extends Controller
                 $this->asset,
                 $preset ? ['p' => $preset] : []
             );
+        } catch(FileNotFoundException $e) {
+            throw new NotFoundHttpException;
         } finally {
             Cache::forget($this->mutex());
         }
