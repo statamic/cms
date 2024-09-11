@@ -167,7 +167,7 @@ class ProviderTest extends TestCase
 
     private function socialite()
     {
-        return new Socialite;
+        return new Socialite();
     }
 }
 

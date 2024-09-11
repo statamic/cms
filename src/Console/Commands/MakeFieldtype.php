@@ -141,7 +141,7 @@ class MakeFieldtype extends GeneratorCommand
      */
     protected function updateServiceProvider()
     {
-        $factory = new BuilderFactory;
+        $factory = new BuilderFactory();
 
         $fieldtypeClassValue = $factory->classConstFetch('Fieldtypes\\'.$this->getNameInput(), 'class');
 

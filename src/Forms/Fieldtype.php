@@ -78,7 +78,7 @@ class Fieldtype extends Relationship
 
     public function getIndexItems($request)
     {
-        $query = (new ItemQueryBuilder)
+        $query = (new ItemQueryBuilder())
             ->withItems(new DataCollection(Facades\Form::all()));
 
         if ($search = $request->search) {

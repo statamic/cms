@@ -10,6 +10,6 @@ class NotFound extends Tags
 
     public function index()
     {
-        throw new NotFoundHttpException;
+        throw new NotFoundHttpException();
     }
 }

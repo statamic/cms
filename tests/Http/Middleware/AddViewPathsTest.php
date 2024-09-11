@@ -36,7 +36,7 @@ class AddViewPathsTest extends TestCase
         $request = $this->createRequest($requestUrl);
         $handled = false;
 
-        (new AddViewPaths)->handle($request, function () use ($expectedPaths, &$handled) {
+        (new AddViewPaths())->handle($request, function () use ($expectedPaths, &$handled) {
             $this->assertEquals($expectedPaths, view()->getFinder()->getPaths());
             $handled = true;
 
@@ -70,7 +70,7 @@ class AddViewPathsTest extends TestCase
         $request = $this->createRequest($requestUrl);
         $handled = false;
 
-        (new AddViewPaths)->handle($request, function () use ($expectedPaths, &$handled) {
+        (new AddViewPaths())->handle($request, function () use ($expectedPaths, &$handled) {
             $this->assertEquals($expectedPaths, array_get(view()->getFinder()->getHints(), 'foo'));
             $handled = true;
 

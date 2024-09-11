@@ -74,7 +74,7 @@ class BardHtmlTest extends TestCase
                     ['type' => 'text', 'text' => 'This is a paragraph.'],
                 ],
             ],
-        ], 'content', new Bard);
+        ], 'content', new Bard());
 
         $expected = '<p>This is a paragraph.</p>';
 

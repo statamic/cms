@@ -4,4 +4,6 @@ namespace Statamic\Contracts\Assets;
 
 use Statamic\Contracts\Query\Builder;
 
-interface QueryBuilder extends Builder {}
+interface QueryBuilder extends Builder
+{
+}

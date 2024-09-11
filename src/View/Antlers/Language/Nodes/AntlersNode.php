@@ -289,7 +289,7 @@ class AntlersNode extends AbstractNode
      */
     public function copyBasicDetails()
     {
-        $copy = new AntlersNode;
+        $copy = new AntlersNode();
 
         return $this->copyBasicDetailsTo($copy);
     }
@@ -436,11 +436,11 @@ class AntlersNode extends AbstractNode
             if ($this->looksLikeAnArray($value) || StringUtilities::containsSymbolicCharacters($pathToParse)) {
                 $value = Antlers::parser()->getVariable($pathToParse, $data, null);
             } else {
-                $pathParser = new PathParser;
+                $pathParser = new PathParser();
                 $path = $pathParser->parse($pathToParse);
                 $doIntercept = count($path->pathParts) > 1;
 
-                $retriever = new PathDataManager;
+                $retriever = new PathDataManager();
                 $retriever->setIsPaired(false)->setReduceFinal(false)
                     ->cascade($processor->getCascade())
                     ->setShouldDoValueIntercept($doIntercept);
@@ -505,8 +505,8 @@ class AntlersNode extends AbstractNode
         $value = $param->value;
 
         if ($param->isVariableReference) {
-            $pathParser = new PathParser;
-            $retriever = new PathDataManager;
+            $pathParser = new PathParser();
+            $retriever = new PathDataManager();
             $retriever->setIsPaired($this->isClosedBy != null);
             $value = $retriever->getData($pathParser->parse($value), $data);
 
@@ -631,7 +631,7 @@ class AntlersNode extends AbstractNode
     public function lexerRelativeOffset($offset)
     {
         if ($this->parser == null) {
-            $position = new Position;
+            $position = new Position();
             $position->index = $offset;
             $position->offset = $offset;
 
@@ -654,7 +654,7 @@ class AntlersNode extends AbstractNode
         }
 
         if ($this->parser == null) {
-            $position = new Position;
+            $position = new Position();
             $position->index = $offset;
             $position->offset = $offset;
 

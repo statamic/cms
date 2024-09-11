@@ -1232,7 +1232,9 @@ EOT;
         Log::shouldReceive('debug')->once()
             ->with('Cannot render an object variable as a string: {{ object }}');
 
-        $object = new class {};
+        $object = new class
+        {
+        };
 
         $this->assertEquals('', $this->renderString('{{ object }}', compact('object')));
     }
@@ -1748,7 +1750,9 @@ EOT;
             $m->shouldNotReceive('get')->with('augmented');
         });
 
-        $fieldtype = new class extends Fieldtype {};
+        $fieldtype = new class extends Fieldtype
+        {
+        };
         $augmented = new Value(['drink' => 'la croix'], 'augmented', $fieldtype);
 
         $context = [
@@ -1933,7 +1937,7 @@ EOT;
     /** @test */
     public function it_counts_query_builder_results_in_conditions()
     {
-        (new EntryFactory)->collection('blog')->create();
+        (new EntryFactory())->collection('blog')->create();
 
         $template = '{{ if entries }}yup{{ else }}nope{{ /if }}';
 
@@ -2170,7 +2174,7 @@ EOT;
     public function objects_are_considered_truthy()
     {
         $this->assertEquals('yes', $this->renderString('{{ if object }}yes{{ else }}no{{ /if }}', [
-            'object' => new \stdClass,
+            'object' => new \stdClass(),
         ]));
     }
 
@@ -2210,7 +2214,9 @@ before
 after
 EOT;
         $this->assertEquals($expected, $this->renderString($template, [
-            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator {}),
+            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator
+            {
+            }),
         ]));
     }
 
@@ -2435,21 +2441,21 @@ EOT;
     public static function objectInConditionProvider()
     {
         return [
-            'with __toString' => [new class
+            'with __toString' => [new class()
             {
                 public function __toString()
                 {
                     return 'foo';
                 }
             }, ],
-            'with __call' => [new class
+            'with __call' => [new class()
             {
                 public function __call($method, $args)
                 {
                     return 'foo';
                 }
             }, ],
-            'without __call or __toString' => [new class
+            'without __call or __toString' => [new class()
             {
                 //
             }, ],

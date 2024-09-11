@@ -5,4 +5,6 @@ namespace Statamic\Exceptions;
 /**
  * Bad. Stops the application in its tracks.
  */
-class FatalException extends \Exception {}
+class FatalException extends \Exception
+{
+}

@@ -17,7 +17,7 @@ class GetErrorTest extends TestCase
     /** @test */
     public function the_tag_by_itself_does_nothing()
     {
-        view()->share('errors', (new ViewErrorBag)->put('default', new MessageBag([])));
+        view()->share('errors', (new ViewErrorBag())->put('default', new MessageBag([])));
 
         $this->assertEquals(
             '',
@@ -28,7 +28,7 @@ class GetErrorTest extends TestCase
     /** @test */
     public function it_outputs_nothing_when_the_field_doesnt_have_an_error()
     {
-        view()->share('errors', (new ViewErrorBag)->put('default', new MessageBag([])));
+        view()->share('errors', (new ViewErrorBag())->put('default', new MessageBag([])));
 
         $this->assertEquals(
             '',
@@ -39,7 +39,7 @@ class GetErrorTest extends TestCase
     /** @test */
     public function it_outputs_nothing_when_there_are_errors_but_not_for_the_given_field_in_a_specific_bag()
     {
-        view()->share('errors', (new ViewErrorBag)->put('custom', new MessageBag([
+        view()->share('errors', (new ViewErrorBag())->put('custom', new MessageBag([
             'name' => ['name is required'],
         ])));
 
@@ -52,7 +52,7 @@ class GetErrorTest extends TestCase
     /** @test */
     public function it_outputs_nothing_when_the_field_doesnt_have_an_error_for_specific_bag()
     {
-        view()->share('errors', (new ViewErrorBag)->put('custom', new MessageBag([])));
+        view()->share('errors', (new ViewErrorBag())->put('custom', new MessageBag([])));
 
         $this->assertEquals(
             '',
@@ -63,7 +63,7 @@ class GetErrorTest extends TestCase
     /** @test */
     public function it_outputs_nothing_when_there_are_errors_but_not_for_the_given_field()
     {
-        view()->share('errors', (new ViewErrorBag)->put('default', new MessageBag([
+        view()->share('errors', (new ViewErrorBag())->put('default', new MessageBag([
             'name' => ['name is required'],
         ])));
 
@@ -76,7 +76,7 @@ class GetErrorTest extends TestCase
     /** @test */
     public function it_gets_the_first_error_for_a_single_field()
     {
-        view()->share('errors', (new ViewErrorBag)->put('default', new MessageBag([
+        view()->share('errors', (new ViewErrorBag())->put('default', new MessageBag([
             'name' => ['name is required'],
             'email' => ['email is required', 'email should be an email address'],
         ])));
@@ -90,7 +90,7 @@ class GetErrorTest extends TestCase
     /** @test */
     public function it_gets_the_first_error_for_a_single_field_in_given_bag()
     {
-        view()->share('errors', (new ViewErrorBag)->put('custom', new MessageBag([
+        view()->share('errors', (new ViewErrorBag())->put('custom', new MessageBag([
             'name' => ['name is required'],
             'email' => ['email is required', 'email should be an email address'],
         ])));

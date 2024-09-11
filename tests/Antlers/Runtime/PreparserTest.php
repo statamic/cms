@@ -25,14 +25,14 @@ class PreparserTest extends ParserTestCase
 {{ title }}
 EOT;
 
-        $documentParser = new DocumentParser;
-        $loader = new Loader;
-        $envDetails = new EnvironmentDetails;
+        $documentParser = new DocumentParser();
+        $loader = new Loader();
+        $envDetails = new EnvironmentDetails();
 
         $processor = new NodeProcessor($loader, $envDetails);
         $processor->setData($data);
 
-        $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer, new LanguageParser);
+        $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
         $runtimeParser->preparse(function ($text) {
             return str_replace('{{ title }}', '{{ subtitle | upper }}', $text);
         });

@@ -49,7 +49,7 @@ class ParserTestCase extends TestCase
 
         $this->setupTestBlueprintAndFields();
 
-        NodeTypeAnalyzer::$environmentDetails = new EnvironmentDetails;
+        NodeTypeAnalyzer::$environmentDetails = new EnvironmentDetails();
         NodeTypeAnalyzer::$environmentDetails->setModifierNames(['upper', 'lower']);
     }
 
@@ -91,7 +91,7 @@ class ParserTestCase extends TestCase
                 return $item['field'];
             })->all();
 
-            $blueprintsRepository = new BlueprintRepository;
+            $blueprintsRepository = new BlueprintRepository();
             self::$testBlueprint = $blueprintsRepository->makeFromFields($blueprintFields);
         }
 
@@ -102,14 +102,14 @@ class ParserTestCase extends TestCase
 
     protected function parsePath($path)
     {
-        $pathParser = new PathParser;
+        $pathParser = new PathParser();
 
         return $pathParser->parse($path);
     }
 
     protected function parseNodes($text)
     {
-        $documentParser = new DocumentParser;
+        $documentParser = new DocumentParser();
         $documentParser->parse($text);
 
         return $documentParser->getNodes();
@@ -154,7 +154,7 @@ class ParserTestCase extends TestCase
     {
         $contents = $this->getTemplate($template);
 
-        $documentParser = new DocumentParser;
+        $documentParser = new DocumentParser();
         $documentParser->parse($contents);
 
         return $documentParser->getRenderNodes();
@@ -164,9 +164,9 @@ class ParserTestCase extends TestCase
     {
         GlobalRuntimeState::resetGlobalState();
 
-        $documentParser = new DocumentParser;
-        $loader = new Loader;
-        $envDetails = new EnvironmentDetails;
+        $documentParser = new DocumentParser();
+        $loader = new Loader();
+        $envDetails = new EnvironmentDetails();
 
         if ($withCoreTagsAndModifiers) {
             $envDetails->setTagNames(app()->make('statamic.tags')->keys()->all());
@@ -178,16 +178,16 @@ class ParserTestCase extends TestCase
         $processor = new NodeProcessor($loader, $envDetails);
         $processor->setData($data);
 
-        return new RuntimeParser($documentParser, $processor, new AntlersLexer, new LanguageParser);
+        return new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
     }
 
     protected function renderStringWithConfiguration($text, RuntimeConfiguration $config, $data = [], $withCoreTagsAndModifiers = false)
     {
         GlobalRuntimeState::resetGlobalState();
 
-        $documentParser = new DocumentParser;
-        $loader = new Loader;
-        $envDetails = new EnvironmentDetails;
+        $documentParser = new DocumentParser();
+        $loader = new Loader();
+        $envDetails = new EnvironmentDetails();
 
         if ($withCoreTagsAndModifiers) {
             $envDetails->setTagNames(app()->make('statamic.tags')->keys()->all());
@@ -200,7 +200,7 @@ class ParserTestCase extends TestCase
         $processor->setRuntimeConfiguration($config);
         $processor->setData($data);
 
-        $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer, new LanguageParser);
+        $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
 
         if ($withCoreTagsAndModifiers) {
             $runtimeParser->cascade(app(Cascade::class));
@@ -214,9 +214,9 @@ class ParserTestCase extends TestCase
         ModifierManager::$statamicModifiers = null;
         GlobalRuntimeState::resetGlobalState();
 
-        $documentParser = new DocumentParser;
-        $loader = new Loader;
-        $envDetails = new EnvironmentDetails;
+        $documentParser = new DocumentParser();
+        $loader = new Loader();
+        $envDetails = new EnvironmentDetails();
 
         if ($withCoreTagsAndModifiers) {
             $envDetails->setTagNames(app()->make('statamic.tags')->keys()->all());
@@ -228,7 +228,7 @@ class ParserTestCase extends TestCase
         $processor = new NodeProcessor($loader, $envDetails);
         $processor->setData($data);
 
-        $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer, new LanguageParser);
+        $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
         $processor->setAntlersParserInstance($runtimeParser);
 
         if ($withCoreTagsAndModifiers) {
@@ -240,11 +240,11 @@ class ParserTestCase extends TestCase
 
     protected function getParsedRuntimeNodes($text)
     {
-        $documentParser = new DocumentParser;
+        $documentParser = new DocumentParser();
         $documentParser->parse($text);
         $node = $documentParser->getNodes()[0];
 
-        $antlersParser = new LanguageParser;
+        $antlersParser = new LanguageParser();
 
         return $antlersParser->parse($node->runtimeNodes);
     }
@@ -256,13 +256,13 @@ class ParserTestCase extends TestCase
         /** @var AntlersNode $antlersNode */
         $antlersNode = $this->parseNodes($nodeText)[0];
 
-        $lexer = new AntlersLexer;
+        $lexer = new AntlersLexer();
         $tokens = $lexer->tokenize($antlersNode, $text);
 
-        $langParser = new LanguageParser;
+        $langParser = new LanguageParser();
         $nodes = $langParser->parse($tokens);
 
-        $sandbox = new Environment;
+        $sandbox = new Environment();
         $sandbox->setData($data);
 
         return $sandbox->evaluateBool($nodes);
@@ -277,18 +277,18 @@ class ParserTestCase extends TestCase
         /** @var AntlersNode $antlersNode */
         $antlersNode = $this->parseNodes($nodeText)[0];
 
-        $lexer = new AntlersLexer;
+        $lexer = new AntlersLexer();
         $tokens = $lexer->tokenize($antlersNode, $text);
 
-        $langParser = new LanguageParser;
+        $langParser = new LanguageParser();
         $nodes = $langParser->parse($tokens);
 
-        $loader = new Loader;
-        $envDetails = new EnvironmentDetails;
+        $loader = new Loader();
+        $envDetails = new EnvironmentDetails();
 
         $processor = new NodeProcessor($loader, $envDetails);
         $processor->setData($data);
-        $sandbox = new Environment;
+        $sandbox = new Environment();
         $sandbox->setProcessor($processor);
         $sandbox->setData($data);
 
@@ -302,18 +302,18 @@ class ParserTestCase extends TestCase
         /** @var AntlersNode $antlersNode */
         $antlersNode = $this->parseNodes($nodeText)[0];
 
-        $lexer = new AntlersLexer;
+        $lexer = new AntlersLexer();
         $tokens = $lexer->tokenize($antlersNode, $text);
 
-        $langParser = new LanguageParser;
+        $langParser = new LanguageParser();
         $nodes = $langParser->parse($tokens);
 
-        $loader = new Loader;
-        $envDetails = new EnvironmentDetails;
+        $loader = new Loader();
+        $envDetails = new EnvironmentDetails();
 
         $processor = new NodeProcessor($loader, $envDetails);
         $processor->setData($data);
-        $sandbox = new Environment;
+        $sandbox = new Environment();
         $sandbox->setProcessor($processor);
         $sandbox->setData($data);
 
@@ -327,16 +327,16 @@ class ParserTestCase extends TestCase
         /** @var AntlersNode $antlersNode */
         $antlersNode = $this->parseNodes($nodeText)[0];
 
-        $lexer = new AntlersLexer;
+        $lexer = new AntlersLexer();
         $tokens = $lexer->tokenize($antlersNode, $text);
 
-        $langParser = new LanguageParser;
+        $langParser = new LanguageParser();
         $nodes = $langParser->parse($tokens);
 
-        $loader = new Loader;
-        $envDetails = new EnvironmentDetails;
+        $loader = new Loader();
+        $envDetails = new EnvironmentDetails();
         $processor = new NodeProcessor($loader, $envDetails);
-        $sandbox = new Environment;
+        $sandbox = new Environment();
         $sandbox->setData($data);
         $sandbox->setProcessor($processor);
 

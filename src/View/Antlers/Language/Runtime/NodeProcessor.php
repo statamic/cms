@@ -225,10 +225,10 @@ class NodeProcessor
     {
         $this->loader = $loader;
         $this->envDetails = $envDetails;
-        $this->pathDataManager = new PathDataManager;
+        $this->pathDataManager = new PathDataManager();
         $this->pathDataManager->setNodeProcessor($this);
-        $this->languageParser = new LanguageParser;
-        $this->conditionProcessor = new ConditionProcessor;
+        $this->languageParser = new LanguageParser();
+        $this->conditionProcessor = new ConditionProcessor();
         $this->conditionProcessor->setProcessor($this);
 
         if (ini_get('short_open_tag')) {
@@ -1036,7 +1036,7 @@ class NodeProcessor
             $scope = $additionalContext + $scope;
         }
 
-        $environment = new Environment;
+        $environment = new Environment();
         $environment->setProcessor($this);
         $environment->cascade($this->cascade)->setData($scope);
 
@@ -1045,7 +1045,7 @@ class NodeProcessor
 
     public function evaluateDeferredVariable(AbstractNode $deferredNode)
     {
-        $environment = new Environment;
+        $environment = new Environment();
         $environment->setProcessor($this);
         $environment->cascade($this->cascade)->setData($this->getActiveData());
 
@@ -1865,7 +1865,7 @@ class NodeProcessor
                                 }
                             }
 
-                            $environment = new Environment;
+                            $environment = new Environment();
                             $environment->cascade($this->cascade)->setData($environmentData);
                             $environment->setProcessor($this);
 
@@ -2014,7 +2014,7 @@ class NodeProcessor
                                 }
                             }
                         } elseif (count($node->runtimeNodes) == 0 && $node->isTagNode) {
-                            $dataRetriever = new PathDataManager;
+                            $dataRetriever = new PathDataManager();
                             if (! empty(GlobalRuntimeState::$prefixState)) {
                                 $dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
                             }
@@ -2055,7 +2055,7 @@ class NodeProcessor
 
                     if ($runtimeResolveLoopVar == false) {
                         if ($node->pathReference != null) {
-                            $dataRetriever = new PathDataManager;
+                            $dataRetriever = new PathDataManager();
                             if (! empty(GlobalRuntimeState::$prefixState)) {
                                 $dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
                             }

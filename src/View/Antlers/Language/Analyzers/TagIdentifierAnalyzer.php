@@ -23,7 +23,7 @@ class TagIdentifierAnalyzer
      */
     public static function getIdentifier($input)
     {
-        $identifier = new TagIdentifier;
+        $identifier = new TagIdentifier();
         $identifier->content = trim($input);
 
         $parts = explode(':', $input);

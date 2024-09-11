@@ -178,7 +178,7 @@ class PerformanceTracer implements RuntimeTracerContract
     {
         $currentMemory = memory_get_usage() - $this->memorySampleBaseline;
 
-        $sample = new RuntimeSample;
+        $sample = new RuntimeSample();
         $sample->time = (microtime(true) * 1000) - $this->firstSampleTime;
         $sample->memory = $currentMemory;
         $sample->antlersNodesProcessed = $this->antlersNodesObserved;
@@ -395,5 +395,7 @@ class PerformanceTracer implements RuntimeTracerContract
         }
     }
 
-    public function onRenderComplete() {}
+    public function onRenderComplete()
+    {
+    }
 }

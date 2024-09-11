@@ -43,7 +43,7 @@ class GuzzleAdapter implements FilesystemAdapter
     public function __construct($base, ?ClientInterface $client = null)
     {
         $this->base = rtrim($base, '/').'/';
-        $this->client = $client ?: new Client;
+        $this->client = $client ?: new Client();
     }
 
     public function fileExists(string $location): bool

@@ -95,7 +95,7 @@ EOT;
         // behavior, and is now disabled by default. However, it
         // can turned back on through the Antlers config file.
 
-        $config = new RuntimeConfiguration;
+        $config = new RuntimeConfiguration();
         $config->allowPhpInUserContent = true;
 
         $fieldType = new class extends Fieldtype
@@ -143,7 +143,7 @@ EOT;
 
     public function test_php_inside_user_content_can_be_disabled()
     {
-        $config = new RuntimeConfiguration;
+        $config = new RuntimeConfiguration();
         $config->allowPhpInUserContent = false;
 
         $fieldType = new class extends Fieldtype
@@ -302,7 +302,7 @@ EOT;
             'title' => 'Antlers PHP Node Test',
         ];
 
-        $entryFactory = new EntryFactory;
+        $entryFactory = new EntryFactory();
         for ($i = 0; $i < 3; $i++) {
             $entryFactory->collection('blog')->create();
         }
@@ -431,7 +431,7 @@ EOT;
             'title' => 'Antlers PHP Node Test',
         ];
 
-        $entryFactory = new EntryFactory;
+        $entryFactory = new EntryFactory();
         for ($i = 0; $i < 3; $i++) {
             $entryFactory->collection('blog')->create();
         }

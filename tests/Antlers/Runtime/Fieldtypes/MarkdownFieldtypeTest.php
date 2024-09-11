@@ -19,7 +19,7 @@ class MarkdownFieldtypeTest extends ParserTestCase
 
     public function test_markdown_with_antlers_evaluates_correctly()
     {
-        $markdown = new Markdown;
+        $markdown = new Markdown();
         $field = new Field('test', [
             'type' => 'markdown',
             'antlers' => true,

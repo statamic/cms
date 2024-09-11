@@ -14,10 +14,10 @@ class ConditionalLogicValueTest extends ParserTestCase
 {
     public function test_conditionals_handle_values_transparently()
     {
-        $integerFieldType = new Integer;
-        $floatFieldType = new Floatval;
-        $checkboxFieldType = new Checkboxes;
-        $buttonFieldType = new ButtonGroup;
+        $integerFieldType = new Integer();
+        $floatFieldType = new Floatval();
+        $checkboxFieldType = new Checkboxes();
+        $buttonFieldType = new ButtonGroup();
         $buttonFieldType->setField(new Field('button_value', [
             'options' => [
                 'one' => 'One',

@@ -6,7 +6,7 @@ class ParserFailNode extends AntlersNode
 {
     public static function makeWithStartPosition(Position $startPosition)
     {
-        $newNode = new ParserFailNode;
+        $newNode = new ParserFailNode();
         $newNode->startPosition = $startPosition;
         $newNode->endPosition = $startPosition;
 

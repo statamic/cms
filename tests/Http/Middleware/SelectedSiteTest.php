@@ -37,7 +37,7 @@ class SelectedSiteTest extends TestCase
         $request = $this->createRequest('/cp/foo');
         $handled = false;
 
-        (new SelectedSite)->handle($request, function () use (&$handled) {
+        (new SelectedSite())->handle($request, function () use (&$handled) {
             $handled = true;
 
             return new Response;
@@ -74,7 +74,7 @@ class SelectedSiteTest extends TestCase
         $request = $this->createRequest('/cp/foo');
         $handled = false;
 
-        (new SelectedSite)->handle($request, function () use (&$handled) {
+        (new SelectedSite())->handle($request, function () use (&$handled) {
             $handled = true;
 
             return new Response;

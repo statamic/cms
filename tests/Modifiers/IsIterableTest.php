@@ -13,7 +13,7 @@ class IsIterableTest extends TestCase
         return [
             'array' => [true, ['foo', 'bar', 'baz']],
             'collection' => [true, collect(['foo', 'bar', 'baz'])],
-            'entries_collection' => [true, new EntryCollection],
+            'entries_collection' => [true, new EntryCollection()],
             'no_iterable' => [false, 'string'],
         ];
     }

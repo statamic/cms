@@ -15,7 +15,7 @@ class FilesystemServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(AssetContainerContents::class, function () {
-            return new AssetContainerContents;
+            return new AssetContainerContents();
         });
 
         $paths = [

@@ -51,7 +51,7 @@ class TokenTest extends TestCase
     public function it_can_be_handled()
     {
         $this->app->bind('TestTokenHandler', function () {
-            return new class
+            return new class()
             {
                 public function handle($token, $request, $next)
                 {

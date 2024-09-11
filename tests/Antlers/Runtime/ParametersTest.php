@@ -404,7 +404,7 @@ EOT;
             }
         })::register();
 
-        $theGroup = new Group;
+        $theGroup = new Group();
 
         $theField = new Field('the_group', [
             'type' => 'group',

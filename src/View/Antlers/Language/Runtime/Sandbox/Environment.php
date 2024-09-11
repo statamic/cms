@@ -122,11 +122,11 @@ class Environment
 
     public function __construct()
     {
-        $this->pathParser = new PathParser;
-        $this->dataRetriever = new PathDataManager;
+        $this->pathParser = new PathParser();
+        $this->dataRetriever = new PathDataManager();
         $this->dataRetriever->setEnvironment($this);
         $this->dataRetriever->setIsPaired(false);
-        $this->operatorManager = new LanguageOperatorManager;
+        $this->operatorManager = new LanguageOperatorManager();
 
         $this->operatorManager->setEnvironment($this);
     }
@@ -1191,7 +1191,7 @@ class Environment
      */
     private function evaluateTernaryGroup(TernaryCondition $condition)
     {
-        $env = new Environment;
+        $env = new Environment();
         $env->setProcessor($this->nodeProcessor);
         $env->setData($this->data);
         $headValue = $env->evaluateBool($condition->head);
@@ -1410,7 +1410,7 @@ class Environment
             return $node->value >= 1;
         }
 
-        $env = new Environment;
+        $env = new Environment();
         $env->setProcessor($this->nodeProcessor);
         $env->setData($this->data);
         $envResult = $env->evaluate([$node]);
@@ -1468,7 +1468,7 @@ class Environment
      */
     public function evaluateArgumentGroup(ArgumentGroup $argumentGroup)
     {
-        $env = new Environment;
+        $env = new Environment();
         $env->setProcessor($this->nodeProcessor);
         $env->setData($this->data);
 

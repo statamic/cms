@@ -17,7 +17,7 @@ class Authenticated extends Protector
         }
 
         if (! $this->getLoginUrl()) {
-            throw new ForbiddenHttpException;
+            throw new ForbiddenHttpException();
         }
 
         abort(redirect($this->getLoginUrl()));

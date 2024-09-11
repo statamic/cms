@@ -360,7 +360,7 @@ EOT;
 
     public function test_empty_terms_collection_is_falsey()
     {
-        $terms = new TermCollection;
+        $terms = new TermCollection();
         $value = new Value($terms);
 
         $template = '{{ if topics }}yes{{ else }}no{{ /if }}';
@@ -371,7 +371,7 @@ EOT;
 
     public function test_values_are_resolved_in_conditions()
     {
-        $fieldType = new Select;
+        $fieldType = new Select();
 
         // Values are different from handle here to ensure that it returns the value
         // and not the name of the variable, and to ensure it's not the handle.
@@ -780,7 +780,7 @@ EOT;
 
     public function test_arrayable_strings_inside_conditions_used_with_modifiers()
     {
-        $code = new Code;
+        $code = new Code();
         $field = new Field('code_field', [
             'type' => 'code',
             'antlers' => false,

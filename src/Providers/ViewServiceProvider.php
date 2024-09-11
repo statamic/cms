@@ -82,7 +82,7 @@ class ViewServiceProvider extends ServiceProvider
         }
 
         $this->app->bind(EnvironmentDetails::class, function ($app) {
-            $envDetails = new EnvironmentDetails;
+            $envDetails = new EnvironmentDetails();
 
             $envDetails->setTagNames($app->make('statamic.tags')->keys()->all());
             $envDetails->setModifierNames($app->make('statamic.modifiers')->keys()->all());
@@ -93,17 +93,17 @@ class ViewServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(ModifierManager::class, function ($app) {
-            return new ModifierManager;
+            return new ModifierManager();
         });
 
         $this->app->singleton(PerformanceTracer::class, function () {
-            return new PerformanceTracer;
+            return new PerformanceTracer();
         });
 
         $this->app->bind('antlers.runtime', function ($app) {
             /** @var RuntimeParser $parser */
             $parser = $app->make(RuntimeParser::class)->cascade($app[Cascade::class]);
-            $runtimeConfig = new RuntimeConfiguration;
+            $runtimeConfig = new RuntimeConfiguration();
 
             $isTracingOn = config('statamic.antlers.tracing', false);
             $runtimeConfig->fatalErrorOnUnpairedLoop = config('statamic.antlers.fatalErrorOnUnpairedLoop', false);
@@ -136,7 +136,7 @@ class ViewServiceProvider extends ServiceProvider
             );
 
             if ($isTracingOn) {
-                $traceManager = new TraceManager;
+                $traceManager = new TraceManager();
                 $tracers = config('statamic.antlers.tracers', []);
 
                 foreach ($tracers as $abstract) {
@@ -149,7 +149,7 @@ class ViewServiceProvider extends ServiceProvider
 
             if (GlobalDebugManager::isDebugSessionActive()) {
                 if (! $isTracingOn) {
-                    $runtimeConfig->traceManager = new TraceManager;
+                    $runtimeConfig->traceManager = new TraceManager();
                     $runtimeConfig->isTracingEnabled = true;
                 }
 
@@ -158,7 +158,7 @@ class ViewServiceProvider extends ServiceProvider
 
             if ($this->profilerEnabled()) {
                 if (! $isTracingOn) {
-                    $runtimeConfig->traceManager = new TraceManager;
+                    $runtimeConfig->traceManager = new TraceManager();
                     $runtimeConfig->isTracingEnabled = true;
                 }
 

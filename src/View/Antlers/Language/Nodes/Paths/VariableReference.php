@@ -76,7 +76,7 @@ class VariableReference
     public function getRoot(): VariableReference
     {
         if ($this->cachedRoot == null) {
-            $this->cachedRoot = new VariableReference;
+            $this->cachedRoot = new VariableReference();
 
             if (count($this->pathParts) == 0) {
                 return $this->cachedRoot;
@@ -93,7 +93,7 @@ class VariableReference
      */
     public function clone()
     {
-        $reference = new VariableReference;
+        $reference = new VariableReference();
         $reference->originalContent = $this->originalContent;
         $reference->normalizedReference = $this->normalizedReference;
         $reference->isStrictVariableReference = $this->isStrictVariableReference;

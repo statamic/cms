@@ -36,7 +36,7 @@ class ResponseFactory implements ResponseFactoryInterface
     {
         $stream = $cache->readStream($path);
 
-        $response = new StreamedResponse;
+        $response = new StreamedResponse();
         $response->headers->set('Content-Type', $cache->mimeType($path));
         $response->headers->set('Content-Length', $cache->fileSize($path));
         $response->setPublic();

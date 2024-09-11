@@ -496,11 +496,11 @@ EOT;
 
     public function test_runtime_maintains_arrays_of_objects()
     {
-        $entryOne = new SimpleEntryObject;
+        $entryOne = new SimpleEntryObject();
         $entryOne->date = Carbon::parse('October 1st, 2012');
         $entryOne->title = 'Title One';
 
-        $entryTwo = new SimpleEntryObject;
+        $entryTwo = new SimpleEntryObject();
         $entryTwo->date = Carbon::parse('November 1st, 2012');
         $entryTwo->title = 'The Second Title';
 

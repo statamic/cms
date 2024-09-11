@@ -59,8 +59,8 @@ class ConditionProcessor
                 // they may want to change their behavior.
                 $this->processor->setIsConditionProcessor(true);
 
-                $parser = new LanguageParser;
-                $environment = new Environment;
+                $parser = new LanguageParser();
+                $environment = new Environment();
                 $environment->setProcessor($this->processor);
                 $dataToUse = $data;
                 $interpolationReplacements = [];

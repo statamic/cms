@@ -47,7 +47,7 @@ class LanguageOperatorManager
 
     public function __construct()
     {
-        $this->dataManager = new PathDataManager;
+        $this->dataManager = new PathDataManager();
     }
 
     public function setNodeProcessor(NodeProcessor $processor)
@@ -160,7 +160,7 @@ class LanguageOperatorManager
      */
     private function makeEnvironment()
     {
-        $env = new Environment;
+        $env = new Environment();
         $env->setProcessor($this->hostProcessor);
 
         return $env;
@@ -170,7 +170,7 @@ class LanguageOperatorManager
     {
         if (array_key_exists($string, self::$parsedVarCache) == false) {
             if (self::$varParser == null) {
-                self::$varParser = new PathParser;
+                self::$varParser = new PathParser();
             }
 
             try {
