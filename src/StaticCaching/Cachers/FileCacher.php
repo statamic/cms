@@ -170,13 +170,13 @@ class FileCacher extends AbstractCacher
         $query = Arr::get($urlParts, 'query', '');
 
         if ($this->config('ignore_query_strings')) {
-            $allowedQueryParams = collect($this->config('allowed_query_parameters', []))
+            $allowedQueryParams = collect($this->config('allowed_query_strings', []))
                 ->map(fn ($param) => Str::ensureRight($param, '='))
                 ->all();
 
-            $query = collect(explode('&', $query))->filter(function ($param) use ($allowedQueryParams) {
-                return Str::startsWith($param, $allowedQueryParams);
-            })->implode('&');
+            $query = collect(explode('&', $query))
+                ->filter(fn ($param) => Str::startsWith($param, $allowedQueryParams))
+                ->implode('&');
         }
 
         if ($this->isBasenameTooLong($basename = $slug.'_'.$query.'.html')) {
