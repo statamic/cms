@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
@@ -158,6 +159,10 @@ class StaticWarm extends Command
     private function requests()
     {
         return $this->uris()->map(function ($uri) {
+            if (config('statamic.static_caching.background_recache', false)) {
+                $url .= '?__recache='.Hash::make($url);
+            }
+
             return new Request('GET', $uri);
         })->all();
     }
