@@ -5,6 +5,7 @@
                 v-for="(option, $index) in options"
                 :key="$index"
                 ref="button"
+                type="button"
                 :name="name"
                 @click="update($event.target.value)"
                 :value="option.value"

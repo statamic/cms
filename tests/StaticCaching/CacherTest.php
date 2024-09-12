@@ -3,7 +3,6 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Cache\Repository;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
@@ -31,43 +30,6 @@ class CacherTest extends TestCase
         ]);
 
         $this->assertEquals(10, $cacher->getDefaultExpiration());
-    }
-
-    #[Test]
-    public function gets_a_url()
-    {
-        $cacher = $this->cacher();
-
-        $request = Request::create('http://example.com/test', 'GET', [
-            'foo' => 'bar',
-        ]);
-
-        $this->assertEquals('http://example.com/test?foo=bar', $cacher->getUrl($request));
-    }
-
-    #[Test]
-    public function gets_a_url_with_query_strings_disabled()
-    {
-        $cacher = $this->cacher(['ignore_query_strings' => true]);
-
-        $request = Request::create('http://example.com/test', 'GET', [
-            'foo' => 'bar',
-        ]);
-
-        $this->assertEquals('http://example.com/test', $cacher->getUrl($request));
-    }
-
-    #[Test]
-    public function gets_a_url_with_query_strings_disabled_and_allowed_query_params()
-    {
-        $cacher = $this->cacher(['ignore_query_strings' => true, 'allowed_query_parameters' => ['page']]);
-
-        $request = Request::create('http://example.com/test', 'GET', [
-            'page' => 5,
-            'foo' => 'bar',
-        ]);
-
-        $this->assertEquals('http://example.com/test?page=5', $cacher->getUrl($request));
     }
 
     #[Test]

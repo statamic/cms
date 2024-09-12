@@ -6,9 +6,16 @@ use Illuminate\Events\NullDispatcher;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Events\ImpersonationEnded;
 use Statamic\Facades\User;
+use Statamic\Http\Controllers\Controller;
+use Statamic\Http\Middleware\CP\AuthenticateSession;
 
-class ImpersonationController
+class ImpersonationController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(AuthenticateSession::class);
+    }
+
     public function stop()
     {
         if ($originalUserId = session()->pull('statamic_impersonated_by')) {

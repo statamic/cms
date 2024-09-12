@@ -90,7 +90,7 @@ return [
     'fields_display_instructions' => 'برچسب یا لیبل فیلد برای نمایش در کنترل پنل.',
     'fields_duplicate_instructions' => 'در هنگام تکثیر شدن مجموعه فیلد آیا این فیلد هم کپی شود؟',
     'fields_fieldsets_description' => 'مجموعه‌های فیلد، گروه‌بندی‌های ساده، انعطاف‌پذیر و کاملاً اختیاری از فیلدها هستند که به سازماندهی فیلدهای قابل استفاده مجدد و از پیش پیکربندی شده کمک می‌کنند.',
-    'fields_handle_instructions' => 'نام متغییر فیلد در فرانت (به لاتین با رعایت قوانین تعریف متغییر)',
+    'fields_handle_instructions' => 'نام متغییر فیلد در فرانت (به لاتین با رعایت قوانین تعریف متغییر). از استفاده از [کلمات رزرو شده](https://statamic.dev/tips/reserved-words#as-field-names) به عنوان هندل خودداری کنید.',
     'fields_instructions_instructions' => 'توضیحاتی در خصوص فیلد برای کاربر که می‌تواند طولانی و به فرمت مارک‌دان (Markdown) هم باشد.',
     'fields_instructions_position_instructions' => 'نمایش توضیحات در زیر یا بالای فیلد',
     'fields_listable_instructions' => 'نحوه نمایش فیلد در لیست ستون‌های قابل انتخاب را مشخض کنید.',
