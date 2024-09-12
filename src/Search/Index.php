@@ -40,7 +40,7 @@ abstract class Index
         return $this->name;
     }
 
-    public static function resolveNameUsing(Closure|null $callback)
+    public static function resolveNameUsing(?Closure $callback)
     {
         static::$nameCallback = $callback;
     }
