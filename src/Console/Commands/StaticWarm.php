@@ -160,7 +160,7 @@ class StaticWarm extends Command
     {
         return $this->uris()->map(function ($uri) {
             if (config('statamic.static_caching.background_recache', false)) {
-                $url .= '?__recache='.Hash::make($url);
+                $uri .= '?__recache='.Hash::make($uri);
             }
 
             return new Request('GET', $uri);
