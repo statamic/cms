@@ -2,10 +2,8 @@
 
 namespace Tests\Auth\Protect;
 
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
-use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Test;
 
 class PasswordEntryTest extends PageProtectionTestCase
 {
