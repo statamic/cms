@@ -50,6 +50,7 @@ class PasswordEntryTest extends TestCase
     public function it_allows_access_if_allowed_password_was_entered()
     {
         $this->withoutExceptionHandling();
+
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
             'form_url' => '/password-entry',
@@ -59,6 +60,9 @@ class PasswordEntryTest extends TestCase
         session()->put('statamic:protect:password.tokens.test-token', [
             'scheme' => 'password-scheme',
             'url' => '/target-url',
+            'id' => 'test',
+            'valid_passwords' => ['the-password'],
+            'local_password' => null,
         ]);
 
         $this
