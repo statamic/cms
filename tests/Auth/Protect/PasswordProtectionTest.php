@@ -31,6 +31,9 @@ class PasswordProtectionTest extends PageProtectionTestCase
             ->assertSessionHas('statamic:protect:password.tokens.test-token', [
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
+                'id' => 'test',
+                'valid_passwords' => ['test'],
+                'local_password' => null,
             ]);
     }
 

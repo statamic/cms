@@ -31,6 +31,9 @@ class PasswordEntryTest extends TestCase
         session()->put('statamic:protect:password.tokens.test-token', [
             'scheme' => 'password-scheme',
             'url' => '/target-url',
+            'id' => 'test',
+            'valid_passwords' => ['the-password'],
+            'local_password' => null,
         ]);
 
         $this
