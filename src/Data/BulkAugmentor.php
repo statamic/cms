@@ -10,6 +10,7 @@ class BulkAugmentor
     private $isTree = false;
     private $originalValues = [];
     private $augmentedValues = [];
+    private ?array $keys = null;
 
     private function getAugmentationReference($item)
     {
@@ -25,9 +26,18 @@ class BulkAugmentor
         return (new static)->augment($items);
     }
 
-    public static function tree($tree)
+    public static function tree($tree, $keys = null)
     {
-        return (new static)->augmentTree($tree);
+        return (new static)
+            ->withKeys($keys)
+            ->augmentTree($tree);
+    }
+
+    public function withKeys(?array $keys)
+    {
+        $this->keys = $keys;
+
+        return $this;
     }
 
     /**
@@ -51,7 +61,7 @@ class BulkAugmentor
             }
 
             $augmented = $item->augmented();
-            $referenceKeys[$reference] = $augmented->keys();
+            $referenceKeys[$reference] = $this->keys ?? $augmented->keys();
             $referenceFields[$reference] = $augmented->blueprintFields();
         }
 

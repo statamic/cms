@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Support\Facades\Cache;
+use League\Flysystem\UnableToReadFile;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
@@ -90,6 +92,8 @@ class ThumbnailController extends Controller
                 ->setSource(Source::from($this->asset))
                 ->setParams($preset ? ['p' => $preset] : [])
                 ->getUrl();
+        } catch (UnableToReadFile $e) {
+            throw new NotFoundHttpException;
         } finally {
             Cache::forget($this->mutex());
         }

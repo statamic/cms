@@ -45,6 +45,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\SupportZipBlueprint::class,
         Commands\AuthMigration::class,
         Commands\Multisite::class,
+        Commands\NocacheMigration::class,
         Commands\SiteClear::class,
         Commands\UpdatesRun::class,
         Commands\ImportGroups::class,

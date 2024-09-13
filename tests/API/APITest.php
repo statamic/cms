@@ -153,6 +153,7 @@ class APITest extends TestCase
         $this->assertEndpointDataCount('/api/collections/pages/entries?filter[status:is]=draft', 2);
         $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=true', 1);
         $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=false', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[status:is]=any', 3);
     }
 
     #[Test]

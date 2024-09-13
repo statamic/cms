@@ -42,4 +42,42 @@ class FormRepositoryTest extends TestCase
 
         $this->repo->findOrFail('does-not-exist');
     }
+
+    /** @test */
+    public function it_registers_config()
+    {
+        $this->repo->appendConfigFields('test_form', 'Test Config', [
+            'alfa' => ['type' => 'text'],
+            'bravo' => ['type' => 'text'],
+        ]);
+
+        $this->repo->appendConfigFields('*', 'This Goes Everywhere', [
+            ['charlie' => ['type' => 'text']],
+        ]);
+
+        $this->assertEquals([
+            'test_config' => [
+                'display' => 'Test Config',
+                'fields' => [
+                    'alfa' => ['type' => 'text'],
+                    'bravo' => ['type' => 'text'],
+                ],
+            ],
+            'this_goes_everywhere' => [
+                'display' => 'This Goes Everywhere',
+                'fields' => [
+                    ['charlie' => ['type' => 'text']],
+                ],
+            ],
+        ], $this->repo->extraConfigFor('test_form'));
+
+        $this->assertEquals([
+            'this_goes_everywhere' => [
+                'display' => 'This Goes Everywhere',
+                'fields' => [
+                    ['charlie' => ['type' => 'text']],
+                ],
+            ],
+        ], $this->repo->extraConfigFor('another_form'));
+    }
 }
