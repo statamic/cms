@@ -130,7 +130,6 @@ export default {
         reordering: Boolean,
         reorderUrl: String,
         site: String,
-        sites: Array,
     },
 
     data() {
