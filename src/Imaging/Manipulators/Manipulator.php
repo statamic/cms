@@ -8,7 +8,7 @@ use Statamic\Imaging\Manipulators\Sources\Source;
 abstract class Manipulator implements Contract
 {
     protected Source $source;
-    protected array $params;
+    private array $params = [];
 
     public function setSource(Source $source): Contract
     {
@@ -22,5 +22,10 @@ abstract class Manipulator implements Contract
         $this->params += $params;
 
         return $this;
+    }
+
+    public function getParams(): array
+    {
+        return $this->params;
     }
 }

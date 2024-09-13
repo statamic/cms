@@ -96,7 +96,8 @@ class Render extends Tags
         $params = $this->params->only($driver->getAvailableParams())->all();
 
         if (($params['fit'] ?? null) === 'crop_focal') {
-            $params['fit'] = ($asset = $source->asset()) ? 'crop-'.$asset->focus : 'crop-50-50-1';
+            $driver->addFocalPointParams(...explode('-', $source->asset()->focus ?? '50-50-1'));
+            unset($params['fit']);
         }
 
         return $driver->setSource($source)->addParams($params);

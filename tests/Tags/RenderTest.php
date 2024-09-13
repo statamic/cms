@@ -334,8 +334,13 @@ EOF;
     }
 
     #[Test, DataProvider('focalPointProvider')]
-    public function fit_crop_focal_param_will_automatically_append_focal_point($src, $defineFocalPoint, $expectedFit)
-    {
+    public function fit_crop_focal_param_will_automatically_append_focal_point(
+        $src,
+        $defineFocalPoint,
+        $expectedX,
+        $expectedY,
+        $expectedZ,
+    ) {
         Storage::fake('test', ['url' => '/assets']);
         $file = UploadedFile::fake()->image('foo.jpg', 30, 60); // creates a 723 byte image
         Storage::disk('test')->putFileAs('', $file, 'foo.jpg');
@@ -347,24 +352,25 @@ EOF;
         }
 
         $driver = Mockery::mock(GlideManipulator::class)->makePartial();
-        $driver->shouldReceive('addParams')->with(['fit' => $expectedFit])->once()->andReturnSelf();
+        $driver->shouldReceive('addParams')->with(['w' => 100])->once()->andReturnSelf();
+        $driver->shouldReceive('addFocalPointParams')->with($expectedX, $expectedY, $expectedZ)->once()->andReturnSelf();
         $driver->shouldReceive('getUrl')->andReturn('the-url');
         Image::shouldReceive('driver')->once()->andReturn($driver);
 
-        $this->assertEquals('the-url', $this->parse('{{ render:img fit="crop_focal" }}', ['img' => $src]));
+        $this->assertEquals('the-url', $this->parse('{{ render:img fit="crop_focal" w="100" }}', ['img' => $src]));
     }
 
     public static function focalPointProvider()
     {
         return [
-            'path to non-asset' => ['something.jpg', false, 'crop-50-50-1'],
-            'path to asset with focal point' => ['assets/foo.jpg', true, 'crop-75-10-2'],
-            'path to asset without focal point' => ['foo.jpg', false, 'crop-50-50-1'],
-            'asset with focal point' => [fn ($asset) => $asset, true, 'crop-75-10-2'],
-            'asset without focal point' => [fn ($asset) => $asset, false, 'crop-50-50-1'],
-            'asset id with focal point' => [fn ($asset) => $asset->id(), true, 'crop-75-10-2'],
-            'asset id without focal point' => [fn ($asset) => $asset->id(), false, 'crop-50-50-1'],
-            'external url' => ['http://external.com/something.jpg', false, 'crop-50-50-1'],
+            'path to non-asset' => ['something.jpg', false, 50, 50, 1],
+            'path to asset with focal point' => ['assets/foo.jpg', true, 75, 10, 2],
+            'path to asset without focal point' => ['foo.jpg', false, 50, 50, 1],
+            'asset with focal point' => [fn ($asset) => $asset, true, 75, 10, 2],
+            'asset without focal point' => [fn ($asset) => $asset, false, 50, 50, 1],
+            'asset id with focal point' => [fn ($asset) => $asset->id(), true, 75, 10, 2],
+            'asset id without focal point' => [fn ($asset) => $asset->id(), false, 50, 50, 1],
+            'external url' => ['http://external.com/something.jpg', false, 50, 50, 1],
         ];
     }
 

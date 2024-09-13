@@ -179,4 +179,11 @@ class GlideManipulator extends Manipulator
             return md5($source.'?'.http_build_query($params));
         };
     }
+
+    public function addFocalPointParams(float $x, float $y, float $z): self
+    {
+        $this->addParams(['fit' => 'crop-'.$x.'-'.$y.'-'.$z]);
+
+        return $this;
+    }
 }

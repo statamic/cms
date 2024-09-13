@@ -17,6 +17,16 @@ interface Manipulator
     public function addParams(array $params): self;
 
     /**
+     * Adds the appropriate params that would control focal point cropping.
+     */
+    public function addFocalPointParams(float $x, float $y, float $z): self;
+
+    /**
+     * Gets the manipulations to be performed.
+     */
+    public function getParams(): array;
+
+    /**
      * Gets the available manipulation parameters.
      */
     public function getAvailableParams(): array;

@@ -272,6 +272,20 @@ class GlideManipulatorTest extends TestCase
         $this->manipulator->setSource(Source::from('main::unknown.jpg'))->addParams(['w' => 100])->getAttributes();
     }
 
+    #[Test]
+    public function it_sets_focal_point_parameters()
+    {
+        $this->manipulator
+            ->addFocalPointParams(10, 20, 2)
+            ->addParams(['w' => 100, 'h' => 200]);
+
+        $this->assertEquals([
+            'w' => 100,
+            'h' => 200,
+            'fit' => 'crop-10-20-2',
+        ], $this->manipulator->getParams());
+    }
+
     public function it_can_mark_with_asset()
     {
         $this->markTestIncomplete();
