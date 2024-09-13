@@ -96,6 +96,7 @@
             :reordering="reordering"
             :reorder-url="reorderUrl"
             :site="site"
+            :sites="sites"
             @reordered="reordering = false"
             @site-changed="site = $event"
         />
