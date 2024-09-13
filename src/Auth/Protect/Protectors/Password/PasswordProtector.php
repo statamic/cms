@@ -47,7 +47,11 @@ class PasswordProtector extends Protector
 
     protected function validPasswords()
     {
-        return array_filter(array_merge($this->masterPasswords(), [$this->localPassword()]));
+        return collect($this->masterPasswords())
+            ->push($this->localPassword())
+            ->filter()
+            ->unique()
+            ->all();
     }
 
     public function hasEnteredValidPassword()
