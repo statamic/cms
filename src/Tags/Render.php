@@ -99,7 +99,7 @@ class Render extends Tags
             $params['fit'] = ($asset = $source->asset()) ? 'crop-'.$asset->focus : 'crop-50-50-1';
         }
 
-        return $driver->setSource($source)->setParams($params);
+        return $driver->setSource($source)->addParams($params);
     }
 
     public function imgTag(string $url): string

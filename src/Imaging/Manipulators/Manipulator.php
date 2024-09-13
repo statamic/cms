@@ -17,9 +17,9 @@ abstract class Manipulator implements Contract
         return $this;
     }
 
-    public function setParams(array $params): Contract
+    public function addParams(array $params): Contract
     {
-        $this->params = $params;
+        $this->params += $params;
 
         return $this;
     }

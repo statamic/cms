@@ -93,7 +93,7 @@ class GlideManipulatorTest extends TestCase
             ->with('/foo bar.jpg', ['w' => 100])
             ->andReturn('the-url-for-path');
 
-        $url = $this->manipulator->setSource(Source::from('/foo bar.jpg'))->setParams(['w' => 100])->getUrl();
+        $url = $this->manipulator->setSource(Source::from('/foo bar.jpg'))->addParams(['w' => 100])->getUrl();
 
         $this->assertEquals('/img/the-url-for-path', $url);
     }
@@ -105,7 +105,7 @@ class GlideManipulatorTest extends TestCase
             ->with('http://example.com/external.jpg', ['w' => 100])
             ->andReturn('the-url-for-external');
 
-        $url = $this->manipulator->setSource(Source::from('http://example.com/external.jpg'))->setParams(['w' => 100])->getUrl();
+        $url = $this->manipulator->setSource(Source::from('http://example.com/external.jpg'))->addParams(['w' => 100])->getUrl();
 
         $this->assertEquals('/img/the-url-for-external', $url);
     }
@@ -121,7 +121,7 @@ class GlideManipulatorTest extends TestCase
             ->with($asset, ['w' => 100])
             ->andReturn('the-url-for-asset');
 
-        $url = $this->manipulator->setSource(Source::from($asset))->setParams(['w' => 100])->getUrl();
+        $url = $this->manipulator->setSource(Source::from($asset))->addParams(['w' => 100])->getUrl();
 
         $this->assertEquals('/img/the-url-for-asset', $url);
     }
@@ -139,7 +139,7 @@ class GlideManipulatorTest extends TestCase
             ->with($asset, ['w' => 100])
             ->andReturn('the-url-for-id');
 
-        $url = $this->manipulator->setSource(Source::from('main::img/foo.jpg'))->setParams(['w' => 100])->getUrl();
+        $url = $this->manipulator->setSource(Source::from('main::img/foo.jpg'))->addParams(['w' => 100])->getUrl();
 
         $this->assertEquals('/img/the-url-for-id', $url);
     }
@@ -153,7 +153,7 @@ class GlideManipulatorTest extends TestCase
         $asset->container((new AssetContainer)->handle('main'));
         $asset->path('img/foo.jpg');
 
-        $url = $this->manipulator->setSource(Source::from('main::unknown.jpg'))->setParams(['w' => 100])->getUrl();
+        $url = $this->manipulator->setSource(Source::from('main::unknown.jpg'))->addParams(['w' => 100])->getUrl();
 
         $this->assertEquals('/img/the-url-for-id', $url);
     }
@@ -168,8 +168,7 @@ class GlideManipulatorTest extends TestCase
             ->getMock();
 
         $manipulator = $this->manipulator(['url' => $prefix], $generator)
-            ->setSource(Source::from('foo.jpg'))
-            ->setParams([]);
+            ->setSource(Source::from('foo.jpg'));
 
         $this->assertEquals($expected, $manipulator->getUrl());
     }
@@ -190,7 +189,7 @@ class GlideManipulatorTest extends TestCase
             ->with('/foo bar.jpg', ['w' => 100])
             ->andReturn('the-path-for-path');
 
-        $manipulator = $this->manipulator->setSource(Source::from('/foo bar.jpg'))->setParams(['w' => 100]);
+        $manipulator = $this->manipulator->setSource(Source::from('/foo bar.jpg'))->addParams(['w' => 100]);
 
         Attributes::shouldReceive('from')
             ->with($manipulator->getCacheDisk(), 'the-path-for-path')
@@ -207,7 +206,7 @@ class GlideManipulatorTest extends TestCase
             ->with('http://example.com/external.jpg', ['w' => 100])
             ->andReturn('the-path-for-external');
 
-        $manipulator = $this->manipulator->setSource(Source::from('http://example.com/external.jpg'))->setParams(['w' => 100]);
+        $manipulator = $this->manipulator->setSource(Source::from('http://example.com/external.jpg'))->addParams(['w' => 100]);
 
         Attributes::shouldReceive('from')
             ->with($manipulator->getCacheDisk(), 'the-path-for-external')
@@ -228,7 +227,7 @@ class GlideManipulatorTest extends TestCase
             ->with($asset, ['w' => 100])
             ->andReturn('the-path-for-asset');
 
-        $manipulator = $this->manipulator->setSource(Source::from($asset))->setParams(['w' => 100]);
+        $manipulator = $this->manipulator->setSource(Source::from($asset))->addParams(['w' => 100]);
 
         Attributes::shouldReceive('from')
             ->with($manipulator->getCacheDisk(), 'the-path-for-asset')
@@ -251,7 +250,7 @@ class GlideManipulatorTest extends TestCase
             ->with($asset, ['w' => 100])
             ->andReturn('the-path-for-id');
 
-        $manipulator = $this->manipulator->setSource(Source::from('main::img/foo.jpg'))->setParams(['w' => 100]);
+        $manipulator = $this->manipulator->setSource(Source::from('main::img/foo.jpg'))->addParams(['w' => 100]);
 
         Attributes::shouldReceive('from')
             ->with($manipulator->getCacheDisk(), 'the-path-for-id')
@@ -270,7 +269,7 @@ class GlideManipulatorTest extends TestCase
         $asset->container((new AssetContainer)->handle('main'));
         $asset->path('img/foo.jpg');
 
-        $this->manipulator->setSource(Source::from('main::unknown.jpg'))->setParams(['w' => 100])->getAttributes();
+        $this->manipulator->setSource(Source::from('main::unknown.jpg'))->addParams(['w' => 100])->getAttributes();
     }
 
     public function it_can_mark_with_asset()

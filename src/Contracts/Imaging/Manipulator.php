@@ -12,9 +12,9 @@ interface Manipulator
     public function setSource(Source $source): self;
 
     /**
-     * Defines the manipulations to be performed.
+     * Adds manipulations to be performed.
      */
-    public function setParams(array $params): self;
+    public function addParams(array $params): self;
 
     /**
      * Gets the available manipulation parameters.
