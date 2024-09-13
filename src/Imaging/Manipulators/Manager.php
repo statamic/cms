@@ -35,6 +35,7 @@ class Manager
         return match ($config['driver']) {
             'glide' => new GlideManipulator($config),
             'imgix' => new ImgixManipulator($config),
+            'cloudflare' => new CloudflareManipulator($config),
         };
     }
 
