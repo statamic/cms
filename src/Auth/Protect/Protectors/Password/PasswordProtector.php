@@ -16,7 +16,7 @@ class PasswordProtector extends Protector
      */
     public function protect()
     {
-        if (empty(Arr::get($this->config, 'allowed', []))) {
+        if (empty($this->masterPasswords()) && ! $this->localPassword()) {
             throw new ForbiddenHttpException();
         }
 
@@ -33,11 +33,34 @@ class PasswordProtector extends Protector
         }
     }
 
+    protected function masterPasswords()
+    {
+        return Arr::get($this->config, 'allowed', []);
+    }
+
+    protected function localPassword()
+    {
+        $field = Arr::get($this->config, 'field');
+
+        return $this->data->$field;
+    }
+
+    protected function validPasswords()
+    {
+        return array_filter(array_merge($this->masterPasswords(), [$this->localPassword()]));
+    }
+
     public function hasEnteredValidPassword()
     {
-        return (new Guard($this->scheme))->check(
+        $masterPassed = (new Guard($this->validPasswords()))->check(
             session("statamic:protect:password.passwords.{$this->scheme}")
         );
+
+        $localPassed = (new Guard($this->validPasswords()))->check(
+            session("statamic:protect:password.passwords.{$this->data->id()}")
+        );
+
+        return $masterPassed || $localPassed;
     }
 
     protected function isPasswordFormUrl()
@@ -64,6 +87,9 @@ class PasswordProtector extends Protector
         session()->put("statamic:protect:password.tokens.$token", [
             'scheme' => $this->scheme,
             'url' => $this->url,
+            'id' => $this->data->id(),
+            'valid_passwords' => $this->validPasswords(),
+            'local_password' => $this->localPassword(),
         ]);
 
         return $token;

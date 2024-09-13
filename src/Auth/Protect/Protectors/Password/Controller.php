@@ -31,7 +31,7 @@ class Controller extends BaseController
             return back()->withErrors(['token' => __('statamic::messages.password_protect_token_invalid')], 'passwordProtect');
         }
 
-        $guard = new Guard($this->getScheme());
+        $guard = new Guard($this->getValidPasswords());
 
         if (! $guard->check($this->password)) {
             return back()->withErrors(['password' => __('statamic::messages.password_protect_incorrect_password')], 'passwordProtect');
@@ -53,12 +53,28 @@ class Controller extends BaseController
         return $this->tokenData['url'];
     }
 
+    protected function getId()
+    {
+        return $this->tokenData['id'];
+    }
+
+    protected function getValidPasswords()
+    {
+        return $this->tokenData['valid_passwords'];
+    }
+
+    protected function getLocalPassword()
+    {
+        return $this->tokenData['local_password'];
+    }
+
     protected function storePassword()
     {
-        session()->put(
-            "statamic:protect:password.passwords.{$this->getScheme()}",
-            $this->password
-        );
+        $sessionKey = $this->password === $this->getLocalPassword()
+            ? "statamic:protect:password.passwords.{$this->getId()}"
+            : "statamic:protect:password.passwords.{$this->getScheme()}";
+
+        session()->put($sessionKey, $this->password);
 
         return $this;
     }
