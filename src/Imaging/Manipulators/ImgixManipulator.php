@@ -199,4 +199,17 @@ class ImgixManipulator extends Manipulator
 
         return compact('width', 'height');
     }
+
+    public function addFocalPointParams(int $x, int $y, int $z): self
+    {
+        $this->addParams([
+            'fit' => 'crop',
+            'crop' => 'focalpoint',
+            'fp-x' => $x / 100,
+            'fp-y' => $y / 100,
+            'fp-z' => $z,
+        ]);
+
+        return $this;
+    }
 }
