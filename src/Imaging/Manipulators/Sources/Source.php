@@ -3,6 +3,8 @@
 namespace Statamic\Imaging\Manipulators\Sources;
 
 use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Imaging\Manipulator;
+use Statamic\Facades\Image;
 use Statamic\Support\Str;
 
 abstract class Source
@@ -25,5 +27,10 @@ abstract class Source
     public function asset(): ?Asset
     {
         return null;
+    }
+
+    public function manipulator(): Manipulator
+    {
+        return Image::driver();
     }
 }

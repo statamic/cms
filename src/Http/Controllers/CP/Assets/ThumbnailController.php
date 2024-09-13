@@ -88,7 +88,7 @@ class ThumbnailController extends Controller
                 throw new \Exception('Invalid preset');
             }
 
-            $path = Image::driver()
+            $path = $this->asset->container()->imageManipulator()
                 ->setSource(Source::from($this->asset))
                 ->setParams($preset ? ['p' => $preset] : [])
                 ->getUrl();

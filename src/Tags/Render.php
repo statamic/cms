@@ -91,7 +91,7 @@ class Render extends Tags
     {
         $source = Source::from($source);
 
-        $driver = Image::driver($this->params->get('using'));
+        $driver = ($explicit = $this->params->get('using')) ? Image::driver($explicit) : $source->manipulator();
 
         $params = $this->params->only($driver->getAvailableParams())->all();
 
