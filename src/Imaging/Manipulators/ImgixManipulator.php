@@ -200,7 +200,7 @@ class ImgixManipulator extends Manipulator
         return compact('width', 'height');
     }
 
-    public function addFocalPointParams(int $x, int $y, int $z): self
+    public function addFocalPointParams(float $x, float $y, float $z): self
     {
         $this->addParams([
             'fit' => 'crop',
