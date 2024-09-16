@@ -16,7 +16,7 @@ class PasswordProtector extends Protector
      */
     public function protect()
     {
-        if (empty($this->schemePasswords()) && ! $this->localPassword()) {
+        if (empty($this->schemePasswords()) && ! $this->localPasswords()) {
             throw new ForbiddenHttpException();
         }
 
@@ -38,19 +38,19 @@ class PasswordProtector extends Protector
         return Arr::get($this->config, 'allowed', []);
     }
 
-    protected function localPassword()
+    protected function localPasswords()
     {
         if (! $field = Arr::get($this->config, 'field')) {
-            return null;
+            return [];
         }
 
-        return $this->data->$field;
+        return Arr::wrap($this->data->$field);
     }
 
     protected function validPasswords()
     {
         return collect($this->schemePasswords())
-            ->push($this->localPassword())
+            ->merge($this->localPasswords())
             ->filter()
             ->unique()
             ->all();
@@ -95,7 +95,7 @@ class PasswordProtector extends Protector
             'url' => $this->url,
             'reference' => $this->data->reference(),
             'valid_passwords' => $this->validPasswords(),
-            'local_password' => $this->localPassword(),
+            'local_passwords' => $this->localPasswords(),
         ]);
 
         return $token;

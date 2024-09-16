@@ -3,6 +3,7 @@
 namespace Tests\Auth\Protect;
 
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
 class PasswordEntryTest extends PageProtectionTestCase
@@ -33,7 +34,7 @@ class PasswordEntryTest extends PageProtectionTestCase
             'url' => '/target-url',
             'reference' => 'entry::test',
             'valid_passwords' => ['the-password'],
-            'local_password' => null,
+            'local_passwords' => [],
         ]);
 
         $this
@@ -62,7 +63,7 @@ class PasswordEntryTest extends PageProtectionTestCase
             'url' => '/target-url',
             'reference' => 'entry::test',
             'valid_passwords' => ['the-password'],
-            'local_password' => null,
+            'local_passwords' => [],
         ]);
 
         $this
@@ -76,8 +77,13 @@ class PasswordEntryTest extends PageProtectionTestCase
     }
 
     #[Test]
-    public function it_allows_access_if_local_password_was_entered()
-    {
+    #[DataProvider('localPasswordProvider')]
+    public function it_allows_access_if_local_password_was_entered(
+        $passwordFieldInContent,
+        $submittedPassword,
+        $expectedValidPasswordsInToken,
+        $expectedLocalPasswordsInToken
+    ) {
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
             'allowed' => ['the-scheme-password'],
@@ -86,26 +92,50 @@ class PasswordEntryTest extends PageProtectionTestCase
 
         Token::shouldReceive('generate')->andReturn('test-token');
 
-        $this->createPage('test', ['data' => ['protect' => 'password-scheme', 'password' => 'the-local-password']]);
+        $this->createPage('test', ['data' => ['protect' => 'password-scheme', 'password' => $passwordFieldInContent]]);
 
         $this->get('test')
             ->assertSessionHas('statamic:protect:password.tokens.test-token', [
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
                 'reference' => 'entry::test',
-                'valid_passwords' => ['the-scheme-password', 'the-local-password'],
-                'local_password' => 'the-local-password',
+                'valid_passwords' => $expectedValidPasswordsInToken,
+                'local_passwords' => $expectedLocalPasswordsInToken,
             ]);
 
         $this
             ->post('/!/protect/password', [
                 'token' => 'test-token',
-                'password' => 'the-local-password',
+                'password' => $submittedPassword,
             ])
             ->assertRedirect('http://localhost/test')
-            ->assertSessionHas('statamic:protect:password.passwords.ref.entry::test', 'the-local-password')
+            ->assertSessionHas('statamic:protect:password.passwords.ref.entry::test', $submittedPassword)
             ->assertSessionMissing('statamic:protect:password.passwords.password-scheme')
             ->assertSessionMissing('statamic:protect:password.tokens.test-token');
+    }
+
+    public static function localPasswordProvider()
+    {
+        return [
+            'string' => [
+                'value' => 'the-local-password',
+                'submitted' => 'the-local-password',
+                'valid' => ['the-scheme-password', 'the-local-password'],
+                'local' => ['the-local-password'],
+            ],
+            'array with single value' => [
+                'value' => ['the-local-password'],
+                'submitted' => 'the-local-password',
+                'valid' => ['the-scheme-password', 'the-local-password'],
+                'local' => ['the-local-password'],
+            ],
+            'array with multiple values' => [
+                'value' => ['first-local-password', 'second-local-password'],
+                'submitted' => 'second-local-password',
+                'valid' => ['the-scheme-password', 'first-local-password', 'second-local-password'],
+                'local' => ['first-local-password', 'second-local-password'],
+            ],
+        ];
     }
 
     #[Test]
@@ -127,7 +157,7 @@ class PasswordEntryTest extends PageProtectionTestCase
                 'url' => 'http://localhost/test',
                 'reference' => 'entry::test',
                 'valid_passwords' => ['the-scheme-password'],
-                'local_password' => 'the-scheme-password',
+                'local_passwords' => ['the-scheme-password'],
             ]);
 
         $this
@@ -162,7 +192,7 @@ class PasswordEntryTest extends PageProtectionTestCase
                 'url' => 'http://localhost/test',
                 'reference' => 'entry::test',
                 'valid_passwords' => ['the-scheme-password', 'the-local-password'],
-                'local_password' => 'the-local-password',
+                'local_passwords' => ['the-local-password'],
             ]);
 
         $this
@@ -182,7 +212,7 @@ class PasswordEntryTest extends PageProtectionTestCase
                 'url' => 'http://localhost/test-2',
                 'reference' => 'entry::test-2',
                 'valid_passwords' => ['the-scheme-password', 'the-local-password'],
-                'local_password' => 'the-local-password',
+                'local_passwords' => ['the-local-password'],
             ]);
     }
 }

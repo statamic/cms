@@ -33,7 +33,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
                 'url' => 'http://localhost/test',
                 'reference' => 'entry::test',
                 'valid_passwords' => ['test'],
-                'local_password' => null,
+                'local_passwords' => [],
             ]);
     }
 
