@@ -41,7 +41,7 @@ abstract class ActionController extends CpController
         try {
             $response = $action->run($items, $values);
         } catch (Exception $e) {
-            $response = empty($e->getMessage()) ? __('Action failed') : $e->getMessage();
+            $response = empty($msg = $e->getMessage()) ? __('Action failed') : $msg;
             $successful = false;
         }
 
