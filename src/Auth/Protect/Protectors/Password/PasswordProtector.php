@@ -40,7 +40,9 @@ class PasswordProtector extends Protector
 
     protected function localPassword()
     {
-        $field = Arr::get($this->config, 'field');
+        if (! $field = Arr::get($this->config, 'field')) {
+            return null;
+        }
 
         return $this->data->$field;
     }
