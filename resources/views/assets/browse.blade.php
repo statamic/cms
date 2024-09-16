@@ -12,6 +12,7 @@
         initial-editing-asset-id="{{ $editing ?? null }}"
         :can-create-containers="{{ Statamic\Support\Str::bool($user->can('create', \Statamic\Contracts\Assets\AssetContainer::class)) }}"
         create-container-url="{{ cp_route('asset-containers.create') }}"
+        :columns="{{ $columns->toJson() }}"
     ></asset-manager>
 
     @include('statamic::partials.docs-callout', [

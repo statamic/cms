@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\CP\Column;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
@@ -13,11 +14,14 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Folder;
 use Statamic\Http\Resources\CP\Assets\FolderAsset;
 use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
+use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 use Statamic\Support\Arr;
 
 class BrowserController extends CpController
 {
-    use RedirectsToFirstAssetContainer;
+    use RedirectsToFirstAssetContainer, HasRequestedColumns;
+
+    private $columns;
 
     public function index()
     {
@@ -34,6 +38,8 @@ class BrowserController extends CpController
     {
         $this->authorize('view', $container);
 
+        $this->setColumns($container);
+
         return view('statamic::assets.browse', [
             'container' => [
                 'id' => $container->id(),
@@ -47,6 +53,7 @@ class BrowserController extends CpController
                 'sort_direction' => $container->sortDirection(),
             ],
             'folder' => $path,
+            'columns' => $this->columns,
         ]);
     }
 
@@ -108,9 +115,18 @@ class BrowserController extends CpController
                 ->get();
         }
 
+        $this->setColumns($container);
+        $columns = $this->visibleColumns();
+
         return [
             'data' => [
-                'assets' => FolderAsset::collection($assets ?? collect())->resolve(),
+                'assets' => collect($assets ?? [])
+                    ->map(fn ($asset) => (new FolderAsset($asset))
+                        ->blueprint($container->blueprint())
+                        ->columns($columns)
+                        ->resolve()
+                    )
+                    ->all(),
                 'folder' => array_merge((new Folder($folder))->resolve(), [
                     'folders' => $folders->values(),
                 ]),
@@ -127,6 +143,7 @@ class BrowserController extends CpController
                 'per_page' => $perPage,
                 'to' => $totalItems > 0 ? $page * $perPage : null,
                 'total' => $totalItems,
+                'columns' => $columns,
             ],
         ];
     }
@@ -155,7 +172,9 @@ class BrowserController extends CpController
             $assets->setCollection($assets->getCollection()->map->getSearchable());
         }
 
-        return new SearchedAssetsCollection($assets);
+        return (new SearchedAssetsCollection($assets))
+            ->blueprint($container->blueprint())
+            ->columnPreferenceKey("assets.{$container->handle()}.columns");
     }
 
     protected function applyQueryScopes($query, $params)
@@ -164,5 +183,41 @@ class BrowserController extends CpController
             ->map(fn ($handle) => Scope::find($handle))
             ->filter()
             ->each(fn ($scope) => $scope->apply($query, $params));
+    }
+
+    // Duplicated in the SearchedAssetsCollection resource.
+    public function setColumns($container)
+    {
+        $blueprint = $container->blueprint();
+
+        $columns = $blueprint->columns();
+
+        $basename = Column::make('basename')
+            ->label(__('File'))
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $size = Column::make('size')
+            ->label(__('Size'))
+            ->value('size_formatted')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $lastModified = Column::make('last_modified')
+            ->label(__('Last Modified'))
+            ->value('last_modified_relative')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $columns->put('basename', $basename);
+        $columns->put('size', $size);
+        $columns->put('last_modified', $lastModified);
+
+        $columns->setPreferred("assets.{$container->handle()}.columns");
+
+        $this->columns = $columns->rejectUnlisted()->values();
     }
 }

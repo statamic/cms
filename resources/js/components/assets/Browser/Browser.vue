@@ -31,6 +31,7 @@
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
+                    @visible-columns-updated="visibleColumns = $event"
                 >
                     <div slot-scope="{ filteredRows: rows }" :class="modeClass">
                         <div class="card overflow-hidden p-0" :class="{ 'select-none' : shifting }">
@@ -57,6 +58,8 @@
                                             <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                         </button>
                                     </div>
+
+                                    <data-list-column-picker v-if="mode === 'table'" class="rtl:mr-3 ltr:ml-3" :preferences-key="preferencesKey('columns')" />
 
                                 </div>
 
@@ -106,8 +109,7 @@
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
-                                        <td />
-                                        <td />
+                                        <td v-for="n in (columns.length - 2)" />
 
                                         <th class="actions-column" :colspan="columns.length">
                                             <dropdown-list placement="left-start" v-if="folderActions(folder).length">
@@ -317,15 +319,16 @@ export default {
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
+        initialColumns: {
+            type: Array,
+            default: () => [],
+        },
     },
 
     data() {
         return {
-            columns: [
-                { label: __('File'), field: 'basename', visible: true, sortable: true },
-                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true, sortable: true },
-                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true, sortable: true },
-            ],
+            columns: this.initialColumns,
+            visibleColumns: this.initialColumns.filter(column => column.visible),
             containers: [],
             container: {},
             initializing: true,
@@ -388,7 +391,20 @@ export default {
                 order: this.sortDirection,
                 search: this.searchQuery,
                 queryScopes: this.queryScopes,
+                columns: this.visibleColumnParameters,
             }
+        },
+
+        visibleColumnParameters: {
+            get() {
+                if (_.isEmpty(this.visibleColumns)) {
+                    return null;
+                }
+                return this.visibleColumns.map(column => column.field).join(',');
+            },
+            set(value) {
+                this.visibleColumns = value.split(',').map(field => this.columns.find(column => column.field === field));
+            },
         },
 
         hasMaxFiles() {
@@ -417,7 +433,11 @@ export default {
 
         modeClass() {
             return 'mode-' + this.mode;
-        }
+        },
+
+        columnShowing(column) {
+            return this.visibleColumns.find(c => c.field === column);
+        },
 
     },
 
@@ -506,6 +526,7 @@ export default {
                 const data = response.data;
                 this.assets = data.data.assets;
                 this.meta = data.meta;
+                this.columns = data.meta.columns;
 
                 if (this.searchQuery) {
                     this.folder = null;

@@ -39,6 +39,7 @@
             :initial-editing-asset-id="initialEditingAssetId"
             :selected-path="path"
             :selected-assets="selectedAssets"
+            :initial-columns="columns"
             @navigated="navigate"
             @selections-updated="updateSelections"
             @asset-doubleclicked="editAsset"
@@ -58,6 +59,7 @@ export default {
         actions: Array,
         canCreateContainers: Boolean,
         createContainerUrl: String,
+        columns: { type: Array, required: true },
     },
 
     data() {
