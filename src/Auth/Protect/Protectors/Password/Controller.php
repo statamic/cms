@@ -53,9 +53,9 @@ class Controller extends BaseController
         return $this->tokenData['url'];
     }
 
-    protected function getId()
+    protected function getReference()
     {
-        return $this->tokenData['id'];
+        return $this->tokenData['reference'];
     }
 
     protected function getValidPasswords()
@@ -71,8 +71,8 @@ class Controller extends BaseController
     protected function storePassword()
     {
         $sessionKey = $this->password === $this->getLocalPassword()
-            ? "statamic:protect:password.passwords.{$this->getId()}"
-            : "statamic:protect:password.passwords.{$this->getScheme()}";
+            ? "statamic:protect:password.passwords.ref.{$this->getReference()}"
+            : "statamic:protect:password.passwords.scheme.{$this->getScheme()}";
 
         session()->put($sessionKey, $this->password);
 

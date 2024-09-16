@@ -59,11 +59,11 @@ class PasswordProtector extends Protector
     public function hasEnteredValidPassword()
     {
         $schemePassed = (new Guard($this->validPasswords()))->check(
-            session("statamic:protect:password.passwords.{$this->scheme}")
+            session("statamic:protect:password.passwords.scheme.{$this->scheme}")
         );
 
         $localPassed = (new Guard($this->validPasswords()))->check(
-            session("statamic:protect:password.passwords.{$this->data->id()}")
+            session("statamic:protect:password.passwords.ref.{$this->data->reference()}")
         );
 
         return $schemePassed || $localPassed;
@@ -93,7 +93,7 @@ class PasswordProtector extends Protector
         session()->put("statamic:protect:password.tokens.$token", [
             'scheme' => $this->scheme,
             'url' => $this->url,
-            'id' => $this->data->id(),
+            'reference' => $this->data->reference(),
             'valid_passwords' => $this->validPasswords(),
             'local_password' => $this->localPassword(),
         ]);

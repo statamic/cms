@@ -61,7 +61,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
             'allowed' => ['the-password'],
         ]]);
 
-        session()->put('statamic:protect:password.passwords.password-scheme', 'the-password');
+        session()->put('statamic:protect:password.passwords.scheme.password-scheme', 'the-password');
 
         $this
             ->requestPageProtectedBy('password-scheme')
