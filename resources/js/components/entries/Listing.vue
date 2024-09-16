@@ -32,7 +32,7 @@
 
                         <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
 
-                        <div class="flex space-x-2 mt-2">
+                        <div class="flex space-x-2 rtl:space-x-reverse mt-2">
                             <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
                             <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
@@ -140,6 +140,7 @@ export default {
             currentSite: this.site,
             initialSite: this.site,
             pushQuery: true,
+            previousFilters: null,
         }
     },
 
@@ -183,7 +184,7 @@ export default {
             } else if (entry.published) {
                 return 'bg-green-600';
             } else {
-                return 'bg-gray-400';
+                return 'bg-gray-400 dark:bg-dark-200';
             }
         },
 
@@ -214,6 +215,7 @@ export default {
         },
 
         reorder() {
+            this.previousFilters = this.activeFilters;
             this.filtersReset();
 
             // When reordering, we *need* a site, since mixing them up would be awkward.
@@ -227,6 +229,8 @@ export default {
         },
 
         cancelReordering() {
+            this.resetToPreviousFilters();
+
             this.request();
         },
 
@@ -260,6 +264,14 @@ export default {
                     this.$toast.error(__('Something went wrong'));
                 });
         },
+
+        resetToPreviousFilters() {
+            this.filtersReset();
+
+            if (this.previousFilters) this.filtersChanged(this.previousFilters);
+
+            this.previousFilters = null;
+        }
     }
 
 }

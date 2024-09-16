@@ -8,7 +8,6 @@
                     :initial-per-page="$config.get('paginationSize')"
                     :selected-path="folder"
                     :selected-assets="browserSelections"
-                    :restrict-container-navigation="restrictContainerNavigation"
                     :restrict-folder-navigation="restrictFolderNavigation"
                     :max-files="maxFiles"
                     :query-scopes="queryScopes"
@@ -59,12 +58,6 @@ export default {
         selected: Array,
         maxFiles: Number,
         queryScopes: Array,
-        restrictContainerNavigation: {
-            type: Boolean,
-            default() {
-                return false;
-            }
-        },
         restrictFolderNavigation: {
             type: Boolean,
             default() {

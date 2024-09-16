@@ -2,6 +2,7 @@
 
 namespace Tests\CP;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Tests\TestCase;
@@ -21,7 +22,7 @@ class ColumnsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_ensure_has()
     {
         $columns = $this->columns
@@ -38,7 +39,7 @@ class ColumnsTest extends TestCase
         $this->assertEquals($expected, $columns->values()->map->label()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_ensure_prepended()
     {
         $columns = $this->columns
@@ -55,7 +56,7 @@ class ColumnsTest extends TestCase
         $this->assertEquals($expected, $columns->values()->map->label()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_preferred_visibility_and_order()
     {
         $columns = $this->columns
@@ -79,7 +80,7 @@ class ColumnsTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /** @test */
+    #[Test]
     public function it_bypasses_setting_preferred_if_preference_returns_null()
     {
         $columns = $this->columns
@@ -103,7 +104,7 @@ class ColumnsTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reject_unlisted_columns()
     {
         $columns = $this->columns

@@ -6,6 +6,7 @@ use Facades\Statamic\Assets\ExtractInfo;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\Attributes;
 use Statamic\Facades\AssetContainer;
@@ -24,7 +25,7 @@ class AttributesTest extends TestCase
         $this->attributes = app(Attributes::class);
     }
 
-    /** @test */
+    #[Test]
     public function a_non_image_asset_has_no_attributes()
     {
         $asset = $this->mock(Asset::class);
@@ -38,7 +39,7 @@ class AttributesTest extends TestCase
         $this->assertEquals([], $attributes->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_attributes()
     {
         Carbon::setTestNow(now());
@@ -62,7 +63,7 @@ class AttributesTest extends TestCase
         $this->assertEquals(['width' => 30, 'height' => 60], $attributes->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_attributes_of_audio_file()
     {
         $asset = (new Asset)
@@ -76,7 +77,7 @@ class AttributesTest extends TestCase
         $this->assertEquals(['duration' => 13], $attributes->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_attributes_of_video_file()
     {
         $asset = (new Asset)
@@ -96,7 +97,7 @@ class AttributesTest extends TestCase
         $this->assertEquals(['duration' => 13, 'width' => 1920, 'height' => 1080], $attributes->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_attributes_of_an_svg()
     {
         $asset = $this->svgAsset('<svg width="30" height="60" viewBox="0 0 100 200"></svg>');
@@ -104,7 +105,7 @@ class AttributesTest extends TestCase
         $this->assertEquals(['width' => 30.0, 'height' => 60.0], $this->attributes->asset($asset)->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_viewbox_if_the_svg_dimensions_havent_been_provided()
     {
         $asset = $this->svgAsset('<svg viewBox="0 0 300 600"></svg>');
@@ -112,7 +113,7 @@ class AttributesTest extends TestCase
         $this->assertEquals(['width' => 300, 'height' => 600], $this->attributes->asset($asset)->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_viewbox_if_the_svg_dimensions_are_percents()
     {
         $asset = $this->svgAsset('<svg width="100%" height="100%" viewBox="0 0 300 600"></svg>');
@@ -120,7 +121,7 @@ class AttributesTest extends TestCase
         $this->assertEquals(['width' => 300, 'height' => 600], $this->attributes->asset($asset)->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_viewbox_if_the_svg_dimensions_are_ems()
     {
         $asset = $this->svgAsset('<svg width="1em" height="2em" viewBox="0 0 300 600"></svg>');
@@ -128,7 +129,7 @@ class AttributesTest extends TestCase
         $this->assertEquals(['width' => 300, 'height' => 600], $this->attributes->asset($asset)->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_default_attributes_if_the_svg_has_no_viewbox_and_is_missing_either_or_both_dimensions()
     {
         $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg></svg>'))->get());

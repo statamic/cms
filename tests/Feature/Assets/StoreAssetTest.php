@@ -4,6 +4,7 @@ namespace Tests\Feature\Assets;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades;
 use Tests\FakesRoles;
@@ -34,7 +35,7 @@ class StoreAssetTest extends TestCase
         Storage::fake('test');
     }
 
-    /** @test */
+    #[Test]
     public function it_uploads_an_asset()
     {
         Storage::disk('test')->assertMissing('path/to/test.jpg');
@@ -53,7 +54,7 @@ class StoreAssetTest extends TestCase
         Storage::disk('test')->assertExists('path/to/test.jpg');
     }
 
-    /** @test */
+    #[Test]
     public function it_denied_access_without_permission()
     {
         $this
@@ -62,7 +63,7 @@ class StoreAssetTest extends TestCase
             ->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_uploads_are_disabled()
     {
         $this->container->allowUploads(false);
@@ -73,7 +74,7 @@ class StoreAssetTest extends TestCase
             ->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_upload_without_a_container()
     {
         $this
@@ -83,7 +84,7 @@ class StoreAssetTest extends TestCase
             ])->assertStatus(422);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_upload_without_a_folder()
     {
         $this
@@ -93,7 +94,7 @@ class StoreAssetTest extends TestCase
             ])->assertStatus(422);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_upload_when_validation_fails()
     {
 

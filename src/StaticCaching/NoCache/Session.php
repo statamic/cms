@@ -131,7 +131,7 @@ class Session
         return $this;
     }
 
-    private function restoreCascade()
+    protected function restoreCascade()
     {
         return Cascade::instance()
             ->withContent(Data::findByRequestUrl($this->url))
@@ -139,7 +139,7 @@ class Session
             ->toArray();
     }
 
-    private function resolvePageAndPathForPagination(): void
+    protected function resolvePageAndPathForPagination(): void
     {
         AbstractPaginator::currentPathResolver(fn () => Str::before($this->url, '?'));
 
@@ -148,7 +148,7 @@ class Session
         });
     }
 
-    private function cacheRegion(Region $region)
+    protected function cacheRegion(Region $region)
     {
         StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), $region);
     }

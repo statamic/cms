@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -17,11 +19,8 @@ class CountTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider arraysToCountProvider
-     */
+    #[Test]
+    #[DataProvider('arraysToCountProvider')]
     public function it_counts_number_of_items_in_array($expected, $input): void
     {
         $modified = $this->modify($input);

@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\User;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
@@ -18,7 +19,7 @@ class ProfileFormTest extends TestCase
         return Parse::template($tag, []);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form()
     {
         $this->actingAs(User::make()->save());
@@ -30,7 +31,7 @@ class ProfileFormTest extends TestCase
         $this->assertStringEndsWith('</form>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_params()
     {
         $this->actingAs(User::make()->save());
@@ -42,7 +43,7 @@ class ProfileFormTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="/errors" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_redirects_to_anchor()
     {
         $this->actingAs(User::make()->save());
@@ -53,7 +54,7 @@ class ProfileFormTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_fields_array()
     {
         $this->actingAs(User::make()
@@ -80,7 +81,7 @@ EOT
         $this->assertEquals($expected, $actual[0]);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_fields_array_and_custom_blueprint()
     {
         $this->useCustomBlueprint();
@@ -111,7 +112,7 @@ EOT
         $this->assertEquals($expected, $actual[0]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_update_user_and_renders_errors()
     {
         $this->actingAs(User::make()->save());
@@ -150,7 +151,7 @@ EOT
         $this->assertEquals($expected, $inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_update_user_and_render_success()
     {
         $this->actingAs(User::make()->save());
@@ -183,7 +184,7 @@ EOT
         $this->assertEmpty($inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_update_user_and_follow_custom_redirect_with_success()
     {
         $this->actingAs(User::make()->save());
@@ -208,7 +209,7 @@ EOT
         $this->assertEquals(['Update successful.'], $success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_update_user_and_follow_custom_redirect_with_errors()
     {
         $this->actingAs(User::make()->save());
@@ -249,7 +250,7 @@ EOT
         $this->assertEquals($expected, $inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=profile-successful&error_redirect=registration-failure');
@@ -315,7 +316,7 @@ EOT
             ->andReturn($blueprint);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_precognitive_requests()
     {
         if (! method_exists($this, 'withPrecognition')) {

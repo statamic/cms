@@ -426,7 +426,7 @@
     "Last rebuild": "Utolsó újraépítés",
     "Layout": "Elrendezés",
     "Learn more": "Tudj meg többet",
-    "Learn more about": "Tudj meg többet: ",
+    "Learn more about :link": "Tudj meg többet: :link",
     "Licensing": "Licenszelés",
     "Light": "Világos",
     "Light Mode": "Világos mód",

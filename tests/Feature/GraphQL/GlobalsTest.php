@@ -5,12 +5,14 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\GlobalFactory;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class GlobalsTest extends TestCase
 {
     use EnablesQueries;
@@ -24,7 +26,7 @@ class GlobalsTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'globals')->andReturnFalse()->once();
@@ -37,7 +39,7 @@ class GlobalsTest extends TestCase
             ->assertSee('Cannot query field \"globalSets\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_global_sets()
     {
         GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
@@ -75,7 +77,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
         GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();

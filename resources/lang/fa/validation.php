@@ -124,7 +124,7 @@ return [
     'date_fieldtype_date_required' => 'تاریخ الزامی است.',
     'date_fieldtype_end_date_invalid' => 'تاریخ پایان معتبری نیست.',
     'date_fieldtype_end_date_required' => 'تاریخ پایان الزامی است.',
-    'date_fieldtype_only_single_mode_allowed' => 'شما تنها زمانی می‌توانید از حالت "تکی" استفاده کنید که هندل فیلد "date" باشد.',
+    'date_fieldtype_only_single_mode_allowed' => 'زمانی که هندل فیلد "date" می‌باشد شما تنها می‌توانید از حالت "تکی" استفاده کنید.',
     'date_fieldtype_start_date_invalid' => 'تاریخ شروع معتبری نیست.',
     'date_fieldtype_start_date_required' => 'تاریخ شروع الزامی است.',
     'date_fieldtype_time_required' => 'زمان الزامی است.',

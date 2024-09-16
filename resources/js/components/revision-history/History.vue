@@ -36,6 +36,7 @@
                         :revision="revision"
                         :restore-url="restoreUrl"
                         :reference="reference"
+                        :can-restore-revisions="canRestoreRevisions"
                         @working-copy-selected="close"
                     />
                 </div>
@@ -60,6 +61,7 @@ export default {
         indexUrl: String,
         restoreUrl: String,
         reference: String,
+        canRestoreRevisions: Boolean,
     },
 
     data() {

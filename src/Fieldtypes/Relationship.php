@@ -23,7 +23,6 @@ abstract class Relationship extends Fieldtype
     protected $canSearch = false;
     protected $statusIcons = false;
     protected $taggable = false;
-    protected $defaultValue = [];
     protected $formComponentProps = [
         '_' => '_', // forces an object in js
     ];
@@ -230,6 +229,11 @@ abstract class Relationship extends Fieldtype
         return collect($values)->map(function ($id) {
             return $this->toItemArray($id);
         })->values();
+    }
+
+    public function getItemHint($item): ?string
+    {
+        return null;
     }
 
     abstract protected function toItemArray($id);

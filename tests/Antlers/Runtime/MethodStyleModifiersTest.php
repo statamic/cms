@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modifier;
 use Statamic\Support\Arr;
 use Tests\Antlers\ParserTestCase;
