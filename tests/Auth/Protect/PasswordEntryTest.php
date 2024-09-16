@@ -80,7 +80,7 @@ class PasswordEntryTest extends PageProtectionTestCase
     {
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
-            'allowed' => ['the-master-password'],
+            'allowed' => ['the-scheme-password'],
             'field' => 'password',
         ]]);
 
@@ -93,7 +93,7 @@ class PasswordEntryTest extends PageProtectionTestCase
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
                 'id' => 'test',
-                'valid_passwords' => ['the-master-password', 'the-local-password'],
+                'valid_passwords' => ['the-scheme-password', 'the-local-password'],
                 'local_password' => 'the-local-password',
             ]);
 
@@ -109,34 +109,34 @@ class PasswordEntryTest extends PageProtectionTestCase
     }
 
     #[Test]
-    public function it_prefers_the_local_password_over_the_master_password()
+    public function it_prefers_the_local_password_over_the_scheme_password()
     {
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
-            'allowed' => ['the-master-password'],
+            'allowed' => ['the-scheme-password'],
             'field' => 'password',
         ]]);
 
         Token::shouldReceive('generate')->andReturn('test-token');
 
-        $this->createPage('test', ['data' => ['protect' => 'password-scheme', 'password' => 'the-master-password']]);
+        $this->createPage('test', ['data' => ['protect' => 'password-scheme', 'password' => 'the-scheme-password']]);
 
         $this->get('test')
             ->assertSessionHas('statamic:protect:password.tokens.test-token', [
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
                 'id' => 'test',
-                'valid_passwords' => ['the-master-password'],
-                'local_password' => 'the-master-password',
+                'valid_passwords' => ['the-scheme-password'],
+                'local_password' => 'the-scheme-password',
             ]);
 
         $this
             ->post('/!/protect/password', [
                 'token' => 'test-token',
-                'password' => 'the-master-password',
+                'password' => 'the-scheme-password',
             ])
             ->assertRedirect('http://localhost/test')
-            ->assertSessionHas('statamic:protect:password.passwords.test', 'the-master-password')
+            ->assertSessionHas('statamic:protect:password.passwords.test', 'the-scheme-password')
             ->assertSessionMissing('statamic:protect:password.passwords.password-scheme')
             ->assertSessionMissing('statamic:protect:password.tokens.test-token');
     }
@@ -146,7 +146,7 @@ class PasswordEntryTest extends PageProtectionTestCase
     {
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
-            'allowed' => ['the-master-password'],
+            'allowed' => ['the-scheme-password'],
             'field' => 'password',
         ]]);
 
@@ -161,7 +161,7 @@ class PasswordEntryTest extends PageProtectionTestCase
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
                 'id' => 'test',
-                'valid_passwords' => ['the-master-password', 'the-local-password'],
+                'valid_passwords' => ['the-scheme-password', 'the-local-password'],
                 'local_password' => 'the-local-password',
             ]);
 
@@ -181,7 +181,7 @@ class PasswordEntryTest extends PageProtectionTestCase
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test-2',
                 'id' => 'test-2',
-                'valid_passwords' => ['the-master-password', 'the-local-password'],
+                'valid_passwords' => ['the-scheme-password', 'the-local-password'],
                 'local_password' => 'the-local-password',
             ]);
     }
