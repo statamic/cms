@@ -19,7 +19,7 @@ use Statamic\Support\Arr;
 
 class BrowserController extends CpController
 {
-    use RedirectsToFirstAssetContainer, HasRequestedColumns;
+    use HasRequestedColumns, RedirectsToFirstAssetContainer;
 
     private $columns;
 
