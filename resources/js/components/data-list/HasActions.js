@@ -16,8 +16,7 @@ export default {
 
             if (response.success === false) {
                 this.$toast.error(response.message || __("Action failed"));
-            }
-            else {
+            } else {
                 this.$toast.success(response.message || __("Action completed"));
             }
 
