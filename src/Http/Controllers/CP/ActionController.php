@@ -59,7 +59,7 @@ abstract class ActionController extends CpController
         }
 
         $response = $response ?: [];
-        $response['successful'] = $successful;
+        $response['success'] = $successful;
 
         if (Arr::get($context, 'view') === 'form') {
             $response['data'] = $this->getItemData($items->first(), $context);
