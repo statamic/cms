@@ -32,8 +32,6 @@ class PasswordProtectionTest extends PageProtectionTestCase
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
                 'reference' => 'entry::test',
-                'valid_passwords' => ['test'],
-                'local_passwords' => [],
             ]);
     }
 

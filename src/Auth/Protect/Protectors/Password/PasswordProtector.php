@@ -38,7 +38,7 @@ class PasswordProtector extends Protector
         return Arr::get($this->config, 'allowed', []);
     }
 
-    protected function localPasswords()
+    public function localPasswords()
     {
         if (! $field = Arr::get($this->config, 'field')) {
             return [];
@@ -58,11 +58,11 @@ class PasswordProtector extends Protector
 
     public function hasEnteredValidPassword()
     {
-        $schemePassed = (new Guard($this->validPasswords()))->check(
+        $schemePassed = $this->guard()->check(
             session("statamic:protect:password.passwords.scheme.{$this->scheme}")
         );
 
-        $localPassed = (new Guard($this->validPasswords()))->check(
+        $localPassed = $this->guard()->check(
             session("statamic:protect:password.passwords.ref.{$this->data->reference()}")
         );
 
@@ -94,10 +94,13 @@ class PasswordProtector extends Protector
             'scheme' => $this->scheme,
             'url' => $this->url,
             'reference' => $this->data->reference(),
-            'valid_passwords' => $this->validPasswords(),
-            'local_passwords' => $this->localPasswords(),
         ]);
 
         return $token;
+    }
+
+    public function guard()
+    {
+        return new Guard($this->validPasswords());
     }
 }

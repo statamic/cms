@@ -2,6 +2,8 @@
 
 namespace Statamic\Auth\Protect\Protectors\Password;
 
+use Statamic\Auth\Protect\ProtectorManager;
+use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller as BaseController;
 use Statamic\View\View;
@@ -31,7 +33,7 @@ class Controller extends BaseController
             return back()->withErrors(['token' => __('statamic::messages.password_protect_token_invalid')], 'passwordProtect');
         }
 
-        $guard = new Guard($this->getValidPasswords());
+        $guard = $this->driver()->guard();
 
         if (! $guard->check($this->password)) {
             return back()->withErrors(['password' => __('statamic::messages.password_protect_incorrect_password')], 'passwordProtect');
@@ -41,6 +43,13 @@ class Controller extends BaseController
             ->storePassword()
             ->expireToken()
             ->redirect();
+    }
+
+    private function driver()
+    {
+        return app(ProtectorManager::class)
+            ->driver($this->getScheme())
+            ->setData(Data::find($this->getReference()));
     }
 
     protected function getScheme()
@@ -58,19 +67,9 @@ class Controller extends BaseController
         return $this->tokenData['reference'];
     }
 
-    protected function getValidPasswords()
-    {
-        return $this->tokenData['valid_passwords'];
-    }
-
-    protected function getLocalPasswords()
-    {
-        return $this->tokenData['local_passwords'];
-    }
-
     protected function storePassword()
     {
-        $sessionKey = in_array($this->password, $this->getLocalPasswords())
+        $sessionKey = in_array($this->password, $this->driver()->localPasswords())
             ? "statamic:protect:password.passwords.ref.{$this->getReference()}"
             : "statamic:protect:password.passwords.scheme.{$this->getScheme()}";
 

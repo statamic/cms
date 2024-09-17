@@ -81,8 +81,6 @@ class PasswordEntryTest extends PageProtectionTestCase
     public function it_allows_access_if_local_password_was_entered(
         $passwordFieldInContent,
         $submittedPassword,
-        $expectedValidPasswordsInToken,
-        $expectedLocalPasswordsInToken
     ) {
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
@@ -99,8 +97,6 @@ class PasswordEntryTest extends PageProtectionTestCase
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
                 'reference' => 'entry::test',
-                'valid_passwords' => $expectedValidPasswordsInToken,
-                'local_passwords' => $expectedLocalPasswordsInToken,
             ]);
 
         $this
@@ -120,20 +116,14 @@ class PasswordEntryTest extends PageProtectionTestCase
             'string' => [
                 'value' => 'the-local-password',
                 'submitted' => 'the-local-password',
-                'valid' => ['the-scheme-password', 'the-local-password'],
-                'local' => ['the-local-password'],
             ],
             'array with single value' => [
                 'value' => ['the-local-password'],
                 'submitted' => 'the-local-password',
-                'valid' => ['the-scheme-password', 'the-local-password'],
-                'local' => ['the-local-password'],
             ],
             'array with multiple values' => [
                 'value' => ['first-local-password', 'second-local-password'],
                 'submitted' => 'second-local-password',
-                'valid' => ['the-scheme-password', 'first-local-password', 'second-local-password'],
-                'local' => ['first-local-password', 'second-local-password'],
             ],
         ];
     }
@@ -156,8 +146,6 @@ class PasswordEntryTest extends PageProtectionTestCase
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
                 'reference' => 'entry::test',
-                'valid_passwords' => ['the-scheme-password'],
-                'local_passwords' => ['the-scheme-password'],
             ]);
 
         $this
@@ -191,8 +179,6 @@ class PasswordEntryTest extends PageProtectionTestCase
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
                 'reference' => 'entry::test',
-                'valid_passwords' => ['the-scheme-password', 'the-local-password'],
-                'local_passwords' => ['the-local-password'],
             ]);
 
         $this
@@ -211,8 +197,6 @@ class PasswordEntryTest extends PageProtectionTestCase
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test-2',
                 'reference' => 'entry::test-2',
-                'valid_passwords' => ['the-scheme-password', 'the-local-password'],
-                'local_passwords' => ['the-local-password'],
             ]);
     }
 }
