@@ -1,6 +1,9 @@
 <template>
     <div class="@container">
 
+        (expecting galleries/whatgallery)
+        {{ folder }}
+
         <div
             v-if="hasPendingDynamicFolder"
             class="py-3 px-4 text-sm w-full rounded-md bg-yellow border border-yellow-dark dark:bg-dark-blue-100 dark:border-none"
@@ -546,7 +549,7 @@ export default {
         },
 
         lockDynamicFolder() {
-            if (this.isUsingDynamicFolder) this.lockedDynamicFolder = this.dynamicFolder;
+            if (this.isUsingDynamicFolder && !this.lockedDynamicFolder) this.lockedDynamicFolder = this.dynamicFolder;
         },
     },
 
