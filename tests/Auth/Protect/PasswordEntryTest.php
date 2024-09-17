@@ -33,8 +33,6 @@ class PasswordEntryTest extends PageProtectionTestCase
             'scheme' => 'password-scheme',
             'url' => '/target-url',
             'reference' => 'entry::test',
-            'valid_passwords' => ['the-password'],
-            'local_passwords' => [],
         ]);
 
         $this
@@ -62,8 +60,6 @@ class PasswordEntryTest extends PageProtectionTestCase
             'scheme' => 'password-scheme',
             'url' => '/target-url',
             'reference' => 'entry::test',
-            'valid_passwords' => ['the-password'],
-            'local_passwords' => [],
         ]);
 
         $this
