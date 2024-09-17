@@ -4,9 +4,8 @@
         <div
             v-if="hasPendingDynamicFolder"
             class="py-3 px-4 text-sm w-full rounded-md bg-yellow border border-yellow-dark dark:bg-dark-blue-100 dark:border-none"
-        >
-            Cannot upload or select assets until a slug has been chosen.
-        </div>
+            v-text="__('statamic::fieldtypes.assets.dynamic_folder_pending')"
+        />
 
         <uploader
             ref="uploader"
