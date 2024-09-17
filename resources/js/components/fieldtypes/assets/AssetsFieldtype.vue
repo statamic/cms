@@ -3,7 +3,7 @@
 
         <div
             v-if="hasPendingDynamicFolder"
-            class="py-3 px-4 text-sm w-full rounded-md bg-yellow border border-yellow-dark dark:bg-dark-blue-100 dark:border-none"
+            class="py-3 px-4 text-sm w-full rounded-md border border-dashed text-gray-700 dark:text-dark-175 dark:border-dark-200"
             v-text="__('statamic::fieldtypes.assets.dynamic_folder_pending')"
         />
 
