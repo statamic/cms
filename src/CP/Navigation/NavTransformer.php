@@ -330,10 +330,12 @@ class NavTransformer
             ->map(fn ($section, $key) => $this->minifySection($section, $key))
             ->all();
 
-        if ($this->config['reorder'] === true) {
-            $this->config['sections'] = $this->rejectUnessessaryInherits($this->config['sections'], 'sections');
+        $sections = $this->rejectInherits($this->config['sections']);
+
+        if ($this->config['reorder']) {
+            $this->config['sections'] = $sections;
         } else {
-            $this->config = $this->rejectAllInherits($this->config['sections']);
+            $this->config = $sections;
         }
 
         // If the config is completely null after minifying, ensure we save an empty array.
@@ -362,10 +364,9 @@ class NavTransformer
             ->map(fn ($item, $key) => $this->minifyItem($item, $key))
             ->all();
 
-        if ($section['reorder'] === true) {
-            $section['items'] = $this->rejectUnessessaryInherits($section['items'], $sectionKey);
-        } else {
-            $section['items'] = $this->rejectAllInherits($section['items']);
+        $section['items'] = $this->rejectInherits($section['items']);
+
+        if (! $section['reorder']) {
             Arr::forget($section, 'reorder');
         }
 
@@ -401,10 +402,9 @@ class NavTransformer
             ->map(fn ($item, $childId) => $this->minifyItem($item, $childId, true))
             ->all();
 
-        if ($item['reorder'] === true) {
-            $item['children'] = $this->rejectUnessessaryInherits($item['children'], $itemKey);
-        } else {
-            $item['children'] = $this->rejectAllInherits($item['children']);
+        $item['children'] = $this->rejectInherits($item['children']);
+
+        if (! $item['reorder']) {
             Arr::forget($item, 'reorder');
         }
 
