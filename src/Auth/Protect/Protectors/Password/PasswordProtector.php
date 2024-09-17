@@ -47,26 +47,38 @@ class PasswordProtector extends Protector
         return Arr::wrap($this->data->$field);
     }
 
-    protected function validPasswords()
-    {
-        return collect($this->schemePasswords())
-            ->merge($this->localPasswords())
-            ->filter()
-            ->unique()
-            ->all();
-    }
-
     public function hasEnteredValidPassword()
     {
-        $schemePassed = $this->guard()->check(
-            session("statamic:protect:password.passwords.scheme.{$this->scheme}")
-        );
+        if (
+            ($password = session("statamic:protect:password.passwords.scheme.{$this->scheme}"))
+            && $this->isValidSchemePassword($password)
+        ) {
+            return true;
+        }
 
-        $localPassed = $this->guard()->check(
-            session("statamic:protect:password.passwords.ref.{$this->data->reference()}")
-        );
+        if (
+            ($password = session("statamic:protect:password.passwords.ref.{$this->data->reference()}"))
+            && $this->isValidLocalPassword($password)
+        ) {
+            return true;
+        }
 
-        return $schemePassed || $localPassed;
+        return false;
+    }
+
+    public function isValidPassword(string $password): bool
+    {
+        return $this->isValidSchemePassword($password) || $this->isValidLocalPassword($password);
+    }
+
+    public function isValidSchemePassword(string $password): bool
+    {
+        return in_array($password, $this->schemePasswords());
+    }
+
+    public function isValidLocalPassword(string $password): bool
+    {
+        return in_array($password, $this->localPasswords());
     }
 
     protected function isPasswordFormUrl()
@@ -97,10 +109,5 @@ class PasswordProtector extends Protector
         ]);
 
         return $token;
-    }
-
-    public function guard()
-    {
-        return new Guard($this->validPasswords());
     }
 }

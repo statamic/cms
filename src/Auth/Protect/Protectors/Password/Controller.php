@@ -33,9 +33,7 @@ class Controller extends BaseController
             return back()->withErrors(['token' => __('statamic::messages.password_protect_token_invalid')], 'passwordProtect');
         }
 
-        $guard = $this->driver()->guard();
-
-        if (! $guard->check($this->password)) {
+        if (! $this->driver()->isValidPassword($this->password)) {
             return back()->withErrors(['password' => __('statamic::messages.password_protect_incorrect_password')], 'passwordProtect');
         }
 
@@ -45,7 +43,7 @@ class Controller extends BaseController
             ->redirect();
     }
 
-    private function driver()
+    private function driver(): PasswordProtector
     {
         return app(ProtectorManager::class)
             ->driver($this->getScheme())
@@ -69,7 +67,7 @@ class Controller extends BaseController
 
     protected function storePassword()
     {
-        $sessionKey = in_array($this->password, $this->driver()->localPasswords())
+        $sessionKey = $this->driver()->isValidLocalPassword($this->password)
             ? "statamic:protect:password.passwords.ref.{$this->getReference()}"
             : "statamic:protect:password.passwords.scheme.{$this->getScheme()}";
 
