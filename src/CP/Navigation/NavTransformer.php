@@ -444,37 +444,6 @@ class NavTransformer
     }
 
     /**
-     * Reject unessessary `@inherit`s at end of array.
-     *
-     * @param  array  $items
-     * @param  string  $parentKey
-     * @return array
-     */
-    protected function rejectUnessessaryInherits($items, $parentKey)
-    {
-        if (! $reorderedMinimum = $this->reorderedMinimums[$parentKey] ?? false) {
-            return $items;
-        }
-
-        $keyValuePairs = collect($items)
-            ->map(fn ($item, $key) => ['key' => $key, 'value' => $item])
-            ->values()
-            ->keyBy(fn ($keyValuePair, $index) => $index + 1);
-
-        $trailingInherits = $keyValuePairs
-            ->reverse()
-            ->takeUntil(fn ($item) => $item['value'] !== '@inherit');
-
-        $modifiedMinimum = $keyValuePairs->count() - $trailingInherits->count();
-
-        $actualMinimum = max($reorderedMinimum, $modifiedMinimum);
-
-        return collect($items)
-            ->take($actualMinimum)
-            ->all();
-    }
-
-    /**
      * Get config.
      *
      * @return array
