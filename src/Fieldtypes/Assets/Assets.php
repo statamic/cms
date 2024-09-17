@@ -70,12 +70,22 @@ class Assets extends Fieldtype
                             'container' => 'not empty',
                         ],
                     ],
+                    'dynamic' => [
+                        'display' => __('Dynamic Folder'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.dynamic'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'if' => [
+                            'container' => 'not empty',
+                        ],
+                    ],
                     'restrict' => [
                         'display' => __('Restrict to Folder'),
                         'instructions' => __('statamic::fieldtypes.assets.config.restrict'),
                         'type' => 'toggle',
                         'if' => [
                             'container' => 'not empty',
+                            'dynamic' => 'not true',
                         ],
                     ],
                     'allow_uploads' => [

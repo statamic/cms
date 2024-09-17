@@ -10,6 +10,7 @@ return [
     'array.title' => 'Array',
     'assets.config.allow_uploads' => 'Allow new file uploads.',
     'assets.config.container' => 'Choose which asset container to use for this field.',
+    'assets.config.dynamic' => 'Whether assets should be placed in a subfolder based on the entry.',
     'assets.config.folder' => 'The folder to begin browsing in.',
     'assets.config.max_files' => 'Set a maximum number of selectable assets.',
     'assets.config.min_files' => 'The minimum number of selectable assets.',
