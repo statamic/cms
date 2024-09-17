@@ -362,7 +362,7 @@ export default {
         },
 
         showLivePreviewButton() {
-            return !this.isCreating && this.isBase && this.livePreviewUrl;
+            return !this.isCreating && this.isBase && this.livePreviewUrl && this.showVisitUrlButton;
         },
 
         showVisitUrlButton() {
