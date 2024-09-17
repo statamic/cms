@@ -1,6 +1,13 @@
 <template>
     <div class="@container">
 
+        <div
+            v-if="hasPendingDynamicFolder"
+            class="py-3 px-4 text-sm w-full rounded-md bg-yellow border border-yellow-dark dark:bg-dark-blue-100 dark:border-none"
+        >
+            Cannot upload or select assets until a slug has been chosen.
+        </div>
+
         <uploader
             ref="uploader"
             :container="container"
@@ -189,6 +196,7 @@ export default {
             uploads: [],
             innerDragging: false,
             displayMode: 'grid',
+            lockedDynamicFolder: this.meta.dynamicFolder,
         };
     },
 
@@ -213,7 +221,42 @@ export default {
          * The initial folder to be displayed in the selector.
          */
         folder() {
+            let folder = this.configuredFolder;
+
+            if (this.isUsingDynamicFolder) {
+                folder = folder + '/' + (this.lockedDynamicFolder || this.dynamicFolder);
+            }
+
+            return folder;
+        },
+
+        configuredFolder() {
             return this.config.folder || '/';
+        },
+
+        isUsingDynamicFolder() {
+            return this.config.dynamic;
+        },
+
+        hasPendingDynamicFolder() {
+            return this.isUsingDynamicFolder && ! this.lockedDynamicFolder && ! this.dynamicFolder;
+        },
+
+        dynamicFolder() {
+            return data_get(this.$store.state.publish[this.store].values, 'slug');
+        },
+
+        store() {
+            let store;
+            let parent = this;
+
+            while (! parent.storeName) {
+                parent = parent.$parent;
+                store = parent.storeName;
+                if (parent === this.$root) return null;
+            }
+
+            return store;
         },
 
         /**
@@ -221,7 +264,7 @@ export default {
          * and folder. This will prevent navigation to other places.
          */
         restrictNavigation() {
-            return this.config.restrict || false;
+            return this.isUsingDynamicFolder || this.config.restrict || false;
         },
 
         /**
@@ -363,11 +406,19 @@ export default {
         },
 
         canBrowse() {
-            return this.can('configure asset containers') || this.can('view '+ this.container +' assets')
+            const hasPermission = this.can('configure asset containers') || this.can('view '+ this.container +' assets');
+
+            if (! hasPermission) return false;
+
+            return ! this.hasPendingDynamicFolder;
         },
 
         canUpload() {
-            return this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload '+ this.container +' assets'))
+            const hasPermission = this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload '+ this.container +' assets'));
+
+            if (! hasPermission) return false;
+
+            return ! this.hasPendingDynamicFolder;
         },
 
     },
@@ -425,6 +476,7 @@ export default {
          */
         assetsSelected(selections) {
             this.loadAssets(selections);
+            this.lockDynamicFolder();
         },
 
         /**
@@ -462,6 +514,8 @@ export default {
          */
         uploadComplete(asset) {
             this.assets.push(asset);
+
+            this.lockDynamicFolder();
         },
 
         /**
@@ -491,6 +545,9 @@ export default {
             this.update([...this.value.slice(0, index), newId, ...this.value.slice(index + 1)]);
         },
 
+        lockDynamicFolder() {
+            if (this.isUsingDynamicFolder) this.lockedDynamicFolder = this.dynamicFolder;
+        },
     },
 
 

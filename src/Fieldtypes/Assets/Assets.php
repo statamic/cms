@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Support\Collection;
 use Statamic\Assets\OrderedQueryBuilder;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -151,7 +152,22 @@ class Assets extends Fieldtype
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
             'container' => $this->container()->handle(),
+            'dynamicFolder' => $this->dynamicFolder(),
         ];
+    }
+
+    private function dynamicFolder()
+    {
+        if (! $this->config('dynamic')) {
+            return null;
+        }
+
+        // Otherwise, use the entry slug as the folder.
+        $parent = $this->field->parent();
+
+        if ($parent instanceof Entry) {
+            return $parent->slug();
+        }
     }
 
     public function getItemData($items)
