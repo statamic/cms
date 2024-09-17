@@ -172,6 +172,16 @@ class Assets extends Fieldtype
             return null;
         }
 
+        // If there's already a value, get the folder from the first asset.
+        // The user may have renamed the directory to differ from the entry slug.
+        if (! empty($value = $this->field->value())) {
+            $folder = ($folder = $this->config('folder')) ? $folder.'/' : '';
+            $prefix = $this->container()->handle().'::'.$folder;
+            $file = Str::after($value[0], $prefix);
+
+            return Str::beforeLast($file, '/');
+        }
+
         // Otherwise, use the entry slug as the folder.
         $parent = $this->field->parent();
 
