@@ -432,7 +432,7 @@ class NavTransformer
      * @param  array  $items
      * @return array
      */
-    protected function rejectAllInherits($items)
+    protected function rejectInherits($items)
     {
         $items = collect($items)->reject(fn ($item) => $item === '@inherit');
 
