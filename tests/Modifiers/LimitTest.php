@@ -5,6 +5,7 @@ namespace Tests\Modifiers;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -34,8 +35,18 @@ class LimitTest extends TestCase
         $this->assertEquals(['one', 'two', 'three'], $limited->all());
     }
 
-    public function modify($arr, $limit)
+    #[Test]
+    public function it_limits_builders(): void
     {
-        return Modify::value($arr)->limit($limit)->fetch();
+        $query = \Mockery::mock(Builder::class);
+        $query->shouldReceive('limit')->with(2)->once()->andReturnSelf();
+
+        $limited = $this->modify($query, 2);
+        $this->assertSame($query, $limited);
+    }
+
+    public function modify($value, $limit)
+    {
+        return Modify::value($value)->limit($limit)->fetch();
     }
 }
