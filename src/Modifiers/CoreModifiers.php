@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Compare;
@@ -1451,6 +1452,10 @@ class CoreModifiers extends Modifier
     public function limit($value, $params)
     {
         $limit = Arr::get($params, 0, 0);
+
+        if ($value instanceof Builder) {
+            return $value->limit($limit);
+        }
 
         if ($value instanceof Collection) {
             return $value->take($limit);

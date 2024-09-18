@@ -2,15 +2,22 @@
 
 namespace Tests\Modifiers;
 
-use Illuminate\Support\Collection;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\Test;
-use Statamic\Modifiers\Modify;
 use Tests\TestCase;
+use Statamic\Facades\Entry;
+use Statamic\Modifiers\Modify;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Query\Builder;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\Group;
+use Facades\Tests\Factories\EntryFactory;
+use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Facades\Collection as CollectionFacade;
 
 #[Group('array')]
 class LimitTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     public function it_limits_arrays(): void
     {
@@ -34,8 +41,26 @@ class LimitTest extends TestCase
         $this->assertEquals(['one', 'two', 'three'], $limited->all());
     }
 
-    public function modify($arr, $limit)
+    #[Test]
+    public function it_limits_builders(): void
     {
-        return Modify::value($arr)->limit($limit)->fetch();
+        CollectionFacade::make('posts')->save();
+
+        EntryFactory::id('id-1')->collection('posts')->create();
+        EntryFactory::id('id-2')->collection('posts')->create();
+        EntryFactory::id('id-3')->collection('posts')->create();
+
+        $limited = $this->modify(Entry::query(), 2);
+        $this->assertInstanceOf(Builder::class, $limited);
+        $this->assertEquals(2, $limited->count());
+
+        $limited = $this->modify(Entry::query(), 3);
+        $this->assertInstanceOf(Builder::class, $limited);
+        $this->assertEquals(3, $limited->count());
+    }
+
+    public function modify($value, $limit)
+    {
+        return Modify::value($value)->limit($limit)->fetch();
     }
 }
