@@ -59,7 +59,7 @@ class NavTransformer
      */
     protected function transform()
     {
-        $this->config['reorder'] = $this->itemsAreReordered(
+        $this->config['reorder'] = $this->getReorderedItems(
             $this->coreNav->pluck('display_original'),
             collect($this->submitted)->pluck('display_original'),
             'sections'
@@ -110,7 +110,7 @@ class NavTransformer
 
         $items = Arr::get($section, 'items', []);
 
-        $transformed['reorder'] = $this->itemsAreReordered(
+        $transformed['reorder'] = $this->getReorderedItems(
             $this->coreNav->pluck('items', 'display_original')->get($displayOriginal, collect())->map->id(),
             collect($items)->pluck('id'),
             $sectionKey
@@ -210,7 +210,7 @@ class NavTransformer
         $transformed['reorder'] = false;
 
         if ($children && $originalHasChildren && ! in_array($transformed['action'], ['@alias', '@create'])) {
-            $transformed['reorder'] = $this->itemsAreReordered(
+            $transformed['reorder'] = $this->getReorderedItems(
                 $originalItem->resolveChildren()->children()->map->id()->all(),
                 collect($children)->keys()->all(),
                 $itemId
@@ -254,14 +254,13 @@ class NavTransformer
     }
 
     /**
-     * Check if items are being reordered.
+     * Check if items are being reordered and return minimum list of item keys required to replicate saved order.
      *
      * @param  array  $originalList
      * @param  array  $newList
      * @param  string  $parentKey
-     * @return bool
      */
-    protected function itemsAreReordered($originalList, $newList, $parentKey)
+    protected function getReorderedItems($originalList, $newList, $parentKey): bool|array
     {
         $itemsAreReordered = collect($originalList)
             ->intersect($newList)
@@ -271,11 +270,15 @@ class NavTransformer
             ->reject(fn ($pair) => $pair->first() === $pair->last())
             ->isNotEmpty();
 
-        if ($itemsAreReordered) {
-            $this->trackReorderedMinimums($originalList, $newList, $parentKey);
+        if (! $itemsAreReordered) {
+            return false;
         }
 
-        return $itemsAreReordered;
+        $minimum = $this->trackReorderedMinimums($originalList, $newList, $parentKey);
+
+        return collect($newList)
+            ->take($minimum)
+            ->all();
     }
 
     /**
@@ -285,7 +288,7 @@ class NavTransformer
      * @param  array  $newList
      * @param  string  $parentKey
      */
-    protected function trackReorderedMinimums($originalList, $newList, $parentKey)
+    protected function trackReorderedMinimums($originalList, $newList, $parentKey): int
     {
         $continueRejecting = true;
 
