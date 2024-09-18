@@ -642,12 +642,12 @@ class NavPreferencesNormalizerTest extends TestCase
             'sections' => [
                 'top_level' => [
                     'action' => false,
-                    'reorder' => false,
                     'display' => false,
+                    'reorder' => false,
                     'items' => [
                         'top_level::dashboard' => [
-                            'action' => '@modify',
                             'display' => 'Dashboard Confessional',
+                            'action' => '@modify',
                         ],
                         $topLevelBlueprintsId => [
                             'action' => '@alias',
@@ -659,12 +659,12 @@ class NavPreferencesNormalizerTest extends TestCase
                 ],
                 'content' => [
                     'action' => false,
-                    'reorder' => false,
                     'display' => false,
+                    'reorder' => false,
                     'items' => [
                         $contentBlueprintsId => [
-                            'action' => '@alias',
                             'display' => 'Content Blueprints',
+                            'action' => '@alias',
                         ],
                         'user::profiles' => [
                             'action' => '@create',
@@ -675,13 +675,13 @@ class NavPreferencesNormalizerTest extends TestCase
                 ],
                 'fields' => [
                     'action' => '@hide',
-                    'reorder' => false,
                     'display' => false,
+                    'reorder' => false,
                     'items' => [],
                 ],
             ],
         ];
 
-        $this->assertEquals($expected, $nav);
+        $this->assertSame($expected, $nav);
     }
 }
