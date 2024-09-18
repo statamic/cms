@@ -134,9 +134,25 @@ class NavPreferencesNormalizerTest extends TestCase
             'top_level' => ['content::collections::pages' => '@alias'],
         ])['sections']));
 
+        // With `reorder: []` array
+        $this->assertEquals(['top_level', 'content'], array_keys($this->normalize([
+            'reorder' => ['content', 'top_level'],
+            'content' => ['fields::blueprints' => '@alias'],
+            'top_level' => ['content::collections::pages' => '@alias'],
+        ])['sections']));
+
         // With `reorder: true` and sections properly nested
         $this->assertEquals(['top_level', 'content'], array_keys($this->normalize([
             'reorder' => true,
+            'sections' => [
+                'content' => ['fields::blueprints' => '@alias'],
+                'top_level' => ['content::collections::pages' => '@alias'],
+            ],
+        ])['sections']));
+
+        // With `reorder: []` array and sections properly nested
+        $this->assertEquals(['top_level', 'content'], array_keys($this->normalize([
+            'reorder' => ['content', 'top_level'],
             'sections' => [
                 'content' => ['fields::blueprints' => '@alias'],
                 'top_level' => ['content::collections::pages' => '@alias'],
@@ -199,6 +215,14 @@ class NavPreferencesNormalizerTest extends TestCase
             'tools' => '@inherit',
         ])['sections']));
 
+        // With `reorder: []` array
+        $this->assertEquals(['top_level', 'users', 'tools'], array_keys($this->normalize([
+            'reorder' => ['top_level', 'users', 'tools'],
+            'users' => [
+                'content::collections::profiles' => '@move',
+            ],
+        ])['sections']));
+
         // With `reorder: true` and sections properly nested
         $this->assertEquals(['top_level', 'users', 'tools'], array_keys($this->normalize([
             'reorder' => true,
@@ -208,6 +232,16 @@ class NavPreferencesNormalizerTest extends TestCase
                     'content::collections::profiles' => '@move',
                 ],
                 'tools' => '@inherit',
+            ],
+        ])['sections']));
+
+        // With `reorder: []` array and sections properly nested
+        $this->assertEquals(['top_level', 'users', 'tools'], array_keys($this->normalize([
+            'reorder' => ['top_level', 'users', 'tools'],
+            'sections' => [
+                'users' => [
+                    'content::collections::profiles' => '@move',
+                ],
             ],
         ])['sections']));
     }
@@ -243,6 +277,18 @@ class NavPreferencesNormalizerTest extends TestCase
             ],
         ])['sections']['content']['items']));
 
+        // With `reorder: []` array
+        $this->assertEquals($expected, array_keys($this->normalize([
+            'content' => [
+                'reorder' => [
+                    'content::collections::pages',
+                    'content::collections::posts',
+                    'content::collections::profiles',
+                ],
+                'content::collections::posts' => ['display' => 'Posterinos'],
+            ],
+        ])['sections']['content']['items']));
+
         // With `reorder: true` and sections properly nested
         $this->assertEquals($expected, array_keys($this->normalize([
             'content' => [
@@ -251,6 +297,20 @@ class NavPreferencesNormalizerTest extends TestCase
                     'content::collections::pages' => '@inherit',
                     'content::collections::posts' => ['display' => 'Posterinos'],
                     'content::collections::profiles' => '@inherit',
+                ],
+            ],
+        ])['sections']['content']['items']));
+
+        // With `reorder: []` array and sections properly nested
+        $this->assertEquals($expected, array_keys($this->normalize([
+            'content' => [
+                'reorder' => [
+                    'content::collections::pages',
+                    'content::collections::posts',
+                    'content::collections::profiles',
+                ],
+                'items' => [
+                    'content::collections::posts' => ['display' => 'Posterinos'],
                 ],
             ],
         ])['sections']['content']['items']));
@@ -270,10 +330,36 @@ class NavPreferencesNormalizerTest extends TestCase
             ],
         ]), 'sections.content.items.content::collections::pages.action'));
 
+        // With `reorder: []` array
+        $this->assertEquals('@modify', Arr::get($this->normalize([
+            'content' => [
+                'reorder' => [
+                    'content::collections::pages',
+                ],
+                'content::collections::pages' => [
+                    $modifier => [],
+                ],
+            ],
+        ]), 'sections.content.items.content::collections::pages.action'));
+
         // With `reorder: true` and sections properly nested
         $this->assertEquals('@modify', Arr::get($this->normalize([
             'content' => [
                 'reorder' => true,
+                'items' => [
+                    'content::collections::pages' => [
+                        $modifier => [],
+                    ],
+                ],
+            ],
+        ]), 'sections.content.items.content::collections::pages.action'));
+
+        // With `reorder: []` array and sections properly nested
+        $this->assertEquals('@modify', Arr::get($this->normalize([
+            'content' => [
+                'reorder' => [
+                    'content::collections::pages',
+                ],
                 'items' => [
                     'content::collections::pages' => [
                         $modifier => [],
@@ -299,12 +385,30 @@ class NavPreferencesNormalizerTest extends TestCase
             ],
         ]), 'sections.content.items.content::collections::pages.action'));
 
+        // With `reorder: []` array
+        $this->assertEquals('@inherit', Arr::get($this->normalize([
+            'content' => [
+                'reorder' => [
+                    'content::collections::pages',
+                ],
+            ],
+        ]), 'sections.content.items.content::collections::pages.action'));
+
         // With `reorder: true` and sections properly nested
         $this->assertEquals('@inherit', Arr::get($this->normalize([
             'content' => [
                 'reorder' => true,
                 'items' => [
                     'content::collections::pages' => [],
+                ],
+            ],
+        ]), 'sections.content.items.content::collections::pages.action'));
+
+        // With `reorder: []` array and sections properly nested
+        $this->assertEquals('@inherit', Arr::get($this->normalize([
+            'content' => [
+                'reorder' => [
+                    'content::collections::pages',
                 ],
             ],
         ]), 'sections.content.items.content::collections::pages.action'));
