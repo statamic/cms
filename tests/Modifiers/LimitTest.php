@@ -2,16 +2,16 @@
 
 namespace Tests\Modifiers;
 
-use Tests\TestCase;
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Query\Builder;
+use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Entry;
 use Statamic\Modifiers\Modify;
-use Illuminate\Support\Collection;
-use Statamic\Contracts\Query\Builder;
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\Group;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
-use Statamic\Facades\Collection as CollectionFacade;
+use Tests\TestCase;
 
 #[Group('array')]
 class LimitTest extends TestCase
