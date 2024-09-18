@@ -59,8 +59,8 @@ class NavTransformer
     protected function transform()
     {
         $this->config['reorder'] = $this->getReorderedItems(
-            $this->coreNav->pluck('display_original'),
-            collect($this->submitted)->pluck('display_original'),
+            $this->coreNav->map(fn ($section) => $this->transformSectionKey($section)),
+            collect($this->submitted)->map(fn ($section) => $this->transformSectionKey($section)),
         );
 
         $this->config['sections'] = collect($this->submitted)
@@ -325,7 +325,7 @@ class NavTransformer
             ->pipe(fn ($sections) => $this->rejectInherits($sections));
 
         $reorder = collect(Arr::get($this->config, 'reorder') ?: [])
-            ->reject(fn ($section) => $section === 'Top Level')
+            ->reject(fn ($section) => $section === 'top_level')
             ->values()
             ->all();
 
