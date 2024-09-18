@@ -3,14 +3,17 @@
 namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Support\Collection;
+use Statamic\Actions\RenameAssetFolder;
 use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Exceptions\AssetContainerNotFoundException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
@@ -161,8 +164,9 @@ class Assets extends Fieldtype
     {
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
-            'container' => $this->container()->handle(),
-            'dynamicFolder' => $this->dynamicFolder(),
+            'container' => $container = $this->container()->handle(),
+            'dynamicFolder' => $dynamicFolder = $this->dynamicFolder(),
+            'rename_folder' => $this->renameFolderAction($dynamicFolder),
         ];
     }
 
@@ -188,6 +192,27 @@ class Assets extends Fieldtype
         if ($parent instanceof Entry) {
             return $parent->slug();
         }
+    }
+
+    private function renameFolderAction($dynamicFolder)
+    {
+        if (! $dynamicFolder) {
+            return null;
+        }
+
+        $container = $this->container();
+        $folder = (($folder = $this->config('folder')) ? $folder.'/' : '').$dynamicFolder;
+        $assetFolder = $container->assetFolder($folder);
+
+        $action = Action::for($assetFolder, [
+            'container' => $container->handle(),
+            'folder' => $folder,
+        ])->first(fn ($action) => get_class($action) === RenameAssetFolder::class)->toArray();
+
+        return [
+            'url' => cp_route('assets.folders.actions.run', $container),
+            'action' => $action,
+        ];
     }
 
     public function getItemData($items)

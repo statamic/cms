@@ -51,6 +51,15 @@
                         <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
                         <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
                     </p>
+
+                    <dropdown-list v-if="meta.rename_folder">
+                        <data-list-inline-actions
+                            :item="folder"
+                            :url="meta.rename_folder.url"
+                            :actions="[meta.rename_folder.action]"
+                            @completed="renameFolderActionCompleted"
+                        />
+                    </dropdown-list>
                 </div>
 
                 <uploads
@@ -547,6 +556,22 @@ export default {
         lockDynamicFolder() {
             if (this.isUsingDynamicFolder && !this.lockedDynamicFolder) this.lockedDynamicFolder = this.dynamicFolder;
         },
+
+        renameFolderActionCompleted(successful=null, response={}) {
+            if (successful === false) return;
+
+            this.$events.$emit('reset-action-modals');
+
+            if (response.message !== false) {
+                this.$toast.success(response.message || __("Action completed"));
+            }
+
+            // Update the folder in the current asset values.
+            // They will be adjusted in the content but not here automatically since there's no refresh.
+            const newFolder = response[0].path;
+            this.update(this.value.map(id => id.replace(`::${this.folder}`, `::${newFolder}`)));
+            this.lockedDynamicFolder = this.configuredFolder ? newFolder.replace(`${this.configuredFolder}/`, '') : newFolder;
+        }
     },
 
 
