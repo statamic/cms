@@ -6,9 +6,9 @@ use Facades\GuzzleHttp\Client as Guzzle;
 use Illuminate\Cache\NoLock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
-use Illuminate\Contracts\Cache\Store;
 
 class Client
 {
