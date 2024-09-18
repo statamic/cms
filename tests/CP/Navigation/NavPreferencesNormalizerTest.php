@@ -265,7 +265,7 @@ class NavPreferencesNormalizerTest extends TestCase
             'content' => [
                 'reorder' => true,
                 'content::collections::pages' => [
-                    $modifier => 'test',
+                    $modifier => [],
                 ],
             ],
         ]), 'sections.content.items.content::collections::pages.action'));
@@ -276,7 +276,7 @@ class NavPreferencesNormalizerTest extends TestCase
                 'reorder' => true,
                 'items' => [
                     'content::collections::pages' => [
-                        $modifier => 'test',
+                        $modifier => [],
                     ],
                 ],
             ],
