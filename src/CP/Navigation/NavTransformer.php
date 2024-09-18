@@ -304,7 +304,7 @@ class NavTransformer
             })
             ->count();
 
-        $this->reorderedMinimums[$parentKey] = max(1, $minimumItemsCount - 1);
+        return $this->reorderedMinimums[$parentKey] = max(1, $minimumItemsCount - 1);
     }
 
     /**
