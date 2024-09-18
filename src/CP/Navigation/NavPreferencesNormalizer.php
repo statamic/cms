@@ -73,11 +73,12 @@ class NavPreferencesNormalizer
     {
         $navConfig = collect($this->preferences);
 
-        $normalized = collect()->put('reorder', $reorder = $navConfig->get('reorder', false));
+        $normalized = collect()->put('reorder', (bool) $reorder = $navConfig->get('reorder', false));
 
         $sections = collect($navConfig->get('sections') ?? $navConfig->except('reorder'));
 
-        $sections = $sections
+        $sections = $this
+            ->normalizeToInheritsFromReorder($sections, $reorder)
             ->prepend($sections->pull('top_level') ?? '@inherit', 'top_level')
             ->map(fn ($config, $section) => $this->normalizeSectionConfig($config, $section))
             ->reject(fn ($config) => $config['action'] === '@inherit' && ! $reorder)
