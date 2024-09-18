@@ -684,4 +684,158 @@ class NavPreferencesNormalizerTest extends TestCase
 
         $this->assertSame($expected, $nav);
     }
+
+    #[Test]
+    public function it_normalizes_example_config_with_legacy_reordering_style()
+    {
+        $nav = $this->normalize([
+            'reorder' => true,
+            'sections' => [
+                'fields' => '@inherit',
+                'content' => [
+                    'reorder' => true,
+                    'items' => [
+                        'content::globals' => '@inherit',
+                        'content::collections' => [
+                            'action' => '@modify',
+                            'reorder' => true,
+                            'children' => [
+                                'content::collections::pages' => '@inherit',
+                                'content::collections::articles' => [
+                                    'action' => '@modify',
+                                    'display' => 'Featured Articles',
+                                ],
+                            ],
+                        ],
+                        'content::assets' => '@inherit',
+                    ],
+                ],
+            ],
+        ]);
+
+        $expected = [
+            'reorder' => true,
+            'sections' => [
+                'top_level' => [
+                    'action' => false,
+                    'display' => false,
+                    'reorder' => false,
+                    'items' => [],
+                ],
+                'fields' => [
+                    'action' => false,
+                    'display' => false,
+                    'reorder' => false,
+                    'items' => [],
+                ],
+                'content' => [
+                    'action' => false,
+                    'display' => false,
+                    'reorder' => true,
+                    'items' => [
+                        'content::globals' => [
+                            'action' => '@inherit',
+                        ],
+                        'content::collections' => [
+                            'action' => '@modify',
+                            'reorder' => true,
+                            'children' => [
+                                'content::collections::pages' => [
+                                    'action' => '@inherit',
+                                ],
+                                'content::collections::articles' => [
+                                    'action' => '@modify',
+                                    'display' => 'Featured Articles',
+                                ],
+                            ],
+                        ],
+                        'content::assets' => [
+                            'action' => '@inherit',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expected, $nav);
+    }
+
+    #[Test]
+    public function it_normalizes_example_config_with_new_array_reordering_style()
+    {
+        $nav = $this->normalize([
+            'reorder' => [
+                'fields',
+            ],
+            'sections' => [
+                'content' => [
+                    'reorder' => [
+                        'content::globals',
+                        'content::collections',
+                        'content::assets',
+                    ],
+                    'items' => [
+                        'content::collections' => [
+                            'action' => '@modify',
+                            'reorder' => [
+                                'content::collections::pages',
+                            ],
+                            'children' => [
+                                'content::collections::articles' => [
+                                    'action' => '@modify',
+                                    'display' => 'Featured Articles',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $expected = [
+            'reorder' => true,
+            'sections' => [
+                'top_level' => [
+                    'action' => false,
+                    'display' => false,
+                    'reorder' => false,
+                    'items' => [],
+                ],
+                'fields' => [
+                    'action' => false,
+                    'display' => false,
+                    'reorder' => false,
+                    'items' => [],
+                ],
+                'content' => [
+                    'action' => false,
+                    'display' => false,
+                    'reorder' => true,
+                    'items' => [
+                        'content::globals' => [
+                            'action' => '@inherit',
+                        ],
+                        'content::collections' => [
+                            'action' => '@modify',
+                            'reorder' => true,
+                            'children' => [
+                                'content::collections::pages' => [
+                                    'action' => '@inherit',
+                                ],
+                                'content::collections::articles' => [
+                                    'action' => '@modify',
+                                    'display' => 'Featured Articles',
+                                ],
+                            ],
+                        ],
+                        'content::assets' => [
+                            'action' => '@inherit',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expected, $nav);
+    }
 }
