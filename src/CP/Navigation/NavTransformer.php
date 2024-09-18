@@ -61,7 +61,6 @@ class NavTransformer
         $this->config['reorder'] = $this->getReorderedItems(
             $this->coreNav->pluck('display_original'),
             collect($this->submitted)->pluck('display_original'),
-            'sections'
         );
 
         $this->config['sections'] = collect($this->submitted)
@@ -112,7 +111,6 @@ class NavTransformer
         $transformed['reorder'] = $this->getReorderedItems(
             $this->coreNav->pluck('items', 'display_original')->get($displayOriginal, collect())->map->id(),
             collect($items)->pluck('id'),
-            $sectionKey
         );
 
         $transformed['items'] = $this->transformItems($items, $sectionKey);
@@ -133,7 +131,7 @@ class NavTransformer
         return collect($items)
             ->map(fn ($item) => array_merge($item, ['id' => $this->transformItemId($item, $item['id'], $parentId, $items)]))
             ->keyBy('id')
-            ->map(fn ($item, $itemId) => $this->transformItem($item, $itemId, $parentId, $transformingChildItems))
+            ->map(fn ($item, $itemId) => $this->transformItem($item, $itemId, $transformingChildItems))
             ->all();
     }
 
@@ -173,11 +171,10 @@ class NavTransformer
      *
      * @param  array  $item
      * @param  string  $itemId
-     * @param  string  $parentId
      * @param  bool  $isChild
      * @return array
      */
-    protected function transformItem($item, $itemId, $parentId, $isChild = false)
+    protected function transformItem($item, $itemId, $isChild = false)
     {
         $transformed = Arr::get($item, 'manipulations', []);
 
@@ -212,7 +209,6 @@ class NavTransformer
             $transformed['reorder'] = $this->getReorderedItems(
                 $originalItem->resolveChildren()->children()->map->id()->all(),
                 collect($children)->keys()->all(),
-                $itemId
             );
         }
 
@@ -257,9 +253,8 @@ class NavTransformer
      *
      * @param  array  $originalList
      * @param  array  $newList
-     * @param  string  $parentKey
      */
-    protected function getReorderedItems($originalList, $newList, $parentKey): bool|array
+    protected function getReorderedItems($originalList, $newList): bool|array
     {
         $itemsAreReordered = collect($originalList)
             ->intersect($newList)
@@ -326,7 +321,7 @@ class NavTransformer
     protected function minify()
     {
         $this->config['sections'] = collect($this->config['sections'])
-            ->map(fn ($section, $key) => $this->minifySection($section, $key))
+            ->map(fn ($section) => $this->minifySection($section))
             ->all();
 
         $sections = $this->rejectInherits($this->config['sections']);
@@ -352,15 +347,14 @@ class NavTransformer
      * Minify tranformed section.
      *
      * @param  array  $section
-     * @param  string  $sectionKey
      * @return mixed
      */
-    protected function minifySection($section, $sectionKey)
+    protected function minifySection($section)
     {
         $action = Arr::get($section, 'action');
 
         $section['items'] = collect($section['items'])
-            ->map(fn ($item, $key) => $this->minifyItem($item, $key))
+            ->map(fn ($item) => $this->minifyItem($item))
             ->all();
 
         $section['items'] = $this->rejectInherits($section['items']);
@@ -390,15 +384,13 @@ class NavTransformer
      * Minify tranformed item.
      *
      * @param  array  $item
-     * @param  string  $itemKey
+     * @param  bool  $isChild
      * @return array
      */
-    protected function minifyItem($item, $itemKey, $isChild = false)
+    protected function minifyItem($item, $isChild = false)
     {
-        $action = Arr::get($item, 'action');
-
         $item['children'] = collect($item['children'] ?? [])
-            ->map(fn ($item, $childId) => $this->minifyItem($item, $childId, true))
+            ->map(fn ($item) => $this->minifyItem($item, true))
             ->all();
 
         $item['children'] = $this->rejectInherits($item['children']);
