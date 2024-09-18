@@ -117,7 +117,7 @@ class NavPreferencesNormalizer
 
         $normalized->put('display', $sectionConfig->get('display', false));
 
-        $normalized->put('reorder', $reorder = $sectionConfig->get('reorder', false));
+        $normalized->put('reorder', (bool) $reorder = $sectionConfig->get('reorder', false));
 
         $items = collect($sectionConfig->get('items') ?? $sectionConfig->except([
             'action',
@@ -125,7 +125,8 @@ class NavPreferencesNormalizer
             'reorder',
         ]));
 
-        $items = $items
+        $items = $this
+            ->normalizeToInheritsFromReorder($items, $reorder)
             ->map(fn ($config, $itemId) => $this->normalizeItemConfig($itemId, $config, $sectionKey))
             ->keyBy(fn ($config, $itemId) => $this->normalizeItemId($itemId, $config))
             ->filter()
