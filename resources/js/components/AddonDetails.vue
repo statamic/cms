@@ -2,8 +2,6 @@
     <div>
         <div class="flex items-center mb-6">
             <h1 class="flex-1" v-text="addon.name" />
-<!--            <a :href="addon.url" target="_blank" class="btn" v-text="__('View on Marketplace')" />-->
-
             <a :href="addon.url" target="_blank" class="btn">
                 <svg-icon name="light/external-link" class="w-3 h-3 rtl:ml-2 ltr:mr-2 shrink-0" />
                 {{ __('View on Marketplace') }}
