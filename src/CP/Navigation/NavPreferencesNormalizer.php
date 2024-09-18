@@ -2,6 +2,7 @@
 
 namespace Statamic\CP\Navigation;
 
+use Illuminate\Support\Collection;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -270,6 +271,21 @@ class NavPreferencesNormalizer
     protected function itemIsInOriginalSection($itemId, $currentSectionKey)
     {
         return Str::startsWith($itemId, "$currentSectionKey::");
+    }
+
+    /**
+     * Normalize to legacy style inherits from new `reorder: []` array schema, introduced to sidestep ordering issues in SQL.
+     */
+    protected function normalizeToInheritsFromReorder(array|Collection $items, array|bool $reorder): Collection
+    {
+        if (! is_array($reorder)) {
+            return collect($items);
+        }
+
+        return collect($reorder)
+            ->flip()
+            ->map(fn () => '@inherit')
+            ->merge($items);
     }
 
     /**
