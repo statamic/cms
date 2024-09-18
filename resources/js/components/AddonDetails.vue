@@ -7,11 +7,11 @@
                 {{ __('View on Marketplace') }}
             </a>
         </div>
-        <div class="lg:grid lg:grid-cols-3 gap-6">
+        <div class="xl:grid xl:grid-cols-3 space-y-6 xl:space-y-0 gap-6">
             <div class="lg:col-span-2">
                 <div class="card prose max-w-full p-6" v-html="description" />
             </div>
-            <div class="lg:col-span-1 flex flex-col space-y-6">
+            <div class="xl:col-span-1 flex flex-col space-y-6">
                 <div class="card flex flex-col space-y-6">
                     <div class="flex-1 text-lg">
                         <div class="little-heading p-0 mb-2 text-gray-700" v-text="__('Seller')" />
