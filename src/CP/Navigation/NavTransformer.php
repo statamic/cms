@@ -320,17 +320,18 @@ class NavTransformer
      */
     protected function minify()
     {
-        $this->config['sections'] = collect($this->config['sections'])
+        $sections = collect($this->config['sections'])
             ->map(fn ($section) => $this->minifySection($section))
+            ->pipe(fn ($sections) => $this->rejectInherits($sections));
+
+        $reorder = collect(Arr::get($this->config, 'reorder') ?: [])
+            ->reject(fn ($section) => $section === 'Top Level')
+            ->values()
             ->all();
 
-        $sections = $this->rejectInherits($this->config['sections']);
-
-        if ($this->config['reorder']) {
-            $this->config['sections'] = $sections;
-        } else {
-            $this->config = $sections;
-        }
+        $this->config = $reorder
+            ? array_filter(compact('reorder', 'sections'))
+            : $sections;
 
         // If the config is completely null after minifying, ensure we save an empty array.
         // For example, if we're transforming this config for a user's nav preferences,
