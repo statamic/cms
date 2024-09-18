@@ -244,11 +244,14 @@ class NavPreferencesNormalizer
             ];
         }
 
-        if (is_array($itemConfig)) {
-            Arr::forget($itemConfig, 'children');
+        $normalized = $this->normalizeItemConfig($itemId, $itemConfig, $sectionKey, false);
+
+        if (is_array($normalized)) {
+            Arr::forget($normalized, 'reorder');
+            Arr::forget($normalized, 'children');
         }
 
-        return $this->normalizeItemConfig($itemId, $itemConfig, $sectionKey, false);
+        return $normalized;
     }
 
     /**
