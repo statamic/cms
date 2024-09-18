@@ -191,7 +191,9 @@ class NavPreferencesNormalizer
         }
 
         // Normalize `reorder` bool.
-        $normalized->put('reorder', (bool) $reorder = $normalized->get('reorder', false));
+        if ($reorder = $normalized->get('reorder', false)) {
+            $normalized->put('reorder', (bool) $reorder);
+        }
 
         // Normalize `children`.
         $children = $this
