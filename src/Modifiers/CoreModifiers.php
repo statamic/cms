@@ -10,7 +10,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Compare;
@@ -1453,7 +1452,7 @@ class CoreModifiers extends Modifier
     {
         $limit = Arr::get($params, 0, 0);
 
-        if ($value instanceof Builder) {
+        if (Compare::isQueryBuilder($value)) {
             return $value->limit($limit);
         }
 
