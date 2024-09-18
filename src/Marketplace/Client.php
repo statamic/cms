@@ -12,6 +12,8 @@ use InvalidArgumentException;
 
 class Client
 {
+    const LOCK_KEY = 'statamic.marketplace.lock';
+
     /**
      * @var string
      */
@@ -31,8 +33,6 @@ class Client
      * @var Store
      */
     private $store;
-
-    const LOCK_KEY = 'statamic.marketplace.lock';
 
     /**
      * Instantiate marketplace API wrapper.
