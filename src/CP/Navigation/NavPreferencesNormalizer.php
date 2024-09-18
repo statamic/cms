@@ -190,13 +190,20 @@ class NavPreferencesNormalizer
             }
         }
 
-        // If item has children, normalize those items as well.
-        if ($children = $normalized->get('children')) {
-            $normalized->put('children', collect($children)
-                ->map(fn ($childConfig, $childId) => $this->normalizeChildItemConfig($childId, $childConfig, $sectionKey))
-                ->keyBy(fn ($childConfig, $childId) => $this->normalizeItemId($childId, $childConfig))
-                ->all());
-        }
+        // Normalize `reorder` bool.
+        $normalized->put('reorder', (bool) $reorder = $normalized->get('reorder', false));
+
+        // Normalize `children`.
+        $children = $this
+            ->normalizeToInheritsFromReorder($normalized->get('children', []), $reorder)
+            ->map(fn ($childConfig, $childId) => $this->normalizeChildItemConfig($childId, $childConfig, $sectionKey))
+            ->keyBy(fn ($childConfig, $childId) => $this->normalizeItemId($childId, $childConfig))
+            ->all();
+
+        // Only output `children` in normalized output if there are any.
+        $children
+            ? $normalized->put('children', $children)
+            : $normalized->forget('children');
 
         $allowedKeys = array_merge(['action'], static::ALLOWED_NAV_ITEM_MODIFICATIONS);
 
