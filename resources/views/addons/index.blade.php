@@ -2,6 +2,7 @@
 
 @extends('statamic::layout')
 @section('title', __('Addons'))
+@section('wrapper_class', 'max-w-full')
 
 @section('content')
 
