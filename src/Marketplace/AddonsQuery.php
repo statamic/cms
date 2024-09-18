@@ -41,7 +41,7 @@ class AddonsQuery
         $params = [
             'page' => $this->page,
             'search' => $this->search,
-            'filter' => ['statamic' => '3,4'],
+            'filter' => ['statamic' => '3,4,5'],
             'sort' => 'most-popular',
         ];
 
