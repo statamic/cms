@@ -356,9 +356,7 @@ class NavTransformer
 
         $section['items'] = collect($section['items'])
             ->map(fn ($item) => $this->minifyItem($item))
-            ->all();
-
-        $section['items'] = $this->rejectInherits($section['items']);
+            ->pipe(fn ($items) => $this->rejectInherits($items));
 
         if (! $section['reorder']) {
             Arr::forget($section, 'reorder');
@@ -392,9 +390,7 @@ class NavTransformer
     {
         $item['children'] = collect($item['children'] ?? [])
             ->map(fn ($item) => $this->minifyItem($item, true))
-            ->all();
-
-        $item['children'] = $this->rejectInherits($item['children']);
+            ->pipe(fn ($items) => $this->rejectInherits($items));
 
         if (! $item['reorder']) {
             Arr::forget($item, 'reorder');
