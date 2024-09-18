@@ -3,7 +3,12 @@
 namespace Statamic\Marketplace;
 
 use Facades\GuzzleHttp\Client as Guzzle;
+use Illuminate\Cache\NoLock;
+use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
+use InvalidArgumentException;
+use Illuminate\Contracts\Cache\Store;
 
 class Client
 {
@@ -23,9 +28,11 @@ class Client
     protected $verifySsl = true;
 
     /**
-     * @var int
+     * @var Store
      */
-    protected $cache;
+    private $store;
+
+    const LOCK_KEY = 'statamic.marketplace.lock';
 
     /**
      * Instantiate marketplace API wrapper.
@@ -47,26 +54,51 @@ class Client
      */
     public function get($endpoint, $params = [])
     {
-        $endpoint = collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
+        $lock = $this->lock(static::LOCK_KEY, 10);
 
-        $key = 'marketplace-'.md5($endpoint.json_encode($params));
+        try {
+            $lock->block(5);
 
-        return Cache::rememberWithExpiration($key, function () use ($endpoint, $params) {
-            $response = Guzzle::request('GET', $endpoint, [
-                'verify' => $this->verifySsl,
-                'query' => $params,
-            ]);
+            $endpoint = collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
 
-            $json = json_decode($response->getBody(), true);
+            $key = 'marketplace-'.md5($endpoint.json_encode($params));
 
-            return [$this->cache => $json];
-        });
+            return $this->cache()->rememberWithExpiration($key, function () use ($endpoint, $params) {
+                $response = Guzzle::request('GET', $endpoint, [
+                    'verify' => $this->verifySsl,
+                    'query' => $params,
+                ]);
+
+                $json = json_decode($response->getBody(), true);
+
+                return [60 => $json];
+            });
+        } catch (LockTimeoutException $e) {
+            return $this->cache()->get($key);
+        } finally {
+            $lock->release();
+        }
     }
 
-    public function cache($cache = 60)
+    private function cache()
     {
-        $this->cache = $cache;
+        if ($this->store) {
+            return $this->store;
+        }
 
-        return $this;
+        try {
+            $store = Cache::store('marketplace');
+        } catch (InvalidArgumentException $e) {
+            $store = Cache::store();
+        }
+
+        return $this->store = $store;
+    }
+
+    private function lock(string $key, int $seconds)
+    {
+        return $this->cache()->getStore() instanceof LockProvider
+            ? $this->cache()->lock($key, $seconds)
+            : new NoLock($key, $seconds);
     }
 }
