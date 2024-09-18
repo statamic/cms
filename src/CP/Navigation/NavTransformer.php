@@ -12,7 +12,6 @@ class NavTransformer
     protected $coreNav;
     protected $submitted;
     protected $config;
-    protected $reorderedMinimums;
 
     /**
      * Instantiate nav transformer.
@@ -274,21 +273,18 @@ class NavTransformer
             return false;
         }
 
-        $minimum = $this->trackReorderedMinimums($originalList, $newList, $parentKey);
-
         return collect($newList)
-            ->take($minimum)
+            ->take($this->calculateMinimumItemsForReorder($originalList, $newList))
             ->all();
     }
 
     /**
-     * Track minimum number of items needed for reorder config.
+     * Calculate minimum number of items needed for reorder config.
      *
      * @param  array  $originalList
      * @param  array  $newList
-     * @param  string  $parentKey
      */
-    protected function trackReorderedMinimums($originalList, $newList, $parentKey): int
+    protected function calculateMinimumItemsForReorder($originalList, $newList): int
     {
         $continueRejecting = true;
 
@@ -304,7 +300,7 @@ class NavTransformer
             })
             ->count();
 
-        return $this->reorderedMinimums[$parentKey] = max(1, $minimumItemsCount - 1);
+        return max(1, $minimumItemsCount - 1);
     }
 
     /**
