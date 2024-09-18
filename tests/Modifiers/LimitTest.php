@@ -42,7 +42,7 @@ class LimitTest extends TestCase
         $query->shouldReceive('limit')->with(2)->once()->andReturnSelf();
 
         $limited = $this->modify($query, 2);
-        $this->assertInstanceOf(Builder::class, $limited);
+        $this->assertSame($query, $limited);
     }
 
     public function modify($value, $limit)
