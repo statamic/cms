@@ -43,6 +43,7 @@ class AddonsQuery
             'search' => $this->search,
             'filter' => ['statamic' => '3,4,5'],
             'sort' => 'most-popular',
+            'perPage' => 12,
         ];
 
         if ($this->installed) {
