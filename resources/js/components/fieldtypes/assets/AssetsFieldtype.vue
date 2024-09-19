@@ -251,7 +251,12 @@ export default {
         },
 
         dynamicFolder() {
-            const value = data_get(this.$store.state.publish[this.store].values, this.config.dynamic);
+            const field = this.config.dynamic;
+            if (! ['id', 'slug', 'author'].includes(field)) {
+                throw new Error(`Dynamic folder field [${field}] is invalid. Must be one of: id, slug, author`);
+            }
+
+            const value = data_get(this.$store.state.publish[this.store].values, field);
 
             // If value is an array (e.g. a users fieldtype), get the first item.
             return Array.isArray(value) ? value[0] : value;

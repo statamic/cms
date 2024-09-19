@@ -83,6 +83,7 @@ class Assets extends Fieldtype
                             'slug' => __('Slug'),
                             'author' => __('Author'),
                         ],
+                        'validate' => 'in:id,slug,author',
                         'if' => [
                             'container' => 'not empty',
                         ],
@@ -191,8 +192,11 @@ class Assets extends Fieldtype
             return Str::beforeLast($file, '/');
         }
 
-        // Otherwise, use the entry slug as the folder.
-        $field = $this->config('dynamic');
+        // Otherwise, use a given field's value as the folder.
+        if (! in_array($field = $this->config('dynamic'), ['id', 'slug', 'author'])) {
+            throw new \Exception("Dynamic folder field [$field] is invalid. Must be one of: id, slug, author");
+        }
+
         $parent = $this->field->parent();
 
         if ($parent instanceof Entry) {
