@@ -81,11 +81,7 @@ class Client
 
     private function cache(): Repository
     {
-        if ($this->store) {
-            return $this->store;
-        }
-
-        return $this->store = Cache::store();
+        return $this->store ??= Cache::store();
     }
 
     private function lock(string $key, int $seconds)
