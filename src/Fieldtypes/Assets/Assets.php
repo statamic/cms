@@ -200,7 +200,7 @@ class Assets extends Fieldtype
         $parent = $this->field->parent();
 
         if ($parent instanceof Entry) {
-            return $parent->$field;
+            return is_array($value = $parent->$field) ? $value[0] : $value;
         }
     }
 
