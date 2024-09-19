@@ -6,7 +6,7 @@ use Facades\GuzzleHttp\Client as Guzzle;
 use Illuminate\Cache\NoLock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\LockTimeoutException;
-use Illuminate\Contracts\Cache\Store;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
 
@@ -30,7 +30,7 @@ class Client
     protected $verifySsl = true;
 
     /**
-     * @var Store
+     * @var Repository
      */
     private $store;
 
@@ -80,7 +80,7 @@ class Client
         }
     }
 
-    private function cache()
+    private function cache(): Repository
     {
         if ($this->store) {
             return $this->store;
