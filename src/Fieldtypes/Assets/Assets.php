@@ -200,7 +200,19 @@ class Assets extends Fieldtype
         $parent = $this->field->parent();
 
         if ($parent instanceof Entry) {
-            return is_array($value = $parent->$field) ? $value[0] : $value;
+            $value = $parent->$field;
+
+            // If the author field doesn't have a max_items of 1, it'll be a collection, so grab the first one.
+            if ($value instanceof Collection) {
+                $value = $value->first();
+            }
+
+            // If the author field had max_items 1 it would be a user, or since we got it above, use its id.
+            if (is_object($value)) {
+                $value = $value->id();
+            }
+
+            return $value;
         }
     }
 
