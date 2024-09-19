@@ -32,8 +32,8 @@
                 <div class="card p-6">
                     <div class="prose">
                         <template v-if="addon.installed">
-                            <p v-text="`${__('messages.addon_uninstall_command')}:`" />
-                            <code-block copyable :text="`composer remove ${package}`" />
+                            <p class="leading-snug" v-text="`${__('messages.addon_uninstall_command')}:`" />
+                            <code-block class="text-xs" copyable :text="`composer remove ${package}`" />
                         </template>
                         <template v-else>
                             <p v-text="`${__('messages.addon_install_command')}:`" />
