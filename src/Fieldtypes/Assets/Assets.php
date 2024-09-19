@@ -76,8 +76,13 @@ class Assets extends Fieldtype
                     'dynamic' => [
                         'display' => __('Dynamic Folder'),
                         'instructions' => __('statamic::fieldtypes.assets.config.dynamic'),
-                        'type' => 'toggle',
-                        'default' => false,
+                        'type' => 'select',
+                        'clearable' => true,
+                        'options' => [
+                            'id' => __('ID'),
+                            'slug' => __('Slug'),
+                            'author' => __('Author'),
+                        ],
                         'if' => [
                             'container' => 'not empty',
                         ],
@@ -187,10 +192,11 @@ class Assets extends Fieldtype
         }
 
         // Otherwise, use the entry slug as the folder.
+        $field = $this->config('dynamic');
         $parent = $this->field->parent();
 
         if ($parent instanceof Entry) {
-            return $parent->slug();
+            return $parent->$field;
         }
     }
 

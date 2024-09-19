@@ -4,7 +4,7 @@
         <div
             v-if="hasPendingDynamicFolder"
             class="py-3 px-4 text-sm w-full rounded-md border border-dashed text-gray-700 dark:text-dark-175 dark:border-dark-200"
-            v-text="__('statamic::fieldtypes.assets.dynamic_folder_pending')"
+            v-html="__('statamic::fieldtypes.assets.dynamic_folder_pending', {field: `<code>${config.dynamic}</code>`})"
         />
 
         <uploader
@@ -243,7 +243,7 @@ export default {
         },
 
         isUsingDynamicFolder() {
-            return this.config.dynamic;
+            return !!this.config.dynamic;
         },
 
         hasPendingDynamicFolder() {
@@ -251,7 +251,10 @@ export default {
         },
 
         dynamicFolder() {
-            return data_get(this.$store.state.publish[this.store].values, 'slug');
+            const value = data_get(this.$store.state.publish[this.store].values, this.config.dynamic);
+
+            // If value is an array (e.g. a users fieldtype), get the first item.
+            return Array.isArray(value) ? value[0] : value;
         },
 
         store() {
