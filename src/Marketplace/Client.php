@@ -8,7 +8,6 @@ use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
-use InvalidArgumentException;
 
 class Client
 {
@@ -86,13 +85,7 @@ class Client
             return $this->store;
         }
 
-        try {
-            $store = Cache::store('marketplace');
-        } catch (InvalidArgumentException $e) {
-            $store = Cache::store();
-        }
-
-        return $this->store = $store;
+        return $this->store = Cache::store();
     }
 
     private function lock(string $key, int $seconds)
