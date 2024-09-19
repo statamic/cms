@@ -29,10 +29,6 @@
                         <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
                             <svg-icon name="dark-mode" class="w-4 h-4" />
                         </button>
-                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')" :aria-label="__('Toggle Fullscreen Mode')">
-                            <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
-                            <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
-                        </button>
                     </div>
                 </div>
 
@@ -715,7 +711,11 @@ export default {
 
             this.count.characters = ucs2decode(trimmed.replace(/\s/g, '')).length;
             this.count.words = trimmed.split(/\s+/).filter(word => word.length > 0).length;
-        }
+        },
+
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+        },
     },
 
     computed: {
@@ -744,7 +744,18 @@ export default {
 
             return marked(this.data || '', { renderer: new PlainTextRenderer })
                 .replace(/<\/?[^>]+(>|$)/g, "");
-        }
+        },
+
+        internalActions() {
+            return [
+                {
+                    display: __('Toggle Fullscreen Mode'),
+                    icon: 'expand-bold',
+                    quick: true,
+                    run: this.toggleFullscreen,
+                },
+            ];
+        },
     }
 
 };

@@ -32,7 +32,7 @@
                         v-model="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
-                        <dropdown-actions :actions="actions" @run="runAction" v-if="hasActions" />
+                        <dropdown-actions :actions="visibleActions" @run="runAction" v-if="visibleActions.length" />
                         <div class="divider" />
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
@@ -187,8 +187,11 @@ export default {
         },
 
         actionPayload() { 
+            const field = this.extension.options.bard;
             return {
-                field: this.extension.options.bard,
+                field: field,
+                fieldPathPrefix: field.fieldPathPrefix || field.handle,
+                index: this.index,
                 values: this.values,
                 config: this.config,
                 meta: this.meta,

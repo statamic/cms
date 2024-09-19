@@ -3,13 +3,36 @@ export default {
     computed: {
 
         actions() {
-            return this.$actions
-                .get(this.$options.name)
-                .filter(action => action.visible());;
+            return this.$actions.get(this.$options.name);
         },
 
-        hasActions() {
-            return this.$options.name !== null && this.actions.length > 0;
+        internalActions() {
+            return [];
+        },
+
+        visibleActions() {
+            return this.actions
+                .filter(action => {
+                    if (typeof action.visible === 'function') return action.visible();
+                    if (typeof action.visible !== 'undefined') return action.visible;
+                    return true;
+                });
+        },
+
+        visibleInternalActions() {
+            return this.internalActions
+                .filter(action => {
+                    if (typeof action.visible === 'function') return action.visible();
+                    if (typeof action.visible !== 'undefined') return action.visible;
+                    return true;
+                });
+        },
+
+        visibleQuickActions() {
+            return [
+                ...this.visibleActions,
+                ...this.visibleInternalActions
+            ].filter(item => item.quick);
         },
 
         actionPayload() { 

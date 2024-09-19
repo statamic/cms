@@ -53,19 +53,17 @@
             <div class="field-dropdown" v-if="mounted && hasDropdown">
                 <quick-dropdown-list>
                     <quick-dropdown-item
-                        v-for="item in fieldQuickActions"
+                        v-for="item, index in fieldQuickActions"
+                        :key="index"
                         :text="item.display"
                         :icon="item.icon"
-                        @click="item.run" />
+                        @click="fieldRunAction(item)" />
                     <template #dropdown>
-                        <dropdown-actions :actions="fieldActions" @run="fieldRunAction" />
+                        <dropdown-actions :actions="fieldActions" @run="fieldRunAction" v-if="fieldActions.length" />
                         <div class="divider" />
-                        <dropdown-item
-                            v-for="item in fieldInternalActions"
-                            :text="item.display"
-                            @click="item.run" />
+                        <dropdown-actions :actions="fieldInternalActions" @run="fieldRunAction" v-if="fieldInternalActions.length" />
                     </template>
-                </quick-dropdown-list>                
+                </quick-dropdown-list>
             </div>
 
         </div>
@@ -250,23 +248,19 @@ export default {
         },
 
         fieldActions() {
-            return this.$refs.field.actions;
+            return this.$refs.field.visibleActions;
         },
 
         fieldInternalActions() {
-            return this.$refs.field.internalActions;
-        },
-
-        fieldAllActions() {
-            return [...this.fieldActions, ...this.fieldInternalActions];
+            return this.$refs.field.visibleInternalActions;
         },
 
         fieldQuickActions() {
-            return this.fieldAllActions.filter(item => item.quick);
+            return this.$refs.field.visibleQuickActions;
         },
 
         hasDropdown() {
-            return this.fieldAllActions.length > 0;
+            return this.fieldActions.length > 0 || this.fieldInternalActions.length > 0;;
         },
 
     },

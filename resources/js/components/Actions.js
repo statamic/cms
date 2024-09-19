@@ -1,3 +1,5 @@
+import uid from 'uniqid';
+
 class Actions {
     constructor() {
         this.actions = {};
@@ -8,14 +10,7 @@ class Actions {
             this.actions[name] = [];
         }
 
-        this.actions[name].push({
-            display: null,
-            icon:  null,
-            quick: false,
-            run: () => {},
-            visible: () => true,
-            ...action,
-        });
+        this.actions[name].push(action);
     }
 
     get(name) {

@@ -3,15 +3,20 @@
 <portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
 <element-container @resized="refresh">
     <div class="code-fieldtype-container" :class="[themeClass, {'code-fullscreen': fullScreenMode }]">
-        <div class="code-fieldtype-toolbar">
+        <publish-field-header
+            v-if="fullScreenMode"
+            :config="config"
+            :run-action="runAction"
+            :actions="visibleActions"
+            :internal-actions="visibleInternalActions"
+            :quick-actions="visibleQuickActions"
+            @close="toggleFullscreen">
+        </publish-field-header>
+        <div class="code-fieldtype-toolbar" v-if="!fullScreenMode">
             <div>
                 <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" :is-read-only="isReadOnly" class="text-xs leading-none" />
                 <div v-else v-text="modeLabel" class="text-xs font-mono text-gray-700"></div>
             </div>
-            <button @click="fullScreenMode = !fullScreenMode" class="btn-icon h-8 leading-none flex items-center justify-center text-gray-800 dark:text-dark-150" v-tooltip="__('Toggle Fullscreen Mode')">
-                <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="!fullScreenMode" />
-                <svg-icon name="arrows-shrink" class="h-3.5 w-3.5" v-show="fullScreenMode" />
-            </button>
         </div>
         <div ref="codemirror"></div>
     </div>
@@ -131,6 +136,16 @@ export default {
                 };
             });
         },
+        internalActions() {
+            return [
+                {
+                    display: __('Toggle Fullscreen Mode'),
+                    icon: 'expand-bold',
+                    quick: true,
+                    run: this.toggleFullscreen,
+                },
+            ];
+        },
     },
 
     watch: {
@@ -204,7 +219,10 @@ export default {
 
             // CodeMirror also needs to be manually refreshed when made visible in the DOM
             this.$events.$on('tab-switched', this.refresh);
-        }
+        },
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+        },
     }
 };
 </script>

@@ -90,6 +90,8 @@ export default {
         actionPayload() { 
             return {
                 field: this,
+                fieldPathPrefix: this.fieldPathPrefix,
+                handle: this.handle,
                 value: this.value,
                 config: this.config,
                 meta: this.meta,

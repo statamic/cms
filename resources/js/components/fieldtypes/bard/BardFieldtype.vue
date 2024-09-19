@@ -15,8 +15,34 @@
         @dragend="ignorePageHeader(false)"
     >
 
-        <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
-            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed" :class="{'justify-center': fullScreenMode}">
+        <publish-field-header
+            v-if="fullScreenMode"
+            :config="config"
+            :run-action="runAction"
+            :actions="visibleActions"
+            :internal-actions="visibleInternalActions"
+            :quick-actions="visibleQuickActions"
+            @close="toggleFullscreen">
+            <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
+                <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
+                    <component
+                        v-for="button in visibleButtons(buttons)"
+                        :key="button.name"
+                        :is="button.component || 'BardToolbarButton'"
+                        :button="button"
+                        :active="buttonIsActive(button)"
+                        :config="config"
+                        :bard="_self"
+                        :editor="editor" />
+                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
+                        <svg-icon name="show-source" class="w-4 h-4 "/>
+                    </button>
+                </div>
+            </div>
+        </publish-field-header>
+
+        <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
                 <component
                     v-for="button in visibleButtons(buttons)"
                     :key="button.name"
@@ -26,9 +52,9 @@
                     :config="config"
                     :bard="_self"
                     :editor="editor" />
-                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                        <svg-icon name="show-source" class="w-4 h-4 "/>
-                    </button>
+                <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
+                    <svg-icon name="show-source" class="w-4 h-4 "/>
+                </button>
             </div>
         </div>
 
@@ -340,6 +366,7 @@ export default {
                     icon: 'expand-bold',
                     quick: true,
                     run: this.toggleFullscreen,
+                    visible: this.config.fullscreen,
                 },
             ];
         },
