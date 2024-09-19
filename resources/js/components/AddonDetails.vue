@@ -7,12 +7,12 @@
                 {{ __('View on Marketplace') }}
             </a>
         </div>
-        <div class="xl:grid xl:grid-cols-3 space-y-6 xl:space-y-0 gap-6">
+        <div class="flex flex-col-reverse xl:grid xl:grid-cols-3 space-y-6 xl:space-y-0 gap-6">
             <div class="lg:col-span-2">
                 <div class="card prose max-w-full p-6" v-html="description" />
             </div>
             <div class="xl:col-span-1 flex flex-col space-y-6">
-                <div class="card flex flex-col space-y-6">
+                <div class="card flex flex-col space-y-6 p-6">
                     <div class="flex-1 text-lg">
                         <div class="little-heading p-0 mb-2 text-gray-700" v-text="__('Seller')" />
                         <a :href="addon.seller.website" target="_blank" class="relative flex items-center">
@@ -29,7 +29,7 @@
                         <div class="font-bold">{{ downloads }}</div>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card p-6">
                     <div class="prose">
                         <template v-if="addon.installed">
                             <p v-text="`${__('messages.addon_uninstall_command')}:`" />
