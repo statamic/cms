@@ -565,6 +565,27 @@ export default {
             if (this.isUsingDynamicFolder && !this.lockedDynamicFolder) this.lockedDynamicFolder = this.dynamicFolder;
         },
 
+        syncDynamicFolderFromValue(value) {
+            if (! this.isUsingDynamicFolder) return;
+
+            this.lockedDynamicFolder = null;
+
+            if (value.length === 0) {
+                // If there are no assets, we should get the dynamic folder naturally.
+                this.lockDynamicFolder();
+            } else {
+                // Otherwise, figure it out from the first selected asset.
+                const first = value[0];
+                const segments = first.split('::')[1].split('/');
+                this.lockedDynamicFolder = segments[segments.length - 2];
+            }
+
+            // Set the new folder in the rename action.
+            const meta = this.meta;
+            meta.rename_folder.action.context.folder = this.folder;
+            this.updateMeta(meta);
+        },
+
         renameFolderActionCompleted(successful=null, response={}) {
             if (successful === false) return;
 
@@ -604,6 +625,8 @@ export default {
 
         value(value) {
             if (_.isEqual(value, this.assetIds)) return;
+
+            this.syncDynamicFolderFromValue(value);
 
             this.loadAssets(value);
         },
