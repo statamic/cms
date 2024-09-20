@@ -1,5 +1,27 @@
 # Release Notes
 
+## 5.25.0 (2024-09-10)
+
+### What's new
+- Prevent query parameters bloating the static cache [#10701](https://github.com/statamic/cms/issues/10701) by @duncanmcclean
+- Add data-type attribute to replicator and bard set divs [#10692](https://github.com/statamic/cms/issues/10692) by @BobWez98
+
+### What's fixed
+- Fix enter key not submitting confirmation modal sometimes [#10721](https://github.com/statamic/cms/issues/10721) by @duncanmcclean
+- Prevent user from being logged out when ending impersonation [#10780](https://github.com/statamic/cms/issues/10780) by @duncanmcclean
+- Only index entries with published status [#10778](https://github.com/statamic/cms/issues/10778) by @jasonvarga
+- Remove legacy code that likely caused issues typing 'f' in asset file rename field [#10777](https://github.com/statamic/cms/issues/10777) by @steveparks
+- Allow bind of ImageGenerator by removing last `new` call [#10775](https://github.com/statamic/cms/issues/10775) by @wuifdesign
+- Private asset container url method should return null [#10769](https://github.com/statamic/cms/issues/10769) by @jasonvarga
+- Improve error messaging in `eloquent:import-users` command [#10767](https://github.com/statamic/cms/issues/10767) by @jesseleite
+- Prevent error when `cascadeContent`  is an Eloquent Model [#10759](https://github.com/statamic/cms/issues/10759) by @duncanmcclean
+- Fix Radio Fieldtype with numeric keys [#10764](https://github.com/statamic/cms/issues/10764) by @duncanmcclean
+- Fix url in translations [#10766](https://github.com/statamic/cms/issues/10766) by @ttrig
+- Fix Ignition Views [#10765](https://github.com/statamic/cms/issues/10765) by @jasonvarga
+- French translations [#10768](https://github.com/statamic/cms/issues/10768) by @ebeauchamps
+
+
+
 ## 5.24.0 (2024-09-03)
 
 ### What's new

@@ -3,6 +3,7 @@
     <node-view-wrapper>
         <div class="bard-set whitespace-normal my-6 rounded bg-white dark:bg-dark-500 border dark:border-dark-900 shadow-md"
             :class="{ 'border-blue-400 dark:border-dark-blue-100': selected || withinSelection, 'has-error': hasError }"
+            :data-type="config.handle"
             contenteditable="false" @copy.stop @paste.stop @cut.stop
         >
             <div ref="content" hidden />

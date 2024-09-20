@@ -7,6 +7,7 @@ use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Exceptions\TermNotFoundException;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Stache\Stache;
@@ -138,7 +139,7 @@ class TermRepository implements RepositoryContract
         return app(Term::class)->slug($slug);
     }
 
-    public function entriesCount(Term $term): int
+    public function entriesCount(Term $term, ?string $status = null): int
     {
         $items = $this->store->store($term->taxonomyHandle())
             ->index('associations')
@@ -151,6 +152,14 @@ class TermRepository implements RepositoryContract
 
         if ($collection = $term->collection()) {
             $items = $items->where('collection', $collection->handle());
+        }
+
+        if ($status) {
+            return Entry::query()
+                ->whereIn('id', $items->pluck('entry')->all())
+                ->when($collection, fn ($query) => $query->where('collection', $collection->handle()))
+                ->whereStatus($status)
+                ->count();
         }
 
         return $items->count();

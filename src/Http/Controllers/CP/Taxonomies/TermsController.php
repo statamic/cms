@@ -144,6 +144,7 @@ class TermsController extends CpController
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
+            'hasTemplate' => view()->exists($term->template()),
         ];
 
         if ($request->wantsJson()) {
