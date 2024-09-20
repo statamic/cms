@@ -27,6 +27,7 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Imaging\AsciiArt;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
@@ -145,6 +146,13 @@ class CoreModifiers extends Modifier
     public function ascii($value)
     {
         return Stringy::toAscii($value);
+    }
+
+    public function asciiArt($value, $params)
+    {
+        $art = (new AsciiArt)->convert($value, $params[0] ?? null);
+
+        return htmlentities($art);
     }
 
     /**
