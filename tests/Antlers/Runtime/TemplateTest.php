@@ -312,6 +312,31 @@ EOT;
     }
 
     #[Test]
+    public function unclosed_array_variable_does_not_report_warning_if_followed_by_ray_modifier()
+    {
+        Log::shouldReceive('debug')->never();
+
+        $template = '{{ simple | ray }}';
+
+        $this->assertEquals('', $this->renderString($template, $this->variables));
+    }
+
+    #[Test]
+    public function unclosed_array_variable_does_reports_warning_even_if_a_call_before_it_did_not()
+    {
+        // Test case to ensure the modifier state is cleared correctly.
+
+        Log::shouldReceive('debug')->once()
+            ->with('Cannot render an array variable as a string: {{ simple }}', [
+                'line' => 1, 'file' => '',
+            ]);
+
+        $template = '{{ simple | ray }}{{ simple }}';
+
+        $this->assertEquals('', $this->renderString($template, $this->variables));
+    }
+
+    #[Test]
     public function single_condition()
     {
         $template = '{{ if string == "Hello wilderness" }}yes{{ endif }}';
