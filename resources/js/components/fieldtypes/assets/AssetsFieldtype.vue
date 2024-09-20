@@ -235,7 +235,7 @@ export default {
                 folder = folder + '/' + (this.lockedDynamicFolder || this.dynamicFolder);
             }
 
-            return folder;
+            return folder.replace(/^\/+/, '');
         },
 
         configuredFolder() {
