@@ -12,7 +12,8 @@
     }
 }
 
-.code-fieldtype-toolbar select {
+.code-fieldtype-toolbar select,
+.code-fieldtype-toolbar-fullscreen select {
     @apply h-8 text-sm leading-none;
 }
 

@@ -11,6 +11,12 @@
             :internal-actions="visibleInternalActions"
             :quick-actions="visibleQuickActions"
             @close="toggleFullscreen">
+            <div class="code-fieldtype-toolbar-fullscreen">
+                <div>
+                    <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" :is-read-only="isReadOnly" class="text-xs leading-none" />
+                    <div v-else v-text="modeLabel" class="text-xs font-mono text-gray-700"></div>
+                </div>
+            </div>
         </publish-field-header>
         <div class="code-fieldtype-toolbar" v-if="!fullScreenMode">
             <div>

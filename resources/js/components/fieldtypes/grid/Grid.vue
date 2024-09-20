@@ -5,14 +5,17 @@
     <element-container @resized="containerWidth = $event.width">
     <div class="grid-fieldtype-container" :class="{'grid-fullscreen bg-white dark:bg-dark-600': fullScreenMode }">
 
-        <template v-if="config.fullscreen || !config.hide_display">
-            <header class="bg-gray-200 dark:bg-dark-550 border-b dark:border-dark-900 py-3 rtl:pr-3 ltr:pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
-                <h2 v-text="__(config.display)" />
-                <button class="btn-close absolute top-2 rtl:left-5 ltr:right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
-            </header>
-        </template>
+        <publish-field-header
+            v-if="fullScreenMode"
+            :config="config"
+            :run-action="runAction"
+            :actions="visibleActions"
+            :internal-actions="visibleInternalActions"
+            :quick-actions="visibleQuickActions"
+            @close="toggleFullscreen">
+        </publish-field-header>
 
-        <section :class="{'p-4': fullScreenMode}">
+        <section :class="{'mt-14 p-4': fullScreenMode}">
 
             <small v-if="hasExcessRows" class="help-block text-red-500">
                 {{ __('Max Rows') }}: {{ maxRows }}
@@ -141,7 +144,18 @@ export default {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
             return `${__(this.config.display)}: ${__n(':count row|:count rows', this.value.length)}`;
-        }
+        },
+
+        internalActions() {
+            return [
+                {
+                    display: __('Toggle Fullscreen Mode'),
+                    icon: 'expand-bold',
+                    quick: true,
+                    run: this.toggleFullScreen,
+                },
+            ];
+        },
 
     },
 

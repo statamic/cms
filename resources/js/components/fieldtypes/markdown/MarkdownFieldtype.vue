@@ -12,7 +12,37 @@
             @upload-complete="uploadComplete"
         >
             <div slot-scope="{ dragging }">
-                <div class="markdown-toolbar">
+
+                <publish-field-header
+                    v-if="fullScreenMode"
+                    :config="config"
+                    :run-action="runAction"
+                    :actions="visibleActions"
+                    :internal-actions="visibleInternalActions"
+                    :quick-actions="visibleQuickActions"
+                    @close="toggleFullscreen">
+                    <div class="markdown-toolbar">
+                        <div class="markdown-modes">
+                            <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
+                            <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />
+                        </div>
+                        <div class="markdown-buttons" v-if="! isReadOnly">
+                            <button
+                                v-for="button in buttons"
+                                v-tooltip="button.text"
+                                :aria-label="button.text"
+                                @click="button.command(editor)"
+                            >
+                                <svg-icon :name="button.svg" class="w-4 h-4" />
+                            </button>
+                            <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
+                                <svg-icon name="dark-mode" class="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                </publish-field-header>
+
+                <div class="markdown-toolbar" v-if="!fullScreenMode">
                     <div class="markdown-modes">
                         <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
                         <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />

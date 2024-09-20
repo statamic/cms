@@ -9,18 +9,16 @@
                 class="group-fieldtype-container"
                 :class="{ 'grid-fullscreen bg-white': fullScreenMode }"
             >
-                <header
+                <publish-field-header
                     v-if="fullScreenMode"
-                    class="relative flex items-center justify-between py-3 rtl:pr-3 ltr:pl-3 bg-gray-200 border-b"
-                >
-                    <h2 v-text="__(config.display)" />
-                    <button
-                        @click="fullScreenMode = false"
-                        class="absolute btn-close top-2 rtl:left-5 ltr:right-5"
-                        :aria-label="__('Exit Fullscreen Mode')"
-                    >&times;</button>
-                </header>
-                <section :class="{ 'p-4': fullScreenMode }">
+                    :config="config"
+                    :run-action="runAction"
+                    :actions="visibleActions"
+                    :internal-actions="visibleInternalActions"
+                    :quick-actions="visibleQuickActions"
+                    @close="toggleFullscreen">
+                </publish-field-header>
+                <section :class="{ 'mt-14 p-4': fullScreenMode }">
                     <div :class="{ 'border dark:border-dark-900 rounded shadow-sm replicator-set': config.border }">
                         <div class="publish-fields @container" :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }">
                             <set-field

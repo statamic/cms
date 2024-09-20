@@ -9,7 +9,7 @@
             <dropdown-list class="mr-2" v-if="actions.length || internalActions.length">
                 <dropdown-actions :actions="actions" @run="runAction" v-if="actions.length" />
                 <div class="divider" />
-                <dropdown-actions :actions="internalActions" @run="runAction" v-if="actions.length" />
+                <dropdown-actions :actions="internalActions" @run="runAction" v-if="internalActions.length" />
             </dropdown-list>
             <button
                 class="btn-quick-action"
