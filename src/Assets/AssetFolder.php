@@ -133,7 +133,7 @@ class AssetFolder implements Arrayable, Contract
         });
         $cache->save();
 
-        AssetFolderDeleted::dispatch($this);
+        AssetFolderDeleted::dispatch(clone $this);
 
         return $this;
     }
@@ -182,6 +182,8 @@ class AssetFolder implements Arrayable, Contract
         $this->container()->assetFolders($oldPath)->each->move($newPath);
         $this->container()->assets($oldPath)->each->move($newPath);
         $this->delete();
+
+        $this->path($newPath);
 
         return $folder;
     }
