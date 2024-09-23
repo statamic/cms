@@ -188,20 +188,13 @@ class Tags extends BaseTags
      */
     public function submissions()
     {
-        $query = $this->submissionsQuery();
-
-        return $this->output($this->results($query));
-    }
-
-    protected function submissionsQuery()
-    {
         $query = $this->form()->querySubmissions();
 
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
 
-        return $query;
+        return $this->output($this->results($query));
     }
 
     /**
