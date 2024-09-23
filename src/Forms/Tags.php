@@ -20,7 +20,11 @@ class Tags extends BaseTags
     use Concerns\GetsFormSession,
         Concerns\GetsRedirects,
         Concerns\OutputsItems,
-        Concerns\RendersForms;
+        Concerns\RendersForms,
+        Concerns\GetsQueryResults,
+        Concerns\QueriesConditions,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes;
 
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
 
@@ -184,9 +188,20 @@ class Tags extends BaseTags
      */
     public function submissions()
     {
-        $submissions = $this->form()->submissions();
+        $query = $this->submissionsQuery();
 
-        return $this->output($submissions);
+        return $this->output($this->results($query));
+    }
+
+    protected function submissionsQuery()
+    {
+        $query = $this->form()->querySubmissions();
+
+        $this->queryConditions($query);
+        $this->queryScopes($query);
+        $this->queryOrderBys($query);
+
+        return $query;
     }
 
     /**
