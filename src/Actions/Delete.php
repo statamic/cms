@@ -2,13 +2,10 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Actions\Concerns\DeletesItems;
 use Statamic\Contracts;
 
 class Delete extends Action
 {
-    use DeletesItems;
-
     protected $dangerous = true;
 
     public static function title()
