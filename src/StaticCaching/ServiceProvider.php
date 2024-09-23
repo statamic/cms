@@ -36,7 +36,7 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         $this->app->singleton(Session::class, function ($app) {
-            $uri = $app['request']->getUri();
+            $uri = $app[Cacher::class]->getUrl($app['request']);
 
             if (config('statamic.static_caching.ignore_query_strings', false)) {
                 $uri = explode('?', $uri)[0];
@@ -85,6 +85,10 @@ class ServiceProvider extends LaravelServiceProvider
 
         Blade::directive('nocache', function ($exp) {
             return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>';
+        });
+
+        Request::macro('normalizedFullUrl', function () {
+            return app(Cacher::class)->getUrl($this);
         });
 
         Request::macro('fakeStaticCacheStatus', function (int $status) {

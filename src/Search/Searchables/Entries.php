@@ -58,6 +58,6 @@ class Entries extends Provider
 
     protected function defaultFilter()
     {
-        return fn ($item) => $item->published();
+        return fn ($item) => $item->status() === 'published';
     }
 }

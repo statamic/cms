@@ -2,7 +2,7 @@
 
     <div :class="sortableItemClass">
         <slot name="picker" />
-        <div class="replicator-set" :class="{ 'has-error': this.hasError }">
+        <div class="replicator-set" :class="{ 'has-error': this.hasError }" :data-type="config.handle">
 
             <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
