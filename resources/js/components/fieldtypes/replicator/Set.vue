@@ -187,7 +187,7 @@ export default {
             return Object.keys(this.config).length === 0;
         },
 
-        field() {
+        fieldVm() {
             let vm = this;
             while (vm !== vm.$root) {
                 if (vm.$options.name === 'replicator-fieldtype') return vm;
@@ -197,7 +197,8 @@ export default {
 
         actionPayload() { 
             return {
-                field: this.field,
+                vm: this,
+                fieldVm: this.fieldVm,
                 fieldPathPrefix: this.fieldPathPrefix,
                 index: this.index,
                 values: this.values,

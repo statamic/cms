@@ -186,11 +186,15 @@ export default {
             return this.decorationSpecs.withinSelection;
         },
 
+        fieldVm() {
+            return this.extension.options.bard
+        },
+
         actionPayload() { 
-            const field = this.extension.options.bard;
             return {
-                field: field,
-                fieldPathPrefix: field.fieldPathPrefix || field.handle,
+                vm: this,
+                fieldVm: this.fieldVm,
+                fieldPathPrefix: this.fieldVm.fieldPathPrefix || this.fieldVm.handle,
                 index: this.index,
                 values: this.values,
                 config: this.config,
