@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Query;
 
-use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\SubmissionQueryBuilder as QueryBuilderContract;
 use Statamic\Data\DataCollection;
 use Statamic\Facades;

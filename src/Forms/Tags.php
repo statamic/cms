@@ -18,13 +18,13 @@ use Statamic\Tags\Tags as BaseTags;
 class Tags extends BaseTags
 {
     use Concerns\GetsFormSession,
+        Concerns\GetsQueryResults,
         Concerns\GetsRedirects,
         Concerns\OutputsItems,
-        Concerns\RendersForms,
-        Concerns\GetsQueryResults,
         Concerns\QueriesConditions,
         Concerns\QueriesOrderBys,
-        Concerns\QueriesScopes;
+        Concerns\QueriesScopes,
+        Concerns\RendersForms;
 
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
 
