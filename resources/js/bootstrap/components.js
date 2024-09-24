@@ -58,6 +58,7 @@ import Portal from '../components/portals/Portal.vue';
 import PermissionTree from '../components/roles/PermissionTree.vue';
 import Modal from '../components/Modal.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
+import ActionModal from '../components/modals/ActionModal.vue';
 import FavoriteCreator from '../components/FavoriteCreator.vue';
 import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';
@@ -145,6 +146,7 @@ Vue.component('role-permission-tree', PermissionTree);
 // Modals
 Vue.component('modal', Modal);
 Vue.component('confirmation-modal', ConfirmationModal);
+Vue.component('action-modal', ActionModal);
 Vue.component('favorite-creator', FavoriteCreator);
 Vue.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
 Vue.component('resource-deleter', ResourceDeleter);

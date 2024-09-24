@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Utility;
+use Statamic\Http\Controllers\CP\ActionModalController;
 use Statamic\Http\Controllers\CP\AddonEditionsController;
 use Statamic\Http\Controllers\CP\AddonsController;
 use Statamic\Http\Controllers\CP\API\AddonsController as AddonsApiController;
@@ -315,6 +316,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('markdown', [MarkdownFieldtypeController::class, 'preview'])->name('markdown.preview');
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
         Route::get('dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
+    });
+
+    Route::group(['prefix' => 'action-modal', 'as' => 'action-modal'], function () {
+        Route::post('resolve', [ActionModalController::class, 'resolve'])->name('resolve');
+        Route::post('process', [ActionModalController::class, 'process'])->name('process');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {

@@ -44,7 +44,7 @@ export default {
     methods: {
 
         runAction(action) {
-            action.run(this.actionPayload);
+            Statamic.$actions.run(action, this.actionPayload);
         },
 
     }

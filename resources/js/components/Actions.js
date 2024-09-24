@@ -16,6 +16,31 @@ class Actions {
     get(name) {
         return this.actions[name] || [];
     }
+
+    async run(action, payload) {
+        if (action.fieldItems) {
+            payload.values = await this.modal(action);
+        }
+        action.run(payload);
+    }
+
+    modal(action) {
+        return new Promise((resolve) => {
+            const component = Statamic.$components.append('action-modal', {
+                props: {
+                    action
+                },
+            });
+            component.on('submit', (values) => {
+                resolve(values);
+                Statamic.$components.destroy(component.id);
+            });
+            component.on('cancel', () => {
+                resolve(false);
+                Statamic.$components.destroy(component.id);
+            });
+        });
+    }
 }
 
 export default Actions;
