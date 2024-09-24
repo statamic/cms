@@ -145,7 +145,7 @@ export default {
         internalActions() {
             return [
                 {
-                    display: __('Toggle Fullscreen Mode'),
+                    title: __('Toggle Fullscreen Mode'),
                     icon: 'expand-bold',
                     quick: true,
                     run: this.toggleFullscreen,

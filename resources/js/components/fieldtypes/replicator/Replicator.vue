@@ -162,19 +162,19 @@ export default {
         internalActions() {
             return [
                 {
-                    display: __('Expand All Sets'),
+                    title: __('Expand All Sets'),
                     icon: 'arrows-horizontal-expand',
                     quick: true,
                     run: this.expandAll,
                 },
                 {
-                    display: __('Collapse All Sets'),
+                    title: __('Collapse All Sets'),
                     icon: 'arrows-horizontal-collapse',
                     quick: true,
                     run: this.collapseAll,
                 },
                 {
-                    display: __('Toggle Fullscreen Mode'),
+                    title: __('Toggle Fullscreen Mode'),
                     icon: 'expand-bold',
                     quick: true,
                     run: this.toggleFullscreen,
