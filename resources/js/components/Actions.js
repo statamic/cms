@@ -24,14 +24,10 @@ class Actions {
         action.run(payload);
     }
 
-    modal(action) {
+    modal(props) {
         return new Promise((resolve) => {
-            const component = Statamic.$components.append('action-modal', {
-                props: {
-                    action
-                },
-            });
-            component.on('submit', (values) => {
+            const component = Statamic.$components.append('action-modal', { props });
+            component.on('confirm', (values) => {
                 resolve(values);
                 Statamic.$components.destroy(component.id);
             });

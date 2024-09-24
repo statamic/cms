@@ -1,64 +1,85 @@
 <template>
 
     <div>
+
         <confirmation-modal
-            v-if="confirming"
-            :title="action.title"
-            :danger="action.dangerous"
-            :buttonText="action.buttonText"
+            :title="title"
+            :danger="dangerous"
+            :buttonText="buttonText"
             :busy="resolving || processing"
             @confirm="confirm"
             @cancel="cancel"
         >
-            <div v-if="action.confirmationText" v-text="action.confirmationText" :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }" />
 
-            <div v-if="action.warningText" v-text="action.warningText" class="text-red-500" :class="{ 'mb-4': showDirtyWarning || action.fields.length }" />
+            <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-4': warningText || showDirtyWarning || fields.length }" />
 
-            <div v-if="showDirtyWarning" v-text="action.dirtyText" class="text-red-500" :class="{ 'mb-4': action.fields.length }" />
+            <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': showDirtyWarning || fields.length }" />
+
+            <div v-if="showDirtyWarning" v-text="dirtyText" class="text-red-500" :class="{ 'mb-4': fields.length }" />
 
             <publish-container
-                v-if="action.fields.length"
+                v-if="hasFields && !resolving"
                 name="confirm-action"
                 :blueprint="fieldset"
                 :values="values"
-                :meta="action.meta"
+                :meta="meta"
                 :errors="errors"
                 @updated="values = $event"
             >
                 <publish-fields
                     slot-scope="{ setFieldValue, setFieldMeta }"
-                    :fields="action.fields"
+                    :fields="fieldset.tabs[0].fields"
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
                 />
             </publish-container>
+
         </confirmation-modal>
+
     </div>
 
 </template>
 
 <script>
-import Action from '../data-list/Action.vue';
-
 export default {
 
-    components: {
-        Action,
-    },
-
     props: {
-        action: {
+        fields: {
             type: Object,
-            required: true,
-        }
+        },
+        title: {
+            type: String,
+        },
+        buttonText: {
+            type: String,
+        },
+        confirmationText: {
+            type: String,
+        },
+        warningText: {
+            type: String,
+        },
+        dirtyText: {
+            type: String,
+        },
+        dirtyWarningText: {
+            type: String,
+        },
+        dangerous: {
+            type: Boolean,
+            default: false,
+        },
+        bypassesDirtyWarning: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     data() {
         return {
-            resolving: true,
+            resolving: this.hasFields,
             processing: false,
-            confirming: false,
-            fieldset: {tabs:[{fields:this.action.fields}]},
+            fieldset: [],
             values: {},
             meta: {},
             error: null,
@@ -73,8 +94,12 @@ export default {
 
     computed: {
 
+        hasFields() {
+            return Object.keys(this.fields).length > 0;
+        },
+
         showDirtyWarning() {
-            return this.isDirty && this.action.dirtyWarningText && ! this.action.bypassesDirtyWarning;
+            return this.isDirty && this.dirtyWarningText && ! this.bypassesDirtyWarning;
         },
 
     },
@@ -82,11 +107,14 @@ export default {
     methods: {
 
         initialize() {
+            if (!this.hasFields) {
+                return;
+            }
             this.resolving = true;
             this.$axios.post(cp_url(`action-modal/resolve`), {
-                fieldItems: this.fieldItems,
+                fields: this.fields,
             }).then(response => {
-                this.fields = response.data.fields;
+                this.fieldset = { tabs: [{ fields: response.data.fieldset }]};
                 this.values = response.data.values;
                 this.meta = response.data.meta;
                 this.resolving = false;
@@ -94,9 +122,12 @@ export default {
         },
 
         confirm() {
+            if (!this.hasFields) {
+                return;
+            }
             this.processing = true;
             this.$axios.post(cp_url('action-modal/process'), {
-                fieldItems: this.fieldItems,
+                fields: this.fields,
                 values: this.values,
             }).then(response => {
                 this.processing = false;

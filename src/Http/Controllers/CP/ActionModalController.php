@@ -9,11 +9,11 @@ class ActionModalController extends CpController
 {
     public function resolve(Request $request)
     {
-        $fields = $this->getFields($request->fieldItems)
+        $fields = $this->getFields($request->fields)
             ->preProcess();
 
         return [
-            'fields' => $fields->toPublishArray(),
+            'fieldset' => $fields->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
         ];
@@ -21,7 +21,7 @@ class ActionModalController extends CpController
 
     public function process(Request $request)
     {
-        $fields = $this->getFields($request->fieldItems)
+        $fields = $this->getFields($request->fields)
             ->addValues($request->values);
 
         $fields->validate();
