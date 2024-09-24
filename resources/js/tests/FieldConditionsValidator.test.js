@@ -770,7 +770,6 @@ test('it tells omitter not omit nested revealer-hidden fields using `root.` in c
     expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
 });
 
-// Kick test.
 test('it tells omitter not omit nested revealer-hidden fields using `$parent.` in condition', async () => {
     Fields.setValues({
         show_more_info: false,
