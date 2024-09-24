@@ -163,7 +163,7 @@ module.exports = {
                 widest: '.15em',
             },
             minHeight: {
-                32: '8rem',
+                20: '5rem',
                 40: '10rem',
             },
             maxHeight: {

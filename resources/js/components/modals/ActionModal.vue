@@ -1,7 +1,6 @@
 <template>
 
     <div>
-
         <confirmation-modal
             :title="title"
             :danger="dangerous"
@@ -10,32 +9,33 @@
             @confirm="confirm"
             @cancel="cancel"
         >
+            <div class="min-h-20">
 
-            <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-4': warningText || showDirtyWarning || fields.length }" />
-
-            <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': showDirtyWarning || fields.length }" />
-
-            <div v-if="showDirtyWarning" v-text="dirtyText" class="text-red-500" :class="{ 'mb-4': fields.length }" />
-
-            <publish-container
-                v-if="hasFields && !resolving"
-                name="confirm-action"
-                :blueprint="fieldset"
-                :values="values"
-                :meta="meta"
-                :errors="errors"
-                @updated="values = $event"
-            >
-                <publish-fields
-                    slot-scope="{ setFieldValue, setFieldMeta }"
-                    :fields="fieldset.tabs[0].fields"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                />
-            </publish-container>
-
+                <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-4': warningText || showDirtyWarning || hasFields }" />
+    
+                <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': showDirtyWarning || hasFields }" />
+    
+                <div v-if="showDirtyWarning" v-text="dirtyText" class="text-red-500" :class="{ 'mb-4': hasFields }" />
+    
+                <publish-container
+                    v-if="hasFields && !resolving"
+                    name="confirm-action"
+                    :blueprint="fieldset"
+                    :values="values"
+                    :meta="meta"
+                    :errors="errors"
+                    @updated="values = $event"
+                >
+                    <publish-fields
+                        slot-scope="{ setFieldValue, setFieldMeta }"
+                        :fields="fieldset.tabs[0].fields"
+                        @updated="setFieldValue"
+                        @meta-updated="setFieldMeta"
+                    />
+                </publish-container>
+                
+            </div>
         </confirmation-modal>
-
     </div>
 
 </template>
@@ -70,6 +70,10 @@ export default {
             default: false,
         },
         bypassesDirtyWarning: {
+            type: Boolean,
+            default: false,
+        },
+        keepOpen: {
             type: Boolean,
             default: false,
         },
@@ -130,8 +134,8 @@ export default {
                 fields: this.fields,
                 values: this.values,
             }).then(response => {
-                this.processing = false;
-                this.$emit('confirm', response.data.values);
+                this.processing = this.keepOpen;
+                this.$emit('confirm', response.data);
             }).catch(e => {
                 this.processing = false;
                 if (e.response && e.response.status === 422) {

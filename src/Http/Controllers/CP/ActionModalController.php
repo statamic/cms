@@ -26,10 +26,14 @@ class ActionModalController extends CpController
 
         $fields->validate();
 
-        $values = $fields->process()->values();
+        $raw = $fields->process()->values();
+
+        $fields->preProcess();
 
         return [
-            'values' => $values,
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
+            'raw' => $raw,
         ];
     }
 

@@ -18,18 +18,22 @@ class Actions {
     }
 
     async run(action, payload) {
-        if (action.fieldItems) {
-            payload.values = await this.modal(action);
-        }
         action.run(payload);
     }
 
     modal(props) {
         return new Promise((resolve) => {
             const component = Statamic.$components.append('action-modal', { props });
-            component.on('confirm', (values) => {
-                resolve(values);
-                Statamic.$components.destroy(component.id);
+            component.on('confirm', (data) => {
+                if (props.keepOpen) {
+                    resolve({
+                        ...data,
+                        close: () => Statamic.$components.destroy(component.id),
+                    });                          
+                } else {
+                    resolve(data);
+                    Statamic.$components.destroy(component.id);
+                }
             });
             component.on('cancel', () => {
                 resolve(false);
