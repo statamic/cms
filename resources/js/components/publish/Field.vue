@@ -53,11 +53,11 @@
             <div class="field-dropdown" v-if="mounted && hasDropdown">
                 <quick-dropdown-list>
                     <quick-dropdown-item
-                        v-for="item, index in fieldQuickActions"
+                        v-for="action, index in fieldQuickActions"
                         :key="index"
-                        :text="item.display"
-                        :icon="item.icon"
-                        @click="fieldRunAction(item)" />
+                        :text="action.title"
+                        :icon="action.icon"
+                        @click="fieldRunAction(action)" />
                     <template #dropdown>
                         <dropdown-actions :actions="fieldActions" @run="fieldRunAction" v-if="fieldActions.length" />
                         <div class="divider" />

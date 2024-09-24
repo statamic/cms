@@ -13,11 +13,11 @@
             </dropdown-list>
             <button
                 class="btn-quick-action"
-                v-for="item, index in quickActions"
+                v-for="action, index in quickActions"
                 :key="index"
-                v-tooltip="item.display"
-                @click="runAction(item)">
-                <svg-icon :name="item.icon" class="h-4 w-4" />
+                v-tooltip="action.title"
+                @click="runAction(action)">
+                <svg-icon :name="action.icon" class="h-4 w-4" />
             </button>
         </div>
     </header>

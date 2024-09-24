@@ -83,10 +83,6 @@ export default {
             return prefix+'field_'+this.config.handle;
         },
 
-        internalActions() {
-            return [];
-        },
-
         actionPayload() { 
             return {
                 vm: this,
