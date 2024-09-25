@@ -18,18 +18,6 @@ class CollectionTreeTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use UnlinksPaths;
 
-    private $directory;
-
-    private $stache;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->stache = $this->app->make('stache');
-        $this->directory = '/path/to/structures/collections';
-    }
-
     #[Test]
     public function it_can_get_and_set_the_handle()
     {
@@ -62,19 +50,15 @@ class CollectionTreeTest extends TestCase
     #[Test]
     public function it_gets_the_path()
     {
-        $this->stache->store('collection-trees')->directory($this->directory);
-
         $collection = Collection::make('pages')->structureContents(['root' => true]);
         Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);
         $tree = $collection->structure()->makeTree('en');
-        $this->assertEquals('/path/to/structures/collections/pages.yaml', $tree->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/structures/collections/pages.yaml', $tree->path());
     }
 
     #[Test]
     public function it_gets_the_path_when_using_multisite()
     {
-        $this->stache->store('collection-trees')->directory($this->directory);
-
         $this->setSites([
             'one' => ['locale' => 'en_US', 'url' => '/one'],
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
@@ -83,7 +67,7 @@ class CollectionTreeTest extends TestCase
         $collection = Collection::make('pages')->structureContents(['root' => true]);
         Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);
         $tree = $collection->structure()->makeTree('en');
-        $this->assertEquals('/path/to/structures/collections/en/pages.yaml', $tree->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/structures/collections/en/pages.yaml', $tree->path());
     }
 
     #[Test]
