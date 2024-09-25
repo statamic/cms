@@ -139,10 +139,10 @@ abstract class AbstractCacher implements Cacher
     public function getUrls($domain = null)
     {
         $domain = $domain ?: $this->getBaseUrl();
-
-        $domain = $this->makeHash($domain);
-
-        return collect($this->cache->get($this->normalizeKey($domain.'.urls'), []));
+        
+        $key = $this->getUrlsCacheKey($domain);
+        
+        return collect($this->cache->get($key, []));
     }
 
     /**
