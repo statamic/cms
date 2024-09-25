@@ -139,7 +139,7 @@ abstract class AbstractCacher implements Cacher
     public function getUrls($domain = null)
     {
         $key = $this->getUrlsCacheKey($domain);
-        
+
         return collect($this->cache->get($key, []));
     }
 
