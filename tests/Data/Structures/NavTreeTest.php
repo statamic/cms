@@ -5,7 +5,6 @@ namespace Tests\Data\Structures;
 use Facades\Statamic\Structures\BranchIds;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Events\NavTreeDeleting;
 use Statamic\Events\NavTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
@@ -139,33 +138,5 @@ class NavTreeTest extends TestCase
         $tree = tap($nav->makeTree('en', [['id' => 'the-id', 'title' => 'Branch']]))->save();
 
         $this->assertFileDoesNotExist($tree->path());
-    }
-
-    #[Test]
-    public function it_fires_a_deleting_event()
-    {
-        Event::fake();
-
-        $nav = tap(Nav::make('links'))->save();
-        $tree = tap($nav->makeTree('en', [['id' => 'the-id', 'title' => 'Branch']]))->save();
-
-        $tree->delete();
-
-        Event::assertDispatched(NavTreeDeleting::class);
-    }
-
-    #[Test]
-    public function returning_false_in_nav_tree_deleting_stops_deleting()
-    {
-        Event::listen(NavTreeDeleting::class, function (NavTreeDeleting $event) {
-            return false;
-        });
-
-        $nav = tap(Nav::make('links'))->save();
-        $tree = tap($nav->makeTree('en', [['id' => 'the-id', 'title' => 'Branch']]))->save();
-
-        $tree->delete();
-
-        $this->assertFileExists($tree->path());
     }
 }

@@ -4,7 +4,6 @@ namespace Tests\Data\Structures;
 
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Events\CollectionTreeDeleting;
 use Statamic\Events\CollectionTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -158,41 +157,5 @@ class CollectionTreeTest extends TestCase
         $tree->save();
 
         $this->assertFileDoesNotExist($tree->path());
-    }
-
-    #[Test]
-    public function it_fires_a_deleting_event()
-    {
-        Event::fake();
-
-        $collection = Collection::make('test')->structureContents(['root' => true]);
-        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
-
-        $tree = $collection->structure()->makeTree('en');
-        $tree->save();
-
-        $tree->delete();
-
-        Event::assertDispatched(CollectionTreeDeleting::class);
-
-        $this->assertFileDoesNotExist($tree->path());
-    }
-
-    #[Test]
-    public function returning_false_in_nav_tree_deleting_stops_deleting()
-    {
-        Event::listen(CollectionTreeDeleting::class, function (CollectionTreeDeleting $event) {
-            return false;
-        });
-
-        $collection = Collection::make('test')->structureContents(['root' => true]);
-        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
-
-        $tree = $collection->structure()->makeTree('en');
-        $tree->save();
-
-        $tree->delete();
-
-        $this->assertFileExists($tree->path());
     }
 }

@@ -176,10 +176,6 @@ abstract class Tree implements Contract, Localization
 
     public function delete()
     {
-        if ($this->dispatchDeletingEvent() === false) {
-            return false;
-        }
-
         Blink::forget('collection-structure-tree*');
 
         $this->repository()->delete($this);
