@@ -11,6 +11,7 @@
             :add-section-text="addSectionText"
             :edit-section-text="editSectionText"
             :show-section-handle-field="showSectionHandleField"
+            :show-section-hide-field="showSectionHideField"
             @updated="sectionsUpdated($event)"
         />
     </div>
@@ -30,6 +31,10 @@ export default {
             type: Object,
         },
         showSectionHandleField: {
+            type: Boolean,
+            default: false,
+        },
+        showSectionHideField: {
             type: Boolean,
             default: false,
         },

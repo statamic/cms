@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Support\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\LabeledValue;
 use Statamic\GraphQL\Types\LabeledValueType;
@@ -24,6 +25,10 @@ trait HasSelectOptions
     protected function getOptions(): array
     {
         $options = $this->config('options') ?? [];
+
+        if ($options instanceof Collection) {
+            $options = $options->all();
+        }
 
         if (array_is_list($options) && ! is_array(Arr::first($options))) {
             $options = collect($options)
@@ -133,16 +138,9 @@ trait HasSelectOptions
             $value = $this->castFromBoolean($value);
         }
 
-        return $this->isOption($value)
-            ? __(Arr::get($this->config('options'), $value) ?? $value)
-            : $actualValue;
-    }
+        $option = collect($this->getOptions())->filter(fn ($option) => $option['value'] === $value)->first();
 
-    private function isOption($value)
-    {
-        return Arr::isAssoc($options = $this->config('options') ?? [])
-            ? in_array($value, array_keys($options), true)
-            : in_array($value, $options, true);
+        return $option ? $option['label'] : $actualValue;
     }
 
     private function castToBoolean($value)
@@ -205,6 +203,15 @@ trait HasSelectOptions
                     return new LabeledValue($item['value'], $item['label']);
                 })->all();
             },
+        ];
+    }
+
+    public function extraRenderableFieldData(): array
+    {
+        return [
+            'options' => collect($this->getOptions())
+                ->mapWithKeys(fn ($option) => [$option['value'] => $option['label']])
+                ->all(),
         ];
     }
 }

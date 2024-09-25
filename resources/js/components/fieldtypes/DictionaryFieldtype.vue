@@ -14,6 +14,7 @@
             :placeholder="__(config.placeholder)"
             :multiple="multiple"
             :value="selectedOptions"
+            :get-option-key="(option) => option.value"
             @input="vueSelectUpdated"
             @focus="$emit('focus')"
             @search="search"

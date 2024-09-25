@@ -29,6 +29,8 @@ class BlueprintController extends CpController
                                 'handle' => $blueprint->handle(),
                                 'namespace' => $blueprint->namespace(),
                                 'title' => $blueprint->title(),
+                                'reset_url' => $blueprint->resetUrl(),
+                                'is_resettable' => $blueprint->isResettable(),
                             ];
                         })
                         ->sortBy('title')
@@ -64,13 +66,24 @@ class BlueprintController extends CpController
             throw new NotFoundHttpException;
         }
 
-        $request->merge(['hidden' => false]); // we dont support hidden here
-
         $request->validate([
             'title' => 'required',
             'tabs' => 'array',
         ]);
 
         $this->updateBlueprint($request, $blueprint);
+    }
+
+    public function reset($namespace, $handle)
+    {
+        $blueprint = Blueprint::find($namespace.'::'.$handle);
+
+        if (! $blueprint) {
+            throw new NotFoundHttpException;
+        }
+
+        $blueprint->reset();
+
+        return response('');
     }
 }

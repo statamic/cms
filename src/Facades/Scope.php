@@ -6,9 +6,10 @@ use Illuminate\Support\Facades\Facade;
 use Statamic\Query\Scopes\ScopeRepository;
 
 /**
- * @method static mixed all()
- * @method static mixed find($key, $context = [])
- * @method static mixed filters($key, $context = [])
+ * @method static \Illuminate\Support\Collection all()
+ * @method static mixed find(string $key, array $context = [])
+ * @method static mixed filters(string $key, array $context = [])
+ * @method static ScopeRepository remove(string $handle)
  *
  * @see \Statamic\Query\Scopes\ScopeRepository
  */

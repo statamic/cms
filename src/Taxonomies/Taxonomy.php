@@ -166,6 +166,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $blueprint;
     }
 
+    public function hasVisibleTermBlueprint()
+    {
+        return $this->termBlueprints()->reject->hidden()->isNotEmpty();
+    }
+
     public function sortField()
     {
         return 'title'; // todo

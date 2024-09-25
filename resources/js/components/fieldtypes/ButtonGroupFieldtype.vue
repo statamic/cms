@@ -5,6 +5,7 @@
                 v-for="(option, $index) in options"
                 :key="$index"
                 ref="button"
+                type="button"
                 :name="name"
                 @click="update($event.target.value)"
                 :value="option.value"
@@ -39,7 +40,7 @@ export default {
 
     computed: {
         options() {
-            return this.normalizeInputOptions(this.meta.options);
+            return this.normalizeInputOptions(this.meta.options || this.config.options);
         },
 
         replicatorPreview() {
