@@ -202,11 +202,6 @@ abstract class Tree implements Contract, Localization
         //
     }
 
-    protected function dispatchDeletingEvent()
-    {
-        //
-    }
-
     public function fileData()
     {
         return [
