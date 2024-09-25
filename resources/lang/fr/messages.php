@@ -69,6 +69,7 @@ return [
     'collections_route_instructions' => 'La route contrôle le modèle d’URL des entrées. Apprenez-en plus dans la [documentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Le sens de tri par défaut.',
     'collections_taxonomies_instructions' => 'Reliez les entrées de cette collection à des taxonomies. Les champs seront automatiquement ajoutés aux formulaires.',
+    'dictionaries_countries_emojis_instructions' => 'Inclure les émojis de drapeaux dans les étiquettes ?',
     'dictionaries_countries_region_instructions' => 'Filtrez éventuellement les pays par région.',
     'duplicate_action_localizations_confirmation' => 'Êtes-vous sûr de vouloir effectuer cette action ? Les traductions seront également dupliquées.',
     'duplicate_action_warning_localization' => 'Cette entrée est une traduction. L’entrée originale sera dupliquée.',
