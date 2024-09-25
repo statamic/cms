@@ -170,6 +170,8 @@ abstract class Tree implements Contract, Localization
         $this->dispatchSavedEvent();
 
         $this->syncOriginal();
+
+        return true;
     }
 
     public function delete()
