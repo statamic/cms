@@ -270,8 +270,6 @@ class EntriesController extends CpController
             $saved = $entry->updateLastModified(User::current())->save();
         }
 
-        $entry = $entry->fresh();
-
         [$values] = $this->extractFromFields($entry, $blueprint);
 
         return [
