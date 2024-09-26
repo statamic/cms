@@ -237,36 +237,11 @@ class MakeAddon extends GeneratorCommand
 
         $this->files->put(base_path('composer.json'), $json);
 
-        $this->components->info("Repository added to your app's composer.json file.");
+        $this->components->info("Repository added to your app's composer.json.");
         $this->components->bulletList([
             'This allows Composer to reference your addon locally during development.',
             'When you publish your package, you should remove this from your composer.json file.',
         ]);
-
-        return $this;
-    }
-
-    /**
-     * Ensures the `minimum-stability` setting is set to `dev` in the app's composer.json file,
-     * so we can install the addon successfully.
-     *
-     * @return $this
-     */
-    protected function ensureMinimumStabilityIsDev()
-    {
-        $decoded = json_decode($this->files->get(base_path('composer.json')), true);
-
-        if (isset($decoded['minimum-stability']) && $decoded['minimum-stability'] === 'dev') {
-            return;
-        }
-
-        $decoded['minimum-stability'] = 'dev';
-
-        $json = json_encode($decoded, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-
-        $this->files->put(base_path('composer.json'), $json);
-
-        $this->components->info("Changed `minimum-stability` to `dev` in your app's composer.json file.");
 
         return $this;
     }
@@ -279,12 +254,11 @@ class MakeAddon extends GeneratorCommand
     protected function installAddon()
     {
         $this->addRepositoryPath();
-        $this->ensureMinimumStabilityIsDev();
 
         spin(
             function () {
                 try {
-                    Composer::withoutQueue()->throwOnFailure()->require($this->package);
+                    Composer::withoutQueue()->throwOnFailure()->require($this->package, '*@dev');
                 } catch (ProcessException $exception) {
                     $this->line($exception->getMessage());
                     throw new \Exception('An error was encountered while installing your addon.');
