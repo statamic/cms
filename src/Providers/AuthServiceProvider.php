@@ -12,10 +12,9 @@ use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Auth\UserProvider;
 use Statamic\Auth\UserRepositoryManager;
 use Statamic\Contracts\Auth\RoleRepository;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
-use Statamic\Contracts\Auth\User as UserContract;
-use Statamic\Facades\User;
 use Statamic\Policies;
 
 class AuthServiceProvider extends ServiceProvider
