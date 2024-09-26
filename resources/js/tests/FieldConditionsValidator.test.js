@@ -331,7 +331,7 @@ test('it can run conditions on nested data', () => {
     expect(showFieldIf({'$parent.name': 'Chewy'}, 'user.address.country')).toBe(false);
 });
 
-test('it can run conditions on nested array data using parent', () => {
+test('it can run conditions on nested array data using parent syntax', () => {
     Fields.setValues({
         name: 'Han',
         grid: [
@@ -712,7 +712,7 @@ test('it tells omitter not omit revealer-hidden fields', async () => {
     expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
 });
 
-test('it tells omitter not omit revealer-hidden fields using `$root.` in condition', async () => {
+test('it tells omitter not omit revealer-hidden fields using root syntax in condition', async () => {
     Fields.setValues({
         show_more_info: false,
         venue: false,
@@ -730,7 +730,7 @@ test('it tells omitter not omit revealer-hidden fields using `$root.` in conditi
     expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
 });
 
-test('it tells omitter not omit revealer-hidden fields using `root.` without `$` for backwards compatibility', async () => {
+test('it tells omitter not omit revealer-hidden fields using legacy root syntax for backwards compatibility', async () => {
     Fields.setValues({
         show_more_info: false,
         venue: false,
@@ -765,7 +765,7 @@ test('it tells omitter not omit nested revealer-hidden fields', async () => {
     expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
 });
 
-test('it tells omitter not omit nested revealer-hidden fields using `$root.` in condition', async () => {
+test('it tells omitter not omit nested revealer-hidden fields using root syntax in condition', async () => {
     Fields.setValues({
         show_more_info: false,
         venue: false,
@@ -782,7 +782,7 @@ test('it tells omitter not omit nested revealer-hidden fields using `$root.` in 
     expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
 });
 
-test('it tells omitter not omit nested revealer-hidden fields using `root.` in condition without `$` for backwards compatibility', async () => {
+test('it tells omitter not omit nested revealer-hidden fields using legacy root syntax for backwards compatibility', async () => {
     Fields.setValues({
         show_more_info: false,
         venue: false,
@@ -799,7 +799,7 @@ test('it tells omitter not omit nested revealer-hidden fields using `root.` in c
     expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
 });
 
-test('it tells omitter not omit nested revealer-hidden fields using `$parent.` in condition', async () => {
+test('it tells omitter not omit nested revealer-hidden fields using wat in condition', async () => {
     Fields.setValues({
         show_more_info: false,
         nested: {
