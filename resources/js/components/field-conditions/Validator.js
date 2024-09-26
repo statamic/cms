@@ -305,23 +305,26 @@ export default class {
             : lhs;
     }
 
-    getParentFieldPath() {
+    getParentFieldPath(dottedFieldPath) {
         const regex = new RegExp('(.*?[^\\.]+)(\\.[0-9]+)*\\.[^\\.]*$');
 
-        let parent = this.dottedFieldPath.replace(regex, '$1');
+        let parent = dottedFieldPath.replace(regex, '$1');
 
         return parent.includes('.')
-            ? parent.replace(regex, '$1')
+            ? parent.replace(regex, '$1$2')
             : '';
     }
 
-    resolveParentInFieldPath(fieldPath) {
-        const fieldHandle = fieldPath.replace(new RegExp('^\\$parent.'), '');
+    removeParentKeyword(dottedFieldPath) {
+        return dottedFieldPath.replace(new RegExp('^\\$parent.'), '');
+    }
 
-        const parentPath = this.getParentFieldPath();
+    resolveParentInFieldPath(dottedFieldPath) {
+        let parentPath = this.getParentFieldPath(this.dottedFieldPath);
+        let fieldPath = this.removeParentKeyword(dottedFieldPath);
 
         return parentPath
-            ? `${parentPath}.${fieldHandle}`
-            : fieldHandle;
+            ? `${parentPath}.${fieldPath}`
+            : fieldPath;
     }
 }

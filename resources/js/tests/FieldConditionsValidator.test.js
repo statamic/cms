@@ -331,33 +331,62 @@ test('it can run conditions on nested data', () => {
     expect(showFieldIf({'$parent.name': 'Chewy'}, 'user.address.country')).toBe(false);
 });
 
-test('it can run conditions on nested array data using parent syntax', () => {
+test('it can run conditions on parent data using parent syntax', () => {
     Fields.setValues({
         name: 'Han',
-        grid: [
+        replicator: [
             { text: 'Foo' },
             { text: 'Bar' },
         ],
-        nested: {
+        group: {
             name: 'Chewy',
+            text: 'Foo',
             replicator: [
                 { text: 'Foo' },
                 { text: 'Bar' },
+                {
+                    name: 'Luke',
+                    replicator: [
+                        { text: 'Foo' },
+                    ],
+                    group: {
+                        name: 'Yoda',
+                        replicator: [
+                            { text: 'Foo' },
+                        ],
+                    },
+                },
             ],
         },
     });
 
-    // Test parent works to get to top level, if parent level is indeed top level
-    expect(showFieldIf({'$parent.name': 'Han'}, 'grid.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Chewy'}, 'grid.0.text')).toBe(false);
-    expect(showFieldIf({'$parent.name': 'Han'}, 'grid.1.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Chewy'}, 'grid.1.text')).toBe(false);
+    // Test parent works from replicator to top level
+    expect(showFieldIf({'$parent.name': 'Han'}, 'replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Han'}, 'replicator.1.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'replicator.1.text')).toBe(false);
 
-    // Test parent works in nested situation, when it should not go to top level
-    expect(showFieldIf({'$parent.name': 'Han'}, 'nested.replicator.0.text')).toBe(false);
-    expect(showFieldIf({'$parent.name': 'Chewy'}, 'nested.replicator.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Han'}, 'nested.replicator.1.text')).toBe(false);
-    expect(showFieldIf({'$parent.name': 'Chewy'}, 'nested.replicator.1.text')).toBe(true);
+    // Test parent works from nested field group to top level
+    expect(showFieldIf({'$parent.name': 'Han'}, 'group.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'group.text')).toBe(false);
+
+    // Test parent works in deeply nested situations through multiple replicators and field groups
+    expect(showFieldIf({'$parent.name': 'Han'}, 'group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Han'}, 'group.replicator.1.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'group.replicator.1.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Luke'}, 'group.replicator.2.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Leia'}, 'group.replicator.2.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Yoda'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+
+    // Test parent can be chained to check upwards through multiple levels of multiple replicators and field groups
+    // expect(showFieldIf({'$parent.$parent.name': 'Luke'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    // expect(showFieldIf({'$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    // expect(showFieldIf({'$parent.$parent.$parent.name': 'Chewy'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    // expect(showFieldIf({'$parent.$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    // expect(showFieldIf({'$parent.$parent.$parent.$parent.name': 'Han'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    // expect(showFieldIf({'$parent.$parent.$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
 });
 
 test('it can run conditions on nested data using `root.` without `$` for backwards compatibility', () => {
