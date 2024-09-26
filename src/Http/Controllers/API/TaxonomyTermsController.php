@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\Term;
 use Statamic\Http\Resources\API\TermResource;
 
 class TaxonomyTermsController extends ApiController

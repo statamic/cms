@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\Entry;
 use Statamic\Http\Resources\API\EntryResource;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesTaxonomyTerms;
