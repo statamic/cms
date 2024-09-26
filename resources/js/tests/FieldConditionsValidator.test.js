@@ -331,6 +331,35 @@ test('it can run conditions on nested data', () => {
     expect(showFieldIf({'$parent.name': 'Chewy'}, 'user.address.country')).toBe(false);
 });
 
+test('it can run conditions on nested array data using parent', () => {
+    Fields.setValues({
+        name: 'Han',
+        grid: [
+            { text: 'Foo' },
+            { text: 'Bar' },
+        ],
+        nested: {
+            name: 'Chewy',
+            replicator: [
+                { text: 'Foo' },
+                { text: 'Bar' },
+            ],
+        },
+    });
+
+    // Test parent works to get to top level, if parent level is indeed top level
+    expect(showFieldIf({'$parent.name': 'Han'}, 'grid.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'grid.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Han'}, 'grid.1.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'grid.1.text')).toBe(false);
+
+    // Test parent works in nested situation, when it should not go to top level
+    expect(showFieldIf({'$parent.name': 'Han'}, 'nested.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'nested.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Han'}, 'nested.replicator.1.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'nested.replicator.1.text')).toBe(true);
+});
+
 test('it can run conditions on nested data using `root.` without `$` for backwards compatibility', () => {
     Fields.setValues({
         name: 'Han',
