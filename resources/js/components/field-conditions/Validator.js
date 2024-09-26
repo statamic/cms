@@ -210,15 +210,7 @@ export default class {
         }
 
         if (field.startsWith('$parent.')) {
-            const fieldHandle = field.replace(new RegExp('^\\$parent.'), '');
-            // Regex for fields like replicators, where the path ends with `parent_field_handle.0.field_handle`.
-            let regex = new RegExp('.[^\.]+\.[0-9]+\.[^\.]*$');
-            if (this.dottedFieldPath.match(regex)) {
-                return data_get(this.rootValues, `${this.dottedFieldPath.replace(regex, '')}.${fieldHandle}`);
-            }
-
-            // We dont’t have a regex field or similar, so the end of the field path looks like `parent_field_handle.field_handle`.
-            return data_get(this.rootValues, `${this.dottedFieldPath.replace(new RegExp('.[^\.]+\.[^\.]*$'), '')}.${fieldHandle}`);
+            return data_get(this.values, this.resolveParentInFieldPath(field));
         }
 
         return data_get(this.values, field);
@@ -311,5 +303,25 @@ export default class {
         return dottedPrefix
             ? dottedPrefix + '.' + lhs
             : lhs;
+    }
+
+    getParentFieldPath() {
+        const regex = new RegExp('(.*?[^\\.]+)(\\.[0-9]+)*\\.[^\\.]*$');
+
+        let parent = this.dottedFieldPath.replace(regex, '$1');
+
+        return parent.includes('.')
+            ? parent.replace(regex, '$1')
+            : '';
+    }
+
+    resolveParentInFieldPath(fieldPath) {
+        const fieldHandle = fieldPath.replace(new RegExp('^\\$parent.'), '');
+
+        const parentPath = this.getParentFieldPath();
+
+        return parentPath
+            ? `${parentPath}.${fieldHandle}`
+            : fieldHandle;
     }
 }
