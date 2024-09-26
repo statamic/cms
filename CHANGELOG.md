@@ -1,5 +1,23 @@
 # Release Notes
 
+## 5.27.0 (2024-09-26)
+
+### What's new
+- Dynamic asset folders [#10808](https://github.com/statamic/cms/issues/10808) by @jasonvarga
+- Add Nav & Collection Tree Saving events [#10625](https://github.com/statamic/cms/issues/10625) by @ryanmitchell
+
+### What's fixed
+- Fix User Accessor in Password Reset [#10848](https://github.com/statamic/cms/issues/10848) by @samharvey44
+- Allow for large field configs in filters [#10822](https://github.com/statamic/cms/issues/10822) by @duncanmcclean
+- Fix textarea UI bug [#10850](https://github.com/statamic/cms/issues/10850) by @aerni
+- Use existing getUrlsCacheKey method instead of duplicating the creation logic [#10836](https://github.com/statamic/cms/issues/10836) by @dadaxr
+- Fix issue when using Livewire with full measure static caching [#10306](https://github.com/statamic/cms/issues/10306) by @aerni
+- German translations [#10849](https://github.com/statamic/cms/issues/10849) by @helloDanuk
+- French translations [#10839](https://github.com/statamic/cms/issues/10839) by @ebeauchamps
+- Bump rollup from 3.29.4 to 3.29.5 [#10851](https://github.com/statamic/cms/issues/10851) by @dependabot
+
+
+
 ## 5.26.0 (2024-09-24)
 
 ### What's new
