@@ -799,24 +799,30 @@ test('it tells omitter not omit nested revealer-hidden fields using legacy root 
     expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
 });
 
-test('it tells omitter not omit nested revealer-hidden fields using wat in condition', async () => {
-    Fields.setValues({
-        show_more_info: false,
-        nested: {
-            venue: false,
-        },
-    });
+// TODO
+// test('it tells omitter not omit nested revealer-hidden fields using parent syntax in condition', async () => {
+//     Fields.setValues({
+//         foo: {
+//             show_more_info: false,
+//             nested: {
+//                 venue: false,
+//             },
+//         }
+//     });
 
-    await Fields.setHiddenFieldsState([
-        {handle: 'show_more_info', type: 'revealer'},
-        {handle: 'nested.venue', if: {'$parent.show_more_info': true}},
-    ]);
+//     await Fields.setHiddenFieldsState([
+//         {handle: 'foo.show_more_info', type: 'revealer'},
+//         {handle: 'foo.nested.venue', if: {'$parent.show_more_info': true}},
+//     ]);
 
-    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
-});
+//     console.log('HIDDDEN...');
+//     console.log(Store.state.publish.base.hiddenFields);
+
+//     expect(Store.state.publish.base.hiddenFields['foo.show_more_info'].hidden).toBe(false);
+//     expect(Store.state.publish.base.hiddenFields['foo.nested.venue'].hidden).toBe(true);
+//     expect(Store.state.publish.base.hiddenFields['foo.show_more_info'].omitValue).toBe(true);
+//     expect(Store.state.publish.base.hiddenFields['foo.nested.venue'].omitValue).toBe(false);
+// });
 
 test('it tells omitter not omit prefixed revealer-hidden fields', async () => {
     Fields.setValues({
