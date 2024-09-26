@@ -9,7 +9,7 @@ class RenameAssetFolder extends Action
 {
     public static function title()
     {
-        return __('Rename');
+        return __('Rename Folder');
     }
 
     public function visibleTo($item)
