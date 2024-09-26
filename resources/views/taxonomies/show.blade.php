@@ -33,12 +33,12 @@
                 @endcan
             </dropdown-list>
 
-            @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
+            @if($canCreate)
                 <create-term-button
                     url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
                     :blueprints="{{ $blueprints->toJson() }}">
                 </create-term-button>
-            @endcan
+            @endif
         </div>
     </header>
 

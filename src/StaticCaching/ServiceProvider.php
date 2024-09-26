@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Facades\Cascade;
+use Statamic\StaticCaching\NoCache\DatabaseSession;
 use Statamic\StaticCaching\NoCache\Session;
 
 class ServiceProvider extends LaravelServiceProvider
@@ -35,13 +36,17 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         $this->app->singleton(Session::class, function ($app) {
-            $uri = $app['request']->getUri();
+            $uri = $app[Cacher::class]->getUrl($app['request']);
 
             if (config('statamic.static_caching.ignore_query_strings', false)) {
                 $uri = explode('?', $uri)[0];
             }
 
-            return new Session($uri);
+            return match ($driver = config('statamic.static_caching.nocache', 'cache')) {
+                'cache' => new Session($uri),
+                'database' => new DatabaseSession($uri),
+                default => throw new \Exception('Nocache driver ['.$driver.'] is not supported.'),
+            };
         });
 
         $this->app->bind(UrlExcluder::class, function ($app) {
@@ -80,6 +85,10 @@ class ServiceProvider extends LaravelServiceProvider
 
         Blade::directive('nocache', function ($exp) {
             return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>';
+        });
+
+        Request::macro('normalizedFullUrl', function () {
+            return app(Cacher::class)->getUrl($this);
         });
 
         Request::macro('fakeStaticCacheStatus', function (int $status) {

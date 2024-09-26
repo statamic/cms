@@ -2,18 +2,23 @@
 
 namespace Statamic\Facades\CP;
 
+use Closure;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\CP\Navigation\Nav as Navigation;
+use Statamic\CP\Navigation\NavItem;
 
 /**
- * @method static void extend(\Closure $callback)
- * @method static \Statamic\CP\Navigation\NavItem create($name)
- * @method static mixed item($name)
- * @method static mixed findOrCreate($section, $name)
- * @method static self remove($section, $name = null)
+ * @method static void extend(Closure $callback)
+ * @method static NavItem create($name)
+ * @method static NavItem item(string $name)
+ * @method static NavItem|null find(string $section, string $name)
+ * @method static NavItem|null findOrCreate(string $section, string $name)
+ * @method static self remove(string $section, $name = null)
+ * @method static Collection build()
+ * @method static Collection buildWithoutPreferences()
+ * @method static void clearCachedUrls()
  * @method static array items()
- * @method static \Illuminate\Support\Collection build()
- * @method static self buildChildren()
  *
  * @see \Statamic\CP\Navigation\Nav
  */
