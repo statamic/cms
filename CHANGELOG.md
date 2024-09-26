@@ -1,5 +1,32 @@
 # Release Notes
 
+## 5.26.0 (2024-09-24)
+
+### What's new
+- Improve feedback when action fails [#10264](https://github.com/statamic/cms/issues/10264) by @simonerd
+- Add option to exclude flag emojis from countries dictionary [#10817](https://github.com/statamic/cms/issues/10817) by @jasonvarga
+- Add entry password protection [#10800](https://github.com/statamic/cms/issues/10800) by @aerni
+- Add submitting state for confirmation modal to better visualise a running action [#10699](https://github.com/statamic/cms/issues/10699) by @morhi
+
+### What's fixed
+- Fix CP nav ordering for when preferences are stored in JSON SQL columns [#10809](https://github.com/statamic/cms/issues/10809) by @jesseleite
+- Fix toasts in actions not being shown [#10828](https://github.com/statamic/cms/issues/10828) by @jasonvarga
+- Fix small typo [#10824](https://github.com/statamic/cms/issues/10824) by @1stevengrant
+- Improve addons listing [#10812](https://github.com/statamic/cms/issues/10812) by @duncanmcclean
+- Prevent concurrent requests to the Marketplace API [#10815](https://github.com/statamic/cms/issues/10815) by @duncanmcclean
+- Make limit modifier work with query builders [#10818](https://github.com/statamic/cms/issues/10818) by @aerni
+- Hide Visit URL and Live Preview if term has no template [#10789](https://github.com/statamic/cms/issues/10789) by @edalzell
+- Set path on asset folder when moving [#10813](https://github.com/statamic/cms/issues/10813) by @jasonvarga
+- Reset previous filters when you finish reordering [#10797](https://github.com/statamic/cms/issues/10797) by @duncanmcclean
+- Update CSRF token when session expiry login modal is closed [#10794](https://github.com/statamic/cms/issues/10794) by @jasonvarga
+- Fix broken state of "Parent" field when saving Home entry with Revisions [#10726](https://github.com/statamic/cms/issues/10726) by @duncanmcclean
+- Improve ImageGenerator Exception handling [#10786](https://github.com/statamic/cms/issues/10786) by @indykoning
+- When augmenting terms, `entries_count` should only consider published entries [#10727](https://github.com/statamic/cms/issues/10727) by @duncanmcclean
+- Prevent saving value of `parent` field to entry data [#10725](https://github.com/statamic/cms/issues/10725) by @duncanmcclean
+- Bump vite from 4.5.3 to 4.5.5 [#10810](https://github.com/statamic/cms/issues/10810) by @dependabot
+
+
+
 ## 5.25.0 (2024-09-10)
 
 ### What's new

@@ -53,7 +53,21 @@ class DeleteMultisiteEntry extends Delete
             $items->each->deleteDescendants();
         }
 
-        $items->each->delete();
+        $failures = $items->reject(fn ($entry) => $entry->delete());
+        $total = $items->count();
+
+        if ($failures->isNotEmpty()) {
+            $success = $total - $failures->count();
+            if ($total === 1) {
+                throw new \Exception(__('Entry could not be deleted'));
+            } elseif ($success === 0) {
+                throw new \Exception(__('Entries could not be deleted'));
+            } else {
+                throw new \Exception(__(':success/:total entries were deleted', ['total' => $total, 'success' => $success]));
+            }
+        }
+
+        return trans_choice('Entry deleted|Entries deleted', $total);
     }
 
     private function canChangeBehavior(): bool

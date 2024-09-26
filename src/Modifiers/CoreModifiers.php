@@ -1452,6 +1452,10 @@ class CoreModifiers extends Modifier
     {
         $limit = Arr::get($params, 0, 0);
 
+        if (Compare::isQueryBuilder($value)) {
+            return $value->limit($limit);
+        }
+
         if ($value instanceof Collection) {
             return $value->take($limit);
         }

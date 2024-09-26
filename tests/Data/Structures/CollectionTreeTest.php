@@ -2,7 +2,9 @@
 
 namespace Tests\Data\Structures;
 
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\CollectionTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Structures\CollectionTree;
@@ -15,16 +17,6 @@ class CollectionTreeTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use UnlinksPaths;
-
-    private $directory;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $stache = $this->app->make('stache');
-        $stache->store('collection-trees')->directory($this->directory = '/path/to/structures/collections');
-    }
 
     #[Test]
     public function it_can_get_and_set_the_handle()
@@ -61,7 +53,7 @@ class CollectionTreeTest extends TestCase
         $collection = Collection::make('pages')->structureContents(['root' => true]);
         Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);
         $tree = $collection->structure()->makeTree('en');
-        $this->assertEquals('/path/to/structures/collections/pages.yaml', $tree->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/structures/collections/pages.yaml', $tree->path());
     }
 
     #[Test]
@@ -75,7 +67,7 @@ class CollectionTreeTest extends TestCase
         $collection = Collection::make('pages')->structureContents(['root' => true]);
         Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);
         $tree = $collection->structure()->makeTree('en');
-        $this->assertEquals('/path/to/structures/collections/en/pages.yaml', $tree->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/structures/collections/en/pages.yaml', $tree->path());
     }
 
     #[Test]
@@ -117,5 +109,37 @@ class CollectionTreeTest extends TestCase
         $this->assertEquals(['1.3'], $diff->removed());
         $this->assertEquals(['1.1', '2.2', '2.3'], $diff->moved());
         $this->assertEquals(['1.1'], $diff->ancestryChanged());
+    }
+
+    #[Test]
+    public function it_fires_a_saving_event()
+    {
+        Event::fake();
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en');
+        $tree->save();
+
+        Event::assertDispatched(CollectionTreeSaving::class);
+
+        $this->assertFileExists($tree->path());
+    }
+
+    #[Test]
+    public function returning_false_in_collection_tree_saving_stops_saving()
+    {
+        Event::listen(CollectionTreeSaving::class, function (CollectionTreeSaving $event) {
+            return false;
+        });
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en');
+        $tree->save();
+
+        $this->assertFileDoesNotExist($tree->path());
     }
 }
