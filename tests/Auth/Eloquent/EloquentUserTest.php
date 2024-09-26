@@ -315,7 +315,7 @@ class EloquentUserTest extends TestCase
         $model = $user->model();
 
         Gate::define('some_ability', function ($user) {
-            return $user->shouldPass;
+            return false;
         });
 
         $result = Gate::forUser($model)->check('some_ability');
