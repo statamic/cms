@@ -210,7 +210,7 @@ export default class {
         }
 
         if (field.startsWith('$parent.')) {
-            return data_get(this.values, this.resolveParentInFieldPath(field));
+            return data_get(this.rootValues, this.resolveParentInFieldPath(field));
         }
 
         return data_get(this.values, field);
