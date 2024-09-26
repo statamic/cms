@@ -25,13 +25,12 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="assets-fieldtype-picker"
+                    class="assets-fieldtype-picker space-x-4"
                     :class="{
                         'is-expanded': expanded,
                         'bard-drag-handle': isInBardField
                     }"
                 >
-
                     <button
                         v-if="canBrowse"
                         :class="{'opacity-0': dragging }"
@@ -43,25 +42,21 @@
                         <svg-icon name="folder-image" class="w-4 h-4 text-gray-800 dark:text-dark-150"></svg-icon>
                         {{ __('Browse') }}
                     </button>
-
-                    <p class="asset-upload-control" v-if="canUpload">
+                    <p class="flex-1 asset-upload-control" v-if="canUpload">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
                         <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
                         <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
                     </p>
-
-                    <div class="absolute top-[16px] right-[10px]">
-                        <dropdown-list v-if="meta.rename_folder">
-                            <data-list-inline-actions
-                                :item="folder"
-                                :url="meta.rename_folder.url"
-                                :actions="[meta.rename_folder.action]"
-                                @completed="renameFolderActionCompleted"
-                            />
-                        </dropdown-list>
-                    </div>
+                    <dropdown-list v-if="meta.rename_folder">
+                        <data-list-inline-actions
+                            :item="folder"
+                            :url="meta.rename_folder.url"
+                            :actions="[meta.rename_folder.action]"
+                            @completed="renameFolderActionCompleted"
+                        />
+                    </dropdown-list>
                 </div>
 
                 <uploads
