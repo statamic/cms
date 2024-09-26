@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
@@ -302,5 +303,23 @@ class EloquentUserTest extends TestCase
 
         $this->assertFalse($user->super);
         $this->assertFalse($user->model()->super);
+    }
+
+    #[Test]
+    public function it_doesnt_run_gate_checks_on_non_statamic_users()
+    {
+        $user = $this->makeUser();
+        $user->super = true;
+        $user->save();
+
+        $model = $user->model();
+
+        Gate::define('some_ability', function ($user) {
+            return $user->shouldPass;
+        });
+
+        $result = Gate::forUser($model)->check('some_ability');
+
+        $this->assertFalse($result);
     }
 }
