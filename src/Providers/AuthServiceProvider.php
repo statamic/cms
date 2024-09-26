@@ -14,6 +14,7 @@ use Statamic\Auth\UserRepositoryManager;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
 use Statamic\Policies;
 
@@ -84,11 +85,19 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::before(function ($user, $ability) {
-            return optional(User::fromUser($user))->isSuper() ? true : null;
+            if (! $user instanceof UserContract) {
+                return null;
+            }
+
+            return $user->isSuper() ? true : null;
         });
 
         Gate::after(function ($user, $ability) {
-            return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
+            if (! $user instanceof UserContract) {
+                return null;
+            }
+
+            return $user->hasPermission($ability) === true ? true : null;
         });
 
         foreach ($this->policies as $key => $policy) {
