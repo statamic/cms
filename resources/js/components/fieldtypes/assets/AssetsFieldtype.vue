@@ -52,14 +52,16 @@
                         <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
                     </p>
 
-                    <dropdown-list v-if="meta.rename_folder">
-                        <data-list-inline-actions
-                            :item="folder"
-                            :url="meta.rename_folder.url"
-                            :actions="[meta.rename_folder.action]"
-                            @completed="renameFolderActionCompleted"
-                        />
-                    </dropdown-list>
+                    <div class="absolute top-[16px] right-[10px]">
+                        <dropdown-list v-if="meta.rename_folder">
+                            <data-list-inline-actions
+                                :item="folder"
+                                :url="meta.rename_folder.url"
+                                :actions="[meta.rename_folder.action]"
+                                @completed="renameFolderActionCompleted"
+                            />
+                        </dropdown-list>
+                    </div>
                 </div>
 
                 <uploads
