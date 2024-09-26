@@ -33,11 +33,9 @@ class CollectionEntriesController extends ApiController
         );
     }
 
-    public function show($collection, $handle)
+    public function show($collection, $entry)
     {
         $this->abortIfDisabled();
-
-        $entry = Entry::find($handle);
 
         $this->abortIfInvalid($entry, $collection);
         $this->abortIfUnpublished($entry);

@@ -32,8 +32,6 @@ class TaxonomyTermsController extends ApiController
     {
         $this->abortIfDisabled();
 
-        $term = Term::find($taxonomy.'::'.$term);
-
         throw_unless($term, new NotFoundHttpException);
 
         return app(TermResource::class)::make($term);
