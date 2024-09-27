@@ -381,12 +381,12 @@ test('it can run conditions on parent data using parent syntax', () => {
     expect(showFieldIf({'$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
 
     // Test parent can be chained to check upwards through multiple levels of multiple replicators and field groups
-    // expect(showFieldIf({'$parent.$parent.name': 'Luke'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
-    // expect(showFieldIf({'$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
-    // expect(showFieldIf({'$parent.$parent.$parent.name': 'Chewy'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
-    // expect(showFieldIf({'$parent.$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
-    // expect(showFieldIf({'$parent.$parent.$parent.$parent.name': 'Han'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
-    // expect(showFieldIf({'$parent.$parent.$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.$parent.name': 'Luke'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.$parent.$parent.name': 'Chewy'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.$parent.$parent.$parent.name': 'Han'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.$parent.$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
 });
 
 test('it can run conditions on nested data using `root.` without `$` for backwards compatibility', () => {
