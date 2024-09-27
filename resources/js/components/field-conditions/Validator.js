@@ -1,4 +1,5 @@
 import Converter from './Converter.js';
+import ParentResolver from './ParentResolver.js';
 import { KEYS } from './Constants.js';
 import { data_get } from  '../../bootstrap/globals.js'
 import isString from 'underscore/modules/isString.js'
@@ -209,10 +210,6 @@ export default class {
             return data_get(this.rootValues, field.replace(new RegExp('^\\$?root\\.'), ''));
         }
 
-        if (field.startsWith('$parent.')) {
-            return data_get(this.rootValues, this.resolveParentInFieldPath(field));
-        }
-
         return data_get(this.values, field);
     }
 
@@ -298,33 +295,8 @@ export default class {
             return lhs.replace(new RegExp('^\\$?root\\.'), '');
         }
 
-        // TODO: Also handle `$parent` usage?
-
         return dottedPrefix
             ? dottedPrefix + '.' + lhs
             : lhs;
-    }
-
-    getParentFieldPath(dottedFieldPath) {
-        const regex = new RegExp('(.*?[^\\.]+)(\\.[0-9]+)*\\.[^\\.]*$');
-
-        let parent = dottedFieldPath.replace(regex, '$1');
-
-        return parent.includes('.')
-            ? parent.replace(regex, '$1$2')
-            : '';
-    }
-
-    removeParentKeyword(dottedFieldPath) {
-        return dottedFieldPath.replace(new RegExp('^\\$parent.'), '');
-    }
-
-    resolveParentInFieldPath(dottedFieldPath) {
-        let parentPath = this.getParentFieldPath(this.dottedFieldPath);
-        let fieldPath = this.removeParentKeyword(dottedFieldPath);
-
-        return parentPath
-            ? `${parentPath}.${fieldPath}`
-            : fieldPath;
     }
 }
