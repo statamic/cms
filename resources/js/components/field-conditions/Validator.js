@@ -295,6 +295,10 @@ export default class {
     }
 
     relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix) {
+        if (lhs.startsWith('$parent.')) {
+            lhs = new ParentResolver(this.dottedFieldPath).resolve(lhs);
+        }
+
         if (lhs.startsWith('$root.') || lhs.startsWith('root.')) {
             return lhs.replace(new RegExp('^\\$?root\\.'), '');
         }
