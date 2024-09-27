@@ -206,6 +206,10 @@ export default class {
     }
 
     getFieldValue(field) {
+        if (field.startsWith('$parent.')) {
+            field = new ParentResolver(this.dottedFieldPath).resolve(field);
+        }
+
         if (field.startsWith('$root.') || field.startsWith('root.')) {
             return data_get(this.rootValues, field.replace(new RegExp('^\\$?root\\.'), ''));
         }
