@@ -832,30 +832,78 @@ test('it tells omitter not omit nested revealer-hidden fields using legacy root 
     expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
 });
 
-// TODO
-// test('it tells omitter not omit nested revealer-hidden fields using parent syntax in condition', async () => {
-//     Fields.setValues({
-//         foo: {
-//             show_more_info: false,
-//             nested: {
-//                 venue: false,
-//             },
-//         }
-//     });
+test('it tells omitter not omit nested revealer-hidden fields using parent syntax in condition', async () => {
+    Fields.setValues({
+        top_level_show_more_info: false,
+        replicator: [
+            { text: 'Foo' },
+            { text: 'Bar' },
+        ],
+        group: {
+            show_more_info: false,
+            replicator: [
+                { text: 'Foo' },
+                { text: 'Bar' },
+                {
+                    show_more_info: false,
+                    replicator: [
+                        { text: 'Foo' },
+                    ],
+                    group: {
+                        show_more_info: false,
+                        replicator: [
+                            { text: 'Foo' },
+                        ],
+                    },
+                },
+            ],
+        },
+    });
 
-//     await Fields.setHiddenFieldsState([
-//         {handle: 'foo.show_more_info', type: 'revealer'},
-//         {handle: 'foo.nested.venue', if: {'$parent.show_more_info': true}},
-//     ]);
+    // Track revealer toggles
+    await Fields.setHiddenFieldsState([
+        {handle: 'top_level_show_more_info', type: 'revealer'},
+        {handle: 'group.show_more_info', type: 'revealer'},
+        {handle: 'group.replicator.2.show_more_info', type: 'revealer'},
+        {handle: 'group.replicator.2.group.show_more_info', type: 'revealer'},
+    ]);
 
-//     console.log('HIDDDEN...');
-//     console.log(Store.state.publish.base.hiddenFields);
+    // Set revealer hidden fields using `$parent` syntax
+    await Fields.setHiddenFieldsState([
+        {handle: 'replicator.1.text', if: {'$parent.top_level_show_more_info': true}},
+        {handle: 'group.replicator.1.text', if: {'$parent.show_more_info': true}},
+    ]);
 
-//     expect(Store.state.publish.base.hiddenFields['foo.show_more_info'].hidden).toBe(false);
-//     expect(Store.state.publish.base.hiddenFields['foo.nested.venue'].hidden).toBe(true);
-//     expect(Store.state.publish.base.hiddenFields['foo.show_more_info'].omitValue).toBe(true);
-//     expect(Store.state.publish.base.hiddenFields['foo.nested.venue'].omitValue).toBe(false);
-// });
+    // Set revealer hidden fields using chained `$parent` syntax
+    await Fields.setHiddenFieldsState([
+        {handle: 'group.replicator.2.replicator.0.text', if: {'$parent.$parent.$parent.top_level_show_more_info': true}},
+        {handle: 'group.replicator.2.group.replicator.0.text', if: {'$parent.$parent.$parent.$parent.top_level_show_more_info': true}},
+    ]);
+
+    // Ensure revealer toggles should definitely hidden and omited from submitted payload
+    expect(Store.state.publish.base.hiddenFields['top_level_show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['top_level_show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.show_more_info'].omitValue).toBe(true);
+
+    // Ensure revealer hidden fields should be hiddden, but not omitted
+    expect(Store.state.publish.base.hiddenFields['replicator.1.text'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['replicator.1.text'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.1.text'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.1.text'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.replicator.0.text'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.replicator.0.text'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.replicator.0.text'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.replicator.0.text'].omitValue).toBe(false);
+
+    // Just a few extra assertions to ensure only sets with revealer conditions should be affected
+    expect('replicator.0.text' in Store.state.publish.base.hiddenFields).toBe(false);
+    expect('group.replicator.0.text' in Store.state.publish.base.hiddenFields).toBe(false);
+});
 
 test('it tells omitter not omit prefixed revealer-hidden fields', async () => {
     Fields.setValues({
