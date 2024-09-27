@@ -36,10 +36,12 @@ class OAuthController
             return $this->redirectToProvider($request, $provider);
         }
 
-        if (config('statamic.oauth.create_user', true)) {
-            $user = $oauth->findOrCreateUser($providerUser);
-        } else {
-            $user = $oauth->findUser($providerUser);
+        if ($user = $oauth->findUser($providerUser)) {
+            if (config('statamic.oauth.merge_user_data', true)) {
+                $user = $oauth->mergeUser($user, $providerUser);
+            }
+        } elseif (config('statamic.oauth.create_user', true)) {
+            $user = $oauth->createUser($providerUser);
         }
 
         if ($user) {
