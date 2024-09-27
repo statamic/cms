@@ -35,7 +35,7 @@ test('it converts from blueprint format and applies prefixes', () => {
     expect(converted).toEqual(expected);
 });
 
-test('it converts from blueprint format and does not apply prefix to `$root.` field conditions', () => {
+test('it converts from blueprint format and does not apply prefix to field conditions with root syntax', () => {
     let converted = FieldConditionsConverter.fromBlueprint({
         'name': 'isnt joe',
         '$root.title': 'not empty',
@@ -49,7 +49,7 @@ test('it converts from blueprint format and does not apply prefix to `$root.` fi
     expect(converted).toEqual(expected);
 });
 
-test('it converts from blueprint format and does not apply prefix to `root.` field conditions without `$` for backwards compatibility', () => {
+test('it converts from blueprint format and does not apply prefix to field conditions with legacy root syntax for backwards compatibility', () => {
     let converted = FieldConditionsConverter.fromBlueprint({
         'name': 'isnt joe',
         'root.title': 'not empty',
@@ -63,7 +63,7 @@ test('it converts from blueprint format and does not apply prefix to `root.` fie
     expect(converted).toEqual(expected);
 });
 
-test('it converts from blueprint format and does not apply prefix to `$parent.` field conditions', () => {
+test('it converts from blueprint format and does not apply prefix to field conditions with parent syntax', () => {
     let converted = FieldConditionsConverter.fromBlueprint({
         'name': 'isnt joe',
         '$parent.title': 'not empty',
