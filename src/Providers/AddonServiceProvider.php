@@ -240,7 +240,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootTags()
     {
-        foreach ($this->tags as $class) {
+        $tags = collect($this->tags)
+            ->merge($this->autoloadFilesFromFolder('Tags', Tags::class))
+            ->unique();
+
+        foreach ($tags as $class) {
             $class::register();
         }
 
@@ -249,7 +253,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootScopes()
     {
-        foreach ($this->scopes as $class) {
+        $scopes = collect($this->scopes)
+            ->merge($this->autoloadFilesFromFolder('Scopes', Scope::class))
+            ->unique();
+
+        foreach ($scopes as $class) {
             $class::register();
         }
 
@@ -258,7 +266,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootActions()
     {
-        foreach ($this->actions as $class) {
+        $actions = collect($this->actions)
+            ->merge($this->autoloadFilesFromFolder('Actions', Action::class))
+            ->unique();
+
+        foreach ($actions as $class) {
             $class::register();
         }
 
@@ -276,7 +288,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldtypes()
     {
-        foreach ($this->fieldtypes as $class) {
+        $fieldtypes = collect($this->fieldtypes)
+            ->merge($this->autoloadFilesFromFolder('Fieldtypes', Fieldtype::class))
+            ->unique();
+
+        foreach ($fieldtypes as $class) {
             $class::register();
         }
 
@@ -285,7 +301,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootModifiers()
     {
-        foreach ($this->modifiers as $class) {
+        $modifiers = collect($this->modifiers)
+            ->merge($this->autoloadFilesFromFolder('Modifiers', Modifier::class))
+            ->unique();
+
+        foreach ($modifiers as $class) {
             $class::register();
         }
 
@@ -294,7 +314,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootWidgets()
     {
-        foreach ($this->widgets as $class) {
+        $widgets = collect($this->widgets)
+            ->merge($this->autoloadFilesFromFolder('Widgets', Widget::class))
+            ->unique();
+
+        foreach ($widgets as $class) {
             $class::register();
         }
 
@@ -322,7 +346,13 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootCommands()
     {
         if ($this->app->runningInConsole()) {
-            $this->commands($this->commands);
+            $commands = collect($this->commands)
+                ->merge($this->autoloadFilesFromFolder('Commands', Command::class))
+                ->merge($this->autoloadFilesFromFolder('Console/Commands', Command::class))
+                ->unique()
+                ->all();
+
+            $this->commands($commands);
         }
 
         return $this;
@@ -507,7 +537,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootUpdateScripts()
     {
-        foreach ($this->updateScripts as $class) {
+        $scripts = collect($this->updateScripts)
+            ->merge($this->autoloadFilesFromFolder('UpdateScripts', UpdateScript::class))
+            ->unique();
+
+        foreach ($scripts as $class) {
             $class::register($this->getAddon()->package());
         }
 
@@ -666,5 +700,27 @@ abstract class AddonServiceProvider extends ServiceProvider
         );
 
         return $this;
+    }
+
+    protected function autoloadFilesFromFolder($folder, $requiredClass)
+    {
+        $addon = $this->getAddon();
+        $path = $addon->directory().$addon->autoload().'/'.$folder;
+
+        if (! $this->app['files']->exists($path)) {
+            return [];
+        }
+
+        $autoloadable = [];
+
+        foreach ($this->app['files']->files($path) as $file) {
+            $class = $file->getBasename('.php');
+            $fqcn = $this->namespace().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
+            if (is_subclass_of($fqcn, $requiredClass)) {
+                $autoloadable[] = $fqcn;
+            }
+        }
+
+        return $autoloadable;
     }
 }
