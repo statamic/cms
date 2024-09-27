@@ -36,14 +36,22 @@ class OAuthController
             return $this->redirectToProvider($request, $provider);
         }
 
-        $user = $oauth->findOrCreateUser($providerUser);
+        if (config('statamic.oauth.create_user', true)) {
+            $user = $oauth->findOrCreateUser($providerUser);
+        } else {
+            $user = $oauth->findUser($providerUser);
+        }
 
-        session()->put('oauth-provider', $provider);
+        if ($user) {
+            session()->put('oauth-provider', $provider);
 
-        Auth::guard($request->session()->get('statamic.oauth.guard'))
-            ->login($user, config('statamic.oauth.remember_me', true));
+            Auth::guard($request->session()->get('statamic.oauth.guard'))
+                ->login($user, config('statamic.oauth.remember_me', true));
 
-        return redirect()->to($this->successRedirectUrl());
+            return redirect()->to($this->successRedirectUrl());
+        } else {
+            return redirect()->to($this->unauthorizedRedirectUrl());
+        }
     }
 
     protected function successRedirectUrl()
@@ -59,5 +67,10 @@ class OAuthController
         parse_str($query, $query);
 
         return Arr::get($query, 'redirect', $default);
+    }
+
+    protected function unauthorizedRedirectUrl()
+    {
+        return config('statamic.oauth.unauthorized_redirect', '/cp/auth/unauthorized');
     }
 }
