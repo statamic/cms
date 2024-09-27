@@ -2,12 +2,18 @@
 
 namespace Tests\Tags\Form;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
 use Statamic\Statamic;
 
 class FormCreateTest extends FormTestCase
 {
-    /** @test */
+    #[Test]
     public function it_renders_form()
     {
         $forms = [
@@ -28,7 +34,7 @@ class FormCreateTest extends FormTestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_params()
     {
         $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /form:contact }}');
@@ -38,7 +44,7 @@ class FormCreateTest extends FormTestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="/errors" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_redirects_to_anchor()
     {
         $output = $this->tag('{{ form:contact redirect="#form" error_redirect="#form" }}{{ /form:contact }}');
@@ -47,7 +53,7 @@ class FormCreateTest extends FormTestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_fields_array()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
@@ -68,7 +74,7 @@ EOT
         $this->assertEquals(['Full Name', 'Email Address', 'Message'], $fieldOrder[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_text_field()
     {
         $this->assertFieldRendersHtml([
@@ -92,7 +98,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_text_field_with_custom_input_type()
     {
         $this->assertFieldRendersHtml([
@@ -118,7 +124,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_textarea_field()
     {
         $this->assertFieldRendersHtml([
@@ -142,7 +148,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_checkboxes_field()
     {
         $this->assertFieldRendersHtml([
@@ -184,7 +190,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_inline_checkboxes_field()
     {
         $this->assertFieldRendersHtml([
@@ -224,7 +230,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_radio_field()
     {
         $this->assertFieldRendersHtml([
@@ -266,7 +272,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_inline_radio_field()
     {
         $this->assertFieldRendersHtml([
@@ -306,7 +312,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_select_field()
     {
         $this->assertFieldRendersHtml([
@@ -350,7 +356,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_multiple_select_field()
     {
         $this->assertFieldRendersHtml([
@@ -394,7 +400,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_asset_field()
     {
         $this->assertFieldRendersHtml([
@@ -409,7 +415,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_multiple_assets_field()
     {
         $this->assertFieldRendersHtml([
@@ -423,7 +429,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_field_with_fallback_to_default_partial()
     {
         $this->assertFieldRendersHtml([
@@ -447,7 +453,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_sections_array()
     {
         $this->createForm([
@@ -502,7 +508,7 @@ EOT
         $this->assertStringContainsString('<div class="fields">alpha,bravo,charlie,delta,echo,fox</div>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_section_instructions_without_cascading_into_field_instructions()
     {
         $this->createForm([
@@ -549,7 +555,7 @@ EOT
         $this->assertStringContainsString('<div class="field-by-itself">bravo (This field has instructions!)</div>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_submit_form_and_renders_errors()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -590,7 +596,7 @@ EOT
         $this->assertEmpty($success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_submit_form_and_render_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -622,7 +628,7 @@ EOT
         $this->assertEquals(['Submission successful.'], $success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_submit_form_and_follow_custom_redirect_with_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -659,7 +665,7 @@ EOT
         $this->assertStringContainsString('<div class="analytics"></div>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_submit_form_with_honeypot_filled_and_render_fake_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -696,7 +702,7 @@ EOT
         $this->assertStringNotContainsString('<div class="analytics"></div>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_submit_form_and_follow_custom_redirect_with_errors()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -735,7 +741,7 @@ EOT
         $this->assertEmpty($success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=submission-successful&error_redirect=submission-failure');
@@ -754,7 +760,7 @@ EOT
         $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_render_an_inline_error_when_multiple_rules_fail()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -798,7 +804,7 @@ EOT
         $this->assertEquals($expectedInline, $inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_fetches_form_data()
     {
         $form = Statamic::tag('form:contact')->params([
@@ -821,5 +827,169 @@ EOT
 
         $this->assertEquals($form['honeypot'], 'winnie');
         $this->assertEquals($form['js_driver'], 'alpine');
+    }
+
+    #[Test]
+    public function it_uploads_assets()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'One',
+                            'instructions' => 'One Instructions',
+                            'fields' => [
+                                ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                ['handle' => 'bravo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $this
+            ->post('/!/forms/survey', [
+                'alpha' => 'test',
+                'bravo' => UploadedFile::fake()->image('avatar.jpg'),
+            ]);
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+    }
+
+    #[Test]
+    public function it_removes_any_uploaded_assets_when_a_submission_silently_fails()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            return false;
+        });
+
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'One',
+                            'instructions' => 'One Instructions',
+                            'fields' => [
+                                ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                ['handle' => 'bravo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $this
+            ->post('/!/forms/survey', [
+                'alpha' => 'test',
+                'bravo' => UploadedFile::fake()->image('avatar.jpg'),
+            ]);
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
+    }
+
+    #[Test]
+    public function it_removes_any_uploaded_assets_when_a_listener_throws_a_validation_exception()
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['custom' => 'This is a custom message']);
+        });
+
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'One',
+                            'instructions' => 'One Instructions',
+                            'fields' => [
+                                ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                ['handle' => 'bravo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $this
+            ->post('/!/forms/survey', [
+                'alpha' => 'test',
+                'bravo' => UploadedFile::fake()->image('avatar.jpg'),
+            ]);
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
+    }
+
+    #[Test]
+    public function it_renders_exceptions_thrown_during_json_requests_as_standard_laravel_errors()
+    {
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['some' => 'error']);
+        });
+
+        $response = $this
+            ->postJson('/!/forms/contact', [
+                'name' => 'Name',
+                'email' => 'test@test.com',
+                'message' => 'This is a message',
+            ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('message', $json);
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertSame($json['errors'], ['some' => ['error']]);
+    }
+
+    #[Test]
+    public function it_renders_exceptions_thrown_during_xml_http_requests_in_statamic_error_format()
+    {
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['some' => 'error']);
+        });
+
+        $response = $this
+            ->withHeaders([
+                'X-Requested-With' => 'XMLHttpRequest',
+            ])
+            ->postJson('/!/forms/contact', [
+                'name' => 'Name',
+                'email' => 'test@test.com',
+                'message' => 'This is a message',
+            ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('error', $json);
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertSame($json['error'], ['some' => 'error']);
+    }
+
+    #[Test]
+    public function it_adds_appended_config_fields()
+    {
+        Form::appendConfigFields('*', 'Fields', [
+            'test_config' => ['type' => 'text', 'display' => 'First injected into fields section'],
+        ]);
+
+        tap(Form::find('contact')->data(['test_config' => 'This is a test config value']))->save();
+
+        $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ form_config:test_config }}{{ /form:contact }}');
+
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/forms/contact" class="form" id="form">', $output);
+        $this->assertStringContainsString('This is a test config value', $output);
     }
 }

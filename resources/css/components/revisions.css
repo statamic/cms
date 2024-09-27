@@ -11,12 +11,12 @@
 }
 
 .revision-item {
-    @apply p-2 text-sm block cursor-pointer border-t;
+    @apply p-2 text-sm block cursor-pointer border-t dark:border-dark-900;
     &:hover {
-        @apply bg-gray-200;
+        @apply bg-gray-200 dark:bg-dark-400;
     }
     &:last-child {
-        @apply border-b;
+        @apply border-b dark:border-dark-900;
     }
 }
 
@@ -34,12 +34,12 @@
 }
 
 .revision-item .badge {
-    @apply uppercase text-4xs ml-2 text-white rounded-sm;
+    @apply uppercase text-4xs rtl:mr-2 ltr:ml-2 text-white rounded-sm;
     height: 16px;
 
     &.publish { @apply bg-green-600; }
     &.revision,
-    &.restore { @apply text-gray-700; }
+    &.restore { @apply text-gray-700 dark:text-dark-150 dark:bg-dark-300; }
     &.unpublish { @apply bg-red-500; }
 }
 
@@ -54,6 +54,6 @@
 
 .revision-item.status-working-copy {
     @apply text-blue;
-    .revision-item-bullet { @apply bg-blue; }
-    .badge { @apply bg-blue; }
+    .revision-item-bullet { @apply bg-blue dark:bg-dark-blue-100; }
+    .badge { @apply bg-blue dark:bg-dark-blue-100; }
 }

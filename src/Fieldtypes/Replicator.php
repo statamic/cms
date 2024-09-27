@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
@@ -16,7 +17,6 @@ use Statamic\Support\Str;
 class Replicator extends Fieldtype
 {
     protected $categories = ['structured'];
-    protected $defaultValue = [];
     protected $rules = ['array'];
 
     protected function configFieldItems(): array
@@ -54,6 +54,12 @@ class Replicator extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
+                    'button_label' => [
+                        'display' => __('Add Set Label'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.button_label'),
+                        'type' => 'text',
+                        'default' => '',
+                    ],
                 ],
             ],
             [
@@ -78,14 +84,14 @@ class Replicator extends Fieldtype
 
     public function process($data)
     {
-        return collect($data)->map(function ($row) {
-            return $this->processRow($row);
+        return collect($data)->map(function ($row, $i) {
+            return $this->processRow($row, $i);
         })->all();
     }
 
-    protected function processRow($row)
+    protected function processRow($row, $index)
     {
-        $fields = $this->fields($row['type'])->addValues($row)->process()->values()->all();
+        $fields = $this->fields($row['type'], $index)->addValues($row)->process()->values()->all();
 
         $row = array_merge([RowId::handle() => Arr::pull($row, '_id')], $row, $fields);
 
@@ -101,7 +107,7 @@ class Replicator extends Fieldtype
 
     protected function preProcessRow($row, $index)
     {
-        $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values()->all();
+        $fields = $this->fields($row['type'], $index)->addValues($row)->preProcess()->values()->all();
 
         $id = Arr::pull($row, RowId::handle()) ?? RowId::generate();
 
@@ -111,13 +117,19 @@ class Replicator extends Fieldtype
         ]);
     }
 
-    public function fields($set)
+    public function fields($set, $index = -1)
     {
-        return new Fields(
-            Arr::get($this->flattenedSetsConfig(), "$set.fields"),
-            $this->field()->parent(),
-            $this->field()
-        );
+        $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
+        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config));
+
+        return Blink::once($hash, function () use ($config, $index) {
+            return new Fields(
+                $config,
+                $this->field()->parent(),
+                $this->field(),
+                $index
+            );
+        });
     }
 
     public function extraRules(): array
@@ -132,7 +144,7 @@ class Replicator extends Fieldtype
     protected function setRules($handle, $data, $index)
     {
         $rules = $this
-            ->fields($handle)
+            ->fields($handle, $index)
             ->addValues($data)
             ->validator()
             ->withContext([
@@ -161,7 +173,7 @@ class Replicator extends Fieldtype
 
     protected function setValidationAttributes($handle, $data, $index)
     {
-        $attributes = $this->fields($handle)->addValues($data)->validator()->attributes();
+        $attributes = $this->fields($handle, $index)->addValues($data)->validator()->attributes();
 
         return collect($attributes)->mapWithKeys(function ($attribute, $handle) use ($index) {
             return [$this->setRuleFieldPrefix($index).'.'.$handle => $attribute];
@@ -181,15 +193,15 @@ class Replicator extends Fieldtype
     protected function performAugmentation($values, $shallow)
     {
         return collect($values)->reject(function ($set, $key) {
-            return array_get($set, 'enabled', true) === false;
-        })->map(function ($set) use ($shallow) {
+            return Arr::get($set, 'enabled', true) === false;
+        })->map(function ($set, $index) use ($shallow) {
             if (! Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields")) {
                 return $set;
             }
 
             $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
 
-            $values = $this->fields($set['type'])->addValues($set)->{$augmentMethod}()->values();
+            $values = $this->fields($set['type'], $index)->addValues($set)->{$augmentMethod}()->values();
 
             return new Values($values->merge([RowId::handle() => $set[RowId::handle()] ?? null, 'type' => $set['type']])->all());
         })->values()->all();
@@ -197,21 +209,25 @@ class Replicator extends Fieldtype
 
     public function preload()
     {
-        $existing = collect($this->field->value())->mapWithKeys(function ($set) {
-            $config = Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields", []);
-
-            return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
+        $existing = collect($this->field->value())->mapWithKeys(function ($set, $index) {
+            return [$set['_id'] => $this->fields($set['type'], $index)->addValues($set)->meta()->put('_', '_')];
         })->toArray();
 
-        $defaults = collect($this->flattenedSetsConfig())->map(function ($set) {
-            return (new Fields($set['fields']))->all()->map(function ($field) {
-                return $field->fieldtype()->preProcess($field->defaultValue());
+        $blink = md5(json_encode($this->flattenedSetsConfig()));
+
+        $defaults = Blink::once($blink.'-defaults', function () {
+            return collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
+                return $this->fields($handle)->all()->map(function ($field) {
+                    return $field->fieldtype()->preProcess($field->defaultValue());
+                })->all();
             })->all();
-        })->all();
+        });
 
-        $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
-            return (new Fields($set['fields']))->addValues($defaults[$handle])->meta()->put('_', '_');
-        })->toArray();
+        $new = Blink::once($blink.'-new', function () use ($defaults) {
+            return collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
+                return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
+            })->toArray();
+        });
 
         $previews = collect($existing)->map(function ($fields) {
             return collect($fields)->map(function () {
@@ -230,21 +246,25 @@ class Replicator extends Fieldtype
 
     public function flattenedSetsConfig()
     {
-        $sets = collect($this->config('sets'));
+        $blink = md5($this->field?->handle().json_encode($this->field?->config()));
 
-        // If the first set doesn't have a nested "set" key, it would be the legacy format.
-        // We'll put it in a "main" group so it's compatible with the new format.
-        // This also happens in the "sets" fieldtype.
-        if (! Arr::has($sets->first(), 'sets')) {
-            $sets = collect([
-                'main' => [
-                    'sets' => $sets->all(),
-                ],
-            ]);
-        }
+        return Blink::once($blink, function () {
+            $sets = collect($this->config('sets'));
 
-        return $sets->flatMap(function ($section) {
-            return $section['sets'];
+            // If the first set doesn't have a nested "set" key, it would be the legacy format.
+            // We'll put it in a "main" group so it's compatible with the new format.
+            // This also happens in the "sets" fieldtype.
+            if (! Arr::has($sets->first(), 'sets')) {
+                $sets = collect([
+                    'main' => [
+                        'sets' => $sets->all(),
+                    ],
+                ]);
+            }
+
+            return $sets->flatMap(function ($section) {
+                return $section['sets'];
+            });
         });
     }
 
@@ -294,8 +314,8 @@ class Replicator extends Fieldtype
 
     public function preProcessValidatable($value)
     {
-        return collect($value)->map(function ($values) {
-            $processed = $this->fields($values['type'])
+        return collect($value)->map(function ($values, $index) {
+            $processed = $this->fields($values['type'], $index)
                 ->addValues($values)
                 ->preProcessValidatables()
                 ->values()

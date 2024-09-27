@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Closure;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
@@ -49,6 +50,17 @@ class BlueprintRepository
                 ? $this->makeBlueprintFromFile($path, count($parts) > 1 ? $parts[0] : null)
                 : $this->findFallback($blueprint);
         });
+    }
+
+    public function findOrFail($id): Blueprint
+    {
+        $blueprint = $this->find($id);
+
+        if (! $blueprint) {
+            throw new BlueprintNotFoundException($id);
+        }
+
+        return $blueprint;
     }
 
     public function findStandardBlueprintPath($handle)
@@ -118,6 +130,15 @@ class BlueprintRepository
         $blueprint->deleteFile();
     }
 
+    public function reset(Blueprint $blueprint)
+    {
+        if (! $blueprint->isNamespaced()) {
+            throw new \Exception('Non-namespaced blueprints cannot be reset');
+        }
+
+        File::delete($blueprint->path());
+    }
+
     private function clearBlinkCaches()
     {
         Blink::store(self::BLINK_FOUND)->flush();
@@ -130,6 +151,15 @@ class BlueprintRepository
         $blueprint = new Blueprint;
 
         if ($handle) {
+            $handle = explode('::', $handle);
+
+            if (count($handle) > 1) {
+                $namespace = array_shift($handle);
+                $blueprint->setNamespace($namespace);
+            }
+
+            $handle = implode('::', $handle);
+
             $blueprint->setHandle($handle);
         }
 
@@ -206,20 +236,22 @@ class BlueprintRepository
             $directory = $this->directory.'/'.$namespaceDir;
 
             if (isset($this->additionalNamespaces[$namespace])) {
-                $directory = $this->additionalNamespaces[$namespace];
-
-                $overridePath = "{$this->directory}/vendor/{$namespaceDir}";
-
-                if (File::exists($overridePath)) {
-                    $directory = $overridePath;
-                }
+                $directory = "{$this->additionalNamespaces[$namespace]}";
             }
 
-            if (! File::exists(Str::removeRight($directory, '/'))) {
-                return collect();
+            $files = File::withAbsolutePaths()
+                ->getFilesByType($directory, 'yaml')
+                ->mapWithKeys(fn ($path) => [Str::after($path, $directory.'/') => $path]);
+
+            if (File::exists($directory = $this->directory.'/vendor/'.$namespaceDir)) {
+                $overrides = File::withAbsolutePaths()
+                    ->getFilesByType($directory, 'yaml')
+                    ->mapWithKeys(fn ($path) => [Str::after($path, $directory.'/') => $path]);
+
+                $files = $files->merge($overrides)->values();
             }
 
-            return File::withAbsolutePaths()->getFilesByType($directory, 'yaml');
+            return $files;
         });
     }
 

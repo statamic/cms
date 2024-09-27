@@ -2,12 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class CeilTest extends TestCase
 {
-    public function numbersPool(): array
+    public static function numbersPoolProvider(): array
     {
         return [
             [-10, -10],
@@ -22,11 +24,8 @@ class CeilTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider numbersPool
-     */
+    #[Test]
+    #[DataProvider('numbersPoolProvider')]
     public function it_rounds_a_number_up_to_next_whole_number($expected, $input): void
     {
         $modified = $this->modify($input);

@@ -2,23 +2,22 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Yaml;
 use Tests\TestCase;
 
 class YamlTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider processProvider
-     */
+    #[Test]
+    #[DataProvider('processProvider')]
     public function it_processes($value, $expected)
     {
         $this->assertSame($expected, $this->fieldtype()->process($value));
     }
 
-    public function processProvider()
+    public static function processProvider()
     {
         return [
             'string' => ['alfa', 'alfa'],

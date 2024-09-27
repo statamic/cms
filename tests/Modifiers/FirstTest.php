@@ -2,22 +2,21 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class FirstTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider stringProvider
-     */
+    #[Test]
+    #[DataProvider('stringProvider')]
     public function it_gets_the_first_n_characters_of_a_string($arg, $expected)
     {
         $this->assertEquals($expected, $this->modify('Testing', $arg));
     }
 
-    public function stringProvider()
+    public static function stringProvider()
     {
         return [
             [1, 'T'],
@@ -25,17 +24,14 @@ class FirstTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider arrayProvider
-     */
+    #[Test]
+    #[DataProvider('arrayProvider')]
     public function it_gets_the_first_value_of_an_array($value, $expected)
     {
         $this->assertEquals($expected, $this->modify($value));
     }
 
-    public function arrayProvider()
+    public static function arrayProvider()
     {
         return [
             'list' => [

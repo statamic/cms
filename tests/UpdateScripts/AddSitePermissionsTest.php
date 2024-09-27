@@ -2,8 +2,8 @@
 
 namespace Tests\UpdateScripts;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
-use Statamic\Facades\Site;
 use Statamic\UpdateScripts\AddSitePermissions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -13,19 +13,19 @@ class AddSitePermissionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk, RunsUpdateScripts;
 
-    /** @test */
+    #[Test]
     public function it_is_registered()
     {
         $this->assertUpdateScriptRegistered(AddSitePermissions::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_site_permissions()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'first' => ['name' => 'First Site', 'locale' => 'en_US', 'url' => '/'],
             'second' => ['name' => 'Second Site', 'locale' => 'en_US', 'url' => '/second'],
-        ]]);
+        ]);
 
         Role::make()
             ->title('Webmaster')

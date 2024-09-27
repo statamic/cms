@@ -5,13 +5,13 @@
             <div class="text-lg font-medium p-4 pb-0">
                 {{ __('Delete') }}
             </div>
-            <div class="flex-1 px-4 py-6 text-gray">
+            <div class="flex-1 px-4 py-6 text-gray dark:text-dark-150">
                 <div class="publish-fields">
                     <div class="form-group" :class="{ 'has-error': this.error }">
                         <div class="field-inner">
                             <label class="publish-field-label" for="field_behavior">
                                 <span v-text="__('Localizations')" />
-                                <i class="required ml-1">*</i>
+                                <i class="required rtl:mr-1 ltr:ml-1">*</i>
                             </label>
                             <div class="help-block -mt-2"><p v-html="instructions" /></div>
                         </div>
@@ -27,11 +27,11 @@
                     </div>
                 </div>
             </div>
-            <div class="p-4 bg-gray-200 border-t flex items-center justify-end text-sm">
-                <button class="text-gray hover:text-gray-900"
+            <div class="p-4 bg-gray-200 dark:bg-dark-550 border-t dark:border-dark-900 flex items-center justify-end text-sm">
+                <button class="text-gray dark:text-dark-150 hover:text-gray-900 dark:hover:text-dark-100"
                     @click="$emit('cancel')"
                     v-text="__('Cancel')" />
-                <button class="btn ml-4 btn-danger"
+                <button class="rtl:mr-4 ltr:ml-4 btn-danger"
                     @click="confirm"
                     v-text="__('Confirm')" />
             </div>

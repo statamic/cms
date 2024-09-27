@@ -4,6 +4,7 @@ namespace Statamic\Stache\Repositories;
 
 use Statamic\Contracts\Globals\GlobalRepository as RepositoryContract;
 use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Exceptions\GlobalSetNotFoundException;
 use Statamic\Globals\GlobalCollection;
 use Statamic\Stache\Stache;
 
@@ -40,6 +41,17 @@ class GlobalRepository implements RepositoryContract
         $key = $this->store->index('handle')->items()->flip()->get($handle);
 
         return $this->find($key);
+    }
+
+    public function findOrFail($id): GlobalSet
+    {
+        $global = $this->find($id);
+
+        if (! $global) {
+            throw new GlobalSetNotFoundException($id);
+        }
+
+        return $global;
     }
 
     public function save($global)

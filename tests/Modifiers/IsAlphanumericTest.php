@@ -2,12 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class IsAlphanumericTest extends TestCase
 {
-    public function strings(): array
+    public static function stringsProvider(): array
     {
         return [
             'string_with_numbers' => [true, '123'],
@@ -19,11 +21,8 @@ class IsAlphanumericTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider strings
-     */
+    #[Test]
+    #[DataProvider('stringsProvider')]
     public function it_returns_true_if_the_string_contains_only_alphanumeric_chars($expected, $input): void
     {
         $modified = $this->modify($input);

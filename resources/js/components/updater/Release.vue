@@ -27,7 +27,7 @@
             <div class="prose">
                 <p v-text="confirmationText" />
                 <code-block copyable :text="command" />
-                <p>{{ __('Learn more about') }} <a href="https://statamic.dev/updating" target="_blank">{{ __('Updates') }}</a>.</p>
+                <p v-html="link"></p>
             </div>
          </confirmation-modal>
     </div>
@@ -89,7 +89,11 @@ export default {
             }
 
             return `composer require "${this.package} ${this.release.version}"`;
-        }
+        },
+
+        link() {
+            return __('Learn more about :link', { link: `<a href="https://statamic.dev/updating" target="_blank">${__('Updates')}</a>`}) + '.';
+        },
     }
 
 }

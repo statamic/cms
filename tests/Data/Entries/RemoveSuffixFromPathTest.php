@@ -2,22 +2,21 @@
 
 namespace Tests\Data\Entries;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\RemoveSuffixFromPath;
 use Tests\TestCase;
 
 class RemoveSuffixFromPathTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider paths
-     **/
+    #[Test]
+    #[DataProvider('pathsProvider')]
     public function it_removes_the_suffix_from_a_path($expected, $path)
     {
         $this->assertEquals($expected, (new RemoveSuffixFromPath)($path));
     }
 
-    public function paths()
+    public static function pathsProvider()
     {
         return [
             'date' => ['path/to/2015-01-01.post.md', 'path/to/2015-01-01.post.md'],

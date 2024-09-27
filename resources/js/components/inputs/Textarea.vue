@@ -13,7 +13,7 @@
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         />
-        <div class="text-right text-xs" :class="limitIndicatorColor" v-if="limit">
+        <div class="rtl:text-left ltr:text-right text-xs -mb-3 @sm:-mb-5 @lg:-mb-5" :class="limitIndicatorColor" v-if="limit">
             <span v-text="currentLength"></span>/<span v-text="limit"></span>
         </div>
     </div>

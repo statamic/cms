@@ -19,7 +19,7 @@
 
         <div class="px-2" v-if="status === 'error'">
             {{ error }}
-            <button @click.prevent="clear" class="flex items-center text-gray-700 hover:text-gray-800">
+            <button @click.prevent="clear" class="flex items-center text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:text-dark-100">
                 <svg-icon name="micro/circle-with-cross" class="h-4 w-4" />
             </button>
         </div>

@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 
@@ -29,7 +30,7 @@ class IncrementTest extends TestCase
         return (string) Parse::template($tag, $context);
     }
 
-    /** @test */
+    #[Test]
     public function basic_increment_works()
     {
         $template = <<<'EOT'
@@ -42,7 +43,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function increment_with_starting_value_works()
     {
         $template = <<<'EOT'
@@ -55,7 +56,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function resetting_an_increment_counter_with_a_value_resets_to_zero()
     {
         $template = <<<'EOT'
@@ -68,7 +69,7 @@ EOT;
         );
     }
 
-    /** @test */
+    #[Test]
     public function resetting_an_increment_counter_with_a_value_uses_the_new_starting_point()
     {
         $template = <<<'EOT'

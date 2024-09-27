@@ -4,64 +4,49 @@ namespace Tests\Modifiers;
 
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class ShuffleTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @group array
-     */
-    public function it_shuffles_the_items_of_an_array(): void
+    #[Test]
+    #[DataProvider('inputsProvider')]
+    public function it_shuffles_the_items($input, $expectedType): void
     {
-        $orderOfCeremony = [
-            'Sonic',
-            'Knuckles',
-            'Tails',
+        $this->assertFalse(
+            $this->modify($input) === $this->modify($input) && $this->modify($input) === $this->modify($input),
+            'The same value was returned multiple times.',
+        );
+
+        $this->assertTrue(
+            $expectedType($this->modify($input)),
+            'The modified value is not of the expected type.'
+        );
+    }
+
+    public static function inputsProvider()
+    {
+        return [
+            'array' => [
+                range('a', 'z'),
+                fn ($value) => is_array($value),
+            ],
+            'collection' => [
+                collect(range('a', 'z')),
+                fn ($value) => $value instanceof Collection,
+            ],
+            'query builder' => [
+                Mockery::mock(Builder::class)->shouldReceive('get')->andReturn(collect(range('a', 'z')))->getMock(),
+                fn ($value) => $value instanceof Collection,
+            ],
         ];
-        $modified = $this->modify($orderOfCeremony, [1234]);
-        $expected = $this->modify($orderOfCeremony, [1234]);
-        $this->assertEquals($expected, $modified);
     }
 
-    /**
-     * @test
-     *
-     * @group array
-     */
-    public function it_shuffles_the_items_of_a_collection(): void
+    private function modify($value)
     {
-        $orderOfCeremony = collect([
-            'Sonic',
-            'Knuckles',
-            'Tails',
-        ]);
-        $modified = $this->modify($orderOfCeremony, [1234]);
-        $expected = $this->modify($orderOfCeremony, [1234]);
-        $this->assertEquals($expected, $modified);
-    }
-
-    /** @test */
-    public function it_shuffles_values_from_query_builder()
-    {
-        $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('get')->andReturn(Collection::make([
-            'Sonic',
-            'Knuckles',
-            'Tails',
-        ]));
-
-        $modified = $this->modify($builder, [1234]);
-        $expected = $this->modify($builder, [1234]);
-        $this->assertInstanceOf(Collection::class, $modified);
-        $this->assertEquals($expected, $modified);
-    }
-
-    private function modify($value, $params)
-    {
-        return Modify::value($value)->shuffle($params)->fetch();
+        return Modify::value($value)->shuffle()->fetch();
     }
 }

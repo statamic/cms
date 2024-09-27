@@ -15,8 +15,7 @@
 }
 
 .blueprint-drag-handle {
-    @apply flex-none;
-    cursor: move;
+    @apply flex-none w-4 ltr:border-r rtl:border-l dark:border-dark-500 cursor-move;
     background: rgba(0, 0, 0, 0.01) url('../../svg/icons/light/drag-dots.svg') 50% 50% no-repeat;
     background-size: 7px 17px;
 }
@@ -26,6 +25,7 @@
 
     .blueprint-section-field-inner {
         @apply relative border rounded bg-gray-200 shadow-sm flex outline-none z-10;
+        @apply dark:border-none dark:shadow-dark dark:bg-dark-600
     }
 
     &.draggable-source--is-dragging {
@@ -41,7 +41,13 @@
     &:before {
         content: '';
         @apply border rounded absolute bg-gray-200 shadow-sm;
-        top: -3px; left: 6px; right: 0; bottom: 3px; z-index: 1;
+        top: -3px; left: 6px ; right: 0 ; bottom: 3px; z-index: 1;
+
+        [dir="rtl"] & { left: 0 ; right: 6px ; }
+
+        .dark & {
+            @apply border-dark-300 bg-dark-550;
+        }
     }
 }
 
@@ -63,10 +69,10 @@
 }
 
 .blueprint-add-section-button {
-    @apply relative w-full border border-gray-500 border-dashed rounded-lg flex justify-center items-center text-gray-700;
+    @apply relative w-full border border-gray-500 dark:border-dark-200 border-dashed rounded-lg flex justify-center items-center text-gray-700 dark:text-dark-150;
 
     &:hover {
-        @apply border-gray text-gray-950;
+        @apply border-gray dark:border-dark-175 text-gray-950 dark:text-dark-100;
     }
 
     .blueprint-section-draggable-zone {

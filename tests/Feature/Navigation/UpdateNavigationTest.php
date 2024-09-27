@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Navigation;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Nav;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -14,7 +14,7 @@ class UpdateNavigationTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $nav = $this->createNav();
@@ -27,7 +27,7 @@ class UpdateNavigationTest extends TestCase
             ->assertSessionHas('error', 'You are not authorized to configure navs.');
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_a_nav()
     {
         $nav = $this->createNav();
@@ -46,14 +46,14 @@ class UpdateNavigationTest extends TestCase
         $this->assertTrue($updated->expectsRoot());
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_a_nav_with_multiple_sites()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
             'de' => ['url' => 'http://localhost/de/', 'locale' => 'de'],
-        ]]);
+        ]);
 
         $nav = $this->createNav();
         $nav->makeTree('de')->save();
@@ -79,7 +79,7 @@ class UpdateNavigationTest extends TestCase
         $this->assertFalse($updated->existsIn('de'));
     }
 
-    /** @test */
+    #[Test]
     public function title_is_required()
     {
         $nav = $this->createNav();
@@ -118,6 +118,7 @@ class UpdateNavigationTest extends TestCase
             'collections' => ['pages'],
             'root' => true,
             'max_depth' => 2,
+            'select_across_sites' => false,
         ], $overrides);
     }
 

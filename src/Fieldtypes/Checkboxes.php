@@ -22,6 +22,7 @@ class Checkboxes extends Fieldtype
                         'display' => __('Options'),
                         'instructions' => __('statamic::fieldtypes.checkboxes.config.options'),
                         'type' => 'array',
+                        'expand' => true,
                         'field' => [
                             'type' => 'text',
                         ],

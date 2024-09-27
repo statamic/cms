@@ -37,6 +37,10 @@ class CpServiceProvider extends ServiceProvider
             return "<?php echo Statamic::svg({$expression}) ?>";
         });
 
+        Blade::directive('rarr', function ($expression) {
+            return "<?php echo Statamic::cpDirection() === 'ltr' ? '&rarr;' : '&larr;' ?>";
+        });
+
         Sets::setIconsDirectory();
 
         $this->registerMiddlewareGroups();
@@ -78,9 +82,11 @@ class CpServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\CP\ContactOutpost::class,
             \Statamic\Http\Middleware\CP\AuthGuard::class,
             \Statamic\Http\Middleware\CP\AddToasts::class,
+            \Statamic\Http\Middleware\CP\TrimStrings::class,
         ]);
 
         $router->middlewareGroup('statamic.cp.authenticated', [
+            \Statamic\Http\Middleware\CP\AuthenticateSession::class,
             \Statamic\Http\Middleware\CP\Authorize::class,
             \Statamic\Http\Middleware\CP\Localize::class,
             \Statamic\Http\Middleware\CP\SelectedSite::class,
@@ -88,6 +94,7 @@ class CpServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\CP\BootPreferences::class,
             \Statamic\Http\Middleware\CP\BootUtilities::class,
             \Statamic\Http\Middleware\CP\CountUsers::class,
+            \Statamic\Http\Middleware\CP\AddVaryHeaderToResponse::class,
             \Statamic\Http\Middleware\DeleteTemporaryFileUploads::class,
         ]);
     }

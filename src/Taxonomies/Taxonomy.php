@@ -166,6 +166,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $blueprint;
     }
 
+    public function hasVisibleTermBlueprint()
+    {
+        return $this->termBlueprints()->reject->hidden()->isNotEmpty();
+    }
+
     public function sortField()
     {
         return 'title'; // todo
@@ -234,9 +239,19 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return true;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (TaxonomyDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && TaxonomyDeleting::dispatch($this) === false) {
             return false;
         }
 
@@ -244,7 +259,9 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
         Facades\Taxonomy::delete($this);
 
-        TaxonomyDeleted::dispatch($this);
+        if ($withEvents) {
+            TaxonomyDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -267,7 +284,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             'layout' => $this->layout,
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $data['sites'] = $this->sites;
         }
 
@@ -286,7 +303,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                if (! Site::hasMultiple() || ! $sites) {
+                if (! Site::multiEnabled() || ! $sites) {
                     $sites = [Site::default()->handle()];
                 }
 
@@ -356,9 +373,17 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             throw new NotFoundHttpException;
         }
 
+        if (! $this->sites()->contains($site = Site::current())) {
+            throw new NotFoundHttpException;
+        }
+
+        if ($this->collection() && ! $this->collection()->sites()->contains($site)) {
+            throw new NotFoundHttpException;
+        }
+
         return (new \Statamic\Http\Responses\DataResponse($this))
             ->with([
-                'terms' => $termQuery = $this->queryTerms(),
+                'terms' => $termQuery = $this->queryTerms()->where('site', $site),
                 $this->handle() => $termQuery,
             ])
             ->toResponse($request);
@@ -517,5 +542,15 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
                 'refresh' => $target['refresh'],
             ];
         })->filter()->values()->all();
+    }
+
+    public function hasCustomTemplate()
+    {
+        return $this->template !== null;
+    }
+
+    public function hasCustomTermTemplate()
+    {
+        return $this->termTemplate !== null;
     }
 }

@@ -2,15 +2,16 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class PluralTest extends TestCase
 {
-    public function shoppingList()
+    public static function shoppingListProvider()
     {
         return [
             ['pickle', ['item' => 'pickle', 'quantity' => 1]],
@@ -19,11 +20,8 @@ class PluralTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider shoppingList
-     */
+    #[Test]
+    #[DataProvider('shoppingListProvider')]
     public function it_returns_the_plural_form_of_an_english_word_from_context($expected, $input): void
     {
         $modified = $this->modify(
@@ -37,9 +35,7 @@ class PluralTest extends TestCase
         $this->assertEquals($expected, $modified);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_returns_the_plural_form_of_an_english_word_from_parameter(): void
     {
         $modified = $this->modify('peanut', [10], []);

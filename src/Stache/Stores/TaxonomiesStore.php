@@ -6,6 +6,8 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class TaxonomiesStore extends BasicStore
@@ -26,7 +28,7 @@ class TaxonomiesStore extends BasicStore
 
     public function getItemFilter(SplFileInfo $file)
     {
-        $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
+        $filename = Str::after(Path::tidy($file->getPathName()), $this->directory);
 
         return $file->getExtension() === 'yaml' && substr_count($filename, '/') === 0;
     }
@@ -36,24 +38,24 @@ class TaxonomiesStore extends BasicStore
         $handle = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::file($path)->parse($contents);
 
-        $sites = array_get($data, 'sites', Site::hasMultiple() ? [] : [Site::default()->handle()]);
+        $sites = Arr::get($data, 'sites', Site::multiEnabled() ? [] : [Site::default()->handle()]);
 
         return Taxonomy::make($handle)
-            ->title(array_get($data, 'title'))
-            ->cascade(array_get($data, 'inject', []))
-            ->revisionsEnabled(array_get($data, 'revisions', false))
-            ->searchIndex(array_get($data, 'search_index'))
+            ->title(Arr::get($data, 'title'))
+            ->cascade(Arr::get($data, 'inject', []))
+            ->revisionsEnabled(Arr::get($data, 'revisions', false))
+            ->searchIndex(Arr::get($data, 'search_index'))
             ->defaultPublishState($this->getDefaultPublishState($data))
             ->sites($sites)
-            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])))
-            ->termTemplate(array_get($data, 'term_template', null))
-            ->template(array_get($data, 'template', null))
-            ->layout(array_get($data, 'layout', null));
+            ->previewTargets($this->normalizePreviewTargets(Arr::get($data, 'preview_targets', [])))
+            ->termTemplate(Arr::get($data, 'term_template', null))
+            ->template(Arr::get($data, 'template', null))
+            ->layout(Arr::get($data, 'layout', null));
     }
 
     protected function getDefaultPublishState($data)
     {
-        $value = array_get($data, 'default_status', 'published');
+        $value = Arr::get($data, 'default_status', 'published');
 
         if (! in_array($value, ['published', 'draft'])) {
             throw new \Exception('Invalid taxonomy default_status value. Must be "published" or "draft".');

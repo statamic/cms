@@ -4,11 +4,13 @@ namespace Tests\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class MakeWidgetTest extends TestCase
 {
-    use Concerns\CleansUpGeneratedPaths;
+    use Concerns\CleansUpGeneratedPaths,
+        Concerns\FakesComposerInstalls;
 
     private $files;
 
@@ -17,6 +19,7 @@ class MakeWidgetTest extends TestCase
         parent::setUp();
 
         $this->files = app(Filesystem::class);
+        $this->fakeSuccessfulComposerRequire();
     }
 
     public function tearDown(): void
@@ -26,7 +29,7 @@ class MakeWidgetTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_widget()
     {
         $path = base_path('app/Widgets/Sloth.php');
@@ -39,7 +42,7 @@ class MakeWidgetTest extends TestCase
         $this->assertStringContainsString('namespace App\Widgets;', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_will_not_overwrite_an_existing_widget()
     {
         $path = base_path('app/Widgets/Sloth.php');
@@ -56,7 +59,7 @@ class MakeWidgetTest extends TestCase
         $this->assertStringContainsString('overwritten widget', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function using_force_option_will_overwrite_original_widget()
     {
         $path = base_path('app/Widgets/Sloth.php');
@@ -71,7 +74,7 @@ class MakeWidgetTest extends TestCase
         $this->assertStringNotContainsString('overwritten widget', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_widget_into_an_addon()
     {
         $path = base_path('addons/yoda/bag-odah');

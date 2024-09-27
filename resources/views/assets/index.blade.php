@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', __('Assets'))
 
@@ -14,7 +16,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Assets'),
-        'url' => 'assets'
+        'url' => Statamic::docsUrl('assets')
     ])
 
 @endsection

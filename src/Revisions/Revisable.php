@@ -3,6 +3,7 @@
 namespace Statamic\Revisions;
 
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Statamic;
 
@@ -71,10 +72,32 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
-        $item
+        if ($item instanceof Entry) {
+            $parent = $item->get('parent');
+
+            $item->remove('parent');
+        }
+
+        $saved = $item
             ->published(true)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
+
+        if (! $saved) {
+            return false;
+        }
+
+        if ($item instanceof Entry && $item->collection()->hasStructure() && $parent) {
+            $tree = $item->collection()->structure()->in($item->locale());
+
+            if (optional($tree->find($parent))->isRoot()) {
+                $parent = null;
+            }
+
+            $tree
+                ->move($this->id(), $parent)
+                ->save();
+        }
 
         $item
             ->makeRevision()
@@ -92,10 +115,14 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
-        $item
+        $saved = $item
             ->published(false)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
+
+        if (! $saved) {
+            return false;
+        }
 
         $item
             ->makeRevision()
@@ -111,16 +138,20 @@ trait Revisable
 
     public function store($options = [])
     {
-        $this
+        $return = $this
             ->published(false)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
 
-        return $this
-            ->makeRevision()
-            ->user($user)
-            ->message($options['message'] ?? false)
-            ->save();
+        if ($this->revisionsEnabled()) {
+            $return = $this
+                ->makeRevision()
+                ->user($user)
+                ->message($options['message'] ?? false)
+                ->save();
+        }
+
+        return $return;
     }
 
     public function createRevision($options = [])
@@ -135,7 +166,7 @@ trait Revisable
 
     public function revisionsEnabled()
     {
-        return config('statamic.revisions.enabled') || ! Statamic::pro();
+        return config('statamic.revisions.enabled') && Statamic::pro();
     }
 
     abstract protected function revisionKey();

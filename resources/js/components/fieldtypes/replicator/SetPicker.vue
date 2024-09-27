@@ -4,7 +4,7 @@
         ref="popover"
         class="set-picker select-none"
         placement="bottom-start"
-        :disabled="!hasMultipleSets"
+        :disabled="!enabled || !hasMultipleSets"
         @opened="opened"
         @closed="closed"
         @click="triggerWasClicked"
@@ -14,10 +14,10 @@
             <slot name="trigger" />
         </template>
         <template #default>
-            <div class="set-picker-header p-3 border-b text-xs flex items-center">
-                <input ref="search" type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="showSearch" v-model="search" />
-                <div v-if="showGroupBreadcrumb" class="flex items-center text-gray-700 font-medium">
-                    <button @click="unselectGroup" class=" hover:text-gray-900 ml-2.5 rounded">
+            <div class="set-picker-header p-3 border-b dark:border-dark-900 text-xs flex items-center">
+                <input ref="search" type="text" class="input-text text-xs h-auto py-1 px-2 border rounded w-full dark:bg-dark-650 dark:border-gray-900" :placeholder="__('Search Sets')" v-show="showSearch" v-model="search" />
+                <div v-if="showGroupBreadcrumb" class="flex items-center text-gray-700 dark:text-gray-600 font-medium">
+                    <button @click="unselectGroup" class="hover:text-gray-900 dark:hover:text-gray-500 rtl:mr-2.5 ltr:ml-2.5 rounded">
                         {{ __('Groups') }}
                     </button>
                     <svg-icon name="micro/chevron-right" class="w-4 h-4" />
@@ -25,20 +25,20 @@
                 </div>
             </div>
             <div class="p-1 max-h-[21rem] overflow-auto">
-                <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
+                <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200 dark:bg-dark-600': selectionIndex === i }" @mouseover="selectionIndex = i">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <svg-icon :name="groupIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2 text-gray-800" />
+                        <svg-icon :name="groupIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white dark:bg-dark-650 border border-gray-600 dark:border-dark-800 rtl:ml-2 ltr:mr-2 p-2 text-gray-800 dark:text-dark-175" />
                         <div class="flex-1">
-                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ __(item.display || item.handle) }}</div>
-                            <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ __(item.instructions) }}</div>
+                            <div class="text-md font-medium text-gray-800 dark:text-dark-175 truncate w-52">{{ __(item.display || item.handle) }}</div>
+                            <div v-if="item.instructions" class="text-2xs text-gray-700 dark:text-dark-175 truncate w-52">{{ __(item.instructions) }}</div>
                         </div>
-                        <svg-icon name="micro/chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
+                        <svg-icon name="micro/chevron-right-thin" class="text-gray-600 group-hover:text-dark-800 dark:group-hover:text-dark-175" />
                     </div>
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <svg-icon :name="setIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2 text-gray-800" />
+                        <svg-icon :name="setIconName(item.icon)" :directory="iconBaseDirectory" class="h-9 w-9 rounded bg-white dark:bg-dark-650 border border-gray-600 dark:border-dark-800 rtl:ml-2 ltr:mr-2 p-2 text-gray-800 dark:text-dark-175" />
                         <div class="flex-1">
-                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ __(item.display || item.handle) }}</div>
-                            <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ __(item.instructions) }}</div>
+                            <div class="text-md font-medium text-gray-800 dark:text-dark-175 truncate w-52">{{ __(item.display || item.handle) }}</div>
+                            <div v-if="item.instructions" class="text-2xs text-gray-700 dark:text-dark-175 truncate w-52">{{ __(item.instructions) }}</div>
                         </div>
                     </div>
                 </div>
@@ -55,7 +55,8 @@
 export default {
 
     props: {
-        sets: Array
+        sets: Array,
+        enabled: { type: Boolean, default: true },
     },
 
     data() {
@@ -107,13 +108,15 @@ export default {
             }, []);
 
             if (this.search) {
-                return sets.filter(set => {
-                    return __(set.display).toLowerCase().includes(this.search.toLowerCase())
-                        || set.handle.toLowerCase().includes(this.search.toLowerCase());
-                });
+                return sets
+                    .filter(set => !set.hide)
+                    .filter(set => {
+                        return __(set.display).toLowerCase().includes(this.search.toLowerCase())
+                            || set.handle.toLowerCase().includes(this.search.toLowerCase());
+                    });
             }
 
-            return sets;
+            return sets.filter(set => !set.hide);
         },
 
         items() {

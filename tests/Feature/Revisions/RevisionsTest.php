@@ -4,6 +4,7 @@ namespace Tests\Feature\Revisions;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Statamic\Revisions\Revision;
@@ -14,7 +15,7 @@ class RevisionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function a_revision_can_be_made_from_an_entry()
     {
         config(['statamic.revisions.path' => '/path/to']);
@@ -42,7 +43,7 @@ class RevisionsTest extends TestCase
         $this->assertEquals('/path/to/collections/test/en/123/'.$now->timestamp.'.yaml', $revision->path());
     }
 
-    /** @test */
+    #[Test]
     public function a_revision_can_be_made_from_a_dated_entry()
     {
         config(['statamic.revisions.path' => '/path/to']);

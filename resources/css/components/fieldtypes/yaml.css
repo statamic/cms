@@ -2,6 +2,15 @@
    YAML FIELDTYPE
    ========================================================================== */
 
+.yaml-fieldtype {
+    .code-mode {
+        @apply absolute top-2 z-10 right-3 text-gray-600 text-xs uppercase tracking-wider;
+    }
+    .CodeMirror-wrap {
+        @apply rounded;
+    }
+}
+
 
 
 /* Inside a Grid field
@@ -10,7 +19,7 @@
 .grid-fieldtype .yaml-fieldtype-wrapper {
     > span {
         border-top: 0;
-        border-right: 0;
+        border-right: 0 ; [dir="rtl"] & { border-right: 0 ; border-left: 0 ; }
     }
 
     .editor {

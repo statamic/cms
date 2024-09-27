@@ -4,6 +4,7 @@ namespace Tests\Translator;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Statamic\Translator\MethodDiscovery;
 
@@ -20,7 +21,7 @@ class MethodDiscoveryTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_discovers_methods()
     {
         $expected = collect([
@@ -44,6 +45,7 @@ class MethodDiscoveryTest extends TestCase
             'vue template backtick quote :count',
             'vue template backtick quote :param',
             'vue template with/slash',
+            'vue template with bracket(s)',
             'vue script single quote',
             'vue script single quote :count',
             'vue script single quote :param',
@@ -54,6 +56,7 @@ class MethodDiscoveryTest extends TestCase
             'vue script backtick quote :count',
             'vue script backtick quote :param',
             'vue script with/slash',
+            'vue script with bracket(s)',
 
             'blade trans single quote string',
             'blade trans single quote :param',
@@ -66,6 +69,7 @@ class MethodDiscoveryTest extends TestCase
             'blade trans_choice double quote :param',
 
             'blade with/slash',
+            'blade with bracket(s)',
 
             'php trans single quote string',
             'php trans single quote :param',
@@ -85,6 +89,8 @@ class MethodDiscoveryTest extends TestCase
 
             'php with/slash',
             'php annotated return with/slash',
+            'php with bracket(s)',
+            'php annotated return with bracket(s)',
 
             'vue template trans single quote',
             'vue template trans single quote :param',

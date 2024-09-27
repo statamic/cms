@@ -1,6 +1,12 @@
 <template>
     <div class="@container">
 
+        <div
+            v-if="hasPendingDynamicFolder"
+            class="py-3 px-4 text-sm w-full rounded-md border border-dashed text-gray-700 dark:text-dark-175 dark:border-dark-200"
+            v-html="__('statamic::fieldtypes.assets.dynamic_folder_pending', {field: `<code>${config.dynamic}</code>`})"
+        />
+
         <uploader
             ref="uploader"
             :container="container"
@@ -13,19 +19,18 @@
             <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
-                    <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 mr-2 @md:mr-6" />
+                    <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 rtl:ml-2 ltr:mr-2 @md:mr-6" />
                     <span>{{ __('Drop to Upload') }}</span>
                 </div>
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="assets-fieldtype-picker"
+                    class="assets-fieldtype-picker space-x-4"
                     :class="{
                         'is-expanded': expanded,
                         'bard-drag-handle': isInBardField
                     }"
                 >
-
                     <button
                         v-if="canBrowse"
                         :class="{'opacity-0': dragging }"
@@ -34,17 +39,24 @@
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                         tabindex="0">
-                        <svg-icon name="folder-image" class="w-4 h-4 text-gray-800"></svg-icon>
+                        <svg-icon name="folder-image" class="w-4 h-4 text-gray-800 dark:text-dark-150"></svg-icon>
                         {{ __('Browse') }}
                     </button>
-
-                    <p class="asset-upload-control" v-if="canUpload">
+                    <p class="flex-1 asset-upload-control" v-if="canUpload">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
                         <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
                         <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
                     </p>
+                    <dropdown-list v-if="meta.rename_folder">
+                        <data-list-inline-actions
+                            :item="folder"
+                            :url="meta.rename_folder.url"
+                            :actions="[meta.rename_folder.action]"
+                            @completed="renameFolderActionCompleted"
+                        />
+                    </dropdown-list>
                 </div>
 
                 <uploads
@@ -67,7 +79,7 @@
                         :animate="false"
                         append-to="body"
                     >
-                        <div class="asset-grid-listing border rounded overflow-hidden rounded-t-none" ref="assets">
+                        <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden" :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }" ref="assets">
                             <asset-tile
                                 v-for="asset in assets"
                                 :key="asset.id"
@@ -118,7 +130,6 @@
             <selector
                 :container="container"
                 :folder="folder"
-                :restrict-container-navigation="true"
                 :restrict-folder-navigation="restrictNavigation"
                 :selected="selectedAssets"
                 :view-mode="selectorViewMode"
@@ -190,6 +201,7 @@ export default {
             uploads: [],
             innerDragging: false,
             displayMode: 'grid',
+            lockedDynamicFolder: this.meta.dynamicFolder,
         };
     },
 
@@ -214,7 +226,50 @@ export default {
          * The initial folder to be displayed in the selector.
          */
         folder() {
+            let folder = this.configuredFolder;
+
+            if (this.isUsingDynamicFolder) {
+                folder = folder + '/' + (this.lockedDynamicFolder || this.dynamicFolder);
+            }
+
+            return folder.replace(/^\/+/, '');
+        },
+
+        configuredFolder() {
             return this.config.folder || '/';
+        },
+
+        isUsingDynamicFolder() {
+            return !!this.config.dynamic;
+        },
+
+        hasPendingDynamicFolder() {
+            return this.isUsingDynamicFolder && ! this.lockedDynamicFolder && ! this.dynamicFolder;
+        },
+
+        dynamicFolder() {
+            const field = this.config.dynamic;
+            if (! ['id', 'slug', 'author'].includes(field)) {
+                throw new Error(`Dynamic folder field [${field}] is invalid. Must be one of: id, slug, author`);
+            }
+
+            const value = data_get(this.$store.state.publish[this.store].values, field);
+
+            // If value is an array (e.g. a users fieldtype), get the first item.
+            return Array.isArray(value) ? value[0] : value;
+        },
+
+        store() {
+            let store;
+            let parent = this;
+
+            while (! parent.storeName) {
+                parent = parent.$parent;
+                store = parent.storeName;
+                if (parent === this.$root) return null;
+            }
+
+            return store;
         },
 
         /**
@@ -222,7 +277,7 @@ export default {
          * and folder. This will prevent navigation to other places.
          */
         restrictNavigation() {
-            return this.config.restrict || false;
+            return this.isUsingDynamicFolder || this.config.restrict || false;
         },
 
         /**
@@ -336,9 +391,11 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return replicatorPreviewHtml(_.map(this.assets, (asset) => {
                 return (asset.isImage || asset.isSvg) ?
-                    `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
+                    `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', '));
         },
@@ -362,11 +419,19 @@ export default {
         },
 
         canBrowse() {
-            return this.can('configure asset containers') || this.can('view '+ this.container +' assets')
+            const hasPermission = this.can('configure asset containers') || this.can('view '+ this.container +' assets');
+
+            if (! hasPermission) return false;
+
+            return ! this.hasPendingDynamicFolder;
         },
 
         canUpload() {
-            return this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload '+ this.container +' assets'))
+            const hasPermission = this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload '+ this.container +' assets'));
+
+            if (! hasPermission) return false;
+
+            return ! this.hasPendingDynamicFolder;
         },
 
     },
@@ -424,6 +489,7 @@ export default {
          */
         assetsSelected(selections) {
             this.loadAssets(selections);
+            this.lockDynamicFolder();
         },
 
         /**
@@ -461,6 +527,8 @@ export default {
          */
         uploadComplete(asset) {
             this.assets.push(asset);
+
+            this.lockDynamicFolder();
         },
 
         /**
@@ -485,19 +553,51 @@ export default {
             this.$refs.uploader.browse();
         },
 
-        getReplicatorPreviewText() {
-            return _.map(this.assets, (asset) => {
-                return asset.is_image ?
-                    `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
-                    : asset.basename;
-            }).join(', ');
-        },
-
         idChanged(oldId, newId) {
             const index = this.value.indexOf(oldId);
             this.update([...this.value.slice(0, index), newId, ...this.value.slice(index + 1)]);
         },
 
+        lockDynamicFolder() {
+            if (this.isUsingDynamicFolder && !this.lockedDynamicFolder) this.lockedDynamicFolder = this.dynamicFolder;
+        },
+
+        syncDynamicFolderFromValue(value) {
+            if (! this.isUsingDynamicFolder) return;
+
+            this.lockedDynamicFolder = null;
+
+            if (value.length === 0) {
+                // If there are no assets, we should get the dynamic folder naturally.
+                this.lockDynamicFolder();
+            } else {
+                // Otherwise, figure it out from the first selected asset.
+                const first = value[0];
+                const segments = first.split('::')[1].split('/');
+                this.lockedDynamicFolder = segments[segments.length - 2];
+            }
+
+            // Set the new folder in the rename action.
+            const meta = this.meta;
+            meta.rename_folder.action.context.folder = this.folder;
+            this.updateMeta(meta);
+        },
+
+        renameFolderActionCompleted(successful=null, response={}) {
+            if (successful === false) return;
+
+            this.$events.$emit('reset-action-modals');
+
+            if (response.message !== false) {
+                this.$toast.success(response.message || __("Action completed"));
+            }
+
+            // Update the folder in the current asset values.
+            // They will be adjusted in the content but not here automatically since there's no refresh.
+            const newFolder = response[0].path;
+            this.update(this.value.map(id => id.replace(`::${this.folder}`, `::${newFolder}`)));
+            this.lockedDynamicFolder = this.configuredFolder ? newFolder.replace(`${this.configuredFolder}/`, '') : newFolder;
+        }
     },
 
 
@@ -522,6 +622,8 @@ export default {
 
         value(value) {
             if (_.isEqual(value, this.assetIds)) return;
+
+            this.syncDynamicFolderFromValue(value);
 
             this.loadAssets(value);
         },

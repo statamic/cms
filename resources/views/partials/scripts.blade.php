@@ -14,6 +14,10 @@
            ->withEntryPoints($vite['input']) }}
 @endforeach
 
+@foreach (Statamic::availableInlineScripts(request()) as $script)
+    <script>{!! $script !!}</script>
+@endforeach
+
 <script>
 var StatamicConfig = {!! json_encode(array_merge(Statamic::jsonVariables(request()), [
     'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl')

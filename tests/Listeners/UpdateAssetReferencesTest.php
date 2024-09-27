@@ -4,6 +4,8 @@ namespace Tests\Listeners;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetFolder;
 use Statamic\Facades;
 use Statamic\Support\Arr;
@@ -30,12 +32,9 @@ class UpdateAssetReferencesTest extends TestCase
             'root' => __DIR__.'/tmp',
         ]]);
 
-        Facades\Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
         ]);
 
         $this->container = tap(Facades\AssetContainer::make()->handle('test_container')->disk('test'))->save();
@@ -57,7 +56,7 @@ class UpdateAssetReferencesTest extends TestCase
         $app['config']->set('statamic.system.update_references', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_references_when_saving_a_new_path_to_an_asset()
     {
         $entry = $this->createEntryWithHoffHeroImage();
@@ -69,7 +68,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('destination/hoff.jpg', $entry->fresh()->get('hero'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_references_when_moving_an_asset()
     {
         $entry = $this->createEntryWithHoffHeroImage();
@@ -81,7 +80,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('destination/hoff.jpg', $entry->fresh()->get('hero'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_references_when_moving_an_asset_with_new_filename()
     {
         $entry = $this->createEntryWithHoffHeroImage();
@@ -93,7 +92,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('destination/new-hoff.jpg', $entry->fresh()->get('hero'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_references_when_renaming_an_asset()
     {
         $entry = $this->createEntryWithHoffHeroImage();
@@ -105,7 +104,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('new-hoff.jpg', $entry->fresh()->get('hero'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_references_when_renaming_an_asset_with_unique_filename_handling()
     {
         $entry = $this->createEntryWithHoffHeroImage();
@@ -119,7 +118,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('norris-1.jpg', $entry->fresh()->get('hero'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_references_when_replacing_an_asset()
     {
         $entry = $this->createEntryWithHoffHeroImage();
@@ -131,7 +130,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('norris.jpg', $entry->fresh()->get('hero'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_references_when_deleting_an_asset()
     {
         $entry = $this->createEntryWithHoffHeroImage();
@@ -143,7 +142,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertFalse($entry->fresh()->has('hero'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_references_when_moving_an_asset_folder()
     {
         $entry = $this->createEntryWithHoffHeroImage('folder/hoff.jpg');
@@ -159,7 +158,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('destination/folder/hoff.jpg', $entry->fresh()->get('hero'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_references_when_renaming_an_asset_folder()
     {
         $entry = $this->createEntryWithHoffHeroImage('folder/hoff.jpg');
@@ -175,7 +174,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('folder-new/hoff.jpg', $entry->fresh()->get('hero'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_references_when_deleting_an_asset_folder()
     {
         $entry = $this->createEntryWithHoffHeroImage('folder/hoff.jpg');
@@ -191,7 +190,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertFalse($entry->fresh()->has('hero'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_single_assets_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -231,7 +230,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('surfboard.jpg', $entry->fresh()->get('product'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_multi_assets_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -259,7 +258,74 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['hoff.jpg', 'content/norris.jpg'], $entry->fresh()->get('pics'));
     }
 
-    /** @test */
+    #[Test]
+    public function it_updates_assets_fields_regardless_of_max_files_setting()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'avatar',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'products',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'avatar' => ['hoff.jpg'], // assuming it was previously `max_files` > 1
+            'products' => 'surfboard.jpg', // assuming it was previously `max_files` == 1
+        ]))->save();
+
+        $this->assertEquals(['hoff.jpg'], $entry->get('avatar'));
+        $this->assertEquals('surfboard.jpg', $entry->get('products'));
+
+        $this->assetHoff->path('hoff-new.jpg')->save();
+
+        $this->assertEquals(['hoff-new.jpg'], $entry->fresh()->get('avatar'));
+        $this->assertEquals('surfboard.jpg', $entry->fresh()->get('products'));
+    }
+
+    #[Test]
+    public function it_updates_multi_assets_fields_even_when_existing_field_value_is_null()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'pics',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'pics' => null,
+        ]))->save();
+
+        $this->assertNull($entry->get('pics'));
+
+        $this->assetNorris->path('content/norris.jpg')->save();
+
+        $this->assertNull($entry->fresh()->get('pics'));
+    }
+
+    #[Test]
     public function it_nullifies_references_when_deleting_an_asset()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -313,11 +379,8 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertFalse($entry->fresh()->has('featured'));
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableUpdateReferences
-     **/
+    #[Test]
+    #[DefineEnvironment('disableUpdateReferences')]
     public function it_can_be_disabled()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -367,7 +430,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('asset::test_container::norris.jpg', $entry->fresh()->get('featured'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_link_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -416,7 +479,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('asset::test_container::surfboard.jpg', $entry->fresh()->get('featured'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_nested_asset_fields_within_replicator_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -502,7 +565,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'reppy.2.pics'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_nested_asset_fields_within_legacy_replicator_configs()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -584,7 +647,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'reppy.2.pics'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_nested_asset_fields_within_grid_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -644,7 +707,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'griddy.1.pics'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_nested_asset_fields_within_bard_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -740,7 +803,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.pics'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_nested_asset_fields_within_legacy_bard_config()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -832,7 +895,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.pics'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_asset_references_in_bard_field()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -948,7 +1011,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('statamic://asset::test_container::content/norris-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.2.content.1.attrs.href'));
     }
 
-    /** @test */
+    #[Test]
     public function it_fails_gracefully_when_bard_value_is_null()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -978,7 +1041,7 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertNull($entry->fresh()->get('bardo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_asset_references_in_bard_field_when_saved_as_html()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -1030,7 +1093,160 @@ EOT;
         $this->assertEquals($expected, $entry->fresh()->get('bardo'));
     }
 
-    /** @test */
+    #[Test]
+    public function it_updates_asset_references_in_bard_field_regardless_of_save_html_setting()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'pretend_array_value',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                    ],
+                ],
+                [
+                    'handle' => 'pretend_html_value',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                        'save_html' => true,
+                    ],
+                ],
+            ],
+        ]);
+
+        $html = <<<'EOT'
+<p>Some text.</p>
+<img src="statamic://asset::test_container::hoff.jpg">
+<img src="statamic://asset::test_container::hoff.jpg" alt="test">
+</p>More text.</p>
+<p><a href="statamic://asset::test_container::hoff.jpg">Link</a></p>
+<img src="statamic://asset::test_container::norris.jpg">
+<p><a href="statamic://asset::test_container::norris.jpg">Link</a></p>
+<img src="statamic://asset::test_container::surfboard.jpg">
+<p><a href="statamic://asset::test_container::surfboard.jpg">Link</a></p>
+EOT;
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'pretend_array_value' => $html,
+            'pretend_html_value' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'asset::test_container::surfboard.jpg',
+                                'alt' => 'surfboard',
+                            ],
+                        ],
+                        [
+                            'type' => 'link',
+                            'attrs' => [
+                                'href' => 'statamic://asset::test_container::surfboard.jpg',
+                            ],
+                        ],
+                        [
+                            'type' => 'paragraph',
+                            'content' => 'unrelated',
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'asset::test_container::hoff.jpg',
+                                'alt' => 'hoff',
+                            ],
+                        ],
+                        [
+                            'type' => 'link',
+                            'attrs' => [
+                                'href' => 'statamic://asset::test_container::hoff.jpg',
+                            ],
+                        ],
+                        [
+                            'type' => 'paragraph',
+                            'content' => 'unrelated',
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'image',
+                            'attrs' => [
+                                'src' => 'asset::test_container::norris.jpg',
+                                'alt' => 'norris',
+                            ],
+                        ],
+                        [
+                            'type' => 'link',
+                            'attrs' => [
+                                'href' => 'statamic://asset::test_container::norris.jpg',
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'paragraph',
+                    'content' => 'unrelated',
+                ],
+            ],
+        ]))->save();
+
+        $this->assertEquals($html, $entry->fresh()->get('pretend_array_value'));
+
+        $this->assertEquals('asset::test_container::surfboard.jpg', Arr::get($entry->fresh()->data(), 'pretend_html_value.0.content.0.attrs.src'));
+        $this->assertEquals('surfboard', Arr::get($entry->fresh()->data(), 'pretend_html_value.0.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::surfboard.jpg', Arr::get($entry->fresh()->data(), 'pretend_html_value.0.content.1.attrs.href'));
+
+        $this->assertEquals('asset::test_container::hoff.jpg', Arr::get($entry->fresh()->data(), 'pretend_html_value.1.content.0.attrs.src'));
+        $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'pretend_html_value.1.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::hoff.jpg', Arr::get($entry->fresh()->data(), 'pretend_html_value.1.content.1.attrs.href'));
+
+        $this->assertEquals('asset::test_container::norris.jpg', Arr::get($entry->fresh()->data(), 'pretend_html_value.2.content.0.attrs.src'));
+        $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'pretend_html_value.2.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::norris.jpg', Arr::get($entry->fresh()->data(), 'pretend_html_value.2.content.1.attrs.href'));
+
+        $this->assetHoff->path('content/hoff-new.jpg')->save();
+        $this->assetNorris->delete();
+
+        $expectedHtml = <<<'EOT'
+<p>Some text.</p>
+<img src="statamic://asset::test_container::content/hoff-new.jpg">
+<img src="statamic://asset::test_container::content/hoff-new.jpg" alt="test">
+</p>More text.</p>
+<p><a href="statamic://asset::test_container::content/hoff-new.jpg">Link</a></p>
+<img src="">
+<p><a href="">Link</a></p>
+<img src="statamic://asset::test_container::surfboard.jpg">
+<p><a href="statamic://asset::test_container::surfboard.jpg">Link</a></p>
+EOT;
+
+        $this->assertEquals($expectedHtml, $entry->fresh()->get('pretend_array_value'));
+
+        $this->assertEquals('asset::test_container::surfboard.jpg', Arr::get($entry->fresh()->data(), 'pretend_html_value.0.content.0.attrs.src'));
+        $this->assertEquals('surfboard', Arr::get($entry->fresh()->data(), 'pretend_html_value.0.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::surfboard.jpg', Arr::get($entry->fresh()->data(), 'pretend_html_value.0.content.1.attrs.href'));
+
+        $this->assertEquals('asset::test_container::content/hoff-new.jpg', Arr::get($entry->fresh()->data(), 'pretend_html_value.1.content.0.attrs.src'));
+        $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'pretend_html_value.1.content.0.attrs.alt'));
+        $this->assertEquals('statamic://asset::test_container::content/hoff-new.jpg', Arr::get($entry->fresh()->data(), 'pretend_html_value.1.content.1.attrs.href'));
+
+        $this->assertEquals('', Arr::get($entry->fresh()->data(), 'pretend_html_value.2.content.0.attrs.src'));
+        $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'pretend_html_value.2.content.0.attrs.alt'));
+        $this->assertEquals('', Arr::get($entry->fresh()->data(), 'pretend_html_value.2.content.1.attrs.href'));
+    }
+
+    #[Test]
     public function it_updates_asset_references_in_markdown_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -1073,7 +1289,7 @@ EOT;
         $this->assertEquals($expected, $entry->fresh()->get('content'));
     }
 
-    /** @test */
+    #[Test]
     public function it_recursively_updates_nested_asset_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -1212,7 +1428,7 @@ EOT;
         $this->assertEquals(['content/norris.jpg', 'surfboard.jpg'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.pics'));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_update_assets_from_another_container()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -1338,7 +1554,7 @@ EOT;
         $this->assertEquals('asset::test_container::hoff.jpg', Arr::get($entry->fresh()->data(), 'wrong_bardo.0.content.0.attrs.src'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_assets_when_the_container_is_implied()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -1377,7 +1593,7 @@ EOT;
         $this->assertEquals(['hoff-new.jpg', 'norris.jpg'], $entry->fresh()->get('pics'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_entries()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -1406,7 +1622,7 @@ EOT;
         $this->assertEquals('hoff-new.jpg', $entry->fresh()->get('pic'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_terms()
     {
         $taxonomy = tap(Facades\Taxonomy::make('tags')->sites(['en', 'fr']))->save();
@@ -1446,7 +1662,7 @@ EOT;
         $this->assertEquals('hoff-new.jpg', $term->in('fr')->fresh()->get('pic'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_global_sets()
     {
         $set = Facades\GlobalSet::make('default');
@@ -1479,7 +1695,7 @@ EOT;
         $this->assertEquals('hoff-new.jpg', $set->in('fr')->fresh()->get('pic'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_users()
     {
         $user = tap(Facades\User::make()->email('hoff@example.com')->data(['avatar' => 'hoff.jpg']))->save();
@@ -1504,7 +1720,7 @@ EOT;
         $this->assertEquals('hoff-new.jpg', $user->fresh()->get('avatar'));
     }
 
-    /** @test */
+    #[Test]
     public function it_only_saves_items_when_there_is_something_to_update()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
