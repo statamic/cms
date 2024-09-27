@@ -345,13 +345,13 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootCommands()
     {
-        $commands = collect($this->commands)
-            ->merge($this->autoloadFilesFromFolder('Commands', Command::class))
-            ->merge($this->autoloadFilesFromFolder('Console/Commands', Command::class))
-            ->unique()
-            ->all();
-
         if ($this->app->runningInConsole()) {
+            $commands = collect($this->commands)
+                ->merge($this->autoloadFilesFromFolder('Commands', Command::class))
+                ->merge($this->autoloadFilesFromFolder('Console/Commands', Command::class))
+                ->unique()
+                ->all();
+
             $this->commands($commands);
         }
 
