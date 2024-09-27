@@ -144,11 +144,13 @@ class AssetContainerTest extends TestCase
         $container = (new AssetContainer)->disk('test');
         $this->assertTrue($container->private());
         $this->assertFalse($container->accessible());
+        $this->assertNull($container->url());
 
         Storage::fake('test', ['url' => '/url']);
 
         $this->assertFalse($container->private());
         $this->assertTrue($container->accessible());
+        $this->assertEquals('/url', $container->url());
     }
 
     #[Test]

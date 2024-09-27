@@ -115,7 +115,7 @@ jobs:
         uses: tj-actions/changed-files@v44
         with:
           files: |
-            **.{js,vue,ts}
+            **/*.{js,vue,ts}
             package.json
             .github/workflows/tests.yml
 

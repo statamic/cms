@@ -360,7 +360,7 @@ class EntriesTest extends TestCase
         $this->assertNull($augmented); // 456 isnt localized
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_localize_when_select_across_sites_setting_is_enabled()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();

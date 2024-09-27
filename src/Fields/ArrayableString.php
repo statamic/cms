@@ -4,8 +4,9 @@ namespace Statamic\Fields;
 
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
+use Statamic\Contracts\Support\Boolable;
 
-class ArrayableString implements Arrayable, JsonSerializable
+class ArrayableString implements Arrayable, Boolable, JsonSerializable
 {
     protected $value;
     protected $extra;
@@ -24,6 +25,11 @@ class ArrayableString implements Arrayable, JsonSerializable
     public function extra()
     {
         return (array) $this->extra;
+    }
+
+    public function toBool(): bool
+    {
+        return (bool) $this->value;
     }
 
     public function __toString()

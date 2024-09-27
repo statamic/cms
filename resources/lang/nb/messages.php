@@ -205,7 +205,7 @@ return [
     'site_configure_lang_instructions' => 'Lær mer om [språk](https://statamic.dev/multi-site#language).',
     'site_configure_locale_instructions' => 'Ler mer om [lokalisering](https://statamic.dev/multi-site#locale).',
     'site_configure_name_instructions' => 'Navn som vises for brukeren i kontrollpanelet.',
-    'site_configure_url_instructions' => 'Lær mer om [nettsted URLer](https://statamic.dev/multi-site#urlhttps://statamic.dev/multi-site#url).',
+    'site_configure_url_instructions' => 'Lær mer om [nettsted URLer](https://statamic.dev/multi-site#url).',
     'status_expired_with_date' => 'Avpublisert :date',
     'status_published_with_date' => 'Publisert :date',
     'status_scheduled_with_date' => 'Planlagt for publisering :date',

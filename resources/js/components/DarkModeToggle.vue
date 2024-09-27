@@ -54,8 +54,12 @@ export default {
                     : 'light';
             }
         },
-        theme(theme) {
-            document.documentElement.classList.toggle('dark', theme === 'dark');
+        theme: {
+            immediate: true,
+            handler(theme) {
+                document.documentElement.classList.toggle('dark', theme === 'dark');
+                Statamic.darkMode = theme === 'dark';
+            }
         }
     },
     created() {
