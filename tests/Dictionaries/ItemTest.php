@@ -20,6 +20,8 @@ class ItemTest extends TestCase
         $this->assertEquals('apple', $item->value());
         $this->assertEquals('🍎 Apple', $item->label());
         $this->assertEquals(['color' => 'red', 'emoji' => '🍎'], $item->data());
+        $this->assertEquals('red', $item->get('color'));
+        $this->assertEquals('red', $item->get('colour', 'red'));
         $this->assertEquals([
             'key' => 'apple',
             'value' => 'apple',

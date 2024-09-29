@@ -21,6 +21,11 @@ class Item extends LabeledValue implements \ArrayAccess
         return Arr::except($this->extra, ['label']);
     }
 
+    public function get($key, $fallback = null)
+    {
+        return Arr::get($this->data(), $key, $fallback);
+    }
+
     public function offsetExists(mixed $offset): bool
     {
         return true;
