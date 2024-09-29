@@ -229,10 +229,10 @@ export default {
             let folder = this.configuredFolder;
 
             if (this.isUsingDynamicFolder) {
-                folder = folder + '/' + (this.lockedDynamicFolder || this.dynamicFolder);
+                folder = folder.replace(/^\/+/, '') + '/' + (this.lockedDynamicFolder || this.dynamicFolder);
             }
 
-            return folder.replace(/^\/+/, '');
+            return folder;
         },
 
         configuredFolder() {
