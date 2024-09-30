@@ -232,7 +232,9 @@ export default {
                 folder = folder + '/' + (this.lockedDynamicFolder || this.dynamicFolder);
             }
 
-            return folder.replace(/^\/+/, '');
+            folder = folder.replace(/^\/+/, '');
+
+            return folder === '' ? '/' : folder;
         },
 
         configuredFolder() {
