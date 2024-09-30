@@ -1,5 +1,19 @@
 # Release Notes
 
+## 5.28.0 (2024-09-30)
+
+### What's new
+- Autoload add-on tags, widgets, modifiers etc from folder [#9270](https://github.com/statamic/cms/issues/9270) by @ryanmitchell
+- Allow filtering/sorting/paginating with the `form:submissions` tag [#10826](https://github.com/statamic/cms/issues/10826) by @duncanmcclean
+
+### What's fixed
+- Fix assets not being uploadable when not using dynamic folders [#10865](https://github.com/statamic/cms/issues/10865) by @jasonvarga
+- Fix "Undefined variable $key" error with Marketplace API Client [#10854](https://github.com/statamic/cms/issues/10854) by @duncanmcclean
+- Fix false-positive on publish form Action exceptions [#10855](https://github.com/statamic/cms/issues/10855) by @caseydwyer
+- Allow make:addon to work for any minimum-stability [#10814](https://github.com/statamic/cms/issues/10814) by @duncanmcclean
+
+
+
 ## 5.27.0 (2024-09-26)
 
 ### What's new
