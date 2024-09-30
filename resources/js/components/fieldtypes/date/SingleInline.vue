@@ -4,6 +4,7 @@
         <v-date-picker
             v-bind="pickerBindings"
             @input="$emit('input', $event)"
+            :is-dark="darkMode"
         />
         <div class="absolute inset-0 z-1 cursor-not-allowed" v-if="isReadOnly" />
     </div>
@@ -18,6 +19,10 @@ export default {
     mixins: [Picker],
 
     computed: {
+
+        darkMode() {
+            return Statamic.darkMode;
+        },
 
         pickerBindings() {
             return {

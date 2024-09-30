@@ -12,7 +12,6 @@ class NavTransformer
     protected $coreNav;
     protected $submitted;
     protected $config;
-    protected $reorderedMinimums;
 
     /**
      * Instantiate nav transformer.
@@ -59,10 +58,9 @@ class NavTransformer
      */
     protected function transform()
     {
-        $this->config['reorder'] = $this->itemsAreReordered(
-            $this->coreNav->pluck('display_original'),
-            collect($this->submitted)->pluck('display_original'),
-            'sections'
+        $this->config['reorder'] = $this->getReorderedItems(
+            $this->coreNav->map(fn ($section) => $this->transformSectionKey($section)),
+            collect($this->submitted)->map(fn ($section) => $this->transformSectionKey($section)),
         );
 
         $this->config['sections'] = collect($this->submitted)
@@ -110,10 +108,9 @@ class NavTransformer
 
         $items = Arr::get($section, 'items', []);
 
-        $transformed['reorder'] = $this->itemsAreReordered(
+        $transformed['reorder'] = $this->getReorderedItems(
             $this->coreNav->pluck('items', 'display_original')->get($displayOriginal, collect())->map->id(),
             collect($items)->pluck('id'),
-            $sectionKey
         );
 
         $transformed['items'] = $this->transformItems($items, $sectionKey);
@@ -126,14 +123,15 @@ class NavTransformer
      *
      * @param  array  $items
      * @param  string  $parentId
+     * @param  bool  $transformingChildItems
      * @return array
      */
-    protected function transformItems($items, $parentId)
+    protected function transformItems($items, $parentId, $transformingChildItems = false)
     {
         return collect($items)
             ->map(fn ($item) => array_merge($item, ['id' => $this->transformItemId($item, $item['id'], $parentId, $items)]))
             ->keyBy('id')
-            ->map(fn ($item, $itemId) => $this->transformItem($item, $itemId, $parentId))
+            ->map(fn ($item, $itemId) => $this->transformItem($item, $itemId, $transformingChildItems))
             ->all();
     }
 
@@ -173,12 +171,16 @@ class NavTransformer
      *
      * @param  array  $item
      * @param  string  $itemId
-     * @param  string  $parentId
+     * @param  bool  $isChild
      * @return array
      */
-    protected function transformItem($item, $itemId, $parentId)
+    protected function transformItem($item, $itemId, $isChild = false)
     {
         $transformed = Arr::get($item, 'manipulations', []);
+
+        if ($isChild) {
+            Arr::forget($transformed, 'icon');
+        }
 
         if (! isset($transformed['action'])) {
             $transformed['action'] = '@inherit';
@@ -188,7 +190,7 @@ class NavTransformer
             $transformed['url'] = $this->transformItemUrl($transformed['url']);
         }
 
-        $children = $this->transformItems(Arr::get($item, 'children', []), $itemId);
+        $children = $this->transformItems(Arr::get($item, 'children', []), $itemId, true);
 
         $childrenHaveModifications = collect($children)
             ->reject(fn ($item) => $item['action'] === '@inherit')
@@ -204,10 +206,9 @@ class NavTransformer
         $transformed['reorder'] = false;
 
         if ($children && $originalHasChildren && ! in_array($transformed['action'], ['@alias', '@create'])) {
-            $transformed['reorder'] = $this->itemsAreReordered(
+            $transformed['reorder'] = $this->getReorderedItems(
                 $originalItem->resolveChildren()->children()->map->id()->all(),
                 collect($children)->keys()->all(),
-                $itemId
             );
         }
 
@@ -248,14 +249,12 @@ class NavTransformer
     }
 
     /**
-     * Check if items are being reordered.
+     * Check if items are being reordered and return minimum list of item keys required to replicate saved order.
      *
      * @param  array  $originalList
      * @param  array  $newList
-     * @param  string  $parentKey
-     * @return bool
      */
-    protected function itemsAreReordered($originalList, $newList, $parentKey)
+    protected function getReorderedItems($originalList, $newList): bool|array
     {
         $itemsAreReordered = collect($originalList)
             ->intersect($newList)
@@ -265,21 +264,22 @@ class NavTransformer
             ->reject(fn ($pair) => $pair->first() === $pair->last())
             ->isNotEmpty();
 
-        if ($itemsAreReordered) {
-            $this->trackReorderedMinimums($originalList, $newList, $parentKey);
+        if (! $itemsAreReordered) {
+            return false;
         }
 
-        return $itemsAreReordered;
+        return collect($newList)
+            ->take($this->calculateMinimumItemsForReorder($originalList, $newList))
+            ->all();
     }
 
     /**
-     * Track minimum number of items needed for reorder config.
+     * Calculate minimum number of items needed for reorder config.
      *
      * @param  array  $originalList
      * @param  array  $newList
-     * @param  string  $parentKey
      */
-    protected function trackReorderedMinimums($originalList, $newList, $parentKey)
+    protected function calculateMinimumItemsForReorder($originalList, $newList): int
     {
         $continueRejecting = true;
 
@@ -295,7 +295,7 @@ class NavTransformer
             })
             ->count();
 
-        $this->reorderedMinimums[$parentKey] = max(1, $minimumItemsCount - 1);
+        return max(1, $minimumItemsCount - 1);
     }
 
     /**
@@ -320,15 +320,18 @@ class NavTransformer
      */
     protected function minify()
     {
-        $this->config['sections'] = collect($this->config['sections'])
-            ->map(fn ($section, $key) => $this->minifySection($section, $key))
+        $sections = collect($this->config['sections'])
+            ->map(fn ($section) => $this->minifySection($section))
+            ->pipe(fn ($sections) => $this->rejectInherits($sections));
+
+        $reorder = collect(Arr::get($this->config, 'reorder') ?: [])
+            ->reject(fn ($section) => $section === 'top_level')
+            ->values()
             ->all();
 
-        if ($this->config['reorder'] === true) {
-            $this->config['sections'] = $this->rejectUnessessaryInherits($this->config['sections'], 'sections');
-        } else {
-            $this->config = $this->rejectAllInherits($this->config['sections']);
-        }
+        $this->config = $reorder
+            ? array_filter(compact('reorder', 'sections'))
+            : $sections;
 
         // If the config is completely null after minifying, ensure we save an empty array.
         // For example, if we're transforming this config for a user's nav preferences,
@@ -345,21 +348,17 @@ class NavTransformer
      * Minify tranformed section.
      *
      * @param  array  $section
-     * @param  string  $sectionKey
      * @return mixed
      */
-    protected function minifySection($section, $sectionKey)
+    protected function minifySection($section)
     {
         $action = Arr::get($section, 'action');
 
         $section['items'] = collect($section['items'])
-            ->map(fn ($item, $key) => $this->minifyItem($item, $key))
-            ->all();
+            ->map(fn ($item) => $this->minifyItem($item))
+            ->pipe(fn ($items) => $this->rejectInherits($items));
 
-        if ($section['reorder'] === true) {
-            $section['items'] = $this->rejectUnessessaryInherits($section['items'], $sectionKey);
-        } else {
-            $section['items'] = $this->rejectAllInherits($section['items']);
+        if (! $section['reorder']) {
             Arr::forget($section, 'reorder');
         }
 
@@ -384,25 +383,21 @@ class NavTransformer
      * Minify tranformed item.
      *
      * @param  array  $item
-     * @param  string  $itemKey
+     * @param  bool  $isChild
      * @return array
      */
-    protected function minifyItem($item, $itemKey, $isChild = false)
+    protected function minifyItem($item, $isChild = false)
     {
-        $action = Arr::get($item, 'action');
-
         $item['children'] = collect($item['children'] ?? [])
-            ->map(fn ($item, $childId) => $this->minifyItem($item, $childId, true))
-            ->all();
+            ->map(fn ($item) => $this->minifyItem($item, true))
+            ->pipe(fn ($items) => $this->rejectInherits($items));
 
-        if ($item['reorder'] === true) {
-            $item['children'] = $this->rejectUnessessaryInherits($item['children'], $itemKey);
-        } else {
-            $item['children'] = $this->rejectAllInherits($item['children']);
+        if (! $item['reorder']) {
             Arr::forget($item, 'reorder');
         }
 
         if ($isChild) {
+            Arr::forget($item, 'icon');
             Arr::forget($item, 'children');
         }
 
@@ -425,7 +420,7 @@ class NavTransformer
      * @param  array  $items
      * @return array
      */
-    protected function rejectAllInherits($items)
+    protected function rejectInherits($items)
     {
         $items = collect($items)->reject(fn ($item) => $item === '@inherit');
 
@@ -434,37 +429,6 @@ class NavTransformer
         }
 
         return $items->all();
-    }
-
-    /**
-     * Reject unessessary `@inherit`s at end of array.
-     *
-     * @param  array  $items
-     * @param  string  $parentKey
-     * @return array
-     */
-    protected function rejectUnessessaryInherits($items, $parentKey)
-    {
-        if (! $reorderedMinimum = $this->reorderedMinimums[$parentKey] ?? false) {
-            return $items;
-        }
-
-        $keyValuePairs = collect($items)
-            ->map(fn ($item, $key) => ['key' => $key, 'value' => $item])
-            ->values()
-            ->keyBy(fn ($keyValuePair, $index) => $index + 1);
-
-        $trailingInherits = $keyValuePairs
-            ->reverse()
-            ->takeUntil(fn ($item) => $item['value'] !== '@inherit');
-
-        $modifiedMinimum = $keyValuePairs->count() - $trailingInherits->count();
-
-        $actualMinimum = max($reorderedMinimum, $modifiedMinimum);
-
-        return collect($items)
-            ->take($actualMinimum)
-            ->all();
     }
 
     /**

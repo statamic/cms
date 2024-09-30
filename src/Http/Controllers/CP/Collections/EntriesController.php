@@ -7,11 +7,13 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\User;
+use Statamic\Hooks\CP\EntriesIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
@@ -22,7 +24,8 @@ use Statamic\Support\Str;
 
 class EntriesController extends CpController
 {
-    use QueriesFilters;
+    use ExtractsFromEntryFields,
+        QueriesFilters;
 
     public function index(FilteredRequest $request, $collection)
     {
@@ -47,7 +50,7 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $entries = $query->paginate(request('perPage'));
+        $entries = (new EntriesIndexQuery($query, $collection))->paginate(request('perPage'));
 
         if (request('search') && $collection->hasSearchIndex()) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());
@@ -155,6 +158,7 @@ class EntriesController extends CpController
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
+            'itemActions' => Action::for($entry, ['collection' => $collection->handle(), 'view' => 'form']),
         ];
 
         if ($request->wantsJson()) {
@@ -208,7 +212,12 @@ class EntriesController extends CpController
         $values = $values->except(['slug', 'published']);
 
         if ($entry->collection()->dated()) {
-            $entry->date($entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date')));
+            $date = $entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date'));
+            if ($entry->hasOrigin()) {
+                $entry->date(in_array('date', $request->input('_localized')) ? $date : null);
+            } else {
+                $entry->date($date);
+            }
         }
 
         if ($entry->hasOrigin()) {
@@ -239,7 +248,7 @@ class EntriesController extends CpController
                         ->save();
                 });
 
-                $values->forget('parent');
+                $entry->remove('parent');
             }
         }
 
@@ -429,46 +438,6 @@ class EntriesController extends CpController
 
             return null;
         };
-    }
-
-    protected function extractFromFields($entry, $blueprint)
-    {
-        // The values should only be data merged with the origin data.
-        // We don't want injected collection values, which $entry->values() would have given us.
-        $values = collect();
-        $target = $entry;
-        while ($target) {
-            $values = $target->data()->merge($target->computedData())->merge($values);
-            $target = $target->origin();
-        }
-        $values = $values->all();
-
-        if ($entry->hasStructure()) {
-            $values['parent'] = array_filter([optional($entry->parent())->id()]);
-
-            if ($entry->revisionsEnabled() && $entry->has('parent')) {
-                $values['parent'] = [$entry->get('parent')];
-            }
-        }
-
-        if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 19);
-            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
-            $values['date'] = $datetime;
-        }
-
-        $fields = $blueprint
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        $values = $fields->values()->merge([
-            'title' => $entry->value('title'),
-            'slug' => $entry->slug(),
-            'published' => $entry->published(),
-        ]);
-
-        return [$values->all(), $fields->meta()];
     }
 
     protected function extractAssetsFromValues($values)

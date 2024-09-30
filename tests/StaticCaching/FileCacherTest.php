@@ -3,7 +3,10 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
@@ -12,7 +15,7 @@ use Tests\TestCase;
 
 class FileCacherTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function gets_cache_paths_when_multiple_paths_are_provided()
     {
         $cacher = $this->fileCacher([
@@ -28,7 +31,7 @@ class FileCacherTest extends TestCase
         ], $cacher->getCachePaths());
     }
 
-    /** @test */
+    #[Test]
     public function gets_cache_paths_when_a_single_path_is_provided()
     {
         $cacher = $this->fileCacher([
@@ -41,7 +44,7 @@ class FileCacherTest extends TestCase
         ], $cacher->getCachePaths());
     }
 
-    /** @test */
+    #[Test]
     public function gets_cache_path_when_multiple_paths_are_provided()
     {
         $cacher = $this->fileCacher([
@@ -57,7 +60,7 @@ class FileCacherTest extends TestCase
         $this->assertEquals('test/path', $cacher->getCachePath());
     }
 
-    /** @test */
+    #[Test]
     public function gets_cache_path_when_a_single_path_is_provided()
     {
         $cacher = $this->fileCacher([
@@ -67,7 +70,7 @@ class FileCacherTest extends TestCase
         $this->assertEquals('test/path', $cacher->getCachePath());
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_path_from_url()
     {
         $cacher = $this->fileCacher([
@@ -86,7 +89,7 @@ class FileCacherTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_path_from_url_and_hashes_long_query_strings()
     {
         $cacher = $this->fileCacher([
@@ -102,7 +105,7 @@ class FileCacherTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_path_from_url_and_ignores_query_strings()
     {
         $cacher = $this->fileCacher([
@@ -121,7 +124,7 @@ class FileCacherTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_path_with_multiple_locations()
     {
         $cacher = $this->fileCacher([
@@ -143,7 +146,7 @@ class FileCacherTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function flushing_the_cache_deletes_from_all_cache_locations()
     {
         $writer = \Mockery::spy(Writer::class);
@@ -162,7 +165,7 @@ class FileCacherTest extends TestCase
         $writer->shouldHaveReceived('flush')->with('fr/test/path');
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_thats_not_cached_will_do_nothing()
     {
         $writer = \Mockery::spy(Writer::class);
@@ -173,7 +176,7 @@ class FileCacherTest extends TestCase
         $writer->shouldNotHaveReceived('delete');
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_deletes_the_file_and_removes_the_url()
     {
         $writer = \Mockery::spy(Writer::class);
@@ -199,7 +202,7 @@ class FileCacherTest extends TestCase
         // Config::set('app.url', 'http://example.com');
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_for_query_string_versions_too()
     {
         $writer = \Mockery::spy(Writer::class);
@@ -224,7 +227,7 @@ class FileCacherTest extends TestCase
         ], $cacher->getUrls('http://example.com')->all());
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite()
     {
         $this->setSites([
@@ -262,7 +265,7 @@ class FileCacherTest extends TestCase
         $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://domain.de')->all());
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite_and_a_single_string_value_for_the_path()
     {
         $this->setSites([
@@ -294,11 +297,8 @@ class FileCacherTest extends TestCase
         $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://domain.de')->all());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider invalidateEventProvider
-     */
+    #[Test]
+    #[DataProvider('invalidateEventProvider')]
     public function invalidating_a_url_dispatches_event($domain, $expectedUrl)
     {
         Event::fake();
@@ -323,6 +323,60 @@ class FileCacherTest extends TestCase
             'no domain' => [null, 'http://base.com/foo'],
             'configured base domain' => ['http://base.com', 'http://base.com/foo'],
             'another domain' => ['http://another.com', 'http://another.com/foo'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('currentUrlProvider')]
+    public function it_gets_the_current_url(
+        array $query,
+        array $config,
+        string $expectedUrl
+    ) {
+        $request = Request::create('http://example.com/test', 'GET', $query);
+
+        $cacher = $this->fileCacher($config);
+
+        $this->assertEquals($expectedUrl, $cacher->getUrl($request));
+    }
+
+    public static function currentUrlProvider()
+    {
+        return [
+            'no query' => [
+                [],
+                [],
+                'http://example.com/test',
+            ],
+            'with query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a',
+            ],
+            'with query, ignoring query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['ignore_query_strings' => true],
+                'http://example.com/test',
+            ],
+            'with query, allowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['allowed_query_strings' => ['alfa', 'bravo']],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a', // allowed_query_strings has no effect
+            ],
+            'with query, disallowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['disallowed_query_strings' => ['charlie']],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a', // disallowed_query_strings has no effect
+
+            ],
+            'with query, allowed and disallowed' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [
+                    'allowed_query_strings' => ['alfa', 'bravo'],
+                    'disallowed_query_strings' => ['bravo'],
+                ],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a', // allowed_query_strings and disallowed_query_strings have no effect
+            ],
         ];
     }
 

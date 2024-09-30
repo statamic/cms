@@ -6,6 +6,7 @@ use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Request;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\Store;
 use Tests\Fakes\FakeArtisanRequest;
@@ -24,7 +25,7 @@ class StoreTest extends TestCase
         $this->store = new TestStore($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_forces_a_trailing_slash_when_setting_the_directory()
     {
         $this->assertNull($this->store->directory());
@@ -41,7 +42,7 @@ class StoreTest extends TestCase
         $this->assertEquals('/path/to/directory/', $property->getValue($this->store));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_paths_from_the_cache_only_once()
     {
         $store = $this->store->directory('/path/to/directory');
@@ -63,7 +64,7 @@ class StoreTest extends TestCase
         $this->assertEquals(1, $cacheHits);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_paths_from_the_cache_every_time_if_running_in_a_queue_worker()
     {
         $store = $this->store->directory('/path/to/directory');

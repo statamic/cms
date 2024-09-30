@@ -5,6 +5,7 @@ namespace Tests\StaticCaching;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\NoCache\StringRegion;
 use Tests\FakesContent;
@@ -18,7 +19,7 @@ class NoCacheSessionTest extends TestCase
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function when_pushing_a_region_it_will_filter_out_cascade()
     {
         $session = new Session('/');
@@ -44,7 +45,7 @@ class NoCacheSessionTest extends TestCase
         ], $region->context());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_fragment_data()
     {
         // fragment data should be the context,
@@ -73,7 +74,7 @@ class NoCacheSessionTest extends TestCase
         ], $region->fragmentData());
     }
 
-    /** @test */
+    #[Test]
     public function it_writes()
     {
         Carbon::setTestNow('2014-02-15');
@@ -120,7 +121,7 @@ class NoCacheSessionTest extends TestCase
         })->write();
     }
 
-    /** @test */
+    #[Test]
     public function it_restores_from_cache()
     {
         Cache::forever('nocache::region.abc', $regionOne = Mockery::mock(StringRegion::class));
@@ -146,7 +147,7 @@ class NoCacheSessionTest extends TestCase
         $this->assertEquals('http://localhost/cp', $cascade['cp_url']);
     }
 
-    /** @test */
+    #[Test]
     public function a_singleton_is_bound_in_the_container()
     {
         $this->get('/test?foo=bar&bar=baz');
@@ -157,7 +158,7 @@ class NoCacheSessionTest extends TestCase
         $this->assertEquals('http://localhost/test?bar=baz&foo=bar', $session->url());
     }
 
-    /** @test */
+    #[Test]
     public function it_ignores_the_query_string()
     {
         config(['statamic.static_caching.ignore_query_strings' => true]);
@@ -170,7 +171,7 @@ class NoCacheSessionTest extends TestCase
         $this->assertEquals('http://localhost/test', $session->url());
     }
 
-    /** @test */
+    #[Test]
     public function it_writes_session_if_a_nocache_tag_is_used()
     {
         $this->withStandardFakeViews();
@@ -187,7 +188,7 @@ class NoCacheSessionTest extends TestCase
         $this->assertNotNull(Cache::get('nocache::session.'.md5('http://localhost/test')));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_write_session_if_a_nocache_tag_is_not_used()
     {
         $this->withStandardFakeViews();
@@ -204,7 +205,7 @@ class NoCacheSessionTest extends TestCase
         $this->assertNull(Cache::get('nocache::session.'.md5('http://localhost/test')));
     }
 
-    /** @test */
+    #[Test]
     public function it_restores_session_if_theres_a_nocache_placeholder_in_the_response()
     {
         $this->withStandardFakeViews();
@@ -226,7 +227,7 @@ class NoCacheSessionTest extends TestCase
         $this->assertEquals(['abc' => $region], app(Session::class)->regions()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_restore_session_if_there_is_no_nocache_placeholder_in_the_response()
     {
         $this->withStandardFakeViews();

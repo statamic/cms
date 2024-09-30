@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Collection;
@@ -15,7 +16,7 @@ class StructureTagTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_renders_a_nav()
     {
         $this->createCollectionAndNav();
@@ -80,7 +81,80 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
+    public function it_renders_a_nav_with_selected_fields()
+    {
+        $this->createCollectionAndNav();
+
+        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
+        $template = <<<'EOT'
+<ul>
+{{ nav:test select="title" }}
+    <li>
+        <i>{{ title }} {{ foo }}</i>
+        {{ if children }}
+        <ul>
+            {{ *recursive children* }}
+        </ul>
+        {{ /if }}
+    </li>
+{{ /nav:test }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+    <li>
+        <i>One bar</i>
+        <ul>
+            <li>
+                <i>One One bar</i>
+            </li>
+            <li>
+                <i>URL and title bar</i>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <i>Two bar</i>
+    </li>
+    <li>
+        <i>Three bar</i>
+        <ul>
+            <li>
+                <i>Three One bar</i>
+            </li>
+            <li>
+                <i>Three Two bar</i>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <i>Title only bar</i>
+        <ul>
+            <li>
+                <i>URL only bar</i>
+           </li>
+        </ul>
+    </li>
+</ul>
+EOT;
+
+        $parsed = (string) Antlers::parse($template, [
+            'foo' => 'bar', // to test that cascade is inherited.
+            'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
+        ]);
+
+        // This is really what we're interested in testing. The "Two" entry has a foo value
+        // of "notbar", but we're only selecting the title, so we shouldn't get the real value.
+        if (str_contains($parsed, 'Two notbar')) {
+            $this->fail('The "Two" entry\'s "foo" value was included.');
+        }
+
+        $this->assertXmlStringEqualsXmlString($expected, $parsed);
+    }
+
+    #[Test]
     public function it_renders_a_nav_with_scope()
     {
         $this->createCollectionAndNav();
@@ -146,7 +220,7 @@ EOT;
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_hides_unpublished_entries_by_default()
     {
         $this->createCollectionAndNav();
@@ -156,7 +230,7 @@ EOT;
         $this->assertEquals('[1][1-1][2][3][3-1][3-2]', $this->parseBasicTemplate('collection:pages'));
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_or_hides_unpublished_entries_using_the_show_unpublished_parameter()
     {
         $this->createCollectionAndNav();
@@ -168,7 +242,7 @@ EOT;
         $this->assertEquals('[1][1-1][2][3][3-1][3-2][3-3][4][4-1]', $this->parseBasicTemplate('collection:pages', 'show_unpublished="true"'));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_status()
     {
         $this->createCollectionAndNav();
@@ -179,7 +253,7 @@ EOT;
         $this->assertEquals('[1][1-1][2][3][3-1][3-2][3-3][4][4-1]', $this->parseBasicTemplate('collection:pages', 'status:in="draft|published"'));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_published_boolean()
     {
         $this->createCollectionAndNav();
@@ -188,7 +262,7 @@ EOT;
         $this->assertEquals('[4]', $this->parseBasicTemplate('collection:pages', 'published:is="false"'));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_entry_data()
     {
         $this->createCollectionAndNav();
@@ -200,7 +274,7 @@ EOT;
         $this->assertEquals('[]', $this->parseBasicTemplate('collection:pages', 'never:is="true"'));
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_is_current_and_is_parent_for_a_nav()
     {
         $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
@@ -296,7 +370,7 @@ EOT;
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_is_parent_based_on_the_url_too()
     {
         $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
@@ -318,7 +392,7 @@ EOT;
         $this->assertEquals('[1=parent][2=parent]', $result);
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_is_current_and_is_parent_for_a_collection()
     {
         $collection = tap(Collection::make('pages'))->save();

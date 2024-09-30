@@ -12,7 +12,7 @@
 
                 <transition name="live-preview-header-slide">
                     <div v-show="headerVisible" class="live-preview-header">
-                        <div class="text-base text-gray-700 font-medium rtl:ml-4 ltr:mr-4">{{ __('Live Preview') }}</div>
+                        <div class="text-base text-gray-700 dark:text-dark-150 font-medium rtl:ml-4 ltr:mr-4">{{ __('Live Preview') }}</div>
                         <div class="flex items-center">
                             <button v-if="canPopOut && !poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">{{ __('Pop in') }}</button>

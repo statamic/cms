@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class ToBoolTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_bools(): void
     {
         $this->assertTrue($this->modify(1));

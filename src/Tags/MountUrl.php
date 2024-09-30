@@ -29,6 +29,14 @@ class MountUrl extends Tags
             return;
         }
 
-        return $collection->url(Site::current()->handle());
+        $currentSite = Site::current();
+        $site = $this->params->has('site') ? Site::get($this->params->get('site')) : $currentSite;
+
+        // If the target site is on a different domain, return an absolute URL.
+        $isDifferentDomain = parse_url($site->absoluteUrl(), PHP_URL_HOST) !== parse_url($currentSite->absoluteUrl(), PHP_URL_HOST);
+
+        return $isDifferentDomain
+            ? $collection->absoluteUrl($site->handle())
+            : $collection->url($site->handle());
     }
 }

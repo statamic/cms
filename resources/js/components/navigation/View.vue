@@ -8,7 +8,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list v-if="editable" class="rtl:ml-2 ltr:mr-2">
+                <dropdown-list v-if="canEdit" class="rtl:ml-2 ltr:mr-2">
                     <slot name="twirldown" />
                 </dropdown-list>
 
@@ -65,31 +65,31 @@
             <template #empty>
                 <div class="card p-4 content w-full">
                     <div class="flex flex-wrap w-full">
-                        <a :href="editUrl" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-                            <svg-icon name="light/hammer-wrench" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800" />
+                        <a :href="editUrl" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <svg-icon name="light/hammer-wrench" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
                             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Configure Navigation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
+                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Configure Navigation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
                                 <p>{{ __('messages.navigation_configure_settings_intro') }}</p>
                             </div>
                         </a>
-                        <a @click="linkPage()" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-                            <svg-icon name="paperclip" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800" />
+                        <a @click="linkPage()" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <svg-icon name="paperclip" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
                             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Link to URL') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
+                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Link to URL') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
                                  <p>{{ __('messages.navigation_link_to_url_instructions') }}</p>
                             </div>
                         </a>
-                        <a @click="linkEntries()" v-if="hasCollections" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-                            <svg-icon name="light/hierarchy-files" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800" />
+                        <a @click="linkEntries()" v-if="hasCollections" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <svg-icon name="light/hierarchy-files" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
                             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Link to Entry') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
+                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Link to Entry') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
                                  <p>{{ __('messages.navigation_link_to_entry_instructions') }}</p>
                             </div>
                         </a>
-                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
-                            <svg-icon name="light/book-pages" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800" />
+                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <svg-icon name="light/book-pages" class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175" />
                             <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Read the Documentation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
+                                <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Read the Documentation') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></h3>
                                  <p>{{ __('messages.navigation_documentation_instructions') }}</p>
                             </div>
                         </a>
@@ -128,6 +128,8 @@
             ref="selector"
             :site="site"
             :collections="collections"
+            :max-items="maxPagesSelection"
+            :can-select-across-sites="canSelectAcrossSites"
             @selected="entriesSelected"
         />
 
@@ -202,7 +204,8 @@ export default {
         site: { type: String, required: true },
         sites: { type: Array, required: true },
         blueprint: { type: Object, required: true },
-        canEdit: { type: Boolean, required: true }
+        canEdit: { type: Boolean, required: true },
+        canSelectAcrossSites: { type: Boolean, required: true }
     },
 
     data() {
@@ -215,6 +218,7 @@ export default {
             showPageDeletionConfirmation: false,
             pageBeingDeleted: null,
             pageDeletionConfirmCallback: null,
+            removePageOnCancel: false,
             preferencesPrefix: `navs.${this.handle}`,
             publishInfo: {},
         }
@@ -250,6 +254,22 @@ export default {
 
         direction() {
             return this.$config.get('direction', 'ltr');
+        },
+
+        fields () {
+            return this.blueprint.tabs.reduce((fields, tab) => {
+                return tab.sections.reduce((fields, section) => {
+                    return fields.concat(section.fields);
+                }, []);
+            }, []);
+        },
+
+        maxPagesSelection() {
+            if (this.fields.filter(field => field.validate?.includes('required')).length > 0) {
+                return 1;
+            }
+
+            return
         },
 
     },
@@ -299,6 +319,11 @@ export default {
             });
 
             this.$refs.tree.addPages(pages, this.targetParent);
+
+            if (this.maxPagesSelection === 1) {
+                this.removePageOnCancel = true;
+                this.editPage(pages[0], this.$refs.tree.$refs.tree, this.$refs.tree.$refs.tree.store);
+            }
         },
 
         isEntryBranch(branch) {
@@ -328,6 +353,11 @@ export default {
         },
 
         closePageEditor() {
+            if (this.removePageOnCancel) {
+                this.$refs.tree.$refs[`branch-${this.editingPage.page.id}`].remove();
+                this.removePageOnCancel = false;
+            }
+
             this.editingPage = false;
         },
 
@@ -391,6 +421,10 @@ export default {
         },
 
         treeSaved(response) {
+            if (! response.data.saved) {
+                return this.$toast.error(`Couldn't save tree`)
+            }
+
             this.replaceGeneratedIds(response.data.generatedIds);
 
             this.changed = false;

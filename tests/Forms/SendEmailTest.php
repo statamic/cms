@@ -4,6 +4,7 @@ namespace Tests\Forms;
 
 use Illuminate\Support\Facades\Mail;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Forms\Email;
 use Statamic\Forms\SendEmail;
@@ -15,7 +16,7 @@ class SendEmailTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_sends_email()
     {
         Mail::fake();

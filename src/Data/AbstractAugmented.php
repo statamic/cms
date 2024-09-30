@@ -69,7 +69,7 @@ abstract class AbstractAugmented implements Augmented
 
         if ($this->methodExistsOnThisClass($method)) {
             $value = $this->wrapAugmentedMethodInvokable($method, $handle);
-        } elseif (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
+        } elseif ($this->methodExistsOnData($handle, $method)) {
             $value = $this->wrapDataMethodInvokable($method, $handle);
         } else {
             $value = $this->wrapDeferredValue($handle);
@@ -90,9 +90,16 @@ abstract class AbstractAugmented implements Augmented
             : [];
     }
 
-    private function methodExistsOnThisClass($method)
+    private function methodExistsOnThisClass(string $method): bool
     {
         return method_exists($this, $method) && ! in_array($method, ['select', 'except']);
+    }
+
+    private function methodExistsOnData(string $handle, string $method): bool
+    {
+        return method_exists($this->data, $method)
+            && collect($this->keys())->contains(Str::snake($handle))
+            && ! in_array($handle, ['hook', 'value', 'entry']);
     }
 
     protected function getFromData($handle)
@@ -108,7 +115,7 @@ abstract class AbstractAugmented implements Augmented
         return $value;
     }
 
-    private function wrapDeferredValue($handle)
+    protected function wrapDeferredValue($handle)
     {
         return new Value(
             fn () => $this->getFromData($handle),
@@ -118,7 +125,7 @@ abstract class AbstractAugmented implements Augmented
         );
     }
 
-    private function wrapAugmentedMethodInvokable(string $method, string $handle)
+    protected function wrapAugmentedMethodInvokable(string $method, string $handle)
     {
         return new Value(
             fn () => $this->$method(),
@@ -128,7 +135,7 @@ abstract class AbstractAugmented implements Augmented
         );
     }
 
-    private function wrapDataMethodInvokable(string $method, string $handle)
+    protected function wrapDataMethodInvokable(string $method, string $handle)
     {
         return new Value(
             fn () => $this->data->$method(),

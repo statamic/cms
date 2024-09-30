@@ -8,6 +8,10 @@ trait QueriesEntryStatus
 {
     public function whereStatus(string $status)
     {
+        if ($status === 'any') {
+            return $this;
+        }
+
         if (! in_array($status, ['published', 'draft', 'scheduled', 'expired'])) {
             throw new \Exception("Invalid status [$status]");
         }
@@ -29,10 +33,12 @@ trait QueriesEntryStatus
     {
         $this->addCollectionWhereToStatusQuery($query, $collection->handle());
 
-        if ($collection->futureDateBehavior() === 'public' && $collection->pastDateBehavior() === 'public') {
+        if (! $collection->dated() || ($collection->futureDateBehavior() === 'public' && $collection->pastDateBehavior() === 'public')) {
             if ($status === 'scheduled' || $status === 'expired') {
                 $query->where('date', 'invalid'); // intentionally trigger no results.
             }
+
+            return;
         }
 
         if ($collection->futureDateBehavior() === 'private') {

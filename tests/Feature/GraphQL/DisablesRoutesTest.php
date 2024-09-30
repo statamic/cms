@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\GraphQL;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class DisablesRoutesTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
@@ -14,7 +16,7 @@ class DisablesRoutesTest extends TestCase
         $app['config']->set('statamic.graphql.enabled', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_disables_routes()
     {
         $this

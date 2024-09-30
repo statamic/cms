@@ -2,9 +2,11 @@
 
 namespace Tests\Tags\Form;
 
+use PHPUnit\Framework\Attributes\Test;
+
 class FormSubmissionsTest extends FormTestCase
 {
-    /** @test */
+    #[Test]
     public function it_renders_submissions()
     {
         $this
