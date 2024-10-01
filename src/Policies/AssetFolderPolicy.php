@@ -34,7 +34,7 @@ class AssetFolderPolicy
                 ->isEmpty();
         }
 
-        return true;
+        return $assetFolder->container()->allowMoving();
     }
 
     public function rename($user, $assetFolder)
@@ -52,7 +52,7 @@ class AssetFolderPolicy
                 ->isEmpty();
         }
 
-        return true;
+        return $assetFolder->container()->allowRenaming();
     }
 
     public function delete($user, $assetFolder)
