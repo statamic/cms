@@ -279,7 +279,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootDictionaries()
     {
-        foreach ($this->dictionaries as $class) {
+        $dictionaries = collect($this->dictionaries)
+            ->merge($this->autoloadFilesFromFolder('Dictionaries', Dictionary::class))
+            ->unique();
+
+        foreach ($dictionaries as $class) {
             $class::register();
         }
 
