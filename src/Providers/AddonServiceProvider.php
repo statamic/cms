@@ -740,6 +740,11 @@ abstract class AddonServiceProvider extends ServiceProvider
         foreach ($this->app['files']->files($path) as $file) {
             $class = $file->getBasename('.php');
             $fqcn = $this->namespace().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
+
+            if ((new \ReflectionClass($fqcn))->isAbstract() || (new \ReflectionClass($fqcn))->isInterface()) {
+                continue;
+            }
+
             if (is_subclass_of($fqcn, $requiredClass)) {
                 $autoloadable[] = $fqcn;
             }
