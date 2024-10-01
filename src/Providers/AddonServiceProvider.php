@@ -345,7 +345,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootCommands()
     {
-        if ($this->app->isBooted() && $this->app->runningInConsole()) {
+        if ($this->app->runningInConsole()) {
             $commands = collect($this->commands)
                 ->merge($this->autoloadFilesFromFolder('Commands', Command::class))
                 ->merge($this->autoloadFilesFromFolder('Console/Commands', Command::class))
@@ -704,7 +704,15 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function autoloadFilesFromFolder($folder, $requiredClass)
     {
-        $addon = $this->getAddon();
+        try {
+            $addon = $this->getAddon();
+        } catch (NotBootedException $e) {
+            // This would be thrown if a developer has tried to call a method
+            // that triggers autoloading before Statamic has booted. Perhaps
+            // they have placed it in the boot method instead of bootAddon.
+            return [];
+        }
+
         $path = $addon->directory().$addon->autoload().'/'.$folder;
 
         if (! $this->app['files']->exists($path)) {
