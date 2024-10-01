@@ -22,6 +22,22 @@ EOT;
 
         $this->assertSame('TitleFooBar', $this->renderString($template, $data));
     }
+
+    public function test_legacy_model_attributes_are_returned()
+    {
+        $model = FakeModel::make();
+        $model->title = 'Title';
+
+        $data = [
+            'model' => $model,
+        ];
+
+        $template = <<<'EOT'
+{{ model:title }}{{ model:bar_baz }}
+EOT;
+
+        $this->assertSame('TitleBarBaz', $this->renderString($template, $data));
+    }
 }
 
 class FakeModel extends \Illuminate\Database\Eloquent\Model
@@ -31,5 +47,10 @@ class FakeModel extends \Illuminate\Database\Eloquent\Model
         return Attribute::make(
             get: fn () => 'FooBar',
         );
+    }
+
+    public function getBarBazAttribute()
+    {
+        return 'BarBaz';
     }
 }

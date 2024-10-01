@@ -1026,6 +1026,11 @@ class PathDataManager
                         $method = Str::snake($method);
                         $data[$method] = $reductionValue->$method;
                     }
+
+                    if (Str::startsWith($method, 'get') && Str::endsWith($method, 'Attribute')) {
+                        $method = Str::of($method)->after('get')->before('Attribute')->snake()->__toString();
+                        $data[$method] = $reductionValue->getAttribute($method);
+                    }
                 }
 
                 $reductionStack[] = $data;
