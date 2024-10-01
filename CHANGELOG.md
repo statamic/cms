@@ -1,5 +1,30 @@
 # Release Notes
 
+## 5.29.0 (2024-10-01)
+
+### What's new
+- Add reorder() query builder method [#10871](https://github.com/statamic/cms/issues/10871) by @ryanmitchell
+- Show toggle UI in conditions builder for revealer fields [#10867](https://github.com/statamic/cms/issues/10867) by @jesseleite
+- Autoload addon routes [#10880](https://github.com/statamic/cms/issues/10880) by @duncanmcclean
+- Autoload addon dictionaries [#10878](https://github.com/statamic/cms/issues/10878) by @duncanmcclean
+- Allow searching by labels in Dictionary fieldtype [#10877](https://github.com/statamic/cms/issues/10877) by @duncanmcclean
+
+### What's fixed
+- Improve `AssetFolderPolicy` performance [#10868](https://github.com/statamic/cms/issues/10868) by @jesseleite
+- Prevent autoloading addon files causing exception when called early [#10875](https://github.com/statamic/cms/issues/10875) by @ryanmitchell
+- Prevent autoloading of abstract classes and interfaces [#10882](https://github.com/statamic/cms/issues/10882) by @duncanmcclean
+- Run query scopes after all other query methods so the query can be changed [#10872](https://github.com/statamic/cms/issues/10872) by @ryanmitchell
+- Only get relationship createables if can create [#10870](https://github.com/statamic/cms/issues/10870) by @ryanmitchell
+- Blink cache Algolia search API calls [#10879](https://github.com/statamic/cms/issues/10879) by @jacksleight
+- Increase `trackDirtyStateTimeout` [#10876](https://github.com/statamic/cms/issues/10876) by @jacksleight
+- Better timezone dictionary test [#10881](https://github.com/statamic/cms/issues/10881) by @jasonvarga
+- Fix duplicate IDs icon [#10864](https://github.com/statamic/cms/issues/10864) by @jesseleite
+- French translations [#10861](https://github.com/statamic/cms/issues/10861) by @ebeauchamps
+- Dutch translations [#10874](https://github.com/statamic/cms/issues/10874) by @ceesvanegmond
+- Dutch translations [#10866](https://github.com/statamic/cms/issues/10866) by @ceesvanegmond
+
+
+
 ## 5.28.0 (2024-09-30)
 
 ### What's new
