@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\Eloquent\UserGroup as EloquentGroup;
 use Statamic\Auth\Eloquent\UserGroupModel;
@@ -84,7 +85,7 @@ class EloquentUserGroupTest extends TestCase
             );
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_a_group()
     {
         $group = $this->makeGroup();
@@ -92,7 +93,7 @@ class EloquentUserGroupTest extends TestCase
         $this->assertInstanceOf(EloquentGroup::class, $group);
     }
 
-    /** @test */
+    #[Test]
     public function it_assigns_a_group_to_a_user()
     {
         $group = $this->makeGroup();
@@ -102,7 +103,7 @@ class EloquentUserGroupTest extends TestCase
         $this->assertEquals($user->groups()->first(), $group);
     }
 
-    /** @test */
+    #[Test]
     public function it_assigns_a_group_to_a_user_then_removes_it()
     {
         $group = $this->makeGroup();
@@ -117,7 +118,7 @@ class EloquentUserGroupTest extends TestCase
         $this->assertCount(0, $user->groups());
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_and_gets_data()
     {
         $group = $this->makeGroup();

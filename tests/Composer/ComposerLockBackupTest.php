@@ -2,6 +2,7 @@
 
 namespace Tests\Composer;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Composer\Lock;
 
 /**
@@ -28,7 +29,7 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_backup_existing_lock_file()
     {
         file_put_contents($this->lockPath, $content = 'test lock file content');
@@ -42,7 +43,7 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($content, file_get_contents($this->backupLockPath));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_throw_exception_when_attempting_to_backup_non_existend_lock_file()
     {
         Lock::backup('non-existent-file.lock');
@@ -50,7 +51,7 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
         $this->assertFileDoesNotExist($this->backupLockPath);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_backup_lock_file_from_custom_location()
     {
         if (! is_dir($dir = './custom')) {

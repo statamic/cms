@@ -3,7 +3,7 @@
 
 @if ($licenses->requestFailed())
     <div class="p-2 w-full fixed bottom-0 z-20">
-        <div class="py-3 px-4 text-sm w-full rounded-md bg-yellow border border-yellow-dark">
+        <div class="py-3 px-4 text-sm w-full rounded-md bg-yellow border border-yellow-dark dark:bg-dark-blue-100 dark:border-none">
         @if ($licenses->usingLicenseKeyFile())
             {{ __('statamic::messages.outpost_license_key_error') }}
         @elseif ($licenses->requestErrorCode() === 422)
@@ -19,7 +19,7 @@
     </div>
 @else
     @if ($licenses->invalid())
-        <div class="p-2 w-full fixed bottom-0 z-2" v-show="showBanner">
+        <div class="p-2 w-full fixed bottom-0 z-2" v-cloak v-show="showBanner">
             <div class="
                 py-3 px-4 text-sm w-full rounded-md
                 @if ($licenses->isOnTestDomain()) bg-gray-800 dark:bg-dark-500 text-gray-300 @endif

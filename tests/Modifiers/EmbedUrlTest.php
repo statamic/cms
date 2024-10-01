@@ -2,18 +2,19 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class EmbedUrlTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_leaves_urls_from_unknown_providers_untouched()
     {
         $this->assertEquals('https://statamic.com/video/hello', $this->embed('https://statamic.com/video/hello'));
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_vimeo_urls()
     {
         $embedUrl = 'https://player.vimeo.com/video/71360261?dnt=1';
@@ -27,7 +28,7 @@ class EmbedUrlTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_private_vimeo_urls()
     {
         $embedUrl = 'https://player.vimeo.com/video/735352648?dnt=1&h=fa55a4d0fc';
@@ -41,7 +42,21 @@ class EmbedUrlTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
+    public function it_transforms_vimeo_file_links()
+    {
+        $embedUrl = 'https://player.vimeo.com/progressive_redirect/playback/990169258/rendition/1080p/file.mp4?dnt=1&loc=external&log_user=0&signature=275be15f3630d1ca3e7a51456a911e11e3ba9fddf89911f49140f6de95357e05';
+
+        $this->assertEquals($embedUrl, $this->embed('https://player.vimeo.com/progressive_redirect/playback/990169258/rendition/1080p/file.mp4?loc=external&log_user=0&signature=275be15f3630d1ca3e7a51456a911e11e3ba9fddf89911f49140f6de95357e05'));
+
+        $this->assertEquals(
+            $embedUrl.'&foo=bar',
+            $this->embed('https://player.vimeo.com/progressive_redirect/playback/990169258/rendition/1080p/file.mp4?loc=external&log_user=0&signature=275be15f3630d1ca3e7a51456a911e11e3ba9fddf89911f49140f6de95357e05&foo=bar'),
+            'It appends the do not track query param if a query string already exists.'
+        );
+    }
+
+    #[Test]
     public function it_transforms_youtube_urls()
     {
         $embedUrl = 'https://www.youtube-nocookie.com/embed/s72r_wu_NVY';

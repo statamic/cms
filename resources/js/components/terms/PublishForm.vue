@@ -299,6 +299,7 @@ export default {
         createAnotherUrl: String,
         listingUrl: String,
         previewTargets: Array,
+        hasTemplate: Boolean,
     },
 
     data() {
@@ -361,11 +362,11 @@ export default {
         },
 
         showLivePreviewButton() {
-            return !this.isCreating && this.isBase && this.livePreviewUrl;
+            return !this.isCreating && this.isBase && this.livePreviewUrl && this.showVisitUrlButton;
         },
 
         showVisitUrlButton() {
-            return !!this.permalink;
+            return !!this.permalink && this.hasTemplate;
         },
 
         isBase() {

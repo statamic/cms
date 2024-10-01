@@ -1,0 +1,21 @@
+<?php
+
+namespace DummyNamespace;
+
+use Statamic\Dictionaries\BasicDictionary;
+
+class DummyClass extends BasicDictionary
+{
+    protected string $valueKey = 'abbr';
+    protected string $labelKey = 'name';
+
+    protected function getItems(): array
+    {
+        return [
+            ['name' => 'Alabama', 'abbr' => 'AL', 'capital' => 'Montgomery'],
+            ['name' => 'Alaska', 'abbr' => 'AK', 'capital' => 'Juneau'],
+            ['name' => 'Arizona', 'abbr' => 'AZ', 'capital' => 'Phoenix'],
+            // ...
+        ];
+    }
+}

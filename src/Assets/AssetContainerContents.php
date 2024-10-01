@@ -5,6 +5,7 @@ namespace Statamic\Assets;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\DirectoryListing;
+use Statamic\Facades\Stache;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
@@ -313,6 +314,6 @@ class AssetContainerContents
 
     private function ttl()
     {
-        return config('statamic.stache.watcher') ? 0 : null;
+        return Stache::isWatcherEnabled() ? 0 : null;
     }
 }

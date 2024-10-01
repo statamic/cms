@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Facades\File;
 use Statamic\Facades\Stache;
@@ -132,7 +131,7 @@ class TaxonomyTermsStore extends ChildStore
 
     public function handleFileChanges()
     {
-        if ($this->fileChangesHandled || ! config('statamic.stache.watcher')) {
+        if ($this->fileChangesHandled || ! Stache::isWatcherEnabled()) {
             return;
         }
 
@@ -151,7 +150,7 @@ class TaxonomyTermsStore extends ChildStore
             return $this->paths;
         }
 
-        if ($paths = Cache::get($this->pathsCacheKey())) {
+        if ($paths = Stache::cacheStore()->get($this->pathsCacheKey())) {
             return $this->paths = collect($paths);
         }
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Rules;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Rules\Slug;
 use Tests\TestCase;
 
@@ -11,8 +12,8 @@ class SlugTest extends TestCase
 
     protected static $customRule = Slug::class;
 
-    /** @test */
-    public function it_validates_handles()
+    #[Test]
+    public function it_validates_slugs()
     {
         $this->assertPasses('foo');
         $this->assertPasses('foo-bar');
@@ -40,7 +41,7 @@ class SlugTest extends TestCase
         $this->assertFails('foo-_-bar');
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_helpful_validation_error()
     {
         $this->assertValidationErrorOutput(trans('statamic::validation.slug'), '-bad-input');

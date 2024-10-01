@@ -8,6 +8,10 @@ trait QueriesEntryStatus
 {
     public function whereStatus(string $status)
     {
+        if ($status === 'any') {
+            return $this;
+        }
+
         if (! in_array($status, ['published', 'draft', 'scheduled', 'expired'])) {
             throw new \Exception("Invalid status [$status]");
         }
