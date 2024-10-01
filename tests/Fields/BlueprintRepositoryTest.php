@@ -20,7 +20,7 @@ class BlueprintRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repo = app(BlueprintRepository::class)
-            ->setDirectory('/path/to/resources/blueprints');
+            ->setDirectories('/path/to/resources/blueprints');
 
         Facades\Blueprint::swap($this->repo);
     }
@@ -338,7 +338,7 @@ EOT;
     public function it_gets_a_blueprint_from_split_repository()
     {
         $repo = (new BlueprintRepository())
-            ->setDirectory([
+            ->setDirectories([
                 'default' => '/path/to/resources/blueprints',
                 'forms' => '/path/to/content/forms/blueprints',
             ]);

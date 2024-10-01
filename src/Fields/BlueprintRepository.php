@@ -22,7 +22,7 @@ class BlueprintRepository
     protected $fallbacks = [];
     protected $additionalNamespaces = [];
 
-    public function setDirectory(string|array $directories)
+    public function setDirectories(string|array $directories)
     {
         if (is_string($directories)) {
             $directories = ['default' => $directories];
@@ -37,6 +37,12 @@ class BlueprintRepository
         }
 
         return $this;
+    }
+
+    /** @deprecated */
+    public function setDirectory(string $directory)
+    {
+        return $this->setDirectories($directory);
     }
 
     public function directory()
