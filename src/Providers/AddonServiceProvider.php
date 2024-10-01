@@ -345,7 +345,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootCommands()
     {
-        if ($this->app->runningInConsole()) {
+        if ($this->app->isBooted() && $this->app->runningInConsole()) {
             $commands = collect($this->commands)
                 ->merge($this->autoloadFilesFromFolder('Commands', Command::class))
                 ->merge($this->autoloadFilesFromFolder('Console/Commands', Command::class))
