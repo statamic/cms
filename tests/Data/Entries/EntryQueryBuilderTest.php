@@ -769,6 +769,16 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_can_be_reordered()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertSame(['post-3', 'post-2', 'post-1'], Entry::query()->orderBy('title', 'desc')->get()->map->slug()->all());
+
+        $this->assertSame(['post-1', 'post-2', 'post-3'], Entry::query()->orderBy('title', 'desc')->reorder()->orderBy('asc', 'desc')->get()->map->slug()->all());
+    }
+
+    #[Test]
     public function filtering_using_where_status_column_writes_deprecation_log()
     {
         $this->withoutDeprecationHandling();
