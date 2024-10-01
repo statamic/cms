@@ -728,7 +728,15 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function autoloadFilesFromFolder($folder, $requiredClass)
     {
-        $addon = $this->getAddon();
+        try {
+            $addon = $this->getAddon();
+        } catch (NotBootedException $e) {
+            // This would be thrown if a developer has tried to call a method
+            // that triggers autoloading before Statamic has booted. Perhaps
+            // they have placed it in the boot method instead of bootAddon.
+            return [];
+        }
+
         $path = $addon->directory().$addon->autoload().'/'.$folder;
 
         if (! $this->app['files']->exists($path)) {
