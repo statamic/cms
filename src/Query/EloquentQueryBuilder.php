@@ -386,6 +386,19 @@ abstract class EloquentQueryBuilder implements Builder
         return $this;
     }
 
+    public function reorder($column = null, $direction = 'asc')
+    {
+        if ($column) {
+            $this->builder->reorder($this->column($column), $direction);
+
+            return $this;
+        }
+
+        $this->builder->reorder();
+
+        return $this;
+    }
+
     protected function column($column)
     {
         return $column;
