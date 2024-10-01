@@ -52,7 +52,7 @@ abstract class BasicDictionary extends Dictionary
     {
         $query = strtolower($query);
 
-        foreach ($item->data() as $key => $value) {
+        foreach ($item->extra() as $key => $value) {
             if (! empty($this->searchable) && ! in_array($key, $this->searchable)) {
                 continue;
             }
