@@ -467,15 +467,35 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootRoutes()
     {
-        if ($web = Arr::get($this->routes, 'web')) {
+        $directory = $this->getAddon()->directory();
+
+        $web = Arr::get(
+            array: $this->routes,
+            key: 'web',
+            default: $this->app['files']->exists($path = $directory.'routes/web.php') ? $path : null
+        );
+
+        if ($web) {
             $this->registerWebRoutes($web);
         }
 
-        if ($cp = Arr::get($this->routes, 'cp')) {
+        $cp = Arr::get(
+            array: $this->routes,
+            key: 'cp',
+            default: $this->app['files']->exists($path = $directory.'routes/cp.php') ? $path : null
+        );
+
+        if ($cp) {
             $this->registerCpRoutes($cp);
         }
 
-        if ($actions = Arr::get($this->routes, 'actions')) {
+        $actions = Arr::get(
+            array: $this->routes,
+            key: 'actions',
+            default: $this->app['files']->exists($path = $directory.'routes/actions.php') ? $path : null
+        );
+
+        if ($actions) {
             $this->registerActionRoutes($actions);
         }
 
