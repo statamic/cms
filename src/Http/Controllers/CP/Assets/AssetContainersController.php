@@ -317,7 +317,7 @@ class AssetContainersController extends CpController
         return collect(config('statamic.assets.image_manipulation.presets'))
             ->mapWithKeys(function ($params, $handle) {
                 return [$handle => $this->expandedGlidePresetLabel($handle, $params)];
-            });
+            })->all();
     }
 
     private function expandedGlidePresetLabel($handle, $params)

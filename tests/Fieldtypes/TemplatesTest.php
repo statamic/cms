@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -29,7 +30,7 @@ class TemplatesTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_a_list_of_templates()
     {
         $files = [

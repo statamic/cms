@@ -270,6 +270,10 @@ class CoreModifiers extends Modifier
             return '';
         }
 
+        if (is_string($value)) {
+            return strip_tags($value);
+        }
+
         if (Arr::isAssoc($value)) {
             $value = [$value];
         }
@@ -296,6 +300,11 @@ class CoreModifiers extends Modifier
         if ($value instanceof Value) {
             $value = $value->raw();
         }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
         if (Arr::isAssoc($value)) {
             $value = [$value];
         }
@@ -1443,6 +1452,10 @@ class CoreModifiers extends Modifier
     {
         $limit = Arr::get($params, 0, 0);
 
+        if (Compare::isQueryBuilder($value)) {
+            return $value->limit($limit);
+        }
+
         if ($value instanceof Collection) {
             return $value->take($limit);
         }
@@ -1811,6 +1824,41 @@ class CoreModifiers extends Modifier
             }
 
             return method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+        });
+
+        return $wasArray ? $items->all() : $items;
+    }
+
+    /**
+     * Selects certain values from each item in a collection.
+     *
+     * @param  array|Collection  $value
+     * @param  array  $params
+     * @return array|Collection
+     */
+    public function select($value, $params)
+    {
+        $keys = Arr::wrap($params);
+
+        if ($wasArray = is_array($value)) {
+            $value = collect($value);
+        }
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        $items = $value->map(function ($item) use ($keys) {
+            return collect($keys)->mapWithKeys(function ($key) use ($item) {
+                $value = null;
+                if (is_array($item) || $item instanceof ArrayAccess) {
+                    $value = Arr::get($item, $key);
+                } else {
+                    $value = method_exists($item, 'value') ? $item->value($key) : $item->get($key);
+                }
+
+                return [$key => $value];
+            })->all();
         });
 
         return $wasArray ? $items->all() : $items;
@@ -2871,13 +2919,35 @@ class CoreModifiers extends Modifier
     public function where($value, $params)
     {
         $key = Arr::get($params, 0);
-        $val = Arr::get($params, 1);
+        $opr = Arr::get($params, 1);
+        $val = Arr::get($params, 2);
 
-        if (! $val && Str::contains($key, ':')) {
-            [$key, $val] = explode(':', $key);
+        if (! $opr && Str::contains($key, ':')) {
+            [$key, $opr] = explode(':', $key);
+        }
+        if (count($params) < 3) {
+            $val = $opr;
+            $opr = '==';
         }
 
-        $collection = collect($value)->where($key, $val);
+        $collection = collect($value)->where($key, $opr, $val);
+
+        return $collection->values()->all();
+    }
+
+    /**
+     * Filters the data by a given key that matches an array of values.
+     *
+     * @param  array  $value
+     * @param  array  $params
+     * @return array
+     */
+    public function whereIn($value, $params)
+    {
+        $key = Arr::get($params, 0);
+        $arr = Arr::get($params, 1);
+
+        $collection = collect($value)->whereIn($key, $arr);
 
         return $collection->values()->all();
     }
@@ -3130,7 +3200,8 @@ class CoreModifiers extends Modifier
     private function handleUnlistedVimeoUrls($url)
     {
         $hash = '';
-        if (Str::substrCount($url, '/') > 4) {
+
+        if (! Str::contains($url, 'progressive_redirect') && Str::substrCount($url, '/') > 4) {
             $hash = Str::afterLast($url, '/');
             $url = Str::beforeLast($url, '/');
 

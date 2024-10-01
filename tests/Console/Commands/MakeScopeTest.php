@@ -4,6 +4,7 @@ namespace Tests\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class MakeScopeTest extends TestCase
@@ -28,7 +29,7 @@ class MakeScopeTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_scope()
     {
         $path = base_path('app/Scopes/Dog.php');
@@ -41,7 +42,7 @@ class MakeScopeTest extends TestCase
         $this->assertStringContainsString('namespace App\Scopes;', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_will_not_overwrite_an_existing_scope()
     {
         $path = base_path('app/Scopes/Dog.php');
@@ -58,7 +59,7 @@ class MakeScopeTest extends TestCase
         $this->assertStringContainsString('overwritten scope', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function using_force_option_will_overwrite_original_scope()
     {
         $path = base_path('app/Scopes/Dog.php');
@@ -73,7 +74,7 @@ class MakeScopeTest extends TestCase
         $this->assertStringNotContainsString('overwritten scope', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_scope_into_an_addon()
     {
         $path = base_path('addons/yoda/bag-odah');

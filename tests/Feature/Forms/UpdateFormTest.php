@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Forms;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -20,7 +21,7 @@ class UpdateFormTest extends TestCase
         $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $form = tap(Form::make('test'))->save();
@@ -33,7 +34,7 @@ class UpdateFormTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_a_form()
     {
         $form = tap(Form::make('test')->title('Original title'))->save();
@@ -58,7 +59,7 @@ class UpdateFormTest extends TestCase
         $this->assertFalse($updated->store());
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_emails()
     {
         $form = tap(Form::make('test'))->save();
@@ -105,6 +106,39 @@ class UpdateFormTest extends TestCase
                 'attachments' => true,
             ],
         ], $updated->email());
+    }
+
+    /** @test */
+    public function it_updates_data()
+    {
+        $form = tap(Form::make('test'))->save();
+        $this->assertNull($form->email());
+
+        Form::appendConfigFields('*', 'Test Config', [
+            'another_config' => [
+                'handle' => 'another_config',
+                'field' => [
+                    'type' => 'text',
+                ],
+            ],
+            'some_config' => [
+                'handle' => 'some_config',
+                'field' => [
+                    'type' => 'text',
+                ],
+            ],
+        ]);
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['some_config' => 'foo', 'another_config' => 'bar'])
+            ->assertOk();
+
+        $updated = Form::all()->first();
+        $this->assertEquals([
+            'another_config' => 'bar',
+            'some_config' => 'foo',
+        ], $updated->data()->all());
     }
 
     private function userWithoutPermission()

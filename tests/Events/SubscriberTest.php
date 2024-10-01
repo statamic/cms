@@ -3,6 +3,7 @@
 namespace Tests\Events;
 
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\Event as StatamicEvent;
 use Statamic\Events\Subscriber as StatamicSubscriber;
 use Statamic\Facades\Blink;
@@ -20,7 +21,7 @@ class SubscriberTest extends TestCase
         Blink::put(EmailPunSubscriber::class, 0);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_dispatched_events()
     {
         Event::subscribe(StaticCachePunSubscriber::class);
@@ -38,7 +39,7 @@ class SubscriberTest extends TestCase
         $this->assertEventHandledCount(2, PunDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_temporarily_disable_and_re_enable_subscriber_handled_listeners()
     {
         Event::subscribe(StaticCachePunSubscriber::class);
@@ -67,7 +68,7 @@ class SubscriberTest extends TestCase
         $this->assertEventHandledCount(2, PunDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_temporarily_disable_listeners_on_code_run_within_a_callback()
     {
         Event::subscribe(StaticCachePunSubscriber::class);
@@ -96,7 +97,7 @@ class SubscriberTest extends TestCase
         $this->assertEventHandledCount(2, PunDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function disabling_one_subscriber_does_not_affect_other_subscribers()
     {
         Event::subscribe(StaticCachePunSubscriber::class);

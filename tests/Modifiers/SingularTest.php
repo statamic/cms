@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -16,11 +18,8 @@ class SingularTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider pluralWordsProvider
-     */
+    #[Test]
+    #[DataProvider('pluralWordsProvider')]
     public function it_returns_the_singular_word_of_an_english_word($expected, $input): void
     {
         $modified = $this->modify($input);

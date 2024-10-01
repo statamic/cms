@@ -20,6 +20,10 @@ class PublishedEntriesController extends CpController
             'user' => User::fromUser($request->user()),
         ]);
 
+        if ($entry === false) {
+            return ['saved' => false];
+        }
+
         $blueprint = $entry->blueprint();
 
         [$values] = $this->extractFromFields($entry, $blueprint);
@@ -28,6 +32,7 @@ class PublishedEntriesController extends CpController
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
             ]),
+            'saved' => true,
         ];
     }
 
@@ -40,6 +45,10 @@ class PublishedEntriesController extends CpController
             'user' => User::fromUser($request->user()),
         ]);
 
+        if ($entry === false) {
+            return ['saved' => false];
+        }
+
         $blueprint = $entry->blueprint();
 
         [$values] = $this->extractFromFields($entry, $blueprint);
@@ -48,6 +57,7 @@ class PublishedEntriesController extends CpController
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
             ]),
+            'saved' => true,
         ];
     }
 }

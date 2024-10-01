@@ -5,7 +5,7 @@
             class="p-3"
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
-            :meta="{}"
+            :meta="meta"
             :values="containerValues"
             :track-dirty-state="false"
             @updated="updateValues"
@@ -15,6 +15,7 @@
                 :fields="filter.fields"
                 :name-prefix="`filter-${filter.handle}`"
                 @updated="setFieldValue"
+                @meta-updated="updateMeta"
             />
         </publish-container>
 
@@ -48,6 +49,12 @@ export default {
         values: Object,
     },
 
+    data() {
+        return {
+            meta: {},
+        };
+    },
+
     computed: {
         defaultValues() {
             return this.filter.values || {};
@@ -63,7 +70,7 @@ export default {
             let filteredValues = clone(values);
 
             Object.keys(values).forEach(key => {
-                if (_.isEmpty(values[key])) delete filteredValues[key];
+                if (values[key] === null || values[key] === undefined) delete filteredValues[key];
             });
 
             this.$emit('changed', filteredValues);
@@ -72,6 +79,10 @@ export default {
         resetAll() {
             this.$emit('changed', null);
             this.$emit('cleared');
+        },
+
+        updateMeta(value) {
+            this.meta = value;
         },
 
         close() {

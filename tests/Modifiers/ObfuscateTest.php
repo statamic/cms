@@ -2,16 +2,15 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class ObfuscateTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider seedProvider
-     */
+    #[Test]
+    #[DataProvider('seedProvider')]
     public function it_obfuscates_strings($seed, $value, $expected)
     {
         mt_srand($seed); // make rand predictable for testing.

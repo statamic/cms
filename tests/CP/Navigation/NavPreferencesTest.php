@@ -3,6 +3,7 @@
 namespace Tests\CP\Navigation;
 
 use Illuminate\Support\Facades\Request;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -25,7 +26,7 @@ class NavPreferencesTest extends TestCase
         Facades\Form::shouldReceive('all')->andReturn(collect());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reorder_sections()
     {
         $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users'];
@@ -124,7 +125,7 @@ class NavPreferencesTest extends TestCase
         ])->keys()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reorder_items_within_sections()
     {
         $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
@@ -234,7 +235,7 @@ class NavPreferencesTest extends TestCase
         ])->get('Content')->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reorder_child_items_within_an_item()
     {
         $defaultUtilitiesItems = ['Cache', 'Email', 'Licensing', 'PHP Info', 'Search'];
@@ -339,7 +340,7 @@ class NavPreferencesTest extends TestCase
         ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_does_nothing_with_inherit_actions_when_not_reordering()
     {
         $nav = $this->buildNavWithPreferences([
@@ -359,7 +360,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Users', 'Groups', 'Permissions'], $nav->get('Users')->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_rename_sections()
     {
         $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users'];
@@ -405,7 +406,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Users', 'Groups', 'Permissions'], $nav->get('Pals')->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_rename_items_within_a_section()
     {
         $defaultItems = ['Users', 'Groups', 'Permissions'];
@@ -453,7 +454,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Articles', 'Pages'], $nav->get('Content')->keyBy->display()->get('Things')->resolveChildren()->children()->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_alias_items_within_a_section()
     {
         $this->assertEquals(['Blueprints', 'Fieldsets'], $this->buildDefaultNav()->get('Fields')->map->display()->all());
@@ -513,7 +514,7 @@ class NavPreferencesTest extends TestCase
         $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function aliasing_an_item_does_not_include_its_children()
     {
         $nav = $this->buildNavWithPreferences([
@@ -526,7 +527,7 @@ class NavPreferencesTest extends TestCase
         $this->assertCount(2, $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_alias_items_into_another_section()
     {
         $this->assertEquals(['Dashboard'], $this->buildDefaultNav()->get('Top Level')->map->display()->all());
@@ -614,7 +615,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Blueprints', 'Fieldsets', 'Blueprints'], $nav->get('Fields')->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_move_items_into_another_section()
     {
         $this->assertEquals(['Dashboard'], $this->buildDefaultNav()->get('Top Level')->map->display()->all());
@@ -670,7 +671,7 @@ class NavPreferencesTest extends TestCase
         $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_hide_sections()
     {
         $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users'];
@@ -704,7 +705,7 @@ class NavPreferencesTest extends TestCase
         ])->keys()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_hide_items_from_a_section()
     {
         $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
@@ -761,7 +762,7 @@ class NavPreferencesTest extends TestCase
         ])->get('Content')->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_new_items_on_the_fly()
     {
         // It can create items in child items...
@@ -898,7 +899,7 @@ class NavPreferencesTest extends TestCase
         ])->get('Top Level')->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_modify_existing_items()
     {
         // It can modify item within a section...
@@ -984,7 +985,7 @@ class NavPreferencesTest extends TestCase
         $this->assertArrayNotHasKey('Dashboard Confessional', $nav->get('Content')->keyBy->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function modifying_an_aliased_item_only_modifies_the_clone_and_not_the_original()
     {
         $nav = $this->buildNavWithPreferences([
@@ -1008,7 +1009,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('http://localhost/cp/fields/blueprints', $nav->get('Fields')->keyBy->display()->get('Blueprints')->url());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_child_items_using_array_setter_notation()
     {
         $children = $this->buildNavWithPreferences([
@@ -1048,7 +1049,7 @@ class NavPreferencesTest extends TestCase
         $this->assertNull($yamlItem->children());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_alias_items_into_the_children_of_another_item()
     {
         $nav = $this->buildNavWithPreferences([
@@ -1078,7 +1079,7 @@ class NavPreferencesTest extends TestCase
         $this->assertArrayHasKey('Cache', $nav->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->keyBy->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_move_items_into_the_children_of_another_item()
     {
         $nav = $this->buildNavWithPreferences([
@@ -1108,7 +1109,7 @@ class NavPreferencesTest extends TestCase
         $this->assertArrayNotHasKey('Cache', $nav->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->keyBy->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_move_items_out_of_the_children_of_an_item_in_the_same_section()
     {
         $nav = $this->buildNavWithPreferences([
@@ -1125,7 +1126,7 @@ class NavPreferencesTest extends TestCase
         $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_move_child_items_into_another_items_children()
     {
         $nav = $this->buildNavWithPreferences([
@@ -1150,7 +1151,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('Pages', $taxonomiesChildren->first()->display());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_hide_child_items()
     {
         // When modifying parent...
@@ -1200,7 +1201,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['http://localhost/cp/collections/articles'], $movedItem->children()->map->url()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_modify_existing_child_items()
     {
         // When modifying parent...
@@ -1297,7 +1298,7 @@ class NavPreferencesTest extends TestCase
         ], $movedItem->children()->map->url()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_alias_newly_created_items_to_an_earlier_section()
     {
         $nav = $this->buildNavWithPreferences([
@@ -1364,7 +1365,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('http://localhost/techs', $aliasedJsonItem->url());
     }
 
-    /** @test */
+    #[Test]
     public function it_respects_order_that_items_are_aliased_and_created()
     {
         $items = $this->buildNavWithPreferences([
@@ -1387,7 +1388,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Dashboard', 'Blueprints', 'Fieldsets', 'Technologies'], $items);
     }
 
-    /** @test */
+    #[Test]
     public function preferences_are_applied_after_addon_nav_extensions()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -1415,7 +1416,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Dashboard', 'SEO Pro'], $nav->get('Top Level')->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_rename_extended_sections_that_dont_follow_title_case_convention()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -1437,7 +1438,7 @@ class NavPreferencesTest extends TestCase
         ])->keys()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_hide_extended_sections_that_dont_follow_title_case_convention()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -1464,7 +1465,7 @@ class NavPreferencesTest extends TestCase
         ])->keys()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_new_items_in_extended_sections_that_dont_follow_title_case_convention()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -1491,7 +1492,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['SEO Settings', 'New Item'], $nav->get('SEO pro')->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_hides_section_when_all_items_are_moved_out_of_section()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -1524,13 +1525,13 @@ class NavPreferencesTest extends TestCase
         $this->assertTrue($navWithHidden->get('SEO Pro')->isEmpty());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_handle_a_bunch_of_useless_config_without_erroring()
     {
         $this->markTestSkipped();
     }
 
-    /** @test */
+    #[Test]
     public function it_builds_out_an_example_config()
     {
         $nav = $this->buildNavWithPreferences([
@@ -1621,7 +1622,7 @@ class NavPreferencesTest extends TestCase
         ], $nav->get('Fields')->mapWithKeys(fn ($i) => [$i->display() => $i->url()])->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_build_with_hidden_items()
     {
         $contentItems = $this->buildNavWithPreferences([
@@ -1644,7 +1645,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('@modify', $contentItems->keyBy->display()->get('Globetrotters')->manipulations()['action']);
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_active_status_on_moved_items()
     {
         Facades\Taxonomy::make('topics')->save();

@@ -2,12 +2,13 @@
 
 namespace Tests\Policies;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\Facades\Taxonomy;
 
 class TaxonomyPolicyTest extends PolicyTestCase
 {
-    /** @test */
+    #[Test]
     public function index_is_allowed_if_any_taxonomy_is_viewable()
     {
         $userWithAlfaPermission = $this->userWithPermissions(['view alfa terms']);
@@ -24,7 +25,7 @@ class TaxonomyPolicyTest extends PolicyTestCase
         $this->assertFalse($userWithoutPermission->can('index', TaxonomyContract::class));
     }
 
-    /** @test */
+    #[Test]
     public function index_is_allowed_if_any_taxonomy_is_viewable_with_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de']);
@@ -44,7 +45,7 @@ class TaxonomyPolicyTest extends PolicyTestCase
         $this->assertFalse($userWithDePermission->can('index', TaxonomyContract::class));
     }
 
-    /** @test */
+    #[Test]
     public function taxonomies_are_viewable_with_view_permissions()
     {
         $user = $this->userWithPermissions(['view alfa terms']);
@@ -58,7 +59,7 @@ class TaxonomyPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $taxonomyB));
     }
 
-    /** @test */
+    #[Test]
     public function taxonomies_are_editable_with_configure_permissions()
     {
         $authorizedUser = $this->userWithPermissions(['configure taxonomies']);
@@ -70,7 +71,7 @@ class TaxonomyPolicyTest extends PolicyTestCase
         $this->assertFalse($forbiddenUser->can('edit', $taxonomy));
     }
 
-    /** @test */
+    #[Test]
     public function taxonomies_can_be_created_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);
@@ -80,7 +81,7 @@ class TaxonomyPolicyTest extends PolicyTestCase
         $this->assertFalse($forbiddenUser->can('create', TaxonomyContract::class));
     }
 
-    /** @test */
+    #[Test]
     public function taxonomies_can_be_deleted_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);

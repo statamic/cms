@@ -23,6 +23,7 @@ export default new Vue({
         return {
             bootingCallbacks: [],
             bootedCallbacks: [],
+            darkMode: null,
         }
     },
 
