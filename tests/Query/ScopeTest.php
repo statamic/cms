@@ -10,7 +10,6 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Query\Scopes\Scope;
-use Statamic\Statamic;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -24,17 +23,6 @@ class ScopeTest extends TestCase
 
         app('statamic.scopes')[ScopeForAllBuilders::handle()] = ScopeForAllBuilders::class;
         app('statamic.scopes')[ScopeForLimitedBuilders::handle()] = ScopeForLimitedBuilders::class;
-    }
-
-    /** @test **/
-    public function can_get_builders()
-    {
-        $builders = collect(['entries', 'terms'])->map(function ($builder) {
-            return get_class(Statamic::query($builder));
-        });
-
-        $this->assertEquals(ScopeForAllBuilders::builders(), collect());
-        $this->assertEquals(ScopeForLimitedBuilders::builders(), $builders);
     }
 
     /** @test **/

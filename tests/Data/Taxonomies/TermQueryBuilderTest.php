@@ -20,13 +20,6 @@ class TermQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        app('statamic.scopes')[CustomScope::handle()] = CustomScope::class;
-    }
-
     #[Test]
     public function it_gets_terms()
     {
@@ -606,13 +599,16 @@ class TermQueryBuilderTest extends TestCase
     #[Test]
     public function terms_are_found_using_scopes()
     {
+        CustomScope::register();
+        Term::allowQueryScope(CustomScope::class);
+        Term::allowQueryScope(CustomScope::class, 'whereCustom');
+
         Taxonomy::make('tags')->save();
         Term::make('a')->taxonomy('tags')->data(['title' => 'Post 1'])->save();
         Term::make('b')->taxonomy('tags')->data(['title' => 'Post 2'])->save();
 
-        $entries = Term::query()->customScope('Post 1')->get();
-
-        $this->assertCount(1, $entries);
+        $this->assertCount(1, Term::query()->customScope('Post 1')->get());
+        $this->assertCount(1, Term::query()->whereCustom('Post 1')->get());
     }
 
     #[Test]

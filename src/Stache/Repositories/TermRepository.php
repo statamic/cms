@@ -9,6 +9,7 @@ use Statamic\Exceptions\TermNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
+use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Stache\Stache;
 use Statamic\Support\Str;
@@ -17,6 +18,8 @@ use Statamic\Taxonomies\TermCollection;
 
 class TermRepository implements RepositoryContract
 {
+    use AllowsScopes;
+
     protected $stache;
     protected $store;
     protected $substitutionsById = [];

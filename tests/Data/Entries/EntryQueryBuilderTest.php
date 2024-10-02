@@ -18,13 +18,6 @@ class EntryQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        app('statamic.scopes')[CustomScope::handle()] = CustomScope::class;
-    }
-
     private function createDummyCollectionAndEntries()
     {
         Collection::make('posts')->save();
@@ -678,12 +671,15 @@ class EntryQueryBuilderTest extends TestCase
     #[Test]
     public function entries_are_found_using_scopes()
     {
+        CustomScope::register();
+        Entry::allowQueryScope(CustomScope::class);
+        Entry::allowQueryScope(CustomScope::class, 'whereCustom');
+
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
         EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
 
-        $entries = Entry::query()->customScope('Post 1')->get();
-
-        $this->assertCount(1, $entries);
+        $this->assertCount(1, Entry::query()->customScope('Post 1')->get());
+        $this->assertCount(1, Entry::query()->whereCustom('Post 1')->get());
     }
 
     #[Test]

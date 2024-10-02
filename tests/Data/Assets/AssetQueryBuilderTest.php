@@ -31,8 +31,6 @@ class AssetQueryBuilderTest extends TestCase
         Storage::disk('test')->put('e.jpg', '');
         Storage::disk('test')->put('f.jpg', '');
         $this->container = tap(AssetContainer::make('test')->disk('test'))->save();
-
-        app('statamic.scopes')[CustomScope::handle()] = CustomScope::class;
     }
 
     #[Test]
@@ -532,9 +530,12 @@ class AssetQueryBuilderTest extends TestCase
     #[Test]
     public function assets_are_found_using_scopes()
     {
-        $assets = $this->container->queryAssets()->customScope('a.jpg')->get();
+        CustomScope::register();
+        Asset::allowQueryScope(CustomScope::class);
+        Asset::allowQueryScope(CustomScope::class, 'whereCustom');
 
-        $this->assertCount(1, $assets);
+        $this->assertCount(1, $this->container->queryAssets()->customScope('a.jpg')->get());
+        $this->assertCount(1, $this->container->queryAssets()->whereCustom('a.jpg')->get());
     }
 
     #[Test]

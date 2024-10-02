@@ -15,13 +15,6 @@ class UserQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        app('statamic.scopes')[CustomScope::handle()] = CustomScope::class;
-    }
-
     #[Test]
     public function users_are_found_using_or_where()
     {
@@ -404,12 +397,15 @@ class UserQueryBuilderTest extends TestCase
     /** @test **/
     public function users_are_found_using_scopes()
     {
+        CustomScope::register();
+        User::allowQueryScope(CustomScope::class);
+        User::allowQueryScope(CustomScope::class, 'whereCustom');
+
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
         User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
 
-        $entries = User::query()->customScope('gandalf@precious.com')->get();
-
-        $this->assertCount(1, $entries);
+        $this->assertCount(1, User::query()->customScope('gandalf@precious.com')->get());
+        $this->assertCount(1, User::query()->whereCustom('gandalf@precious.com')->get());
     }
 }
 

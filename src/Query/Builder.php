@@ -2,6 +2,7 @@
 
 namespace Statamic\Query;
 
+use BadMethodCallException;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Pagination\Paginator;
@@ -41,9 +42,15 @@ abstract class Builder implements Contract
 
     public function __call($method, $args)
     {
-        $this->applyScope($method, $args);
+        if ($this->canApplyScope($method)) {
+            $this->applyScope($method, $args);
 
-        return $this;
+            return $this;
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Call to undefined method %s::%s()', static::class, $method
+        ));
     }
 
     public function select($columns = ['*'])
