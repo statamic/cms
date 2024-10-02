@@ -64,6 +64,9 @@ class Cache
 
     private function handleRequest($request, Closure $next)
     {
+        // When the file driver loads a cached page, it logs a debug message explaining
+        // that it's being serving via PHP and rewrite rules are not set up correctly.
+        // Since we're intentionally doing it here, we should prevent that warning.
         if ($this->cacher instanceof FileCacher) {
             $this->cacher->preventLoggingRewriteWarning();
         }
