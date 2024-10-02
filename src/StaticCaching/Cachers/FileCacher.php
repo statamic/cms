@@ -90,8 +90,6 @@ class FileCacher extends AbstractCacher
 
         $path = $this->getFilePath($url);
 
-        ray($this->shouldLog);
-
         if ($this->shouldLog && ! $this->isLongQueryStringPath($path)) {
             Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
         }
