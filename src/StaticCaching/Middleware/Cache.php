@@ -59,9 +59,13 @@ class Cache
         $lock = $this->createLock($request);
 
         try {
-            return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
+            $lock->block($this->lockFor / 2);
+
+            return $this->handleRequest($request, $next);
         } catch (LockTimeoutException $e) {
             return $this->outputRefreshResponse($request);
+        } finally {
+            $lock->release();
         }
     }
 
