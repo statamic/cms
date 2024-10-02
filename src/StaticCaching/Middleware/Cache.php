@@ -14,6 +14,7 @@ use Statamic\Facades\StaticCache;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
+use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
@@ -63,6 +64,10 @@ class Cache
 
     private function handleRequest($request, Closure $next)
     {
+        if ($this->cacher instanceof FileCacher) {
+            $this->cacher->preventLogging();
+        }
+
         if ($response = $this->serveFromCache($request)) {
             return $response;
         }
