@@ -39,7 +39,7 @@ class FileCacher extends AbstractCacher
     /**
      * @var bool
      */
-    private $shouldLog = true;
+    private $logRewriteWarning = true;
 
     /**
      * @param  array  $config
@@ -76,9 +76,9 @@ class FileCacher extends AbstractCacher
         $this->cacheUrl($this->makeHash($url), ...$this->getPathAndDomain($url));
     }
 
-    public function preventLogging()
+    public function preventLoggingRewriteWarning()
     {
-        $this->shouldLog = false;
+        $this->logRewriteWarning = false;
     }
 
     /**
@@ -90,7 +90,7 @@ class FileCacher extends AbstractCacher
 
         $path = $this->getFilePath($url);
 
-        if ($this->shouldLog && ! $this->isLongQueryStringPath($path)) {
+        if ($this->logRewriteWarning && ! $this->isLongQueryStringPath($path)) {
             Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
         }
 

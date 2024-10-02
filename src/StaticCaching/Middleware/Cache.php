@@ -49,7 +49,7 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
-        if ($response = $this->serveFromCache($request)) {
+        if ($response = $this->attemptToServeCachedResponse($request)) {
             return $response;
         }
 
@@ -65,10 +65,10 @@ class Cache
     private function handleRequest($request, Closure $next)
     {
         if ($this->cacher instanceof FileCacher) {
-            $this->cacher->preventLogging();
+            $this->cacher->preventLoggingRewriteWarning();
         }
 
-        if ($response = $this->serveFromCache($request)) {
+        if ($response = $this->attemptToServeCachedResponse($request)) {
             return $response;
         }
 
@@ -102,7 +102,7 @@ class Cache
         }
     }
 
-    private function serveFromCache($request)
+    private function attemptToServeCachedResponse($request)
     {
         try {
             if ($response = $this->attemptToGetCachedResponse($request)) {
