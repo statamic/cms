@@ -26,4 +26,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function scopeStatamic($query)
+    {
+        return $query->where('email', 'like', '%@statamic.com');
+    }
 }
