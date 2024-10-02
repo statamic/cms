@@ -48,29 +48,25 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
-        try {
-            if ($response = $this->attemptToGetCachedResponse($request)) {
-                return $response;
-            }
-        } catch (RegionNotFound $e) {
-            Log::debug("Static cache region [{$e->getRegion()}] not found on [{$request->fullUrl()}]. Serving uncached response.");
+        if ($response = $this->serveFromCache($request)) {
+            return $response;
         }
 
         $lock = $this->createLock($request);
 
         try {
-            $lock->block($this->lockFor / 2);
-
-            return $this->handleRequest($request, $next);
+            return $lock->block($this->lockFor, fn () => $this->handleRequest($request, $next));
         } catch (LockTimeoutException $e) {
             return $this->outputRefreshResponse($request);
-        } finally {
-            $lock->release();
         }
     }
 
     private function handleRequest($request, Closure $next)
     {
+        if ($response = $this->serveFromCache($request)) {
+            return $response;
+        }
+
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
@@ -98,6 +94,17 @@ class Cache
 
         if (! $this->cacher->hasCachedPage($request)) {
             $this->cacher->cachePage($request, $response);
+        }
+    }
+
+    private function serveFromCache($request)
+    {
+        try {
+            if ($response = $this->attemptToGetCachedResponse($request)) {
+                return $response;
+            }
+        } catch (RegionNotFound $e) {
+            Log::debug("Static cache region [{$e->getRegion()}] not found on [{$request->fullUrl()}]. Serving uncached response.");
         }
     }
 
