@@ -746,6 +746,10 @@ abstract class AddonServiceProvider extends ServiceProvider
         $autoloadable = [];
 
         foreach ($this->app['files']->files($path) as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
             $class = $file->getBasename('.php');
             $fqcn = $this->namespace().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
 
