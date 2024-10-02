@@ -256,45 +256,39 @@ class TermQueryBuilderTest extends TestCase
         Term::make('g')->taxonomy('cats')->data([])->save();
         Term::make('h')->taxonomy('cats')->data([])->save();
 
-        $this->assertEquals(
-            ['cats::f', 'cats::g', 'tags::a', 'tags::c'],
+        $this->assertEquals(['cats::f', 'cats::g', 'tags::a', 'tags::c'],
             Term::query()
                 ->where('collection', 'blog')
                 ->get()->map->id()->sort()->values()->all()
         );
 
-        $this->assertEquals(
-            ['tags::a', 'tags::c'],
+        $this->assertEquals(['tags::a', 'tags::c'],
             Term::query()
                 ->where('collection', 'blog')
                 ->where('taxonomy', 'tags')
                 ->get()->map->id()->sort()->values()->all()
         );
 
-        $this->assertEquals(
-            ['cats::f', 'cats::h', 'tags::a', 'tags::b'],
+        $this->assertEquals(['cats::f', 'cats::h', 'tags::a', 'tags::b'],
             Term::query()
                 ->where('collection', 'news')
                 ->get()->map->id()->sort()->values()->all()
         );
 
-        $this->assertEquals(
-            ['tags::a', 'tags::b'],
+        $this->assertEquals(['tags::a', 'tags::b'],
             Term::query()
                 ->where('collection', 'news')
                 ->where('taxonomy', 'tags')
                 ->get()->map->id()->sort()->values()->all()
         );
 
-        $this->assertEquals(
-            ['cats::f', 'cats::g', 'cats::h', 'tags::a', 'tags::b', 'tags::c'],
+        $this->assertEquals(['cats::f', 'cats::g', 'cats::h', 'tags::a', 'tags::b', 'tags::c'],
             Term::query()
                 ->whereIn('collection', ['blog', 'news'])
                 ->get()->map->id()->sort()->values()->all()
         );
 
-        $this->assertEquals(
-            ['tags::a', 'tags::b', 'tags::c'],
+        $this->assertEquals(['tags::a', 'tags::b', 'tags::c'],
             Term::query()
                 ->whereIn('collection', ['blog', 'news'])
                 ->where('taxonomy', 'tags')
