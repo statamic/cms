@@ -152,8 +152,8 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('dance')->slug('dance')->published(true)->save();
         Facades\Entry::make()->collection('pages')->id('nectar')->slug('nectar')->published(true)->save();
 
-        $this->assertEndpointDataCount('/api/collections/pages/entries?query_scope[test_scope][]=is&query_scope[test_scope][]=about', 1);
-        $this->assertEndpointDataCount('/api/collections/pages/entries?query_scope[test_scope][]=isnt&query_scope[test_scope][]=about', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?query_scope[test_scope][operator]=is&query_scope[test_scope][value]=about', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?query_scope[test_scope][operator]=isnt&query_scope[test_scope][value]=about', 2);
     }
 
     #[Test]
@@ -617,6 +617,6 @@ class TestScope extends Scope
 {
     public function apply($query, $values)
     {
-        $query->where('id', $values[0] == 'is' ? '=' : '!=', $values[1]);
+        $query->where('id', $values['operator'] == 'is' ? '=' : '!=', $values['value']);
     }
 }
