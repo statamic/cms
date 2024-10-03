@@ -63,9 +63,9 @@ class EloquentUserQueryBuilderTest extends TestCase
     #[Test]
     public function it_queries_by_scope()
     {
-        BobScope::register();
-        Users::allowQueryScope(BobScope::class);
-        Users::allowQueryScope(BobScope::class, 'namedBob');
+        NameScope::register();
+        Users::allowQueryScope(NameScope::class);
+        Users::allowQueryScope(NameScope::class, 'byName');
 
         User::create(['name' => 'Jack', 'email' => 'jack@statamic.com']);
         User::create(['name' => 'Jason', 'email' => 'jason@statamic.com']);
@@ -73,19 +73,21 @@ class EloquentUserQueryBuilderTest extends TestCase
         User::create(['name' => 'Bob Vance', 'email' => 'bob@vancerefridgeration.com']);
 
         // Scope defined in model ...
+        // Eloquent model scopes can pass arguments.
         $this->assertEquals([
             'Jack', 'Jason',
-        ], Users::query()->statamic()->get()->map->name->all());
+        ], Users::query()->domain('statamic.com')->get()->map->name->all());
 
         // Statamic style scope ...
+        // Statamic scopes require arrays.
         $this->assertEquals([
             'Bob Down', 'Bob Vance',
-        ], Users::query()->bob()->get()->map->name->all());
+        ], Users::query()->name(['name' => 'bob'])->get()->map->name->all());
 
         // Statamic style scope with method ...
         $this->assertEquals([
             'Bob Down', 'Bob Vance',
-        ], Users::query()->namedBob()->get()->map->name->all());
+        ], Users::query()->byName(['name' => 'bob'])->get()->map->name->all());
 
         // Otherwise calling a non-existent method should throw appropriate exception ...
         try {
@@ -97,12 +99,12 @@ class EloquentUserQueryBuilderTest extends TestCase
     }
 }
 
-class BobScope extends Scope
+class NameScope extends Scope
 {
-    protected static $handle = 'bob';
+    protected static $handle = 'name';
 
-    public function apply($query, $context)
+    public function apply($query, $values)
     {
-        $query->where('name', 'like', '%bob%');
+        $query->where('name', 'like', '%'.$values['name'].'%');
     }
 }

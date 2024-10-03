@@ -2,7 +2,6 @@
 
 namespace Tests\Data\Users;
 
-use Illuminate\Support\Arr;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
@@ -404,8 +403,8 @@ class UserQueryBuilderTest extends TestCase
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
         User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
 
-        $this->assertCount(1, User::query()->customScope('gandalf@precious.com')->get());
-        $this->assertCount(1, User::query()->whereCustom('gandalf@precious.com')->get());
+        $this->assertCount(1, User::query()->customScope(['email' => 'gandalf@precious.com'])->get());
+        $this->assertCount(1, User::query()->whereCustom(['email' => 'gandalf@precious.com'])->get());
     }
 }
 
@@ -413,6 +412,6 @@ class CustomScope extends Scope
 {
     public function apply($query, $params)
     {
-        $query->where('email', Arr::first($params));
+        $query->where('email', $params['email']);
     }
 }

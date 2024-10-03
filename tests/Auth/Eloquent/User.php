@@ -27,8 +27,8 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function scopeStatamic($query)
+    public function scopeDomain($query, $domain)
     {
-        return $query->where('email', 'like', '%@statamic.com');
+        return $query->where('email', 'like', '%@'.$domain);
     }
 }

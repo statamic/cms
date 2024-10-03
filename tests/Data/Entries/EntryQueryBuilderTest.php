@@ -3,7 +3,6 @@
 namespace Tests\Data\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -678,8 +677,8 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
         EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
 
-        $this->assertCount(1, Entry::query()->customScope('Post 1')->get());
-        $this->assertCount(1, Entry::query()->whereCustom('Post 1')->get());
+        $this->assertCount(1, Entry::query()->customScope(['title' => 'Post 1'])->get());
+        $this->assertCount(1, Entry::query()->whereCustom(['title' => 'Post 1'])->get());
     }
 
     #[Test]
@@ -919,6 +918,6 @@ class CustomScope extends Scope
 {
     public function apply($query, $params)
     {
-        $query->where('title', Arr::first($params));
+        $query->where('title', $params['title']);
     }
 }

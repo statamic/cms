@@ -3,7 +3,6 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
-use Illuminate\Support\Arr;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
@@ -601,8 +600,8 @@ class TermQueryBuilderTest extends TestCase
         Term::make('a')->taxonomy('tags')->data(['title' => 'Post 1'])->save();
         Term::make('b')->taxonomy('tags')->data(['title' => 'Post 2'])->save();
 
-        $this->assertCount(1, Term::query()->customScope('Post 1')->get());
-        $this->assertCount(1, Term::query()->whereCustom('Post 1')->get());
+        $this->assertCount(1, Term::query()->customScope(['title' => 'Post 1'])->get());
+        $this->assertCount(1, Term::query()->whereCustom(['title' => 'Post 1'])->get());
     }
 
     #[Test]
@@ -625,6 +624,6 @@ class CustomScope extends Scope
 {
     public function apply($query, $params)
     {
-        $query->where('title', Arr::first($params));
+        $query->where('title', $params['title']);
     }
 }

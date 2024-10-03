@@ -2,7 +2,6 @@
 
 namespace Tests\Data\Assets;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
@@ -534,8 +533,8 @@ class AssetQueryBuilderTest extends TestCase
         Asset::allowQueryScope(CustomScope::class);
         Asset::allowQueryScope(CustomScope::class, 'whereCustom');
 
-        $this->assertCount(1, $this->container->queryAssets()->customScope('a.jpg')->get());
-        $this->assertCount(1, $this->container->queryAssets()->whereCustom('a.jpg')->get());
+        $this->assertCount(1, $this->container->queryAssets()->customScope(['path' => 'a.jpg'])->get());
+        $this->assertCount(1, $this->container->queryAssets()->whereCustom(['path' => 'a.jpg'])->get());
     }
 
     #[Test]
@@ -650,6 +649,6 @@ class CustomScope extends Scope
 {
     public function apply($query, $params)
     {
-        $query->where('path', Arr::first($params));
+        $query->where('path', $params['path']);
     }
 }
