@@ -180,11 +180,15 @@ class Users extends Relationship
 
     public function augment($values)
     {
+        $single = $this->config('max_items') === 1;
+
         $ids = Arr::wrap($values);
 
         $query = (new OrderedQueryBuilder(User::query(), $ids))->whereIn('id', $ids);
 
-        return $this->config('max_items') === 1 ? $query->first() : $query;
+        return $single && ! config('statamic.system.always_augment_to_query', false)
+            ? $query->first()
+            : $query;
     }
 
     public function shallowAugment($values)
