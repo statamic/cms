@@ -167,6 +167,8 @@ class AppServiceProvider extends ServiceProvider
             app()->bind('statamic.queries.'.$alias, $binding);
         });
 
+        $this->app->instance('statamic.query-scopes', collect());
+
         $this->app->bind('statamic.imaging.guzzle', function () {
             return new \GuzzleHttp\Client;
         });

@@ -10,6 +10,7 @@ use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
+use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Rules\Slug;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
@@ -17,6 +18,8 @@ use Statamic\Support\Arr;
 
 class EntryRepository implements RepositoryContract
 {
+    use AllowsScopes;
+
     protected $stache;
     protected $store;
     protected $substitutionsById = [];
