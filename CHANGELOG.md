@@ -1,5 +1,19 @@
 # Release Notes
 
+## 5.30.0 (2024-10-03)
+
+### What's new
+- Support scopes as query methods [#5927](https://github.com/statamic/cms/issues/5927) by @aerni
+
+### What's fixed
+- Move nocache js back to end of body but make configurable [#10898](https://github.com/statamic/cms/issues/10898) by @jasonvarga
+- Fix static cache locking [#10887](https://github.com/statamic/cms/issues/10887) by @duncanmcclean
+- Prevent autoloading non-PHP files [#10886](https://github.com/statamic/cms/issues/10886) by @duncanmcclean
+- Don't show updates badge count for local/dev installations [#10884](https://github.com/statamic/cms/issues/10884) by @jesseleite
+- Update tiptap npm dependencies [#10883](https://github.com/statamic/cms/issues/10883) by @jasonvarga
+
+
+
 ## 5.29.0 (2024-10-01)
 
 ### What's new
