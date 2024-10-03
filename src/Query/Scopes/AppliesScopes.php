@@ -7,8 +7,6 @@ use Statamic\Tags\Parameters;
 
 trait AppliesScopes
 {
-    private static array $scopes = [];
-
     public function applyScope($scope, Parameters|array $context = [])
     {
         if (! $class = $this->getScopeClassFor($scope)) {
