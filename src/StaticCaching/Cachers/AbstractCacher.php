@@ -272,6 +272,10 @@ abstract class AbstractCacher implements Cacher
         })->each(function ($url) use ($domain) {
             $url = ($domain ?: $this->getBaseUrl()).$url;
 
+            if (Str::endsWith($url, '?')) {
+                $url = Str::removeRight($url, '?');
+            }
+
             $url .= (str_contains($url, '?') ? '&' : '?').'__recache='.Hash::make($url);
 
             $request = new GuzzleRequest('GET', $url);
