@@ -47,8 +47,8 @@ class Dictionary extends Tags
             throw new DictionaryNotFoundException($handle);
         }
 
-        $options = (new DataCollection($dictionary->options($search)))
-            ->map(fn ($label, $value) => new DictionaryItem($dictionary->get($value)->toArray()))
+        $options = (new DataCollection($dictionary->optionItems($search)))
+            ->map(fn ($item) => new DictionaryItem($item->toArray()))
             ->values();
 
         $query = (new ItemQueryBuilder)->withItems($options);
