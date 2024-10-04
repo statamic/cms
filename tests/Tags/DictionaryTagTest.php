@@ -45,15 +45,11 @@ class DictionaryTagTest extends TestCase
     }
 
     #[Test]
-    public function it_can_supplement_data()
+    public function it_pulls_extra_data_data()
     {
-        $template = '{{ dictionary:countries search="Alg" supplement_data="true" }}{{ region }} - {{ iso2 }}{{ /dictionary:countries }}';
+        $template = '{{ dictionary:countries search="Alg" }}{{ region }} - {{ iso2 }}{{ /dictionary:countries }}';
 
         $this->assertEquals('Africa - DZ', $this->tag($template));
-
-        $template = '{{ dictionary:countries search="Alg" supplement_data="false" }}{{ region }} - {{ iso2 }}{{ /dictionary:countries }}';
-
-        $this->assertEquals(' - ', $this->tag($template));
     }
 
     #[Test]
@@ -71,7 +67,7 @@ class DictionaryTagTest extends TestCase
     #[Test]
     public function it_can_be_filtered_using_conditions()
     {
-        $template = '{{ dictionary:countries supplement_data="true" iso3:is="AUS" }}{{ name }}{{ /dictionary:countries }}';
+        $template = '{{ dictionary:countries iso3:is="AUS" }}{{ name }}{{ /dictionary:countries }}';
 
         $this->assertEquals('Australia', $this->tag($template));
     }
@@ -81,7 +77,7 @@ class DictionaryTagTest extends TestCase
     {
         app('statamic.scopes')[TestScope::handle()] = TestScope::class;
 
-        $template = '{{ dictionary:countries supplement_data="true" query_scope="test_scope" }}{{ name }}{{ /dictionary:countries }}';
+        $template = '{{ dictionary:countries query_scope="test_scope" }}{{ name }}{{ /dictionary:countries }}';
 
         $this->assertEquals('Australia', $this->tag($template));
     }

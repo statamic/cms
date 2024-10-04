@@ -39,14 +39,13 @@ class Dictionary extends Tags
         }
 
         $search = $this->params->pull('search');
-        $supplement = $this->params->pull('supplement_data');
 
         if (! $dictionary = Dictionaries::find($handle, $this->params->all())) {
             throw new DictionaryNotFoundException($handle);
         }
 
         $options = collect($dictionary->options($search))
-            ->map(fn ($label, $value) => new DictionaryItem($supplement ? $dictionary->get($value)->extra() : ['label' => $label, 'value' => $value]))
+            ->map(fn ($label, $value) => new DictionaryItem(array_merge(['label' => $label, 'value' => $value], $dictionary->get($value)->extra())))
             ->values();
 
         $query = (new ItemQueryBuilder)->withItems(new DataCollection($options));
