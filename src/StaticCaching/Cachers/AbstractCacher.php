@@ -259,27 +259,27 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Recache an individual URLs.
+     * Recache an individual URL.
      *
      * @param  string  $path
      * @param  string|null  $domain
      * @return void
      */
-    public function recacheUrl($path, $domain = null)
+    public function recacheUrl($url, $domain = null)
     {
-        $domain ??= app(Cacher::class)->getBaseUrl();
+        $this->getUrls($domain)->filter(function ($value) use ($url) {
+            return $value === $url || Str::startsWith($value, $url.'?');
+        })->each(function ($url) use ($domain) {
+            $url = ($domain ?: $this->getBaseUrl()).$url;
 
-        $url = $domain.$path;
+            $url .= (str_contains($url, '?') ? '&' : '?').'__recache='.Hash::make($url);
 
-        $param = '__recache='.Hash::make($url);
+            $request = new GuzzleRequest('GET', $url);
 
-        $url .= (str_contains($url, '?') ? '&' : '?').$param;
-
-        $request = new GuzzleRequest('GET', $url);
-
-        StaticWarmJob::dispatch($request, [])
-            ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
-            ->onQueue(config('statamic.static_caching.warm_queue'));
+            StaticWarmJob::dispatch($request, [])
+                ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
+                ->onQueue(config('statamic.static_caching.warm_queue'));
+        });
     }
 
     /**
