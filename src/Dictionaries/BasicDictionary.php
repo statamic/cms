@@ -17,10 +17,16 @@ abstract class BasicDictionary extends Dictionary
 
     public function options(?string $search = null): array
     {
+        return collect($this->optionItems($search))
+            ->mapWithKeys(fn (Item $item) => [$item->value() => $item->label()])
+            ->all();
+    }
+
+    public function optionItems(?string $search = null): array
+    {
         return $this
             ->getFilteredItems()
             ->when($search, fn ($collection) => $collection->filter(fn ($item) => $this->matchesSearchQuery($search, $item)))
-            ->mapWithKeys(fn (Item $item) => [$item->value() => $item->label()])
             ->all();
     }
 
