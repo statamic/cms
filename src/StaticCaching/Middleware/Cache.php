@@ -189,7 +189,7 @@ class Cache
             return false;
         }
 
-        $url = str_replace('__recache='.$token, '', $request->getUri());
+        $url = str_replace('__recache='.urlencode($token), '', $request->getUri());
         if (substr($url, -1, 1) == '?') {
             $url = substr($url, 0, -1);
         }

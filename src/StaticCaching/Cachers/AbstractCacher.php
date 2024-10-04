@@ -352,16 +352,27 @@ abstract class AbstractCacher implements Cacher
         ];
     }
 
+    protected function removeBackgroundRecacheTokenFromUrl(Request $request, string $url): string
+    {
+        if (! config('statamic.static_caching.background_recache', false)) {
+            return $url;
+        }
+
+        if (! $recache = $request->input('__recache')) {
+            return $url;
+        }
+
+        $url = str_replace('__recache='.urlencode($recache), '', $url);
+        if (substr($url, -1, 1) == '?') {
+            $url = substr($url, 0, -1);
+        }
+
+        return $url;
+    }
+
     public function getUrl(Request $request)
     {
-        $url = $request->getUri();
-
-        if ($recache = $request->input('__recache')) {
-            $url = str_replace('__recache='.$recache, '', $url);
-            if (substr($url, -1, 1) == '?') {
-                $url = substr($url, 0, -1);
-            }
-        }
+        $url = $this->removeBackgroundRecacheTokenFromUrl($request, $request->getUri());
 
         if ($this->isExcluded($url)) {
             return $url;
