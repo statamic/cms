@@ -12,7 +12,6 @@ class DictionaryItem implements Arrayable
 
     public function __construct(public array $data)
     {
-
     }
 
     public function get($key, $default = null)
@@ -22,6 +21,6 @@ class DictionaryItem implements Arrayable
 
     public function toArray()
     {
-        return array_merge($this->data, $this->supplements() ?? []);
+        return array_merge($this->data, $this->supplements ?? []);
     }
 }

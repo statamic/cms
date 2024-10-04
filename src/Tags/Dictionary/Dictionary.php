@@ -24,9 +24,7 @@ class Dictionary extends Tags
      */
     public function wildcard($tag)
     {
-        $this->params['handle'] = $tag;
-
-        return $this->index();
+        return $this->loop($tag);
     }
 
     /**
@@ -34,7 +32,12 @@ class Dictionary extends Tags
      */
     public function index()
     {
-        if (! $handle = $this->params->pull('handle')) {
+        return $this->loop($this->params->pull('handle'));
+    }
+
+    private function loop($handle)
+    {
+        if (! $handle) {
             return [];
         }
 
@@ -44,18 +47,16 @@ class Dictionary extends Tags
             throw new DictionaryNotFoundException($handle);
         }
 
-        $options = collect($dictionary->options($search))
-            ->map(fn ($label, $value) => new DictionaryItem(array_merge(['label' => $label, 'value' => $value], $dictionary->get($value)->extra())))
+        $options = (new DataCollection($dictionary->options($search)))
+            ->map(fn ($label, $value) => new DictionaryItem($dictionary->get($value)->toArray()))
             ->values();
 
-        $query = (new ItemQueryBuilder)->withItems(new DataCollection($options));
+        $query = (new ItemQueryBuilder)->withItems($options);
 
         $this->queryConditions($query);
         $this->queryOrderBys($query);
         $this->queryScopes($query);
 
-        $options = $this->results($query);
-
-        return $this->output($options);
+        return $this->output($this->results($query));
     }
 }
