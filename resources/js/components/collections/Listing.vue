@@ -68,7 +68,14 @@ export default {
             }
 
             Listing.methods.request.call(this);
-        }
+        },
+
+        removeRow(row) {
+            let id = row.id;
+            let i = _.indexOf(this.items, _.findWhere(this.items, { id }));
+            this.items.splice(i, 1);
+            if (this.items.length === 0) location.reload();
+        },
     }
 
 }
