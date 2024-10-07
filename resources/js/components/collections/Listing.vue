@@ -68,7 +68,7 @@ export default {
             }
 
             Listing.methods.request.call(this);
-        },
+        }
     }
 
 }
