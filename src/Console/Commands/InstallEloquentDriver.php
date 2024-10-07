@@ -28,7 +28,8 @@ class InstallEloquentDriver extends Command
      *
      * @var string
      */
-    protected $signature = 'statamic:install:eloquent-driver';
+    protected $signature = 'statamic:install:eloquent-driver
+        { --everything : Configures all repositories to use the database }';
 
     /**
      * The console command description.
@@ -69,19 +70,28 @@ class InstallEloquentDriver extends Command
             return $this->components->warn("No repositories left to migrate. You're already using the Eloquent Driver for all repositories.");
         }
 
-        $repositories = multiselect(
-            label: 'Which repositories would you like to migrate?',
-            hint: 'You can always import other repositories later.',
-            options: $this->availableRepositories()->all(),
-            validate: fn (array $values) => count($values) === 0
-                ? 'You must select at least one repository to migrate.'
-                : null
-        );
+        $repositories = $this->repositories();
 
         foreach ($repositories as $repository) {
             $method = 'migrate'.Str::studly($repository);
             $this->$method();
         }
+    }
+
+    protected function repositories(): array
+    {
+        if ($this->option('everything')) {
+            return $this->availableRepositories()->keys()->all();
+        }
+
+        return multiselect(
+            label: 'Which repositories would you like to migrate?',
+            options: $this->availableRepositories()->all(),
+            validate: fn (array $values) => count($values) === 0
+                ? 'You must select at least one repository to migrate.'
+                : null,
+            hint: 'You can always import other repositories later.'
+        );
     }
 
     protected function availableRepositories(): Collection
