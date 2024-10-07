@@ -1,5 +1,5 @@
 <template>
-    <data-list ref="dataList" :columns="columns" :rows="items">
+    <data-list ref="dataList" :columns="columns" :rows="rows">
         <div class="card overflow-hidden p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
                 <template slot="cell-title" slot-scope="{ row: collection }">
@@ -52,7 +52,7 @@ export default {
     data() {
         return {
             initializedRequest: false,
-            items: this.initialRows,
+            rows: this.initialRows,
             requestUrl: cp_url(`collections`),
         }
     },
@@ -68,13 +68,6 @@ export default {
             }
 
             Listing.methods.request.call(this);
-        },
-
-        removeRow(row) {
-            let id = row.id;
-            let i = _.indexOf(this.items, _.findWhere(this.items, { id }));
-            this.items.splice(i, 1);
-            if (this.items.length === 0) location.reload();
         },
     }
 
