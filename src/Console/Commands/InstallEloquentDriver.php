@@ -29,7 +29,8 @@ class InstallEloquentDriver extends Command
      * @var string
      */
     protected $signature = 'statamic:install:eloquent-driver
-        { --everything : Configures all repositories to use the database }';
+        { --everything : Configures all repositories to use the database }
+        { --import : Whether existing data should be imported. }';
 
     /**
      * The console command description.
@@ -189,7 +190,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured asset containers');
 
-        if (confirm('Would you like to import existing asset containers?')) {
+        if ($this->shouldImport('asset containers')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-assets --force --only-asset-containers'),
                 message: 'Importing existing asset containers...'
@@ -213,7 +214,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured assets');
 
-        if (confirm('Would you like to import existing assets?')) {
+        if ($this->shouldImport('assets')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-assets --force --only-assets'),
                 message: 'Importing existing assets...'
@@ -237,7 +238,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured blueprints');
 
-        if (confirm('Would you like to import existing blueprints?')) {
+        if ($this->shouldImport('blueprints')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-blueprints --force --only-blueprints'),
                 message: 'Importing existing blueprints...'
@@ -261,7 +262,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured collections');
 
-        if (confirm('Would you like to import existing collections?')) {
+        if ($this->shouldImport('collections')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-collections --force --only-collections'),
                 message: 'Importing existing collections...'
@@ -285,7 +286,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured collection trees');
 
-        if (confirm('Would you like to import existing collection trees?')) {
+        if ($this->shouldImport('collection trees')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-collections --force --only-collection-trees'),
                 message: 'Importing existing collections...'
@@ -297,7 +298,7 @@ class InstallEloquentDriver extends Command
 
     protected function migrateEntries(): void
     {
-        $shouldImportEntries = confirm('Would you like to import existing entries?');
+        $shouldImportEntries = $this->shouldImport('entries');
 
         spin(
             callback: function () use ($shouldImportEntries) {
@@ -356,7 +357,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured fieldsets');
 
-        if (confirm('Would you like to import existing fieldsets?')) {
+        if ($this->shouldImport('fieldsets')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-blueprints --force --only-fieldsets'),
                 message: 'Importing existing fieldsets...'
@@ -380,7 +381,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured forms');
 
-        if (confirm('Would you like to import existing forms?')) {
+        if ($this->shouldImport('forms')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-forms --only-forms'),
                 message: 'Importing existing forms...'
@@ -404,7 +405,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured form submissions');
 
-        if (confirm('Would you like to import existing form submissions?')) {
+        if ($this->shouldImport('form submissions')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-forms --only-form-submissions'),
                 message: 'Importing existing form submissions...'
@@ -428,7 +429,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured globals');
 
-        if (confirm('Would you like to import existing globals?')) {
+        if ($this->shouldImport('globals')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-globals --only-global-sets'),
                 message: 'Importing existing globals...'
@@ -452,7 +453,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured global variables');
 
-        if (confirm('Would you like to import existing global variables?')) {
+        if ($this->shouldImport('global variables')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-globals --only-global-variables'),
                 message: 'Importing existing global variables...'
@@ -476,7 +477,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured navs');
 
-        if (confirm('Would you like to import existing navs?')) {
+        if ($this->shouldImport('navs')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-navs --force --only-navs'),
                 message: 'Importing existing navs...'
@@ -500,7 +501,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured nav trees');
 
-        if (confirm('Would you like to import existing nav trees?')) {
+        if ($this->shouldImport('nav trees')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-navs --force --only-nav-trees'),
                 message: 'Importing existing nav trees...'
@@ -523,7 +524,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured revisions');
 
-        if (confirm('Would you like to import existing revisions?')) {
+        if ($this->shouldImport('revisions')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-revisions'),
                 message: 'Importing existing revisions...'
@@ -564,7 +565,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured taxonomies');
 
-        if (confirm('Would you like to import existing taxonomies?')) {
+        if ($this->shouldImport('taxonomies')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-taxonomies --force --only-taxonomies'),
                 message: 'Importing existing taxonomies...'
@@ -588,7 +589,7 @@ class InstallEloquentDriver extends Command
 
         $this->components->info('Configured terms');
 
-        if (confirm('Would you like to import existing terms?')) {
+        if ($this->shouldImport('terms')) {
             spin(
                 callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-taxonomies --force --only-terms'),
                 message: 'Importing existing terms...'
@@ -611,6 +612,11 @@ class InstallEloquentDriver extends Command
         );
 
         $this->components->info('Configured tokens');
+    }
+
+    private function shouldImport(string $repository): bool
+    {
+        return $this->option('import') || confirm("Would you like to import existing {$repository}?");
     }
 
     private function switchToEloquentDriver(string $repository): void
