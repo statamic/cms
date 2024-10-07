@@ -249,7 +249,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $subscribers = collect($this->subscribe)
             ->merge($this->autoloadFilesFromFolder('Subscribers'))
             ->unique();
-        
+
         foreach ($subscribers as $subscriber) {
             Event::subscribe($subscriber);
         }
