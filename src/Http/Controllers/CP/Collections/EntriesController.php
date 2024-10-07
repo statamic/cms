@@ -13,6 +13,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\User;
+use Statamic\Hooks\CP\EntriesIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
@@ -49,7 +50,7 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $entries = $query->paginate(request('perPage'));
+        $entries = (new EntriesIndexQuery($query, $collection))->paginate(request('perPage'));
 
         if (request('search') && $collection->hasSearchIndex()) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());
@@ -247,7 +248,7 @@ class EntriesController extends CpController
                         ->save();
                 });
 
-                $values->forget('parent');
+                $entry->remove('parent');
             }
         }
 

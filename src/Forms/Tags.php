@@ -6,6 +6,7 @@ use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\JsDrivers\JsDriver;
@@ -17,8 +18,12 @@ use Statamic\Tags\Tags as BaseTags;
 class Tags extends BaseTags
 {
     use Concerns\GetsFormSession,
+        Concerns\GetsQueryResults,
         Concerns\GetsRedirects,
         Concerns\OutputsItems,
+        Concerns\QueriesConditions,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes,
         Concerns\RendersForms;
 
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
@@ -62,6 +67,10 @@ class Tags extends BaseTags
         $data = $this->getFormSession($this->sessionHandle());
 
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
+
+        $data['form_config'] = ($configFields = Form::extraConfigFor($form->handle()))
+            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
+            : [];
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
@@ -179,9 +188,13 @@ class Tags extends BaseTags
      */
     public function submissions()
     {
-        $submissions = $this->form()->submissions();
+        $query = $this->form()->querySubmissions();
 
-        return $this->output($submissions);
+        $this->queryConditions($query);
+        $this->queryScopes($query);
+        $this->queryOrderBys($query);
+
+        return $this->output($this->results($query));
     }
 
     /**

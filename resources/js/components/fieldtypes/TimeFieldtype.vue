@@ -115,7 +115,8 @@ export default {
             parts = parts.map(part => part.padStart(2, '0'));
 
             let newValue = parts.join(':');
-            this.update(newValue);
+
+            if (this.value !== newValue) this.update(newValue);
             this.inputValue = newValue;
         },
 
