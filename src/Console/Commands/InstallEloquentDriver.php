@@ -29,7 +29,7 @@ class InstallEloquentDriver extends Command
      * @var string
      */
     protected $signature = 'statamic:install:eloquent-driver
-        { --everything : Configures all repositories to use the database }
+        { --all : Configures all repositories to use the database }
         { --import : Whether existing data should be imported. }';
 
     /**
@@ -81,7 +81,7 @@ class InstallEloquentDriver extends Command
 
     protected function repositories(): array
     {
-        if ($this->option('everything')) {
+        if ($this->option('all')) {
             return $this->availableRepositories()->keys()->all();
         }
 
