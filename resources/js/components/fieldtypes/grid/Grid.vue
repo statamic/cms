@@ -3,12 +3,14 @@
 <portal name="grid-fullscreen" :disabled="!fullScreenMode" :provide="provide">
 
     <element-container @resized="containerWidth = $event.width">
-    <div class="grid-fieldtype-container" :class="{'grid-fullscreen bg-white': fullScreenMode }">
+    <div class="grid-fieldtype-container" :class="{'grid-fullscreen bg-white dark:bg-dark-600': fullScreenMode }">
 
-        <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
-            <h2 v-text="config.display" />
-            <button class="btn-close absolute top-2 right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
-        </header>
+        <template v-if="config.fullscreen || !config.hide_display">
+            <header class="bg-gray-200 dark:bg-dark-550 border-b dark:border-dark-900 py-3 rtl:pr-3 ltr:pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
+                <h2 v-text="__(config.display)" />
+                <button class="btn-close absolute top-2 rtl:left-5 ltr:right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
+            </header>
+        </template>
 
         <section :class="{'p-4': fullScreenMode}">
 
@@ -28,6 +30,7 @@
                 :can-delete-rows="canDeleteRows"
                 :can-add-rows="canAddRows"
                 :allow-fullscreen="config.fullscreen"
+                :hide-display="config.hide_display"
                 @updated="updated"
                 @meta-updated="updateRowMeta"
                 @removed="removed"
@@ -40,7 +43,7 @@
             <button
                 class="btn"
                 v-if="canAddRows"
-                v-text="addRowButtonLabel"
+                v-text="__(addRowButtonLabel)"
                 @click.prevent="addRow" />
 
         </section>
@@ -115,7 +118,7 @@ export default {
         },
 
         addRowButtonLabel() {
-            return this.config.add_row || __('Add Row');
+            return __(this.config.add_row) || __('Add Row');
         },
 
         hasMaxRows() {
@@ -135,7 +138,9 @@ export default {
         },
 
         replicatorPreview() {
-            return `${this.config.display}: ${__n(':count row|:count rows', this.value.length)}`;
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
+            return `${__(this.config.display)}: ${__n(':count row|:count rows', this.value.length)}`;
         }
 
     },

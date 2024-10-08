@@ -6,14 +6,18 @@ use Closure;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\LazyCollection;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
+use Statamic\Query\Scopes\AppliesScopes;
 use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
 {
+    use AppliesScopes;
+
     protected $builder;
     protected $columns;
 
@@ -38,6 +42,12 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function __call($method, $args)
     {
+        if ($this->canApplyScope($method)) {
+            $this->applyScope($method, $args[0] ?? []);
+
+            return $this;
+        }
+
         $response = $this->builder->$method(...$args);
 
         return $response instanceof EloquentBuilder ? $this : $response;
@@ -100,6 +110,13 @@ abstract class EloquentQueryBuilder implements Builder
 
         if ($column instanceof Closure && is_null($operator)) {
             return $this->whereNested($column, $boolean);
+        }
+
+        if (strtolower($operator) == 'like') {
+            $grammar = $this->builder->getConnection()->getQueryGrammar();
+            $this->builder->whereRaw('LOWER('.$grammar->wrap($this->column($column)).') LIKE ?', strtolower($value), $boolean);
+
+            return $this;
         }
 
         $this->builder->where($this->column($column), $operator, $value, $boolean);
@@ -378,6 +395,19 @@ abstract class EloquentQueryBuilder implements Builder
         return $this;
     }
 
+    public function reorder($column = null, $direction = 'asc')
+    {
+        if ($column) {
+            $this->builder->reorder($this->column($column), $direction);
+
+            return $this;
+        }
+
+        $this->builder->reorder();
+
+        return $this;
+    }
+
     protected function column($column)
     {
         return $column;
@@ -422,5 +452,107 @@ abstract class EloquentQueryBuilder implements Builder
     {
         return is_null($value) && in_array($operator, array_keys($this->operators)) &&
              ! in_array($operator, ['=', '<>', '!=']);
+    }
+
+    /**
+     * Chunk the results of the query.
+     *
+     * @param  int  $count
+     * @return bool
+     */
+    public function chunk($count, callable $callback)
+    {
+        $this->enforceOrderBy();
+
+        $page = 1;
+
+        do {
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
+            $results = $this->forPage($page, $count)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
+            // On each chunk result set, we will pass them to the callback and then let the
+            // developer take care of everything within the callback, which allows us to
+            // keep the memory low for spinning through large result sets for working.
+            if ($callback($results, $page) === false) {
+                return false;
+            }
+
+            unset($results);
+
+            $page++;
+        } while ($countResults == $count);
+
+        return true;
+    }
+
+    /**
+     * Query lazily, by chunks of the given size.
+     *
+     * @param  int  $chunkSize
+     * @return \Illuminate\Support\LazyCollection
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function lazy($chunkSize = 1000)
+    {
+        if ($chunkSize < 1) {
+            throw new InvalidArgumentException('The chunk size should be at least 1');
+        }
+
+        $this->enforceOrderBy();
+
+        return LazyCollection::make(function () use ($chunkSize) {
+            $page = 1;
+
+            while (true) {
+                $results = $this->forPage($page++, $chunkSize)->get();
+
+                foreach ($results as $result) {
+                    yield $result;
+                }
+
+                if ($results->count() < $chunkSize) {
+                    return;
+                }
+            }
+        });
+    }
+
+    /**
+     * Add a generic "order by" clause if the query doesn't already have one.
+     *
+     * @return void
+     */
+    protected function enforceOrderBy()
+    {
+        if (empty($this->builder->getQuery()->orders) && empty($this->builder->getQuery()->unionOrders)) {
+            $this->orderBy($this->builder->getModel()->getQualifiedKeyName(), 'asc');
+        }
+    }
+
+    public function __serialize(): array
+    {
+        $this->builder->getQuery()->connection = null;
+        $this->builder->getQuery()->grammar = null;
+
+        return get_object_vars($this);
+    }
+
+    public function __unserialize($data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->$key = $value;
+        }
+
+        $this->builder->getQuery()->connection = $this->builder->getModel()->getConnection();
+        $this->builder->getQuery()->grammar = $this->builder->getQuery()->connection->getQueryGrammar();
     }
 }

@@ -6,6 +6,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\CodeType;
+use Statamic\Rules\CodeFieldtypeRulers;
 
 class Code extends Fieldtype
 {
@@ -102,6 +103,15 @@ class Code extends Fieldtype
                         'display' => __('Enable Line Wrapping'),
                         'type' => 'toggle',
                         'default' => true,
+                    ],
+                    'rulers' => [
+                        'display' => __('Rulers'),
+                        'instructions' => __('statamic::fieldtypes.code.config.rulers'),
+                        'type' => 'array',
+                        'key_header' => __('Columns'),
+                        'value_header' => __('Line Style (dashed or solid)'),
+                        'add_button' => __('Add Ruler'),
+                        'validate' => [new CodeFieldtypeRulers],
                     ],
                 ],
             ],

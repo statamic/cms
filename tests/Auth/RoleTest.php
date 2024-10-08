@@ -4,16 +4,18 @@ namespace Tests\Auth;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Role;
 use Tests\TestCase;
 
 class RoleTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_title()
     {
         $role = new Role;
-        $this->assertNull($role->title());
+        $role->handle('testing');
+        $this->assertEquals('Testing', $role->title());
 
         $return = $role->title('Test');
 
@@ -21,7 +23,7 @@ class RoleTest extends TestCase
         $this->assertEquals($role, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_handle()
     {
         $role = new Role;
@@ -33,7 +35,7 @@ class RoleTest extends TestCase
         $this->assertEquals($role, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_adds_permissions()
     {
         $role = new Role;
@@ -48,7 +50,7 @@ class RoleTest extends TestCase
         $this->assertEquals($role, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_all_permissions()
     {
         $role = new Role;
@@ -61,7 +63,7 @@ class RoleTest extends TestCase
         $this->assertEquals($role, $return);
     }
 
-    /** @test */
+    #[Test]
     public function permissions_get_deduplicated()
     {
         $role = new Role;
@@ -71,7 +73,7 @@ class RoleTest extends TestCase
         $this->assertEquals(['foo', 'bar', 'baz'], $role->permissions()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_permissions()
     {
         $role = (new Role)->addPermission(['foo', 'bar', 'baz', 'qux']);
@@ -83,7 +85,7 @@ class RoleTest extends TestCase
         $this->assertEquals($role, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_it_has_permission()
     {
         $role = (new Role)->addPermission('foo');
@@ -92,7 +94,7 @@ class RoleTest extends TestCase
         $this->assertFalse($role->hasPermission('bar'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_it_has_super_permissions()
     {
         $superRole = (new Role)->addPermission('super');
@@ -102,19 +104,19 @@ class RoleTest extends TestCase
         $this->assertFalse($nonSuperRole->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_saved()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_deleted()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         $role = (new Role)->handle('test')->title('Test');
@@ -125,7 +127,7 @@ class RoleTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $role[$key]));
     }
 
-    /** @test */
+    #[Test]
     public function it_is_arrayable()
     {
         $role = (new Role)->handle('test')->title('Test');

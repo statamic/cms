@@ -8,10 +8,6 @@
     min-height: 80px;
   }
 
-  .code-mode {
-      @apply select-none z-10 opacity-25 absolute right-0 p-2 text-white text-2xs uppercase;
-  }
-
   /* PADDING */
 
   .CodeMirror-lines {
@@ -21,7 +17,7 @@
     padding: 0 16px; /* Horizontal padding of content */
   }
   .CodeMirror-wrap {
-    @apply py-2 rounded;
+    @apply rounded-b;
   }
 
   .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
@@ -40,7 +36,7 @@
   .CodeMirror-linenumber {
     padding: 0 3px 0 5px;
     min-width: 20px;
-    text-align: right;
+    @apply text-right;
     color: #999;
     white-space: nowrap;
   }
@@ -113,18 +109,18 @@
   .cm-link {text-decoration: underline;}
   .cm-strikethrough {text-decoration: line-through;}
 
-  .cm-s-default .cm-keyword {color: #708;}
+  .cm-s-default .cm-keyword {color: #708; @apply dark:text-purple-dark;}
   .cm-s-default .cm-atom {color: #219;}
   .cm-s-default .cm-number {color: #164;}
-  .cm-s-default .cm-def {color: #00f;}
+  .cm-s-default .cm-def {color: #00f; @apply dark:text-blue-600;}
   .cm-s-default .cm-variable,
   .cm-s-default .cm-punctuation,
   .cm-s-default .cm-property,
   .cm-s-default .cm-operator {}
-  .cm-s-default .cm-variable-2 {color: #05a;}
-  .cm-s-default .cm-variable-3 {color: #085;}
-  .cm-s-default .cm-comment {color: #a50;}
-  .cm-s-default .cm-string {color: #a11;}
+  .cm-s-default .cm-variable-2 {color: #05a; @apply dark:text-blue-600;}
+  .cm-s-default .cm-variable-3 {color: #085; @apply dark:text-green-600;}
+  .cm-s-default .cm-comment {color: #a50; @apply dark:text-orange-dark;}
+  .cm-s-default .cm-string {color: #a11; @apply dark:text-red-500;}
   .cm-s-default .cm-string-2 {color: #f50;}
   .cm-s-default .cm-meta {color: #555;}
   .cm-s-default .cm-qualifier {color: #555;}
@@ -133,7 +129,7 @@
   .cm-s-default .cm-tag {color: #170;}
   .cm-s-default .cm-attribute {color: #00c;}
   .cm-s-default .cm-hr {color: #999;}
-  .cm-s-default .cm-link {color: #00c;}
+  .cm-s-default .cm-link {color: #00c; @apply dark:text-blue-500;}
 
   .cm-s-default .cm-error {color: #f00;}
   .cm-invalidchar {color: #f00;}
@@ -274,7 +270,7 @@
 
   .CodeMirror-widget {}
 
-  .CodeMirror-rtl pre { direction: rtl; }
+  .CodeMirror-rtl pre { direction: ltr; }
 
   .CodeMirror-code {
     outline: none;
@@ -345,20 +341,27 @@
   span.CodeMirror-selectedtext { background: none; }
 
 
+  .CodeMirror-fullscreen {
+      @apply fixed h-auto inset-0 top-12 rounded-none;
+  }
+
+  .CodeMirror-rulers {
+      @apply absolute left-0 right-0 overflow-hidden;
+      top: -50px;
+      bottom: -20px;
+  }
+
+  .CodeMirror-ruler {
+      @apply top-0 bottom-0;
+  }
+
+
   /* Light Theme
   ========================================================================== */
   .code-fieldtype .theme-light {
 
-    .code-mode {
-        @apply text-gray-900;
-    }
-
     .CodeMirror {
         @apply border p-0
-    }
-
-    CodeMirror-scroll {
-        min-height: 80px;
     }
   }
 
@@ -368,12 +371,14 @@
     ========================================================================== */
 
   .cm-s-material.CodeMirror {
-    background-color: #263238;
+    background: #263238;
+    @apply dark:bg-dark-650;
     color: #EEFFFF;
   }
 
   .cm-s-material .CodeMirror-gutters {
     background: #263238;
+    @apply dark:bg-dark-650;
     color: #546E7A;
     border: none;
   }

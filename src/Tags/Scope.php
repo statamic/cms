@@ -6,7 +6,7 @@ use Statamic\View\Cascade;
 
 class Scope extends Tags
 {
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         throw_unless($this->isPair, new \Exception('Scope tag must be a pair'));
 

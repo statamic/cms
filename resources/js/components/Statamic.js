@@ -3,22 +3,27 @@ import Echo from './Echo';
 import Bard from './Bard';
 import Keys from './keys/Keys';
 import Hooks from './Hooks';
+import Reveal from './Reveal';
 import Components from './Components';
 import FieldConditions from './FieldConditions';
 import Callbacks from './Callbacks';
+import Slugs from './slugs/Manager.js';
 const echo = new Echo;
 const bard = new Bard;
 const keys = new Keys;
 const hooks = new Hooks;
+const reveal = new Reveal;
 const components = new Components;
 const conditions = new FieldConditions;
 const callbacks = new Callbacks;
+const slug = new Slugs;
 
 export default new Vue({
     data() {
         return {
             bootingCallbacks: [],
             bootedCallbacks: [],
+            darkMode: null,
         }
     },
 
@@ -49,12 +54,20 @@ export default new Vue({
             return hooks;
         },
 
+        $reveal() {
+            return reveal;
+        },
+
         $conditions() {
             return conditions;
         },
 
         $keys() {
             return keys;
+        },
+
+        $slug() {
+            return slug;
         },
 
         user() {

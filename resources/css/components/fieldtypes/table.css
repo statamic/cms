@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .table-fieldtype-table {
-    @apply w-full text-left border text-gray relative mb-4 outline-none shadow-sm rounded;
+    @apply w-full rtl:text-right ltr:text-left border dark:border-dark-900 text-gray dark:text-dark-150 relative mb-4 outline-none shadow-sm rounded;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
@@ -11,13 +11,13 @@
 
 .table-fieldtype-table thead {
     th {
-        @apply font-medium border-r p-2 border-b z-10 bg-gray-200 text-gray-900 text-sm;
+        @apply font-medium rtl:border-l ltr:border-r p-2 border-b dark:border-dark-900 z-10 bg-gray-200 dark:bg-dark-700 text-gray-900 dark:text-dark-150 text-sm;
         display: table-cell;
         position: sticky;
         top: -1px;
 
-        &:first-child { @apply rounded-tl pl-3; }
-        &:last-child { @apply rounded-tr border-r-0; }
+        &:first-child { @apply rtl:rounded-tr ltr:rounded-tl rtl:pr-3 ltr:pl-3; }
+        &:last-child { @apply rtl:rounded-tl ltr:rounded-tr rtl:border-l-0 ltr:border-r-0; }
         &.grid-drag-handle-header {
             @apply w-3;
         }
@@ -26,8 +26,9 @@
 
 .table-fieldtype-table .input-text {
     @apply bg-white border-none rounded-none shadow-none outline-none text-sm;
+    @apply dark:bg-dark-650;
     &:focus {
-        @apply shadow-inner bg-gray-100 ring-0;
+        @apply shadow-inner bg-gray-100 dark:bg-dark-700 ring-0;
     }
 }
 
@@ -39,41 +40,46 @@
     }
 
     td {
-        @apply border-b border-r p-0;
+        @apply border-b rtl:border-l ltr:border-r dark:border-dark-900 p-0;
 
         &:first-child.grid-cell {
-            @apply pl-3;
+            @apply rtl:pr-3 ltr:pl-3;
         }
 
         &:last-child {
-            @apply border-r-0;
+            @apply rtl:border-l-0 ltr:border-r-0;
         }
 
         &.table-drag-handle {
-            @apply w-3 border-r h-full p-2;
+            @apply w-3 rtl:border-l ltr:border-r h-full p-2;
             cursor: grab;
             background: theme('colors.gray.200') url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
             background-size: 7px 17px;
-            &:hover { @apply bg-gray-300; }
+
+            .dark & {
+                background-color: theme(colors.dark.600);
+            }
+
+            &:hover { @apply bg-gray-300 dark:bg-dark-750; }
         }
     }
 
     tr:last-child td {
         @apply border-b-0;
-        &:first-child { @apply rounded-bl; }
-        &:last-child { @apply rounded-br; }
+        &:first-child { @apply rtl:rounded-br ltr:rounded-bl; }
+        &:last-child { @apply rtl:rounded-bl ltr:rounded-br; }
     }
 
     tr.draggable-source--is-dragging td {
-        @apply bg-gray-100;
+        @apply bg-gray-100 dark:bg-dark-800;
     }
 }
 
 .table-fieldtype-table .row-controls {
-    @apply w-8 pl-0 text-center;
+    @apply w-8 rtl:pr-0 ltr:pl-0 text-center;
     vertical-align: middle;
     &:focus-within {
-        @apply bg-gray-200;
+        @apply bg-gray-200 dark:bg-dark-750;
         button {
             @apply outline-none ring-0;
         }

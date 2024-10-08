@@ -4,16 +4,16 @@ namespace Statamic\Fieldtypes;
 
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
-use Statamic\Exceptions\ValidationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Fields\DateField;
 use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
+use Statamic\Rules\DateFieldtype as ValidationRule;
 use Statamic\Statamic;
 use Statamic\Support\DateFormat;
-use Statamic\Validation\DateFieldtype as ValidationRule;
 
 class Date extends Fieldtype
 {
@@ -182,7 +182,7 @@ class Date extends Fieldtype
         ];
     }
 
-    private function splitDateTimeForPreProcessRange(array $range = null)
+    private function splitDateTimeForPreProcessRange(?array $range = null)
     {
         return ['date' => $range, 'time' => null];
     }
@@ -212,13 +212,20 @@ class Date extends Fieldtype
 
         return [
             'start' => $this->processDateTime($date['start']),
-            'end' => $this->processDateTime($date['end']),
+            'end' => $this->processDateTimeEndOfDay($date['end']),
         ];
     }
 
     private function processDateTime($value)
     {
         $date = Carbon::parse($value);
+
+        return $this->formatAndCast($date, $this->saveFormat());
+    }
+
+    private function processDateTimeEndOfDay($value)
+    {
+        $date = Carbon::parse($value)->endOfDay();
 
         return $this->formatAndCast($date, $this->saveFormat());
     }
@@ -359,11 +366,10 @@ class Date extends Fieldtype
 
     public function preProcessValidatable($value)
     {
-        if ($error = (new ValidationRule($this))($value)) {
-            throw ValidationException::withMessages([
-                $this->field->handle() => $error,
-            ]);
-        }
+        Validator::make(
+            [$this->field->handle() => $value],
+            [$this->field->handle() => [new ValidationRule($this)]],
+        )->validate();
 
         if ($value === null) {
             return null;

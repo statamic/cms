@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Contracts\Validation\Rule;
 use Statamic\Facades\Asset;
+use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DimensionsRule implements Rule
@@ -30,7 +31,7 @@ class DimensionsRule implements Rule
                     return true;
                 }
 
-                $size = getimagesize($id);
+                $size = getimagesize($id->getPathname());
             } else {
                 if (! $asset = Asset::find($id)) {
                     return false;
@@ -63,7 +64,7 @@ class DimensionsRule implements Rule
      */
     public function message()
     {
-        return __('statamic::validation.dimensions');
+        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.dimensions');
     }
 
     /**

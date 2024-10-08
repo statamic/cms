@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', __('Rebuild Search'))
 
@@ -14,7 +16,7 @@
             <form method="POST" action="{{ cp_route('utilities.search', 'all') }}">
                 @csrf
                 @foreach (\Statamic\Facades\Search::indexes() as $index)
-                    <input type="hidden" name="indexes[]" value="{{ $index->name() }}">
+                    <input type="hidden" name="indexes[]" value="{{ $index->name() }}::{{ $index->locale() }}">
                 @endforeach
                 <button class="btn-primary">{{ __('Update All') }}</button>
             </form>
@@ -40,8 +42,8 @@
                 @foreach (\Statamic\Facades\Search::indexes() as $index)
                     <tr>
                         <td class="flex items-center">
-                            @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 mr-2')
-                            <div class="text-gray-800 leading-none">{{ $index->title() }}</div>
+                            @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 rtl:ml-2 ltr:mr-2')
+                            <div class="text-gray-800 dark:text-dark-150 leading-none">{{ $index->title() }}</div>
                         </td>
                         <td>
                             {{ ucwords($index->config()['driver']) }}
@@ -52,7 +54,7 @@
                             @else
                                 <div class="text-sm text-gray flex flex-wrap">
                                     @foreach($index->config()['searchables'] as $searchable)
-                                        <div class="mr-2 badge-pill-sm">
+                                        <div class="rtl:ml-2 ltr:mr-2 badge-pill-sm">
                                             {{ $searchable }}
                                         </div>
                                     @endforeach
@@ -62,16 +64,16 @@
                         <td>
                             <div class="text-sm text-gray flex flex-wrap">
                                 @foreach($index->config()['fields'] as $field)
-                                    <div class="mr-2 badge-pill-sm">
+                                    <div class="rtl:ml-2 ltr:mr-2 badge-pill-sm">
                                         {{ $field }}
                                     </div>
                                 @endforeach
                             </div>
                         </td>
-                        <td class="text-right">
+                        <td class="rtl:text-left ltr:text-right">
                             <form method="POST" action="{{ cp_route('utilities.search') }}">
                                 @csrf
-                                <input type="hidden" name="indexes[]" value="{{ $index->name() }}">
+                                <input type="hidden" name="indexes[]" value="{{ $index->name() }}::{{ $index->locale() }}">
                                 <button type="submit" class="btn btn-xs">{{ __('Update') }}</button>
                             </form>
                         </td>

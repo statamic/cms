@@ -5,11 +5,14 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
+use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 
 class FileCacher extends AbstractCacher
 {
@@ -32,6 +35,11 @@ class FileCacher extends AbstractCacher
      * @var string
      */
     private $nocachePlaceholder;
+
+    /**
+     * @var bool
+     */
+    private $logRewriteWarning = true;
 
     /**
      * @param  array  $config
@@ -59,7 +67,7 @@ class FileCacher extends AbstractCacher
 
         $content = $this->normalizeContent($content);
 
-        $path = $this->getFilePath($request->getUri());
+        $path = $this->getFilePath($url);
 
         if (! $this->writer->write($path, $content, $this->config('lock_hold_length'))) {
             return;
@@ -68,8 +76,13 @@ class FileCacher extends AbstractCacher
         $this->cacheUrl($this->makeHash($url), ...$this->getPathAndDomain($url));
     }
 
+    public function preventLoggingRewriteWarning()
+    {
+        $this->logRewriteWarning = false;
+    }
+
     /**
-     * @return string
+     * @return Page
      */
     public function getCachedPage(Request $request)
     {
@@ -77,11 +90,11 @@ class FileCacher extends AbstractCacher
 
         $path = $this->getFilePath($url);
 
-        if (! $this->isLongQueryStringPath($path)) {
+        if ($this->logRewriteWarning && ! $this->isLongQueryStringPath($path)) {
             Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
         }
 
-        return File::get($path);
+        return new Page(File::get($path));
     }
 
     public function hasCachedPage(Request $request)
@@ -119,9 +132,11 @@ class FileCacher extends AbstractCacher
             ->getUrls($domain)
             ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
             ->each(function ($value, $key) use ($site, $domain) {
-                $this->writer->delete($this->getFilePath($value, $site));
+                $this->writer->delete($this->getFilePath($domain.$value, $site));
                 $this->forgetUrl($key, $domain);
             });
+
+        UrlInvalidated::dispatch($url, $domain);
     }
 
     public function getCachePaths()
@@ -203,7 +218,7 @@ class FileCacher extends AbstractCacher
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            url: window.location.href,
+            url: window.location.href.split('#')[0],
             sections: Object.keys(map)
         })
     })
@@ -221,12 +236,20 @@ class FileCacher extends AbstractCacher
         for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
             meta.content = data.csrf;
         }
-        
+
+        for (const input of document.querySelectorAll('script[data-csrf="$csrfPlaceholder"]')) {
+            input.setAttribute('data-csrf', data.csrf);
+        }
+
         if (window.hasOwnProperty('livewire_token')) {
             window.livewire_token = data.csrf
         }
 
-        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
+        if (window.hasOwnProperty('livewireScriptConfig')) {
+            window.livewireScriptConfig.csrf = data.csrf
+        }
+
+        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));
     });
 })();
 EOT;
@@ -252,5 +275,32 @@ EOT;
     public function getNocachePlaceholder()
     {
         return $this->nocachePlaceholder ?? '';
+    }
+
+    public function getUrl(Request $request)
+    {
+        $url = $request->getUri();
+
+        if ($this->isExcluded($url)) {
+            return $url;
+        }
+
+        $url = explode('?', $url)[0];
+
+        if ($this->config('ignore_query_strings', false)) {
+            return $url;
+        }
+
+        // Symfony will normalize the query string which includes alphabetizing it. However, we
+        // want to maintain the real order so that when nginx looks for the file, it can find
+        // it. The following is the same normalizing code from Symfony without the ordering.
+
+        if (! $qs = $request->server->get('QUERY_STRING')) {
+            return $url;
+        }
+
+        $qs = HeaderUtils::parseQuery($qs);
+
+        return $url.'?'.http_build_query($qs, '', '&', \PHP_QUERY_RFC3986);
     }
 }

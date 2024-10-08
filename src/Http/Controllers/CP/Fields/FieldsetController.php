@@ -4,9 +4,11 @@ namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
 use Statamic\Facades;
+use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -28,8 +30,13 @@ class FieldsetController extends CpController
                         'id' => $fieldset->handle(),
                         'delete_url' => $fieldset->deleteUrl(),
                         'edit_url' => $fieldset->editUrl(),
+                        'reset_url' => $fieldset->resetUrl(),
                         'fields' => $fieldset->fields()->all()->count(),
+                        'imported_by' => collect($fieldset->importedBy())->flatten(1)->mapToGroups(function ($item) {
+                            return [$this->group($item) => ['handle' => $item->handle(), 'title' => $item->title()]];
+                        }),
                         'is_deletable' => $fieldset->isDeletable(),
+                        'is_resettable' => $fieldset->isResettable(),
                         'title' => $fieldset->title(),
                     ],
                 ];
@@ -42,9 +49,34 @@ class FieldsetController extends CpController
         return view('statamic::fieldsets.index', compact('fieldsets'));
     }
 
+    private function group(Blueprint|Fieldset $item)
+    {
+        if ($item instanceof Fieldset) {
+            return __('Fieldsets');
+        }
+
+        if ($namespace = $item->namespace()) {
+            return match (Str::before($namespace, '.')) {
+                'collections' => __('Collections'),
+                'taxonomies' => __('Taxonomies'),
+                'navigation' => __('Navigation'),
+                'globals' => __('Globals'),
+                'assets' => __('Asset Containers'),
+                'forms' => __('Forms'),
+            };
+        }
+
+        return match ($item->handle()) {
+            'user', 'user_group' => __('Users'),
+            default => __('Other'),
+        };
+    }
+
     public function edit($fieldset)
     {
         $fieldset = Facades\Fieldset::find($fieldset);
+
+        $fieldset->validateRecursion();
 
         $vue = [
             'title' => $fieldset->title(),
@@ -74,7 +106,11 @@ class FieldsetController extends CpController
             'fields' => collect($request->fields)->map(function ($field) {
                 return FieldTransformer::fromVue($field);
             })->all(),
-        ]))->save();
+        ]));
+
+        $fieldset->validateRecursion();
+
+        $fieldset->save();
 
         return response('', 204);
     }
@@ -88,11 +124,17 @@ class FieldsetController extends CpController
     {
         $request->validate([
             'title' => 'required',
-            'handle' => 'required|alpha_dash',
+            'handle' => ['required', new Handle],
         ]);
 
         if (Facades\Fieldset::find($request->handle)) {
-            return back()->withInput()->with('error', __('A fieldset with that name already exists.'));
+            $error = __('A fieldset with that name already exists.');
+
+            if ($request->wantsJson()) {
+                throw new \Exception($error);
+            }
+
+            return back()->withInput()->with('error', $error);
         }
 
         $fieldset = (new Fieldset)
@@ -114,6 +156,17 @@ class FieldsetController extends CpController
         $this->authorize('delete', $fieldset);
 
         $fieldset->delete();
+
+        return response('');
+    }
+
+    public function reset($fieldset)
+    {
+        $fieldset = Facades\Fieldset::find($fieldset);
+
+        $this->authorize('delete', $fieldset);
+
+        $fieldset->reset();
 
         return response('');
     }

@@ -2,12 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class IsArrayTest extends TestCase
 {
-    public function array(): array
+    public static function arrayProvider(): array
     {
         return [
             'empty_array' => [true, []],
@@ -19,11 +21,8 @@ class IsArrayTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider array
-     */
+    #[Test]
+    #[DataProvider('arrayProvider')]
     public function it_returns_true_if_value_is_array($expected, $input): void
     {
         $modified = $this->modify($input);

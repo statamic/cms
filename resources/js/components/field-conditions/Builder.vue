@@ -17,53 +17,28 @@
                     v-model="type"
                     :options="typeOptions"
                     :placeholder="false"
-                    class="ml-4" />
+                    class="rtl:mr-4 ltr:ml-4" />
 
                 <text-input
                     v-if="hasConditions && isCustom"
                     v-model="customMethod"
-                    class="ml-4 flex-1" />
+                    class="rtl:mr-4 ltr:ml-4 flex-1" />
             </div>
 
-            <div
+            <condition
                 v-if="hasConditions && isStandard"
                 v-for="(condition, index) in conditions"
+                :index="index"
+                :config="config"
+                :condition="condition"
+                :conditions="conditions"
                 :key="condition._id"
-                class="flex flex-wrap items-center py-4 border-t"
-            >
-                <div v-if="index === 0" class="help-block" v-text="__('messages.field_conditions_field_instructions')" />
+                :suggestable-fields="suggestableFields"
+                @updated="updated(index, $event)"
+                @removed="remove(index)"
+            />
 
-                <v-select
-                    ref="fieldSelect"
-                    v-model="conditions[index].field"
-                    class="w-full md:w-1/3 mb-2 md:mb-0"
-                    :options="fieldOptions"
-                    :placeholder="__('Field')"
-                    :taggable="true"
-                    :push-tags="true"
-                    :reduce="field => field.value"
-                    :create-option="field => ({value: field, label: field })"
-                    @search:blur="fieldSelectBlur(index)"
-                >
-                    <template #no-options><div class="hidden" /></template>
-                </v-select>
-
-                <select-input
-                    v-model="conditions[index].operator"
-                    :options="operatorOptions"
-                    :placeholder="false"
-                    class="md:ml-4" />
-
-                <text-input
-                    v-model="conditions[index].value"
-                    class="ml-4" />
-
-                <button @click="remove(index)" class="btn-close ml-2 group">
-                    <svg-icon name="micro/trash" class="w-4 h-4 group-hover:text-red-500" />
-                </button>
-            </div>
-
-            <div class="border-t pt-6" v-if="hasConditions && isStandard">
+            <div class="border-t dark:border-dark-900 pt-6" v-if="hasConditions && isStandard">
                 <button
                     v-text="__('Add Condition')"
                     @click="add"
@@ -90,10 +65,14 @@ import uniqid from 'uniqid';
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
+import Condition from './Condition.vue';
+import { __ } from '../../bootstrap/globals';
 
 export default {
 
     mixins: [HasInputOptions],
+
+    components: { Condition },
 
     props: {
         config: {
@@ -130,16 +109,6 @@ export default {
                 any: __('Any of the following conditions pass'),
                 custom: __('Custom method passes')
             });
-        },
-
-        fieldOptions() {
-            return this.normalizeInputOptions(
-                _.reject(this.suggestableFields, field => field === this.config.handle)
-            );
-        },
-
-        operatorOptions() {
-            return this.normalizeInputOptions(OPERATORS);
         },
 
         hasConditions() {
@@ -206,6 +175,10 @@ export default {
             this.conditions.splice(index, 1);
         },
 
+        updated(index, condition) {
+            this.conditions.splice(index, 1, condition);
+        },
+
         getInitialConditions() {
             let key = _.chain(KEYS)
                 .filter(key => this.config[key])
@@ -266,11 +239,6 @@ export default {
             }
 
             return operator;
-        },
-
-        fieldSelectBlur(index) {
-            const value = this.$refs.fieldSelect[index].$refs.search.value;
-            if (value) this.conditions[index].field = value;
         },
 
     }

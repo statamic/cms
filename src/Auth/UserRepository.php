@@ -9,11 +9,12 @@ use Statamic\Events\UserBlueprintFound;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\OAuth\Provider;
+use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Statamic;
 
 abstract class UserRepository implements RepositoryContract
 {
-    use StoresComputedFieldCallbacks;
+    use AllowsScopes, StoresComputedFieldCallbacks;
 
     public function create()
     {
@@ -63,10 +64,11 @@ abstract class UserRepository implements RepositoryContract
         }
 
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
-            'name' => ['type' => 'text', 'display' => 'Name', 'listable' => true],
+            'name' => ['type' => 'text', 'display' => __('Name'), 'listable' => true],
+            'email' => ['type' => 'text', 'input_type' => 'email', 'display' => __('Email Address'), 'listable' => true],
         ])->setHandle('user');
 
-        $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address', 'listable' => true]);
+        $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => __('Email Address'), 'listable' => true]);
 
         if (Statamic::pro()) {
             $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);
@@ -83,10 +85,10 @@ abstract class UserRepository implements RepositoryContract
         return $blueprint;
     }
 
-    public function findByOAuthId(string $provider, string $id): ?User
+    public function findByOAuthId(Provider $provider, string $id): ?User
     {
         return $this->find(
-            (new Provider($provider))->getUserId($id)
+            $provider->getUserId($id)
         );
     }
 }

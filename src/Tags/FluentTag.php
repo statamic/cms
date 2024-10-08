@@ -6,7 +6,7 @@ use ArrayIterator;
 use Statamic\Support\Str;
 use Traversable;
 
-class FluentTag implements \IteratorAggregate, \ArrayAccess
+class FluentTag implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * @var mixed
@@ -149,7 +149,7 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
      * Allow calls to tag params.
      *
      * @param  string  $param
-     * @param  array  $value
+     * @param  mixed  $value
      * @return $this
      */
     public function param($param, $value = true)
@@ -183,7 +183,7 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
      */
     public function __call($param, $args)
     {
-        $this->param($param, $args[0] ?? true);
+        $this->param(Str::snake($param), $args[0] ?? true);
 
         return $this;
     }

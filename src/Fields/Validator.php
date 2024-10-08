@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator as LaravelValidator;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -49,13 +50,15 @@ class Validator
 
     public function rules()
     {
-        return $this
+        $rules = $this
             ->merge($this->fieldRules(), $this->extraRules)
             ->map(function ($rules) {
                 return collect($rules)->map(function ($rule) {
                     return $this->parse($rule);
                 })->all();
             })->all();
+
+        return $this->filterPrecognitiveRules($rules);
     }
 
     private function fieldRules()
@@ -65,6 +68,10 @@ class Validator
         }
 
         return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
+            if (request()->isPrecognitive() && $field->type() == 'assets') {
+                return $carry;
+            }
+
             return $carry->merge($field->setValidationContext($this->context)->rules());
         }, collect());
     }
@@ -74,7 +81,7 @@ class Validator
         foreach ($overrides as $field => $fieldRules) {
             $fieldRules = self::explodeRules($fieldRules);
 
-            if (array_has($original, $field)) {
+            if (Arr::has($original, $field)) {
                 $original[$field] = array_merge($original[$field], $fieldRules);
             } else {
                 $original[$field] = $fieldRules;
@@ -93,14 +100,19 @@ class Validator
         return $this;
     }
 
-    public function validate()
+    public function validator()
     {
-        return LaravelValidator::validate(
+        return LaravelValidator::make(
             $this->fields->preProcessValidatables()->values()->all(),
             $this->rules(),
             $this->customMessages,
             $this->attributes()
         );
+    }
+
+    public function validate()
+    {
+        return $this->validator()->validate();
     }
 
     public function attributes()
@@ -112,14 +124,44 @@ class Validator
 
     private function parse($rule)
     {
-        if (! is_string($rule) ||
-            ! Str::contains($rule, '{') ||
-            Str::startsWith($rule, 'regex:') ||
-            Str::startsWith($rule, 'not_regex:')
-        ) {
-            return $rule;
+        if (is_string($rule) && Str::startsWith($rule, 'new ')) {
+            return $this->parseClassBasedRule($rule);
         }
 
+        if (is_string($rule) && Str::contains($rule, '{') && ! Str::startsWith($rule, ['regex:', 'not_regex:'])) {
+            return $this->parseStringBasedRule($rule);
+        }
+
+        return $rule;
+    }
+
+    private function parseClassBasedRule($rule)
+    {
+        $rule = preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
+            $value = Arr::get($this->replacements, $match[1]);
+
+            if ($value === null) {
+                return 'null';
+            }
+
+            if ($value === true) {
+                return 'true';
+            }
+
+            if ($value === false) {
+                return 'false';
+            }
+
+            return is_string($value) ? "'{$value}'" : $value;
+        }, $rule);
+
+        [$class, $arguments] = (new ClassRuleParser)->parse($rule);
+
+        return new $class(...$arguments);
+    }
+
+    private function parseStringBasedRule($rule)
+    {
         $rule = str_replace('{this}.', $this->context['prefix'] ?? '', $rule);
 
         return preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
@@ -138,5 +180,18 @@ class Validator
         }
 
         return $rules;
+    }
+
+    public function filterPrecognitiveRules($rules)
+    {
+        $request = request();
+
+        if (! $request->headers->has('Precognition-Validate-Only')) {
+            return $rules;
+        }
+
+        return Collection::make($rules)
+            ->only(explode(',', $request->header('Precognition-Validate-Only')))
+            ->all();
     }
 }

@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
@@ -10,9 +11,13 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Preference;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
+use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
+use Statamic\Tokens\Handlers\LivePreview;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected $configFiles = [
         'antlers', 'api', 'assets', 'autosave', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'markdown', 'oauth', 'protect', 'revisions',
-        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users',
+        'routes', 'search', 'static_caching', 'stache', 'system', 'users',
     ];
 
     public function boot()
@@ -28,15 +33,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             Statamic::runBootedCallbacks();
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
+            $this->registerMiddlewareGroup();
         });
-
-        $this->registerMiddlewareGroup();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class)
+            ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -85,6 +90,12 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
+        Request::macro('isLivePreview', function () {
+            return optional($this->statamicToken())->handler() === LivePreview::class;
+        });
+
+        TrimStrings::skipWhen(fn (Request $request) => $request->is(config('statamic.cp.route').'/*'));
+
         $this->addAboutCommandInfo();
     }
 
@@ -94,9 +105,7 @@ class AppServiceProvider extends ServiceProvider
             $this->mergeConfigFrom("{$this->root}/config/$config.php", "statamic.$config");
         });
 
-        $this->app->singleton(Sites::class, function () {
-            return new Sites(config('statamic.sites'));
-        });
+        $this->app->singleton(Sites::class);
 
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
@@ -112,6 +121,8 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Structures\NavigationRepository::class => \Statamic\Stache\Repositories\NavigationRepository::class,
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
             \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
+            \Statamic\Contracts\Forms\SubmissionRepository::class => \Statamic\Stache\Repositories\SubmissionRepository::class,
+            \Statamic\Contracts\Tokens\TokenRepository::class => \Statamic\Tokens\FileTokenRepository::class,
         ])->each(function ($concrete, $abstract) {
             if (! $this->app->bound($abstract)) {
                 Statamic::repository($abstract, $concrete);
@@ -129,7 +140,7 @@ class AppServiceProvider extends ServiceProvider
                 ->setRepository('user', \Statamic\Contracts\Auth\UserRepository::class);
         });
 
-        $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function () {
+        $this->app->singleton(\Statamic\Fields\BlueprintRepository::class, function () {
             return (new \Statamic\Fields\BlueprintRepository)
                 ->setDirectory(resource_path('blueprints'))
                 ->setFallback('default', function () {
@@ -144,14 +155,19 @@ class AppServiceProvider extends ServiceProvider
                 ->setDirectory(resource_path('fieldsets'));
         });
 
+        $this->app->singleton(FieldsetRecursionStack::class);
+
         collect([
             'entries' => fn () => Facades\Entry::query(),
+            'form-submissions' => fn () => Facades\FormSubmission::query(),
             'terms' => fn () => Facades\Term::query(),
             'assets' => fn () => Facades\Asset::query(),
             'users' => fn () => Facades\User::query(),
         ])->each(function ($binding, $alias) {
             app()->bind('statamic.queries.'.$alias, $binding);
         });
+
+        $this->app->instance('statamic.query-scopes', collect());
 
         $this->app->bind('statamic.imaging.guzzle', function () {
             return new \GuzzleHttp\Client;
@@ -160,14 +176,16 @@ class AppServiceProvider extends ServiceProvider
 
     protected function registerMiddlewareGroup()
     {
-        $this->app->make(Router::class)->middlewareGroup('statamic.web', [
+        $router = $this->app->make(Router::class);
+
+        collect([
             \Statamic\Http\Middleware\StacheLock::class,
             \Statamic\Http\Middleware\HandleToken::class,
             \Statamic\Http\Middleware\Localize::class,
             \Statamic\Http\Middleware\AddViewPaths::class,
             \Statamic\Http\Middleware\AuthGuard::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
-        ]);
+        ])->each(fn ($middleware) => $router->pushMiddlewareToGroup('statamic.web', $middleware));
     }
 
     protected function addAboutCommandInfo()
@@ -180,14 +198,40 @@ class AppServiceProvider extends ServiceProvider
 
         AboutCommand::add('Statamic', [
             'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
-            'Antlers' => config('statamic.antlers.version'),
             'Addons' => $addons->count(),
-            'Stache Watcher' => config('statamic.stache.watcher') ? 'Enabled' : 'Disabled',
+            'Stache Watcher' => fn () => $this->stacheWatcher(),
             'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',
+            'Sites' => fn () => $this->sitesAboutCommandInfo(),
         ]);
 
         foreach ($addons as $addon) {
             AboutCommand::add('Statamic Addons', $addon->package(), $addon->version());
         }
+    }
+
+    private function stacheWatcher()
+    {
+        $status = Stache::isWatcherEnabled() ? 'Enabled' : 'Disabled';
+
+        if (config('statamic.stache.watcher') === 'auto') {
+            $status .= ' (auto)';
+        }
+
+        return $status;
+    }
+
+    private function sitesAboutCommandInfo()
+    {
+        if (($sites = Site::all())->count() === 1) {
+            return 1;
+        }
+
+        // If there are 5 or fewer sites, list all their names.
+        // If there are more than 5, list the first 3 and append "and n more".
+        $summary = $sites->count() <= 5
+            ? $sites->map->name()->join(', ')
+            : $sites->take(3)->map->name()->join(', ').', and '.($sites->count() - 3).' more';
+
+        return $sites->count().' ('.$summary.')';
     }
 }

@@ -2,17 +2,16 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Code;
 use Tests\TestCase;
 
 class CodeTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider processValues
-     **/
+    #[Test]
+    #[DataProvider('processValuesProvider')]
     public function it_processes_values($isSelectable, $value, $expected)
     {
         $field = (new Code)->setField(new Field('test', [
@@ -23,7 +22,7 @@ class CodeTest extends TestCase
         $this->assertEquals($expected, $field->process($value));
     }
 
-    public function processValues()
+    public static function processValuesProvider()
     {
         return [
             'selectable' => [true, ['code' => 'bar', 'mode' => 'htmlmixed'], ['code' => 'bar', 'mode' => 'htmlmixed']],
@@ -31,11 +30,8 @@ class CodeTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider preProcessValues
-     **/
+    #[Test]
+    #[DataProvider('preProcessValuesProvider')]
     public function it_preprocesses_values($value, $expected)
     {
         $field = (new Code)->setField(new Field('test', ['type' => 'code']));
@@ -43,7 +39,7 @@ class CodeTest extends TestCase
         $this->assertEquals($expected, $field->preProcess($value));
     }
 
-    public function preProcessValues()
+    public static function preProcessValuesProvider()
     {
         return [
             'string' => ['bar', ['code' => 'bar', 'mode' => 'htmlmixed']],
@@ -52,7 +48,7 @@ class CodeTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_do_any_preprocessing_for_config()
     {
         $field = (new Code)->setField(new Field('test', ['type' => 'code']));

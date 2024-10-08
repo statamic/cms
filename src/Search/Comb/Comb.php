@@ -379,7 +379,7 @@ class Comb
      */
     private function preformat($raw_query)
     {
-        return trim(mb_ereg_replace("[^\w\d\-\.:+\s@&’'‘]", '', $raw_query));
+        return trim(mb_ereg_replace("[^\w\d\-\.:+\s\\\/@&’'‘]", '', $raw_query));
     }
 
     /**
@@ -465,11 +465,16 @@ class Comb
         $output = '';
 
         if (! is_array($item)) {
-            return preg_replace('#\s+#ism', ' ', $item);
+            return preg_replace('#\s+#ism', ' ', (string) $item);
         }
 
         foreach ($item as $part) {
-            $output .= (is_array($part)) ? $this->flattenArray($part, $glue) : $glue.$part;
+            if (is_array($part)) {
+                unset($part['id'], $part['type'], $part['attrs']);
+                $output .= $this->flattenArray($part, $glue);
+            } else {
+                $output .= $glue.$part;
+            }
         }
 
         return preg_replace('#\s+#ism', ' ', $output);
@@ -510,6 +515,9 @@ class Comb
         // loop over records
         foreach ($this->haystack as $key => $item) {
             $data = $item['pruned'];
+            $data = array_map(function ($property) {
+                return $this->flattenArray($property);
+            }, $data);
 
             // counters
             $found = [
@@ -529,76 +537,75 @@ class Comb
             // loop over each query chunk
             foreach ($params['chunks'] as $j => $chunk) {
                 $escaped_chunk = preg_quote($chunk, '#');
+                $chunk_is_word = ! preg_match('#\s#', $chunk);
                 $regex = [
-                    'whole' => '#^'.$escaped_chunk.'$#i',
-                    'partial' => '#'.$escaped_chunk.'#i',
+                    'partial_anywhere' => '#'.$escaped_chunk.'#i',
+                    'partial_from_start_anywhere' => '#(^|\s)'.$escaped_chunk.'#i',
+                    'whole_anywhere' => '#(^|\s)'.$escaped_chunk.'($|\s)#i',
                     'partial_from_start' => '#^'.$escaped_chunk.'#i',
+                    'whole' => '#^'.$escaped_chunk.'$#i',
                 ];
 
                 // loop over each data property
                 foreach ($data as $name => $property) {
-                    $property = $this->flattenArray($property);
-
                     if (! is_string($property)) {
                         continue;
                     }
 
-                    $words = preg_split("#\s#i", $property);
+                    preg_match('#^[^\s]+#', $property, $first_word);
+                    $first_word = $first_word[0] ?? '';
                     $strength = (! isset($this->property_weights[$name])) ? 1 : $this->property_weights[$name];
 
-                    // reset iterator
-                    $i = 0;
+                    $matched = false;
 
-                    // whole matching
-                    $result = preg_match_all($regex['whole'], $property, $matches);
+                    $result = preg_match_all($regex['partial_anywhere'], $property);
                     if ($result) {
-                        $found['whole'] += $strength * $result;
-                    }
-
-                    $result = preg_match_all($regex['partial'], $property, $matches);
-                    if ($result) {
+                        $matched = true;
                         $found['partial_whole'] += $strength * $result;
-                    }
-
-                    $result = preg_match_all($regex['partial_from_start'], $property, $matches);
-                    if ($result) {
-                        $found['partial_whole_start'] += $strength * $result;
-                    }
-
-                    // word matching
-                    foreach ($words as $word) {
-                        $result = preg_match_all($regex['whole'], $word, $matches);
-                        if ($result) {
-                            $found['whole_word'] += $strength * $result;
-
-                            if ($i === 0) {
-                                $found['whole_first_word'] += $strength * $result;
-                            }
-                        }
-
-                        $result = preg_match_all($regex['partial'], $word, $matches);
-                        if ($result) {
+                        if ($chunk_is_word) {
                             $found['partial_word'] += $strength * $result;
-
-                            if ($i === 0) {
+                            if (preg_match_all($regex['partial_anywhere'], $first_word)) {
                                 $found['partial_first_word'] += $strength * $result;
                             }
                         }
 
-                        $result = preg_match_all($regex['partial_from_start'], $word, $matches);
+                        $result = preg_match_all($regex['partial_from_start_anywhere'], $property);
                         if ($result) {
-                            $found['partial_word_start'] += $strength * $result;
+                            $matched = true;
+                            if ($chunk_is_word) {
+                                $found['partial_word_start'] += $strength * $result;
+                                if (preg_match_all($regex['partial_from_start_anywhere'], $first_word)) {
+                                    $found['partial_first_word_start'] += $strength * $result;
+                                }
+                            }
 
-                            if ($i === 0) {
-                                $found['partial_first_word_start'] += $strength * $result;
+                            $result = preg_match_all($regex['whole_anywhere'], $property);
+                            if ($result) {
+                                $matched = true;
+                                if ($chunk_is_word) {
+                                    $found['whole_word'] += $strength * $result;
+                                    if (preg_match_all($regex['whole_anywhere'], $first_word)) {
+                                        $found['whole_first_word'] += $strength * $result;
+                                    }
+                                }
+                            }
+
+                            $result = preg_match_all($regex['partial_from_start'], $property);
+                            if ($result) {
+                                $matched = true;
+                                $found['partial_whole_start'] += $strength * $result;
+
+                                $result = preg_match_all($regex['whole'], $property);
+                                if ($result) {
+                                    $matched = true;
+                                    $found['whole'] += $strength * $result;
+                                }
                             }
                         }
-
-                        $i++;
                     }
 
                     // snippet extraction (only needs to run during one chunk)
-                    if ($j === 0) {
+                    if ($matched && $j === 0) {
                         $snippets[$name] = $this->extractSnippets($property, $params['chunks']);
                     }
                 }
@@ -827,7 +834,7 @@ class Comb
     {
         $length = strlen($query);
 
-        if ($length === 0) {
+        if ($length === 0 && $this->min_characters > 0) {
             throw new NoQuery('No query given.');
         }
 
@@ -927,10 +934,10 @@ class Comb
         $output = [];
 
         if (! is_array($words)) {
-            $output = str_singular($words);
+            $output = Str::singular($words);
         } else {
             foreach ($words as $word) {
-                array_push($output, str_singular($word));
+                array_push($output, Str::singular($word));
             }
         }
 

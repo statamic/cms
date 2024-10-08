@@ -2,11 +2,14 @@
 
 namespace Statamic\Auth;
 
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Auth\Role;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
 
@@ -390,18 +393,29 @@ class UserTags extends Tags
             $this->params->put('redirect', request()->getPathInfo());
         }
 
-        $knownParams = ['redirect'];
-
         $action = route('statamic.password.reset.action');
         $method = 'POST';
 
         $token = Html::entities(request('token'));
-        $redirect = $this->params->get('redirect');
+
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
+
+        $params = [];
+
+        $redirect = $this->getRedirectUrl();
+
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            if (Str::startsWith($errorRedirect, '#')) {
+                $errorRedirect = request()->url().'?token='.$token.$errorRedirect;
+            }
+
+            $params['error_redirect'] = $errorRedirect;
+        }
 
         if (! $this->parser) {
             return array_merge([
                 'attrs' => $this->formAttrs($action, $method, $knownParams),
-                'params' => array_merge($this->formMetaPrefix($this->formParams($method)), [
+                'params' => array_merge($this->formMetaPrefix($this->formParams($method, $params)), [
                     'token' => $token,
                     'redirect' => $redirect,
                 ]),
@@ -409,6 +423,8 @@ class UserTags extends Tags
         }
 
         $html = $this->formOpen($action, $method, $knownParams);
+
+        $html .= $this->formMetaFields($params);
 
         $html .= '<input type="hidden" name="token" value="'.$token.'" />';
 
@@ -491,7 +507,11 @@ class UserTags extends Tags
             return $this->parser ? null : false;
         }
 
-        $roles = Arr::wrap($this->params->explode(['role', 'roles']));
+        $roles = $this->params->get(['role', 'roles']);
+
+        if (! $roles instanceof Collection || ! $roles->every(fn ($role) => $role instanceof Role)) {
+            $roles = Arr::wrap($this->params->explode(['role', 'roles']));
+        }
 
         foreach ($roles as $role) {
             if ($user->hasRole($role)) {
@@ -515,7 +535,11 @@ class UserTags extends Tags
             return $this->parser ? $this->parse() : true;
         }
 
-        $roles = Arr::wrap($this->params->explode(['roles', 'role']));
+        $roles = $this->params->get(['role', 'roles']);
+
+        if (! $roles instanceof Collection || ! $roles->every(fn ($role) => $role instanceof Role)) {
+            $roles = Arr::wrap($this->params->explode(['roles', 'role']));
+        }
 
         $is = false;
 

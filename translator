@@ -22,6 +22,7 @@ $manualFiles = [
     'permissions',
     'markdown',
     'validation',
+    'moment',
 ];
 
 // Don't translate the following files.
@@ -76,6 +77,7 @@ $additionalKeys = [
         'float.title',
         'form.title',
         'grid.title',
+        'group.title',
         'hidden.title',
         'html.title',
         'icon.title',

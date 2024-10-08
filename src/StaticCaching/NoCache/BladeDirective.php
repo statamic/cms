@@ -2,6 +2,8 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
+use Statamic\StaticCaching\Middleware\Cache;
+
 class BladeDirective
 {
     /**
@@ -14,7 +16,7 @@ class BladeDirective
         $this->nocache = $nocache;
     }
 
-    public function handle($expression, array $params, array $data = null)
+    public function handle($expression, array $params, ?array $data = null)
     {
         if (func_num_args() == 2) {
             $data = $params;
@@ -24,6 +26,10 @@ class BladeDirective
         $view = $expression;
 
         $context = array_merge($data, $params);
+
+        if (! Cache::isBeingUsedOnCurrentRoute()) {
+            return view($view, $context)->render();
+        }
 
         return $this->nocache->pushView($view, $context)->placeholder();
     }

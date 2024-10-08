@@ -1,3 +1,5 @@
+@php use function Statamic\trans as __; @endphp
+
 @extends('statamic::layout')
 @section('title', __('Edit User'))
 
@@ -14,6 +16,9 @@
         :initial-meta="{{ json_encode($meta) }}"
         :can-edit-password="{{ Statamic\Support\Str::bool($canEditPassword) }}"
         :can-edit-blueprint="{{ Statamic\Support\Str::bool($user->can('configure fields')) }}"
+        :requires-current-password="{{ Statamic\Support\Str::bool($requiresCurrentPassword) }}"
+        :initial-item-actions="{{ json_encode($itemActions) }}"
+        item-action-url="{{ cp_route('users.actions.run') }}"
     ></user-publish-form>
 
 @endsection

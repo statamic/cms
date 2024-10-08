@@ -5,12 +5,15 @@ namespace Statamic\Tags;
 use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
+use Statamic\Fieldtypes\Icon;
 use Statamic\Support\Str;
 use Stringy\StaticStringy;
 
 class Svg extends Tags
 {
     use Concerns\RendersAttributes;
+
+    private static $shouldSanitize = true;
 
     public function wildcard($src)
     {
@@ -28,6 +31,7 @@ class Svg extends Tags
             resource_path(),
             public_path('svg'),
             public_path(),
+            statamic_path('resources/svg/icons/'.Icon::DEFAULT_FOLDER),
         ];
 
         $svg = null;
@@ -42,19 +46,27 @@ class Svg extends Tags
             }
         }
 
-        $attributes = $this->renderAttributesFromParams(['src', 'title', 'desc']);
+        if (! $svg && Str::startsWith(mb_strtolower(trim($name)), '<svg')) {
+            $svg = $this->params->get('src');
+        }
+
+        if (empty($svg)) {
+            return '';
+        }
 
         if ($this->params->get('title') || $this->params->get('desc')) {
             $svg = $this->setTitleAndDesc($svg);
         }
 
-        $svg = str_replace(
+        $svg = $this->sanitize($svg);
+
+        $attributes = $this->renderAttributesFromParams(except: ['src', 'title', 'desc', 'sanitize', 'allow_tags', 'allow_attrs']);
+
+        return str_replace(
             '<svg',
             collect(['<svg', $attributes])->filter()->implode(' '),
             $svg
         );
-
-        return $this->sanitize($svg);
     }
 
     private function setTitleAndDesc($svg)
@@ -85,7 +97,7 @@ class Svg extends Tags
 
     private function sanitize($svg)
     {
-        if ($this->params->bool('sanitize') === false) {
+        if ($this->params->bool('sanitize', static::$shouldSanitize) === false) {
             return $svg;
         }
 
@@ -115,5 +127,15 @@ class Svg extends Tags
         $disallowed = array_diff($sanitizer->getDisallowedTags(), $tags);
         $sanitizer->setAllowedTags($allowed);
         $sanitizer->setDisallowedTags($disallowed);
+    }
+
+    public static function disableSanitization()
+    {
+        static::$shouldSanitize = false;
+    }
+
+    public static function enableSanitization()
+    {
+        static::$shouldSanitize = true;
     }
 }

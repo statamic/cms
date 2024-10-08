@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Contracts\Support\Boolable;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
@@ -91,6 +92,7 @@ class Environment
     protected $interpolationKeys = [];
     protected $assignments = [];
     protected $dataManagerInterpolations = [];
+    private $protectedScopes = ['view'];
 
     /**
      * @var LanguageOperatorManager|null
@@ -277,7 +279,6 @@ class Environment
 
     /**
      * @param  SemanticGroup[]  $statements
-     * @return null
      *
      * @throws RuntimeException
      * @throws SyntaxErrorException
@@ -353,8 +354,8 @@ class Environment
         $this->isEvaluatingTruthValue = false;
 
         if (is_object($result)) {
-            if ($result instanceof ArrayableString) {
-                $value = $this->getTruthValue($result->value());
+            if ($result instanceof Boolable) {
+                $value = $this->getTruthValue($result->toBool());
                 $this->unlock();
 
                 return $value;
@@ -965,10 +966,12 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $right;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $right;
 
-                if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
-                    GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                    if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
+                        GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                    }
                 }
 
                 return null;
@@ -1010,7 +1013,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $newVal;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $newVal;
+                }
 
                 return null;
             } elseif ($operand instanceof DivisionAssignmentOperator) {
@@ -1037,7 +1042,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof ModulusAssignmentOperator) {
@@ -1063,7 +1070,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof MultiplicationAssignmentOperator) {
@@ -1089,7 +1098,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof SubtractionAssignmentOperator) {
@@ -1115,7 +1126,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof ConditionalVariableFallbackOperator) {
@@ -1236,6 +1249,8 @@ class Environment
      */
     private function scopeValue($name, $originalNode = null)
     {
+        ModifierManager::clearModifierState();
+
         if (! empty(GlobalRuntimeState::$prefixState)) {
             $this->dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
         }
@@ -1243,6 +1258,8 @@ class Environment
         if ($name instanceof VariableReference) {
             if (! $this->isEvaluatingTruthValue) {
                 $this->dataRetriever->setReduceFinal(false);
+            } else {
+                $this->dataRetriever->setIsReturningForConditions(true);
             }
 
             if ($originalNode != null && $originalNode->hasModifiers()) {
@@ -1341,7 +1358,7 @@ class Environment
             }
         }
 
-        if (! empty($this->interpolationReplacements)) {
+        if (! empty($this->interpolationReplacements) && is_string($value)) {
             if (Str::contains($value, $this->interpolationKeys)) {
                 $value = strtr($value, $this->interpolationReplacements);
             }
@@ -1555,7 +1572,11 @@ class Environment
             $varName = $this->nameOf($val);
 
             if ($val->isInterpolationReference) {
-                $interpolationValue = $this->adjustValue($this->nodeProcessor->reduceInterpolatedVariable($val), $val);
+                if (array_key_exists($varName->normalizedReference, $this->data)) {
+                    $interpolationValue = $this->adjustValue($this->data[$varName->normalizedReference], $val);
+                } else {
+                    $interpolationValue = $this->adjustValue($this->nodeProcessor->reduceInterpolatedVariable($val), $val);
+                }
 
                 // If the currently active node is an instance of ArithmeticNodeContract,
                 // we will ask the runtime type coercion to convert whatever value

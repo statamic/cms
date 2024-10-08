@@ -24,6 +24,9 @@
         :search="canSearch"
         :read-only="isReadOnly"
         :taggable="taggable"
+        :tree="meta.tree"
+        :initial-sort-column="meta.initialSortColumn"
+        :initial-sort-direction="meta.initialSortDirection"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
         @input="update"
@@ -89,9 +92,11 @@ export default {
         },
 
         site() {
-            if (! this.storeName) return this.$config.get('selectedSite');
+            if (this.storeName) {
+                return this.$store.state.publish[this.storeName].site || this.$config.get('selectedSite');
+            }
 
-            return this.$store.state.publish[this.storeName].site;
+            return this.$config.get('selectedSite');
         },
 
         canEdit() {
@@ -131,6 +136,8 @@ export default {
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.value.map(id => {
                 const item = _.findWhere(this.meta.data, { id });
                 return item ? item.title : id;

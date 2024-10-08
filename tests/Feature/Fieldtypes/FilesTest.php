@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Fieldtypes;
 
-use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -31,11 +33,8 @@ class FilesTest extends TestCase
         AssetContainer::make('with_preset')->disk('with_preset')->sourcePreset('upload')->save();
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider uploadProvider
-     */
+    #[Test]
+    #[DataProvider('uploadProvider')]
     public function it_uploads_a_file($container, $isImage, $expectedPath, $expectedWidth, $expectedHeight)
     {
         $glideDir = storage_path('statamic/glide/tmp');
@@ -45,7 +44,7 @@ class FilesTest extends TestCase
             ? UploadedFile::fake()->image('test.jpg', 50, 75)
             : UploadedFile::fake()->create('test.txt');
 
-        Carbon::setTestNow(Carbon::createFromTimestamp(1671484636));
+        Date::setTestNow(Date::createFromTimestamp(1671484636));
 
         $disk = Storage::fake('local');
 
@@ -77,7 +76,7 @@ class FilesTest extends TestCase
         }
     }
 
-    public function uploadProvider()
+    public static function uploadProvider()
     {
         return [
             'no container' => [null, true, '1671484636/test.jpg', 50, 75],

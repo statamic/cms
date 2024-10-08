@@ -4,8 +4,10 @@ namespace Statamic\Extensions\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use Illuminate\Translation\Translator as BaseTranslator;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 class Translator extends BaseTranslator
 {
@@ -19,7 +21,7 @@ class Translator extends BaseTranslator
 
     public function parseKey($key)
     {
-        if (Statamic::isCpRoute() && starts_with($key, 'validation.')) {
+        if (Statamic::isCpRoute() && Str::startsWith($key, 'validation.')) {
             $key = 'statamic::'.$key;
         }
 
@@ -45,7 +47,7 @@ class Translator extends BaseTranslator
         $translations->put('*', $this->loader->load($this->locale, '*', '*'));
 
         // The Javascript side is expecting one flattened object.
-        return array_dot($translations);
+        return Arr::dot($translations);
     }
 
     protected function getTranslations($path, $namespace)

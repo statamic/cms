@@ -8,6 +8,7 @@ use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RequireStatamicPro;
+use Statamic\Support\Str;
 
 class UserGroupsController extends CpController
 {
@@ -74,7 +75,11 @@ class UserGroupsController extends CpController
 
         $fields = $blueprint
             ->fields()
-            ->addValues($group->data()->merge(['handle' => $group->handle()])->all())
+            ->addValues($group->data()->merge([
+                'title' => $group->title(),
+                'handle' => $group->handle(),
+                'roles' => $group->roles()->map->handle()->values()->all(),
+            ])->all())
             ->preProcess();
 
         $viewData = [
@@ -167,10 +172,22 @@ class UserGroupsController extends CpController
 
         $values = $fields->process()->values()->except(['title', 'handle', 'roles']);
 
+        $handle = $request->handle ?: Str::snake($request->title);
+
+        if (UserGroup::find($handle)) {
+            $error = __('A User Group with that handle already exists.');
+
+            if ($request->wantsJson()) {
+                return response()->json(['message' => $error], 422);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
+
         $group = UserGroup::make()
             ->title($request->title)
             ->data($values)
-            ->handle($request->handle ?: snake_case($request->title));
+            ->handle($handle);
 
         if (User::current()->can('assign roles')) {
             $group->roles($request->roles);

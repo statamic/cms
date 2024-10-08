@@ -5,8 +5,12 @@ namespace Tests\Data\Taxonomies;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Event;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
+use Statamic\Events\TermCreating;
+use Statamic\Events\TermDeleted;
+use Statamic\Events\TermDeleting;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
 use Statamic\Facades;
@@ -21,7 +25,7 @@ class TermTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_the_blueprint_when_defined_on_itself()
     {
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
@@ -35,7 +39,7 @@ class TermTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_blueprint_when_defined_in_a_value()
     {
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
@@ -49,7 +53,7 @@ class TermTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_default_taxonomy_blueprint_when_undefined()
     {
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
@@ -63,7 +67,7 @@ class TermTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function the_blueprint_is_blinked_when_getting_and_flushed_when_setting()
     {
         $term = (new Term)->taxonomy('tags');
@@ -81,7 +85,7 @@ class TermTest extends TestCase
         $this->assertEquals('the new blueprint', $term->blueprint());
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_an_event_when_getting_blueprint()
     {
         Event::fake();
@@ -103,7 +107,7 @@ class TermTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_entry_count_through_the_repository()
     {
         $term = (new Term)->taxonomy('tags')->slug('foo');
@@ -116,7 +120,7 @@ class TermTest extends TestCase
         $this->assertEquals(7, $term->entriesCount());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_through_the_api()
     {
         Event::fake();
@@ -127,6 +131,10 @@ class TermTest extends TestCase
         $return = $term->save();
 
         $this->assertTrue($return);
+
+        Event::assertDispatched(TermCreating::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
 
         Event::assertDispatched(TermSaving::class, function ($event) use ($term) {
             return $event->term === $term;
@@ -141,7 +149,7 @@ class TermTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_term_created_only_once()
     {
         Event::fake();
@@ -160,7 +168,7 @@ class TermTest extends TestCase
         Event::assertDispatched(TermCreated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_quietly()
     {
         Event::fake();
@@ -172,12 +180,32 @@ class TermTest extends TestCase
 
         $this->assertTrue($return);
 
+        Event::assertNotDispatched(TermCreating::class);
         Event::assertNotDispatched(TermSaving::class);
         Event::assertNotDispatched(TermSaved::class);
         Event::assertNotDispatched(TermCreated::class);
     }
 
-    /** @test */
+    #[Test]
+    public function if_creating_event_returns_false_the_term_doesnt_save()
+    {
+        Event::fake([TermCreated::class]);
+
+        Event::listen(TermCreating::class, function () {
+            return false;
+        });
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->save();
+
+        $this->assertFalse($return);
+
+        Event::assertNotDispatched(TermCreated::class);
+    }
+
+    #[Test]
     public function if_saving_event_returns_false_the_term_doesnt_save()
     {
         Event::fake([TermSaved::class]);
@@ -239,14 +267,14 @@ class TermTest extends TestCase
         ], $term->fileData());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_preview_targets()
     {
-        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
-        ]]);
+        ]);
 
         $taxonomy = tap(Taxonomy::make('tags')->sites(['en', 'fr', 'de']))->save();
 
@@ -287,5 +315,170 @@ class TermTest extends TestCase
             ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true', 'url' => 'http://preview.com/de/tags?preview=true'],
             ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/de/tags/das-foo?preview=true'],
         ], $termDe->previewTargets()->all());
+    }
+
+    #[Test]
+    public function it_has_a_dirty_state()
+    {
+        tap(Taxonomy::make('tags')->sites(['en', 'fr']))->save();
+
+        $term = (new Term)
+            ->taxonomy('tags')
+            ->slug('test');
+
+        $term->data([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ])->save();
+
+        $this->assertFalse($term->isDirty());
+        $this->assertFalse($term->isDirty('title'));
+        $this->assertFalse($term->isDirty('food'));
+        $this->assertFalse($term->isDirty(['title']));
+        $this->assertFalse($term->isDirty(['food']));
+        $this->assertFalse($term->isDirty(['title', 'food']));
+        $this->assertTrue($term->isClean());
+        $this->assertTrue($term->isClean('title'));
+        $this->assertTrue($term->isClean('food'));
+        $this->assertTrue($term->isClean(['title']));
+        $this->assertTrue($term->isClean(['food']));
+        $this->assertTrue($term->isClean(['title', 'food']));
+
+        $term->merge(['title' => 'French']);
+
+        $this->assertTrue($term->isDirty());
+        $this->assertTrue($term->isDirty('title'));
+        $this->assertFalse($term->isDirty('food'));
+        $this->assertTrue($term->isDirty(['title']));
+        $this->assertFalse($term->isDirty(['food']));
+        $this->assertTrue($term->isDirty(['title', 'food']));
+        $this->assertFalse($term->isClean());
+        $this->assertFalse($term->isClean('title'));
+        $this->assertTrue($term->isClean('food'));
+        $this->assertFalse($term->isClean(['title']));
+        $this->assertTrue($term->isClean(['food']));
+        $this->assertFalse($term->isClean(['title', 'food']));
+    }
+
+    #[Test]
+    public function it_syncs_original_at_the_right_time()
+    {
+        $eventsHandled = 0;
+
+        Event::listen(function (TermCreating $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->term->isDirty());
+        });
+        Event::listen(function (TermSaving $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->term->isDirty());
+        });
+        Event::listen(function (TermCreated $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->term->isDirty());
+        });
+        Event::listen(function (TermSaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->term->isDirty());
+        });
+
+        tap(Taxonomy::make('tags'))->save();
+
+        $term = (new Term)->taxonomy('tags')->slug('test');
+        $term->dataForLocale('en', ['title' => 'The title']);
+        $term->save();
+
+        $this->assertFalse($term->isDirty());
+        $this->assertEquals(4, $eventsHandled);
+    }
+
+    #[Test]
+    public function it_gets_and_sets_the_layout()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        // defaults to layout
+        $this->assertEquals('layout', $term->layout());
+
+        // taxonomy level overrides the default
+        $taxonomy->layout('foo');
+        $this->assertEquals('foo', $term->layout());
+
+        // term level overrides the origin
+        $return = $term->layout('baz');
+        $this->assertEquals($term, $return);
+        $this->assertEquals('baz', $term->layout());
+    }
+
+    #[Test]
+    public function it_gets_and_sets_the_template()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        // defaults to taxonomy.show
+        $this->assertEquals('tags.show', $term->template());
+
+        // taxonomy level overrides the default
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $term->template());
+
+        // term level overrides the origin
+        $return = $term->template('baz');
+        $this->assertEquals($term, $return);
+        $this->assertEquals('baz', $term->template());
+    }
+
+    #[Test]
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $term->delete();
+
+        Event::assertDispatched(TermDeleting::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+    }
+
+    #[Test]
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Term::spy();
+        Event::fake([TermDeleted::class]);
+
+        Event::listen(TermDeleting::class, function () {
+            return false;
+        });
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $return = $term->delete();
+
+        $this->assertFalse($return);
+        Facades\Term::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(TermDeleted::class);
+    }
+
+    #[Test]
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy('tags');
+
+        $return = $term->deleteQuietly();
+
+        Event::assertNotDispatched(TermDeleting::class);
+        Event::assertNotDispatched(TermDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

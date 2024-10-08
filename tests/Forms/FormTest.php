@@ -4,7 +4,11 @@ namespace Tests\Forms;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FormCreated;
+use Statamic\Events\FormCreating;
+use Statamic\Events\FormDeleted;
+use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
 use Statamic\Facades\Form;
@@ -20,7 +24,7 @@ class FormTest extends TestCase
         Form::all()->each->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_form()
     {
         Event::fake();
@@ -29,13 +33,25 @@ class FormTest extends TestCase
 
         $form = Form::make('contact_us')
             ->title('Contact Us')
-            ->honeypot('winnie');
+            ->honeypot('winnie')
+            ->data([
+                'foo' => 'bar',
+                'roo' => 'rar',
+            ]);
 
         $form->save();
 
         $this->assertEquals('contact_us', $form->handle());
         $this->assertEquals('Contact Us', $form->title());
         $this->assertEquals('winnie', $form->honeypot());
+        $this->assertEquals([
+            'foo' => 'bar',
+            'roo' => 'rar',
+        ], $form->data()->all());
+
+        Event::assertDispatched(FormCreating::class, function ($event) use ($form) {
+            return $event->form === $form;
+        });
 
         Event::assertDispatched(FormSaving::class, function ($event) use ($form) {
             return $event->form === $form;
@@ -50,7 +66,7 @@ class FormTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_form_created_only_once()
     {
         Event::fake();
@@ -72,7 +88,7 @@ class FormTest extends TestCase
         Event::assertDispatched(FormCreated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_quietly()
     {
         Event::fake();
@@ -84,12 +100,32 @@ class FormTest extends TestCase
             ->honeypot('winnie')
             ->saveQuietly();
 
+        Event::assertNotDispatched(FormCreating::class);
         Event::assertNotDispatched(FormSaving::class);
         Event::assertNotDispatched(FormSaved::class);
         Event::assertNotDispatched(FormCreated::class);
     }
 
-    /** @test */
+    #[Test]
+    public function if_creating_event_returns_false_the_form_doesnt_save()
+    {
+        Event::fake([FormCreated::class]);
+
+        Event::listen(FormCreating::class, function () {
+            return false;
+        });
+
+        $blueprint = (new Blueprint)->setHandle('post')->save();
+
+        $form = Form::make('contact_us')
+            ->title('Contact Us')
+            ->honeypot('winnie')
+            ->save();
+
+        Event::assertNotDispatched(FormCreated::class);
+    }
+
+    #[Test]
     public function if_saving_event_returns_false_the_form_doesnt_save()
     {
         Event::fake([FormSaved::class]);
@@ -108,7 +144,7 @@ class FormTest extends TestCase
         Event::assertNotDispatched(FormSaved::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_forms()
     {
         $this->assertEmpty(Form::all());
@@ -119,7 +155,7 @@ class FormTest extends TestCase
         $this->assertEquals(['contact_us', 'vote_for_canada'], Form::all()->map->handle()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_has_default_honeypot()
     {
         $form = Form::make('contact_us');
@@ -127,7 +163,7 @@ class FormTest extends TestCase
         $this->assertEquals('honeypot', $form->honeypot());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         $form = Form::make('contact_us');
@@ -137,7 +173,7 @@ class FormTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $form->{$key}));
     }
 
-    /** @test */
+    #[Test]
     public function it_is_arrayable()
     {
         $form = Form::make('contact_us');
@@ -158,12 +194,60 @@ class FormTest extends TestCase
             });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_action_url()
     {
         $form = Form::make('contact_us');
         $route = route('statamic.forms.submit', $form->handle());
 
         $this->assertEquals($route, $form->actionUrl());
+    }
+
+    #[Test]
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $form = Form::make('contact_us');
+
+        $form->delete();
+
+        Event::assertDispatched(FormDeleting::class, function ($event) use ($form) {
+            return $event->form === $form;
+        });
+    }
+
+    #[Test]
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Form::spy();
+        Event::fake([FormDeleted::class]);
+
+        Event::listen(FormDeleting::class, function () {
+            return false;
+        });
+
+        $form = new \Statamic\Forms\Form('test');
+
+        $return = $form->delete();
+
+        $this->assertFalse($return);
+        Form::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(FormDeleted::class);
+    }
+
+    #[Test]
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $form = Form::make('contact_us');
+
+        $return = $form->deleteQuietly();
+
+        Event::assertNotDispatched(FormDeleting::class);
+        Event::assertNotDispatched(FormDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

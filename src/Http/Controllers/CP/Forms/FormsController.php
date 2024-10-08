@@ -8,8 +8,10 @@ use Statamic\CP\Column;
 use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Support\Str;
 
 class FormsController extends CpController
@@ -30,11 +32,13 @@ class FormsController extends CpController
             ->map(function ($form) {
                 return [
                     'id' => $form->handle(),
-                    'title' => $form->title(),
-                    'submissions' => $form->submissions()->count(),
+                    'title' => __($form->title()),
+                    'submissions' => $form->querySubmissions()->count(),
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
                     'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
+                    'can_edit' => User::current()->can('edit', $form),
+                    'can_edit_blueprint' => User::current()->can('configure form fields', $form),
                     'actions' => Action::for($form),
                 ];
             })
@@ -69,7 +73,15 @@ class FormsController extends CpController
             ->rejectUnlisted()
             ->values();
 
-        return view('statamic::forms.show', compact('form', 'columns'));
+        $viewData = [
+            'form' => $form,
+            'columns' => $columns,
+            'filters' => Scope::filters('form-submissions', [
+                'form' => $form->handle(),
+            ]),
+        ];
+
+        return view('statamic::forms.show', $viewData);
     }
 
     /**
@@ -119,7 +131,7 @@ class FormsController extends CpController
 
         $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
+            'handle' => ['nullable', new Handle],
         ]);
 
         $handle = $request->handle ?? Str::snake($request->title);
@@ -139,13 +151,13 @@ class FormsController extends CpController
     {
         $this->authorize('edit', $form);
 
-        $values = [
+        $values = array_merge($form->data()->all(), [
             'handle' => $form->handle(),
-            'title' => $form->title(),
+            'title' => __($form->title()),
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
             'email' => $form->email(),
-        ];
+        ]);
 
         $fields = ($blueprint = $this->editFormBlueprint($form))
             ->fields()
@@ -170,11 +182,14 @@ class FormsController extends CpController
 
         $values = $fields->process()->values()->all();
 
+        $data = collect($values)->except(['title', 'honeypot', 'store', 'email']);
+
         $form
             ->title($values['title'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
-            ->email($values['email']);
+            ->email($values['email'])
+            ->merge($data);
 
         $form->save();
 
@@ -190,7 +205,7 @@ class FormsController extends CpController
 
     protected function editFormBlueprint($form)
     {
-        return Blueprint::makeFromTabs([
+        $fields = [
             'name' => [
                 'display' => __('Name'),
                 'fields' => [
@@ -241,11 +256,27 @@ class FormsController extends CpController
                                 'handle' => 'to',
                                 'field' => [
                                     'type' => 'text',
-                                    'display' => __('Recipient'),
+                                    'display' => __('Recipient(s)'),
                                     'validate' => [
                                         'required',
                                     ],
                                     'instructions' => __('statamic::messages.form_configure_email_to_instructions'),
+                                ],
+                            ],
+                            [
+                                'handle' => 'cc',
+                                'field' => [
+                                    'type' => 'text',
+                                    'display' => __('CC Recipient(s)'),
+                                    'instructions' => __('statamic::messages.form_configure_email_cc_instructions'),
+                                ],
+                            ],
+                            [
+                                'handle' => 'bcc',
+                                'field' => [
+                                    'type' => 'text',
+                                    'display' => __('BCC Recipient(s)'),
+                                    'instructions' => __('statamic::messages.form_configure_email_bcc_instructions'),
                                 ],
                             ],
                             [
@@ -306,12 +337,39 @@ class FormsController extends CpController
                                     'instructions' => __('statamic::messages.form_configure_email_attachments_instructions'),
                                 ],
                             ],
+                            [
+                                'handle' => 'mailer',
+                                'field' => [
+                                    'type' => 'select',
+                                    'instructions' => __('statamic::messages.form_configure_mailer_instructions'),
+                                    'options' => array_keys(config('mail.mailers')),
+                                    'clearable' => true,
+                                ],
+                            ],
                         ],
                     ],
                 ],
             ],
 
             // metrics
-        ]);
+            // ...
+
+        ];
+
+        foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
+            $merged = false;
+            foreach ($fields as $sectionHandle => $section) {
+                if ($section['display'] == $config['display']) {
+                    $fields[$sectionHandle]['fields'] += $config['fields'];
+                    $merged = true;
+                }
+            }
+
+            if (! $merged) {
+                $fields[$handle] = $config;
+            }
+        }
+
+        return Blueprint::makeFromTabs($fields);
     }
 }

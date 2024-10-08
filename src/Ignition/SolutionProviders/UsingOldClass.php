@@ -2,7 +2,7 @@
 
 namespace Statamic\Ignition\SolutionProviders;
 
-use Facade\IgnitionContracts\HasSolutionsForThrowable;
+use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Statamic\Ignition\Solutions\UpdateClassReference;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -10,6 +10,7 @@ use Throwable;
 
 class UsingOldClass implements HasSolutionsForThrowable
 {
+    protected $oldClass;
     protected $class;
 
     public function canSolve(Throwable $throwable): bool

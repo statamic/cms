@@ -3,19 +3,27 @@
 namespace Statamic\Structures;
 
 use Facades\Statamic\Structures\CollectionTreeDiff;
+use Statamic\Contracts\Structures\CollectionTree as TreeContract;
 use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Events\CollectionTreeDeleted;
 use Statamic\Events\CollectionTreeSaved;
+use Statamic\Events\CollectionTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 
-class CollectionTree extends Tree
+class CollectionTree extends Tree implements TreeContract
 {
+    private $structureCache;
+
     public function structure()
     {
-        return Blink::once('collection-tree-structure-'.$this->handle(), function () {
+        if ($this->structureCache) {
+            return $this->structureCache;
+        }
+
+        return $this->structureCache = Blink::once('collection-tree-structure-'.$this->handle(), function () {
             return Collection::findByHandle($this->handle())->structure();
         });
     }
@@ -24,7 +32,7 @@ class CollectionTree extends Tree
     {
         $path = Stache::store('collection-trees')->directory();
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $path .= $this->locale().'/';
         }
 
@@ -36,6 +44,11 @@ class CollectionTree extends Tree
     protected function dispatchSavedEvent()
     {
         CollectionTreeSaved::dispatch($this);
+    }
+
+    protected function dispatchSavingEvent()
+    {
+        return CollectionTreeSaving::dispatch($this);
     }
 
     protected function dispatchDeletedEvent()

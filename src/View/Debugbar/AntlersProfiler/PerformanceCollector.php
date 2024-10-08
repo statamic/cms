@@ -8,7 +8,7 @@ use DebugBar\DataCollector\Renderable;
 use InvalidArgumentException;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 
-class PerformanceCollector extends DataCollector implements Renderable, AssetProvider
+class PerformanceCollector extends DataCollector implements AssetProvider, Renderable
 {
     /**
      * A list of known editor strings.

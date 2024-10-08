@@ -5,6 +5,7 @@ namespace Statamic\Assets;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\DirectoryListing;
+use Statamic\Facades\Stache;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
@@ -16,9 +17,11 @@ class AssetContainerContents
     protected $filteredFiles;
     protected $filteredDirectories;
 
-    public function __construct($container)
+    public function container($container)
     {
         $this->container = $container;
+
+        return $this;
     }
 
     /**
@@ -292,7 +295,11 @@ class AssetContainerContents
             $this->add($dir);
         }
 
-        $this->all()->put($path, $metadata);
+        $files = $this->all()->put($path, $metadata);
+
+        if (Statamic::isWorker()) {
+            Cache::put($this->key(), $files, $this->ttl());
+        }
 
         $this->filteredFiles = null;
         $this->filteredDirectories = null;
@@ -307,6 +314,6 @@ class AssetContainerContents
 
     private function ttl()
     {
-        return config('statamic.stache.watcher') ? 0 : null;
+        return Stache::isWatcherEnabled() ? 0 : null;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Statamic\UpdateScripts;
 
-use Composer\Package\Version\VersionParser;
+use Composer\Semver\VersionParser;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Composer\Lock;
 use Statamic\Console\NullConsole;

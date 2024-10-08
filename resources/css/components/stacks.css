@@ -17,6 +17,10 @@
     .stack-container {
         @apply absolute inset-0;
         transition: left .3s ease;
+
+        [dir='rtl'] & {
+            transition: right .3s ease;
+        }
     }
 
     .stack-overlay {
@@ -44,12 +48,20 @@
         &.stack-slide-leave-to {
             transform: translateX(10px);
             opacity: 0;
+
+            [dir='rtl'] & {
+                transform: translateX(-10px);
+            }
         }
     }
 
 
     .hovering .stack-content {
         transform: translateX(-16px);
+
+        [dir='rtl'] & {
+            transform: translateX(16px);
+        }
     }
 
     .breadcrumb svg {
@@ -60,5 +72,10 @@
 @media all and (max-width: 980px) {
     .stacks-on-stacks .stack-container {
         left: 0 !important;
+
+        [dir='rtl'] & {
+            left: unset !important;
+            right: 0 !important;
+        }
     }
 }

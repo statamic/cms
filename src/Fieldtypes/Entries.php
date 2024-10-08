@@ -5,19 +5,25 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\CP\Column;
+use Statamic\CP\Columns;
 use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
-use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
+use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
+use Statamic\Search\Index;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
@@ -31,6 +37,7 @@ class Entries extends Relationship
     protected $canSearch = true;
     protected $statusIcons = true;
     protected $formComponent = 'entry-publish-form';
+    protected $activeFilterBadges;
 
     protected $formComponentProps = [
         'initialActions' => 'actions',
@@ -91,10 +98,25 @@ class Entries extends Relationship
                         'type' => 'collections',
                         'mode' => 'select',
                     ],
+                    'search_index' => [
+                        'display' => __('Search Index'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
+                        'type' => 'text',
+                    ],
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
                         'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
+                    ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.select_across_sites'),
+                        'type' => 'toggle',
                     ],
                 ],
             ],
@@ -130,7 +152,7 @@ class Entries extends Relationship
 
     public function getResourceCollection($request, $items)
     {
-        return (new EntriesResource($items))
+        return (new EntriesFieldtypeEntries($items, $this))
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
@@ -158,10 +180,10 @@ class Entries extends Relationship
 
     public function getSortColumn($request)
     {
-        $column = $request->get('sort');
+        $column = $request->sort ?? 'title';
 
-        if (! $column && ! $request->search) {
-            $column = 'title'; // todo: get from collection or config
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
+            $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
         return $column;
@@ -169,37 +191,34 @@ class Entries extends Relationship
 
     public function getSortDirection($request)
     {
-        $order = $request->get('order', 'asc');
+        $order = $request->order ?? 'asc';
 
-        if (! $request->sort && ! $request->search) {
-            // $order = 'asc'; // todo: get from collection or config
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
+            $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
         }
 
         return $order;
+    }
+
+    public function initialSortColumn()
+    {
+        return $this->getSortColumn(optional());
+    }
+
+    public function initialSortDirection()
+    {
+        return $this->getSortDirection(optional());
     }
 
     protected function getIndexQuery($request)
     {
         $query = Entry::query();
 
-        if ($search = $request->search) {
-            $usingSearchIndex = false;
-            $collections = collect($this->getConfiguredCollections());
+        $query = $this->toSearchQuery($query, $request);
 
-            if ($collections->count() == 1) {
-                $collection = Collection::findByHandle($collections->first());
-                if ($collection && $collection->hasSearchIndex()) {
-                    $query = $collection->searchIndex()->ensureExists()->search($search);
-                    $usingSearchIndex = true;
-                }
-            }
-
-            if (! $usingSearchIndex) {
-                $query->where('title', 'like', '%'.$search.'%');
-            }
-        }
-
-        if ($site = $request->site) {
+        if ($this->canSelectAcrossSites()) {
+            $query->whereIn('site', Site::authorized()->map->handle()->all());
+        } elseif ($site = $request->site) {
             $query->where('site', $site);
         }
 
@@ -210,6 +229,49 @@ class Entries extends Relationship
         $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
+    }
+
+    private function toSearchQuery($query, $request)
+    {
+        if (! $search = $request->search) {
+            return $query;
+        }
+
+        if ($index = $this->getSearchIndex($request)) {
+            return $index->search($search);
+        }
+
+        return $query->where('title', 'like', '%'.$search.'%');
+    }
+
+    private function getSearchIndex($request): ?Index
+    {
+        $index = $this->getExplicitSearchIndex() ?? $this->getCollectionSearchIndex($request);
+
+        return $index?->ensureExists();
+    }
+
+    private function getExplicitSearchIndex(): ?Index
+    {
+        return ($explicit = $this->config('search_index'))
+            ? Search::in($explicit)
+            : null;
+    }
+
+    private function getCollectionSearchIndex($request): ?Index
+    {
+        // Use the collections being filtered, or the configured collections.
+        $collections = collect(
+            $request->input('filters.collection.collections') ?? $this->getConfiguredCollections()
+        );
+
+        $indexes = $collections->map(fn ($handle) => Collection::findByHandle($handle)->searchIndex());
+
+        // If all the collections use the same index, return it.
+        // Even if they're all null, that's fine. It'll just return null.
+        return $indexes->unique()->count() === 1
+            ? $indexes->first()
+            : null;
     }
 
     protected function getCreatables()
@@ -263,7 +325,7 @@ class Entries extends Relationship
             return $this->invalidItemArray($id);
         }
 
-        return (new EntryResource($entry))->resolve()['data'];
+        return (new EntryResource($entry, $this))->resolve()['data'];
     }
 
     protected function collect($value)
@@ -271,26 +333,42 @@ class Entries extends Relationship
         return new \Statamic\Entries\EntryCollection($value);
     }
 
-    public function augment($values)
+    private function queryBuilder($values)
     {
         $site = Site::current()->handle();
         if (($parent = $this->field()->parent()) && $parent instanceof Localization) {
             $site = $parent->locale();
         }
 
+        // If they've opted into selecting across sites, we won't automatically localize or
+        // filter out entries that don't exist in the current site. They would do that.
+        $shouldLocalize = ! $this->canSelectAcrossSites();
+
         $ids = (new OrderedQueryBuilder(Entry::query(), $ids = Arr::wrap($values)))
             ->whereIn('id', $ids)
             ->get()
-            ->map(function ($entry) use ($site) {
-                return optional($entry->in($site))->id();
-            })
-            ->filter()
+            ->when($shouldLocalize, fn ($entries) => $entries
+                ->map(fn ($entry) => $entry->in($site))
+                ->filter()
+            )
+            ->map->id()
             ->all();
 
-        $query = (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
+        return (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
             ->whereIn('id', $ids);
+    }
 
-        return $this->config('max_items') === 1 ? $query->first() : $query;
+    public function augment($values)
+    {
+        $single = $this->config('max_items') === 1;
+
+        if ($single && Blink::has($key = 'entries-augment-'.json_encode($values))) {
+            return Blink::get($key);
+        }
+
+        $query = $this->queryBuilder($values);
+
+        return $single ? Blink::once($key, fn () => $query->first()) : $query;
     }
 
     public function shallowAugment($values)
@@ -317,7 +395,10 @@ class Entries extends Relationship
 
     protected function getSelectionFilterContext()
     {
-        return ['collections' => $this->getConfiguredCollections()];
+        return [
+            'collections' => $this->getConfiguredCollections(),
+            'showSiteFilter' => $this->canSelectAcrossSites(),
+        ];
     }
 
     protected function getConfiguredCollections()
@@ -340,22 +421,100 @@ class Entries extends Relationship
 
     public function getColumns()
     {
-        return $this->getBlueprint()->columns()->values()->all();
+        if (count($this->getConfiguredCollections()) === 1) {
+            $columns = $this->getBlueprint()->columns();
+
+            $this->addColumn($columns, 'status');
+
+            $columns->setPreferred("collections.{$this->getConfiguredCollections()[0]}.columns");
+
+            return $columns->rejectUnlisted()->values();
+        }
+
+        $columns = $this->getBlueprint()->columns();
+
+        if ($this->canSelectAcrossSites()) {
+            $this->addColumn($columns, 'site');
+        }
+
+        return $columns->values();
     }
 
     protected function getItemsForPreProcessIndex($values): SupportCollection
     {
-        if (! $augmented = $this->augment($values)) {
-            return collect();
-        }
-
-        return $this->config('max_items') === 1
-            ? collect([$augmented])
-            : $augmented->whereAnyStatus()->get();
+        return $this->queryBuilder($values)->whereAnyStatus()->get();
     }
 
     public function filter()
     {
         return new EntriesFilter($this);
+    }
+
+    public function preload()
+    {
+        $collection = count($this->getConfiguredCollections()) === 1
+            ? Collection::findByHandle($this->getConfiguredCollections()[0])
+            : null;
+
+        if (! $collection || ! $collection->hasStructure()) {
+            return parent::preload();
+        }
+
+        $blueprints = $collection
+            ->entryBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
+
+        return array_merge(parent::preload(), ['tree' => [
+            'title' => $collection->title(),
+            'url' => cp_route('collections.tree.index', $collection),
+            'showSlugs' => $collection->structure()->showSlugs(),
+            'expectsRoot' => $collection->structure()->expectsRoot(),
+            'blueprints' => $blueprints,
+        ]]);
+    }
+
+    public function getItemHint($item): ?string
+    {
+        return collect([
+            count($this->getConfiguredCollections()) > 1 ? __($item->collection()->title()) : null,
+            $this->canSelectAcrossSites() && count($this->availableSites()) > 1 ? $item->site()->name() : null,
+        ])->filter()->implode(' • ');
+    }
+
+    private function addColumn(Columns $columns, string $columnKey): void
+    {
+        $column = Column::make($columnKey)
+            ->listable(true)
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(false);
+
+        $columns->put($columnKey, $column);
+    }
+
+    private function canSelectAcrossSites(): bool
+    {
+        return $this->config('select_across_sites', false);
+    }
+
+    private function availableSites()
+    {
+        if (! Site::hasMultiple()) {
+            return [];
+        }
+
+        $configuredSites = collect($this->getConfiguredCollections())->flatMap(fn ($collection) => Collection::find($collection)->sites());
+
+        return Site::authorized()
+            ->when(isset($configuredSites), fn ($sites) => $sites->filter(fn ($site) => $configuredSites->contains($site->handle())))
+            ->map->handle()
+            ->values()
+            ->all();
     }
 }

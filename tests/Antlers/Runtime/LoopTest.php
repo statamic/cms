@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Value;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
@@ -13,8 +14,8 @@ use Tests\FakesViews;
 
 class LoopTest extends ParserTestCase
 {
-    use FakesViews,
-        FakesContent;
+    use FakesContent,
+        FakesViews;
 
     public function test_non_sequential_numeric_keys_are_not_treated_as_associative_arrays()
     {

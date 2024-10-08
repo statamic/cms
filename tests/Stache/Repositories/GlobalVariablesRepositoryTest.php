@@ -2,7 +2,9 @@
 
 namespace Tests\Stache\Repositories;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Globals\Variables;
+use Statamic\Exceptions\GlobalVariablesNotFoundException;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Globals\VariablesCollection;
@@ -17,6 +19,7 @@ class GlobalVariablesRepositoryTest extends TestCase
 {
     private $directory;
     private $repo;
+    private $globalRepo;
 
     private function setUpSingleSite()
     {
@@ -32,10 +35,10 @@ class GlobalVariablesRepositoryTest extends TestCase
 
     private function setUpMultiSite()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr/'],
-        ]]);
+        ]);
         $stache = (new Stache)->sites(['en', 'fr']);
         $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/globals-multisite';
@@ -46,7 +49,7 @@ class GlobalVariablesRepositoryTest extends TestCase
         $this->globalRepo = new GlobalRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_global_variables_with_single_site()
     {
         $this->setUpSingleSite();
@@ -62,7 +65,7 @@ class GlobalVariablesRepositoryTest extends TestCase
         $this->assertEquals(['contact', 'global'], $ordered->map->handle()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_global_variables_with_multi_site()
     {
         $this->setUpMultiSite();
@@ -78,7 +81,7 @@ class GlobalVariablesRepositoryTest extends TestCase
         $this->assertEquals(['contact', 'global', 'contact', 'global'], $ordered->map->handle()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_global_variable_by_id_with_single_site()
     {
         $this->setUpSingleSite();
@@ -98,7 +101,7 @@ class GlobalVariablesRepositoryTest extends TestCase
         $this->assertNull($this->repo->find('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_global_variable_by_id_with_multi_site()
     {
         $this->setUpMultiSite();
@@ -134,7 +137,7 @@ class GlobalVariablesRepositoryTest extends TestCase
         $this->assertNull($this->repo->find('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_global_variables_by_set_handle_with_single_site()
     {
         $this->setUpSingleSite();
@@ -156,7 +159,7 @@ class GlobalVariablesRepositoryTest extends TestCase
         $this->assertCount(0, $this->repo->whereSet('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_global_variables_by_set_handle_with_multi_site()
     {
         $this->setUpMultiSite();
@@ -176,7 +179,7 @@ class GlobalVariablesRepositoryTest extends TestCase
         $this->assertCount(0, $this->repo->whereSet('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_global_to_the_stache_and_to_a_file_with_single_site()
     {
         // In single site, the actual global set should get written.
@@ -214,7 +217,7 @@ YAML;
         @unlink($this->directory.'/new.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_global_to_the_stache_and_to_a_file_with_multi_site()
     {
         // In multi-site, the global set should not get written.
@@ -244,7 +247,7 @@ YAML;
         @unlink($this->directory.'/en/new.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_a_global_from_the_stache_and_file_with_single_site()
     {
         // In single site, the actual global set holds the data.
@@ -285,7 +288,7 @@ YAML;
         @unlink($this->directory.'/new.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_a_global_from_the_stache_and_file_with_multi_site()
     {
         // In multi-site, the global set file should not be touched.
@@ -308,5 +311,27 @@ YAML;
         $this->assertNotNull($this->globalRepo->find('new'));
         $this->assertFileDoesNotExist($this->directory.'/en/new.yaml');
         @unlink($this->directory.'/new.yaml');
+    }
+
+    #[Test]
+    public function test_find_or_fail_gets_global()
+    {
+        $this->setUpSingleSite();
+
+        $var = $this->repo->findOrFail('global::en');
+
+        $this->assertInstanceOf(Variables::class, $var);
+        $this->assertEquals('General', $var->title());
+    }
+
+    #[Test]
+    public function test_find_or_fail_throws_exception_when_global_does_not_exist()
+    {
+        $this->setUpSingleSite();
+
+        $this->expectException(GlobalVariablesNotFoundException::class);
+        $this->expectExceptionMessage('Global Variables [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }

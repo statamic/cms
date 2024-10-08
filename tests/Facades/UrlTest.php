@@ -2,7 +2,8 @@
 
 namespace Tests\Facades;
 
-use Statamic\Facades\Site;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\URL;
 use Tests\TestCase;
 
@@ -17,7 +18,7 @@ class UrlTest extends TestCase
 
     public function testPrependsSiteUrl()
     {
-        Site::setConfig('sites.en.url', 'http://site.com/');
+        $this->setSiteValue('en', 'url', 'http://site.com/');
 
         $this->assertEquals(
             'http://site.com/foo',
@@ -27,7 +28,7 @@ class UrlTest extends TestCase
 
     public function testPrependsSiteUrlWithController()
     {
-        Site::setConfig('sites.en.url', 'http://site.com/index.php/');
+        $this->setSiteValue('en', 'url', 'http://site.com/index.php/');
 
         $this->assertEquals(
             'http://site.com/index.php/foo',
@@ -40,7 +41,7 @@ class UrlTest extends TestCase
         // Override with what would be used on a normal request.
         request()->server->set('SCRIPT_NAME', '/index.php');
 
-        Site::setConfig('sites.en.url', 'http://site.com/index.php/');
+        $this->setSiteValue('en', 'url', 'http://site.com/index.php/');
 
         $this->assertEquals(
             'http://site.com/foo',
@@ -50,7 +51,7 @@ class UrlTest extends TestCase
 
     public function testDeterminesExternalUrl()
     {
-        Site::setConfig('sites.en.url', 'http://this-site.com/');
+        $this->setSiteValue('en', 'url', 'http://this-site.com/');
         $this->assertTrue(URL::isExternal('http://that-site.com'));
         $this->assertTrue(URL::isExternal('http://that-site.com/'));
         $this->assertTrue(URL::isExternal('http://that-site.com/some-slug'));
@@ -65,7 +66,7 @@ class UrlTest extends TestCase
 
     public function testDeterminesExternalUrlWhenUsingRelativeInConfig()
     {
-        Site::setConfig('sites.en.url', '/');
+        $this->setSiteValue('en', 'url', '/');
         $this->assertTrue(URL::isExternal('http://that-site.com'));
         $this->assertTrue(URL::isExternal('http://that-site.com/'));
         $this->assertTrue(URL::isExternal('http://that-site.com/some-slug'));
@@ -78,17 +79,14 @@ class UrlTest extends TestCase
         $this->assertFalse(URL::isExternal(null));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider ancestorProvider
-     **/
+    #[Test]
+    #[DataProvider('ancestorProvider')]
     public function it_checks_whether_a_url_is_an_ancestor_of_another($child, $parent, $isAncestor)
     {
         $this->assertSame($isAncestor, URL::isAncestorOf($child, $parent));
     }
 
-    public function ancestorProvider()
+    public static function ancestorProvider()
     {
         return [
             'homepage to homepage' => ['/', '/', false],
@@ -118,17 +116,60 @@ class UrlTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider relativeProvider
-     **/
+    #[Test]
+    public function gets_site_url()
+    {
+        $this->assertEquals('http://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+
+        \Illuminate\Support\Facades\URL::forceScheme('https');
+        $this->assertEquals('https://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+
+        \Illuminate\Support\Facades\URL::forceScheme('http');
+        $this->assertEquals('http://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+    }
+
+    #[Test]
+    #[DataProvider('absoluteProvider')]
+    public function it_makes_urls_absolute($url, $expected, $forceScheme = false)
+    {
+        if ($forceScheme) {
+            \Illuminate\Support\Facades\URL::forceScheme($forceScheme);
+        }
+
+        $this->assertSame($expected, URL::makeAbsolute($url));
+    }
+
+    public static function absoluteProvider()
+    {
+        return [
+            ['http://example.com', 'http://example.com'],
+            ['http://example.com/', 'http://example.com/'],
+            ['/', 'http://absolute-url-resolved-from-request.com/'],
+            ['/foo', 'http://absolute-url-resolved-from-request.com/foo'],
+            ['/foo/', 'http://absolute-url-resolved-from-request.com/foo/'],
+
+            ['http://example.com', 'http://example.com', 'https'], // absolute url provided, so scheme is left alone.
+            ['http://example.com/', 'http://example.com/', 'https'], // absolute url provided, so scheme is left alone.
+            ['/', 'https://absolute-url-resolved-from-request.com/', 'https'],
+            ['/foo', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
+            ['/foo/', 'https://absolute-url-resolved-from-request.com/foo/', 'https'],
+
+            ['https://example.com', 'https://example.com', 'http'], // absolute url provided, so scheme is left alone.
+            ['https://example.com/', 'https://example.com/', 'http'], // absolute url provided, so scheme is left alone.
+            ['/', 'http://absolute-url-resolved-from-request.com/', 'http'],
+            ['/foo', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
+            ['/foo/', 'http://absolute-url-resolved-from-request.com/foo/', 'http'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('relativeProvider')]
     public function makes_urls_relative($url, $expected)
     {
         $this->assertSame($expected, URL::makeRelative($url));
     }
 
-    public function relativeProvider()
+    public static function relativeProvider()
     {
         return [
             ['http://example.com', '/'],
@@ -179,5 +220,24 @@ class UrlTest extends TestCase
             ['/foo/bar?bar=baz#fragment', '/foo/bar?bar=baz#fragment'],
             ['/foo/bar/?bar=baz#fragment', '/foo/bar/?bar=baz#fragment'],
         ];
+    }
+
+    #[Test]
+    public function it_can_remove_query_and_fragment()
+    {
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?query'));
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com#anchor'));
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?foo=bar&baz=qux'));
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?foo=bar&baz=qux#anchor'));
+
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?query'));
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/#anchor'));
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?foo=bar&baz=qux'));
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?foo=bar&baz=qux#anchor'));
+
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?query'));
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about#anchor'));
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux'));
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux#anchor'));
     }
 }

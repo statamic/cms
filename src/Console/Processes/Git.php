@@ -43,8 +43,6 @@ class Git extends Process
 
     /**
      * Git push.
-     *
-     * @return null
      */
     public function push()
     {
@@ -87,7 +85,13 @@ class Git extends Process
      */
     protected function prepareErrorOutput($type, $buffer)
     {
-        if (Str::contains($buffer, 'remote: Resolving deltas')) {
+        $ignore = [
+            'remote: Resolving deltas',
+            'Permanently added the ECDSA host key for IP address',
+            'remote: Processed',
+        ];
+
+        if (Str::contains($buffer, $ignore)) {
             return;
         }
 

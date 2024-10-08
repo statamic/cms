@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Contracts\Support\Boolable;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
@@ -89,6 +90,8 @@ class PathDataManager
      */
     private $reduceFinal = true;
 
+    private $isReturningForConditions = false;
+
     /**
      * @var Parser|null
      */
@@ -163,6 +166,17 @@ class PathDataManager
         if ($this->nodeProcessor != null) {
             $this->nodeProcessor->restoreLockedData();
         }
+    }
+
+    /**
+     * Reset state for things that should not persist
+     * across repeated calls to getData and friends.
+     *
+     * @return void
+     */
+    private function resetInternalState()
+    {
+        $this->isReturningForConditions = false;
     }
 
     /**
@@ -296,6 +310,13 @@ class PathDataManager
     public function setReduceFinal($reduceFinal)
     {
         $this->reduceFinal = $reduceFinal;
+
+        return $this;
+    }
+
+    public function setIsReturningForConditions($isCondition)
+    {
+        $this->isReturningForConditions = $isCondition;
 
         return $this;
     }
@@ -476,6 +497,15 @@ class PathDataManager
         }
     }
 
+    private function collapseValues(bool $isFinal)
+    {
+        if (! $isFinal && $this->reducedVar instanceof Values) {
+            $this->lockData();
+            $this->reducedVar = self::reduce($this->reducedVar, true, $this->shouldDoValueIntercept);
+            $this->unlockData();
+        }
+    }
+
     private function collapseQueryBuilder($builder)
     {
         $this->reducedVar = $builder->get();
@@ -514,6 +544,8 @@ class PathDataManager
             $path = $tempPathParser->parse($dynamicPath);
 
             if (! $this->guardRuntimeAccess($path->normalizedReference)) {
+                $this->resetInternalState();
+
                 return null;
             }
         }
@@ -546,6 +578,8 @@ class PathDataManager
                 }
 
                 if ($pathItem->name == 'void' && count($path->pathParts) == 1) {
+                    $this->resetInternalState();
+
                     return 'void::'.GlobalRuntimeState::$environmentId;
                 }
 
@@ -616,6 +650,8 @@ class PathDataManager
                             $this->unlockData();
                         }
 
+                        $this->collapseValues($pathItem->isFinal);
+
                         continue;
                     } else {
                         if ($this->cascade != null) {
@@ -659,6 +695,8 @@ class PathDataManager
                 }
 
                 $this->reduceVar($pathItem, $data);
+
+                $this->collapseValues($pathItem->isFinal);
 
                 if ($pathItem->isFinal && $this->reducedVar instanceof Builder && ! $wasBuilderGoingIntoLast) {
                     $this->encounteredBuilderOnFinalPart = true;
@@ -737,6 +775,7 @@ class PathDataManager
         }
 
         $this->namedSlotsInScope = false;
+        $this->resetInternalState();
 
         return $this->reducedVar;
     }
@@ -872,6 +911,12 @@ class PathDataManager
     {
         if ($this->isForArrayIndex && $isFinal && is_object($this->reducedVar) && method_exists($this->reducedVar, '__toString')) {
             $this->reducedVar = (string) $this->reducedVar;
+
+            return;
+        }
+
+        if ($this->isReturningForConditions && $isFinal && $this->reducedVar instanceof Boolable) {
+            $this->reducedVar = $this->reducedVar->toBool();
 
             return;
         }

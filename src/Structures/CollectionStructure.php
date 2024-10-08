@@ -2,6 +2,7 @@
 
 namespace Statamic\Structures;
 
+use Statamic\Contracts\Structures\CollectionTree;
 use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -58,7 +59,7 @@ class CollectionStructure extends Structure
 
     public function newTreeInstance()
     {
-        return new CollectionTree;
+        return app(CollectionTree::class);
     }
 
     public function validateTree(array $tree, string $locale): array
@@ -73,8 +74,7 @@ class CollectionStructure extends Structure
 
         $thisCollectionsEntries = $this->collection()->queryEntries()
             ->where('site', $locale)
-            ->get(['id', 'site'])
-            ->map->id();
+            ->pluck('id');
 
         $otherCollectionEntries = $entryIds->diff($thisCollectionsEntries);
 
@@ -134,13 +134,15 @@ class CollectionStructure extends Structure
 
     public function in($site)
     {
-        $tree = app(CollectionTreeRepository::class)->find($this->collection()->handle(), $site);
+        return Blink::once("collection-structure-tree-{$this->handle()}-{$site}", function () use ($site) {
+            $tree = app(CollectionTreeRepository::class)->find($this->collection()->handle(), $site);
 
-        if (! $tree && $this->existsIn($site)) {
-            $tree = $this->makeTree($site);
-        }
+            if (! $tree && $this->existsIn($site)) {
+                $tree = $this->makeTree($site);
+            }
 
-        return $tree;
+            return $tree;
+        });
     }
 
     public function existsIn($site)

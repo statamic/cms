@@ -43,7 +43,7 @@ import LoadingGraphic from '../components/LoadingGraphic.vue';
 import DropdownList from '../components/DropdownList.vue';
 import DropdownItem from '../components/DropdownItem.vue';
 import ValidationErrors from '../components/ValidationErrors.vue';
-import Slugify from '../components/Slugify.vue';
+import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import Avatar from '../components/Avatar.vue';
 import Breadcrumb from '../components/Breadcrumb.vue';
@@ -60,6 +60,7 @@ import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
+import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 
 // Third Party
 Vue.component('v-select', vSelect)
@@ -142,3 +143,5 @@ Vue.component('resource-deleter', ResourceDeleter);
 
 Vue.component('stack', Stack);
 Vue.component('stack-test', StackTest);
+
+Vue.component('blueprint-resetter', BlueprintResetter);

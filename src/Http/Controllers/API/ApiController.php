@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\ResourceAuthorizer;
-use Illuminate\Validation\ValidationException;
+use Statamic\Exceptions\ApiValidationException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
@@ -25,6 +25,10 @@ class ApiController extends Controller
      */
     protected function abortIfUnpublished($item)
     {
+        if (request()->isLivePreview()) {
+            return;
+        }
+
         throw_if($item->published() === false, new NotFoundHttpException);
     }
 
@@ -101,6 +105,8 @@ class ApiController extends Controller
                     $value = true;
                 } elseif ($value === 'false') {
                     $value = false;
+                } elseif (is_numeric($value)) {
+                    $value = Str::contains($value, '.') ? (float) $value : (int) $value;
                 }
 
                 if (Str::contains($filter, ':')) {
@@ -138,7 +144,7 @@ class ApiController extends Controller
             ->filter(fn ($field) => ! $allowedFilters->contains($field));
 
         if ($forbidden->isNotEmpty()) {
-            throw ValidationException::withMessages([
+            throw ApiValidationException::withMessages([
                 'filter' => Str::plural('Forbidden filter', $forbidden).': '.$forbidden->join(', '),
             ]);
         }

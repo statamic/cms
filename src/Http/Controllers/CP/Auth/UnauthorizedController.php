@@ -6,6 +6,10 @@ class UnauthorizedController
 {
     public function __invoke()
     {
-        return view('statamic::auth.unauthorized');
+        $redirect = config('statamic.cp.auth.enabled', true)
+            ? cp_route('login')
+            : config('statamic.cp.auth.redirect_to', '/');
+
+        return view('statamic::auth.unauthorized', compact('redirect'));
     }
 }

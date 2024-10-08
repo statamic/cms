@@ -1,26 +1,30 @@
 .code-fieldtype-container {
-    @apply relative;
+    direction: ltr;
+    @apply dark:border dark:border-dark-800 rounded;
+}
 
-    .code-mode-picker {
-        @apply z-10 right-0 uppercase absolute outline-none shadow-none;
-        right: 0;
+.code-fieldtype-toolbar {
+    @apply bg-white shadow-none py-1 px-2 rounded-t border border-b-0 text-sm flex flex-wrap items-center justify-end gap-2;
+    @apply dark:bg-dark-800 dark:border-l-0 dark:border-r-0 dark:border-t-0 dark:border-b dark:border-dark-900;
 
-        select {
-            @apply text-white w-auto text-2xs p-2 text-right;
-            opacity: .5;
-            background: none;
-            border: none;
-            &:focus {
-                @apply outline-none shadow-none text-blue-300;
-            }
-        }
-        select:hover:not(:disabled) {
-            @apply text-white opacity-100;
-            background: none;
-            border: none;
-        }
-        .select-input-toggle {
-            display: none;
-        }
+    [dir='rtl'] & {
+        direction: rtl;
     }
+}
+
+.code-fieldtype-toolbar select {
+    @apply h-8 text-sm leading-none;
+}
+
+
+.code-fieldtype-container.code-fullscreen {
+    @apply fixed bg-gray-200 dark:bg-dark-600 inset-0 min-h-screen overflow-scroll rounded-none pt-12;
+
+    .code-fieldtype-toolbar {
+        @apply fixed z-2 top-0 w-full px-6 py-2 h-12 shadow dark:shadow-dark text-base rounded-none bg-gradient-to-b from-white to-gray-100 dark:from-dark-550 dark:to-dark-600;
+    }
+}
+
+.CodeMirror {
+    @apply dark:text-dark-150 dark:shadow-inner-dark;
 }

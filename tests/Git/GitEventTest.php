@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\ReplacementFile;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
@@ -32,7 +33,8 @@ class GitEventTest extends TestCase
         Config::set('statamic.git.enabled', true);
 
         $this->actingAs(
-            User::make()
+            $user = User::make()
+                ->id('chewbacca')
                 ->email('chew@bacca.com')
                 ->data(['name' => 'Chewbacca'])
                 ->makeSuper()
@@ -46,11 +48,13 @@ class GitEventTest extends TestCase
         Storage::fake('test');
 
         Git::shouldReceive('statuses');
+        Git::shouldReceive('as')->with($user)->andReturnSelf();
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_commit_when_git_is_disabled()
     {
+        Git::shouldReceive('as')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection deleted')->never();
 
@@ -62,9 +66,10 @@ class GitEventTest extends TestCase
         $collection->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_commit_when_automatic_is_disabled()
     {
+        Git::shouldReceive('as')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection deleted')->never();
 
@@ -76,9 +81,10 @@ class GitEventTest extends TestCase
         $collection->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_commit_ignored_events()
     {
+        Git::shouldReceive('as')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection deleted')->once();
 
@@ -92,9 +98,10 @@ class GitEventTest extends TestCase
         $collection->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_commit_when_event_subscriber_is_disabled()
     {
+        Git::shouldReceive('as')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
         Git::shouldReceive('dispatchCommit')->with('Collection deleted')->once();
 
@@ -107,7 +114,7 @@ class GitEventTest extends TestCase
         $collection->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_custom_addon_events_are_registered()
     {
         Git::shouldReceive('dispatchCommit')->with('Pun saved')->once();
@@ -122,7 +129,7 @@ class GitEventTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_blueprint_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Blueprint saved')->once();
@@ -134,7 +141,7 @@ class GitEventTest extends TestCase
         $blueprint->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_fieldset_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Fieldset saved')->once();
@@ -146,7 +153,7 @@ class GitEventTest extends TestCase
         $fieldset->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_collection_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Collection saved')->once();
@@ -158,7 +165,7 @@ class GitEventTest extends TestCase
         $collection->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_entry_is_saved_and_deleted()
     {
         Config::set('statamic.git.ignored_events', [
@@ -179,7 +186,7 @@ class GitEventTest extends TestCase
         $entry->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_tracked_revisions_are_saved_and_deleted()
     {
         Config::set('statamic.git.ignored_events', [
@@ -202,7 +209,7 @@ class GitEventTest extends TestCase
         $entry->latestRevision()->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_navigation_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Navigation saved')->once();
@@ -214,7 +221,7 @@ class GitEventTest extends TestCase
         $nav->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_a_navigation_tree_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Navigation tree saved')->once();
@@ -227,7 +234,7 @@ class GitEventTest extends TestCase
         $tree->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_a_collection_tree_is_saved_and_deleted()
     {
         Config::set('statamic.git.ignored_events', [
@@ -244,7 +251,7 @@ class GitEventTest extends TestCase
         $tree->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_taxonomy_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Taxonomy saved')->once();
@@ -256,7 +263,7 @@ class GitEventTest extends TestCase
         $taxonomy->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_term_is_saved_and_deleted()
     {
         Config::set('statamic.git.ignored_events', [
@@ -278,7 +285,7 @@ class GitEventTest extends TestCase
         $term->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_global_set_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Global Set saved')->once();
@@ -291,7 +298,7 @@ class GitEventTest extends TestCase
         $set->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_form_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Form saved')->once();
@@ -303,7 +310,7 @@ class GitEventTest extends TestCase
         $form->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_form_submission_is_saved_and_deleted()
     {
         Config::set('statamic.git.ignored_events', [
@@ -323,7 +330,7 @@ class GitEventTest extends TestCase
         $submission->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_user_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('User saved')->once();
@@ -335,7 +342,7 @@ class GitEventTest extends TestCase
         $user->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_user_role_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Role saved')->once();
@@ -347,7 +354,7 @@ class GitEventTest extends TestCase
         $role->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_user_group_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('User group saved')->once();
@@ -359,7 +366,7 @@ class GitEventTest extends TestCase
         $group->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_default_user_preferences_are_saved()
     {
         Git::shouldReceive('dispatchCommit')->with('Default preferences saved')->once();
@@ -369,7 +376,32 @@ class GitEventTest extends TestCase
         Facades\File::delete(resource_path('preferences.yaml'));
     }
 
-    /** @test */
+    #[Test]
+    public function it_commits_when_site_is_saved_and_deleted()
+    {
+        // Ensure we have one `en` site to start
+        Facades\File::put(resource_path('sites.yaml'), Facades\YAML::dump([
+            'en' => [
+                'name' => 'English',
+                'url' => 'http://localhost/',
+                'locale' => 'en_US',
+            ],
+        ]));
+
+        Git::shouldReceive('dispatchCommit')->with('Site saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Site deleted')->once();
+
+        // Delete the `en` site and save a new `fr` site
+        Facades\Site::setSites([
+            'fr' => [
+                'name' => 'French',
+                'url' => 'http://localhost/',
+                'locale' => 'fr_FR',
+            ],
+        ])->save();
+    }
+
+    #[Test]
     public function it_commits_when_asset_container_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset container saved')->once();
@@ -381,7 +413,7 @@ class GitEventTest extends TestCase
         $container->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_asset_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
@@ -393,7 +425,7 @@ class GitEventTest extends TestCase
         $asset->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_asset_is_uploaded()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
@@ -403,7 +435,7 @@ class GitEventTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_asset_is_reuploaded()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset reuploaded')->once();
@@ -415,7 +447,7 @@ class GitEventTest extends TestCase
         $this->makeAsset()->reupload($file);
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_asset_is_moved()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
@@ -425,7 +457,7 @@ class GitEventTest extends TestCase
         $asset->move('new-location');
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_asset_is_renamed()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
@@ -435,7 +467,7 @@ class GitEventTest extends TestCase
         $asset->rename('new-name');
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_only_once_when_asset_is_replaced()
     {
         $originalAsset = tap($this->makeAsset())->saveQuietly();
@@ -449,7 +481,7 @@ class GitEventTest extends TestCase
         $newAsset->replace($originalAsset);
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_replaced_asset_is_deleted()
     {
         $originalAsset = tap($this->makeAsset())->saveQuietly();
@@ -466,7 +498,7 @@ class GitEventTest extends TestCase
         $newAsset->replace($originalAsset, true);
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_when_asset_folder_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset folder saved')->once();
@@ -481,7 +513,7 @@ class GitEventTest extends TestCase
         $folder->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_batches_term_references_changes_into_one_commit()
     {
         Config::set('statamic.git.ignored_events', [
@@ -535,7 +567,7 @@ class GitEventTest extends TestCase
         $term->slug('leia-updated')->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_batches_asset_references_changes_into_one_commit()
     {
         Config::set('statamic.git.ignored_events', [

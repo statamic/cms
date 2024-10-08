@@ -15,5 +15,15 @@ trait RunsUpdateScripts
         $script = new $fqcn($package);
 
         $script->update();
+
+        return $script;
+    }
+
+    protected function assertUpdateScriptRegistered($class)
+    {
+        $this->assertTrue(
+            app('statamic.update-scripts')->map->class->contains($class),
+            "Update script $class is not registered."
+        );
     }
 }

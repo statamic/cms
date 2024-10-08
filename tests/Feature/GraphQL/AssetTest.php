@@ -4,20 +4,23 @@ namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class AssetTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['assets'];
 
@@ -28,7 +31,7 @@ class AssetTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnFalse()->once();
@@ -41,7 +44,7 @@ class AssetTest extends TestCase
             ->assertSee('Cannot query field \"asset\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource_with_container_arg()
     {
         Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
@@ -85,7 +88,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource_with_id_arg()
     {
         Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
@@ -129,7 +132,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_asset_by_id()
     {
         Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
@@ -225,7 +228,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_asset_by_container_and_path()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -257,7 +260,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields_to_interface()
     {
         GraphQL::addField('AssetInterface', 'one', function () {
@@ -316,7 +319,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields_to_an_implementation()
     {
         GraphQL::addField('Asset_Test', 'one', function () {
@@ -366,7 +369,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function adding_custom_field_to_an_implementation_does_not_add_it_to_the_interface()
     {
         GraphQL::addField('Asset_Test', 'one', function () {
@@ -397,5 +400,59 @@ GQL;
             ->assertJson(['errors' => [[
                 'message' => 'Cannot query field "one" on type "AssetInterface". Did you mean to use an inline fragment on "Asset_Test"?',
             ]]]);
+    }
+
+    #[Test]
+    public function it_resolves_query_builders()
+    {
+        config(['app.debug' => true]);
+        BlueprintRepository::partialMock();
+
+        $blueprint = Blueprint::makeFromFields([])->setHandle('test');
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
+        EntryFactory::collection('test')->id('bravo')->data(['title' => 'Bravo'])->create();
+        EntryFactory::collection('test')->id('charlie')->data(['title' => 'Charlie'])->create();
+
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']])->setHandle('tags');
+        BlueprintRepository::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+
+        Storage::fake('test', ['url' => '/assets']);
+        Storage::disk('test')->put('a.txt', '');
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $container->makeAsset('a.txt')->data(['entries_field' => ['bravo', 'charlie']])->save();
+
+        $query = <<<'GQL'
+{
+    asset(id: "test::a.txt") {
+        path
+        ... on Asset_Test {
+            entries_field {
+                id
+                title
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'asset' => [
+                    'path' => 'a.txt',
+                    'entries_field' => [
+                        [
+                            'id' => 'bravo',
+                            'title' => 'Bravo',
+                        ],
+                        [
+                            'id' => 'charlie',
+                            'title' => 'Charlie',
+                        ],
+                    ],
+                ],
+            ]]);
     }
 }

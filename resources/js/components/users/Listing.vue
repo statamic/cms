@@ -15,8 +15,8 @@
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0 relative">
-                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
+                <div class="card overflow-hidden p-0 relative">
+                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
 
                         <data-list-filter-presets
                             v-show="allowFilterPresets"
@@ -33,9 +33,9 @@
 
                         <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
 
-                        <div class="flex space-x-2 mt-2">
-                            <button class="btn btn-sm ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
-                            <button class="btn btn-sm ml-2" v-text="__('Save')" v-show="allowFilterPresets && isDirty" @click="$refs.presets.savePreset()" />
+                        <div class="flex space-x-2 rtl:space-x-reverse mt-2">
+                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
+                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Save')" v-show="allowFilterPresets && isDirty" @click="$refs.presets.savePreset()" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
                     </div>
@@ -65,45 +65,47 @@
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
-                    <data-list-table
-                        v-show="items.length"
-                        :allow-bulk-actions="true"
-                        :allow-column-picker="true"
-                        :column-preferences-key="preferencesKey('columns')"
-                        @sorted="sorted"
-                    >
-                        <template slot="cell-email" slot-scope="{ row: user, value }">
-                            <a :href="user.edit_url" class="flex items-center">
-                                <avatar :user="user" class="w-8 h-8 rounded-full mr-2" />
-                                {{ value }}
-                            </a>
-                        </template>
-                        <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
-                            <div class="role-index-field">
-                                <div v-if="user.super" class="role-index-field-item mr-1 mb-1.5">{{ __('Super Admin') }}</div>
-                                <div v-if="!roles || roles.length === 0" />
-                                <div v-for="(role, i) in (roles || [])" class="role-index-field-item mr-1 mb-1.5">{{ role.title }}</div>
-                            </div>
-                        </template>
-                        <template slot="cell-groups" slot-scope="{ row: user, value: groups }">
-                            <div class="groups-index-field">
-                                <div v-for="group in (groups || [])" class="groups-index-field-item mr-1 mb-1.5">{{ group.title }}</div>
-                            </div>
-                        </template>
-                        <template slot="actions" slot-scope="{ row: user, index }">
-                            <dropdown-list placement="right-start">
-                                <dropdown-item :text="__('Edit')" :redirect="user.edit_url" v-if="user.editable" />
-                                <dropdown-item :text="__('View')" :redirect="user.edit_url" v-else />
-                                <data-list-inline-actions
-                                    :item="user.id"
-                                    :url="actionUrl"
-                                    :actions="user.actions"
-                                    @started="actionStarted"
-                                    @completed="actionCompleted"
-                                />
-                            </dropdown-list>
-                        </template>
-                    </data-list-table>
+                    <div class="overflow-x-auto overflow-y-hidden">
+                        <data-list-table
+                            v-show="items.length"
+                            :allow-bulk-actions="true"
+                            :allow-column-picker="true"
+                            :column-preferences-key="preferencesKey('columns')"
+                            @sorted="sorted"
+                        >
+                            <template slot="cell-email" slot-scope="{ row: user, value }">
+                                <a :href="user.edit_url" class="flex items-center">
+                                    <avatar :user="user" class="w-8 h-8 rounded-full rtl:ml-2 ltr:mr-2" />
+                                    {{ value }}
+                                </a>
+                            </template>
+                            <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
+                                <div class="role-index-field">
+                                    <div v-if="user.super" class="role-index-field-item rtl:ml-1 ltr:mr-1 mb-1.5">{{ __('Super Admin') }}</div>
+                                    <div v-if="!roles || roles.length === 0" />
+                                    <div v-for="(role, i) in (roles || [])" class="role-index-field-item rtl:ml-1 ltr:mr-1 mb-1.5">{{ __(role.title) }}</div>
+                                </div>
+                            </template>
+                            <template slot="cell-groups" slot-scope="{ row: user, value: groups }">
+                                <div class="groups-index-field">
+                                    <div v-for="group in (groups || [])" class="groups-index-field-item rtl:ml-1 ltr:mr-1 mb-1.5">{{ __(group.title) }}</div>
+                                </div>
+                            </template>
+                            <template slot="actions" slot-scope="{ row: user, index }">
+                                <dropdown-list placement="right-start">
+                                    <dropdown-item :text="__('Edit')" :redirect="user.edit_url" v-if="user.editable" />
+                                    <dropdown-item :text="__('View')" :redirect="user.edit_url" v-else />
+                                    <data-list-inline-actions
+                                        :item="user.id"
+                                        :url="actionUrl"
+                                        :actions="user.actions"
+                                        @started="actionStarted"
+                                        @completed="actionCompleted"
+                                    />
+                                </dropdown-list>
+                            </template>
+                        </data-list-table>
+                    </div>
                 </div>
 
                 <data-list-pagination
@@ -139,6 +141,7 @@ export default {
         return {
             preferencesPrefix: 'users',
             requestUrl: cp_url('users'),
+            pushQuery: true,
         }
     },
 

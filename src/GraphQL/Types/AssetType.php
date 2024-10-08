@@ -5,7 +5,6 @@ namespace Statamic\GraphQL\Types;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Facades\GraphQL;
-use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
 class AssetType extends \Rebing\GraphQL\Support\Type
@@ -50,13 +49,7 @@ class AssetType extends \Rebing\GraphQL\Support\Type
     private function resolver()
     {
         return function (Asset $asset, $args, $context, $info) {
-            $value = $asset->augmentedValue($info->fieldName);
-
-            if ($value instanceof Value) {
-                $value = $value->value();
-            }
-
-            return $value;
+            return $asset->resolveGqlValue($info->fieldName);
         };
     }
 }

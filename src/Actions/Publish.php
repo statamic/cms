@@ -14,7 +14,7 @@ class Publish extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof Entry && ! $item->published();
+        return $this->context['view'] === 'list' && $item instanceof Entry && ! $item->published();
     }
 
     public function visibleToBulk($items)
@@ -49,8 +49,20 @@ class Publish extends Action
 
     public function run($entries, $values)
     {
-        $entries->each(function ($entry) {
-            $entry->publish(['user' => User::current()]);
-        });
+        $failures = $entries->reject(fn ($entry) => $entry->publish(['user' => User::current()]));
+        $total = $entries->count();
+
+        if ($failures->isNotEmpty()) {
+            $success = $total - $failures->count();
+            if ($total === 1) {
+                throw new \Exception(__('Entry could not be published'));
+            } elseif ($success === 0) {
+                throw new \Exception(__('Entries could not be published'));
+            } else {
+                throw new \Exception(__(':success/:total entries were published', ['total' => $total, 'success' => $success]));
+            }
+        }
+
+        return trans_choice('Entry published|Entries published', $total);
     }
 }

@@ -12,7 +12,7 @@
         >
             <div :class="`${isOpen ? 'popover-open' : ''}`">
                 <div ref="popover" class="popover" v-if="!disabled" v-on-clickaway="clickawayClose">
-                    <div class="popover-content bg-white shadow-popover rounded-md">
+                    <div class="popover-content bg-white dark:bg-dark-550 shadow-popover dark:shadow-dark-popover rounded-md">
                         <slot :close="close" />
                     </div>
                 </div>
@@ -100,7 +100,7 @@ export default {
             if (this.disabled) return;
 
             this.isOpen = true;
-            this.escBinding = this.$keys.bind('esc', e => this.close());
+            this.escBinding = this.$keys.bindGlobal('esc', e => this.close());
             this.$nextTick(() => {
                 this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger.firstChild, this.$refs.popover, this.computePosition);
 

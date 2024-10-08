@@ -3,9 +3,10 @@
 namespace Statamic\Assets;
 
 use Illuminate\Support\Carbon;
+use Statamic\Facades\Image;
 use Statamic\Facades\Path;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AssetUploader extends Uploader
@@ -24,7 +25,12 @@ class AssetUploader extends Uploader
 
     protected function uploadPath(UploadedFile $file)
     {
-        $ext = $file->getClientOriginalExtension();
+        $ext = $this->getNewExtension() ?? $file->getClientOriginalExtension();
+
+        if (config('statamic.assets.lowercase')) {
+            $ext = strtolower($ext);
+        }
+
         $filename = self::getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
 
         $directory = $this->asset->folder();
@@ -51,23 +57,43 @@ class AssetUploader extends Uploader
         return $this->asset->container()->disk();
     }
 
+    protected function getNewExtension()
+    {
+        if (! $preset = $this->asset->container()->sourcePreset()) {
+            return null;
+        }
+
+        if (! $this->asset->isImage()) {
+            return null;
+        }
+
+        if (! $ext = Arr::get(Image::userManipulationPresets(), "$preset.fm")) {
+            return null;
+        }
+
+        return $ext;
+    }
+
     public static function getSafeFilename($string)
     {
         $replacements = [
             ' ' => '-',
             '#' => '-',
+            ':' => '-',
+            '<' => '-',
+            '>' => '-',
+            '"' => '-',
+            '/' => '-',
+            '\\' => '-',
+            '|' => '-',
+            '?' => '-',
+            '*' => '-',
+            '%' => '-',
         ];
 
-        $str = Stringy::create(urldecode($string))->toAscii();
-
-        foreach ($replacements as $from => $to) {
-            $str = $str->replace($from, $to);
-        }
-
-        if (config('statamic.assets.lowercase')) {
-            $str = strtolower($str);
-        }
-
-        return (string) $str;
+        return (string) Str::of(urldecode($string))
+            ->replace(array_keys($replacements), array_values($replacements))
+            ->when(config('statamic.assets.lowercase'), fn ($stringable) => $stringable->lower())
+            ->ascii();
     }
 }

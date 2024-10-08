@@ -4,6 +4,7 @@ namespace Statamic\View\Antlers\Language\Runtime;
 
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Position;
+use Statamic\View\Interop\Stacks;
 
 class StackReplacementManager
 {
@@ -11,16 +12,50 @@ class StackReplacementManager
     protected static $arrayStacks = [];
     protected static $stackContents = [];
 
+    protected static $cachedStacks = [];
+
+    protected static $stackNames = [];
+
     public static function clearStackState()
     {
         self::$stackContents = [];
         self::$arrayStacks = [];
         self::$stacks = [];
+        self::$stackNames = [];
+    }
+
+    public static function getStacks()
+    {
+        $stacks = [];
+
+        if (! array_key_exists(GlobalRuntimeState::$environmentId, self::$stackContents)) {
+            return $stacks;
+        }
+
+        $currentStacks = self::$stackContents[GlobalRuntimeState::$environmentId];
+
+        foreach (self::$stackNames as $replacement => $realName) {
+            if (! array_key_exists($replacement, $currentStacks)) {
+                continue;
+            }
+
+            $stacks[$realName] = [];
+
+            foreach ($currentStacks[$replacement] as $replacement) {
+                $stacks[$realName][] = $replacement;
+            }
+        }
+
+        return $stacks;
     }
 
     protected static function getStackReplacement($name)
     {
-        return '__stackReplacement::_'.md5($name);
+        $replacement = '__stackReplacement::_'.md5($name);
+
+        self::$stackNames[$replacement] = $name;
+
+        return $replacement;
     }
 
     public static function registerStack($name)
@@ -53,7 +88,7 @@ class StackReplacementManager
         return $name.$contentHash;
     }
 
-    public static function prependStack($stackName, $content, $trimContentWhitespace = false)
+    public static function prependStack($stackName, $content, $trimContentWhitespace = false, $isBlade = false)
     {
         $name = self::getStackReplacement($stackName);
 
@@ -67,12 +102,20 @@ class StackReplacementManager
 
         if ($trimContentWhitespace) {
             $content = trim($content);
+        }
+
+        if (! $isBlade) {
+            Stacks::prependToBladeStack($stackName, $content);
+        }
+
+        if (GlobalRuntimeState::$isCacheEnabled) {
+            self::$cachedStacks[] = $stackName;
         }
 
         array_unshift(self::$stackContents[GlobalRuntimeState::$environmentId][$name], $content);
     }
 
-    public static function pushStack($stackName, $content, $trimContentWhitespace = true)
+    public static function pushStack($stackName, $content, $trimContentWhitespace = true, $isBlade = false)
     {
         $name = self::getStackReplacement($stackName);
 
@@ -88,7 +131,50 @@ class StackReplacementManager
             $content = trim($content);
         }
 
+        if (! $isBlade) {
+            Stacks::pushToBladeStack($stackName, $content);
+        }
+
+        if (GlobalRuntimeState::$isCacheEnabled) {
+            self::$cachedStacks[] = $stackName;
+        }
+
         self::$stackContents[GlobalRuntimeState::$environmentId][$name][] = $content;
+    }
+
+    public static function clearCachedStacks()
+    {
+        self::$cachedStacks = [];
+    }
+
+    public static function restoreCachedStacks($cachedStacks)
+    {
+        foreach ($cachedStacks as $stackName => $stackContents) {
+            $stackKey = self::getStackReplacement($stackName);
+
+            if (! array_key_exists(GlobalRuntimeState::$environmentId, self::$stackContents)) {
+                self::$stackContents[GlobalRuntimeState::$environmentId] = [];
+            }
+
+            self::$stackContents[GlobalRuntimeState::$environmentId][$stackKey] = array_merge(
+                self::$stackContents[GlobalRuntimeState::$environmentId][$stackKey] ?? [],
+                $stackContents
+            );
+        }
+    }
+
+    public static function getCachedStacks()
+    {
+        $stackValues = [];
+
+        foreach (self::$cachedStacks as $stackName) {
+            $stackKey = self::getStackReplacement($stackName);
+            if (array_key_exists($stackKey, self::$stackContents[GlobalRuntimeState::$environmentId])) {
+                $stackValues[$stackName] = self::$stackContents[GlobalRuntimeState::$environmentId][$stackKey];
+            }
+        }
+
+        return $stackValues;
     }
 
     public static function processReplacements($content)

@@ -11,8 +11,11 @@ use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\CollectionCreated;
+use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionDeleting;
 use Statamic\Events\CollectionSaved;
+use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -29,12 +32,13 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayable
+class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
+    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
     protected $handle;
     protected $routes = [];
+    private $cachedRoutes = null;
     protected $mount;
     protected $title;
     protected $template;
@@ -59,6 +63,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $titleFormats = [];
     protected $previewTargets = [];
     protected $autosave;
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -72,7 +77,13 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function handle($handle = null)
     {
-        return $this->fluentlyGetOrSet('handle')->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->handle;
+        }
+
+        $this->handle = $handle;
+
+        return $this;
     }
 
     public function routes($routes = null)
@@ -80,12 +91,17 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $this
             ->fluentlyGetOrSet('routes')
             ->getter(function ($routes) {
-                return $this->sites()->mapWithKeys(function ($site) use ($routes) {
+                if ($this->cachedRoutes !== null) {
+                    return $this->cachedRoutes;
+                }
+
+                return $this->cachedRoutes = $this->sites()->mapWithKeys(function ($site) use ($routes) {
                     $siteRoute = is_string($routes) ? $routes : ($routes[$site] ?? null);
 
                     return [$site => $siteRoute];
                 });
             })
+            ->afterSetter(fn () => $this->cachedRoutes = null)
             ->args(func_get_args());
     }
 
@@ -132,7 +148,13 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function dated($dated = null)
     {
-        return $this->fluentlyGetOrSet('dated')->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->dated;
+        }
+
+        $this->dated = $dated;
+
+        return $this;
     }
 
     public function orderable()
@@ -147,7 +169,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->getter(function ($sortField) {
                 if ($sortField) {
                     return $sortField;
-                } elseif ($this->orderable()) {
+                } elseif ($this->orderable() || $this->hasStructure()) {
                     return 'order';
                 } elseif ($this->dated()) {
                     return 'date';
@@ -265,6 +287,11 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return Facades\Entry::query()->where('collection', $this->handle());
     }
 
+    public function hasVisibleEntryBlueprint()
+    {
+        return $this->entryBlueprints()->reject->hidden()->isNotEmpty();
+    }
+
     public function entryBlueprints()
     {
         $blink = 'collection-entry-blueprints-'.$this->handle();
@@ -313,7 +340,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
         return Blink::once($blink, function () use ($blueprint) {
             if (is_null($blueprint)) {
-                return $this->entryBlueprints()->reject->hidden()->first();
+                return $this->entryBlueprints()->reject->hidden()->first() ?? $this->entryBlueprints()->first();
             }
 
             return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
@@ -342,7 +369,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         ]);
 
         if ($this->requiresSlugs()) {
-            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
+            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true, 'validate' => 'max:200'], 'sidebar');
         }
 
         if ($this->dated()) {
@@ -360,6 +387,10 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         }
 
         foreach ($this->taxonomies() as $taxonomy) {
+            if ($blueprint->hasField($taxonomy->handle())) {
+                continue;
+            }
+
             $blueprint->ensureField($taxonomy->handle(), [
                 'type' => 'terms',
                 'taxonomies' => [$taxonomy->handle()],
@@ -376,12 +407,13 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                if (! Site::hasMultiple() || ! $sites) {
+                if (! Site::multiEnabled() || ! $sites) {
                     $sites = [Site::default()->handle()];
                 }
 
                 return collect($sites);
             })
+            ->afterSetter(fn () => $this->cachedRoutes = null)
             ->args(func_get_args());
     }
 
@@ -428,34 +460,64 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $translation;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
         $isNew = ! Facades\Collection::handleExists($this->handle);
 
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents) {
+            if ($isNew && CollectionCreating::dispatch($this) === false) {
+                return false;
+            }
+
+            if (CollectionSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\Collection::save($this);
 
         Blink::forget('collection-handles');
+        Blink::forget('mounted-collections');
         Blink::flushStartingWith("collection-{$this->id()}");
 
-        if ($isNew) {
-            CollectionCreated::dispatch($this);
-        }
+        if ($withEvents) {
+            if ($isNew) {
+                CollectionCreated::dispatch($this);
+            }
 
-        CollectionSaved::dispatch($this);
+            CollectionSaved::dispatch($this);
+        }
 
         return $this;
     }
 
     public function updateEntryUris($ids = null)
     {
-        Facades\Collection::updateEntryUris($this, $ids);
+        Facades\Entry::updateUris($this, $ids);
 
         return $this;
     }
 
     public function updateEntryOrder($ids = null)
     {
-        Facades\Collection::updateEntryOrder($this, $ids);
+        Facades\Entry::updateOrders($this, $ids);
+
+        return $this;
+    }
+
+    public function updateEntryParent($ids = null)
+    {
+        Facades\Entry::updateParents($this, $ids);
 
         return $this;
     }
@@ -537,7 +599,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             'origin_behavior' => ($ob = $this->originBehavior()) === 'select' ? null : $ob,
         ]));
 
-        if (! Site::hasMultiple()) {
+        if (! Site::multiEnabled()) {
             unset($array['sites'], $array['propagate']);
         }
 
@@ -600,16 +662,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
-    public function revisions($enabled = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('revisions')
-            ->getter(function ($behavior) {
-                return $behavior ?? false;
-            })
-            ->args(func_get_args());
-    }
-
     public function revisionsEnabled($enabled = null)
     {
         return $this
@@ -664,7 +716,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
-    public function structureContents(array $contents = null)
+    public function structureContents(?array $contents = null)
     {
         return $this
             ->fluentlyGetOrSet('structureContents')
@@ -711,13 +763,38 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $this->structure !== null || $this->structureContents !== null;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        $this->queryEntries()->get()->each->delete();
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && CollectionDeleting::dispatch($this) === false) {
+            return false;
+        }
+
+        $this->queryEntries()->get()->each(function ($entry) use ($withEvents) {
+            $entry->deleteDescendants($withEvents);
+            $withEvents ? $entry->delete() : $entry->deleteQuietly();
+        });
+
+        if ($this->hasStructure()) {
+            $this->structure()->trees()->each->delete();
+        }
 
         Facades\Collection::delete($this);
 
-        CollectionDeleted::dispatch($this);
+        if ($withEvents) {
+            CollectionDeleted::dispatch($this);
+        }
+
+        Blink::forget('mounted-collections');
 
         return true;
     }
@@ -738,7 +815,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                     return null;
                 }
 
-                return Blink::once("collection-{$this->id()}-mount-{$mount}", function () use ($mount) {
+                return Blink::store('collection-mounts')->once("{$this->id()}-{$mount}", function () use ($mount) {
                     return Entry::find($mount);
                 });
             })

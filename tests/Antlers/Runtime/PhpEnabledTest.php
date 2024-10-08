@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
@@ -105,7 +106,7 @@ EOT;
                 return $value;
             }
 
-            public function config(string $key = null, $fallback = null)
+            public function config(?string $key = null, $fallback = null)
             {
                 return true;
             }
@@ -153,7 +154,7 @@ EOT;
                 return $value;
             }
 
-            public function config(string $key = null, $fallback = null)
+            public function config(?string $key = null, $fallback = null)
             {
                 return true;
             }

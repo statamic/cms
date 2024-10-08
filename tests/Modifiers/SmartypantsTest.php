@@ -2,12 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class SmartypantsTest extends TestCase
 {
-    public function dumbChars(): array
+    public static function dumbCharsProvider(): array
     {
         return [
             [
@@ -17,11 +19,8 @@ class SmartypantsTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider dumbChars
-     */
+    #[Test]
+    #[DataProvider('dumbCharsProvider')]
     public function it_translates_plain_ascii_chars_into_smart_punctuation($expected, $input): void
     {
         $modified = $this->modify($input);

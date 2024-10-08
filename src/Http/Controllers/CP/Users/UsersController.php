@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Action;
+use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
@@ -15,11 +17,14 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Rules\UniqueUserValue;
 use Statamic\Search\Result;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 class UsersController extends CpController
 {
-    use QueriesFilters;
+    use ExtractsFromUserFields,
+        QueriesFilters;
 
     /**
      * @var UserContract
@@ -66,9 +71,19 @@ class UsersController extends CpController
             'blueprints' => ['user'],
         ]);
 
-        $users = $query
-            ->orderBy(request('sort', 'email'), request('order', 'asc'))
-            ->paginate(request('perPage'));
+        $sortField = request('sort');
+        $sortDirection = request('order', 'asc');
+
+        if (! $sortField && ! request('search')) {
+            $sortField = config('statamic.user.sort_field', 'email');
+            $sortDirection = config('statamic.user.sort_direction', 'asc');
+        }
+
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $users = $query->paginate(request('perPage'));
 
         if ($users->getCollection()->first() instanceof Result) {
             $users->setCollection($users->getCollection()->map->getSearchable());
@@ -116,20 +131,22 @@ class UsersController extends CpController
         $this->authorize('create', UserContract::class);
 
         $blueprint = User::blueprint();
+        $blueprint->ensureFieldHasConfig('email', ['validate' => 'required']);
 
         $fields = $blueprint->fields()->preProcess();
 
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
+        $additional = $fields->all()
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
+            ->keys();
+
         $viewData = [
-            'title' => __('Create'),
-            'values' => $fields->values()->all(),
-            'meta' => $fields->meta(),
+            'values' => (object) $fields->values()->only($additional)->all(),
+            'meta' => (object) $fields->meta()->only($additional)->all(),
+            'fields' => collect($blueprint->fields()->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->all(),
             'blueprint' => $blueprint->toPublishArray(),
-            'actions' => [
-                'save' => cp_route('users.store'),
-            ],
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
             'canSendInvitation' => config('statamic.users.wizard_invitation'),
@@ -149,18 +166,22 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->only(['email', 'name', 'first_name', 'last_name'])->addValues($request->all());
+        $fields = $blueprint->fields()->except(['roles', 'groups'])->addValues($request->all());
 
-        $fields->validate(['email' => 'required|email|unique_user_value']);
+        $fields->validate(['email' => ['required', 'email', new UniqueUserValue]]);
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        if ($request->input('_validate_only')) {
+            return [];
+        }
+
+        $values = $fields->process()->values()->except(['email']);
 
         $user = User::make()
             ->email($request->email)
             ->data($values);
 
         if ($request->roles && User::current()->can('assign roles')) {
-            $user->roles($request->roles);
+            $user->explicitRoles($request->roles);
         }
 
         if ($request->groups && User::current()->can('assign user groups')) {
@@ -178,7 +199,13 @@ class UsersController extends CpController
         if ($request->invitation['send']) {
             ActivateAccount::subject($request->invitation['subject']);
             ActivateAccount::body($request->invitation['message']);
-            $user->generateTokenAndSendActivateAccountNotification();
+
+            try {
+                $user->generateTokenAndSendActivateAccountNotification();
+            } catch (TransportException $e) {
+                Toast::error(__('statamic::messages.user_activation_email_not_sent_error'));
+            }
+
             $url = null;
         } else {
             $url = PasswordReset::url($user->generateActivateAccountToken(), PasswordReset::BROKER_ACTIVATIONS);
@@ -207,24 +234,15 @@ class UsersController extends CpController
         }
 
         if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
-            $blueprint->ensureField('super', ['type' => 'toggle']);
+            $blueprint->ensureField('super', ['type' => 'toggle', 'display' => __('permissions.super')]);
         }
 
-        $values = $user->data()
-            ->merge($user->computedData())
-            ->merge(['email' => $user->email()]);
-
-        $fields = $blueprint
-            ->removeField('password')
-            ->removeField('password_confirmation')
-            ->fields()
-            ->addValues($values->all())
-            ->preProcess();
+        [$values, $meta] = $this->extractFromFields($user, $blueprint);
 
         $viewData = [
             'title' => $user->email(),
-            'values' => $fields->values()->all(),
-            'meta' => $fields->meta(),
+            'values' => array_merge($values, ['id' => $user->id()]),
+            'meta' => $meta,
             'blueprint' => $user->blueprint()->toPublishArray(),
             'reference' => $user->reference(),
             'actions' => [
@@ -233,6 +251,8 @@ class UsersController extends CpController
                 'editBlueprint' => cp_route('users.blueprint.edit'),
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
+            'requiresCurrentPassword' => $request->user()->id === $user->id(),
+            'itemActions' => Action::for($user, ['view' => 'form']),
         ];
 
         if ($request->wantsJson()) {
@@ -248,15 +268,15 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
-        $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
+        $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->except('id'));
 
         $fields
             ->validator()
-            ->withRules(['email' => 'required|unique_user_value:{id}'])
+            ->withRules(['email' => ['required', 'email', new UniqueUserValue(except: $user->id())]])
             ->withReplacements(['id' => $user->id()])
             ->validate();
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles', 'super']);
 
         foreach ($values as $key => $value) {
             $user->set($key, $value);
@@ -269,30 +289,23 @@ class UsersController extends CpController
         $user->email($request->email);
 
         if (User::current()->can('assign roles')) {
-            $user->roles($request->roles);
+            $user->explicitRoles($request->roles);
         }
 
         if (User::current()->can('assign user groups')) {
             $user->groups($request->groups);
         }
 
-        $user->save();
+        $save = $user->save();
 
-        return ['title' => $user->title()];
-    }
+        [$values] = $this->extractFromFields($user, $user->blueprint());
 
-    public function destroy($user)
-    {
-        throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (! $user = User::find($user)) {
-            return $this->pageNotFound();
-        }
-
-        $this->authorize('delete', $user);
-
-        $user->delete();
-
-        return response('', 204);
+        return [
+            'title' => $user->title(),
+            'saved' => is_bool($save) ? $save : true,
+            'data' => [
+                'values' => $values,
+            ],
+        ];
     }
 }

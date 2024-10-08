@@ -30,10 +30,12 @@ export default {
 
     computed: {
         options() {
-            return this.normalizeInputOptions(this.config.options);
+            return this.normalizeInputOptions(this.meta.options || this.config.options);
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.values.map(value => {
                 const option = _.findWhere(this.options, { value });
                 return option ? option.label : value;

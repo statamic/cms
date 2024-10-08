@@ -3,12 +3,18 @@
 namespace Tests\Sites;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Role;
+use Statamic\Facades\User;
 use Statamic\Sites\Site;
 use Statamic\Sites\Sites;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class SitesTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     private $sites;
 
     protected function resolveApplicationConfiguration($app)
@@ -22,17 +28,14 @@ class SitesTest extends TestCase
     {
         parent::setUp();
 
-        $this->sites = new Sites([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['url' => 'http://test.com/'],
-                'fr' => ['url' => 'http://fr.test.com/'],
-                'de' => ['url' => 'http://test.com/de/'],
-            ],
+        $this->sites = (new Sites)->setSites([
+            'en' => ['url' => 'http://test.com/'],
+            'fr' => ['url' => 'http://fr.test.com/'],
+            'de' => ['url' => 'http://test.com/de/'],
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function gets_all_sites()
     {
         tap($this->sites->all(), function ($sites) {
@@ -45,7 +48,30 @@ class SitesTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
+    public function gets_authorized_sites()
+    {
+        Role::make('test')
+            ->permissions([
+                'access en site',
+                'access de site',
+            ])
+            ->save();
+
+        $this->actingAs(tap(User::make()->assignRole('test'))->save());
+
+        \Statamic\Facades\Site::shouldReceive('multiEnabled')->andReturnTrue();
+
+        tap($this->sites->authorized(), function ($sites) {
+            $this->assertInstanceOf(Collection::class, $sites);
+            $this->assertEquals(2, $sites->count());
+            $this->assertInstanceOf(Site::class, $sites->first());
+            $this->assertEquals('en', $sites->values()->get(0)->handle());
+            $this->assertEquals('de', $sites->values()->get(1)->handle());
+        });
+    }
+
+    #[Test]
     public function can_reinitialize_sites_by_reproviding_the_config()
     {
         $this->sites->setConfig([
@@ -63,15 +89,23 @@ class SitesTest extends TestCase
         $this->assertArrayNotHasKey('de', $this->sites->all());
     }
 
-    /** @test */
+    #[Test]
     public function can_change_specific_config_items()
+    {
+        $this->sites->setSiteValue('en', 'url', 'http://foobar.com/');
+
+        $this->assertEquals('http://foobar.com', $this->sites->get('en')->url());
+    }
+
+    #[Test]
+    public function can_change_specific_config_items_the_legacy_deprecated_way()
     {
         $this->sites->setConfig('sites.en.url', 'http://foobar.com/');
 
         $this->assertEquals('http://foobar.com', $this->sites->get('en')->url());
     }
 
-    /** @test */
+    #[Test]
     public function checks_whether_there_are_multiple_sites()
     {
         $this->sites->setConfig([
@@ -94,7 +128,7 @@ class SitesTest extends TestCase
         $this->assertFalse($this->sites->hasMultiple());
     }
 
-    /** @test */
+    #[Test]
     public function gets_site_by_handle()
     {
         tap($this->sites->get('en'), function ($site) {
@@ -103,7 +137,7 @@ class SitesTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_default_site()
     {
         tap($this->sites->default(), function ($site) {
@@ -112,7 +146,7 @@ class SitesTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function gets_site_from_url()
     {
         $this->assertEquals('en', $this->sites->findByUrl('http://test.com/something')->handle());
@@ -131,7 +165,7 @@ class SitesTest extends TestCase
         $this->assertEquals('de', $this->sites->findByUrl('http://test.com/de?foo=bar')->handle());
     }
 
-    /** @test */
+    #[Test]
     public function current_site_can_be_explicitly_set()
     {
         $this->assertEquals('en', $this->sites->current()->handle());
@@ -141,19 +175,37 @@ class SitesTest extends TestCase
         $this->assertEquals('fr', $this->sites->current()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function gets_site_from_url_when_using_relative_urls()
     {
-        $sites = new Sites([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['url' => '/'],
-                'fr' => ['url' => '/fr/'],
-            ],
+        $sites = (new Sites)->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
         ]);
 
         $this->assertEquals('en', $sites->findByUrl('http://absolute-url-resolved-from-request.com/something')->handle());
         $this->assertEquals('fr', $sites->findByUrl('http://absolute-url-resolved-from-request.com/fr/something')->handle());
         $this->assertNull($sites->findByUrl('http://unknownsite.com'));
+    }
+
+    #[Test]
+    public function it_gets_the_selected_site_from_session()
+    {
+        session()->put('statamic.cp.selected-site', 'fr');
+        $this->assertEquals('fr', $this->sites->selected()->handle());
+    }
+
+    #[Test]
+    public function the_selected_site_is_the_default_if_not_set()
+    {
+        session()->put('statamic.cp.selected-site', null);
+        $this->assertEquals('en', $this->sites->selected()->handle());
+    }
+
+    #[Test]
+    public function the_selected_site_is_the_default_if_invalid()
+    {
+        session()->put('statamic.cp.selected-site', 'invalid');
+        $this->assertEquals('en', $this->sites->selected()->handle());
     }
 }

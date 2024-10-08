@@ -9,6 +9,7 @@ use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 
 class NavigationController extends CpController
@@ -18,7 +19,8 @@ class NavigationController extends CpController
         $this->authorize('index', NavContract::class, __('You are not authorized to view navs.'));
 
         $navs = Nav::all()->filter(function ($nav) {
-            return User::current()->can('view', $nav);
+            return User::current()->can('configure navs')
+                || ($nav->sites()->contains(Site::selected()->handle()) && User::current()->can('view', $nav));
         })->map(function ($structure) {
             return [
                 'id' => $structure->handle(),
@@ -27,6 +29,7 @@ class NavigationController extends CpController
                 'edit_url' => $structure->editUrl(),
                 'delete_url' => $structure->deleteUrl(),
                 'deleteable' => User::current()->can('delete', $structure),
+                'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
             ];
         })->values();
 
@@ -37,7 +40,7 @@ class NavigationController extends CpController
     {
         $nav = Nav::find($nav);
 
-        $this->authorize('edit', $nav, __('You are not authorized to configure navs.'));
+        $this->authorize('configure', $nav, __('You are not authorized to configure navs.'));
 
         $values = [
             'title' => $nav->title(),
@@ -46,6 +49,7 @@ class NavigationController extends CpController
             'root' => $nav->expectsRoot(),
             'sites' => $nav->trees()->keys()->all(),
             'max_depth' => $nav->maxDepth(),
+            'select_across_sites' => $nav->canSelectAcrossSites(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($nav))
@@ -65,20 +69,24 @@ class NavigationController extends CpController
     {
         abort_if(! $nav = Nav::find($nav), 404);
 
-        $this->authorize('view', $nav, __('You are not authorized to view navs.'));
-
         $site = $request->site ?? Site::selected()->handle();
 
         if (! $nav->existsIn($site)) {
-            return redirect($nav->trees()->first()->showUrl());
+            if ($nav->trees()->isNotEmpty()) {
+                return redirect($nav->trees()->first()->showUrl());
+            }
+
+            $nav->makeTree($site)->save();
         }
+
+        $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
 
         return view('statamic::navigation.show', [
             'site' => $site,
             'nav' => $nav,
             'expectsRoot' => $nav->expectsRoot(),
             'collections' => $nav->collections()->map->handle()->all(),
-            'sites' => $nav->trees()->map(function ($tree) {
+            'sites' => $this->getAuthorizedTreesForNav($nav)->map(function ($tree) {
                 return [
                     'handle' => $tree->locale(),
                     'name' => $tree->site()->name(),
@@ -87,6 +95,13 @@ class NavigationController extends CpController
             })->values()->all(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
         ]);
+    }
+
+    private function getAuthorizedTreesForNav($nav)
+    {
+        return $nav
+            ->trees()
+            ->filter(fn ($tree) => User::current()->can('view', Site::get($tree->locale())));
     }
 
     public function update(Request $request, $nav)
@@ -118,6 +133,8 @@ class NavigationController extends CpController
             foreach (array_diff($existingSites, $sites) as $site) {
                 $nav->in($site)->delete();
             }
+
+            $nav->canSelectAcrossSites($values['select_across_sites']);
         }
 
         $nav->save();
@@ -140,8 +157,18 @@ class NavigationController extends CpController
 
         $values = $request->validate([
             'title' => 'required',
-            'handle' => 'required|alpha_dash',
+            'handle' => ['required', new Handle],
         ]);
+
+        if (Nav::find($values['handle'])) {
+            $error = __('A navigation with that handle already exists.');
+
+            if ($request->wantsJson()) {
+                throw new \Exception($error);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
 
         $structure = Nav::make()
             ->title($values['title'])
@@ -200,12 +227,18 @@ class NavigationController extends CpController
             ],
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $contents['options']['fields']['sites'] = [
                 'display' => __('Sites'),
                 'type' => 'sites',
                 'mode' => 'select',
                 'required' => true,
+            ];
+
+            $contents['options']['fields']['select_across_sites'] = [
+                'display' => __('Select Across Sites'),
+                'instructions' => __('statamic::messages.navigation_configure_select_across_sites'),
+                'type' => 'toggle',
             ];
         }
 

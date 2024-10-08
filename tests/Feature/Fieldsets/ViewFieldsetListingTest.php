@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Fieldsets;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Fields\Fieldset;
 use Tests\FakesRoles;
@@ -13,7 +14,7 @@ class ViewFieldsetListingTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_a_list_of_fieldsets()
     {
         Facades\Fieldset::shouldReceive('all')->andReturn(collect([
@@ -23,6 +24,14 @@ class ViewFieldsetListingTest extends TestCase
             'baz::bar' => $this->createFieldset('baz::bar'),
             'baz::baz' => $this->createFieldset('baz::baz'),
         ]));
+
+        Facades\Fieldset::shouldReceive('overriddenNamespacedFieldsetPath')
+            ->with('baz::foo')
+            ->andReturn('/fieldsets/vendor/baz/foo.yaml');
+
+        Facades\Fieldset::shouldReceive('overriddenNamespacedFieldsetPath')
+            ->with('baz::bar')
+            ->andReturn('/fieldsets/vendor/baz/bar.yaml');
 
         // Custom policy to allow fieldsets to demonstrate how certain fieldset can be restricted
         app()->bind(\Statamic\Policies\FieldsetPolicy::class, function () {
@@ -53,7 +62,10 @@ class ViewFieldsetListingTest extends TestCase
                         'fields' => 0,
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
+                        'reset_url' => 'http://localhost/cp/fields/fieldsets/foo/reset',
                         'is_deletable' => true,
+                        'is_resettable' => false,
+                        'imported_by' => collect(),
                     ],
                     [
                         'id' => 'bar',
@@ -62,7 +74,10 @@ class ViewFieldsetListingTest extends TestCase
                         'fields' => 0,
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/bar/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/bar',
+                        'reset_url' => 'http://localhost/cp/fields/fieldsets/bar/reset',
                         'is_deletable' => true,
+                        'is_resettable' => false,
+                        'imported_by' => collect(),
                     ],
                 ]),
                 'Baz' => collect([
@@ -73,7 +88,10 @@ class ViewFieldsetListingTest extends TestCase
                         'fields' => 0,
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::foo/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::foo',
+                        'reset_url' => 'http://localhost/cp/fields/fieldsets/baz::foo/reset',
                         'is_deletable' => false,
+                        'is_resettable' => false,
+                        'imported_by' => collect(),
                     ],
                     [
                         'id' => 'baz::bar',
@@ -82,14 +100,17 @@ class ViewFieldsetListingTest extends TestCase
                         'fields' => 0,
                         'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
                         'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
+                        'reset_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/reset',
                         'is_deletable' => false,
+                        'is_resettable' => false,
+                        'imported_by' => collect(),
                     ],
                 ]),
             ]))
             ->assertDontSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

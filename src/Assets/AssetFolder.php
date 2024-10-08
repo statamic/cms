@@ -3,6 +3,7 @@
 namespace Statamic\Assets;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
 use Statamic\Events\AssetFolderDeleted;
 use Statamic\Events\AssetFolderSaved;
@@ -11,7 +12,7 @@ use Statamic\Facades\Path;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetFolder implements Contract, Arrayable
+class AssetFolder implements Arrayable, Contract
 {
     use FluentlyGetsAndSets;
 
@@ -132,7 +133,7 @@ class AssetFolder implements Contract, Arrayable
         });
         $cache->save();
 
-        AssetFolderDeleted::dispatch($this);
+        AssetFolderDeleted::dispatch(clone $this);
 
         return $this;
     }
@@ -165,7 +166,7 @@ class AssetFolder implements Contract, Arrayable
             throw new \Exception('Folder cannot be moved to its own subfolder.');
         }
 
-        $name = $this->getSafeBasename($name ?? $this->basename());
+        $name = Uploader::getSafeFilename($name ?? $this->basename());
         $oldPath = $this->path();
         $newPath = Str::removeLeft(Path::tidy($parent.'/'.$name), '/');
 
@@ -182,22 +183,9 @@ class AssetFolder implements Contract, Arrayable
         $this->container()->assets($oldPath)->each->move($newPath);
         $this->delete();
 
+        $this->path($newPath);
+
         return $folder;
-    }
-
-    /**
-     * Ensure safe basename string.
-     *
-     * @param  string  $string
-     * @return string
-     */
-    private function getSafeBasename($string)
-    {
-        if (config('statamic.assets.lowercase')) {
-            $string = strtolower($string);
-        }
-
-        return (string) $string;
     }
 
     /**

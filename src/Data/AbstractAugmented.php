@@ -13,6 +13,7 @@ abstract class AbstractAugmented implements Augmented
     protected $data;
     protected $blueprintFields;
     protected $relations = [];
+    private $fieldtype;
 
     public function __construct($data)
     {
@@ -36,10 +37,28 @@ abstract class AbstractAugmented implements Augmented
         $keys = $this->filterKeys(Arr::wrap($keys ?: $this->keys()));
 
         foreach ($keys as $key) {
-            $arr[$key] = $this->get($key);
+            $arr[$key] = $this->transientValue($key);
         }
 
         return (new AugmentedCollection($arr))->withRelations($this->relations);
+    }
+
+    private function transientValue($key)
+    {
+        $fields = $this->blueprintFields();
+
+        $callback = function (Value $value) use ($key, $fields) {
+            $this->fieldtype = $fields->get($key)?->fieldtype();
+            $deferred = $this->get($key);
+            $this->fieldtype = null;
+
+            $value->setFieldtype($deferred->fieldtype());
+            $value->setAugmentable($deferred->augmentable());
+
+            return $deferred->raw();
+        };
+
+        return new Value($callback, $key);
     }
 
     abstract public function keys();
@@ -49,35 +68,38 @@ abstract class AbstractAugmented implements Augmented
         $method = Str::camel($handle);
 
         if ($this->methodExistsOnThisClass($method)) {
-            $value = $this->$method();
-
-            return $value instanceof Value
-                ? $value
-                : new Value($value, $method, null, $this->data);
+            $value = $this->wrapAugmentedMethodInvokable($method, $handle);
+        } elseif ($this->methodExistsOnData($handle, $method)) {
+            $value = $this->wrapDataMethodInvokable($method, $handle);
+        } else {
+            $value = $this->wrapDeferredValue($handle);
         }
 
-        if (method_exists($this->data, $method) && collect($this->keys())->contains(Str::snake($handle))) {
-            return $this->wrapValue($this->data->$method(), $handle);
-        }
-
-        return $this->wrapValue($this->getFromData($handle), $handle);
+        return $value->resolve();
     }
 
-    protected function filterKeys($keys)
+    private function filterKeys($keys)
     {
         return array_diff($keys, $this->excludedKeys());
     }
 
-    protected function excludedKeys()
+    private function excludedKeys()
     {
         return Statamic::isApiRoute()
             ? config('statamic.api.excluded_keys', [])
             : [];
     }
 
-    private function methodExistsOnThisClass($method)
+    private function methodExistsOnThisClass(string $method): bool
     {
         return method_exists($this, $method) && ! in_array($method, ['select', 'except']);
+    }
+
+    private function methodExistsOnData(string $handle, string $method): bool
+    {
+        return method_exists($this->data, $method)
+            && collect($this->keys())->contains(Str::snake($handle))
+            && ! in_array($handle, ['hook', 'value', 'entry']);
     }
 
     protected function getFromData($handle)
@@ -93,19 +115,52 @@ abstract class AbstractAugmented implements Augmented
         return $value;
     }
 
-    protected function wrapValue($value, $handle)
+    protected function wrapDeferredValue($handle)
     {
-        $fields = $this->blueprintFields();
-
         return new Value(
-            $value,
+            fn () => $this->getFromData($handle),
             $handle,
-            optional($fields->get($handle))->fieldtype(),
+            $this->fieldtype($handle),
             $this->data
         );
     }
 
-    protected function blueprintFields()
+    protected function wrapAugmentedMethodInvokable(string $method, string $handle)
+    {
+        return new Value(
+            fn () => $this->$method(),
+            $handle,
+            null,
+            $this->data,
+        );
+    }
+
+    protected function wrapDataMethodInvokable(string $method, string $handle)
+    {
+        return new Value(
+            fn () => $this->data->$method(),
+            $handle,
+            $this->fieldtype($handle),
+            $this->data
+        );
+    }
+
+    protected function wrapValue($value, $handle)
+    {
+        return new Value(
+            $value,
+            $handle,
+            $this->fieldtype($handle),
+            $this->data
+        );
+    }
+
+    private function fieldtype($handle)
+    {
+        return $this->fieldtype ?? optional($this->blueprintFields()->get($handle))->fieldtype();
+    }
+
+    public function blueprintFields()
     {
         if (! isset($this->blueprintFields)) {
             $this->blueprintFields = (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
@@ -114,6 +169,13 @@ abstract class AbstractAugmented implements Augmented
         }
 
         return $this->blueprintFields;
+    }
+
+    public function withBlueprintFields($fields)
+    {
+        $this->blueprintFields = $fields;
+
+        return $this;
     }
 
     public function withRelations($relations)

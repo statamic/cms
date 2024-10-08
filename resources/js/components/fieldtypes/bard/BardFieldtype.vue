@@ -77,13 +77,13 @@
                             v-tooltip="__('Add Set')"
                             @click="addSetButtonClicked"
                         >
-                            <svg-icon name="micro/plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
+                            <svg-icon name="micro/plus" class="w-3 h-3 text-gray-800 dark:text-dark-175 group-hover:text-black dark:group-hover:dark-text-100" />
                         </button>
                     </template>
                 </set-picker>
             </floating-menu>
 
-            <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
+            <div class="bard-error" v-if="initError" v-html="initError"></div>
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
@@ -103,6 +103,7 @@
 import uniqid from 'uniqid';
 import reduce from 'underscore/modules/reduce';
 import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';
+import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
@@ -173,13 +174,14 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
-            invalid: false,
+            initError: null,
             pageHeader: null,
             escBinding: null,
             showAddSetButton: false,
             provide: {
                 bard: this.makeBardProvide(),
-                storeName: this.storeName
+                storeName: this.storeName,
+                bardSets: this.config.sets
             }
         }
     },
@@ -286,7 +288,8 @@ export default {
         },
 
         replicatorPreview() {
-            const stack = JSON.parse(this.value);
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            const stack = [...this.value];
             let text = '';
             while (stack.length) {
                 const node = stack.shift();
@@ -295,7 +298,7 @@ export default {
                 } else if (node.type === 'set') {
                     const handle = node.attrs.values.type;
                     const set = this.setConfigs.find(set => set.handle === handle);
-                    text += ` [${set ? set.display : handle}]`;
+                    text += ` [${__(set ? set.display : handle)}]`;
                 }
                 if (text.length > 150) {
                     break;
@@ -343,37 +346,32 @@ export default {
 
         this.pageHeader = document.querySelector('.global-header');
 
-        this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
-
-        document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
-            this.editor.commands.focus();
+        this.$nextTick(() => {
+            let el = document.querySelector(`label[for="${this.fieldId}"]`);
+            if (el) {
+                el.addEventListener('click', () => {
+                    this.editor.commands.focus();
+                });
+            }
         });
     },
 
     beforeDestroy() {
         this.editor.destroy();
         this.escBinding.destroy();
-
-        this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
 
     watch: {
 
-        json(json) {
+        json(json, oldJson) {
             if (!this.mounted) return;
+                        
+            if (json === oldJson) return;
 
-            // Prosemirror's JSON will include spaces between tags.
-            // For example (this is not the actual json)...
-            // "<p>One <b>two</b> three</p>" becomes ['OneSPACE', '<b>two</b>', 'SPACEthree']
-            // But, Laravel's TrimStrings middleware would remove them.
-            // Those spaces need to be there, otherwise it would be rendered as <p>One<b>two</b>three</p>
-            // To combat this, we submit the JSON string instead of an object.
-            this.updateDebounced(JSON.stringify(json));
+            this.updateDebounced(json);
         },
 
-        value(value, oldValue) {
-            if (value === oldValue) return;
-
+        value(value, oldValue) {    
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
@@ -405,13 +403,6 @@ export default {
             }
         },
 
-        fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
-            this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
-            this.$nextTick(() => {
-                this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
-            });
-        },
-
         fullScreenMode() {
             this.initEditor();
         }
@@ -429,9 +420,16 @@ export default {
 
             this.updateSetMeta(id, this.meta.new[handle]);
 
+            const { $head } = this.editor.view.state.selection;
+            const { nodeBefore } = $head;
+
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
-                this.editor.commands.set({ id, values });
+                if (nodeBefore) {
+                    this.editor.commands.setAt({ attrs: { id, values }, pos: $head.pos });
+                } else {
+                    this.editor.commands.set({ id, values });
+                }
             });
         },
 
@@ -449,6 +447,20 @@ export default {
             this.$nextTick(() => {
                 this.editor.commands.setAt({ attrs: { id, enabled, values }, pos });
             });
+        },
+
+        pasteSet(attrs) {
+            const old_id = attrs.id;
+            const id = uniqid();
+            const enabled = attrs.enabled;
+            const values = Object.assign({}, attrs.values);
+
+            let previews = Object.assign({}, this.previews[old_id] || {});
+            this.previews = Object.assign({}, this.previews, { [id]: previews });
+
+            this.updateSetMeta(id, this.meta.existing[old_id] || this.meta.defaults[values.type] || {});
+
+            return { id, enabled, values };
         },
 
         collapseSet(id) {
@@ -620,7 +632,7 @@ export default {
                     }, 1);
                 },
                 onUpdate: () => {
-                    this.json = this.editor.getJSON().content;
+                    this.json = clone(this.editor.getJSON().content);
                     this.html = this.editor.getHTML();
                 },
                 onCreate: ({ editor }) => {
@@ -629,17 +641,40 @@ export default {
                         try {
                             state.schema.nodeFromJSON(content);
                         } catch (error) {
-                            this.invalid = true;
+                            const invalidError = this.invalidError(error);
+                            if (invalidError) {
+                                this.initError = invalidError;
+                            } else {
+                                this.initError = __('Something went wrong');
+                                console.error(error);
+                            }
                         }
                     }
                 }
             });
         },
 
-        valueToContent(value) {
-            // A json string is passed from PHP since that's what's submitted.
-            value = JSON.parse(value);
+        invalidError(error) {
+            const messages = {
+                'Invalid text node in JSON': 'Invalid content, text values must be strings',
+                'Empty text nodes are not allowed': 'Invalid content, text values cannot be empty',
+            };
 
+            if (messages[error.message]) {
+                return __(messages[error.message]);
+            }
+
+            let match;
+            if (match = error.message.match(/^(?:There is no|Unknown) (?:node|mark) type:? (\w*)(?: in this schema)?$/)) {
+                if (match[1]) {
+                    return __('Invalid content, :type button/extension is not enabled', { type: match[1] });
+                } else {
+                    return __('Invalid content, nodes and marks must have a type');
+                }
+            }
+        },
+
+        valueToContent(value) {
             return value.length
                 ? { type: 'doc', content: value }
                 : null;
@@ -647,6 +682,7 @@ export default {
 
         getExtensions() {
             let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
+
             if (this.config.inline === 'break') {
                 modeExts.push(HardBreak.extend({
                     addKeyboardShortcuts() {
@@ -657,14 +693,29 @@ export default {
                     },
                 }));
             }
+
+            if (this.config.placeholder) {
+                modeExts.push(Placeholder.configure({ placeholder: __(this.config.placeholder) }));
+            }
+
+            // Allow passthrough of Ctrl/Cmd + Enter to submit the form
+            const DisableCtrlEnter = Extension.create({
+                addKeyboardShortcuts() {
+                    return {
+                        'Ctrl-Enter': () => true,
+                        'Cmd-Enter': () => true,
+                    }
+                },
+            });
+
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
                 ...modeExts,
+                DisableCtrlEnter,
                 Dropcursor,
                 Gapcursor,
                 History,
                 Paragraph,
-                Placeholder.configure({ placeholder: this.config.placeholder }),
                 Set.configure({ bard: this }),
                 Text
             ];
@@ -701,12 +752,15 @@ export default {
             if (btns.includes('h6')) levels.push(6);
             if (levels.length) exts.push(Heading.configure({ levels }));
 
+            let alignmentTypes = ['paragraph'];
+            if (levels.length) alignmentTypes.push('heading');
+
             let alignments = [];
             if (btns.includes('alignleft')) alignments.push('left');
             if (btns.includes('aligncenter')) alignments.push('center');
             if (btns.includes('alignright')) alignments.push('right');
             if (btns.includes('alignjustify')) alignments.push('justify');
-            if (alignments.length) exts.push(TextAlign.configure({ types: ['heading', 'paragraph'], alignments }));
+            if (alignments.length) exts.push(TextAlign.configure({ types: alignmentTypes, alignments }));
 
             if (btns.includes('table')) {
                 exts.push(

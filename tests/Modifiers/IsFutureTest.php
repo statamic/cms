@@ -3,12 +3,14 @@
 namespace Tests\Modifiers;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class IsFutureTest extends TestCase
 {
-    public function dates(): array
+    public static function datesProvider(): array
     {
         $futureDate = Carbon::createFromDate(2030, 10, 21);
         $pastDate = Carbon::createFromDate(2015, 10, 21);
@@ -24,11 +26,8 @@ class IsFutureTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider dates
-     */
+    #[Test]
+    #[DataProvider('datesProvider')]
     public function it_returns_true_if_date_is_future($expected, $input): void
     {
         $modified = $this->modify($input);

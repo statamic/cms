@@ -15,8 +15,13 @@ export default {
             readOnly: true,
             method: 'patch',
             action: 'update',
-            title: this.revision.attributes.data.title,
-            itemUrl: `${document.location.pathname}/revisions/${this.revision.id}`,
+            itemUrl: this.revision.attributes.item_url,
+        }
+    },
+
+    computed: {
+        title() {
+            return this.revision.attributes.data?.title ?? '';
         }
     },
 

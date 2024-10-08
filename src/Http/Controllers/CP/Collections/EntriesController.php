@@ -8,10 +8,13 @@ use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Exceptions\BlueprintNotFoundException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\User;
+use Statamic\Hooks\CP\EntriesIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
@@ -50,7 +53,7 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $entries = $query->paginate(request('perPage'));
+        $entries = (new EntriesIndexQuery($query, $collection))->paginate(request('perPage'));
 
         if (request('search') && $collection->hasSearchIndex()) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());
@@ -74,6 +77,10 @@ class EntriesController extends CpController
             }
 
             $query->where('title', 'like', '%'.$search.'%');
+        }
+
+        if (Site::multiEnabled()) {
+            $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
         return $query;
@@ -130,7 +137,7 @@ class EntriesController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'permalink' => $entry->absoluteUrl(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
 
@@ -146,7 +153,7 @@ class EntriesController extends CpController
                     'url' => $exists ? $localized->editUrl() : null,
                     'livePreviewUrl' => $exists ? $localized->livePreviewUrl() : null,
                 ];
-            })->all(),
+            })->values()->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
@@ -154,6 +161,7 @@ class EntriesController extends CpController
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
+            'itemActions' => Action::for($entry, ['collection' => $collection->handle(), 'view' => 'form']),
         ];
 
         if ($request->wantsJson()) {
@@ -200,8 +208,6 @@ class EntriesController extends CpController
 
         $values = $fields->process()->values();
 
-        $parent = $values->pull('parent');
-
         if ($explicitBlueprint = $values->pull('blueprint')) {
             $entry->blueprint($explicitBlueprint);
         }
@@ -209,7 +215,12 @@ class EntriesController extends CpController
         $values = $values->except(['slug', 'published']);
 
         if ($entry->collection()->dated()) {
-            $entry->date($entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date')));
+            $date = $entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date'));
+            if ($entry->hasOrigin()) {
+                $entry->date(in_array('date', $request->input('_localized')) ? $date : null);
+            } else {
+                $entry->date($date);
+            }
         }
 
         if ($entry->hasOrigin()) {
@@ -224,48 +235,61 @@ class EntriesController extends CpController
             $tree = $entry->structure()->in($entry->locale());
         }
 
+        $parent = $values->get('parent');
+
         if ($structure && ! $collection->orderable()) {
             $this->validateParent($entry, $tree, $parent);
 
-            $entry->afterSave(function ($entry) use ($parent, $tree) {
-                if ($parent && optional($tree->find($parent))->isRoot()) {
-                    $parent = null;
-                }
+            if (! $entry->revisionsEnabled()) {
+                $entry->afterSave(function ($entry) use ($parent, $tree) {
+                    if ($parent && optional($tree->find($parent))->isRoot()) {
+                        $parent = null;
+                    }
 
-                $tree
-                    ->move($entry->id(), $parent)
-                    ->save();
-            });
+                    $tree
+                        ->move($entry->id(), $parent)
+                        ->save();
+                });
+
+                $entry->remove('parent');
+            }
         }
 
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled() && $entry->published()) {
-            $entry
+            $saved = $entry
                 ->makeWorkingCopy()
                 ->user(User::current())
                 ->save();
+
+            // catch any changes through RevisionSaving event
+            $entry = $entry->fromWorkingCopy();
         } else {
             if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($request->published);
             }
 
-            $entry->updateLastModified(User::current())->save();
+            $saved = $entry->updateLastModified(User::current())->save();
         }
 
         [$values] = $this->extractFromFields($entry, $blueprint);
 
-        return (new EntryResource($entry->fresh()))
-            ->additional([
-                'data' => [
-                    'values' => $values,
-                ],
-            ]);
+        return [
+            'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
+                'values' => $values,
+            ]),
+            'saved' => $saved,
+        ];
     }
 
     public function create(Request $request, $collection, $site)
     {
-        $this->authorize('create', [EntryContract::class, $collection]);
+        $this->authorize('create', [EntryContract::class, $collection, $site]);
+
+        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, $site)) {
+            return $response;
+        }
 
         $blueprint = $collection->entryBlueprint($request->blueprint);
 
@@ -311,7 +335,7 @@ class EntriesController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site, $blueprint) {
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($collection, $site, $blueprint) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -321,7 +345,7 @@ class EntriesController extends CpController
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle, 'blueprint' => $blueprint->handle()]),
                     'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
                 ];
-            })->all(),
+            })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
@@ -394,15 +418,18 @@ class EntriesController extends CpController
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled()) {
-            $entry->store([
+            $saved = $entry->store([
                 'message' => $request->message,
                 'user' => User::current(),
             ]);
         } else {
-            $entry->updateLastModified(User::current())->save();
+            $saved = $entry->updateLastModified(User::current())->save();
         }
 
-        return new EntryResource($entry);
+        return [
+            'data' => (new EntryResource($entry))->resolve()['data'],
+            'saved' => $saved,
+        ];
     }
 
     private function resolveSlug($request)
@@ -418,55 +445,6 @@ class EntriesController extends CpController
 
             return null;
         };
-    }
-
-    public function destroy($entry)
-    {
-        if (! $entry = Entry::find($entry)) {
-            return $this->pageNotFound();
-        }
-
-        $this->authorize('delete', $entry);
-
-        $entry->delete();
-
-        return response('', 204);
-    }
-
-    protected function extractFromFields($entry, $blueprint)
-    {
-        // The values should only be data merged with the origin data.
-        // We don't want injected collection values, which $entry->values() would have given us.
-        $values = collect();
-        $target = $entry;
-        while ($target) {
-            $values = $target->data()->merge($target->computedData())->merge($values);
-            $target = $target->origin();
-        }
-        $values = $values->all();
-
-        if ($entry->hasStructure()) {
-            $values['parent'] = array_filter([optional($entry->parent())->id()]);
-        }
-
-        if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 19);
-            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
-            $values['date'] = $datetime;
-        }
-
-        $fields = $blueprint
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        $values = $fields->values()->merge([
-            'title' => $entry->value('title'),
-            'slug' => $entry->slug(),
-            'published' => $entry->published(),
-        ]);
-
-        return [$values->all(), $fields->meta()];
     }
 
     protected function extractAssetsFromValues($values)
@@ -499,6 +477,13 @@ class EntriesController extends CpController
         // If the entry being edited is not the root, then we don't have anything to worry about.
         // If the parent is the root, that's fine, and is handled during the tree update later.
         if (! $parent || ! $entry->page()->isRoot()) {
+            $maxDepth = $entry->collection()->structure()->maxDepth();
+
+            // If a parent is selected, validate that it doesn't exceed the max depth of the structure.
+            if ($parent && $maxDepth && Entry::find($parent)->page()->depth() >= $maxDepth) {
+                throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_exceeds_max_depth')]);
+            }
+
             return;
         }
 
@@ -532,7 +517,12 @@ class EntriesController extends CpController
         }
 
         if (! $tree) {
-            return $entry->uri();
+            return app(\Statamic\Contracts\Routing\UrlBuilder::class)
+                ->content($entry)
+                ->merge([
+                    'id' => $entry->id() ?? Stache::generateId(),
+                ])
+                ->build($entry->route());
         }
 
         $parent = $parent ? $tree->find($parent) : null;
@@ -560,5 +550,19 @@ class EntriesController extends CpController
                 'url' => $collection->showUrl(),
             ],
         ]);
+    }
+
+    protected function getAuthorizedSitesForCollection($collection)
+    {
+        return $collection
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
+    }
+
+    protected function ensureCollectionIsAvailableOnSite($collection, $site)
+    {
+        if (Site::multiEnabled() && ! $collection->sites()->contains($site->handle())) {
+            return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
+        }
     }
 }

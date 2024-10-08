@@ -7,6 +7,11 @@ use Statamic\StaticCaching\Cacher;
 
 class NullCacher implements Cacher
 {
+    public function config($key, $default = null)
+    {
+        return $default;
+    }
+
     public function cachePage(Request $request, $content)
     {
         //
@@ -40,5 +45,15 @@ class NullCacher implements Cacher
     public function getUrls($domain = null)
     {
         return collect();
+    }
+
+    public function getBaseUrl()
+    {
+        return '/';
+    }
+
+    public function getUrl(Request $request)
+    {
+        return $request->getUri();
     }
 }

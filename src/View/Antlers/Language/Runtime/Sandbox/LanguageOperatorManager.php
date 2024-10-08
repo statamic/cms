@@ -25,7 +25,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\QueryOperators\ExecutesWhere;
 
 class LanguageOperatorManager
 {
-    use ExecutesOrderBy, ExecutesGroupBy, ExecutesWhere;
+    use ExecutesGroupBy, ExecutesOrderBy, ExecutesWhere;
 
     /**
      * @var NodeProcessor|null
@@ -204,13 +204,13 @@ class LanguageOperatorManager
             }
 
             if (is_array($data)) {
-                return array_get($data, $node->name);
+                return Arr::get($data, $node->name);
             }
 
             return data_get($data, $node->name);
         } elseif ($node instanceof StringValueNode) {
             if (is_array($data)) {
-                return array_get($data, $node->value);
+                return Arr::get($data, $node->value);
             }
 
             return data_get($data, $node->value);
@@ -226,7 +226,7 @@ class LanguageOperatorManager
 
         if (is_string($node)) {
             if (is_array($data)) {
-                return array_get($data, $node);
+                return Arr::get($data, $node);
             }
 
             return data_get($data, $node);

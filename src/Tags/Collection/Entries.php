@@ -5,22 +5,24 @@ namespace Statamic\Tags\Collection;
 use Closure;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Query\OrderBy;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 
 class Entries
 {
-    use Concerns\QueriesScopes,
-        Concerns\QueriesOrderBys,
-        Concerns\GetsQueryResults,
+    use Concerns\GetsQueryResults,
         Concerns\GetsQuerySelectKeys,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes,
         Concerns\QueriesTaxonomyTerms;
     use Concerns\QueriesConditions {
         queryableConditionParams as traitQueryableConditionParams;
@@ -66,17 +68,22 @@ class Entries
         throw_if($this->params->has('offset'), new \Exception('collection:next is not compatible with [offset] parameter'));
         throw_if($this->collections->count() > 1, new \Exception('collection:next is not compatible with multiple collections'));
 
-        $collection = $this->collections->first();
-        $primaryOrderBy = $this->orderBys->first();
-
-        if ($primaryOrderBy->direction === 'desc') {
-            $operator = '<';
+        if ($this->orderBys->count() === 1) {
+            $this->orderBys[] = new OrderBy('title', 'asc');
         }
 
-        if ($collection->orderable() && $primaryOrderBy->sort === 'order') {
-            $query = $this->query()->where('order', $operator ?? '>', $currentEntry->order());
+        $collection = $this->collections->first();
+        $primaryOrderBy = $this->orderBys->first();
+        $secondaryOrderBy = $this->orderBys->get(1);
+
+        $primaryOperator = $primaryOrderBy->direction === 'desc' ? '<' : '>';
+        $secondaryOperator = $secondaryOrderBy->direction === 'desc' ? '<' : '>';
+
+        if ($primaryOrderBy->sort === 'order') {
+            throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
+            $query = $this->query()->where('order', $primaryOperator, $currentOrder);
         } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
-            $query = $this->query()->where('date', $operator ?? '>', $currentEntry->date());
+            $query = $this->queryPreviousNextByDate($currentEntry, $primaryOperator, $secondaryOperator);
         } else {
             throw new \Exception('collection:next requires ordered or dated collection');
         }
@@ -90,17 +97,22 @@ class Entries
         throw_if($this->params->has('offset'), new \Exception('collection:previous is not compatible with [offset] parameter'));
         throw_if($this->collections->count() > 1, new \Exception('collection:previous is not compatible with multiple collections'));
 
-        $collection = $this->collections->first();
-        $primaryOrderBy = $this->orderBys->first();
-
-        if ($primaryOrderBy->direction === 'desc') {
-            $operator = '>';
+        if ($this->orderBys->count() === 1) {
+            $this->orderBys[] = new OrderBy('title', 'asc');
         }
 
-        if ($collection->orderable() && $primaryOrderBy->sort === 'order') {
-            $query = $this->query()->where('order', $operator ?? '<', $currentEntry->order());
+        $collection = $this->collections->first();
+        $primaryOrderBy = $this->orderBys->first();
+        $secondaryOrderBy = $this->orderBys->get(1);
+
+        $primaryOperator = $primaryOrderBy->direction === 'desc' ? '>' : '<';
+        $secondaryOperator = $secondaryOrderBy->direction === 'desc' ? '>' : '<';
+
+        if ($primaryOrderBy->sort === 'order') {
+            throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
+            $query = $this->query()->where('order', $primaryOperator, $currentOrder);
         } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
-            $query = $this->query()->where('date', $operator ?? '<', $currentEntry->date());
+            $query = $this->queryPreviousNextByDate($currentEntry, $primaryOperator, $secondaryOperator);
         } else {
             throw new \Exception('collection:previous requires ordered or dated collection');
         }
@@ -139,6 +151,32 @@ class Entries
             : $this->previous($currentEntry);
     }
 
+    protected function queryPreviousNextByDate($currentEntry, string $primaryOperator, string $secondaryOperator): QueryBuilder
+    {
+        $primaryOrderBy = $this->orderBys->first();
+        $secondaryOrderBy = $this->orderBys->get(1);
+
+        $currentEntryDate = $currentEntry->date();
+
+        // Get the IDs of any items that have the same date as the current entry,
+        // but come before/after the current entry sorted by the second column.
+        $previousOfSame = $this->query()
+            ->where('date', $currentEntryDate)
+            ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction)
+            ->where($secondaryOrderBy->sort, $secondaryOperator, $currentEntry->value($secondaryOrderBy->sort))
+            ->get()
+            ->pluck('id')
+            ->toArray();
+
+        return $this->query()
+            ->where(fn ($query) => $query
+                ->where('date', $primaryOperator, $currentEntryDate)
+                ->orWhereIn('id', $previousOfSame)
+            )
+            ->orderBy('date', $primaryOrderBy->direction)
+            ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction);
+    }
+
     protected function query()
     {
         $query = Entry::query()
@@ -146,14 +184,14 @@ class Entries
 
         $this->querySelect($query);
         $this->querySite($query);
-        $this->queryStatus($query);
+        $this->queryPublished($query);
         $this->queryPastFuture($query);
         $this->querySinceUntil($query);
         $this->queryTaxonomies($query);
         $this->queryRedirects($query);
         $this->queryConditions($query);
-        $this->queryScopes($query);
         $this->queryOrderBys($query);
+        $this->queryScopes($query);
 
         return $query;
     }
@@ -232,13 +270,13 @@ class Entries
         return $query->where('site', $site);
     }
 
-    protected function queryStatus($query)
+    protected function queryPublished($query)
     {
         if ($this->isQueryingCondition('status') || $this->isQueryingCondition('published')) {
             return;
         }
 
-        return $query->where('status', 'published');
+        return $query->where('published', true);
     }
 
     protected function queryPastFuture($query)
@@ -319,6 +357,10 @@ class Entries
                 return;
             }
 
+            if (! is_iterable($values)) {
+                $values = [$values];
+            }
+
             $values = collect($values)->map(function ($term) use ($taxonomy) {
                 if ($term instanceof Term) {
                     return $term->id();
@@ -342,14 +384,14 @@ class Entries
         }
 
         if (! $this->params->bool(['redirects', 'links'], false)) {
-            $query->where('redirect', '=', null);
+            $query->whereNull('redirect');
         }
     }
 
     protected function queryableConditionParams()
     {
-        return $this->traitQueryableConditionParams()->reject(function ($value, $key) {
-            return Str::startsWith($key, 'taxonomy:');
-        });
+        return $this->traitQueryableConditionParams()
+            ->reject(fn ($value, $key) => Str::startsWith($key, 'taxonomy:'))
+            ->reject(fn ($value, $key) => $value === '');
     }
 }

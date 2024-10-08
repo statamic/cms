@@ -39,6 +39,8 @@ class NavigationTreeController extends CpController
 
         $tree = $nav->in($request->site);
 
+        $this->authorize('edit', $tree);
+
         $this->data = $this->flattenExistingBranchData([], $tree->tree());
 
         $blueprint = $nav->blueprint()
@@ -49,10 +51,11 @@ class NavigationTreeController extends CpController
 
         $tree = $this->reorderTree($request->pages);
 
-        $nav->in($request->site)->tree($tree)->save();
+        $saved = $nav->in($request->site)->tree($tree)->save();
 
         return [
             'generatedIds' => $this->generatedIds,
+            'saved' => $saved,
         ];
     }
 

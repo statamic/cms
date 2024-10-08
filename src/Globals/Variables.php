@@ -17,7 +17,9 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Events\GlobalVariablesCreated;
+use Statamic\Events\GlobalVariablesCreating;
 use Statamic\Events\GlobalVariablesDeleted;
+use Statamic\Events\GlobalVariablesDeleting;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Events\GlobalVariablesSaving;
 use Statamic\Facades;
@@ -27,9 +29,9 @@ use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Variables implements Contract, Localization, Augmentable, ResolvesValuesContract, ArrayAccess, Arrayable
+class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Localization, ResolvesValuesContract
 {
-    use ExistsAsFile, ContainsData, HasAugmentedInstance, HasOrigin, FluentlyGetsAndSets, ResolvesValues, TracksQueriedRelations;
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, HasOrigin, ResolvesValues, TracksQueriedRelations;
 
     protected $set;
     protected $locale;
@@ -75,7 +77,7 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
     {
         return vsprintf('%s/%s%s.%s', [
             rtrim(Stache::store('global-variables')->directory(), '/'),
-            Site::hasMultiple() ? $this->locale().'/' : '',
+            Site::multiEnabled() ? $this->locale().'/' : '',
             $this->handle(),
             'yaml',
         ]);
@@ -95,7 +97,7 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
     {
         $params = [$this->handle()];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $params['site'] = $this->locale();
         }
 
@@ -127,6 +129,10 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && GlobalVariablesCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (GlobalVariablesSaving::dispatch($this) === false) {
                 return false;
             }
@@ -149,11 +155,27 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && GlobalVariablesDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\GlobalVariables::delete($this);
 
-        GlobalVariablesDeleted::dispatch($this);
+        if ($withEvents) {
+            GlobalVariablesDeleted::dispatch($this);
+        }
 
         return true;
     }

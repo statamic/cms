@@ -10,7 +10,7 @@
             :clearable="config.clearable"
             :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
             :options="options"
-            :placeholder="config.placeholder"
+            :placeholder="__(config.placeholder)"
             :searchable="config.searchable || config.taggable"
             :taggable="config.taggable"
             :push-tags="config.push_tags"
@@ -26,7 +26,7 @@
                 <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
                 <template #search="{ events, attributes }" v-if="config.multiple">
                     <input
-                        :placeholder="config.placeholder"
+                        :placeholder="__(config.placeholder)"
                         class="vs__search"
                         type="search"
                         v-on="events"
@@ -42,7 +42,7 @@
                     <template v-else v-text="label"></template>
                 </template>
                 <template #no-options>
-                    <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                    <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
                 </template>
                 <template #footer="{ deselect }" v-if="config.multiple">
                     <sortable-list
@@ -56,7 +56,7 @@
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item">
                             <div v-if="config.label_html" v-html="option.label"></div>
-                            <template v-else>{{ option.label }}</template>
+                            <template v-else>{{ __(option.label) }}</template>
                             <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                                 <span>×</span>
                             </button>
@@ -68,7 +68,7 @@
                     </sortable-list>
                 </template>
         </v-select>
-        <div class="text-xs ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items">
+        <div class="text-xs rtl:mr-2 ltr:ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items">
             <span v-text="currentLength"></span>/<span v-text="config.max_items"></span>
         </div>
     </div>
@@ -96,7 +96,7 @@ export default {
 
     computed: {
         selectedOptions() {
-            let selections = this.value || [];
+            let selections = this.value === null ? [] : this.value;
             if (typeof selections === 'string' || typeof selections === 'number') {
                 selections = [selections];
             }
@@ -106,10 +106,12 @@ export default {
         },
 
         options() {
-            return this.normalizeInputOptions(this.config.options);
+            return this.normalizeInputOptions(this.meta.options || this.config.options);
         },
 
         replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
             return this.selectedOptions.map(option => option.label).join(', ');
         },
 

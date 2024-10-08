@@ -3,29 +3,28 @@
 namespace Tests;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
 use Statamic\View\View;
 
 class MiscTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesViews;
+    use PreventSavingStacheItemsToDisk;
 
     /**
-     * @test
-     *
-     * @dataProvider localesTagTestProvider
-     *
      * @see https://github.com/statamic/cms/issues/4839
      **/
+    #[Test]
+    #[DataProvider('localesTagTestProvider')]
     public function locales_tag_doesnt_ruin_future_tag_pairs($withParameter)
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
             'de' => ['url' => 'http://localhost/de/', 'locale' => 'de', 'name' => 'German'],
-        ]]);
+        ]);
 
         $blueprint = Blueprint::makeFromFields(['related_entries' => ['type' => 'entries']]);
         Blueprint::shouldReceive('in')->with('collections/test')->andReturn(collect([$blueprint]));
@@ -59,7 +58,7 @@ EOT;
         $this->assertEquals($expected, View::make('test')->cascadeContent($a)->render());
     }
 
-    public function localesTagTestProvider()
+    public static function localesTagTestProvider()
     {
         return [
             'without parameter' => [false],
@@ -68,10 +67,9 @@ EOT;
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/4889
      **/
+    #[Test]
     public function fieldtype_gets_correct_parent_in_loop()
     {
         $fieldtype = new class extends Fieldtype

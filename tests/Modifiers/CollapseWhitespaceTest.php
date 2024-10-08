@@ -2,12 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class CollapseWhitespaceTest extends TestCase
 {
-    public function stringsWithWeirdWhitespaces(): array
+    public static function stringsWithWeirdWhitespacesProvider(): array
     {
         return [
             'multiple_whitespace' => ['Bad at typing', 'Bad   at           typing'],
@@ -19,11 +21,8 @@ class CollapseWhitespaceTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider stringsWithWeirdWhitespaces
-     */
+    #[Test]
+    #[DataProvider('stringsWithWeirdWhitespacesProvider')]
     public function it_collapses_whitespaces($expected, $input): void
     {
         $modified = $this->modify($input);

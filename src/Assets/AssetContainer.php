@@ -11,7 +11,9 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetContainerCreated;
+use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerDeleted;
+use Statamic\Events\AssetContainerDeleting;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
@@ -20,13 +22,14 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Image;
+use Statamic\Facades\Pattern;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess, Arrayable
+class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -46,6 +49,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     protected $withEvents = true;
     protected $sortField;
     protected $sortDirection;
+    protected $validation;
 
     public function id($id = null)
     {
@@ -96,6 +100,20 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             ->args(func_get_args());
     }
 
+    /**
+     * Get or set the validation rules.
+     *
+     * @param  null|array  $rules
+     * @return array
+     */
+    public function validationRules($rules = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('validation')
+            ->getter(fn ($rules) => $rules ?? [])
+            ->args(func_get_args());
+    }
+
     public function diskPath()
     {
         return rtrim($this->disk()->path('/'), '/');
@@ -116,6 +134,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function url()
     {
+        if ($this->private()) {
+            return null;
+        }
+
         $url = rtrim($this->disk()->url('/'), '/');
 
         return ($url === '') ? '/' : $url;
@@ -171,25 +193,37 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      *
      * @return \Statamic\Fields\Blueprint
      */
-    public function blueprint()
+    public function blueprint($asset = null)
     {
-        if (Blink::has($blink = 'asset-container-blueprint-'.$this->handle())) {
-            return Blink::get($blink);
+        $blueprint = $this->getBaseBlueprint();
+
+        $blueprint->setParent($asset ?? $this);
+
+        // Only dispatch the event when there's no asset.
+        // When there is an asset, the event is dispatched from the asset.
+        if (! $asset) {
+            Blink::once(
+                'asset-container-assetcontainerblueprintfound-'.$this->handle(),
+                fn () => AssetContainerBlueprintFound::dispatch($blueprint, $this)
+            );
         }
 
-        $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
-            'alt' => [
-                'type' => 'text',
-                'display' => __('Alt Text'),
-                'instructions' => __('Description of the image'),
-            ],
-        ])->setHandle($this->handle())->setNamespace('assets');
-
-        Blink::put($blink, $blueprint);
-
-        AssetContainerBlueprintFound::dispatch($blueprint, $this);
-
         return $blueprint;
+    }
+
+    private function getBaseBlueprint()
+    {
+        $blink = 'asset-container-blueprint-'.$this->handle();
+
+        return Blink::once($blink, function () {
+            return Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
+                'alt' => [
+                    'type' => 'text',
+                    'display' => __('Alt Text'),
+                    'instructions' => __('Description of the image'),
+                ],
+            ])->setHandle($this->handle())->setNamespace('assets');
+        });
     }
 
     public function afterSave($callback)
@@ -222,6 +256,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && AssetContainerCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (AssetContainerSaving::dispatch($this) === false) {
                 return false;
             }
@@ -244,6 +282,13 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     /**
      * Delete the container.
      *
@@ -251,9 +296,18 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && AssetContainerDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\AssetContainer::delete($this);
 
-        AssetContainerDeleted::dispatch($this);
+        if ($withEvents) {
+            AssetContainerDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -281,7 +335,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     public function contents()
     {
         return Blink::once('asset-listing-cache-'.$this->handle(), function () {
-            return new AssetContainerContents($this);
+            return app(AssetContainerContents::class)->container($this);
         });
     }
 
@@ -357,7 +411,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
 
         if ($folder !== null) {
             if ($recursive) {
-                $query->where('path', 'like', "{$folder}/%");
+                $query->where('path', 'like', Pattern::sqlLikeQuote($folder).'/%');
             } else {
                 $query->where('folder', $folder);
             }
@@ -590,6 +644,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             'create_folders' => $this->createFolders,
             'source_preset' => $this->sourcePreset,
             'warm_presets' => $this->warmPresets,
+            'validate' => $this->validation,
         ];
 
         $array = Arr::removeNullValues(array_merge($array, [

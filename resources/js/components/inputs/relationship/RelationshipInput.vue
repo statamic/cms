@@ -19,8 +19,8 @@
 
         <loading-graphic v-if="initializing" :inline="true" />
 
-        <template v-if="!initializing && !usesSelectField">
-            <div ref="items" class="relationship-input-items space-y-1 outline-none">
+        <template v-if="shouldShowSelectedItems">
+            <div ref="items" class="relationship-input-items space-y-1 outline-none" :class="{ 'mt-4': usesSelectField && items.length }">
                 <component
                     :is="itemComponent"
                     v-for="(item, i) in items"
@@ -54,8 +54,8 @@
                             @created="itemCreated"
                         />
                     </div>
-                    <button ref="existing" class="text-blue hover:text-gray-800 flex items-center mb-2 outline-none" @click.prevent="isSelecting = true">
-                        <svg-icon name="light/hyperlink" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
+                    <button ref="existing" class="text-blue dark:text-dark-blue-100 hover:text-gray-800 dark:hover:text-dark-100 flex items-center mb-2 outline-none" @click.prevent="isSelecting = true">
+                        <svg-icon name="light/hyperlink" class="rtl:ml-1 ltr:mr-1 h-4 w-4 flex items-center"></svg-icon>
                         <span class="hidden @sm:block" v-text="__('Link Existing Item')" />
                         <span class="@sm:hidden" v-text="__('Link')" />
                     </button>
@@ -65,17 +65,19 @@
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
                     slot-scope="{ close }"
+                    :name="name"
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"
                     :site="site"
                     :initial-columns="columns"
-                    initial-sort-column="title"
-                    initial-sort-direction="asc"
+                    :initial-sort-column="initialSortColumn"
+                    :initial-sort-direction="initialSortDirection"
                     :initial-selections="value"
                     :max-selections="maxItems"
                     :search="search"
                     :exclusions="exclusions"
                     :type="config.type"
+                    :tree="tree"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
@@ -128,6 +130,15 @@ export default {
         columns: {
             type: Array,
             default: () => []
+        },
+        tree: Object,
+        initialSortColumn: {
+            type: String,
+            default: 'title'
+        },
+        initialSortDirection: {
+            type: String,
+            default: 'asc'
         }
     },
 
@@ -153,7 +164,9 @@ export default {
     computed: {
 
         items() {
-            return this.value.map(selection => {
+            if (this.value === null) return [];
+
+            return this.value?.map(selection => {
                 const data = _.find(this.data, (item) => item.id == selection);
 
                 if (! data) return { id: selection, title: selection };
@@ -163,15 +176,23 @@ export default {
         },
 
         maxItemsReached() {
-            return this.value.length >= this.maxItems;
+            return this.value?.length >= this.maxItems;
         },
 
         canSelectOrCreate() {
-            return !this.readOnly && !this.maxItemsReached;
+            return !this.usesSelectField && !this.readOnly && !this.maxItemsReached;
         },
 
         usesSelectField() {
             return ['select', 'typeahead'].includes(this.mode);
+        },
+
+        shouldShowSelectedItems() {
+            if (this.initializing) return false;
+
+            if (this.usesSelectField && this.maxItems === 1) return false;
+
+            return true;
         }
 
     },
@@ -277,7 +298,7 @@ export default {
         },
 
         selectFieldSelected(selectedItemData) {
-            this.$emit('item-data-updated', selectedItemData.map(item => ({ id: item.id, title: item.title })));
+            this.$emit('item-data-updated', selectedItemData);
             this.update(selectedItemData.map(item => item.id));
         },
 

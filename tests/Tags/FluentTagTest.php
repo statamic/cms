@@ -4,6 +4,8 @@ namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Tags\FluentTag;
@@ -32,11 +34,8 @@ class FluentTagTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider fluentTagProvider
-     **/
+    #[Test]
+    #[DataProvider('fluentTagProvider')]
     public function it_handles_params_fluently($usedTag, $expectedTagName, $expectedTag, $expectedTagMethod, $expectedClassMethod)
     {
         $tag = Mockery::mock(Tags::class);
@@ -52,6 +51,7 @@ class FluentTagTest extends TestCase
                         'params' => [
                             'sort' => 'slug:desc',
                             'limit' => 3,
+                            'alfa_bravo' => 'charlie',
                             'title:contains' => 'chewy',
                             'slug:contains' => 'han',
                             'description:contains' => 'luke',
@@ -68,6 +68,7 @@ class FluentTagTest extends TestCase
         $fluentTag = FluentTag::make($usedTag)
             ->sort('slug:desc')
             ->limit(3)
+            ->alfaBravo('charlie')
             ->param('title:contains', 'chewy')
             ->params([
                 'slug:contains' => 'han',
@@ -79,7 +80,7 @@ class FluentTagTest extends TestCase
         $this->assertEquals('tag return value', $fluentTag->fetch());
     }
 
-    public function fluentTagProvider()
+    public static function fluentTagProvider()
     {
         return [
             'foo' => ['foo', 'foo', 'foo:index', 'index', 'index'],
@@ -88,7 +89,7 @@ class FluentTagTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_can_iterate_over_tag_results()
     {
         $this->mockTagThatReturns(collect([
@@ -110,7 +111,7 @@ class FluentTagTest extends TestCase
         $this->assertEquals($expected, $slugs);
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_array_access()
     {
         $this->mockTagThatReturns([
@@ -124,7 +125,7 @@ class FluentTagTest extends TestCase
         $this->assertEquals('bar', $result->foo);
     }
 
-    /** @test */
+    #[Test]
     public function it_casts_string_results_to_string()
     {
         $this->mockTagThatReturns('/fanny-packs');

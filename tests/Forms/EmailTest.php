@@ -5,8 +5,11 @@ namespace Tests\Forms;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\GlobalFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Forms\Email;
 use Statamic\Forms\Submission;
@@ -17,11 +20,8 @@ class EmailTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_recipient_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['to' => $address]);
@@ -29,11 +29,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->to);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider singleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('singleAddressProvider')]
     public function it_adds_sender_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['from' => $address]);
@@ -41,11 +38,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->from);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_reply_to_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['reply_to' => $address]);
@@ -53,11 +47,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->replyTo);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_cc_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['cc' => $address]);
@@ -65,11 +56,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->cc);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_bcc_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['bcc' => $address]);
@@ -77,7 +65,7 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->bcc);
     }
 
-    public function singleAddressProvider()
+    public static function singleAddressProvider()
     {
         return [
             'single email' => ['foo@bar.com', [
@@ -92,12 +80,18 @@ class EmailTest extends TestCase
             'single email with name using antlers' => ['{{ name }} <{{ email }}>', [
                 ['address' => 'foo@bar.com', 'name' => 'Foo Bar'],
             ]],
+            'single email from global set using antlers' => ['{{ company_information:email }}', [
+                ['address' => 'info@example.com', 'name' => null],
+            ]],
+            'single email with name from global set using antlers' => ['{{ company_information:name }} <{{ company_information:email }}>', [
+                ['address' => 'info@example.com', 'name' => 'Example Company'],
+            ]],
         ];
     }
 
-    public function multipleAddressProvider()
+    public static function multipleAddressProvider()
     {
-        return array_merge($this->singleAddressProvider(), [
+        return array_merge(static::singleAddressProvider(), [
             'multiple emails' => ['foo@bar.com, baz@qux.com', [
                 ['address' => 'foo@bar.com', 'name' => null],
                 ['address' => 'baz@qux.com', 'name' => null],
@@ -117,7 +111,7 @@ class EmailTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_subject_from_the_config()
     {
         $email = $this->makeEmailWithConfig(['subject' => 'A nice form subject']);
@@ -125,7 +119,7 @@ class EmailTest extends TestCase
         $this->assertEquals('A nice form subject', $email->subject);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_data_to_the_view()
     {
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
@@ -171,13 +165,13 @@ class EmailTest extends TestCase
         $this->assertEquals('Statamic', (string) $email->viewData['company']['company_name']);
     }
 
-    /** @test */
+    #[Test]
     public function attachments_are_added()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_renderable_fields()
     {
         $this->markTestIncomplete();
@@ -190,12 +184,28 @@ class EmailTest extends TestCase
 
     private function makeEmailWithConfig(array $config)
     {
+        $globalSet = GlobalSet::make()->handle('company_information');
+        $globalSet->addLocalization($globalSet->makeLocalization('en')->data([
+            'name' => 'Example Company',
+            'email' => 'info@example.com',
+        ]));
+        $globalSet->save();
+
         $formBlueprint = Blueprint::makeFromFields([
             'name' => ['type' => 'text'],
             'email' => ['type' => 'text'],
         ]);
+
+        $companyInformationBlueprint = Blueprint::makeFromFields([
+            'name' => ['type' => 'text'],
+            'email' => ['type' => 'text'],
+        ]);
+
         BlueprintRepository::shouldReceive('find')->with('forms.test')->andReturn($formBlueprint);
+        BlueprintRepository::shouldReceive('find')->with('globals.company_information')->andReturn($companyInformationBlueprint);
+
         $form = tap(Form::make('test'))->save();
+
         $submission = $form->makeSubmission()->data([
             'name' => 'Foo Bar',
             'email' => 'foo@bar.com',
@@ -208,14 +218,14 @@ class EmailTest extends TestCase
         ))->build();
     }
 
-    /** @test */
+    #[Test]
     public function the_sites_locale_gets_used_on_the_mailable()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'one' => ['locale' => 'en_US', 'url' => '/one'],
             'two' => ['locale' => 'fr_Fr', 'url' => '/two'],
             'three' => ['locale' => 'de_CH', 'lang' => 'de_CH', 'url' => '/three'],
-        ]]);
+        ]);
 
         $makeEmail = function ($site) {
             $submission = Mockery::mock(Submission::class);

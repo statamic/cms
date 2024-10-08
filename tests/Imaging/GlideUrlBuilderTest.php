@@ -43,7 +43,7 @@ class GlideUrlBuilderTest extends TestCase
     public function testExternal()
     {
         $this->assertEquals(
-            '/img/http/'.base64_encode('http://example.com').'?w=100',
+            '/img/http/'.base64_encode('http://example.com').'/example.com?w=100',
             $this->builder->build('http://example.com', ['w' => '100'])
         );
     }
@@ -57,7 +57,7 @@ class GlideUrlBuilderTest extends TestCase
         $encoded = base64_encode('main/img/foo.jpg');
 
         $this->assertEquals(
-            "/img/asset/$encoded?w=100",
+            "/img/asset/$encoded/foo.jpg?w=100",
             $this->builder->build($asset, ['w' => '100'])
         );
     }
@@ -72,11 +72,17 @@ class GlideUrlBuilderTest extends TestCase
         );
     }
 
-    public function testFilename()
+    public function testConfigAddsFilename()
     {
+        $asset = new Asset;
+        $asset->container((new AssetContainer)->handle('main'));
+        $asset->path('img/foo.jpg');
+
+        $encoded = base64_encode('main/img/foo.jpg');
+
         $this->assertEquals(
-            '/img/foo.jpg/custom.png?w=100',
-            $this->builder->build('/foo.jpg', ['w' => '100'], 'custom.png')
+            "/img/asset/$encoded/foo.jpg?w=100",
+            $this->builder->build($asset, ['w' => '100'])
         );
     }
 

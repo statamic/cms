@@ -7,14 +7,14 @@
 }
 
 .assets-fieldtype .assets-fieldtype-picker {
-    @apply flex flex-col @sm:flex-row items-start @sm:items-center px-4 py-2 bg-gray-200 border rounded;
+    @apply flex items-center px-4 py-2 bg-gray-200 dark:bg-dark-650 border dark:border-dark-900 rounded;
 
     &.is-expanded {
         @apply border-b-0 rounded-b-none;
     }
 
     .asset-upload-control {
-      @apply mt-2 @sm:ml-4 @sm:mt-0 text-xs text-gray-600 leading-tight;
+      @apply mt-2 @sm:rtl:mr-4 @sm:ltr:ml-4 @sm:mt-0 text-xs text-gray-600 leading-tight;
     }
 
     .upload-text-button {
@@ -26,7 +26,7 @@
 }
 
 .assets-fieldtype .drag-drop-text {
-    @apply ml-1 text-gray-700;
+    @apply rtl:mr-1 ltr:ml-1 text-gray-700 dark:text-dark-175;
 }
 
 .assets-fieldtype .asset-upload-control {

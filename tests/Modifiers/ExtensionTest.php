@@ -2,12 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class ExtensionTest extends TestCase
 {
-    public function filenames(): array
+    public static function filenamesProvider(): array
     {
         return [
             ['pdf', 'example.pdf'],
@@ -17,11 +19,8 @@ class ExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider filenames
-     */
+    #[Test]
+    #[DataProvider('filenamesProvider')]
     public function it_returns_the_extension_of_filename($expected, $input): void
     {
         $modified = $this->modify($input);

@@ -192,6 +192,9 @@ class GlobalRuntimeState
     public static $prefixState = [];
 
     public static $containsLayout = false;
+    public static $renderingLayout = false;
+    public static $shareVariablesTemplateTrigger = '';
+    public static $layoutVariables = [];
 
     public static $requiresRuntimeIsolation = false;
 
@@ -209,8 +212,12 @@ class GlobalRuntimeState
      */
     public static $peekCallbacks = [];
 
+    public static $isCacheEnabled = false;
+
     public static function resetGlobalState()
     {
+        self::$shareVariablesTemplateTrigger = '';
+        self::$layoutVariables = [];
         self::$containsLayout = false;
         self::$tracedRuntimeAssignments = [];
         self::$traceTagAssignments = false;

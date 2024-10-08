@@ -5,6 +5,9 @@
         :from="source"
         :separator="separator"
         :language="language"
+        :async="config.async"
+        @slugifying="syncing = true"
+        @slugified="syncing = false"
         v-model="slug"
     >
         <div>
@@ -12,15 +15,17 @@
                 v-model="slug"
                 classes="font-mono text-xs"
                 :isReadOnly="isReadOnly"
-                :append="config.show_regenerate && value"
+                :append="config.show_regenerate"
                 :name="slug"
                 :id="fieldId"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
+                direction="ltr"
             >
                 <template v-slot:append v-if="config.show_regenerate">
-                    <button class="input-group-append items-center flex" @click="sync" v-tooltip="__('Regenerate from: ' + config.from)">
-                        <svg-icon name="light/synchronize" class="w-5 h-5" />
+                    <button class="input-group-append items-center flex" @click="sync" v-tooltip="__('Regenerate from: :field', { 'field': config.from })">
+                        <svg-icon name="light/synchronize" class="w-5 h-5" v-show="!syncing" />
+                        <div class="w-5 h-5" v-show="syncing"><loading-graphic inline text="" class="mt-0.5 ml-0.5" /></div>
                     </button>
                 </template>
             </text-input>
@@ -30,6 +35,7 @@
 </template>
 
 <script>
+import { data_get } from '../../bootstrap/globals';
 import Fieldtype from './Fieldtype.vue';
 
 export default {
@@ -39,7 +45,8 @@ export default {
     data() {
         return {
             slug: this.value,
-            generate: this.config.generate
+            generate: this.config.generate,
+            syncing: false,
         }
     },
 
@@ -66,8 +73,14 @@ export default {
             if (! this.generate) return;
 
             const field = this.config.from || 'title';
+            let key = field;
 
-            return this.$store.state.publish[this.store].values[field];
+            if (this.fieldPathPrefix) {
+                let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\.'+this.handle+'$'), '');
+                key = dottedPrefix + '.' + field;
+            }
+
+            return data_get(this.$store.state.publish[this.store].values, key);
         },
 
         language() {

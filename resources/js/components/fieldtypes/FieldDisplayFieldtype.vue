@@ -20,7 +20,8 @@
                 v-tooltip="hidden ? __('Hidden') : __('Visible')"
                 @click="toggleHidden"
             >
-                <svg-icon name="light/hidden" class="w-5 h-5" :class="{ 'text-gray-500': !hidden }" />
+                <svg-icon v-show="hidden" name="light/hidden" class="w-5 h-5 text-gray-600 dark:text-dark-200" />
+                <svg-icon v-show="!hidden" name="light/eye" class="w-5 h-5 " />
             </button>
         </div>
     </div>
@@ -47,8 +48,17 @@ export default {
             return parent;
         },
 
+        nearestFieldSettings() {
+            let parent = this;
+            while (parent.$options._componentTag !== 'field-settings') {
+                parent = parent.$parent;
+                if (parent === this.$root) return null;
+            }
+            return parent;
+        },
+
         hidden() {
-            return this.$store.state.publish[this.storeName].values.hide_display;
+            return this.nearestFieldSettings.values.hide_display;
         }
 
     },
@@ -60,7 +70,7 @@ export default {
     methods: {
 
         toggleHidden() {
-            this.nearestPublishContainer.setFieldValue('hide_display', ! this.hidden);
+            this.nearestFieldSettings.updateField('hide_display', ! this.hidden)
         }
 
     }

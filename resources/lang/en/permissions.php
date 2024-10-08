@@ -8,12 +8,17 @@ return [
     'group_cp' => 'Control Panel',
     'access_cp' => 'Access the Control Panel',
     'access_cp_desc' => 'Allows access into control panel, but doesn\'t guarantee anything can be done once inside.',
+    'configure_sites' => 'Configure Sites',
+    'configure_sites_desc' => 'Ability to configure sites when multi-site is enabled.',
     'configure_fields' => 'Configure Fields',
     'configure_fields_desc' => 'Ability to edit blueprints, fieldsets, and their fields.',
     'configure_addons' => 'Configure Addons',
     'configure_addons_desc' => 'Ability to access the addon area to install and uninstall addons.',
     'manage_preferences' => 'Manage Preferences',
     'manage_preferences_desc' => 'Ability to customize global and role-specific preferences.',
+
+    'group_sites' => 'Sites',
+    'access_{site}_site' => 'Access :site site',
 
     'group_collections' => 'Collections',
     'configure_collections' => 'Configure Collections',
@@ -64,6 +69,8 @@ return [
     'group_forms' => 'Forms',
     'configure_forms' => 'Configure forms',
     'configure_forms_desc' => 'Grants access to all form related permissions',
+    'configure_form_fields' => 'Configure Form Fields',
+    'configure_form_fields_desc' => 'Ability to edit form blueprints, fieldsets, and their fields.',
     'view_{form}_form_submissions' => 'View :form submissions',
     'delete_{form}_form_submissions' => 'Delete :form submissions',
 
@@ -77,6 +84,7 @@ return [
     'edit_roles' => 'Edit roles',
     'assign_user_groups' => 'Assign groups to users',
     'assign_roles' => 'Assign roles to users',
+    'impersonate_users' => 'Impersonate users',
 
     'group_updates' => 'Updates',
     'view_updates' => 'View updates',

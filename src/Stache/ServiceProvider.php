@@ -7,6 +7,7 @@ use Statamic\Assets\QueryBuilder as AssetQueryBuilder;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
+use Statamic\Stache\Query\SubmissionQueryBuilder;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 
@@ -31,6 +32,10 @@ class ServiceProvider extends LaravelServiceProvider
         $this->app->bind(AssetQueryBuilder::class, function () {
             return new AssetQueryBuilder($this->app->make(Stache::class)->store('assets'));
         });
+
+        $this->app->bind(SubmissionQueryBuilder::class, function () {
+            return new SubmissionQueryBuilder($this->app->make(Stache::class)->store('form-submissions'));
+        });
     }
 
     public function boot()
@@ -50,6 +55,7 @@ class ServiceProvider extends LaravelServiceProvider
         $published = config('statamic.stache.stores');
 
         $nativeStores = collect($config['stores'])
+            ->reject(fn ($config, $key) => $key === 'users' && config('statamic.users.repository') !== 'file')
             ->map(function ($config, $key) use ($published) {
                 return array_merge($config, $published[$key] ?? []);
             });

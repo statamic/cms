@@ -3,8 +3,8 @@
 namespace Tests\Feature\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -14,7 +14,7 @@ class TermEntriesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_term_across_collections()
     {
         Taxonomy::make('colors')->save();
@@ -49,7 +49,7 @@ class TermEntriesTest extends TestCase
         $this->assertEquals(['cheetah'], Term::find('colors::yellow')->term()->entries()->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_term_for_a_single_collection()
     {
         Taxonomy::make('colors')->save();
@@ -96,26 +96,26 @@ class TermEntriesTest extends TestCase
         $this->assertEquals([], Term::find('colors::yellow')->term()->collection($clothes)->entries()->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_localized_term_across_collections()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'name' => 'English', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'name' => 'French', 'url' => '/fr/'],
-        ]]);
+        ]);
 
         Taxonomy::make('colors')->save();
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('red')->data(['hex' => 'f00'])->save();
-            $term->in('fr')->slug('rouge')->data([])->save();
+            $term->in('fr')->slug('rouge')->save();
         });
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('black')->data(['hex' => '000'])->save();
-            $term->in('fr')->slug('noir')->data([])->save();
+            $term->in('fr')->slug('noir')->save();
         });
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('yellow')->data(['hex' => 'ff0'])->save();
-            $term->in('fr')->slug('jaune')->data([])->save();
+            $term->in('fr')->slug('jaune')->save();
         });
 
         Collection::make('animals')->taxonomies(['colors'])->save();
@@ -160,26 +160,26 @@ class TermEntriesTest extends TestCase
         $this->assertEquals(['cheetah', 'guepard'], Term::find('colors::yellow')->term()->entries()->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_localized_term_for_a_single_collection()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'name' => 'English', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'name' => 'French', 'url' => '/fr/'],
-        ]]);
+        ]);
 
         Taxonomy::make('colors')->save();
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('red')->data(['hex' => 'f00'])->save();
-            $term->in('fr')->slug('rouge')->data([])->save();
+            $term->in('fr')->slug('rouge')->save();
         });
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('black')->data(['hex' => '000'])->save();
-            $term->in('fr')->slug('noir')->data([])->save();
+            $term->in('fr')->slug('noir')->save();
         });
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('yellow')->data(['hex' => 'ff0'])->save();
-            $term->in('fr')->slug('jaune')->data([])->save();
+            $term->in('fr')->slug('jaune')->save();
         });
 
         $animals = tap(Collection::make('animals')->taxonomies(['colors']))->save();

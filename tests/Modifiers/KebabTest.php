@@ -2,12 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class KebabTest extends TestCase
 {
-    public function strings(): array
+    public static function stringsProvider(): array
     {
         return [
             'with_whitespaces' => ['just-because-i-can', 'Just Because I Can'],
@@ -17,11 +19,8 @@ class KebabTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider strings
-     */
+    #[Test]
+    #[DataProvider('stringsProvider')]
     public function it_converts_the_value_to_kebab_case($expected, $input): void
     {
         $modified = $this->modify($input);

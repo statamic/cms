@@ -9,6 +9,7 @@ use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -110,7 +111,7 @@ class GlobalsController extends CpController
             ->title($values['title'])
             ->blueprint($values['blueprint']);
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $sites = collect(Arr::get($values, 'sites'));
 
             foreach ($sites->filter->enabled as $site) {
@@ -144,10 +145,20 @@ class GlobalsController extends CpController
 
         $data = $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
+            'handle' => ['nullable', new Handle],
         ]);
 
         $handle = $data['handle'] ?? Str::snake($data['title']);
+
+        if (GlobalSet::find($handle)) {
+            $error = __('A Global Set with that handle already exists.');
+
+            if ($request->wantsJson()) {
+                throw new \Exception($error);
+            }
+
+            return back()->withInput()->with('error', $error);
+        }
 
         $global = GlobalSet::make($handle)->title($data['title']);
 
@@ -201,7 +212,7 @@ class GlobalsController extends CpController
             ],
         ];
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $fields['sites'] = [
                 'display' => __('Sites'),
                 'fields' => [

@@ -2,14 +2,15 @@
 
 namespace Statamic\Facades;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Actions\ActionRepository;
 
 /**
- * @method static mixed get($action)
- * @method static mixed all()
- * @method static mixed for($item, $context = [])
- * @method static mixed forBulk($items, $context = [])
+ * @method static \Statamic\Actions\Action get($action)
+ * @method static Collection all()
+ * @method static Collection for($item, $context = [])
+ * @method static Collection forBulk($items, $context = [])
  *
  * @see \Statamic\Actions\ActionRepository
  */

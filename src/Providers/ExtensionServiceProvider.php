@@ -6,6 +6,8 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
+use Statamic\Dictionaries;
+use Statamic\Dictionaries\Dictionary;
 use Statamic\Extend\Manifest;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
@@ -45,6 +47,14 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\ReuploadAsset::class,
         Actions\MoveAssetFolder::class,
         Actions\RenameAssetFolder::class,
+        Actions\Impersonate::class,
+    ];
+
+    protected $dictionaries = [
+        Dictionaries\Countries::class,
+        Dictionaries\Currencies::class,
+        Dictionaries\File::class,
+        Dictionaries\Timezones::class,
     ];
 
     protected $fieldtypes = [
@@ -62,12 +72,15 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
+        Fieldtypes\Dictionary::class,
+        Fieldtypes\DictionaryFields::class,
         Fieldtypes\Entries::class,
         Fieldtypes\FieldDisplay::class,
         Fieldtypes\Files::class,
         Fieldtypes\Floatval::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
+        Fieldtypes\Group::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Html::class,
         Fieldtypes\Icon::class,
@@ -149,14 +162,17 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Assets::class,
         Tags\Cache::class,
         Tags\Can::class,
+        Tags\Children::class,
         Tags\Collection\Collection::class,
         Tags\Cookie::class,
         Tags\Dd::class,
+        Tags\Dictionary\Dictionary::class,
         Tags\Dump::class,
         Tags\GetContent::class,
         Tags\GetError::class,
         Tags\GetErrors::class,
         Tags\GetFiles::class,
+        Tags\GetSite::class,
         Tags\Glide::class,
         Tags\In::class,
         Tags\Increment::class,
@@ -225,6 +241,10 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddGraphQLPermission::class,
         Updates\AddAssignRolesAndGroupsPermissions::class,
         Updates\AddDefaultPreferencesToGitConfig::class,
+        Updates\AddConfigureFormFieldsPermission::class,
+        Updates\AddSitePermissions::class,
+        Updates\UseClassBasedStatamicUniqueRules::class,
+        Updates\MigrateSitesConfigToYaml::class,
     ];
 
     public function register()
@@ -233,6 +253,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerAddonManifest();
         $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
+        $this->app->instance('statamic.hooks', collect());
     }
 
     protected function registerAddonManifest()
@@ -253,6 +274,11 @@ class ExtensionServiceProvider extends ServiceProvider
                 'class' => Action::class,
                 'directory' => 'Actions',
                 'extensions' => $this->actions,
+            ],
+            'dictionaries' => [
+                'class' => Dictionary::class,
+                'directory' => 'Dictionaries',
+                'extensions' => $this->dictionaries,
             ],
             'fieldtypes' => [
                 'class' => Fieldtype::class,

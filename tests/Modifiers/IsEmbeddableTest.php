@@ -2,12 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class IsEmbeddableTest extends TestCase
 {
-    public function embeddables(): array
+    public static function embeddablesProvider(): array
     {
         return [
             'youtube.com' => [true, 'https://www.youtube.com/watch?v=s9F5fhJQo34'],
@@ -17,11 +19,8 @@ class IsEmbeddableTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider embeddables
-     */
+    #[Test]
+    #[DataProvider('embeddablesProvider')]
     public function it_checks_if_an_url_is_embeddable($expected, $input): void
     {
         $modified = $this->modify($input);

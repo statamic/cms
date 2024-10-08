@@ -15,17 +15,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Submissions Path
-    |--------------------------------------------------------------------------
-    |
-    | Where your form submissions are stored.
-    |
-    */
-
-    'submissions' => storage_path('forms'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Email View Folder
     |--------------------------------------------------------------------------
     |
@@ -48,13 +37,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | CSV Export Delimiter
+    | Exporters
     |--------------------------------------------------------------------------
     |
-    | Statamic will use this character as delimiter for csv exports.
+    | Here you may define all the available form submission exporters.
+    | You may customize the options within each exporter's array.
     |
     */
 
-    'csv_delimiter' => ',',
+    'exporters' => [
+        'csv' => [
+            'class' => Statamic\Forms\Exporters\CsvExporter::class,
+        ],
+        'json' => [
+            'class' => Statamic\Forms\Exporters\JsonExporter::class,
+        ],
+    ],
 
 ];

@@ -14,7 +14,7 @@ use Statamic\Events\UserGroupSaved;
 use Statamic\Facades;
 use Statamic\Facades\Role as RoleAPI;
 
-abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess, Arrayable
+abstract class UserGroup implements Arrayable, ArrayAccess, Augmentable, UserGroupContract
 {
     protected $title;
     protected $handle;
@@ -29,10 +29,10 @@ abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess,
         $this->data = collect();
     }
 
-    public function title(string $title = null)
+    public function title(?string $title = null)
     {
         if (func_num_args() === 0) {
-            return $this->title;
+            return $this->title ?? ucfirst($this->handle);
         }
 
         $this->title = $title;
@@ -45,7 +45,7 @@ abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess,
         return $this->handle();
     }
 
-    public function handle(string $handle = null)
+    public function handle(?string $handle = null)
     {
         if (is_null($handle)) {
             return $this->handle;

@@ -14,6 +14,8 @@ use Statamic\Support\Str;
  */
 class URL
 {
+    private static $externalUriCache = [];
+
     /**
      * Removes occurrences of "//" in a $path (except when part of a protocol)
      * Alias of Path::tidy().
@@ -221,14 +223,31 @@ class URL
      */
     public function isExternal($url)
     {
-        if (! $url || Str::startsWith($url, ['/', '#'])) {
+        if (isset(self::$externalUriCache[$url])) {
+            return self::$externalUriCache[$url];
+        }
+
+        if (! $url) {
             return false;
         }
 
-        return ! Pattern::startsWith(
+        if (Str::startsWith($url, ['/', '#'])) {
+            return self::$externalUriCache[$url] = false;
+        }
+
+        $isExternal = ! Pattern::startsWith(
             Str::ensureRight($url, '/'),
             Site::current()->absoluteUrl()
         );
+
+        self::$externalUriCache[$url] = $isExternal;
+
+        return $isExternal;
+    }
+
+    public function clearExternalUrlCache()
+    {
+        self::$externalUriCache = [];
     }
 
     /**
@@ -238,11 +257,7 @@ class URL
      */
     public function getSiteUrl()
     {
-        if (app()->runningInConsole()) {
-            return config('app.url');
-        }
-
-        $rootUrl = app('request')->root();
+        $rootUrl = url()->to('/');
 
         return Str::ensureRight($rootUrl, '/');
     }
@@ -302,6 +317,20 @@ class URL
         if ($size) {
             $url .= '?s='.$size;
         }
+
+        return $url;
+    }
+
+    /**
+     * Remove query and fragment from end of URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function removeQueryAndFragment($url)
+    {
+        $url = Str::before($url, '?'); // Remove query params
+        $url = Str::before($url, '#'); // Remove anchor fragment
 
         return $url;
     }

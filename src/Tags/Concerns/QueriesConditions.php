@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 trait QueriesConditions
@@ -27,9 +28,9 @@ trait QueriesConditions
 
     protected function queryableConditionParams()
     {
-        return $this->params->filter(function ($value, $param) {
-            return Str::contains($param, ':');
-        });
+        return $this->params
+            ->filter(fn ($value, $param) => Str::contains($param, ':'))
+            ->reject(fn ($value, $param) => $value === '');
     }
 
     protected function isQueryingCondition($field)
@@ -44,6 +45,8 @@ trait QueriesConditions
     protected function queryCondition($query, $field, $condition, $value)
     {
         $regexOperator = $value ? 'regexp' : 'not regexp';
+
+        $field = str_replace('.', '->', $field);
 
         switch ($condition) {
             case 'is':
@@ -125,6 +128,10 @@ trait QueriesConditions
 
     protected function queryIsCondition($query, $field, $value)
     {
+        if ($field === 'status') {
+            return $query->whereStatus($value);
+        }
+
         return $query->where($field, $value);
     }
 
@@ -149,7 +156,7 @@ trait QueriesConditions
             $value = $this->getPipedValues($value);
         }
 
-        return $query->whereIn($field, $value);
+        return $query->whereIn($field, Arr::wrap($value));
     }
 
     protected function queryNotInCondition($query, $field, $value)
@@ -158,7 +165,7 @@ trait QueriesConditions
             $value = $this->getPipedValues($value);
         }
 
-        return $query->whereNotIn($field, $value);
+        return $query->whereNotIn($field, Arr::wrap($value));
     }
 
     protected function queryStartsWithCondition($query, $field, $value)

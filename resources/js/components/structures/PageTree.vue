@@ -3,12 +3,12 @@
 
         <div class="mb-2 flex justify-end">
             <a
-                class="text-2xs text-blue mr-4 underline"
+                class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
                 v-text="__('Expand All')"
                 @click="expandAll"
             />
             <a
-                class="text-2xs text-blue mr-2 underline"
+                class="text-2xs text-blue rtl:ml-2 ltr:mr-2 underline"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
@@ -24,30 +24,38 @@
 
         <div v-if="!loading" class="page-tree w-full">
             <draggable-tree
-                draggable
+                :draggable="editable"
                 ref="tree"
                 :data="treeData"
                 :space="1"
                 :indent="24"
+                :dir="direction"
                 @change="treeChanged"
                 @drag="treeDragstart"
                 @nodeOpenChanged="saveTreeState"
             >
                 <tree-branch
+                    :ref="`branch-${page.id}`"
                     slot-scope="{ data: page, store, vm }"
                     :page="page"
                     :depth="vm.level"
                     :vm="vm"
                     :first-page-is-root="expectsRoot"
-                    :has-collection="hasCollection"
                     :is-open="page.open"
                     :has-children="page.children.length > 0"
                     :show-slugs="showSlugs"
+                    :show-blueprint="blueprints?.length > 1"
+                    :editable="editable"
                     @edit="$emit('edit-page', page, vm, store, $event)"
                     @toggle-open="store.toggleOpen(page)"
                     @removed="pageRemoved"
                     @children-orphaned="childrenOrphaned"
+                    @branch-clicked="$emit('branch-clicked', page)"
                 >
+                    <template #branch-action="props">
+                        <slot name="branch-action" v-bind="{ ...props, vm }" />
+                    </template>
+
                     <template #branch-icon="props">
                         <slot name="branch-icon" v-bind="{ ...props, vm }" />
                     </template>
@@ -78,7 +86,7 @@ export default {
 
     props: {
         pagesUrl: { type: String, required: true },
-        submitUrl: { type: String, required: true },
+        submitUrl: { type: String },
         submitParameters: { type: Object, default: () => ({}) },
         createUrl: { type: String },
         site: { type: String, required: true },
@@ -86,8 +94,9 @@ export default {
         maxDepth: { type: Number, default: Infinity, },
         expectsRoot: { type: Boolean, required: true },
         showSlugs: { type: Boolean, default: false },
-        hasCollection: { type: Boolean, required: true },
         preferencesPrefix: { type: String },
+        editable: { type: Boolean, default: true },
+        blueprints: { type: Array },
     },
 
     data() {
@@ -107,6 +116,10 @@ export default {
 
         preferencesKey() {
             return this.preferencesPrefix ? `${this.preferencesPrefix}.${this.site}.pagetree` : null;
+        },
+
+        direction() {
+            return this.$config.get('direction', 'ltr');
         },
 
     },
@@ -180,6 +193,10 @@ export default {
         },
 
         save() {
+            if (! this.editable) {
+                return;
+            }
+
             this.saving = true;
 
             const payload = {
@@ -190,6 +207,10 @@ export default {
             };
 
             return this.$axios.patch(this.submitUrl, payload).then(response => {
+                if (! response.data.saved) {
+                    return this.$toast.error(`Couldn't save tree`)
+                }
+
                 this.$emit('saved', response);
                 this.$toast.success(__('Saved'));
                 this.initialPages = this.pages;

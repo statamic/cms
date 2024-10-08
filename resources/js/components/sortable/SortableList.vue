@@ -60,6 +60,12 @@ export default {
         }
     },
 
+    data() {
+        return {
+            sortable: null,
+        }
+    },
+
     computed: {
 
         computedOptions() {
@@ -109,23 +115,39 @@ export default {
             return;
         }
 
-        const sortable = new Sortable(this.$el, this.computedOptions);
+        this.setupSortableList();
+    },
 
-        sortable.on('drag:start', () => this.$emit('dragstart'));
-        sortable.on('drag:stop', () => this.$emit('dragend'));
+    methods: {
+        setupSortableList() {
+            this.sortable = new Sortable(this.$el, this.computedOptions);
 
-        sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-            this.$emit('input', move(this.value, oldIndex, newIndex))
-        })
+            this.sortable.on('drag:start', () => this.$emit('dragstart'));
+            this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
-        this.$on('hook:destroyed', () => {
-            sortable.destroy()
-        })
+            this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
+                this.$emit('input', move(this.value, oldIndex, newIndex))
+            })
 
-        if (this.mirror === false) {
-            sortable.on('mirror:create', (e) => e.cancel());
-        }
-    }
+            this.$on('hook:destroyed', () => {
+                this.sortable.destroy()
+            })
+
+            if (this.mirror === false) {
+                this.sortable.on('mirror:create', (e) => e.cancel());
+            }
+        },
+
+        destroySortableList() {
+            this.sortable.destroy()
+        },
+    },
+
+    watch: {
+        disabled(disabled) {
+            disabled ? this.destroySortableList() : this.setupSortableList();
+        },
+    },
 
 }
 </script>

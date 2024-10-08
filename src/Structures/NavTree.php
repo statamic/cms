@@ -3,19 +3,27 @@
 namespace Statamic\Structures;
 
 use Facades\Statamic\Structures\BranchIds;
+use Statamic\Contracts\Structures\NavTree as TreeContract;
 use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
+use Statamic\Events\NavTreeSaving;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 
-class NavTree extends Tree
+class NavTree extends Tree implements TreeContract
 {
+    private $structureCache;
+
     public function structure()
     {
-        return Blink::once('nav-tree-structure-'.$this->handle(), function () {
+        if ($this->structureCache) {
+            return $this->structureCache;
+        }
+
+        return $this->structureCache = Blink::once('nav-tree-structure-'.$this->handle(), function () {
             return Nav::findByHandle($this->handle());
         });
     }
@@ -24,7 +32,7 @@ class NavTree extends Tree
     {
         $path = Stache::store('nav-trees')->directory();
 
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $path .= $this->locale().'/';
         }
 
@@ -34,6 +42,11 @@ class NavTree extends Tree
     protected function dispatchSavedEvent()
     {
         NavTreeSaved::dispatch($this);
+    }
+
+    protected function dispatchSavingEvent()
+    {
+        return NavTreeSaving::dispatch($this);
     }
 
     protected function dispatchDeletedEvent()

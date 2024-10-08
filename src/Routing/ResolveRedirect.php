@@ -6,6 +6,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\Site;
+use Statamic\Fields\Values;
 use Statamic\Structures\Page;
 use Statamic\Support\Str;
 
@@ -22,18 +23,42 @@ class ResolveRedirect
             return null;
         }
 
+        if (! $item = $this->item($redirect, $parent, $localize)) {
+            return 404;
+        }
+
+        return is_object($item) ? $item->url() : $item;
+    }
+
+    public function item($redirect, $parent = null, $localize = false)
+    {
+        if (is_null($redirect)) {
+            return null;
+        }
+
+        if (is_array($redirect)) {
+            $redirect = $redirect['url'];
+        }
+
         if ($redirect === '@child') {
-            $redirect = $this->firstChildUrl($parent);
+            return $this->firstChild($parent);
+        }
+
+        if ($redirect instanceof Values) {
+            // Assume it's a `group` fieldtype with a `url` subfield.
+            return $redirect->url->value();
         }
 
         if (Str::startsWith($redirect, 'entry::')) {
             $id = Str::after($redirect, 'entry::');
-            $redirect = optional($this->findEntry($id, $parent, $localize))->url() ?? 404;
+
+            return $this->findEntry($id, $parent, $localize);
         }
 
         if (Str::startsWith($redirect, 'asset::')) {
             $id = Str::after($redirect, 'asset::');
-            $redirect = optional(Facades\Asset::find($id))->url() ?? 404;
+
+            return Facades\Asset::find($id);
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;
@@ -56,7 +81,7 @@ class ResolveRedirect
         return $entry->in($site) ?? $entry;
     }
 
-    private function firstChildUrl($parent)
+    private function firstChild($parent)
     {
         if (! $parent || ! $parent instanceof Entry) {
             throw new \Exception("Cannot resolve a page's child redirect without providing a page.");
@@ -71,9 +96,9 @@ class ResolveRedirect
             : $parent->pages()->all();
 
         if ($children->isEmpty()) {
-            return 404;
+            return null;
         }
 
-        return $children->first()->url();
+        return $children->first();
     }
 }

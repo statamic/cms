@@ -4,6 +4,7 @@ namespace Tests\Feature\Globals;
 
 use Facades\Tests\Factories\GlobalFactory;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Facades\Blueprint;
@@ -18,22 +19,42 @@ class UpdateGlobalVariablesTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
-    public function it_denies_access_if_you_dont_have_permission()
+    #[Test]
+    public function it_denies_access_if_you_dont_have_edit_permission()
     {
-        $this->setTestRoles(['test' => ['access cp']]);
+        $this->setTestRoles(['test' => ['access cp', 'access en site']]);
         $user = User::make()->assignRole('test')->save();
         $global = GlobalFactory::handle('test')->create();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->patch($global->in('en')->editUrl())
+            ->patch($global->in('en')->updateUrl())
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
+    public function it_denies_access_if_you_dont_have_site_permission()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->make();
+        $global->addLocalization($global->makeLocalization('fr'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->patch($global->in('fr')->updateUrl(), ['foo' => 'baz'])
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+    }
+
+    #[Test]
     public function global_variables_get_updated()
     {
         $blueprint = Blueprint::make()->setContents(['fields' => [

@@ -1,9 +1,9 @@
 <template>
 
     <stack narrow name="publish-options" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
+        <div slot-scope="{ close }" class="bg-white dark:bg-dark-800 h-full flex flex-col">
 
-            <div class="bg-gray-200 px-6 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
+            <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
                 {{ __('Publish') }}
                 <button
                     type="button"
@@ -18,48 +18,52 @@
                     <loading-graphic text="" />
                 </div>
 
-                <select-input
-                    class="mb-6"
-                    v-model="action"
-                    :options="options"
-                />
+                <template v-else>
 
-                <div v-if="action">
-
-                    <date-fieldtype
-                        v-if="action == 'schedule'"
+                    <select-input
                         class="mb-6"
-                        name="publishTime"
-                        :value="publishTime" />
-
-                    <textarea-input
-                        class="mb-6 text-sm"
-                        v-model="revisionMessage"
-                        :placeholder="__('Notes about this revision')"
-                        @keydown.enter="submit"
-                        :focus="true" />
-
-                    <button
-                        class="btn-primary w-full mb-6"
-                        v-text="submitButtonText"
-                        @click="submit"
+                        v-model="action"
+                        :options="options"
                     />
 
-                    <div class="text-gray text-xs flex mb-6">
-                        <div class="pt-px w-4 mr-2">
-                            <svg-icon name="info-circle" class="pt-px" />
+                    <div v-if="action">
+
+                        <date-fieldtype
+                            v-if="action == 'schedule'"
+                            class="mb-6"
+                            name="publishTime"
+                            :value="publishTime" />
+
+                        <textarea-input
+                            class="mb-6 text-sm"
+                            v-model="revisionMessage"
+                            :placeholder="__('Notes about this revision')"
+                            @keydown.enter="submit"
+                            :focus="true" />
+
+                        <button
+                            class="btn-primary w-full mb-6"
+                            v-text="submitButtonText"
+                            @click="submit"
+                        />
+
+                        <div class="text-gray text-xs flex mb-6">
+                            <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
+                                <svg-icon name="info-circle" class="pt-px" />
+                            </div>
+                            <div class="flex-1" v-text="actionInfoText" />
                         </div>
-                        <div class="flex-1" v-text="actionInfoText" />
+
+                        <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
+                            <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
+                                <svg-icon name="info-circle" class="pt-px" />
+                            </div>
+                            <div class="flex-1" v-text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
+                        </div>
+
                     </div>
 
-                    <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
-                        <div class="pt-px w-4 mr-2">
-                            <svg-icon name="info-circle" class="pt-px" />
-                        </div>
-                        <div class="flex-1" v-text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
-                    </div>
-
-                </div>
+                </template>
 
             </div>
         </div>
@@ -152,6 +156,11 @@ export default {
             this.$axios.post(this.actions.publish, payload)
                 .then(response => {
                     this.saving = false;
+
+                    if (! response.data.saved) {
+                        this.$emit('failed');
+                        return this.$toast.error(__(`Couldn't publish entry`));
+                    }
                     this.$toast.success(__('Published'));
                     this.runAfterPublishHook(response);
                 }).catch(error => this.handleAxiosError(error));
@@ -183,6 +192,13 @@ export default {
             const payload = { message: this.revisionMessage };
 
             this.$axios.post(this.actions.unpublish, { data: payload }).then(response => {
+                this.saving = false;
+
+                if (! response.data.saved) {
+                    this.$emit('failed');
+                    return this.$toast.error(__(`Couldn't unpublish entry`));
+                }
+
                 this.$toast.success(__('Unpublished'));
                 this.revisionMessage = null;
                 this.$emit('saved', { published: false, isWorkingCopy: false, response });
