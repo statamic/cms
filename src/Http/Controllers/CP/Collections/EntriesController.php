@@ -19,10 +19,13 @@ use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 
 class EntriesController extends CpController
 {
-    use QueriesFilters;
+    use ExtractsFromEntryFields,
+        Hookable,
+        QueriesFilters;
 
     public function index(FilteredRequest $request, $collection)
     {
@@ -274,14 +277,11 @@ class EntriesController extends CpController
             $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
-        $entry = Entry::make()
-            ->collection($collection);
+        $entry = Entry::make()->collection($collection);
 
-        EntryBlueprintFound::dispatch($blueprint, $entry);
+        $this->runHooks('creating-entry', $entry);
 
-        $values = $entry
-            ->values()
-            ->all();
+        $values = $entry->values()->all();
 
         if ($collection->hasStructure() && $request->parent) {
             $values['parent'] = $request->parent;
