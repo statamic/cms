@@ -30,7 +30,8 @@ class InstallEloquentDriver extends Command
      */
     protected $signature = 'statamic:install:eloquent-driver
         { --all : Configures all repositories to use the database }
-        { --import : Whether existing data should be imported }';
+        { --import : Whether existing data should be imported }
+        { --without-messages : Disables output messages }';
 
     /**
      * The console command description.
@@ -52,12 +53,12 @@ class InstallEloquentDriver extends Command
                 message: 'Installing the statamic/eloquent-driver package...'
             );
 
-            $this->components->info('Installed statamic/eloquent-driver package');
+            $this->infoMessage('Installed statamic/eloquent-driver package');
         }
 
         if (! File::exists(config_path('statamic/eloquent-driver.php'))) {
             $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-config');
-            $this->components->info('Config file [config/statamic/eloquent-driver.php] published successfully.');
+            $this->infoMessage('Config file [config/statamic/eloquent-driver.php] published successfully.');
         }
 
         try {
@@ -188,7 +189,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating asset containers...'
         );
 
-        $this->components->info('Configured asset containers');
+        $this->infoMessage('Configured asset containers');
 
         if ($this->shouldImport('asset containers')) {
             spin(
@@ -196,7 +197,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing asset containers...'
             );
 
-            $this->components->info('Imported existing asset containers');
+            $this->infoMessage('Imported existing asset containers');
         }
     }
 
@@ -212,7 +213,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating assets...'
         );
 
-        $this->components->info('Configured assets');
+        $this->infoMessage('Configured assets');
 
         if ($this->shouldImport('assets')) {
             spin(
@@ -220,7 +221,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing assets...'
             );
 
-            $this->components->info('Imported existing assets');
+            $this->infoMessage('Imported existing assets');
         }
     }
 
@@ -236,7 +237,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating blueprints...'
         );
 
-        $this->components->info('Configured blueprints');
+        $this->infoMessage('Configured blueprints');
 
         if ($this->shouldImport('blueprints')) {
             spin(
@@ -244,7 +245,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing blueprints...'
             );
 
-            $this->components->info('Imported existing blueprints');
+            $this->infoMessage('Imported existing blueprints');
         }
     }
 
@@ -260,7 +261,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating collections...'
         );
 
-        $this->components->info('Configured collections');
+        $this->infoMessage('Configured collections');
 
         if ($this->shouldImport('collections')) {
             spin(
@@ -268,7 +269,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing collections...'
             );
 
-            $this->components->info('Imported existing collections');
+            $this->infoMessage('Imported existing collections');
         }
     }
 
@@ -284,7 +285,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating collection trees...'
         );
 
-        $this->components->info('Configured collection trees');
+        $this->infoMessage('Configured collection trees');
 
         if ($this->shouldImport('collection trees')) {
             spin(
@@ -292,7 +293,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing collections...'
             );
 
-            $this->components->info('Imported existing collection trees');
+            $this->infoMessage('Imported existing collection trees');
         }
     }
 
@@ -336,7 +337,7 @@ class InstallEloquentDriver extends Command
                 : 'Migrating and importing entries...'
         );
 
-        $this->components->info(
+        $this->infoMessage(
             $shouldImportEntries
                 ? 'Configured & imported existing entries'
                 : 'Configured entries'
@@ -355,7 +356,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating fieldsets...'
         );
 
-        $this->components->info('Configured fieldsets');
+        $this->infoMessage('Configured fieldsets');
 
         if ($this->shouldImport('fieldsets')) {
             spin(
@@ -363,7 +364,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing fieldsets...'
             );
 
-            $this->components->info('Imported existing fieldsets');
+            $this->infoMessage('Imported existing fieldsets');
         }
     }
 
@@ -379,7 +380,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating forms...'
         );
 
-        $this->components->info('Configured forms');
+        $this->infoMessage('Configured forms');
 
         if ($this->shouldImport('forms')) {
             spin(
@@ -387,7 +388,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing forms...'
             );
 
-            $this->components->info('Imported existing forms');
+            $this->infoMessage('Imported existing forms');
         }
     }
 
@@ -403,7 +404,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating form submissions...'
         );
 
-        $this->components->info('Configured form submissions');
+        $this->infoMessage('Configured form submissions');
 
         if ($this->shouldImport('form submissions')) {
             spin(
@@ -411,7 +412,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing form submissions...'
             );
 
-            $this->components->info('Imported existing form submissions');
+            $this->infoMessage('Imported existing form submissions');
         }
     }
 
@@ -427,7 +428,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating globals...'
         );
 
-        $this->components->info('Configured globals');
+        $this->infoMessage('Configured globals');
 
         if ($this->shouldImport('globals')) {
             spin(
@@ -435,7 +436,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing globals...'
             );
 
-            $this->components->info('Imported existing globals');
+            $this->infoMessage('Imported existing globals');
         }
     }
 
@@ -451,7 +452,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating global variables...'
         );
 
-        $this->components->info('Configured global variables');
+        $this->infoMessage('Configured global variables');
 
         if ($this->shouldImport('global variables')) {
             spin(
@@ -459,7 +460,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing global variables...'
             );
 
-            $this->components->info('Imported existing global variables');
+            $this->infoMessage('Imported existing global variables');
         }
     }
 
@@ -475,7 +476,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating navs...'
         );
 
-        $this->components->info('Configured navs');
+        $this->infoMessage('Configured navs');
 
         if ($this->shouldImport('navs')) {
             spin(
@@ -483,7 +484,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing navs...'
             );
 
-            $this->components->info('Imported existing navs');
+            $this->infoMessage('Imported existing navs');
         }
     }
 
@@ -499,7 +500,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating nav trees...'
         );
 
-        $this->components->info('Configured nav trees');
+        $this->infoMessage('Configured nav trees');
 
         if ($this->shouldImport('nav trees')) {
             spin(
@@ -507,7 +508,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing nav trees...'
             );
 
-            $this->components->info('Imported existing navs trees');
+            $this->infoMessage('Imported existing navs trees');
         }
     }
 
@@ -522,7 +523,7 @@ class InstallEloquentDriver extends Command
             },
         );
 
-        $this->components->info('Configured revisions');
+        $this->infoMessage('Configured revisions');
 
         if ($this->shouldImport('revisions')) {
             spin(
@@ -530,7 +531,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing revisions...'
             );
 
-            $this->components->info('Imported existing revisions');
+            $this->infoMessage('Imported existing revisions');
         }
     }
 
@@ -548,7 +549,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating sites...'
         );
 
-        $this->components->info('Configured & imported sites');
+        $this->infoMessage('Configured & imported sites');
     }
 
     protected function migrateTaxonomies(): void
@@ -563,7 +564,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating taxonomies...'
         );
 
-        $this->components->info('Configured taxonomies');
+        $this->infoMessage('Configured taxonomies');
 
         if ($this->shouldImport('taxonomies')) {
             spin(
@@ -571,7 +572,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing taxonomies...'
             );
 
-            $this->components->info('Imported existing taxonomies');
+            $this->infoMessage('Imported existing taxonomies');
         }
     }
 
@@ -587,7 +588,7 @@ class InstallEloquentDriver extends Command
             message: 'Migrating terms...'
         );
 
-        $this->components->info('Configured terms');
+        $this->infoMessage('Configured terms');
 
         if ($this->shouldImport('terms')) {
             spin(
@@ -595,7 +596,7 @@ class InstallEloquentDriver extends Command
                 message: 'Importing existing terms...'
             );
 
-            $this->components->info('Imported existing terms');
+            $this->infoMessage('Imported existing terms');
         }
     }
 
@@ -611,12 +612,21 @@ class InstallEloquentDriver extends Command
             message: 'Migrating tokens...'
         );
 
-        $this->components->info('Configured tokens');
+        $this->infoMessage('Configured tokens');
     }
 
     private function shouldImport(string $repository): bool
     {
         return $this->option('import') || confirm("Would you like to import existing {$repository}?");
+    }
+
+    private function infoMessage(string $message): void
+    {
+        if ($this->option('without-messages')) {
+            return;
+        }
+
+        $this->components->info('Configured asset containers');
     }
 
     private function switchToEloquentDriver(string $repository): void
