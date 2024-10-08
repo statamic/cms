@@ -4,7 +4,6 @@ namespace Tests\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Facades\Antlers;
 
 trait HasSelectOptionsTests
 {
@@ -26,7 +25,7 @@ trait HasSelectOptionsTests
     {
         $fieldType = $this->field(['options' => $options]);
 
-        if ( ! in_array(MultipleLabeledValueTests::class, class_uses_recursive(self::class))) {
+        if (! in_array(MultipleLabeledValueTests::class, class_uses_recursive(self::class))) {
             $this->assertSame($fieldType->augment(50)?->value(), 50);
             $this->assertSame($fieldType->augment('50')?->value(), 50);
             $this->assertSame($fieldType->augment(100)?->value(), 100);
