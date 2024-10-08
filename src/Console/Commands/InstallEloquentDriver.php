@@ -30,7 +30,7 @@ class InstallEloquentDriver extends Command
      */
     protected $signature = 'statamic:install:eloquent-driver
         { --all : Configures all repositories to use the database }
-        { --import : Whether existing data should be imported. }';
+        { --import : Whether existing data should be imported }';
 
     /**
      * The console command description.
