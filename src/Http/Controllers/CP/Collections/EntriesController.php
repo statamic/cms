@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
-use Statamic\Events\EntryBlueprintFound;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
