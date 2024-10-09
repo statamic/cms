@@ -99,7 +99,7 @@ class BardTextTest extends TestCase
     }
 
     #[Test]
-    public function it_skips_nodes_with_no_typevend()
+    public function it_skips_nodes_with_no_type()
     {
         $data = [
             [
