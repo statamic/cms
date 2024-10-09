@@ -96,4 +96,15 @@ class AssetUploader extends Uploader
             ->when(config('statamic.assets.lowercase'), fn ($stringable) => $stringable->lower())
             ->ascii();
     }
+
+    public static function getSafeFoldername($string)
+    {
+        // Apply the same replacements as with filenames above, but
+        // for each folder in the path instead of the whole string
+        $str = Stringy::create(urldecode($string))->toAscii();
+        $folders = array_filter(preg_split('/[\/\\\\]+/', $str));
+        $safe_folders = array_map(fn ($folder) => self::getSafeFilename($folder), $folders);
+
+        return implode('/', $safe_folders);
+    }
 }
