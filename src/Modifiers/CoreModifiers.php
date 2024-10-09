@@ -2362,9 +2362,7 @@ class CoreModifiers extends Modifier
         $desc = $order == 'desc';
 
         if (Compare::isQueryBuilder($value)) {
-            return ($key === 'random')
-                ? $value->inRandomOrder()
-                : $value->orderBy($key, $order);
+            return $key === 'random' ? $value->inRandomOrder() : $value->orderBy($key, $order);
         }
 
         $value = $value instanceof Collection ? $value : collect($value);
