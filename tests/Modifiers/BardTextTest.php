@@ -113,6 +113,7 @@ class BardTextTest extends TestCase
                 ],
             ],
             [
+                // no type
             ],
             [
                 'type' => 'paragraph',
