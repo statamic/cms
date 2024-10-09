@@ -2360,6 +2360,12 @@ class CoreModifiers extends Modifier
         $key = Arr::get($params, 0, 'true');
         $desc = strtolower(Arr::get($params, 1, 'asc')) == 'desc';
 
+        if (Compare::isQueryBuilder($value)) {
+            return ($key === 'random')
+                ? $value->inRandomOrder()
+                : $value->orderBy($key, Arr::get($params, 1, 'asc'));
+        }
+
         $value = $value instanceof Collection ? $value : collect($value);
 
         // Working with a DataCollection
