@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
@@ -91,6 +92,16 @@ class BrowserController extends CpController
             $query = $folder->queryAssets();
 
             if ($request->sort) {
+                $sortByMethod = $request->order === 'desc' ? 'sortByDesc' : 'sortBy';
+
+                $folders = $folders->$sortByMethod(function (AssetFolder $folder) use ($request) {
+                    return match ($request->sort) {
+                        'basename' => $folder->basename(),
+                        'last_modified' => $folder->lastModified(),
+                        default => $folder->basename(),
+                    };
+                });
+
                 $query->orderBy($request->sort, $request->order ?? 'asc');
             } else {
                 $query->orderBy($container->sortField(), $container->sortDirection());
