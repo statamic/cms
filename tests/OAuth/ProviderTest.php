@@ -122,7 +122,39 @@ class ProviderTest extends TestCase
     }
 
     #[Test]
-    public function it_finds_an_existing_user_by_email()
+    public function it_finds_an_existing_user_via_find_user_method()
+    {
+        $provider = $this->provider();
+
+        $savedUser = $this->user()->save();
+
+        $this->assertCount(1, UserFacade::all());
+        $this->assertEquals([$savedUser], UserFacade::all()->all());
+
+        $foundUser = $provider->findUser($this->socialite());
+
+        $this->assertCount(1, UserFacade::all());
+        $this->assertEquals([$savedUser], UserFacade::all()->all());
+        $this->assertEquals($savedUser, $foundUser);
+    }
+
+    #[Test]
+    public function it_does_not_find_or_create_a_user_via_find_user_method()
+    {
+        $this->assertCount(0, UserFacade::all());
+
+        $provider = $this->provider();
+        $foundUser = $provider->findUser($this->socialite());
+
+        $this->assertNull($foundUser);
+
+        $this->assertCount(0, UserFacade::all());
+        $user = UserFacade::all()->get(0);
+        $this->assertNull($user);
+    }
+
+    #[Test]
+    public function it_finds_an_existing_user_via_find_or_create_user_method()
     {
         $provider = $this->provider();
 
@@ -136,6 +168,22 @@ class ProviderTest extends TestCase
         $this->assertCount(1, UserFacade::all());
         $this->assertEquals([$savedUser], UserFacade::all()->all());
         $this->assertEquals($savedUser, $foundUser);
+    }
+
+    #[Test]
+    public function it_creates_a_user_via_find_or_create_user_method()
+    {
+        $this->assertCount(0, UserFacade::all());
+
+        $provider = $this->provider();
+        $provider->findOrCreateUser($this->socialite());
+
+        $this->assertCount(1, UserFacade::all());
+        $user = UserFacade::all()->get(0);
+        $this->assertNotNull($user);
+        $this->assertEquals('foo@bar.com', $user->email());
+        $this->assertEquals('Foo Bar', $user->name());
+        $this->assertEquals($user->id(), $provider->getUserId('foo-bar'));
     }
 
     #[Test]
