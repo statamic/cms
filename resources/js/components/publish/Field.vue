@@ -49,6 +49,23 @@
                 class="help-block" :class="{ '-mt-2': showLabel }"
                 v-if="instructions && config.instructions_position !== 'below'"
                 v-html="instructions" />
+
+            <div class="field-dropdown" v-if="mounted && hasDropdown">
+                <quick-dropdown-list>
+                    <quick-dropdown-item
+                        v-for="action, index in fieldQuickActions"
+                        :key="index"
+                        :text="action.title"
+                        :icon="action.icon"
+                        @click="fieldRunAction(action)" />
+                    <template #dropdown>
+                        <dropdown-actions :actions="fieldActions" @run="fieldRunAction" v-if="fieldActions.length" />
+                        <div class="divider" />
+                        <dropdown-actions :actions="fieldInternalActions" @run="fieldRunAction" v-if="fieldInternalActions.length" />
+                    </template>
+                </quick-dropdown-list>
+            </div>
+
         </div>
 
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
@@ -57,6 +74,7 @@
             <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
             <component
                 v-else
+                ref="field"
                 :is="fieldtypeComponent"
                 :config="config"
                 :value="value"
@@ -80,6 +98,7 @@
         <div v-if="hasError">
             <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
+
     </div>
     </publish-field-meta>
 
@@ -112,6 +131,16 @@ export default {
     inject: {
         storeName: { default: null },
         isInsideConfigFields: { default: false },
+    },
+
+    data() {
+        return {
+            mounted: false,
+        }
+    },
+
+    mounted() {
+        this.mounted = true;
     },
 
     computed: {
@@ -159,6 +188,7 @@ export default {
                 `${this.config.component || this.config.type}-fieldtype`,,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
+                this.mounted && this.hasDropdown && !this.isInsideConfigFields ? 'has-dropdown' : '',
                 this.config.classes || '',
                 this.config.full_width_setting ? 'full-width-setting' : '',
                 { 'has-error': this.hasError || this.hasNestedError }
@@ -204,18 +234,34 @@ export default {
                  || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
          },
 
-         showLabelText() {
+        showLabelText() {
             return !this.config.hide_display;
-         },
+        },
 
-         showLabel() {
+        showLabel() {
             return this.showLabelText // Need to see the text
                 || this.isReadOnly // Need to see the "Read Only" text
                 || this.config.required // Need to see the asterisk
                 || this.isLocked // Need to see the avatar
                 || this.isLocalizable // Need to see the icon
                 || this.syncable // Need to see the icon
-         }
+        },
+
+        fieldActions() {
+            return this.$refs.field.visibleActions;
+        },
+
+        fieldInternalActions() {
+            return this.$refs.field.visibleInternalActions;
+        },
+
+        fieldQuickActions() {
+            return this.$refs.field.visibleQuickActions;
+        },
+
+        hasDropdown() {
+            return this.fieldActions.length > 0 || this.fieldInternalActions.length > 0;;
+        },
 
     },
 
@@ -246,6 +292,10 @@ export default {
             });
 
             return marked(text);
+        },
+
+        fieldRunAction(action) {
+            this.$refs.field.runAction(action);
         }
 
     }
