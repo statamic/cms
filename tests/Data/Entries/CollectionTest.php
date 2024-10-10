@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Entries\Collection;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionCreating;
@@ -429,6 +430,26 @@ class CollectionTest extends TestCase
             return $event->blueprint === $blueprint
                 && $event->entry === null;
         });
+    }
+
+    #[Test]
+    public function it_gets_and_sets_taxonomies()
+    {
+        Facades\Taxonomy::make('tags')->save();
+        Facades\Taxonomy::make('categories')->save();
+        Facades\Taxonomy::make('sizes')->save();
+
+        $collection = Facades\Collection::make('test')->save();
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->taxonomies());
+        $this->assertEquals([], $collection->taxonomies()->all());
+
+        $return = $collection->taxonomies(['tags', 'categories']);
+
+        $this->assertEquals($collection, $return);
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomies = $collection->taxonomies());
+        $this->assertEveryItemIsInstanceOf(Taxonomy::class, $taxonomies);
+        $this->assertEquals(['test', 'test'], $taxonomies->map(fn ($taxonomy) => $taxonomy->collection()?->handle())->all());
+        $this->assertEquals(['tags', 'categories'], $taxonomies->map->handle()->all());
     }
 
     #[Test]
