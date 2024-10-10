@@ -2,10 +2,13 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
+use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
@@ -231,6 +234,79 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
+     * Recache multiple URLs.
+     *
+     * @param  array  $urls
+     * @return void
+     */
+    public function recacheUrls($urls)
+    {
+        collect($urls)
+            ->map(fn ($url) => is_array($url) ? $url : [$url, null])
+            ->each(function ($parts) {
+                [$path, $domain] = $parts;
+
+                if (Str::contains($path, '*')) {
+                    $this->recacheWildcardUrl($path, $domain);
+
+                    return;
+                }
+
+                $this->recacheUrl($path, $domain);
+            });
+    }
+
+    /**
+     * Recache an individual URL.
+     *
+     * @param  string  $path
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function recacheUrl($url, $domain = null)
+    {
+        $this->getUrls($domain)->filter(function ($value) use ($url) {
+            return $value === $url || Str::startsWith($value, $url.'?');
+        })->each(function ($url) use ($domain) {
+            $url = ($domain ?: $this->getBaseUrl()).$url;
+
+            if (Str::endsWith($url, '?')) {
+                $url = Str::removeRight($url, '?');
+            }
+
+            $url .= (str_contains($url, '?') ? '&' : '?').'__recache='.Hash::make($url);
+
+            $request = new GuzzleRequest('GET', $url);
+
+            StaticWarmJob::dispatch($request, [])
+                ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
+                ->onQueue(config('statamic.static_caching.warm_queue'));
+        });
+    }
+
+    /**
+     * Recache a wildcard URL.
+     *
+     * @param  string  $wildcard
+     * @param  string|null  $domain
+     */
+    protected function recacheWildcardUrl($wildcard, $domain = null)
+    {
+        // Remove the asterisk
+        $wildcard = substr($wildcard, 0, -1);
+
+        if (! $domain) {
+            [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
+        }
+
+        $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
+            return Str::startsWith($url, $wildcard);
+        })->each(function ($url) use ($domain) {
+            $this->recacheUrl($url, $domain);
+        });
+    }
+
+    /**
      * Determine if a given URL should be excluded from caching.
      *
      * @param  string  $url
@@ -278,9 +354,27 @@ abstract class AbstractCacher implements Cacher
         ];
     }
 
+    protected function removeBackgroundRecacheTokenFromUrl(Request $request, string $url): string
+    {
+        if (! config('statamic.static_caching.background_recache', false)) {
+            return $url;
+        }
+
+        if (! $recache = $request->input('__recache')) {
+            return $url;
+        }
+
+        $url = str_replace('__recache='.urlencode($recache), '', $url);
+        if (substr($url, -1, 1) == '?') {
+            $url = substr($url, 0, -1);
+        }
+
+        return $url;
+    }
+
     public function getUrl(Request $request)
     {
-        $url = $request->getUri();
+        $url = $this->removeBackgroundRecacheTokenFromUrl($request, $request->getUri());
 
         if ($this->isExcluded($url)) {
             return $url;
