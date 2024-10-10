@@ -3,9 +3,14 @@
 namespace Statamic\Imaging;
 
 use League\Glide\Responses\ResponseFactoryInterface;
+use Statamic\Imaging\Manipulators\GlideManipulator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+ * @deprecated The new Glide implementation does not use the HTTP API.
+ * @see GlideManipulator
+ */
 class ResponseFactory implements ResponseFactoryInterface
 {
     /**
