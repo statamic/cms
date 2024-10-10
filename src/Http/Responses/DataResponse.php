@@ -91,9 +91,13 @@ class DataResponse implements Responsable
 
     protected function protect()
     {
-        app(Protection::class)
+        $isProtected = app(Protection::class)
             ->setData($this->data)
             ->protect();
+
+        if ($isProtected) {
+            $this->headers['X-Statamic-Protected'] = true;
+        }
 
         return $this;
     }
