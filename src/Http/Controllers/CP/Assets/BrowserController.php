@@ -95,12 +95,9 @@ class BrowserController extends CpController
                 $sortByMethod = $request->order === 'desc' ? 'sortByDesc' : 'sortBy';
 
                 $folders = $folders->$sortByMethod(function (AssetFolder $folder) use ($request) {
-                    return match ($request->sort) {
-                        'basename' => $folder->basename(),
-                        'size' => $folder->size(),
-                        'last_modified' => $folder->lastModified(),
-                        default => $folder->basename(),
-                    };
+                    $method = $request->sort;
+
+                    return method_exists($folder, $method) ? $folder->$method() : $folder->basename();
                 });
 
                 $query->orderBy($request->sort, $request->order ?? 'asc');
