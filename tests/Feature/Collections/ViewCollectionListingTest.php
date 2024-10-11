@@ -4,6 +4,7 @@ namespace Tests\Feature\Collections;
 
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Actions\Delete;
 use Statamic\Auth\User;
 use Statamic\Entries\Collection;
 use Statamic\Facades;
@@ -44,7 +45,7 @@ class ViewCollectionListingTest extends TestCase
                     'editable' => true,
                     'blueprint_editable' => true,
                     'available_in_selected_site' => true,
-                    'actions' => collect(),
+                    'actions' => Facades\Action::for($collectionA, ['view' => 'list']),
                     'actions_url' => 'http://localhost/cp/collections/foo/actions',
                 ],
                 [
@@ -61,7 +62,7 @@ class ViewCollectionListingTest extends TestCase
                     'editable' => true,
                     'blueprint_editable' => true,
                     'available_in_selected_site' => true,
-                    'actions' => collect(),
+                    'actions' => Facades\Action::for($collectionB, ['view' => 'list']),
                     'actions_url' => 'http://localhost/cp/collections/bar/actions',
                 ],
             ]))
