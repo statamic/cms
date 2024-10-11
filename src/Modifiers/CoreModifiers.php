@@ -281,6 +281,11 @@ class CoreModifiers extends Modifier
         $text = '';
         while (count($value)) {
             $item = array_shift($value);
+
+            if (! isset($item['type'])) {
+                continue;
+            }
+
             if ($item['type'] === 'text') {
                 $text .= ' '.($item['text'] ?? '');
             }
