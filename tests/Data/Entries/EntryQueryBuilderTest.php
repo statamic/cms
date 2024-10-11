@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -921,6 +922,166 @@ class EntryQueryBuilderTest extends TestCase
             'post-3',
             'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
+    }
+
+    /** @test */
+    public function entry_can_be_found_using_find_or_new()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $findOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->findOrNew('hoff');
+
+        $this->assertSame($entry, $findOrNew);
+    }
+
+    /** @test */
+    public function entry_can_be_created_using_find_or_new()
+    {
+        Collection::make('posts')->save();
+
+        $findOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->findOrNew('hoff');
+
+        $this->assertNull($findOrNew->id());
+        $this->assertInstanceOf(EntryContract::class, $findOrNew);
+    }
+
+    /** @test */
+    public function entry_can_be_found_using_find_or()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $findOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->findOr('hoff', function () {
+                return 'This could be anything.';
+            });
+
+        $this->assertSame($entry, $findOrNew);
+    }
+
+    /** @test */
+    public function callback_is_called_using_find_or()
+    {
+        Collection::make('posts')->save();
+
+        $findOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->findOr('hoff', function () {
+                return 'This could be anything.';
+            });
+
+        $this->assertSame('This could be anything.', $findOrNew);
+    }
+
+    /** @test */
+    public function entry_can_be_found_using_first_or_new()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->firstOrNew(
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'David Hasselhoff']
+            );
+
+        $this->assertSame($entry, $firstOrNew);
+    }
+
+    /** @test */
+    public function entry_can_be_created_using_first_or_new()
+    {
+        Collection::make('posts')->save();
+
+        $firstOrNew = Entry::query()
+            ->where('collection', 'posts')
+            ->firstOrNew(
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'David Hasselhoff']
+            );
+
+        $this->assertNull($firstOrNew->id());
+        $this->assertSame('David Hasselhoff', $firstOrNew->title);
+        $this->assertSame('david-hasselhoff', $firstOrNew->slug());
+        $this->assertSame('posts', $firstOrNew->collection()->handle());
+    }
+
+    /** @test */
+    public function entry_can_be_found_using_first_or_create()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrCreate = Entry::query()
+            ->where('collection', 'posts')
+            ->firstOrCreate(
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'David Hasselhoff']
+            );
+
+        $this->assertSame($entry, $firstOrCreate);
+    }
+
+    /** @test */
+    public function entry_can_be_created_using_first_or_create()
+    {
+        Collection::make('posts')->save();
+
+        $firstOrCreate = Entry::query()
+            ->where('collection', 'posts')
+            ->firstOrCreate(
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'David Hasselhoff']
+            );
+
+        $this->assertNotNull($firstOrCreate->id());
+        $this->assertSame('David Hasselhoff', $firstOrCreate->title);
+        $this->assertSame('david-hasselhoff', $firstOrCreate->slug());
+        $this->assertSame('posts', $firstOrCreate->collection()->handle());
+    }
+
+    /** @test */
+    public function entry_can_be_found_and_updated_using_update_or_create()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $updateOrCreate = Entry::query()
+            ->where('collection', 'posts')
+            ->updateOrCreate(
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'The Hoff']
+            );
+
+        $this->assertSame($entry->id(), $updateOrCreate->id());
+        $this->assertSame('The Hoff', $updateOrCreate->title);
+        $this->assertSame('david-hasselhoff', $updateOrCreate->slug());
+        $this->assertSame('posts', $updateOrCreate->collection()->handle());
+    }
+
+    /** @test */
+    public function entry_can_be_created_using_update_or_create()
+    {
+        Collection::make('posts')->save();
+
+        $updateOrCreate = Entry::query()
+            ->where('collection', 'posts')
+            ->updateOrCreate(
+                ['slug' => 'david-hasselhoff'],
+                ['title' => 'The Hoff']
+            );
+
+        $this->assertNotNull($updateOrCreate->id());
+        $this->assertSame('The Hoff', $updateOrCreate->title);
+        $this->assertSame('david-hasselhoff', $updateOrCreate->slug());
+        $this->assertSame('posts', $updateOrCreate->collection()->handle());
     }
 }
 
