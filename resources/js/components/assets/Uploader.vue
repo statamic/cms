@@ -170,9 +170,11 @@ export default {
         },
 
         processUploadQueue() {
-            if (this.uploads.length === 0) return;
+            const uploads = this.uploads.filter(u => !u.errorMessage);
 
-            const upload = this.uploads[0];
+            if (uploads.length === 0) return;
+
+            const upload = uploads[0];
             const id = upload.id;
 
             upload.instance.upload().then(response => {
