@@ -132,7 +132,7 @@ class Result implements ContainsQueryableValues, Contract
 
     public function get($key, $fallback = null)
     {
-        if ($key === 'date') {
+        if ($key === 'date' && method_exists($this->searchable, 'date')) {
             return $this->searchable->date();
         }
 
