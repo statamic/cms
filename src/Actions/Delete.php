@@ -19,6 +19,7 @@ class Delete extends Action
             case $item instanceof Contracts\Entries\Entry && $item->collection()->sites()->count() === 1:
                 return ! $item->page()?->isRoot();
                 break;
+            case $item instanceof Contracts\Entries\Collection:
             case $item instanceof Contracts\Taxonomies\Term:
             case $item instanceof Contracts\Assets\Asset:
             case $item instanceof Contracts\Assets\AssetFolder:
@@ -85,6 +86,8 @@ class Delete extends Action
         $item = $items->first();
 
         switch (true) {
+            case $item instanceof Contracts\Entries\Collection:
+                return cp_route('collections.index');
             case $item instanceof Contracts\Entries\Entry:
                 return cp_route('collections.show', $item->collection()->handle());
             case $item instanceof Contracts\Taxonomies\Term:
