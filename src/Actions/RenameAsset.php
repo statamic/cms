@@ -16,6 +16,11 @@ class RenameAsset extends Action
         return $item instanceof Asset;
     }
 
+    public function visibleToBulk($items)
+    {
+        return false;
+    }
+
     public function authorize($user, $asset)
     {
         return $user->can('rename', $asset);
