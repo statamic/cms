@@ -97,6 +97,7 @@ class BrowserController extends CpController
                 $folders = $folders->$sortByMethod(function (AssetFolder $folder) use ($request) {
                     return match ($request->sort) {
                         'basename' => $folder->basename(),
+                        'size' => $folder->size(),
                         'last_modified' => $folder->lastModified(),
                         default => $folder->basename(),
                     };
