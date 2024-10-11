@@ -53,6 +53,14 @@ class Delete extends Action
         return 'Are you sure you want to delete this?|Are you sure you want to delete these :count items?';
     }
 
+    public function warningText()
+    {
+        if ($this->items->first() instanceof Contracts\Entries\Collection) {
+            /** @translation */
+            return 'This will delete the collection and all of its entries.|This will delete the collections and all of their entries.';
+        }
+    }
+
     public function bypassesDirtyWarning(): bool
     {
         return true;
