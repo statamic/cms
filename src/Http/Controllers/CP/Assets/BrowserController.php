@@ -91,18 +91,24 @@ class BrowserController extends CpController
         if ($page >= $lastFolderPage) {
             $query = $folder->queryAssets();
 
-            if ($request->sort) {
+            if ($sort = $request->sort) {
                 $sortByMethod = $request->order === 'desc' ? 'sortByDesc' : 'sortBy';
 
-                $folders = $folders->$sortByMethod(function (AssetFolder $folder) use ($request) {
-                    $method = $request->sort;
-
-                    return method_exists($folder, $method) ? $folder->$method() : $folder->basename();
-                });
+                $folders = $folders->$sortByMethod(
+                    fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
+                );
 
                 $query->orderBy($request->sort, $request->order ?? 'asc');
             } else {
-                $query->orderBy($container->sortField(), $container->sortDirection());
+                $sort = $container->sortField();
+                $order = $container->sortDirection();
+                $sortByMethod = $request->order === 'desc' ? 'sortByDesc' : 'sortBy';
+
+                $folders = $folders->$sortByMethod(
+                    fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
+                );
+
+                $query->orderBy($sort, $order);
             }
 
             $this->applyQueryScopes($query, $request->all());
