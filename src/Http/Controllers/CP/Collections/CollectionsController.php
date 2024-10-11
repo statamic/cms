@@ -121,7 +121,7 @@ class CollectionsController extends CpController
                 ->all(),
             'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
             'canChangeLocalizationDeleteBehavior' => count($authorizedSites) > 1 && (count($authorizedSites) == $collection->sites()->count()),
-            'actions' => Action::for($collection),
+            'actions' => Action::for($collection, ['view' => 'form']),
         ];
 
         if ($collection->queryEntries()->count() === 0) {
