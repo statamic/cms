@@ -1,5 +1,5 @@
 <template>
-    <data-list ref="dataList" :columns="columns" :rows="rows">
+    <data-list ref="dataList" :columns="columns" :rows="items">
         <div class="card overflow-hidden p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
                 <template slot="cell-title" slot-scope="{ row: collection }">
@@ -52,7 +52,7 @@ export default {
     data() {
         return {
             initializedRequest: false,
-            rows: this.initialRows,
+            items: this.initialRows,
             requestUrl: cp_url(`collections`),
         }
     },
