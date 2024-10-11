@@ -54,6 +54,7 @@ class RenameAsset extends Action
                 'default' => $value = $this->items->containsOneItem() ? $this->items->first()->filename() : null,
                 'placeholder' => $value,
                 'debounce' => false,
+                'autoselect' => true,
             ],
         ];
     }
