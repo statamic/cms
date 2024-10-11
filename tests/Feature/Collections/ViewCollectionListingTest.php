@@ -4,7 +4,6 @@ namespace Tests\Feature\Collections;
 
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Actions\Delete;
 use Statamic\Auth\User;
 use Statamic\Entries\Collection;
 use Statamic\Facades;
