@@ -2,8 +2,6 @@
 
 namespace Statamic\Console\Commands;
 
-use Archetype\Facades\PHPFile;
-use PhpParser\BuilderFactory;
 use Statamic\Console\RunsInPlease;
 
 class MakeScope extends GeneratorCommand
