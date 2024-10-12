@@ -17,11 +17,12 @@ class Controller extends BaseController
     {
         if ($this->tokenData = session('statamic:protect:password.tokens.'.request('token'))) {
             $site = Site::findByUrl($this->getUrl());
+            $data = Data::find($this->tokenData['reference']);
 
             app()->setLocale($site->lang());
         }
 
-        return View::make('statamic::auth.protect.password');
+        return View::make('statamic::auth.protect.password')->cascadeContent($data ?? null);
     }
 
     public function store()
