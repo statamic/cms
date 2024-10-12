@@ -66,17 +66,17 @@ class PasswordProtector extends Protector
         return false;
     }
 
-    public function isValidPassword(string $password): bool
+    public function isValidPassword(?string $password): bool
     {
         return $this->isValidSchemePassword($password) || $this->isValidLocalPassword($password);
     }
 
-    public function isValidSchemePassword(string $password): bool
+    public function isValidSchemePassword(?string $password): bool
     {
         return in_array($password, $this->schemePasswords());
     }
 
-    public function isValidLocalPassword(string $password): bool
+    public function isValidLocalPassword(?string $password): bool
     {
         return in_array($password, $this->localPasswords());
     }
