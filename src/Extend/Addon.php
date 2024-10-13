@@ -371,6 +371,10 @@ final class Addon
 
     public function isLatestVersion()
     {
+        if (Str::startsWith($this->version, 'dev-') || Str::endsWith($this->version, '-dev')) {
+            return true;
+        }
+
         if (! $this->latestVersion) {
             return true;
         }

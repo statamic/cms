@@ -24,8 +24,7 @@ body:
     attributes:
       label: Environment
       description: |
-        Details about your environment. Versions of Statamic, PHP, Laravel, any addons that are installed, etc.
-        (Go ahead and just paste the output of the `php please support:details` command.)
+        Please paste the *full* output of the `php please support:details` command. It gives us some context about your project.
       render: yaml # the format of the command is close to yaml and gets highlighted nicely
     validations:
       required: true

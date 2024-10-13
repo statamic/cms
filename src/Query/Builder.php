@@ -2,6 +2,7 @@
 
 namespace Statamic\Query;
 
+use BadMethodCallException;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Pagination\Paginator;
@@ -13,10 +14,11 @@ use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 use Statamic\Query\Concerns\FakesQueries;
+use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
 {
-    use FakesQueries;
+    use AppliesScopes, FakesQueries;
     use Traits\QueriesRelationships;
 
     protected $columns;
@@ -38,6 +40,19 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+
+    public function __call($method, $args)
+    {
+        if ($this->canApplyScope($method)) {
+            $this->applyScope($method, $args[0] ?? []);
+
+            return $this;
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Call to undefined method %s::%s()', static::class, $method
+        ));
+    }
 
     public function select($columns = ['*'])
     {
@@ -82,6 +97,17 @@ abstract class Builder implements Contract
     public function orderByDesc($column)
     {
         return $this->orderBy($column, 'desc');
+    }
+
+    public function reorder($column = null, $direction = 'asc')
+    {
+        $this->orderBys = [];
+
+        if ($column) {
+            return $this->orderBy($column, $direction);
+        }
+
+        return $this;
     }
 
     abstract public function inRandomOrder();

@@ -12,7 +12,7 @@ use Statamic\Data\HasAugmentedInstance;
 class Result implements ContainsQueryableValues, Contract
 {
     use HasAugmentedInstance {
-        toAugmentedCollection as traitToAugmentedCollection;
+        toAugmentedCollectionWithFields as traitToAugmentedCollectionWithFields;
     }
 
     protected $searchable;
@@ -98,17 +98,12 @@ class Result implements ContainsQueryableValues, Contract
         throw new \Exception('Searchable '.get_class($this->searchable).' must implement '.ContainsQueryableValues::class);
     }
 
-    public function toAugmentedCollection($keys = null)
+    private function toAugmentedCollectionWithFields($keys = null)
     {
-        return $this->traitToAugmentedCollection($keys)->merge([
+        return $this->traitToAugmentedCollectionWithFields($keys)->merge([
             'result_type' => $this->getType(),
             'search_score' => $this->getScore(),
         ])->merge($this->index->extraAugmentedResultData($this));
-    }
-
-    public function toDeferredAugmentedArray($keys = null)
-    {
-        return $this->toAugmentedCollection($keys);
     }
 
     public function newAugmentedInstance(): Augmented
@@ -137,6 +132,10 @@ class Result implements ContainsQueryableValues, Contract
 
     public function get($key, $fallback = null)
     {
+        if ($key === 'date' && method_exists($this->searchable, 'date')) {
+            return $this->searchable->date();
+        }
+
         return $this->searchable->get($key, $fallback);
     }
 

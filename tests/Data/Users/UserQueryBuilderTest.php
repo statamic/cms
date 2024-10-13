@@ -9,6 +9,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -480,5 +481,27 @@ class UserQueryBuilderTest extends TestCase
             'Smeagol',
             'Frodo',
         ], User::query()->where('type', 'b')->pluck('name')->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_scopes()
+    {
+        CustomScope::register();
+        User::allowQueryScope(CustomScope::class);
+        User::allowQueryScope(CustomScope::class, 'whereCustom');
+
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+
+        $this->assertCount(1, User::query()->customScope(['email' => 'gandalf@precious.com'])->get());
+        $this->assertCount(1, User::query()->whereCustom(['email' => 'gandalf@precious.com'])->get());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('email', $params['email']);
     }
 }

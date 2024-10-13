@@ -135,15 +135,18 @@ abstract class Index
 
     public function cacheKey()
     {
+        $searches = ['.', '/'];
         $replacements = ['::', '->'];
 
         if (windows_os()) {
             $replacements[1] = '-]';
+            $searches[] = '->';
+            $replacements[] = '-]';
         }
 
         return vsprintf('stache::indexes::%s::%s', [
             $this->store->key(),
-            str_replace(['.', '/'], $replacements, $this->name),
+            str_replace($searches, $replacements, $this->name),
         ]);
     }
 
