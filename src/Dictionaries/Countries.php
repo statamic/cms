@@ -19,7 +19,10 @@ class Countries extends BasicDictionary
 
     protected function getItemLabel(array $item): string
     {
-        return "{$item['emoji']} {$item['name']}";
+        return vsprintf('%s%s', [
+            ($this->config['emojis'] ?? true) ? "{$item['emoji']} " : '',
+            $item['name'],
+        ]);
     }
 
     protected function fieldItems()
@@ -30,6 +33,12 @@ class Countries extends BasicDictionary
                 'instructions' => __('statamic::messages.dictionaries_countries_region_instructions'),
                 'type' => 'select',
                 'options' => $this->regions,
+            ],
+            'emojis' => [
+                'display' => __('Emojis'),
+                'instructions' => __('statamic::messages.dictionaries_countries_emojis_instructions'),
+                'type' => 'toggle',
+                'default' => true,
             ],
         ];
     }

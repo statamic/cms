@@ -130,7 +130,7 @@ return [
     'date_fieldtype_time_required' => 'Eine Zeitangabe ist erforderlich.',
     'duplicate_field_handle' => 'Ein Feld mit einem Handle :handle gibt es bereits.',
     'duplicate_uri' => 'Doppelte URI :value',
-    'email_available' => 'Eine Benutzer:in mit dieser E-Mailadresse existiert bereits.',
+    'email_available' => 'Eine Benutzer:in mit dieser E-Mail-Adresse existiert bereits.',
     'fieldset_imported_recursively' => 'Fieldset :handle wird rekursiv importiert.',
     'one_site_without_origin' => 'Mindestens eine Website darf keine Quelle enthalten.',
     'options_require_keys' => 'Alle Optionen müssen Schlüssel haben.',

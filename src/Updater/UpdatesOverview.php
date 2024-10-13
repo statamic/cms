@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use Facades\Statamic\Marketplace\Marketplace;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Addon;
+use Statamic\Statamic;
+use Statamic\Support\Str;
 
 class UpdatesOverview
 {
@@ -93,6 +95,12 @@ class UpdatesOverview
      */
     protected function checkForStatamicUpdates()
     {
+        $version = Statamic::version();
+
+        if (Str::startsWith($version, 'dev-') || Str::endsWith($version, '-dev')) {
+            return $this;
+        }
+
         if (Marketplace::statamic()->changelog()->latest()->type === 'upgrade') {
             $this->statamic = true;
             $this->count++;

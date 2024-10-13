@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class ButtonGroupTest extends TestCase
 {
-    use CastsBooleansTests, LabeledValueTests;
+    use CastsBooleansTests, HasSelectOptionsTests, LabeledValueTests;
 
     private function field($config)
     {
@@ -32,7 +32,8 @@ class ButtonGroupTest extends TestCase
                 'options' => [
                     'one' => 'One',
                     'two' => 'Two',
-                    '' => 'Three',
+                    'null' => 'Three',
+                    '' => 'Four',
                 ],
             ]);
 
@@ -59,5 +60,27 @@ class ButtonGroupTest extends TestCase
             ]);
 
         $this->assertEquals($values, $fields->validate());
+    }
+
+    #[Test]
+    public function does_not_throw_a_validation_error_when_label_is_missing_from_option()
+    {
+        $fieldtype = FieldtypeRepository::find('button_group');
+        $blueprint = $fieldtype->configBlueprint();
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues([
+                'options' => [
+                    'one' => null,
+                    'two' => null,
+                ],
+            ]);
+
+        $fields->validate();
+
+        // If we've made it this far, it means we've passed validation
+        // (otherwise an exception would be thrown).
+        $this->assertTrue(true);
     }
 }

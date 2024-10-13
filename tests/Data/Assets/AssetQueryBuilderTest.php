@@ -7,6 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -526,6 +527,17 @@ class AssetQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function assets_are_found_using_scopes()
+    {
+        CustomScope::register();
+        Asset::allowQueryScope(CustomScope::class);
+        Asset::allowQueryScope(CustomScope::class, 'whereCustom');
+
+        $this->assertCount(1, $this->container->queryAssets()->customScope(['path' => 'a.jpg'])->get());
+        $this->assertCount(1, $this->container->queryAssets()->whereCustom(['path' => 'a.jpg'])->get());
+    }
+
+    #[Test]
     public function assets_are_found_using_offset()
     {
         $query = $this->container->queryAssets()->limit(3);
@@ -630,5 +642,13 @@ class AssetQueryBuilderTest extends TestCase
             'e.jpg',
             'f.jpg',
         ], $this->container->queryAssets()->where('extension', 'jpg')->pluck('path')->all());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('path', $params['path']);
     }
 }

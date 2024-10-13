@@ -477,7 +477,7 @@ class BlueprintTest extends TestCase
                                     'type' => 'textarea',
                                     'placeholder' => null,
                                     'validate' => 'min:2',
-                                    'character_limit' => null,
+                                    'character_limit' => 0,
                                     'default' => null,
                                     'antlers' => false,
                                     'component' => 'textarea',

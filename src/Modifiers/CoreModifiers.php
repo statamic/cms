@@ -281,6 +281,11 @@ class CoreModifiers extends Modifier
         $text = '';
         while (count($value)) {
             $item = array_shift($value);
+
+            if (! isset($item['type'])) {
+                continue;
+            }
+
             if ($item['type'] === 'text') {
                 $text .= ' '.($item['text'] ?? '');
             }
@@ -1451,6 +1456,10 @@ class CoreModifiers extends Modifier
     public function limit($value, $params)
     {
         $limit = Arr::get($params, 0, 0);
+
+        if (Compare::isQueryBuilder($value)) {
+            return $value->limit($limit);
+        }
 
         if ($value instanceof Collection) {
             return $value->take($limit);
@@ -2921,7 +2930,7 @@ class CoreModifiers extends Modifier
         if (! $opr && Str::contains($key, ':')) {
             [$key, $opr] = explode(':', $key);
         }
-        if (! $val) {
+        if (count($params) < 3) {
             $val = $opr;
             $opr = '==';
         }

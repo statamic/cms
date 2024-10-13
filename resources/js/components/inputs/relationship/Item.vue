@@ -52,7 +52,11 @@ export default {
         InlineEditForm
     },
 
-    inject: ['storeName'],
+    inject: {
+        storeName: {
+            default: null
+        }
+    },
 
     props: {
         item: Object,
