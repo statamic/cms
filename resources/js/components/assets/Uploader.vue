@@ -227,7 +227,7 @@ export default {
 
         processUploadQueue() {
             // Make sure we're not grabbing a running or failed upload
-            const upload = uploads.find(u => u.instance.state === 'new' && !u.errorMessage);
+            const upload = this.uploads.find(u => u.instance.state === 'new' && !u.errorMessage);
             if (!upload) return;
 
             const id = upload.id;
