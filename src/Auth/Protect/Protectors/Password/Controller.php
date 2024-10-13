@@ -15,13 +15,14 @@ class Controller extends BaseController
 
     public function show()
     {
-        if ($this->tokenData = session('statamic:protect:password.tokens.'.request('token'))) {
-            $site = Site::findByUrl($this->getUrl());
-
-            app()->setLocale($site->lang());
+        if (! $this->tokenData = session('statamic:protect:password.tokens.'.request('token'))) {
+            abort(401);
         }
 
-        return View::make('statamic::auth.protect.password');
+        app()->setLocale(Site::findByUrl($this->getUrl())->lang());
+
+        return View::make('statamic::auth.protect.password')
+            ->cascadeContent(Data::find($this->tokenData['reference']));
     }
 
     public function store()
