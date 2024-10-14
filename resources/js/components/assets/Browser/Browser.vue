@@ -453,6 +453,10 @@ export default {
             this.loadAssets();
         },
 
+        selectedPath(selectedPath) {
+            this.path = selectedPath;
+        },
+
         parameters(after, before) {
             if (this.initializing || JSON.stringify(before) === JSON.stringify(after)) return;
             this.loadAssets();
