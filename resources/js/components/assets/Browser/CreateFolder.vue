@@ -3,6 +3,7 @@
     <confirmation-modal
         name="folder-editor"
         :title="modalTitle"
+        :busy="submitting"
         @cancel="cancel"
         @confirm="submit"
     >
@@ -42,6 +43,7 @@ export default {
             buttonText: __('Create'),
             directory: this.initialDirectory,
             errors: {},
+            submitting: false,
         }
     },
 
@@ -59,12 +61,16 @@ export default {
                 title: this.title
             };
 
+            this.submitting = true;
+
             this.$axios.post(url, payload).then(response => {
                 this.$toast.success(__('Folder created'));
                 this.$emit('created', response.data);
                 this.directory = this.initialDirectory
             }).catch(e => {
                 this.handleErrors(e);
+            }).finally(() => {
+                this.submitting = false;
             });
         },
 
@@ -82,7 +88,6 @@ export default {
     },
 
     created() {
-        this.$keys.bindGlobal('enter', this.submit)
         this.$keys.bindGlobal('esc', this.cancel)
     },
 

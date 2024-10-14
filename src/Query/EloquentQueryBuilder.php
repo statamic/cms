@@ -11,10 +11,13 @@ use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
+use Statamic\Query\Scopes\AppliesScopes;
 use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
 {
+    use AppliesScopes;
+
     protected $builder;
     protected $columns;
 
@@ -39,6 +42,12 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function __call($method, $args)
     {
+        if ($this->canApplyScope($method)) {
+            $this->applyScope($method, $args[0] ?? []);
+
+            return $this;
+        }
+
         $response = $this->builder->$method(...$args);
 
         return $response instanceof EloquentBuilder ? $this : $response;
@@ -382,6 +391,19 @@ abstract class EloquentQueryBuilder implements Builder
     public function orderBy($column, $direction = 'asc')
     {
         $this->builder->orderBy($this->column($column), $direction);
+
+        return $this;
+    }
+
+    public function reorder($column = null, $direction = 'asc')
+    {
+        if ($column) {
+            $this->builder->reorder($this->column($column), $direction);
+
+            return $this;
+        }
+
+        $this->builder->reorder();
 
         return $this;
     }

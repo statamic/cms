@@ -38,6 +38,7 @@
         :preview-targets="{{ json_encode($previewTargets) }}"
         :initial-item-actions="{{ json_encode($itemActions) }}"
         item-action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy) }}"
+        :has-template="{{ $str::bool($hasTemplate) }}"
     ></term-publish-form>
 
 @endsection

@@ -2,6 +2,7 @@
 
 namespace Tests\Dictionaries;
 
+use DateTimeZone;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -16,7 +17,7 @@ class TimezonesTest extends TestCase
     {
         $options = (new Timezones)->options();
 
-        $this->assertCount(419, $options);
+        $this->assertCount(count(DateTimeZone::listIdentifiers()), $options);
         $this->assertEquals([
             'Africa/Abidjan' => 'Africa/Abidjan (+00:00)',
             'Africa/Accra' => 'Africa/Accra (+00:00)',

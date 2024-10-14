@@ -112,7 +112,7 @@ class BrowserController extends CpController
             'data' => [
                 'assets' => FolderAsset::collection($assets ?? collect())->resolve(),
                 'folder' => array_merge((new Folder($folder))->resolve(), [
-                    'folders' => $folders->values(),
+                    'folders' => Folder::collection($folders->values()),
                 ]),
             ],
             'links' => [

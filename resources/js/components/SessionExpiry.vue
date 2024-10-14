@@ -120,6 +120,10 @@ export default {
             }
 
             this.lastCount = moment();
+        },
+
+        isShowingLogin(showing, wasShowing) {
+            if (showing && !wasShowing) this.updateCsrfToken();
         }
 
     },

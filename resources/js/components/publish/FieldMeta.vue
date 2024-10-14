@@ -57,7 +57,7 @@ export default {
                 value: this.modelValue,
             };
 
-            this.$axios.get(cp_url('fields/field-meta'), { params }).then(response => {
+            this.$axios.post(cp_url('fields/field-meta'), params).then(response => {
                 this.meta = response.data.meta;
                 this.modelValue = response.data.value;
                 this.loading = false;
