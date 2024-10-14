@@ -10,12 +10,14 @@
             :is-dirty="isDirty"
             @selected="run"
         >
-            <div slot-scope="{ action, select }">
-                <button
-                    v-text="__(action.title)"
-                    :class="{ warning: action.dangerous }"
-                    @click="select" />
-            </div>
+            <template #default="{ action, select }">
+                <div>
+                    <button
+                        v-text="__(action.title)"
+                        :class="{ warning: action.dangerous }"
+                        @click="select" />
+                </div>
+            </template>
         </data-list-action>
     </div>
 

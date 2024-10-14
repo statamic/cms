@@ -1,19 +1,19 @@
 <template>
-
     <tr :class="[sortableItemClass, { 'opacity-50': isExcessive }]">
-        <td class="drag-handle" :class="sortableHandleClass" v-if="grid.isReorderable"></td>
+        <td v-if="grid.isReorderable" class="drag-handle" :class="sortableHandleClass"></td>
+
         <grid-cell
             v-for="(field, i) in fields"
-            :show-inner="showField(field, fieldPath(field.handle))"
             :key="field.handle"
+            :show-inner="showField(field, fieldPath(field.handle))"
             :field="field"
-            :value="values[field.handle]"
             :meta="meta[field.handle]"
             :index="i"
             :row-index="index"
             :grid-name="name"
             :errors="errors(field.handle)"
             :field-path="fieldPath(field.handle)"
+            :model-value="values[field.handle]"
             @updated="updated(field.handle, $event)"
             @meta-updated="metaUpdated(field.handle, $event)"
             @focus="$emit('focus')"
@@ -27,7 +27,6 @@
             </dropdown-list>
         </td>
     </tr>
-
 </template>
 
 <style scoped>
@@ -41,7 +40,6 @@ import GridCell from './Cell.vue';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
-
     components: { GridCell },
 
     mixins: [ValidatesFieldConditions],

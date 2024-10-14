@@ -4,7 +4,7 @@
 
             <!-- Field filter (requires custom selection UI) -->
             <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
-                <template slot="trigger">
+                <template #trigger>
                     <button class="filter-badge filter-badge-control rtl:ml-2 ltr:mr-2 mb-2" @click="resetFilterPopover">
                         {{ fieldFilter.title }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
@@ -18,7 +18,7 @@
                                 :config="fieldFilter"
                                 :values="activeFilters.fields || {}"
                                 :badges="fieldFilterBadges"
-                                @changed="$emit('changed', {handle: 'fields', values: $event})"
+                                @changed="$emit('changed', { handle: 'fields', values: $event })"
                                 @cleared="creating = false"
                                 @closed="closePopover"
                             />
@@ -29,7 +29,7 @@
 
             <!-- Standard pinned filters -->
             <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-start" :stop-propagation="false">
-                <template slot="trigger">
+                <template #trigger>
                     <button class="filter-badge filter-badge-control rtl:ml-2 ltr:mr-2 mb-2">
                         {{ filter.title }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
@@ -41,7 +41,7 @@
                             :key="filter.handle"
                             :filter="filter"
                             :values="activeFilters[filter.handle]"
-                            @changed="$emit('changed', {handle: filter.handle, values: $event})"
+                            @changed="$emit('changed', { handle: filter.handle, values: $event })"
                             @closed="closePopover"
                         />
                     </div>
@@ -50,7 +50,7 @@
 
             <!-- Standard unpinned filters -->
             <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
-                <template slot="trigger">
+                <template #trigger>
                     <button class="filter-badge filter-badge-control rtl:ml-2 ltr:mr-2 mb-2" @click="resetFilterPopover">
                         {{ __('Filter') }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
@@ -75,7 +75,7 @@
                                 :key="filter.handle"
                                 :filter="filter"
                                 :values="activeFilters[filter.handle]"
-                                @changed="$emit('changed', {handle: filter.handle, values: $event})"
+                                @changed="$emit('changed', { handle: filter.handle, values: $event })"
                                 @cleared="creating = false"
                                 @closed="closePopover"
                             />
@@ -85,18 +85,17 @@
             </popover>
 
             <!-- Active filter badges -->
-            <div class="filter-badge rtl:ml-2 ltr:mr-2 mb-2" v-for="(badge, handle) in fieldFilterBadges">
+            <div class="filter-badge rtl:ml-2 ltr:mr-2 mb-2" v-for="(badge, handle) in fieldFilterBadges" :key="handle">
                 <span>{{ badge }}</span>
                 <button @click="removeFieldFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
             </div>
-            <div class="filter-badge rtl:ml-2 ltr:mr-2 mb-2" v-for="(badge, handle) in standardBadges">
+            <div class="filter-badge rtl:ml-2 ltr:mr-2 mb-2" v-for="(badge, handle) in standardBadges" :key="handle">
                 <span>{{ badge }}</span>
                 <button @click="removeStandardFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
             </div>
 
         </div>
     </div>
-
 </template>
 
 <script>

@@ -1,9 +1,8 @@
 <template>
-
-    <table class="grid-table" v-if="rows.length > 0">
+    <table v-if="rows.length > 0" class="grid-table">
         <thead>
             <tr>
-                <th class="grid-drag-handle-header" v-if="grid.isReorderable"></th>
+                <th v-if="grid.isReorderable" class="grid-drag-handle-header"></th>
                 <grid-header-cell
                     v-for="field in fields"
                     :key="field.handle"
@@ -18,16 +17,16 @@
             </tr>
         </thead>
         <sortable-list
-            :value="rows"
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
             append-to="body"
+            :model-value="rows"
+            @update:model-value="(rows) => $emit('sorted', rows)"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
-            @input="(rows) => $emit('sorted', rows)"
         >
-            <tbody slot-scope="{}">
+            <tbody>
                 <grid-row
                     v-for="(row, index) in rows"
                     :key="`row-${row._id}`"
@@ -59,15 +58,12 @@ import GridHeaderCell from './HeaderCell.vue';
 import { SortableList, SortableItem } from '../../sortable/Sortable';
 
 export default {
-
     mixins: [View],
-
     components: {
         GridRow,
         GridHeaderCell,
         SortableList,
         SortableItem
     }
-
 }
 </script>

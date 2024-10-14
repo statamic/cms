@@ -1,3 +1,48 @@
+<script setup>
+import { onMounted, ref } from 'vue';
+
+import useLengthLimiter from '../../composables/useLengthLimiter';
+
+const $emit = defineEmits(['keydown', 'focus', 'blur'])
+
+const props = defineProps({
+    name: {},
+    disabled: { default: false },
+    classes: { default: null },
+    id: { default: null },
+    isReadOnly: { type: Boolean, default: false },
+    placeholder: { required: false },
+    type: { default: 'text' },
+    step: {},
+    prepend: { default: null },
+    append: { default: null },
+    focus: { type: Boolean },
+    autocomplete: { default: null },
+    autoselect: { type: Boolean },
+    min: { type: Number, default: undefined },
+    direction: { type: String },
+    limit: { type: Number, required: false }
+});
+
+const modelValue = defineModel()
+const input = ref(null)
+
+onMounted(() => {
+    if (props.autoselect) {
+        input.value.select();
+    }
+
+    if (props.focus) {
+        input.value.focus();
+    }
+});
+
+const { currentLength, limitIndicatorColor } = useLengthLimiter({
+    value: modelValue,
+    limit: props.limit,
+});
+</script>
+
 <template>
     <div class="flex items-center">
         <div class="input-group">
@@ -7,12 +52,13 @@
                 </div>
             </slot>
             <input
+                :value="modelValue"
+                @input="modelValue = $event.target.value"
                 ref="input"
                 class="input-text"
                 :class="classes"
                 :id="id"
                 :name="name"
-                :value="value"
                 :type="type"
                 :step="step"
                 :disabled="disabled"
@@ -22,7 +68,6 @@
                 :autofocus="focus"
                 :min="min"
                 :dir="direction"
-                @input="$emit('input', $event.target.value)"
                 @keydown="$emit('keydown', $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
@@ -38,37 +83,3 @@
         </div>
     </div>
 </template>
-
-<script>
-import LengthLimiter from '../LengthLimiter.vue'
-
-export default {
-    mixins: [LengthLimiter],
-    props: {
-        name: {},
-        disabled: { default: false },
-        classes: { default: null },
-        id: { default: null },
-        isReadOnly: { type: Boolean, default: false },
-        placeholder: { required: false },
-        type: { default: "text" },
-        step: {},
-        value: { required: true },
-        prepend: { default: null },
-        append: { default: null },
-        focus: { type: Boolean },
-        autocomplete: { default: null },
-        autoselect: { type: Boolean },
-        min: { type: Number, default: undefined },
-        direction: { type: String }
-    },
-    mounted() {
-        if (this.autoselect) {
-            this.$refs.input.select();
-        }
-        if (this.focus) {
-            this.$refs.input.focus();
-        }
-    }
-}
-</script>

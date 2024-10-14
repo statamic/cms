@@ -29,7 +29,7 @@ class ToastBus {
 
             promise.then(json => {
                 const toasts = json._toasts ?? [];
-                toasts.forEach(toast => this.instance.$toast[toast.type](toast.message, {duration: toast.duration}))
+                toasts.forEach(toast => this.instance.$toast[toast.type](toast.message, {timeout: toast.duration}))
             });
 
             return response;

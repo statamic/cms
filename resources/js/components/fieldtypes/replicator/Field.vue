@@ -11,20 +11,21 @@
         <div
             class="help-block" :class="{ '-mt-2': showLabel }"
             v-if="instructions && field.instructions_position !== 'below'"
-            v-html="instructions" />
+            v-html="instructions"
+        />
 
         <component
             :is="fieldtypeComponent"
             :config="field"
             :meta="meta"
-            :value="value"
             :handle="field.handle"
             :name-prefix="namePrefix"
             :field-path-prefix="fieldPath"
             :has-error="hasError || hasNestedError"
             :read-only="isReadOnly"
             :show-field-previews="showFieldPreviews"
-            @input="$emit('updated', $event)"
+            :model-value="modelValue"
+            @update:model-value="$emit('updated', $event)"
             @meta-updated="$emit('meta-updated', $event)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
@@ -34,7 +35,8 @@
         <div
             class="help-block mt-2"
             v-if="instructions && field.instructions_position === 'below'"
-            v-html="instructions" />
+            v-html="instructions"
+        />
 
         <div v-if="hasError">
             <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
@@ -46,6 +48,13 @@
 
 <script>
 export default {
+    emits: [
+        'focus',
+        'blur',
+        'updated',
+        'meta-updated',
+        'replicator-preview-updated',
+    ],
 
     props: {
         field: {
@@ -55,7 +64,7 @@ export default {
         meta: {
             type: Object,
         },
-        value: {
+        modelValue: {
             required: true
         },
         parentName: {
@@ -86,13 +95,13 @@ export default {
         },
 
         display() {
-            return __(this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1))
+            return __(this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1));
         },
 
         instructions() {
             return this.field.instructions
-                ? this.$options.filters.markdown(__(this.field.instructions))
-                : null
+                ? this.$filters.markdown(__(this.field.instructions))
+                : null;
         },
 
         storeState() {
@@ -139,11 +148,11 @@ export default {
         },
 
         fieldId() {
-            let prefix = this.fieldPath ? this.fieldPath+'.' : '';
-            return prefix+'field_'+this.field.handle;
+            let prefix = this.fieldPath ? this.fieldPath + '.' : '';
+            return prefix + 'field_' + this.field.handle;
         }
 
     }
 
-}
+};
 </script>

@@ -16,8 +16,8 @@
             :placeholder="__(config.placeholder) || __('Choose...')"
             :searchable="true"
             :taggable="isTaggable"
-            :value="items"
-            @input="input"
+            :model-value="items"
+            @update:model-value="input"
             @search="search"
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')"
@@ -60,6 +60,7 @@ import PositionsSelectOptions from '../../../mixins/PositionsSelectOptions';
 import { SortableList, SortableItem } from '../../sortable/Sortable';
 
 export default {
+    emits: ['focus', 'blur'],
 
     mixins: [PositionsSelectOptions],
 
@@ -137,7 +138,7 @@ export default {
                 items = items === null ? [] : [items];
             }
 
-            this.$emit('input', items);
+            this.$emit('update:model-value', items);
         },
 
     }

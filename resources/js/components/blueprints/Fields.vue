@@ -1,8 +1,7 @@
 <template>
-
     <div class="flex flex-col text-sm">
-
-        <div class="blueprint-section-draggable-zone -mx-1"
+        <div
+            class="blueprint-section-draggable-zone -mx-1"
             :class="{ 'flex flex-wrap flex-1': fields.length }"
             :data-tab="tabId"
             :data-section="sectionId"
@@ -30,8 +29,10 @@
             <div class="px-1">
                 <link-fields
                     :exclude-fieldset="excludeFieldset"
-                    @linked="$emit('field-linked', $event)" />
+                    @linked="$emit('field-linked', $event)"
+                />
             </div>
+
             <div class="px-1">
                 <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
                     <svg-icon name="light/wireframe" class="rtl:ml-2 ltr:mr-2 w-4 h-4" />
@@ -40,33 +41,36 @@
             </div>
         </div>
 
-        <stack name="fieldtype-selector"
+        <stack
+            name="fieldtype-selector"
             v-if="isSelectingNewFieldtype"
             @closed="isSelectingNewFieldtype = false"
         >
-            <fieldtype-selector slot-scope="{ close }" @closed="close" @selected="fieldtypeSelected" />
+            <template #default="{ close }">
+                <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
+            </template>
         </stack>
 
-        <stack name="field-settings"
+        <stack
+            name="field-settings"
             v-if="pendingCreatedField != null"
             @closed="pendingCreatedField = null"
         >
-            <field-settings
-                slot-scope="{ close }"
-                ref="settings"
-                :type="pendingCreatedField.config.type"
-                :root="true"
-                :fields="fields"
-                :config="pendingCreatedField.config"
-                :suggestable-condition-fields="suggestableConditionFields"
-                :is-inside-set="isInsideSet"
-                @committed="fieldCreated"
-                @closed="close"
-            />
+            <template #default="{ close }">
+                <field-settings
+                    ref="settings"
+                    :type="pendingCreatedField.config.type"
+                    :root="true"
+                    :fields="fields"
+                    :config="pendingCreatedField.config"
+                    :suggestable-condition-fields="suggestableConditionFields"
+                    :is-inside-set="isInsideSet"
+                    @committed="fieldCreated"
+                    @closed="close"
+                />
+            </template>
         </stack>
-
     </div>
-
 </template>
 
 <script>
@@ -79,7 +83,6 @@ import FieldSettings from '../fields/Settings.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
-
     mixins: [CanDefineLocalizable],
 
     components: {
@@ -111,7 +114,6 @@ export default {
     },
 
     methods: {
-
         fieldComponent(field) {
             return (field.type === 'import') ? 'ImportField' : 'RegularField';
         },
@@ -166,8 +168,6 @@ export default {
 
             this.$nextTick(() => this.pendingCreatedField = pending);
         },
-
     }
-
 }
 </script>

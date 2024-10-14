@@ -5,34 +5,31 @@
         <relationship-fieldtype
             v-if="container"
             :handle="handle"
-            :value="value"
             :meta="relationshipMeta"
             :config="{ type: 'asset_folder' }"
-            @input="update"
+            :model-value="modelValue"
+            @update:model-value="update"
         />
     </div>
 </template>
 
 <script>
-export default {
+import Fieldtype from './Fieldtype.vue'
 
+export default {
     mixins: [Fieldtype],
 
     inject: ['storeName'],
 
     computed: {
-
         container() {
             return data_get(this.$store.state.publish[this.storeName].values.container, '0', null);
         },
-
         relationshipMeta() {
             return {...this.meta, ...{
                 getBaseSelectionsUrlParameters: { container: this.container }
             }};
         }
-
     }
-
 };
 </script>

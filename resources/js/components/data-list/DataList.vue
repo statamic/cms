@@ -2,6 +2,7 @@
 import Fuse from 'fuse.js';
 
 export default {
+    emits: ['visible-columns-updated', 'selections-updated'],
     props: {
         columns: {
             type: Array,
@@ -17,7 +18,7 @@ export default {
         },
         selections: {
             type: Array,
-            default: () => []
+            default: () => ([])
         },
         maxSelections: {
             type: Number
@@ -53,7 +54,6 @@ export default {
     },
 
     computed: {
-
         filteredRows() {
             let rows = this.rows;
             rows = this.filterBySearch(rows);
@@ -69,11 +69,9 @@ export default {
                 ? this.visibleColumns.map(column => column.field)
                 : Object.keys(rows[0]);
         },
-
     },
 
     watch: {
-
         filteredRows: {
             immediate: true,
             handler: function (rows) {
@@ -85,8 +83,11 @@ export default {
             this.sharedState.selections = selections;
         },
 
-        'sharedState.selections': function (selections) {
-            this.$emit('selections-updated', selections);
+        'sharedState.selections': {
+            deep: true,
+            handler: function (selections) {
+                this.$emit('selections-updated', selections);
+            }
         },
 
         columns(columns) {
@@ -100,21 +101,19 @@ export default {
         visibleColumns(columns) {
             this.$emit('visible-columns-updated', columns);
         },
-
     },
 
-    created() {
+    mounted() {
         this.setInitialSortColumn();
 
         this.$events.$on('clear-selections', this.clearSelections);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('clear-selections', this.clearSelections);
     },
 
     methods: {
-
         setInitialSortColumn() {
             const columns = this.sharedState.columns;
 
@@ -135,7 +134,7 @@ export default {
                 keys: this.searchableColumns,
             });
 
-            return fuse.search(this.searchQuery);
+            return fuse.search(this.searchQuery).map(result => result.item);
         },
 
         sortRows(rows) {
@@ -156,15 +155,13 @@ export default {
         clearSelections() {
             this.sharedState.selections = [];
         },
-
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             rows: this.filteredRows,
             hasSelections: this.sharedState.selections.length > 0,
         });
     }
-
 }
 </script>

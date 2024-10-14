@@ -11,6 +11,7 @@
                 <svg-icon :name="button.svg" v-if="button.svg"></svg-icon>
             </button>
         </template>
+
         <template #default>
             <link-toolbar
                 class="w-84"
@@ -28,9 +29,9 @@
 
 <script>
 import LinkToolbar from './LinkToolbar.vue';
+import BardToolbarButton from './ToolbarButton.vue'
 
 export default {
-
     mixins: [BardToolbarButton],
 
     components: {
@@ -45,7 +46,6 @@ export default {
     },
 
     methods: {
-
         toggleLinkToolbar() {
             this.showingToolbar = ! this.showingToolbar;
 
@@ -69,18 +69,20 @@ export default {
             this.editor.chain().focus().setLink(attributes).run();
             this.linkAttrs = null;
             this.close();
-        }
-    },
+        },
 
-    created() {
-        this.bard.$on('link-toggle', () => {
+        linkToggle() {
             this.toggleLinkToolbar();
             this.$refs.popover.toggle();
-        });
+        },
     },
 
-    beforeDestroy() {
-        this.bard.$off('link-toggle');
+    mounted() {
+        this.bard.eventBus.on('link-toggle', this.linkToggle);
+    },
+
+    unmounted() {
+        this.bard.eventBus.off('link-toggle', this.linkToggle);
     }
 }
 </script>

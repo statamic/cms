@@ -3,6 +3,13 @@ import uniqid from 'uniqid';
 import Component from '../Component';
 
 export default {
+    emits: [
+        'publish-container-created',
+        'publish-container-destroyed',
+        'focus',
+        'blur',
+        'updated',
+    ],
 
     model: {
         prop: 'values',
@@ -19,15 +26,15 @@ export default {
         },
         blueprint: {
             type: Object,
-            default: () => {}
+            default: () => ({})
         },
         values: {
             type: Object,
-            default: () => {}
+            default: () => ({})
         },
         meta: {
             type: Object,
-            default: () => {}
+            default: () => ({})
         },
         errors: {
             type: Object
@@ -50,6 +57,17 @@ export default {
     data() {
         return {
             components: [], // extra components to be injected
+        }
+    },
+
+    computed: {
+        storeValues() {
+            if (!this.$store.state.hasOwnProperty('publish')
+                || !this.$store.state.publish.hasOwnProperty(this.name)) {
+                return {}
+            }
+
+            return this.$store.state.publish[this.name].values
         }
     },
 
@@ -169,10 +187,21 @@ export default {
                         state.localizedFields = fields;
                     },
                     lockField(state, { handle, user }) {
-                        Vue.set(state.fieldLocks, handle, user || true);
+                        // @todo(jelleroorda): double check if it still works
+                        // Vue.set(state.fieldLocks, handle, user || true);
+                        state.fieldsLocks = {
+                            ...state.fieldsLocks,
+                            [handle]: user || true,
+                        }
                     },
                     unlockField(state, handle) {
-                        Vue.delete(state.fieldLocks, handle);
+                        // @todo(jelleroorda): double check if it still works
+                        // Vue.delete(state.fieldLocks, handle);
+                        const newLocks = { ...state.fieldsLocks }
+
+                        delete newLocks[handle]
+
+                        state.fieldsLocks = newLocks
                     },
                     initialize(state, payload) {
                         state.blueprint = payload.blueprint;
@@ -196,14 +225,12 @@ export default {
                 actions: {
                     setFieldValue(context, payload) {
                         context.commit('setFieldValue', payload);
-                        vm.emitUpdatedEvent(context.state.values);
                     },
                     setFieldMeta(context, payload) {
                         context.commit('setFieldMeta', payload);
                     },
                     setValues(context, payload) {
                         context.commit('setValues', payload);
-                        vm.emitUpdatedEvent(context.state.values);
                     },
                     setMeta(context, payload) {
                         context.commit('setMeta', payload);
@@ -214,11 +241,6 @@ export default {
 
         removeVuexModule() {
             this.$store.unregisterModule(['publish', this.name]);
-        },
-
-        emitUpdatedEvent(values) {
-            this.$emit('updated', values);
-            this.dirty();
         },
 
         saving() {
@@ -270,6 +292,14 @@ export default {
             }
         },
 
+        storeValues: {
+            deep: true,
+            handler(newValue) {
+                this.$emit('updated', newValue)
+                this.dirty();
+            }
+        },
+
         meta: {
             deep: true,
             handler(after, before) {
@@ -304,9 +334,9 @@ export default {
     },
 
     render() {
-        return this.$scopedSlots.default({
-            values: this.$store.state.publish[this.name].values,
-            container: this._self,
+        return this.$slots.default({
+            values: this.storeValues,
+            container: this, // @todo this was this._self, how to fix this?
             components: this.components,
             setFieldValue: this.setFieldValue,
             setFieldMeta: this.setFieldMeta,

@@ -25,6 +25,7 @@
 
 <script>
 export default {
+    emits: ['cancel', 'confirm', 'opened'],
     props: {
         title: {
             type: String

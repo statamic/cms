@@ -19,10 +19,10 @@
                     <td class="text-sm">
                         <v-select
                             :options="siteOriginOptions(site)"
-                            :value="site.origin"
+                            :model-value="site.origin"
                             :searchable="false"
                             :reduce="opt => opt.value"
-                            @input="site.origin = $event"
+                            @update:model-value="site.origin = $event"
                         />
                     </td>
                 </tr>

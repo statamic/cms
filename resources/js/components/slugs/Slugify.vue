@@ -1,5 +1,6 @@
 <script>
 export default {
+    emits: ['slugifying', 'slugified'],
 
     model: {
         prop: 'to',
@@ -26,6 +27,7 @@ export default {
 
     data() {
         let slugifier = this.$slug.in(this.language).separatedBy(this.separator);
+
         if (this.async) slugifier.async();
 
         return {
@@ -61,11 +63,10 @@ export default {
     },
 
     render() {
-        return this.$scopedSlots.default({});
+        return this.$slots.default(this.$attrs);
     },
 
     methods: {
-
         reset() {
             if (! this.enabled) return Promise.resolve();
 
@@ -77,7 +78,6 @@ export default {
                 this.shouldSlugify = true;
                 if (this.slug === initialSlug) this.$emit('slugified', this.slug);
             });
-
         },
 
         slugify() {

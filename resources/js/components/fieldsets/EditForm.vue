@@ -1,9 +1,8 @@
 <template>
-
     <div>
-
         <header class="mb-6">
             <breadcrumb :url="breadcrumbUrl" :title="__('Fieldsets')" />
+
             <div class="flex items-center justify-between">
                 <h1>{{ __(initialTitle) }}</h1>
                 <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
@@ -25,7 +24,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="content mt-10 mb-4">
@@ -46,9 +44,7 @@
                 @editor-closed="editingField = null"
             />
         </div>
-
     </div>
-
 </template>
 
 <script>
@@ -57,7 +53,6 @@ import {Sortable, Plugins} from '@shopify/draggable';
 import SuggestsConditionalFields from '../blueprints/SuggestsConditionalFields';
 
 export default {
-
     mixins: [SuggestsConditionalFields],
 
     components: {
@@ -77,7 +72,6 @@ export default {
     },
 
     computed: {
-
         fields: {
             get() {
                 return this.fieldset.fields;
@@ -90,7 +84,13 @@ export default {
         fieldsForConditionSuggestions() {
             return this.fields;
         }
+    },
 
+    created() {
+        this.$keys.bindGlobal(['mod+s'], e => {
+            e.preventDefault();
+            this.save();
+        });
     },
 
     mounted() {
@@ -98,7 +98,6 @@ export default {
     },
 
     methods: {
-
         save() {
             this.$axios[this.method](this.action, this.fieldset)
                 .then(response => {
@@ -143,13 +142,5 @@ export default {
             });
         }
     },
-
-    created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
-            e.preventDefault();
-            this.save();
-        });
-    },
-
 }
 </script>
