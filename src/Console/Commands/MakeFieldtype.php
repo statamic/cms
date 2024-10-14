@@ -24,7 +24,7 @@ class MakeFieldtype extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new fieldtype addon';
+    protected $description = 'Create a new fieldtype';
 
     /**
      * The type of class being generated.
