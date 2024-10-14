@@ -33,7 +33,7 @@ class Controller extends BaseController
             return back()->withErrors(['token' => __('statamic::messages.password_protect_token_invalid')], 'passwordProtect');
         }
 
-        if (! $this->driver()->isValidPassword($this->password)) {
+        if (is_null($this->password) || ! $this->driver()->isValidPassword($this->password)) {
             return back()->withErrors(['password' => __('statamic::messages.password_protect_incorrect_password')], 'passwordProtect');
         }
 
