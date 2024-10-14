@@ -27,6 +27,7 @@ if (config('statamic.cp.enabled')) {
     });
 }
 
+/* @deprecated The new Glide implementation does not use the HTTP API. */
 if (Glide::shouldServeByHttp()) {
     require __DIR__.'/glide.php';
 }
