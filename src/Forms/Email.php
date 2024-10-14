@@ -160,6 +160,7 @@ class Email extends Mailable
             });
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
+            'email_config' => $this->config,
             'config' => config()->all(),
             'fields' => $fields,
             'site_url' => Config::getSiteUrl(),
