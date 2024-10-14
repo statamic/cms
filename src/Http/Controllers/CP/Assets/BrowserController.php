@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -112,7 +113,14 @@ class BrowserController extends CpController
             'data' => [
                 'assets' => FolderAsset::collection($assets ?? collect())->resolve(),
                 'folder' => array_merge((new Folder($folder))->resolve(), [
-                    'folders' => $folders->values(),
+                    'folders' => $folders->values()->map(function ($folder) use ($container) {
+                        return array_merge($folder->toArray(), [
+                            'actions' => Action::for($folder, [
+                                'container' => $container->handle(),
+                                'folder' => $folder->path(),
+                            ]),
+                        ]);
+                    }),
                 ]),
             ],
             'links' => [
