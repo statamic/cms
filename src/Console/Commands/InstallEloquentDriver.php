@@ -652,7 +652,7 @@ class InstallEloquentDriver extends Command
             explode(' ', $command)
         );
 
-        $result = Process::run($components, function ($type, $line) use ($writeOutput) {
+        $result = Process::forever()->run($components, function ($type, $line) use ($writeOutput) {
             if ($writeOutput) {
                 $this->output->write($line);
             }
