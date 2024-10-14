@@ -22,7 +22,7 @@ class MakeScope extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new query scope addon';
+    protected $description = 'Create a new query scope';
 
     /**
      * The type of class being generated.

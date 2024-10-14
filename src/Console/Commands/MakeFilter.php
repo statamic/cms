@@ -22,7 +22,7 @@ class MakeFilter extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new filter addon';
+    protected $description = 'Create a new filter';
 
     /**
      * The type of class being generated.

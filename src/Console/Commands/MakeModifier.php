@@ -22,7 +22,7 @@ class MakeModifier extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new modifier addon';
+    protected $description = 'Create a new modifier';
 
     /**
      * The type of class being generated.

@@ -23,7 +23,7 @@ class MakeTag extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new tag addon';
+    protected $description = 'Create a new tag';
 
     /**
      * The type of class being generated.

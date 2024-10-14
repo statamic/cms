@@ -23,7 +23,7 @@ class MakeWidget extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new widget addon';
+    protected $description = 'Create a new widget';
 
     /**
      * The type of class being generated.

@@ -22,7 +22,7 @@ class MakeDictionary extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new dictionary addon';
+    protected $description = 'Create a new dictionary';
 
     /**
      * The type of class being generated.
