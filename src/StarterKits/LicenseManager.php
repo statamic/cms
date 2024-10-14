@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
 
+use function Laravel\Prompts\text;
+
 final class LicenseManager
 {
     const OUTPOST_ENDPOINT = 'https://outpost.statamic.com/v3/starter-kits/';
