@@ -102,8 +102,8 @@ class CoreModifiersTest extends ParserTestCase
 
     public function test_filter_empty()
     {
-        $this->assertSame("one, two, three, four, five", $this->resultOf('{{ filter | filter_empty | join(", ") }}'));
-        $this->assertSame("one, two, three, four, five", $this->resultOf('{{ filter_collection | filter_empty | join(", ") }}'));
+        $this->assertSame('one, two, three, four, five', $this->resultOf('{{ filter | filter_empty | join(", ") }}'));
+        $this->assertSame('one, two, three, four, five', $this->resultOf('{{ filter_collection | filter_empty | join(", ") }}'));
     }
 
     public function test_starts_with_accepts_special_characters()

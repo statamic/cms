@@ -703,8 +703,8 @@ class CoreModifiers extends Modifier
     public function filter_empty($value)
     {
         return collect($value)
-            ->filter(fn($item) => ! empty($item))
-            ->when(is_array($value), fn($collection) => $collection->all());
+            ->filter(fn ($item) => ! empty($item))
+            ->when(is_array($value), fn ($collection) => $collection->all());
     }
 
     /**
