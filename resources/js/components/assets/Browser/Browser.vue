@@ -74,7 +74,9 @@
                             <uploads
                                 v-if="uploads.length"
                                 :uploads="uploads"
+                                :allow-selecting-existing="allowSelectingExistingUpload"
                                 class="-mt-px"
+                                @existing-selected="existingUploadSelected"
                             />
 
                             <div class="overflow-x-auto overflow-y-hidden">
@@ -317,6 +319,7 @@ export default {
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
+        allowSelectingExistingUpload: Boolean
     },
 
     data() {
@@ -579,6 +582,11 @@ export default {
         uploadError(upload, uploads) {
             this.uploads = uploads;
             this.$toast.error(upload.errorMessage);
+        },
+
+        existingUploadSelected(upload) {
+            this.selectedAssets.push('images::kayaks.jpg');
+            this.$emit('selections-updated', this.selectedAssets);
         },
 
         openFileBrowser() {

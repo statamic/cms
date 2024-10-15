@@ -26,6 +26,7 @@
                 <dropdown-item @click="retryAndOverwrite">Overwrite existing file</dropdown-item>
                 <dropdown-item @click="openNewFilenameModal">Choose new filename</dropdown-item>
                 <dropdown-item @click="retryWithTimestamp">Append timestamp</dropdown-item>
+                <dropdown-item @click="selectExisting" v-if="allowSelectingExisting">Select existing file</dropdown-item>
             </dropdown-list>
             <button class="btn btn-xs" @click="clear">Cancel</button>
         </div>
@@ -48,7 +49,13 @@
 <script>
 export default {
 
-    props: ['extension', 'basename', 'percent', 'error'],
+    props: {
+        extension: String,
+        basename: String,
+        percent: Number,
+        error: String,
+        allowSelectingExisting: Boolean,
+    },
 
     data() {
         return {
@@ -97,6 +104,10 @@ export default {
 
         retryWithNewFilename() {
             this.$emit('retry', { option: 'rename', filename: this.newFilename})
+        },
+
+        selectExisting() {
+            this.$emit('existing-selected');
         }
 
     }
