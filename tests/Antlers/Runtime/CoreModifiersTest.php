@@ -50,6 +50,18 @@ class CoreModifiersTest extends ParserTestCase
                 'hippo',
                 'hippo',
             ],
+            'filter' => $filter_data = [
+                'one',
+                '',
+                'two',
+                null,
+                'three',
+                [],
+                'four',
+                false,
+                'five',
+            ],
+            'filter_collection' => collect($filter_data),
             'complex' => [
                 [
                     'last_name' => 'Zebra',
@@ -86,6 +98,12 @@ class CoreModifiersTest extends ParserTestCase
     protected function resultOf($text)
     {
         return $this->renderString($text, $this->data, true);
+    }
+
+    public function test_filter_empty()
+    {
+        $this->assertSame("one, two, three, four, five", $this->resultOf('{{ filter | filter_empty | join(", ") }}'));
+        $this->assertSame("one, two, three, four, five", $this->resultOf('{{ filter_collection | filter_empty | join(", ") }}'));
     }
 
     public function test_starts_with_accepts_special_characters()

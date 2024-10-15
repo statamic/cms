@@ -700,6 +700,13 @@ class CoreModifiers extends Modifier
         return pathinfo($value, PATHINFO_EXTENSION);
     }
 
+    public function filter_empty($value)
+    {
+        return collect($value)
+            ->filter(fn($item) => ! empty($item))
+            ->when(is_array($value), fn($collection) => $collection->all());
+    }
+
     /**
      * Generate a link to a Favicon file.
      *
