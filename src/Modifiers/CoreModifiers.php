@@ -711,19 +711,16 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Generate a link to a Favicon file.
+     * Filters out empty values from an array or collection.
      *
      * @param  array  $value
-     * @param  array  $params
      * @return array
      */
-    public function filter($value, $params)
+    public function filterEmpty($value)
     {
-        $keepKeys = Arr::get($params, 0, true);
-
-        $collection = collect($value)->filter();
-
-        return $keepKeys ? $collection->all() : $collection->values()->all();
+        return collect($value)
+            ->filter()
+            ->when(is_array($value), fn ($collection) => $collection->all());
     }
 
     /**
