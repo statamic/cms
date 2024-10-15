@@ -711,6 +711,22 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Generate a link to a Favicon file.
+     *
+     * @param  array  $value
+     * @param  array  $params
+     * @return array
+     */
+    public function filter($value, $params)
+    {
+        $keepKeys = Arr::get($params, 0, true);
+
+        $collection = collect($value)->filter();
+
+        return $keepKeys ? $collection->all() : $collection->values()->all();
+    }
+
+    /**
      * Returns the first $params[0] characters of a string, or the first element of an array.
      *
      * @return string
