@@ -31,7 +31,7 @@ class AssetUploader extends Uploader
             $ext = strtolower($ext);
         }
 
-        $filename = self::getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $filename = self::getSafeFilename($this->asset->filename());
 
         $directory = $this->asset->folder();
         $directory = ($directory === '.') ? '/' : $directory;

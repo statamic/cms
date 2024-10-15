@@ -17,12 +17,28 @@
                 :style="{ width: percent+'%' }" />
         </div>
 
-        <div class="px-2" v-if="status === 'error'">
+        <div class="ml-4 px-2 flex items-center gap-2" v-if="status === 'error'">
             {{ error }}
-            <button @click.prevent="clear" class="flex items-center text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:text-dark-100">
-                <svg-icon name="micro/circle-with-cross" class="h-4 w-4" />
-            </button>
+            <dropdown-list>
+                <template #trigger>
+                    <button class="ml-4 btn btn-xs">Retry...</button>
+                </template>
+                <dropdown-item @click="retryAndOverwrite">Overwrite existing file</dropdown-item>
+                <dropdown-item @click="openNewFilenameModal">Choose new filename</dropdown-item>
+                <dropdown-item @click="retryWithTimestamp">Append timestamp</dropdown-item>
+            </dropdown-list>
+            <button class="btn btn-xs" @click="clear">Cancel</button>
         </div>
+
+
+        <confirmation-modal
+            v-if="showNewFilenameModal"
+            :title="__('New Filename')"
+            @cancel="showNewFilenameModal = false"
+            @confirm="confirmNewFilename"
+        >
+            <text-input :focus="true" v-model="newFilename" @keydown.enter="confirmNewFilename" />
+        </confirmation-modal>
 
     </div>
 
@@ -34,6 +50,12 @@ export default {
 
     props: ['extension', 'basename', 'percent', 'error'],
 
+    data() {
+        return {
+            showNewFilenameModal: false,
+            newFilename: '',
+        }
+    },
 
     computed: {
 
@@ -54,6 +76,27 @@ export default {
 
         clear() {
             this.$emit('clear');
+        },
+
+        retryAndOverwrite() {
+            this.$emit('retry', { option: 'overwrite' });
+        },
+
+        retryWithTimestamp() {
+            this.$emit('retry', { option: 'timestamp' });
+        },
+
+        openNewFilenameModal() {
+            this.showNewFilenameModal = true;
+        },
+
+        confirmNewFilename() {
+            this.showNewFilenameModal = false;
+            this.retryWithNewFilename();
+        },
+
+        retryWithNewFilename() {
+            this.$emit('retry', { option: 'rename', filename: this.newFilename})
         }
 
     }

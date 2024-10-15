@@ -9,6 +9,7 @@
             :percent="upload.percent"
             :error="upload.errorMessage"
             @clear="clearUpload(i)"
+            @retry="retry(i, $event)"
         />
     </div>
 
@@ -32,6 +33,10 @@ export default {
 
         clearUpload(i) {
             this.uploads.splice(i, 1);
+        },
+
+        retry(i, args) {
+            this.uploads[i].retry(args);
         }
 
     }

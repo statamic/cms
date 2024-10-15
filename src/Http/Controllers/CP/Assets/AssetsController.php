@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Statamic\Assets\UploadedReplacementFile;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
@@ -12,6 +14,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
 use Statamic\Rules\AllowedFile;
+use Statamic\Rules\UploadableAssetPath;
 
 class AssetsController extends CpController
 {
@@ -81,9 +84,27 @@ class AssetsController extends CpController
         ]);
 
         $file = $request->file('file');
-        $path = ltrim($request->folder.'/'.$file->getClientOriginalName(), '/');
 
-        $asset = $container->makeAsset($path)->upload($file);
+        $basename = $request->option === 'rename' && $request->filename
+            ? $request->filename.'.'.$file->getClientOriginalExtension()
+            : $file->getClientOriginalName();
+
+        $path = ltrim($request->folder.'/'.$basename, '/');
+
+        $validator = Validator::make(['path' => $path], ['path' => new UploadableAssetPath($container)]);
+
+        if (! in_array($request->option, ['timestamp', 'overwrite']) && $validator->fails()) {
+            return response()->json([
+                'message' => 'The given data was invalid.',
+                'errors' => $validator->errors()->messages(),
+            ], 422);
+        }
+
+        $asset = $container->asset($path) ?? $container->makeAsset($path);
+
+        $asset = $request->option === 'overwrite'
+            ? $asset->reupload(new UploadedReplacementFile($file))
+            : $asset->upload($file);
 
         return new AssetResource($asset);
     }
