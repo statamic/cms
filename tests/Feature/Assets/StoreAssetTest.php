@@ -120,6 +120,21 @@ class StoreAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_upload_when_file_exists_with_different_casing()
+    {
+        Storage::disk('test')->put('path/to/test.jpg', 'contents');
+        Storage::disk('test')->assertExists('path/to/test.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->submit([
+                'file' => UploadedFile::fake()->image('tEsT.jpg'),
+            ])
+            ->assertStatus(422)
+            ->assertInvalid(['path' => 'A file already exists with this name.']);
+    }
+
+    #[Test]
     public function it_can_upload_and_overwrite()
     {
         Storage::disk('test')->put('path/to/test.jpg', 'contents');

@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Statamic\Assets\AssetUploader;
 use Statamic\Assets\UploadedReplacementFile;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -88,6 +89,8 @@ class AssetsController extends CpController
         $basename = $request->option === 'rename' && $request->filename
             ? $request->filename.'.'.$file->getClientOriginalExtension()
             : $file->getClientOriginalName();
+
+        $basename = AssetUploader::getSafeFilename($basename);
 
         $path = ltrim($request->folder.'/'.$basename, '/');
 
