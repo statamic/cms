@@ -585,7 +585,10 @@ export default {
         },
 
         existingUploadSelected(upload) {
-            this.selectedAssets.push('images::kayaks.jpg');
+            const path = `${this.folder.path}/${upload.basename}`.replace(/^\/+/, '');
+            const id = `${this.container.id}::${path}`;
+
+            this.selectedAssets.push(id);
             this.$emit('selections-updated', this.selectedAssets);
         },
 
