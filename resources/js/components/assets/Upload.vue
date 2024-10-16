@@ -97,6 +97,7 @@ export default {
 
         openNewFilenameModal() {
             this.showNewFilenameModal = true;
+            this.newFilename = this.basename.substring(0, this.basename.lastIndexOf('.'));
         },
 
         confirmNewFilename() {
