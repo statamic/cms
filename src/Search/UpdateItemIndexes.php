@@ -8,6 +8,7 @@ use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
+use Statamic\Events\EntryScheduleFulfilled;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Events\UserDeleted;
@@ -20,6 +21,7 @@ class UpdateItemIndexes implements ShouldQueue
     {
         $event->listen(EntrySaved::class, self::class.'@update');
         $event->listen(EntryDeleted::class, self::class.'@delete');
+        $event->listen(EntryScheduleFulfilled::class, self::class.'@update');
         $event->listen(AssetSaved::class, self::class.'@update');
         $event->listen(AssetDeleted::class, self::class.'@delete');
         $event->listen(UserSaved::class, self::class.'@update');
