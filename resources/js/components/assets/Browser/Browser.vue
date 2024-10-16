@@ -454,7 +454,10 @@ export default {
         },
 
         selectedPath(selectedPath) {
-            this.path = selectedPath;
+            // The selected path might change from outside due to a popstate navigation
+            if (!selectedPath.endsWith('/edit')) {
+                this.path = selectedPath;
+            }
         },
 
         parameters(after, before) {
