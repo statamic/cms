@@ -16,7 +16,7 @@ class AvailableAssetFilename implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if ($value === $this->asset->filename()) {
-            $fail('This is the current filename.');
+            $fail('statamic::validation.asset_current_filename')->translate();
 
             return;
         }
@@ -33,8 +33,8 @@ class AvailableAssetFilename implements ValidationRule
         }
 
         $this->isSameFile($this->asset, $existing)
-            ? $fail('A file already exists with this name and has the same content. You may want to delete this rather than rename it.')
-            : $fail('A file already exists with this name but has different content. You may want to replace the other file with this one instead.');
+            ? $fail('statamic::validation.asset_file_exists_same_content')->translate()
+            : $fail('statamic::validation.asset_file_exists_different_content')->translate();
     }
 
     private function isSameFile($a, $b)

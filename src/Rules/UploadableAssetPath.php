@@ -15,7 +15,7 @@ class UploadableAssetPath implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if ($this->container->asset($value)) {
-            $fail('A file already exists with this name.');
+            $fail('statamic::validation.asset_file_exists')->translate();
         }
     }
 }
