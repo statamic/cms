@@ -2,12 +2,14 @@
 
     <div class="flex items-center my-4" :class="{'text-red-500': status == 'error'}">
 
-        <div class="mx-2 flex items-center">
-            <svg-icon name="micro/warning" class="text-red-500 h-4 w-4" v-if="status === 'error'" />
-            <loading-graphic v-else :inline="true" text="" />
-        </div>
+        <div class="flex items-center flex-1">
+            <div class="mx-2 flex items-center">
+                <svg-icon name="micro/warning" class="text-red-500 h-4 w-4" v-if="status === 'error'" />
+                <loading-graphic v-else :inline="true" text="" />
+            </div>
 
-        <div class="filename">{{ basename }}</div>
+            <div class="filename">{{ basename }}</div>
+        </div>
 
         <div
             v-if="status !== 'error'"
@@ -21,7 +23,7 @@
             {{ error }}
             <dropdown-list>
                 <template #trigger>
-                    <button class="ml-4 btn btn-xs">Retry...</button>
+                    <button class="ml-4 btn btn-xs">Fix...</button>
                 </template>
                 <dropdown-item @click="retryAndOverwrite">Overwrite existing file</dropdown-item>
                 <dropdown-item @click="openNewFilenameModal">Choose new filename</dropdown-item>
