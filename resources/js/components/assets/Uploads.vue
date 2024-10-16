@@ -8,6 +8,7 @@
             :extension="upload.extension"
             :percent="upload.percent"
             :error="upload.errorMessage"
+            :error-status="upload.errorStatus"
             :allow-selecting-existing="allowSelectingExisting"
             @clear="clearUpload(i)"
             @retry="retry(i, $event)"

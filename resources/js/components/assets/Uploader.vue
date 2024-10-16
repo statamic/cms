@@ -129,6 +129,7 @@ export default {
                 extension: file.name.split('.').pop(),
                 percent: 0,
                 errorMessage: null,
+                errorStatus: null,
                 instance: upload,
                 retry: (opts) => this.retry(id, opts)
             });
@@ -217,6 +218,7 @@ export default {
                 }
             }
             upload.errorMessage = msg;
+            upload.errorStatus = status;
             this.$emit('error', upload, this.uploads);
             this.processUploadQueue();
         },
