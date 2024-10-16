@@ -7,6 +7,7 @@ use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
@@ -97,6 +98,8 @@ class AppServiceProvider extends ServiceProvider
         TrimStrings::skipWhen(fn (Request $request) => $request->is(config('statamic.cp.route').'/*'));
 
         $this->addAboutCommandInfo();
+
+        Schedule::command('statamic:entry:schedule')->everyMinute();
     }
 
     public function register()
