@@ -26,11 +26,11 @@
                     <button class="ml-4 btn btn-xs">Fix...</button>
                 </template>
                 <dropdown-item @click="retryAndOverwrite">Overwrite existing file</dropdown-item>
-                <dropdown-item @click="openNewFilenameModal">Choose new filename</dropdown-item>
+                <dropdown-item @click="openNewFilenameModal">Choose new filename...</dropdown-item>
                 <dropdown-item @click="retryWithTimestamp">Append timestamp</dropdown-item>
-                <dropdown-item @click="selectExisting" v-if="allowSelectingExisting">Select existing file</dropdown-item>
+                <dropdown-item @click="selectExisting" v-if="allowSelectingExisting">Discard and use existing file</dropdown-item>
             </dropdown-list>
-            <button class="btn btn-xs" @click="clear">Cancel</button>
+            <button class="btn btn-xs" @click="clear">Discard</button>
         </div>
 
         <confirmation-modal
