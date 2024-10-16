@@ -4,6 +4,7 @@ namespace Statamic\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Statamic\Assets\AssetUploader;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Support\Arr;
 
@@ -15,6 +16,8 @@ class AvailableAssetFilename implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        $value = AssetUploader::getSafeFilename($value);
+
         if ($value === $this->asset->filename()) {
             $fail('statamic::validation.asset_current_filename')->translate();
 
