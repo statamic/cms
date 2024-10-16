@@ -96,11 +96,8 @@ class AssetsController extends CpController
 
         $validator = Validator::make(['path' => $path], ['path' => new UploadableAssetPath($container)]);
 
-        if (! in_array($request->option, ['timestamp', 'overwrite']) && $validator->fails()) {
-            return response()->json([
-                'message' => 'The given data was invalid.',
-                'errors' => $validator->errors()->messages(),
-            ], 422);
+        if (! in_array($request->option, ['timestamp', 'overwrite'])) {
+            $validator->validate();
         }
 
         $asset = $container->asset($path) ?? $container->makeAsset($path);
