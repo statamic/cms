@@ -40,7 +40,7 @@
             @cancel="showNewFilenameModal = false"
             @confirm="confirmNewFilename"
         >
-            <text-input :focus="true" v-model="newFilename" @keydown.enter="confirmNewFilename" />
+            <text-input autoselect v-model="newFilename" @keydown.enter="confirmNewFilename" />
         </confirmation-modal>
 
     </div>
