@@ -33,7 +33,6 @@
             <button class="btn btn-xs" @click="clear">Cancel</button>
         </div>
 
-
         <confirmation-modal
             v-if="showNewFilenameModal"
             :title="__('New Filename')"
