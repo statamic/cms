@@ -611,7 +611,12 @@ export default {
 
             if (this.value.includes(id)) return;
 
-            this.loadAssets([...this.value, id]);
+            if (this.maxFiles === 1) {
+                this.loadAssets([id]);
+            } else {
+                this.loadAssets([...this.value, id]);
+            }
+
         }
     },
 
