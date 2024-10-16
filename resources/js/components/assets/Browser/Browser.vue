@@ -75,7 +75,7 @@
                                 v-if="uploads.length"
                                 :uploads="uploads"
                                 :allow-selecting-existing="allowSelectingExistingUpload"
-                                class="-mt-px"
+                                :class="{ '-mt-px': !hasSelections, 'mt-10': hasSelections }"
                                 @existing-selected="existingUploadSelected"
                             />
 
