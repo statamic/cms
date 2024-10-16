@@ -2,12 +2,12 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
@@ -99,7 +99,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->addAboutCommandInfo();
 
-        Schedule::command('statamic:entry:schedule')->everyMinute();
+        $this->app->make(Schedule::class)->command('statamic:entry:schedule')->everyMinute();
     }
 
     public function register()
