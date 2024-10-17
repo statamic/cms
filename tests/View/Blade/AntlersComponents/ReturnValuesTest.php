@@ -12,6 +12,13 @@ use Tests\TestCase;
 #[Group('blade-compiler')]
 class ReturnValuesTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->artisan('view:clear');
+    }
+
     #[Test]
     public function it_renders_arrays()
     {
