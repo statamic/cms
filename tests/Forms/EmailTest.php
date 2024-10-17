@@ -149,6 +149,7 @@ class EmailTest extends TestCase
             'social',
 
             // manual "system" vars added to email
+            'email_config',
             'config',
             'date',
             'fields',
