@@ -28,90 +28,122 @@ class DefaultInvalidator implements Invalidator
             return $this->cacher->flush();
         }
 
+        $urls = collect();
+
         if ($item instanceof Entry) {
-            $this->invalidateEntryUrls($item);
+            $urls = $this->getEntryUrls($item);
         } elseif ($item instanceof Term) {
-            $this->invalidateTermUrls($item);
+            $urls = $this->getTermUrls($item);
         } elseif ($item instanceof Nav) {
-            $this->invalidateNavUrls($item);
+            $urls = $this->getNavUrls($item);
         } elseif ($item instanceof GlobalSet) {
-            $this->invalidateGlobalUrls($item);
+            $urls = $this->getGlobalUrls($item);
         } elseif ($item instanceof Collection) {
-            $this->invalidateCollectionUrls($item);
+            $urls = $this->getCollectionUrls($item);
         } elseif ($item instanceof Asset) {
-            $this->invalidateAssetUrls($item);
+            $urls = $this->getAssetUrls($item);
         } elseif ($item instanceof Form) {
-            $this->invalidateFormUrls($item);
+            $urls = $this->getFormUrls($item);
+        }
+
+        collect($urls)
+            ->filter(fn ($url) => is_array($url))
+            ->each(fn ($url) => $this->cacher->invalidateUrl(...$url));
+
+        $urls = collect($urls)->filter(fn ($url) => ! is_array($url));
+        if ($urls->isNotEmpty()) {
+            $this->cacher->invalidateUrls($urls->values()->all());
         }
     }
 
-    protected function invalidateFormUrls($form)
+    public function invalidateAndRecache($item)
     {
-        $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "forms.{$form->handle()}.urls")
-        );
+        if (! config('statamic.static_caching.background_recache', false)) {
+            return $this->invalidate($item);
+        }
+
+        $urls = [];
+
+        if ($this->rules === 'all') {
+            $this->recacheUrls($this->cacher->getUrls());
+
+            return;
+        }
+
+        if ($item instanceof Entry) {
+            $urls = $this->getEntryUrls($item);
+        } elseif ($item instanceof Term) {
+            $urls = $this->getTermUrls($item);
+        } elseif ($item instanceof Nav) {
+            $urls = $this->getNavUrls($item);
+        } elseif ($item instanceof GlobalSet) {
+            $urls = $this->getGlobalUrls($item);
+        } elseif ($item instanceof Collection) {
+            $urls = $this->getCollectionUrls($item);
+        } elseif ($item instanceof Asset) {
+            $urls = $this->getAssetUrls($item);
+        } elseif ($item instanceof Form) {
+            $urls = $this->getFormUrls($item);
+        }
+
+        $this->cacher->recacheUrls($urls);
     }
 
-    protected function invalidateAssetUrls($asset)
+    private function getFormUrls($form)
     {
-        $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls")
-        );
+        return Arr::get($this->rules, "forms.{$form->handle()}.urls");
     }
 
-    protected function invalidateEntryUrls($entry)
+    protected function getAssetUrls($asset)
     {
-        $entry->descendants()->merge([$entry])->each(function ($entry) {
+        return Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls");
+    }
+
+    protected function getEntryUrls($entry)
+    {
+        $urls = $entry->descendants()->merge([$entry])->map(function ($entry) {
             if (! $entry->isRedirect() && $url = $entry->absoluteUrl()) {
-                $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+                return $this->splitUrlAndDomain($url);
             }
-        });
+        })->filter();
 
-        $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls")
-        );
+        return $urls->merge(Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls"))->all();
     }
 
-    protected function invalidateTermUrls($term)
+    protected function getTermUrls($term)
     {
+        $urls = collect();
         if ($url = $term->absoluteUrl()) {
-            $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+            $urls = $urls->push($this->splitUrlAndDomain($url));
 
-            $term->taxonomy()->collections()->each(function ($collection) use ($term) {
+            $urls = $urls->merge($term->taxonomy()->collections()->map(function ($collection) use ($term) {
                 if ($url = $term->collection($collection)->absoluteUrl()) {
-                    $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+                    return $this->splitUrlAndDomain($url);
                 }
-            });
+            }))->filter();
         }
 
-        $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls")
-        );
+        return $urls->merge(Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls"))->all();
     }
 
-    protected function invalidateNavUrls($nav)
+    protected function getNavUrls($nav)
     {
-        $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "navigation.{$nav->handle()}.urls")
-        );
+        return Arr::get($this->rules, "navigation.{$nav->handle()}.urls");
     }
 
-    protected function invalidateGlobalUrls($set)
+    protected function getGlobalUrls($set)
     {
-        $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "globals.{$set->handle()}.urls")
-        );
+        return Arr::get($this->rules, "globals.{$set->handle()}.urls");
     }
 
-    protected function invalidateCollectionUrls($collection)
+    protected function getCollectionUrls($collection)
     {
+        $urls = [];
         if ($url = $collection->absoluteUrl()) {
-            $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+            $urls[] = $this->splitUrlAndDomain($url);
         }
 
-        $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "collections.{$collection->handle()}.urls")
-        );
+        return array_merge($urls, Arr::get($this->rules, "collections.{$collection->handle()}.urls"));
     }
 
     private function splitUrlAndDomain(string $url)
