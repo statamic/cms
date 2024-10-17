@@ -13,7 +13,6 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\AddonsDiscover::class,
         Commands\AssetsGeneratePresets::class,
         Commands\AssetsMeta::class,
-        Commands\EntrySchedule::class,
         Commands\GlideClear::class,
         Commands\Install::class,
         Commands\InstallCollaboration::class,

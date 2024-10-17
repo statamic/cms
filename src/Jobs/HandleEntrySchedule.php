@@ -1,18 +1,18 @@
 <?php
 
-namespace Statamic\Console\Commands;
+namespace Statamic\Jobs;
 
-use Illuminate\Console\Command;
-use Statamic\Console\RunsInPlease;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 use Statamic\Events\EntryScheduleFulfilled;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 
-class EntrySchedule extends Command
+class HandleEntrySchedule implements ShouldQueue
 {
-    use RunsInPlease;
-
-    protected $signature = 'statamic:entry:schedule';
+    use Dispatchable, InteractsWithQueue, Queueable;
 
     public function handle()
     {
