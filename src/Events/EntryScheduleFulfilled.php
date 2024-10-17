@@ -2,12 +2,8 @@
 
 namespace Statamic\Events;
 
-use Illuminate\Foundation\Events\Dispatchable;
-
-class EntryScheduleFulfilled
+class EntryScheduleFulfilled extends Event
 {
-    use Dispatchable;
-
     public $entry;
 
     public function __construct($entry)
