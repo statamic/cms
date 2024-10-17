@@ -15,6 +15,6 @@ class EntryScheduleReached extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Entry schedule fulfilled', [], config('statamic.git.locale'));
+        return __('Entry schedule reached', [], config('statamic.git.locale'));
     }
 }
