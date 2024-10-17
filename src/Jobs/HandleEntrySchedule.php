@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Statamic\Events\EntryScheduleFulfilled;
+use Statamic\Events\EntryScheduleReached;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 
@@ -16,7 +16,7 @@ class HandleEntrySchedule implements ShouldQueue
 
     public function handle()
     {
-        $this->entries()->each(fn ($entry) => EntryScheduleFulfilled::dispatch($entry));
+        $this->entries()->each(fn ($entry) => EntryScheduleReached::dispatch($entry));
     }
 
     private function entries()

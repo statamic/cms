@@ -4,7 +4,7 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
-class EntryScheduleFulfilled extends Event implements ProvidesCommitMessage
+class EntryScheduleReached extends Event implements ProvidesCommitMessage
 {
     public $entry;
 

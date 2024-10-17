@@ -27,7 +27,7 @@ trait ListensForContentEvents
         \Statamic\Events\CollectionTreeDeleted::class,
         \Statamic\Events\EntryDeleted::class,
         \Statamic\Events\EntrySaved::class,
-        \Statamic\Events\EntryScheduleFulfilled::class,
+        \Statamic\Events\EntryScheduleReached::class,
         \Statamic\Events\FieldsetDeleted::class,
         \Statamic\Events\FieldsetReset::class,
         \Statamic\Events\FieldsetSaved::class,
