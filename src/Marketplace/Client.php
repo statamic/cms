@@ -55,12 +55,11 @@ class Client
     {
         $lock = $this->lock(static::LOCK_KEY, 10);
 
+        $endpoint = collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
+        $key = 'marketplace-'.md5($endpoint.json_encode($params));
+
         try {
             $lock->block(5);
-
-            $endpoint = collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
-
-            $key = 'marketplace-'.md5($endpoint.json_encode($params));
 
             return $this->cache()->rememberWithExpiration($key, function () use ($endpoint, $params) {
                 $response = Guzzle::request('GET', $endpoint, [

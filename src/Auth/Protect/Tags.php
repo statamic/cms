@@ -15,14 +15,17 @@ class Tags extends BaseTags
 
     public function passwordForm()
     {
-        if (! $token = Html::entities(request('token'))) {
+        if (! session('statamic:protect:password.tokens.'.request('token'))) {
             $data = [
                 'errors' => [],
                 'no_token' => true,
+                'invalid_token' => true,
             ];
 
             return $this->parser ? $this->parse($data) : $data;
         }
+
+        $token = Html::entities(request('token'));
 
         $errors = session('errors', new ViewErrorBag)->passwordProtect;
 

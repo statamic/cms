@@ -281,6 +281,11 @@ class CoreModifiers extends Modifier
         $text = '';
         while (count($value)) {
             $item = array_shift($value);
+
+            if (! isset($item['type'])) {
+                continue;
+            }
+
             if ($item['type'] === 'text') {
                 $text .= ' '.($item['text'] ?? '');
             }
@@ -703,6 +708,19 @@ class CoreModifiers extends Modifier
     public function favicon($value)
     {
         return Html::favicon($value);
+    }
+
+    /**
+     * Filters out empty values from an array or collection.
+     *
+     * @param  array  $value
+     * @return array
+     */
+    public function filterEmpty($value)
+    {
+        return collect($value)
+            ->filter()
+            ->when(is_array($value), fn ($collection) => $collection->all());
     }
 
     /**

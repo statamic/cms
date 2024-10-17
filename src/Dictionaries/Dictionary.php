@@ -68,4 +68,11 @@ abstract class Dictionary
 
         return GraphQL::string();
     }
+
+    public function optionItems(?string $search = null): array
+    {
+        return collect($this->options($search))
+            ->map(fn ($label, $value) => new Item($value, $label, $this->get($value)->extra()))
+            ->all();
+    }
 }

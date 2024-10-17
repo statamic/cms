@@ -69,6 +69,8 @@ return [
     'collections_route_instructions' => 'Die Route steuert das URL-Schema der Einträge. Weitere Infos dazu findest du in der [Dokumentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Die voreingestellte Sortierrichtung.',
     'collections_taxonomies_instructions' => 'Einträge in dieser Sammlung mit Taxonomien verknüpfen. Die Felder werden automatisch den Eingabemasken hinzugefügt.',
+    'dictionaries_countries_emojis_instructions' => 'Flaggen-Emojis in die Beschriftung aufnehmen oder nicht.',
+    'dictionaries_countries_region_instructions' => 'Optional die Länder nach Regionen filtern.',
     'duplicate_action_localizations_confirmation' => 'Bist du sicher, dass du diese Aktion ausführen willst? Die Lokalisierungen werden ebenfalls dupliziert.',
     'duplicate_action_warning_localization' => 'Dieser Eintrag ist eine Lokalisierung. Der Ursprungseintrag wird dupliziert.',
     'duplicate_action_warning_localizations' => 'Ein oder mehrere ausgewählte Einträge sind Lokalisierungen. Es wird stattdessen der Ursprungseintrag dupliziert.',

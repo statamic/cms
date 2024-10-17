@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Replacers;
 
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
@@ -78,12 +79,40 @@ class NoCacheReplacer implements Replacer
         $contents = $response->getContent();
 
         if ($cacher->shouldOutputJs()) {
-            $js = $cacher->getNocacheJs();
-            $contents = str_replace('</body>', '<script type="text/javascript">'.$js.'</script></body>', $contents);
+            $contents = match ($pos = $this->insertPosition()) {
+                'head' => $this->insertJsInHead($contents, $cacher),
+                'body' => $this->insertJsInBody($contents, $cacher),
+                default => throw new \Exception('Invalid nocache js insert position ['.$pos.']'),
+            };
         }
 
         $contents = str_replace('NOCACHE_PLACEHOLDER', $cacher->getNocachePlaceholder(), $contents);
 
         $response->setContent($contents);
+    }
+
+    private function insertPosition()
+    {
+        return config('statamic.static_caching.nocache_js_position', 'body');
+    }
+
+    private function insertJsInHead($contents, $cacher)
+    {
+        $insertBefore = collect([
+            Str::position($contents, '<link'),
+            Str::position($contents, '<script'),
+            Str::position($contents, '</head>'),
+        ])->filter()->min();
+
+        $js = "<script type=\"text/javascript\">{$cacher->getNocacheJs()}</script>";
+
+        return Str::substrReplace($contents, $js, $insertBefore, 0);
+    }
+
+    private function insertJsInBody($contents, $cacher)
+    {
+        $js = $cacher->getNocacheJs();
+
+        return str_replace('</body>', '<script type="text/javascript">'.$js.'</script></body>', $contents);
     }
 }
