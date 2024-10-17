@@ -3,10 +3,12 @@
 namespace Tests\View\Blade\AntlersComponents;
 
 use Illuminate\Support\Facades\Blade;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Tags\Tags;
 use Tests\TestCase;
 
+#[Group('blade-compiler')]
 class TagContentsTest extends TestCase
 {
     #[Test]
