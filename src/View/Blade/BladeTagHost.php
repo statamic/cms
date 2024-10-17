@@ -141,7 +141,41 @@ class BladeTagHost
             ];
         }
 
+        if ($this->shouldAddValue()) {
+            return $this->addValueKey($this->tagValue);
+        }
+
         return $this->tagValue;
+    }
+
+    protected function shouldAddValue(): bool
+    {
+        $isCandidate = $this->isPair &&
+            is_array($this->tagValue) &&
+            ! Arr::isAssoc($this->tagValue);
+
+        if (! $isCandidate) {
+            return false;
+        }
+
+        foreach ($this->tagValue as $value) {
+            if (is_array($value) && Arr::isAssoc($value)) {
+                return false;
+            }
+
+            if ($value instanceof Augmentable) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function addValueKey(array $value): array
+    {
+        return collect($value)
+            ->map(fn ($value) => ['value' => $value])
+            ->all();
     }
 
     public function hasTag(): bool
