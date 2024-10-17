@@ -1,5 +1,11 @@
 <script>
+import HasActions from '../HasActions';
+
 export default {
+
+    mixins: [
+        HasActions,
+    ],
 
     props: {
         value: {
@@ -40,7 +46,7 @@ export default {
 
         updateMeta(value) {
             this.$emit('meta-updated', value);
-        }
+        },
     },
 
     computed: {
@@ -75,7 +81,21 @@ export default {
             let prefix = this.fieldPathPrefix ? this.fieldPathPrefix+'.' : '';
 
             return prefix+'field_'+this.config.handle;
-        }
+        },
+
+        actionPayload() { 
+            return {
+                vm: this,
+                fieldPathPrefix: this.fieldPathPrefix,
+                handle: this.handle,
+                value: this.value,
+                config: this.config,
+                meta: this.meta,
+                update: this.update,
+                updateMeta: this.updateMeta,
+            };
+        },
+
     },
 
     watch: {
