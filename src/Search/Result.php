@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Illuminate\Support\Arr;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Query\ContainsQueryableValues;
@@ -118,6 +119,17 @@ class Result implements ContainsQueryableValues, Contract
     public function getCpTitle(): string
     {
         return $this->searchable->getCpSearchResultTitle();
+    }
+
+    public function searchSnippets(?string $key = null, mixed $default = null): array
+    {
+        $snippets = $this->result['search_snippets'] ?? [];
+
+        if ($key) {
+            return Arr::get($snippets, $key, $default);
+        }
+
+        return $snippets;
     }
 
     public function getCpUrl(): string
