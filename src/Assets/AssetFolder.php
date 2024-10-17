@@ -97,6 +97,17 @@ class AssetFolder implements Arrayable, Contract
         return $date;
     }
 
+    public function size()
+    {
+        $size = 0;
+
+        foreach ($this->assets() as $asset) {
+            $size += $asset->size();
+        }
+
+        return $size;
+    }
+
     public function save()
     {
         $this->disk()->put($this->path().'/.gitkeep', '');
