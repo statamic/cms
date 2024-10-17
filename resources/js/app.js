@@ -93,6 +93,7 @@ import './components/portals/Portals';
 import './components/stacks/Stacks';
 import './components/ProgressBar';
 import './components/DirtyState';
+import './components/Clipboard';
 import './components/Config';
 import './components/Preference';
 import './components/Permission';

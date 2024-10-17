@@ -72,6 +72,8 @@
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
                     @duplicated="duplicateSet(set._id)"
+                    @cut="copySet(set._id, true)"
+                    @copied="copySet(set._id)"
                     @updated="updated"
                     @meta-updated="updateSetMeta(set._id, $event)"
                     @removed="removed(set, index)"
@@ -86,7 +88,9 @@
                             :sets="setConfigs"
                             :index="index"
                             :enabled="canAddSet"
-                            @added="addSet" />
+                            :paste-enabled="canPasteSet"
+                            @added="addSet"
+                            @pasted="pasteSet" />
                     </template>
                 </replicator-set>
             </div>
@@ -99,7 +103,9 @@
             :sets="setConfigs"
             :index="value.length"
             :label="config.button_label"
-            @added="addSet" />
+            :paste-enabled="canPasteSet"
+            @added="addSet"
+            @pasted="pasteSet" />
 
     </section>
 
@@ -151,10 +157,19 @@ export default {
             return !this.config.max_sets || this.value.length < this.config.max_sets;
         },
 
+        canPasteSet() {
+            const data = this.$clipboard.get();
+            return this.canAddSet && data?.type === 'replicator' && Object.values(this.setConfigHashes).includes(data?.configHash);
+        },
+
         setConfigs() {
             return reduce(this.groupConfigs, (sets, group) => {
                 return sets.concat(group.sets);
             }, []);
+        },
+
+        setConfigHashes() {
+            return this.meta.setConfigHashes;
         },
 
         groupConfigs() {
@@ -184,6 +199,10 @@ export default {
 
         setConfig(handle) {
             return _.find(this.setConfigs, { handle }) || {};
+        },
+
+        setConfigHash(handle) {
+            return this.setConfigHashes[handle];
         },
 
         updated(index, set) {
@@ -242,6 +261,47 @@ export default {
             this.expandSet(set._id);
         },
 
+        copySet(id, cut = false) {
+            const index = this.value.findIndex(v => v._id === id);
+            const value = this.value[index];
+            const meta = this.meta.existing[id];
+
+            this.$clipboard.set({
+                type: 'replicator',
+                configHash: this.setConfigHash(value.type),
+                value,
+                meta,
+            });
+
+            if (cut) {
+                this.removed(value, index);                
+            }
+        },
+
+        pasteSet(index) {
+            const data = this.$clipboard.get();
+            if (!data || data.type !== 'replicator') {
+                return;
+            }
+
+            const set = {
+                ...data.value,
+                _id: uniqid(),
+            };
+
+            this.updateSetPreviews(set._id, {});
+
+            this.updateSetMeta(set._id, data.meta);
+
+            this.update([
+                ...this.value.slice(0, index),
+                set,
+                ...this.value.slice(index)
+            ]);
+
+            this.expandSet(set._id);
+        },
+
         updateSetPreviews(id, previews) {
             this.previews[id] = previews;
         },
@@ -285,6 +345,7 @@ export default {
 
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
+
     },
 
     mounted() {
