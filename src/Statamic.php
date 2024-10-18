@@ -428,7 +428,10 @@ class Statamic
             return false;
         }
 
-        return Str::startsWith(Arr::get(request()->server(), 'argv.1') ?? '', ['queue:', 'horizon:']);
+        $commands = collect(Artisan::all())->keys()->toArray();
+
+        return Str::startsWith(Arr::get(request()->server(), 'argv.1') ?? '', ['queue:', 'horizon:'])
+            || App::runningConsoleCommand($commands);
     }
 
     private static function createVersionedAssetPath($name, $path, $extension)
