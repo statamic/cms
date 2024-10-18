@@ -67,8 +67,6 @@ class Protection
             ->setUrl($this->url())
             ->setData($this->data())
             ->protect();
-
-        return $this->scheme() !== null;
     }
 
     protected function url()

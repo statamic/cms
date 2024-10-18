@@ -358,6 +358,12 @@ class FrontendTest extends TestCase
     public function header_is_added_to_protected_responses()
     {
         $page = $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertHeaderMissing('X-Statamic-Protected');
+
         $page->set('protect', 'logged_in')->save();
 
         $this
