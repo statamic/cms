@@ -127,7 +127,7 @@ trait RendersForms
      * @param  bool|Closure  $manipulateDataCallback
      * @return array
      */
-    protected function getRenderableField($field, $errorBag = 'default', $manipulateDataCallback = false)
+    protected function getRenderableField($field, $errorBag = 'default', $manipulateDataCallback = false, $prefix = null)
     {
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
@@ -142,12 +142,22 @@ trait RendersForms
             ->filter()->all();
 
         $data = array_merge($configDefaults, $field->toArray(), [
+            'handle' => $field->handle(),
+            'name' => $this->convertDottedHandleToInputName($field->handle()),
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
-            'old' => old($field->handle()),
+            'old' => old($field->handle()), // dotted as well?
             'value' => $value,
         ], $field->fieldtype()->extraRenderableFieldData());
+
+        if ($field->fieldtype()->handle() === 'group') {
+            $data['fields'] = collect($field->fieldtype()->fields()->all())
+                ->map(fn ($child) => $child->setHandle($field->handle().'.'.$child->handle()))
+                ->map(fn ($child) => $this->getRenderableField($child, $errorBag, $manipulateDataCallback, $field->handle()))
+                ->values()
+                ->all();
+        }
 
         if ($manipulateDataCallback instanceof Closure) {
             $data = $manipulateDataCallback($data, $field);
@@ -156,6 +166,18 @@ trait RendersForms
         $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());
 
         return $data;
+    }
+
+    protected function convertDottedHandleToInputName($handle)
+    {
+        ray($handle)->purple();
+        $parts = collect(explode('.', $handle));
+
+        $first = $parts->pull(0);
+
+        return $first.$parts
+            ->map(fn ($part) => '['.$part.']')
+            ->join('');
     }
 
     /**
