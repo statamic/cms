@@ -147,7 +147,7 @@ trait RendersForms
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
-            'old' => old($field->handle()), // dotted as well?
+            'old' => old($field->handle()), // TODO: Ensure dotted path for old input works here.
             'value' => $value,
         ], $field->fieldtype()->extraRenderableFieldData());
 
@@ -168,9 +168,8 @@ trait RendersForms
         return $data;
     }
 
-    protected function convertDottedHandleToInputName($handle)
+    protected function convertDottedHandleToInputName(string $handle): string
     {
-        ray($handle)->purple();
         $parts = collect(explode('.', $handle));
 
         $first = $parts->pull(0);
