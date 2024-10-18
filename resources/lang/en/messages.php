@@ -222,6 +222,7 @@ return [
     'taxonomy_configure_term_template_instructions' => 'Set this taxonomy\'s default template. Terms can override this setting with a `template` field.',
     'taxonomies_preview_targets_instructions' => 'The URLs to be viewable within Live Preview. Learn more in the [documentation](https://statamic.dev/live-preview#preview-targets).',
     'taxonomies_preview_target_refresh_instructions' => 'Automatically refresh the preview while editing. Disabling this will use postMessage.',
+    'taxonomies_route_instructions' => 'The route controls show and index URL patterns. Learn more in the [documentation](https://statamic.dev/taxonomies#routing).',
     'taxonomy_configure_handle_instructions' => 'Used to reference this taxonomy on the frontend. It\'s non-trivial to change later.',
     'taxonomy_configure_intro' => 'A taxonomy is a system of classifying data around a set of unique characteristics, such as categories, tags, or colors.',
     'taxonomy_configure_title_instructions' => 'We recommend using a plural noun, like "Categories" or "Tags".',
