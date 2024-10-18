@@ -51,6 +51,12 @@ class Tags extends BaseTags
     {
         $this->context['form'] = $this->params->get(static::HANDLE_PARAM);
 
+        if ($this->tagRenderer) {
+            return $this->parse([
+                'success' => $this->success(),
+            ]);
+        }
+
         return [];
     }
 
@@ -113,7 +119,7 @@ class Tags extends BaseTags
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
-        if (! $this->parser) {
+        if (! $this->canParseContents()) {
             return array_merge([
                 'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
                 'params' => $this->formMetaPrefix($this->formParams($method, $params)),
@@ -164,9 +170,14 @@ class Tags extends BaseTags
     public function success()
     {
         $sessionHandle = $this->sessionHandle();
+        $successMessage = $this->getFromFormSession($sessionHandle, 'success');
+
+        if ($this->isAntlersBladeComponent() && $this->isPair) {
+            return str($successMessage)->length() > 0;
+        }
 
         // TODO: Should probably output success string instead of `true` boolean for consistency.
-        return $this->getFromFormSession($sessionHandle, 'success');
+        return $successMessage;
     }
 
     /**
@@ -177,7 +188,7 @@ class Tags extends BaseTags
     public function submission()
     {
         if ($this->success()) {
-            return session('submission')->toArray();
+            return $this->aliasedResult(session('submission')->toArray());
         }
     }
 

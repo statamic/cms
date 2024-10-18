@@ -30,6 +30,7 @@ class Tags extends BaseTags
         $errors = session('errors', new ViewErrorBag)->passwordProtect;
 
         $data = [
+            'no_token' => false,
             'errors' => $errors->toArray(),
             'error' => $errors->first(),
         ];
@@ -37,7 +38,7 @@ class Tags extends BaseTags
         $action = route('statamic.protect.password.store');
         $method = 'POST';
 
-        if (! $this->parser) {
+        if (! $this->canParseContents()) {
             return array_merge([
                 'attrs' => $this->formAttrs($action, $method),
                 'params' => array_merge($this->formMetaPrefix($this->formParams($method)), [
