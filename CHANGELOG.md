@@ -1,5 +1,21 @@
 # Release Notes
 
+## 5.32.0 (2024-10-18)
+
+### What's new
+- Improve duplicate asset upload handling [#10959](https://github.com/statamic/cms/issues/10959) by @jasonvarga
+- Add `parent` keyword to field conditions [#9385](https://github.com/statamic/cms/issues/9385) by @florianbrinkmann
+- Add `filter_empty` modifier [#10962](https://github.com/statamic/cms/issues/10962) by @marcorieser
+- Add `invalid_token` variable for password-protected page [#10956](https://github.com/statamic/cms/issues/10956) by @aerni
+
+### What's fixed
+- Fix error when editing Bard field with set and no fields [#10971](https://github.com/statamic/cms/issues/10971) by @duncanmcclean
+- Fix issue where editing an asset loads the `/edit` url in the browser [#10964](https://github.com/statamic/cms/issues/10964) by @daun
+- Remove deprecated options from PHPUnit stub [#10963](https://github.com/statamic/cms/issues/10963) by @duncanmcclean
+- German translations [#10968](https://github.com/statamic/cms/issues/10968) by @helloDanuk
+
+
+
 ## 5.31.0 (2024-10-14)
 
 ### What's new
