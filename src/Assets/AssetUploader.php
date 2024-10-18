@@ -101,7 +101,7 @@ class AssetUploader extends Uploader
     {
         // Apply the same replacements as with filenames above, but
         // for each folder in the path instead of the whole string
-        $str = Stringy::create(urldecode($string))->toAscii();
+        $str = (string) Str::of(urldecode($string))->ascii();
         $folders = array_filter(preg_split('/[\/\\\\]+/', $str));
         $safe_folders = array_map(fn ($folder) => self::getSafeFilename($folder), $folders);
 
