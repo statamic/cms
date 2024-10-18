@@ -18,9 +18,9 @@ class UserGroups extends Tags
         }
 
         if (empty($handles)) {
-            return $groups->values();
+            return $this->aliasedResult($groups->values());
         }
 
-        return $groups->filter(fn ($group) => in_array($group->handle(), $handles))->values();
+        return $this->aliasedResult($groups->filter(fn ($group) => in_array($group->handle(), $handles))->values());
     }
 }
