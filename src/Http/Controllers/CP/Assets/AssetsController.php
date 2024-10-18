@@ -86,13 +86,18 @@ class AssetsController extends CpController
 
         $file = $request->file('file');
 
+        $folder = $request->folder;
+        if ($container->createFolders() && ($subfolder = AssetUploader::getSafeFoldername($request->subfolder))) {
+            $folder = $folder.'/'.$subfolder;
+        }
+
         $basename = $request->option === 'rename' && $request->filename
             ? $request->filename.'.'.$file->getClientOriginalExtension()
             : $file->getClientOriginalName();
 
         $basename = AssetUploader::getSafeFilename($basename);
 
-        $path = ltrim($request->folder.'/'.$basename, '/');
+        $path = ltrim($folder.'/'.$file->getClientOriginalName(), '/');
 
         $validator = Validator::make(['path' => $path], ['path' => new UploadableAssetPath($container)]);
 
