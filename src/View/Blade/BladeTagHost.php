@@ -99,6 +99,7 @@ class BladeTagHost
         if ($this->isPair) {
             $this->tag->setContent($this->content)
                 ->setTagRenderer(app(TagRenderer::class));
+            $this->tag->isPair = true;
         }
 
         $this->originalValue = $this->tag->{$method}();
