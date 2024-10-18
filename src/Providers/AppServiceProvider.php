@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
 use Statamic\Fields\FieldsetRecursionStack;
+use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
@@ -97,6 +99,8 @@ class AppServiceProvider extends ServiceProvider
         TrimStrings::skipWhen(fn (Request $request) => $request->is(config('statamic.cp.route').'/*'));
 
         $this->addAboutCommandInfo();
+
+        $this->app->make(Schedule::class)->job(new HandleEntrySchedule)->everyMinute();
     }
 
     public function register()
