@@ -19,8 +19,8 @@ trait ExtractsFromEntryFields
         if ($entry->hasStructure()) {
             $values['parent'] = array_filter([optional($entry->parent())->id()]);
 
-            if ($entry->revisionsEnabled() && $entry->has('parent')) {
-                $values['parent'] = [$entry->get('parent')];
+            if ($entry->revisionsEnabled() && $parent = $entry->get('parent')) {
+                $values['parent'] = [$parent];
             }
         }
 

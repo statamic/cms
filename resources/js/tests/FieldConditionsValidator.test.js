@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
+import { data_get } from '../bootstrap/globals'
 Vue.use(Vuex);
 
 const Store = new Vuex.Store({
@@ -95,8 +96,12 @@ const Fields = new Vue({
     }
 });
 
-let showFieldIf = function (conditions=null) {
-    return Fields.showField(conditions ? {'if': conditions} : {});
+let showFieldIf = function (conditions=null, dottedFieldPath=null) {
+    if (dottedFieldPath === null && conditions && Object.keys(conditions).length === 1) {
+        dottedFieldPath = Object.keys(conditions)[0].replace(new RegExp('^\\$?root.'), '');
+    }
+
+    return Fields.showField(conditions ? {'if': conditions} : {}, dottedFieldPath);
 };
 
 afterEach(() => {
@@ -320,6 +325,82 @@ test('it can run conditions on nested data', () => {
     expect(showFieldIf({'name': 'Chewy'})).toBe(false);
     expect(showFieldIf({'address.country': 'Canada'})).toBe(true);
     expect(showFieldIf({'address.country': 'Australia'})).toBe(false);
+    expect(showFieldIf({'$root.user.address.country': 'Canada'})).toBe(true);
+    expect(showFieldIf({'$root.user.address.country': 'Australia'})).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Han'}, 'user.address.country')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'user.address.country')).toBe(false);
+});
+
+test('it can run conditions on parent data using parent syntax', () => {
+    Fields.setValues({
+        name: 'Han',
+        replicator: [
+            { text: 'Foo' },
+            { text: 'Bar' },
+        ],
+        group: {
+            name: 'Chewy',
+            text: 'Foo',
+            replicator: [
+                { text: 'Foo' },
+                { text: 'Bar' },
+                {
+                    name: 'Luke',
+                    replicator: [
+                        { text: 'Foo' },
+                    ],
+                    group: {
+                        name: 'Yoda',
+                        replicator: [
+                            { text: 'Foo' },
+                        ],
+                    },
+                },
+            ],
+        },
+    });
+
+    // Test parent works from replicator to top level
+    expect(showFieldIf({'$parent.name': 'Han'}, 'replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Han'}, 'replicator.1.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'replicator.1.text')).toBe(false);
+
+    // Test parent works from nested field group to top level
+    expect(showFieldIf({'$parent.name': 'Han'}, 'group.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'group.text')).toBe(false);
+
+    // Test parent works in deeply nested situations through multiple replicators and field groups
+    expect(showFieldIf({'$parent.name': 'Han'}, 'group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Han'}, 'group.replicator.1.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Chewy'}, 'group.replicator.1.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Luke'}, 'group.replicator.2.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Leia'}, 'group.replicator.2.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Yoda'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.name': 'Luke'}, 'group.replicator.2.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.name': 'Leia'}, 'group.replicator.2.replicator.0.text')).toBe(false);
+
+    // Test parent can be chained to check upwards through multiple levels of multiple replicators and field groups
+    expect(showFieldIf({'$parent.$parent.name': 'Luke'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.$parent.$parent.name': 'Chewy'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.$parent.$parent.$parent.name': 'Han'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.$parent.$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({'$parent.$parent.name': 'Chewy'}, 'group.replicator.2.replicator.0.text')).toBe(true);
+    expect(showFieldIf({'$parent.$parent.name': 'Leia'}, 'group.replicator.2.replicator.0.text')).toBe(false);
+});
+
+test('it can run conditions on nested data using `root.` without `$` for backwards compatibility', () => {
+    Fields.setValues({
+        name: 'Han',
+        address: {
+            country: 'Canada'
+        }
+    }, 'user');
+
     expect(showFieldIf({'root.user.address.country': 'Canada'})).toBe(true);
     expect(showFieldIf({'root.user.address.country': 'Australia'})).toBe(false);
 });
@@ -330,6 +411,14 @@ test('it can run conditions on root store values', () => {
     });
 
     expect(showFieldIf({'favorite_foods': 'contains lasagna'})).toBe(false);
+    expect(showFieldIf({'$root.favorite_foods': 'contains lasagna'})).toBe(true);
+});
+
+test('it can run conditions on root store values using `root.` without `$` for backwards compatibility', () => {
+    Fields.setStoreValues({
+        favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
+    });
+
     expect(showFieldIf({'root.favorite_foods': 'contains lasagna'})).toBe(true);
 });
 
@@ -346,13 +435,18 @@ test('it can run conditions on prefixed fields', async () => {
 test('it can run conditions on nested prefixed fields', async () => {
     Fields.setValues({
         prefixed_first_name: 'Rincess',
-        prefixed_last_name: 'Pleia'
+        prefixed_last_name: 'Pleia',
+        prefixed_address: {
+            home_planet: 'Elderaan'
+        }
     }, 'nested');
 
     expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
     expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
-    expect(Fields.showField({if: {'root.nested.prefixed_last_name': 'is Pleia'}})).toBe(true);
-    expect(Fields.showField({if: {'root.nested.prefixed_last_name': 'is Holo'}})).toBe(false);
+    expect(Fields.showField({if: {'$root.nested.prefixed_last_name': 'is Pleia'}})).toBe(true);
+    expect(Fields.showField({if: {'$root.nested.prefixed_last_name': 'is Holo'}})).toBe(false);
+    expect(Fields.showField({if: {'$parent.prefixed_last_name': 'is Pleia'}}, 'nested.prefixed_address.home_planet')).toBe(true);
+    expect(Fields.showField({if: {'$parent.prefixed_last_name': 'is Holo'}}, 'nested.prefixed_address.home_planet')).toBe(false);
 });
 
 test('it can call a custom function', () => {
@@ -372,6 +466,27 @@ test('it can call a custom function', () => {
     expect(Fields.showField({if: 'custom reallyLovesAnimals'})).toBe(false);
     expect(Fields.showField({unless: 'reallyLovesAnimals'})).toBe(true);
     expect(Fields.showField({unless: 'custom reallyLovesAnimals'})).toBe(true);
+});
+
+test('it can call a custom function that uses `fieldPath` param to evaluate nested fields', () => {
+    Fields.setValues({ nested:
+        [
+            { favorite_animals: ['cats', 'dogs'] },
+            { favorite_animals: ['cats', 'dogs', 'giraffes', 'lions'] }
+        ]
+    });
+
+    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, store, storeName, root, fieldPath }) {
+        expect(target).toBe(null);
+        expect(params).toEqual([]);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
+
+        return data_get(root, fieldPath).length > 3;
+    });
+
+    expect(showFieldIf({'favorite_animals': 'custom reallyLovesAnimals'}, 'nested.0.favorite_animals')).toBe(false);
+    expect(showFieldIf({'favorite_animals': 'custom reallyLovesAnimals'}, 'nested.1.favorite_animals')).toBe(true);
 });
 
 test('it can call a custom function using params against root values', () => {
@@ -395,12 +510,13 @@ test('it can call a custom function on a specific field', () => {
         favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
     });
 
-    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, values }) {
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, values, fieldPath }) {
         expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(values.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(params).toEqual([]);
         expect(store).toBe(Store);
         expect(storeName).toBe('base');
+        expect(fieldPath).toBe('favorite_animals');
         return values.favorite_animals.length > 3;
     });
 
@@ -412,11 +528,31 @@ test('it can call a custom function on a specific field using params against a r
         favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
     });
 
-    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, root }) {
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, root, fieldPath }) {
         expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(root.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(store).toBe(Store);
         expect(storeName).toBe('base');
+        expect(fieldPath).toBe('favorite_animals');
+        return target.length > (params[0] || 3);
+    });
+
+    expect(showFieldIf({'$root.favorite_animals': 'custom lovesAnimals'})).toBe(true);
+    expect(showFieldIf({'$root.favorite_animals': 'custom lovesAnimals:2'})).toBe(true);
+    expect(showFieldIf({'$root.favorite_animals': 'custom lovesAnimals:7'})).toBe(false);
+});
+
+test('it can call a custom function on a specific field using params against a root value using `root.` backwards compatibility', () => {
+    Fields.setStoreValues({
+        favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
+    });
+
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, root, fieldPath }) {
+        expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(root.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
+        expect(fieldPath).toBe('favorite_animals');
         return target.length > (params[0] || 3);
     });
 
@@ -544,7 +680,7 @@ test('it tells omitter to omit hidden fields by default', async () => {
 test('it tells omitter to omit nested hidden fields by default', async () => {
     Fields.setValues({
         is_online_event: false,
-        event_venue: false,
+        venue: false,
     }, 'nested');
 
     await Fields.setHiddenFieldsState([
@@ -595,7 +731,7 @@ test('it tells omitter to omit nested revealer fields', async () => {
 test('it tells omitter not omit revealer-hidden fields', async () => {
     Fields.setValues({
         show_more_info: false,
-        event_venue: false,
+        venue: false,
     });
 
     await Fields.setHiddenFieldsState([
@@ -609,10 +745,46 @@ test('it tells omitter not omit revealer-hidden fields', async () => {
     expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
 });
 
+test('it tells omitter not omit revealer-hidden fields using root syntax in condition', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        venue: false,
+    });
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'venue', if: {'$root.show_more_info': true}},
+    ]);
+
+    console.log(Store.state.publish.base.hiddenFields);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
+});
+
+test('it tells omitter not omit revealer-hidden fields using legacy root syntax for backwards compatibility', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        venue: false,
+    });
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'venue', if: {'root.show_more_info': true}},
+    ]);
+
+    console.log(Store.state.publish.base.hiddenFields);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
+});
+
 test('it tells omitter not omit nested revealer-hidden fields', async () => {
     Fields.setValues({
         show_more_info: false,
-        event_venue: false,
+        venue: false,
     }, 'nested');
 
     await Fields.setHiddenFieldsState([
@@ -624,6 +796,113 @@ test('it tells omitter not omit nested revealer-hidden fields', async () => {
     expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
     expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
     expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+});
+
+test('it tells omitter not omit nested revealer-hidden fields using root syntax in condition', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        venue: false,
+    }, 'nested');
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'venue', if: {'$root.nested.show_more_info': true}},
+    ], 'nested');
+
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+});
+
+test('it tells omitter not omit nested revealer-hidden fields using legacy root syntax for backwards compatibility', async () => {
+    Fields.setValues({
+        show_more_info: false,
+        venue: false,
+    }, 'nested');
+
+    await Fields.setHiddenFieldsState([
+        {handle: 'show_more_info', type: 'revealer'},
+        {handle: 'venue', if: {'root.nested.show_more_info': true}},
+    ], 'nested');
+
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+});
+
+test('it tells omitter not omit nested revealer-hidden fields using parent syntax in condition', async () => {
+    Fields.setValues({
+        top_level_show_more_info: false,
+        replicator: [
+            { text: 'Foo' },
+            { text: 'Bar' },
+        ],
+        group: {
+            show_more_info: false,
+            replicator: [
+                { text: 'Foo' },
+                { text: 'Bar' },
+                {
+                    show_more_info: false,
+                    replicator: [
+                        { text: 'Foo' },
+                    ],
+                    group: {
+                        show_more_info: false,
+                        replicator: [
+                            { text: 'Foo' },
+                        ],
+                    },
+                },
+            ],
+        },
+    });
+
+    // Track revealer toggles
+    await Fields.setHiddenFieldsState([
+        {handle: 'top_level_show_more_info', type: 'revealer'},
+        {handle: 'group.show_more_info', type: 'revealer'},
+        {handle: 'group.replicator.2.show_more_info', type: 'revealer'},
+        {handle: 'group.replicator.2.group.show_more_info', type: 'revealer'},
+    ]);
+
+    // Set revealer hidden fields using `$parent` syntax
+    await Fields.setHiddenFieldsState([
+        {handle: 'replicator.1.text', if: {'$parent.top_level_show_more_info': true}},
+        {handle: 'group.replicator.1.text', if: {'$parent.show_more_info': true}},
+    ]);
+
+    // Set revealer hidden fields using chained `$parent` syntax
+    await Fields.setHiddenFieldsState([
+        {handle: 'group.replicator.2.replicator.0.text', if: {'$parent.$parent.$parent.top_level_show_more_info': true}},
+        {handle: 'group.replicator.2.group.replicator.0.text', if: {'$parent.$parent.$parent.$parent.top_level_show_more_info': true}},
+    ]);
+
+    // Ensure revealer toggles should definitely hidden and omited from submitted payload
+    expect(Store.state.publish.base.hiddenFields['top_level_show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['top_level_show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.show_more_info'].omitValue).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.show_more_info'].hidden).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.show_more_info'].omitValue).toBe(true);
+
+    // Ensure revealer hidden fields should be hiddden, but not omitted
+    expect(Store.state.publish.base.hiddenFields['replicator.1.text'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['replicator.1.text'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.1.text'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.1.text'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.replicator.0.text'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.replicator.0.text'].omitValue).toBe(false);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.replicator.0.text'].hidden).toBe(true);
+    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.replicator.0.text'].omitValue).toBe(false);
+
+    // Just a few extra assertions to ensure only sets with revealer conditions should be affected
+    expect('replicator.0.text' in Store.state.publish.base.hiddenFields).toBe(false);
+    expect('group.replicator.0.text' in Store.state.publish.base.hiddenFields).toBe(false);
 });
 
 test('it tells omitter not omit prefixed revealer-hidden fields', async () => {

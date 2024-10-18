@@ -24,6 +24,7 @@ use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
+use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionTreeController;
@@ -147,6 +148,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'index'])->name('collections.tree.index');
     Route::patch('collections/{collection}/tree', [CollectionTreeController::class, 'update'])->name('collections.tree.update');
+    Route::post('collections/{collection}/actions', [CollectionActionController::class, 'run'])->name('collections.actions.run');
 
     Route::group(['prefix' => 'collections/{collection}/entries'], function () {
         Route::get('/', [EntriesController::class, 'index'])->name('collections.entries.index');
@@ -250,10 +252,13 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('edit', [FieldsController::class, 'edit'])->name('fields.edit');
         Route::post('update', [FieldsController::class, 'update'])->name('fields.update');
         Route::get('field-meta', [MetaController::class, 'show']);
+        Route::post('field-meta', [MetaController::class, 'show']);
+        Route::delete('fieldsets/{fieldset}/reset', [FieldsetController::class, 'reset'])->name('fieldsets.reset');
         Route::resource('fieldsets', FieldsetController::class)->except(['show']);
         Route::get('blueprints', [BlueprintController::class, 'index'])->name('blueprints.index');
         Route::get('blueprints/{namespace}/{handle}', [BlueprintController::class, 'edit'])->name('blueprints.edit');
         Route::patch('blueprints/{namespace}/{handle}', [BlueprintController::class, 'update'])->name('blueprints.update');
+        Route::delete('blueprints/{namespace}/{handle}/reset', [BlueprintController::class, 'reset'])->name('blueprints.reset');
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
     });
 

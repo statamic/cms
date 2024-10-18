@@ -160,6 +160,9 @@ class ViewServiceProvider extends ServiceProvider
         Blade::directive('tags', function ($expression) {
             return "<?php extract(\Statamic\View\Blade\TagsDirective::handle($expression)) ?>";
         });
+        Blade::directive('cascade', function ($expression) {
+            return "<?php extract(\Statamic\View\Blade\CascadeDirective::handle($expression)) ?>";
+        });
     }
 
     public function boot()

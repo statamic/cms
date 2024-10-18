@@ -19,9 +19,18 @@ class ToastBus {
 
     intercept() {
         this.instance.$axios.interceptors.response.use(response => {
-            const toasts = response?.data?._toasts ?? []
+            const data = response?.data;
 
-            toasts.forEach(toast => this.instance.$toast[toast.type](toast.message, {duration: toast.duration}))
+            if (!data) return response;
+
+            const promise = data instanceof Blob
+                ? data.text().then(text => JSON.parse(text))
+                : new Promise(resolve => resolve(data));
+
+            promise.then(json => {
+                const toasts = json._toasts ?? [];
+                toasts.forEach(toast => this.instance.$toast[toast.type](toast.message, {duration: toast.duration}))
+            });
 
             return response;
         });

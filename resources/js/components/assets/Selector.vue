@@ -13,8 +13,10 @@
                     :query-scopes="queryScopes"
                     :autoselect-uploads="true"
                     :autofocus-search="true"
+                    allow-selecting-existing-upload
                     @selections-updated="selectionsUpdated"
-                    @asset-doubleclicked="select">
+                    @asset-doubleclicked="select"
+                >
 
                     <template slot="contextual-actions" v-if="browserSelections.length">
                         <button class="btn action mb-6" @click="browserSelections = []">{{ __('Uncheck All') }}</button>

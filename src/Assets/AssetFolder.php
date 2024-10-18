@@ -3,6 +3,7 @@
 namespace Statamic\Assets;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
 use Statamic\Events\AssetFolderDeleted;
 use Statamic\Events\AssetFolderSaved;
@@ -96,6 +97,17 @@ class AssetFolder implements Arrayable, Contract
         return $date;
     }
 
+    public function size()
+    {
+        $size = 0;
+
+        foreach ($this->assets() as $asset) {
+            $size += $asset->size();
+        }
+
+        return $size;
+    }
+
     public function save()
     {
         $this->disk()->put($this->path().'/.gitkeep', '');
@@ -132,7 +144,7 @@ class AssetFolder implements Arrayable, Contract
         });
         $cache->save();
 
-        AssetFolderDeleted::dispatch($this);
+        AssetFolderDeleted::dispatch(clone $this);
 
         return $this;
     }
@@ -165,7 +177,7 @@ class AssetFolder implements Arrayable, Contract
             throw new \Exception('Folder cannot be moved to its own subfolder.');
         }
 
-        $name = $this->getSafeBasename($name ?? $this->basename());
+        $name = Uploader::getSafeFilename($name ?? $this->basename());
         $oldPath = $this->path();
         $newPath = Str::removeLeft(Path::tidy($parent.'/'.$name), '/');
 
@@ -182,22 +194,9 @@ class AssetFolder implements Arrayable, Contract
         $this->container()->assets($oldPath)->each->move($newPath);
         $this->delete();
 
+        $this->path($newPath);
+
         return $folder;
-    }
-
-    /**
-     * Ensure safe basename string.
-     *
-     * @param  string  $string
-     * @return string
-     */
-    private function getSafeBasename($string)
-    {
-        if (config('statamic.assets.lowercase')) {
-            $string = strtolower($string);
-        }
-
-        return (string) $string;
     }
 
     /**
