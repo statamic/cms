@@ -711,6 +711,19 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Filters out empty values from an array or collection.
+     *
+     * @param  array  $value
+     * @return array
+     */
+    public function filterEmpty($value)
+    {
+        return collect($value)
+            ->filter()
+            ->when(is_array($value), fn ($collection) => $collection->all());
+    }
+
+    /**
      * Returns the first $params[0] characters of a string, or the first element of an array.
      *
      * @return string

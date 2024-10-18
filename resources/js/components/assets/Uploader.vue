@@ -168,11 +168,11 @@ export default {
             return readEntries();
         },
 
-        addFile(file) {
+        addFile(file, data = {}) {
             if (! this.enabled) return;
 
             const id = uniqid();
-            const upload = this.makeUpload(id, file);
+            const upload = this.makeUpload(id, file, data);
 
             this.uploads.push({
                 id,
@@ -180,7 +180,9 @@ export default {
                 extension: file.name.split('.').pop(),
                 percent: 0,
                 errorMessage: null,
-                instance: upload
+                errorStatus: null,
+                instance: upload,
+                retry: (opts) => this.retry(id, opts)
             });
         },
 
@@ -192,10 +194,10 @@ export default {
             return this.uploads.findIndex(u => u.id === id);
         },
 
-        makeUpload(id, file) {
+        makeUpload(id, file, data = {}) {
             const upload = new Upload({
                 url: this.url,
-                form: this.makeFormData(file),
+                form: this.makeFormData(file, data),
                 headers: {
                     Accept: 'application/json'
                 }
@@ -208,7 +210,7 @@ export default {
             return upload;
         },
 
-        makeFormData(file) {
+        makeFormData(file, data = {}) {
             const form = new FormData();
 
             form.append('file', file);
@@ -220,6 +222,10 @@ export default {
 
             for (let key in this.extraData) {
                 form.append(key, this.extraData[key]);
+            }
+
+            for (let key in data) {
+                form.append(key, data[key]);
             }
 
             return form;
@@ -267,8 +273,16 @@ export default {
                 }
             }
             upload.errorMessage = msg;
+            upload.errorStatus = status;
             this.$emit('error', upload, this.uploads);
+            this.processUploadQueue();
         },
+
+        retry(id, args) {
+            let file = this.findUpload(id).instance.form.get('file');
+            this.addFile(file, args);
+            this.uploads.splice(this.findUploadIndex(id), 1);
+        }
     }
 
 }

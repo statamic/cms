@@ -270,8 +270,6 @@
 
   .CodeMirror-widget {}
 
-  .CodeMirror-rtl pre { direction: ltr; }
-
   .CodeMirror-code {
     outline: none;
   }
