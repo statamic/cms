@@ -126,4 +126,52 @@ BLADE;
             Str::squish(Blade::render($template))
         );
     }
+
+    #[Test]
+    public function it_conditionally_renders_content_based_on_boolean_results()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'my_tag';
+
+            public function index()
+            {
+                return $this->params->get('value', true);
+            }
+        })::register();
+
+        $this->assertSame(
+            'Yes',
+            Blade::render('<s:my_tag>Yes</s:my_tag>')
+        );
+
+        $this->assertSame(
+            '',
+            Blade::render('<s:my_tag></s:my_tag>')
+        );
+    }
+
+    #[Test]
+    public function it_renders_string_results()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'my_tag';
+
+            public function index()
+            {
+                return 'Hi!';
+            }
+        })::register();
+
+        $this->assertSame(
+            'Hi!',
+            Blade::render('<s:my_tag />')
+        );
+
+        $this->assertSame(
+            'Hi!',
+            Blade::render('<s:my_tag></s:my_tag>')
+        );
+    }
 }
